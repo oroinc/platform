@@ -137,48 +137,11 @@ abstract class EmailOrigin
     }
 
     /**
-     * @param EmailFolder $folder
+     * @param EmailFolder[]|ArrayCollection $folders
      *
      * @return $this
      */
-    public function addRootFolder(EmailFolder $folder)
-    {
-        return $this->addFolder($folder);
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return $this
-     */
-    public function removeRootFolder(EmailFolder $folder)
-    {
-        if ($this->folders->contains($folder)) {
-            $this->folders->remove($folder);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get root folders list
-     *
-     * @return ArrayCollection|EmailFolder[]
-     */
-    public function getRootFolders()
-    {
-        return $this->folders->filter(function (EmailFolder $folder) {
-            // todo add outdatedAt condition
-            return $folder->getParentFolder() === null;
-        });
-    }
-
-    /**
-     * @param array $folders
-     *
-     * @return $this
-     */
-    public function setFolders(array $folders)
+    public function setFolders($folders)
     {
         $this->folders->clear();
 
@@ -201,6 +164,20 @@ abstract class EmailOrigin
         $this->folders[] = $folder;
 
         $folder->setOrigin($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            $this->folders->removeElement($folder);
+        }
 
         return $this;
     }

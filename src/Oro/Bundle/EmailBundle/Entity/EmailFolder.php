@@ -252,6 +252,8 @@ class EmailFolder
      */
     public function setSubFolders($folders)
     {
+        $this->subFolders->clear();
+
         foreach ($folders as $folder) {
             $this->addSubFolder($folder);
         }
@@ -283,7 +285,7 @@ class EmailFolder
     public function removeSubFolder(EmailFolder $folder)
     {
         if ($this->subFolders->contains($folder)) {
-            $this->subFolders->remove($folder);
+            $this->subFolders->removeElement($folder);
         }
 
         return $this;
@@ -292,7 +294,7 @@ class EmailFolder
     /**
      * Get parent folder
      *
-     * @return EmailFolder[]
+     * @return EmailFolder
      */
     public function getParentFolder()
     {

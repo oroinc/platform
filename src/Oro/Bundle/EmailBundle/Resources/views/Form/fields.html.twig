@@ -195,10 +195,11 @@
 {% endblock %}
 
 {% block oro_email_email_folder_row %}
-    {% if form.vars.value is not null %}
+    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
         <div>
             {{ form_widget(form.syncEnabled) }}<label style="margin-left: 5px">{{ form.vars.value.name }}</label>
             {{ form_widget(form.fullName) }}
+            {{ form_widget(form.uidValidity) }}
             {{ form_widget(form.name) }}
             {{ form_widget(form.type) }}
             {% if form.vars.value.subFolders|length > 0 %}
@@ -211,7 +212,7 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_row %}
-    {% if form.vars.value is not null %}
+    {% if form.vars.value is not null and form.vars.value|length > 0 %}
         {{ form_row(form) }}
     {% endif %}
 {% endblock %}
@@ -220,7 +221,11 @@
     <div style="margin-top: 5px">
         <input id="check-all" type="checkbox" style="margin: 0"/><label style="margin-left: 5px">All</label>
         <div id="folder-list" style="margin-left: 20px">
-            {{ form_rest(form) }}
+            {% for child in form.children %}
+                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 

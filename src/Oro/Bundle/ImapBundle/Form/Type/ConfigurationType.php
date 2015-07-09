@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -9,6 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -26,11 +32,25 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    public function __construct(Mcrypt $encryptor, SecurityFacade $securityFacade, TranslatorInterface $translator)
-    {
+    /** @var EntityManager */
+    protected $em;
+
+    /**
+     * @param Mcrypt              $encryptor
+     * @param SecurityFacade      $securityFacade
+     * @param TranslatorInterface $translator
+     * @param Registry            $doctrine
+     */
+    public function __construct(
+        Mcrypt $encryptor,
+        SecurityFacade $securityFacade,
+        TranslatorInterface $translator,
+        Registry $doctrine
+    ) {
         $this->encryptor = $encryptor;
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
+        $this->em = $doctrine->getManager();
     }
 
     /**
@@ -40,6 +60,8 @@ class ConfigurationType extends AbstractType
     {
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
+        $this->addMergeFoldersListener($builder);
+        $this->addPostSubmitFoldersListener($builder);
 
         $builder
             ->add(
@@ -74,9 +96,85 @@ class ConfigurationType extends AbstractType
                 array('label' => 'oro.imap.configuration.password.label', 'required' => true)
             )
             ->add('check_connection', new CheckButtonType())
-            ->add('rootFolders', 'oro_email_email_folder_tree', [
+            ->add('folders', 'oro_email_email_folder_tree', [
                 'label' => $this->translator->trans('oro.email.folders.label'),
             ]);
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addMergeFoldersListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            /** @var ImapEmailOrigin $origin */
+            $origin = $event->getForm()->getData();
+            if ($origin !== null) {
+                $data = $event->getData();
+                if ($origin->getId() && !$origin->getFolders()->isEmpty() && isset($data['folders'])) {
+                    $result = [];
+                    $this->expandFolderTree($data['folders'], $result);
+                    $this->applySyncEnabled($result, $origin->getFolders());
+                    unset($data['folders']);
+                    $event->setData($data);
+                }
+            }
+        });
+    }
+
+    protected function addPostSubmitFoldersListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            /** @var ImapEmailOrigin $origin */
+            $origin = $event->getData();
+            if ($origin->getId()) {
+                foreach ($origin->getFolders() as $folder) {
+                    $this->em->refresh($folder);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param array $submittedFolders
+     * @param ArrayCollection|EmailFolder[] $existingFolders
+     */
+    protected function applySyncEnabled($submittedFolders, $existingFolders)
+    {
+        $submittedFolders = new ArrayCollection($submittedFolders);
+        foreach ($existingFolders as $existingFolder) {
+            $this->em->refresh($existingFolder);
+            $f = $submittedFolders->filter(function ($item) use ($existingFolder) {
+                return $item['fullName'] === $existingFolder->getFullName();
+            });
+            if (!$f->isEmpty()) {
+                $item = $f->first();
+                $existingFolder->setSyncEnabled($item['syncEnabled']);
+/*                $imapEmailFolder = new ImapEmailFolder();
+                $imapEmailFolder->setUidValidity($item['uidValidity']);
+                $imapEmailFolder->setFolder($existingFolder);
+                $this->em->persist($imapEmailFolder);*/
+                $this->em->flush($existingFolder);
+                $submittedFolders->removeElement($item);
+            }
+            if (!$existingFolder->getSubFolders()->isEmpty()) {
+                $this->applySyncEnabled($submittedFolders, $existingFolder->getSubFolders());
+            }
+        }
+    }
+
+    /**
+     * @param array $folders
+     * @param array $result
+     */
+    protected function expandFolderTree($folders, &$result)
+    {
+        foreach ($folders as $folder) {
+            $result[] = $folder;
+            if (isset($folder['subFolders'])) {
+                $this->expandFolderTree($folder['subFolders'], $result);
+            }
+        }
     }
 
     /**

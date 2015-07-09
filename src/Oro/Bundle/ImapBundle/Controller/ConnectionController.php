@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -36,6 +39,7 @@ class ConnectionController extends Controller
 
         $form = $this->createForm('oro_imap_configuration', $data, ['csrf_protection' => false]);
         $form->submit($this->getRequest());
+        /** @var ImapEmailOrigin $origin */
         $origin = $form->getData();
 
         if ($form->isValid() && null !== $origin) {
@@ -53,10 +57,9 @@ class ConnectionController extends Controller
 
                 $connector->getCapability();
 
-                $folders = $this->manager->getFolders();
-                $origin->setFolders($folders);
+                $emailFolders = $this->manager->getFolders();
+                $origin->setFolders($emailFolders);
 
-                // todo try achieve the same without creating hierarchy of forms
                 $user = new User();
                 $user->setImapConfiguration($origin);
 

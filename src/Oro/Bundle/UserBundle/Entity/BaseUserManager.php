@@ -75,21 +75,6 @@ class BaseUserManager implements UserProviderInterface
         $this->assertRoles($user);
         $this->updatePassword($user);
 
-        // todo create event and move to listener ?
-        $em = $this->registry->getManager();
-        if ($user instanceof User && $user->getImapConfiguration()) {
-            $folders = $user->getImapConfiguration()->getFolders();
-
-            foreach ($folders as $folder) {
-                if (!$folder->getId()) {
-                    $imapEmailFolder = new ImapEmailFolder();
-                    $imapEmailFolder->setFolder($folder);
-                    $imapEmailFolder->setUidValidity(mt_rand(1,100));
-                    $em->persist($imapEmailFolder);
-                }
-            }
-        }
-
         $this->getStorageManager()->persist($user);
 
         if ($flush) {

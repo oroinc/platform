@@ -24,17 +24,18 @@ class EmailFolderType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (--$options['nesting_level'] > 0) {
+        if ($options['nesting_level'] > 0) {
             $builder
                 ->add('syncEnabled', 'checkbox')
                 ->add('fullName', 'hidden')
                 ->add('name', 'hidden')
                 ->add('type', 'hidden')
+                ->add('uidValidity', 'hidden', ['mapped' => false])
                 ->add('subFolders', 'collection', [
                     'type' => 'oro_email_email_folder',
                     'allow_add' => true,
                     'options' => [
-                        'nesting_level' => $options['nesting_level'],
+                        'nesting_level' => --$options['nesting_level'],
                     ],
                 ]);
         }
