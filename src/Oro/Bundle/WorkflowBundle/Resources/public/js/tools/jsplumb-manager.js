@@ -99,7 +99,6 @@ define(function (require) {
                 return a.root.y > b.root.y;
             });
             _.each(transforms, function (rule) {
-                console.log('Rule: ' + rule.name + '; Step: ' + rule.root.step.get('label'));
                 rule.apply();
 
             });
@@ -157,24 +156,6 @@ define(function (require) {
             }
 
             return [sa, ta];
-        },
-
-        getIntersections: function(conn) {
-            var that = this,
-                segs = conn.connector.getAbsSegments(conn),
-                collection = [];
-            _.each(that.jsPlumbInstance.getConnections(), function (c) {
-                if(c !== conn && _.isArray(c.endpoints) && c.endpoints.length === 2) {
-                    _.each(c.connector.getAbsSegments(c), function (s1) {
-                        _.each(segs, function (s2) {
-                            if (intersect(s1, s2) || overlap(s1, s2)) {
-                                collection.push(c.overlayView.model.get('label'));
-                            }
-                        });
-                    });
-                }
-            });
-            return collection;
         },
 
         debounceRecalculateConnections: function () {
@@ -236,16 +217,6 @@ define(function (require) {
                     process(te, anchors[1]);
                 }
             });
-            console.groupCollapsed('Intersections');
-            _.each(that.jsPlumbInstance.getConnections(), function (conn) {
-                var is = that.getIntersections(conn),
-                    msg = 'Connection "' + conn.overlayView.model.get('label') + '" has ' + (is.length ? is.length : 'not.');
-                if(is.length) {
-                    msg += ' : ' + is.join(', ');
-                }
-                console.log(msg);
-            });
-            console.groupEnd();
         }
     });
 

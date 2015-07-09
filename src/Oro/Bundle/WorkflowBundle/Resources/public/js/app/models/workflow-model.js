@@ -69,10 +69,9 @@ define(function(require) {
         },
 
         setWorkflowToCollection: function (collection) {
-            var that = this;
             collection.each( function (item) {
-                item.setWorkflow(that);
-            });
+                item.setWorkflow(this);
+            }, this);
         },
 
         cloneTransitionDefinition: function(definition) {

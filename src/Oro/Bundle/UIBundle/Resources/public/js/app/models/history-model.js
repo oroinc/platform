@@ -4,6 +4,7 @@ define(function(require) {
 
     var HistoryModel,
         MAX_LENGTH = 64,
+        _ = require('underscore'),
         BaseModel = require('oroui/js/app/models/base/model'),
         HistoryStateCollection = require('./history-state-collection');
     HistoryModel = BaseModel.extend({

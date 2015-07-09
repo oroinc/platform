@@ -17,6 +17,7 @@ define(function (require) {
             }
             this.history = new HistoryModel({}, historyOptions);
             this.boundEvents = [];
+            this.debouncedOnStateChange = _.debounce(_.bind(this.onStateChange, this), 50);
             this.bindEvents();
         },
 
@@ -26,51 +27,40 @@ define(function (require) {
         },
 
         bindEvents: function () {
-            var that = this,
-                onStateChange = _.debounce(_.bind(that.onStateChange, this), 50);
-            if ('observedAttributes' in that) {
-                _.each(that.observedAttributes, function (attrName){
-                    var boundEvent,
-                        prop = that.get(attrName);
-                    if (prop) {
-                        if (prop instanceof Backbone.Collection) {
-                            boundEvent = that.bindEvent(prop, 'change add remove', onStateChange);
-                            that.on('change:' + attrName, function (model, collection) {
-                                that.unbindEvent(boundEvent);
-                                that.bindEvent(collection, 'change add remove', onStateChange);
-                            })
-                        } else {
-                            that.bindEvent(that, 'change:' + attrName, onStateChange);
-                        }
+            if ('observedAttributes' in this) {
+                _.each(this.observedAttributes, function (attrName){
+                    var eventName,
+                        prop = this.get(attrName);
+                    if (prop instanceof Backbone.Collection) {
+                        eventName = 'change add remove';
+                        prop.on(eventName, this.debouncedOnStateChange, this);
+                        this.on('change:' + attrName, function (model, collection) {
+                            collection.off(eventName, this.debouncedOnStateChange, this);
+                            collection.on(eventName, this.debouncedOnStateChange, this);
+                        }, this);
+                    } else {
+                        this.on('change:' + attrName, this.debouncedOnStateChange, this);
                     }
-                });
+                }, this);
             } else {
-                this.bindEvent(this, 'change', onStateChange);
+                this.on('change', this.debouncedOnStateChange, this);
             }
         },
 
         unbindEvents: function () {
-            _.each(this.boundEvents,  function (boundEvent) {
-                boundEvent.object.off(boundEvent.event, boundEvent.handler);
-            });
-            this.boundEvents = [];
-        },
-
-        unbindEvent: function (boundEvent) {
-            boundEvent.object.off(boundEvent.event, boundEvent.handler);
-            this.boundEvents = _.without(this.boundEvents, boundEvent);
-        },
-
-        bindEvent: function (object, event, handler) {
-            var boundEvent;
-            object.on(event, handler);
-            boundEvent = {
-                object: object,
-                event: event,
-                handler: handler
-            };
-            this.boundEvents.push(boundEvent);
-            return boundEvent;
+            if ('observedAttributes' in this) {
+                _.each(this.observedAttributes, function (attrName){
+                    var prop = this.get(attrName);
+                    if (prop instanceof Backbone.Collection) {
+                        prop.off('change add remove', this.debouncedOnStateChange, this);
+                        this.off('change:' + attrName, null, this);
+                    } else {
+                        this.off('change:' + attrName, this.debouncedOnStateChange, this);
+                    }
+                }, this);
+            } else {
+                this.off('change', this.debouncedOnStateChange, this);
+            }
         },
 
         onStateChange: function () {
@@ -83,6 +73,7 @@ define(function (require) {
         getState: function () {
             throw new Error('Method getState should be defined in a inherited class.');
         },
+
         setState: function () {
             throw new Error('Method getState should be defined in a inherited class.');
         }
