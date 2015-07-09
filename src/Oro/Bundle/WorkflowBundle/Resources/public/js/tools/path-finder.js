@@ -85,6 +85,9 @@ var GraphConstant = (function () {
     function GraphConstant() {
     }
     GraphConstant.connectionWidth = 16;
+    GraphConstant.cornerCost = 200;
+    GraphConstant.crossRealCost = 2400; // recomended > crossPathCost * 3
+    GraphConstant.crossPathCost = 600; // recomended > cornerCost * 3
     GraphConstant.turnPreference = -1; // right turn
     return GraphConstant;
 })();
@@ -988,14 +991,81 @@ var NodePath = (function () {
     NodePath.prototype.calculateLength = function () {
         if (this.previous) {
             this.length = this.previous.length + this.connection.cost;
-            var result = this.connection.origin.calculatePathLength(this.connection.oppositeConnection, this.previous.leavingInterval, this.previous.connection.oppositeConnection, this.connection.interval);
+            var result = this.calculatePathLength(this.connection.oppositeConnection, this.previous.leavingInterval, this.previous.connection.oppositeConnection, this.connection.interval);
             this.length += result.distance;
             this.leavingInterval = result.interval;
         }
         else {
             this.length = this.connection.cost;
             this.leavingInterval = this.connection.interval;
+            this.leavingCoordinate = this.connection.getPosition();
         }
+    };
+    NodePath.prototype.calculatePathLength = function (enteringConnection, enteringInterval, leavingConnection, leavingInterval) {
+        // console.log("item(" + this.id + ").calc(" + enteringConnection.id + ", " + enteringInterval.toString() + ", " + leavingConnection.id + ", " + leavingInterval.toString() + ")")
+        var result = {
+            distance: 0,
+            interval: null
+        }, middleInterval;
+        if (Math.abs(leavingConnection.direction - enteringConnection.direction) == 1) {
+            // opposite directions
+            result.distance += GraphConstant.cornerCost * 2;
+            var res = enteringInterval.continueTo(leavingInterval);
+            result.distance += res.distance;
+            result.interval = res.interval;
+            if (graphUtil.xor(enteringConnection.interval.min > leavingConnection.interval.min, enteringConnection.isForward)) {
+                result.distance += 2 * GraphConstant.turnPreference;
+            }
+            // this doesn't change leavingCoordinate
+            this.leavingCoordinate = this.previous.leavingCoordinate;
+        }
+        else if (leavingConnection.direction !== enteringConnection.direction) {
+            // corner
+            result.interval = leavingInterval.clone();
+            result.distance += GraphConstant.cornerCost;
+            switch (leavingConnection.direction) {
+                case connectionDirection.BOTTOM_TO_TOP:
+                case connectionDirection.RIGHT_TO_LEFT:
+                    result.interval.entryType = intervalEntryType.MIN;
+                    break;
+                default:
+                    result.interval.entryType = intervalEntryType.MAX;
+            }
+            result.distance += enteringInterval.distanceTo(enteringConnection.getPosition());
+            result.distance += result.interval.distanceTo(leavingConnection.getPosition());
+            if (this.isLeftTurn(enteringConnection.isHorizontal, enteringConnection.isForward, leavingConnection.isForward)) {
+                result.distance += GraphConstant.turnPreference;
+            }
+            this.leavingCoordinate = enteringConnection.getPosition();
+        }
+        else {
+            // continuation
+            // result.distance += leavingConnection.isHorizontal ? leavingConnection.origin.width : leavingConnection.origin.height;
+            this.leavingCoordinate = enteringConnection.getPosition();
+            result.distance += Math.abs(this.leavingCoordinate - this.previous.leavingCoordinate);
+            var intersection = enteringInterval.intersection(leavingInterval);
+            if (intersection.width > GraphConstant.connectionWidth) {
+                middleInterval = intersection;
+            }
+            else {
+                result.distance += GraphConstant.cornerCost * 2;
+                // turn preference is not needed because here are two opposite turns
+                middleInterval = leavingInterval;
+            }
+            var res = enteringInterval.continueTo(middleInterval);
+            result.distance += res.distance;
+            result.interval = res.interval;
+        }
+        if (this.connection.origin.isReal) {
+            result.distance += GraphConstant.crossRealCost;
+        }
+        if (DEBUG_ENABLED) {
+            Object.freeze(result.interval);
+        }
+        return result;
+    };
+    NodePath.prototype.isLeftTurn = function (isVertical, prevForward, nextForward) {
+        return graphUtil.xor(graphUtil.xor(isVertical, prevForward), nextForward);
     };
     NodePath.prototype.addConnection = function (connection) {
         return new NodePath(connection, this);
@@ -1035,7 +1105,7 @@ var NodePath = (function () {
         return axis;
     };
     NodePath.prototype.put = function (previousAxis, previousDivision) {
-        var crossPathCost = this.connection.origin.graph.crossPathCost, firstDivision, centralDivision, secondDivision, nextGraphItem, tempConnection, isConnectionHorizontal = this.connection.isHorizontal, lastAxis, centerAxis;
+        var crossPathCost = GraphConstant.crossPathCost, firstDivision, centralDivision, secondDivision, nextGraphItem, tempConnection, isConnectionHorizontal = this.connection.isHorizontal, lastAxis, centerAxis;
         if (!previousAxis) {
             previousAxis = new Axis(this.connection.isHorizontal, this.leavingInterval);
             this.addAxis(previousAxis);
@@ -1191,7 +1261,6 @@ var NodePath = (function () {
         // go through all saved axises
         for (; currentIntervalNo < this.axises.length; currentIntervalNo++) {
             axis = this.axises[currentIntervalNo];
-            //if (lastIsHorizontal !== axis.isHorizontal) {
             lastIsHorizontal = axis.isHorizontal;
             switch (axis.isHorizontal) {
                 case false:
@@ -1263,68 +1332,6 @@ var RectangularGraphNode = (function (_super) {
             this.enteringConnections[0].destroy();
         }
     };
-    // @todo move to path node
-    RectangularGraphNode.prototype.calculatePathLength = function (enteringConnection, enteringInterval, leavingConnection, leavingInterval) {
-        // console.log("item(" + this.id + ").calc(" + enteringConnection.id + ", " + enteringInterval.toString() + ", " + leavingConnection.id + ", " + leavingInterval.toString() + ")")
-        var result = {
-            distance: 0,
-            interval: null
-        }, middleInterval;
-        if (Math.abs(leavingConnection.direction - enteringConnection.direction) == 1) {
-            // opposite directions
-            result.distance += this.graph.cornerCost * 2;
-            var res = enteringInterval.continueTo(leavingInterval);
-            result.distance += res.distance;
-            result.interval = res.interval;
-            if (graphUtil.xor(enteringConnection.interval.min > leavingConnection.interval.min, enteringConnection.isForward)) {
-                result.distance += 2 * GraphConstant.turnPreference;
-            }
-        }
-        else if (leavingConnection.direction !== enteringConnection.direction) {
-            // corner
-            result.interval = leavingInterval.clone();
-            result.distance += this.graph.cornerCost;
-            switch (leavingConnection.direction) {
-                case connectionDirection.BOTTOM_TO_TOP:
-                case connectionDirection.RIGHT_TO_LEFT:
-                    result.interval.entryType = intervalEntryType.MIN;
-                    break;
-                default:
-                    result.interval.entryType = intervalEntryType.MAX;
-            }
-            result.distance += enteringInterval.distanceTo(enteringConnection.getPosition());
-            result.distance += result.interval.distanceTo(leavingConnection.getPosition());
-            if (this.isLeftTurn(enteringConnection.isHorizontal, enteringConnection.isForward, leavingConnection.isForward)) {
-                result.distance += GraphConstant.turnPreference;
-            }
-        }
-        else {
-            // continuation
-            result.distance += leavingConnection.isHorizontal ? leavingConnection.origin.width : leavingConnection.origin.height;
-            var intersection = enteringInterval.intersection(leavingInterval);
-            if (intersection.width > GraphConstant.connectionWidth) {
-                middleInterval = intersection;
-            }
-            else {
-                result.distance += this.graph.cornerCost * 2;
-                // turn preference is not needed because here are two opposite turns
-                middleInterval = leavingInterval;
-            }
-            var res = enteringInterval.continueTo(middleInterval);
-            result.distance += res.distance;
-            result.interval = res.interval;
-        }
-        if (this.isReal) {
-            result.distance += this.graph.crossRealCost;
-        }
-        if (DEBUG_ENABLED) {
-            Object.freeze(result.interval);
-        }
-        return result;
-    };
-    RectangularGraphNode.prototype.isLeftTurn = function (isVertical, prevForward, nextForward) {
-        return graphUtil.xor(graphUtil.xor(isVertical, prevForward), nextForward);
-    };
     RectangularGraphNode.prototype.findLeavingConnectionTo = function (neededDestination) {
         for (var i = this.leavingConnections.length - 1; i >= 0; i--) {
             if (this.leavingConnections[i].destination == neededDestination) {
@@ -1387,8 +1394,6 @@ var RectangularGraphNode = (function (_super) {
                     }
                     break;
             }
-            if (!isConnectionCreated)
-                console.log('No connection');
         });
     };
     RectangularGraphNode.prototype.divideWidth = function (left) {
@@ -1569,17 +1574,14 @@ var Connection = (function (_super) {
         return Math.max(0, this.destination.top - to.destination.bottom, to.destination.top - this.destination.bottom)
             + Math.max(0, this.destination.left - to.destination.right, to.destination.left - this.destination.right)
             + ((Math.abs(this.direction - to.direction) == 1) ?
-            (this.destination.graph.cornerCost * 2) :
-            (this.direction !== to.direction ? this.destination.graph.cornerCost : 0));
+            (GraphConstant.cornerCost * 2) :
+            (this.direction !== to.direction ? GraphConstant.cornerCost : 0));
     };
     return Connection;
 })(UUID);
 var Graph = (function () {
     function Graph() {
         this.items = [];
-        this.cornerCost = 200;
-        this.crossRealCost = 2400; // = crossPathCost * 3
-        this.crossPathCost = 600; // = cornerCost * 3
         this.items.push(new RectangularGraphNode(this, -100000, -100000, 200000, 200000));
     }
     Graph.prototype.get = function (id) {
@@ -1788,5 +1790,6 @@ var Finder = (function () {
     };
     return Finder;
 })();
+
 define({});
 /*jslint ignore:end*/
