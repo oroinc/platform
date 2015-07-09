@@ -109,8 +109,7 @@ class ActivityListManager
         $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-
-        $qb=  $this->addAclCriteria($qb);
+        $this->addAclCriteria($qb);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -126,24 +125,39 @@ class ActivityListManager
         return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
     }
 
+    /**
+     * Add ACL Criteria to QueryBuilder
+     *
+     * @param QueryBuilder $qb
+     *
+     * @return $this
+     */
     protected function addAclCriteria(QueryBuilder $qb)
     {
-        $supportedActivities = $this->chainProvider->getSupportedActivities();
-        $activityClass= 'Oro\Bundle\EmailBundle\Entity\EmailUser';
-
+        $providers = $this->chainProvider->getProviders();
         $newCriteria = new Criteria();
-        foreach ($supportedActivities as $supportedActivity) {
-            if ($supportedActivity === 'Oro\Bundle\EmailBundle\Entity\Email') {
-                $supportedActivity = $activityClass;
-            }
+        foreach ($providers as $provider) {
+            $activityClass = $provider->getActivityClass();
+            $aclClass = $provider->getAclClass();
+
             $criteria = new Criteria();
-            $criteria = $this->aclHelper->applyAclToCriteria($supportedActivity, $criteria, 'VIEW');
-            $criteria->andWhere(Criteria::expr()->eq('relatedActivityClass', quotemeta($supportedActivity)));
+            $criteria = $this->aclHelper->applyAclToCriteria($aclClass, $criteria, 'VIEW');
+            $criteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
             $newCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
         }
 
-        $qb->addCriteria($newCriteria);
-        return $qb;
+        $this->applyCriteriaToQb($qb, $newCriteria);
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param Criteria $criteria
+     */
+    protected function applyCriteriaToQb(QueryBuilder $qb, Criteria $criteria)
+    {
+        QueryBuilderHelper::addCriteria($qb, $criteria);
     }
 
     /**
@@ -161,6 +175,7 @@ class ActivityListManager
         $qb->resetDQLPart('orderBy');
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->addAclCriteria($qb);
 
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -287,7 +302,7 @@ class ActivityListManager
     public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
         $results = [];
-        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
             $activityResults = $this->getEntityViewModels($groupedActivities, [

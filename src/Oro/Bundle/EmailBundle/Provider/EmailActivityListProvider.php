@@ -38,6 +38,7 @@ class EmailActivityListProvider implements
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
+    const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -127,6 +128,14 @@ class EmailActivityListProvider implements
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**

@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 class CalendarEventActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ACL_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -54,6 +55,14 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**
