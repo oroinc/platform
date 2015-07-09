@@ -685,9 +685,7 @@ define(function(require) {
             var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
             // prepare FullCalendar specific date/time formats
             var isDateFormatStartedWithDay = dateFormat[0] === 'D';
-            var weekFormat = isDateFormatStartedWithDay ?
-                'D MMMM YYYY'
-                : 'MMMM D YYYY';
+            var weekFormat = isDateFormatStartedWithDay ? 'D MMMM YYYY' : 'MMMM D YYYY';
 
             options.titleFormat = {
                 month: 'MMMM YYYY',
@@ -716,6 +714,8 @@ define(function(require) {
                 var event = this.collection.get(fcEvent.id);
                 eventDecorator.decorate(event, $el);
             }, this);
+
+            return options;
         },
 
         initializeFullCalendar: function() {

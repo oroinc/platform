@@ -3,7 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var Calendar = require('orocalendar/js/calendar-view');
+    var CalendarView = require('orocalendar/js/calendar-view');
     var EventCollection = require('orocalendar/js/calendar/event/collection');
     var ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
@@ -63,7 +63,7 @@ define(function(require) {
             delete options.eventsOptions.rightHeader;
         },
         renderCalendar: function() {
-            this.calendar = new Calendar(this.options);
+            this.calendar = new CalendarView(this.options);
             this.calendar.render();
         }
     });
