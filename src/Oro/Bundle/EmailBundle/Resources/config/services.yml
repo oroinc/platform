@@ -518,6 +518,7 @@ services:
            - @oro_entity_config.config_manager
            - @oro_email.email.thread.provider
            - @oro_ui.html_tag_helper
+           - @service_container
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
