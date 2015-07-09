@@ -22,12 +22,12 @@ define(function(require) {
             name: '',
             label: '',
             entity: '',
-            entity_attribute: 'entity',
-            start_step: null,
-            steps_display_ordered: false,
+            'entity_attribute': 'entity',
+            'start_step': null,
+            'steps_display_ordered': false,
             steps: null,
             transitions: null,
-            transition_definitions: null,
+            'transition_definitions': null,
             attributes: null
         },
 
@@ -93,14 +93,14 @@ define(function(require) {
             var cloned = this._getClonedItem(transition);
             if (transition.get('transition_definition')) {
                 var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
-                cloned.transition_definition = transitionDefinition.get('name');
+                cloned['transition_definition'] = transitionDefinition.get('name');
             }
 
-            cloned.frontend_options = helper.deepClone(cloned.frontend_options);
-            cloned.form_options = helper.deepClone(cloned.form_options);
+            cloned['frontend_options'] = helper.deepClone(cloned['frontend_options']);
+            cloned['form_options'] = helper.deepClone(cloned['form_options']);
             cloned.label = __('Copy of') + ' ' + cloned.label;
             if (doNotAddToCollection) {
-                cloned._is_clone = true;
+                cloned['_is_clone'] = true;
             }
 
             var clonedModel = new TransitionModel(cloned);
@@ -224,15 +224,23 @@ define(function(require) {
         },
 
         getState: function () {
-            return {
+            this.lastState = new Backbone.Model({
                 steps: this.get('steps').toJSON(),
                 transitions: this.get('transitions').toJSON()
-            };
+            });
+            return this.lastState;
         },
-        setState: function (data) {
-            if (data.steps && data.transitions) {
-                this.get('steps').reset(data.steps);
-                this.get('transitions').reset(data.transitions);
+        setState: function (state) {
+            WorkflowModel.__super__.setState.apply(this, arguments);
+            if (state === this.lastState) {
+                return;
+            }
+            this.lastState = state;
+            var steps = state.get('steps'),
+                transitions = state.get('transitions');
+            if (steps && transitions) {
+                this.get('steps').reset(steps);
+                this.get('transitions').reset(transitions);
             }
         }
     });

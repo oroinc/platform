@@ -1,4 +1,5 @@
-define(['jsplumb', 'underscore'], function (_jp, _) {
+/* jslint ignore:start */
+define(['jsplumb', 'underscore', './jsplumb-smartline-manager'], function (_jp, _, JsPlumbSmartlineManager) {
     "use strict";
     var Smartline = function (params) {
         this.type = "Smartline";
@@ -150,6 +151,12 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
             return userSuppliedSegments || segments;
         };
 
+        this.ensureSmartlineManager = function () {
+            if (!this._jsPlumb.smartlineManager) {
+                this._jsPlumb.smartlineManager = new JsPlumbSmartlineManager(this._jsPlumb);
+            }
+        };
+
         this._compute = function (paintInfo, params) {
 
             if (params.clearEdits)
@@ -160,242 +167,44 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
                 return;
             }
 
-            segments = [];
             lastx = null;
             lasty = null;
             lastOrientation = null;
 
-            if (showLoopback && (params.sourceEndpoint.elementId === params.targetEndpoint.elementId)) {
-                if(paintInfo.so[1] > 0) {
-                    addSegment(segments, paintInfo.sx, paintInfo.sy + paintInfo.startStubY, paintInfo);
-                    addSegment(segments, paintInfo.tx + paintInfo.endStubX, paintInfo.sy + paintInfo.startStubY, paintInfo);
-                    addSegment(segments, paintInfo.tx + paintInfo.endStubX, paintInfo.ty, paintInfo);
-                    addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
-                } else {
-                    addSegment(segments, paintInfo.sx + paintInfo.startStubX, paintInfo.sy, paintInfo);
-                    addSegment(segments, paintInfo.sx + paintInfo.startStubX, paintInfo.ty + paintInfo.endStubY, paintInfo);
-                    addSegment(segments, paintInfo.tx, paintInfo.ty + paintInfo.endStubY, paintInfo);
-                    addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
-                }
-                writeSegments(this, segments, paintInfo);
-                return;
-
-            }
-
-
-
-            var midx = paintInfo.startStubX + ((paintInfo.endStubX - paintInfo.startStubX) * midpoint),
-                midy = paintInfo.startStubY + ((paintInfo.endStubY - paintInfo.startStubY) * midpoint);
-
-            var orientations = { x: [ 0, 1 ], y: [ 1, 0 ] },
-                commonStubCalculator = function () {
-                    return [ paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY ];
-                },
-                stubCalculators = {
-                    perpendicular: commonStubCalculator,
-                    orthogonal: commonStubCalculator,
-                    opposite: function (axis) {
-                        var pi = paintInfo,
-                            idx = axis == "x" ? 0 : 1,
-                            areInProximity = {
-                                "x": function () {
-                                    return ( (pi.so[idx] == 1 && (
-                                        ( (pi.startStubX > pi.endStubX) && (pi.tx > pi.startStubX) ) ||
-                                        ( (pi.sx > pi.endStubX) && (pi.tx > pi.sx))))) ||
-
-                                        ( (pi.so[idx] == -1 && (
-                                            ( (pi.startStubX < pi.endStubX) && (pi.tx < pi.startStubX) ) ||
-                                            ( (pi.sx < pi.endStubX) && (pi.tx < pi.sx)))));
-                                },
-                                "y": function () {
-                                    return ( (pi.so[idx] == 1 && (
-                                        ( (pi.startStubY > pi.endStubY) && (pi.ty > pi.startStubY) ) ||
-                                        ( (pi.sy > pi.endStubY) && (pi.ty > pi.sy))))) ||
-
-                                        ( (pi.so[idx] == -1 && (
-                                            ( (pi.startStubY < pi.endStubY) && (pi.ty < pi.startStubY) ) ||
-                                            ( (pi.sy < pi.endStubY) && (pi.ty < pi.sy)))));
-                                }
-                            };
-
-                        if (!alwaysRespectStubs && areInProximity[axis]()) {
-                            return {
-                                "x": [(paintInfo.sx + paintInfo.tx) / 2, paintInfo.startStubY, (paintInfo.sx + paintInfo.tx) / 2, paintInfo.endStubY],
-                                "y": [paintInfo.startStubX, (paintInfo.sy + paintInfo.ty) / 2, paintInfo.endStubX, (paintInfo.sy + paintInfo.ty) / 2]
-                            }[axis];
-                        }
-                        else {
-                            return [ paintInfo.startStubX, paintInfo.startStubY, paintInfo.endStubX, paintInfo.endStubY ];
-                        }
-                    }
-                },
-                lineCalculators = {
-                    perpendicular: function (axis) {
-                        var pi = paintInfo,
-                            sis = {
-                                x: [
-                                    [ [ 1, 2, 3, 4 ], null, [ 2, 1, 4, 3 ] ],
-                                    null,
-                                    [ [ 4, 3, 2, 1 ], null, [ 3, 4, 1, 2 ] ]
-                                ],
-                                y: [
-                                    [ [ 3, 2, 1, 4 ], null, [ 2, 3, 4, 1 ] ],
-                                    null,
-                                    [ [ 4, 1, 2, 3 ], null, [ 1, 4, 3, 2 ] ]
-                                ]
-                            },
-                            stubs = {
-                                x: [ [ pi.startStubX, pi.endStubX ], null, [ pi.endStubX, pi.startStubX ] ],
-                                y: [ [ pi.startStubY, pi.endStubY ], null, [ pi.endStubY, pi.startStubY ] ]
-                            },
-                            midLines = {
-                                x: [ [ midx, pi.startStubY ], [ midx, pi.endStubY ] ],
-                                y: [ [ pi.startStubX, midy ], [ pi.endStubX, midy ] ]
-                            },
-                            linesToEnd = {
-                                x: [ [ pi.endStubX, pi.startStubY ] ],
-                                y: [ [ pi.startStubX, pi.endStubY ] ]
-                            },
-                            startToEnd = {
-                                x: [ [ pi.startStubX, pi.endStubY ], [ pi.endStubX, pi.endStubY ] ],
-                                y: [ [ pi.endStubX, pi.startStubY ], [ pi.endStubX, pi.endStubY ] ]
-                            },
-                            startToMidToEnd = {
-                                x: [ [ pi.startStubX, midy ], [ pi.endStubX, midy ], [ pi.endStubX, pi.endStubY ] ],
-                                y: [ [ midx, pi.startStubY ], [ midx, pi.endStubY ], [ pi.endStubX, pi.endStubY ] ]
-                            },
-                            otherStubs = {
-                                x: [ pi.startStubY, pi.endStubY ],
-                                y: [ pi.startStubX, pi.endStubX ]
-                            },
-                            soIdx = orientations[axis][0], toIdx = orientations[axis][1],
-                            _so = pi.so[soIdx] + 1,
-                            _to = pi.to[toIdx] + 1,
-                            otherFlipped = (pi.to[toIdx] == -1 && (otherStubs[axis][1] < otherStubs[axis][0])) || (pi.to[toIdx] == 1 && (otherStubs[axis][1] > otherStubs[axis][0])),
-                            stub1 = stubs[axis][_so][0],
-                            stub2 = stubs[axis][_so][1],
-                            segmentIndexes = sis[axis][_so][_to];
-
-                        if (pi.segment == segmentIndexes[3] || (pi.segment == segmentIndexes[2] && otherFlipped)) {
-                            return midLines[axis];
-                        }
-                        else if (pi.segment == segmentIndexes[2] && stub2 < stub1) {
-                            return linesToEnd[axis];
-                        }
-                        else if ((pi.segment == segmentIndexes[2] && stub2 >= stub1) || (pi.segment == segmentIndexes[1] && !otherFlipped)) {
-                            return startToMidToEnd[axis];
-                        }
-                        else if (pi.segment == segmentIndexes[0] || (pi.segment == segmentIndexes[1] && otherFlipped)) {
-                            return startToEnd[axis];
-                        }
-                    },
-                    orthogonal: function (axis, startStub, otherStartStub, endStub, otherEndStub) {
-                        var pi = paintInfo,
-                            extent = {
-                                "x": pi.so[0] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub),
-                                "y": pi.so[1] == -1 ? Math.min(startStub, endStub) : Math.max(startStub, endStub)
-                            }[axis];
-
-                        return {
-                            "x": [
-                                [ extent, otherStartStub ],
-                                [ extent, otherEndStub ],
-                                [ endStub, otherEndStub ]
-                            ],
-                            "y": [
-                                [ otherStartStub, extent ],
-                                [ otherEndStub, extent ],
-                                [ otherEndStub, endStub ]
-                            ]
-                        }[axis];
-                    },
-                    opposite: function (axis, ss, oss, es) {
-                        var pi = paintInfo,
-                            otherAxis = {"x": "y", "y": "x"}[axis],
-                            dim = {"x": "height", "y": "width"}[axis],
-                            comparator = pi["is" + axis.toUpperCase() + "GreaterThanStubTimes2"];
-
-                        if (params.sourceEndpoint.elementId == params.targetEndpoint.elementId) {
-                            var _val;
-                            if (! (otherAxis in params.sourceEndpoint.anchor)) {
-                                _val = oss;
-                            } else {
-                                _val = oss + ((1 - params.sourceEndpoint.anchor[otherAxis]) * params.sourceInfo[dim]) + _super.maxStub;
-                            }
-                            /*if(isNaN(_val)) {
-                                _val = 0;
-                            }*/
-                            return {
-                                "x": [
-                                    [ ss, 30 ],
-                                    [ es, 80 ]
-                                ],
-                                "y": [
-                                    [ _val, ss ],
-                                    [ _val, es ]
-                                ]
-                            }[axis];
-
-                        }
-                        else if (!comparator || (pi.so[idx] == 1 && ss > es) || (pi.so[idx] == -1 && ss < es)) {
-                            if(isNaN(midy)) {
-                                debugger;
-                            }
-
-                            return {
-                                "x": [
-                                    [ ss, midy ],
-                                    [ es, midy ]
-                                ],
-                                "y": [
-                                    [ midx, ss ],
-                                    [ midx, es ]
-                                ]
-                            }[axis];
-                        }
-                        else if ((pi.so[idx] == 1 && ss < es) || (pi.so[idx] == -1 && ss > es)) {
-                            if(isNaN(pi.sy)) {
-                                debugger;
-                            }
-
-                            return {
-                                "x": [
-                                    [ midx, pi.sy ],
-                                    [ midx, pi.ty ]
-                                ],
-                                "y": [
-                                    [ pi.sx, midy ],
-                                    [ pi.tx, midy ]
-                                ]
-                            }[axis];
-                        }
-                    }
-                };
-
-            var stubs = stubCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis),
-                idx = paintInfo.sourceAxis == "x" ? 0 : 1,
-                oidx = paintInfo.sourceAxis == "x" ? 1 : 0,
-                ss = stubs[idx],
-                oss = stubs[oidx],
-                es = stubs[idx + 2],
-                oes = stubs[oidx + 2];
-
-            // add the start stub segment.
-            addSegment(segments, stubs[0], stubs[1], paintInfo);
+            segments = [];
 
             // compute the rest of the line
-            var p = lineCalculators[paintInfo.anchorOrientation](paintInfo.sourceAxis, ss, oss, es, oes);
-            if (p) {
-                for (var i = 0; i < p.length; i++) {
-                    addSegment(segments, p[i][0], p[i][1], paintInfo);
+            this.ensureSmartlineManager();
+            var points = this._jsPlumb.smartlineManager.getConnectionPath(this);
+            if (points.length == 0) {
+                // leave everything as is
+                return;
+            }
+            // set valid archors
+            var sourceRect = params.sourceEndpoint.element.getBoundingClientRect(),
+                targetRect = params.targetEndpoint.element.getBoundingClientRect(),
+                sourcePoint = points.shift(),
+                targetPoint = points.pop(),
+                correction = {
+                    x: Math.min(sourcePoint.x, targetPoint.x),
+                    y: Math.min(sourcePoint.y, targetPoint.y)
+                };
+            params.sourceEndpoint.anchor.x = (sourcePoint.x - sourceRect.left)/ sourceRect.width;
+            params.sourceEndpoint.anchor.y = (sourcePoint.y - sourceRect.top)/ sourceRect.height;
+            params.targetEndpoint.anchor.x = (targetPoint.x - targetRect.left)/ targetRect.width;
+            params.targetEndpoint.anchor.y = (targetPoint.y - targetRect.top)/ targetRect.height;
+            if (points.length) {
+                for (var i = 0; i < points.length; i++) {
+                    addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
                 }
+            } else {
+                addSegment(segments, sourcePoint.x - correction.x, sourcePoint.y - correction.y, paintInfo);
             }
 
-            // line to end stub
-            addSegment(segments, stubs[2], stubs[3], paintInfo);
+            //addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
 
             // end stub to end
-            addSegment(segments, paintInfo.tx, paintInfo.ty, paintInfo);
+            addSegment(segments, targetPoint.x - correction.x, targetPoint.y - correction.y, paintInfo);
 
             writeSegments(this, segments, paintInfo);
         };
@@ -487,3 +296,4 @@ define(['jsplumb', 'underscore'], function (_jp, _) {
     return Smartline;
 
 })
+/* jslint ignore:end */

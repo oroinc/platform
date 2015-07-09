@@ -1,7 +1,6 @@
 define(function (require) {
     'use strict';
     var FlowchartJsPlumbAreaView,
-        $ = require('jquery'),
         _ = require('underscore'),
         jsPlumb = require('jsplumb'),
         JPManager = require('../../../../tools/jsplumb-manager'),
@@ -91,7 +90,6 @@ define(function (require) {
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
             }
-            this.jsPlumbManager.debounceRecalculateConnections();
         }
     });
 

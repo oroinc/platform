@@ -1,26 +1,14 @@
 define(function (require) {
-    "use strict";
-
-    function getEdge (params) {
-        var x = params[0] - 0.5,
-            y = params[1] - 0.5,
-            edge = '';
-        if(Math.abs(y) > Math.abs(x)) {
-            edge = y > 0 ? 'bottom' : 'top';
-        } else {
-            edge = x > 0 ? 'right' : 'left'
-        }
-        return edge;
-    }
+    'use strict';
 
     function between(a, b, c) {
         return Math.min(a, c) < b && Math.max(a, c) > b;
     }
 
     function overlap(a,b) {
-        if(a[0] == a[2] && b[0] == b[2] && a[0] == b[0]) {
+        if(a[0] === a[2] && b[0] === b[2] && a[0] === b[0]) {
             return between(a[1], b[1], a[3]) || between(a[1], b[3], a[3]);
-        } else if(a[1] == a[3] && b[1] == b[3] && a[1] == b[3]) {
+        } else if(a[1] === a[3] && b[1] == b[3] && a[1] === b[3]) {
             return between(a[0], b[0], a[2]) || between(a[0], b[2], a[2]);
         }
         return false;
@@ -43,7 +31,6 @@ define(function (require) {
         PyramidRule = require('./jsplumb-manager/jpm-pyramid-rule'),
         TriadaRule = require('./jsplumb-manager/jpm-triada-rule'),
         CherryRule = require('./jsplumb-manager/jpm-cherry-rule'),
-        positions = [0.5, 0.8, 0.2, 0.65, 0.35, 0.6, 0.3, 0.7, 0.4],
         mids = {
             'top': [0.5, 0, 0, -1],
             'bottom': [0.5, 1, 0, 1],
@@ -175,77 +162,6 @@ define(function (require) {
                 }
             });
             return collection;
-        },
-
-        debounceRecalculateConnections: function () {
-            return this._debounceRecalculateConnections();
-        },
-
-        recalculateConnections: function () {
-            function process (ep, anchor) {
-                // don't manage Perimeter type anchors
-                var i, adjusted,
-                    coords = _.clone(anchor),
-                    round = $('#' + ep.elementId).hasClass('start-step'),
-                    edge = getEdge(coords),
-                    key = ep.element.id + '_' + edge;
-                if(key in that.anchors === false) {
-                    that.anchors[key] = [];
-                }
-                i = that.anchors[key].length % positions.length;
-                if( edge === 'top' || edge === 'bottom') {
-                    coords[0] = positions[i];
-                } else {
-                    coords[1] = positions[i];
-                }
-                if (round) {
-                    adjusted = roundAdjust(edge, coords[0], coords[1]);
-                    coords[0] = adjusted[0];
-                    coords[1] = adjusted[1]
-                }
-                that.anchors[key].push(coords);
-                ep.setAnchor(coords);
-            }
-            function roundAdjust(edge, x, y) {
-                if(x * 2 % 1 === 0 && y * 2 % 1 === 0) {
-                    return [x, y];
-                }
-                var a, b, c = 0.5;
-                if(edge === 'top' || edge === 'bottom') {
-                    b = x - 0.5;
-                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
-                    y = 0.5 + a * (edge === 'bottom' ? 1 : -1);
-                } else {
-                    b = y - 0.5;
-                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
-                    x = 0.5 + a * (edge === 'right' ? 1 : -1);
-                }
-                return [x, y];
-            }
-            var that = this;
-            that.loopback = {};
-            that.anchors = {};
-             _.each(that.jsPlumbInstance.getConnections(), function (conn) {
-                var anchors, se, te;
-                if(_.isArray(conn.endpoints) && conn.endpoints.length === 2) {
-                    se = conn.endpoints[0];
-                    te = conn.endpoints[1];
-
-                    anchors = that.getAnchors(se.element, te.element);
-                    process(se, anchors[0]);
-                    process(te, anchors[1]);
-                }
-            });
-            console.groupCollapsed('Intersections');
-            _.each(that.jsPlumbInstance.getConnections(), function (conn) {
-                var is = that.getIntersections(conn),
-                    msg = 'Connection "' + conn.overlayView.model.get('label') + '" has ' + (is.length ? is.length : 'not.');
-                if(is.length) {
-                    msg += ' : ' + is.join(', ');
-                }
-                console.log(msg);
-            });
-            console.groupEnd();
         }
     });
 
