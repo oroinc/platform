@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Entity;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class RoleTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreate()
+    {
+        $strRole = 'foo';
+        $role = new Role($strRole);
+
+        $this->assertEquals($strRole, $role->getLabel());
+        $this->assertEquals($strRole, $role->getRole());
+    }
+
     public function testRole()
     {
         $role = $this->getRole();
