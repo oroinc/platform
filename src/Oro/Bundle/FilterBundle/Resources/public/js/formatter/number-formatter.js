@@ -14,10 +14,6 @@ define(['underscore', './abstract-formatter'
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
-        if (this.percent && (typeof this.percent !== 'number' || isNaN(this.percent))) {
-            throw new TypeError('percent must be a number');
-        }
-
         if (typeof this.decimals !== 'number' || isNaN(this.decimals)) {
             throw new TypeError('decimals must be a number');
         }
