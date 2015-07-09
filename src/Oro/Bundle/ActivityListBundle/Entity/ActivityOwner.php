@@ -48,6 +48,7 @@ class ActivityOwner
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @Soap\ComplexType("Oro\Bundle\UserBundle\Entity\User")
      */
     protected $user;
 
