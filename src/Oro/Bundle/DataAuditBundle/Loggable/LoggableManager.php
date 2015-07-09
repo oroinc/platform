@@ -27,7 +27,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
  */
 class LoggableManager
 {
-    protected static $userCache = array();
+    protected static $userCache = [];
 
     const ACTION_CREATE = 'create';
     const ACTION_UPDATE = 'update';
@@ -52,13 +52,16 @@ class LoggableManager
     protected $logEntityFieldClass;
 
     /** @var array */
-    protected $pendingLogEntityInserts = array();
+    protected $pendingLogEntityInserts = [];
 
     /** @var array */
-    protected $pendingRelatedEntities = array();
+    protected $pendingRelatedEntities = [];
 
     /** @var array */
-    protected $collectionLogData = array();
+    protected $updatedEntities = [];
+
+    /** @var array */
+    protected $collectionLogData = [];
 
     /** @var ConfigProvider */
     protected $auditConfigProvider;
@@ -154,6 +157,16 @@ class LoggableManager
             $this->calculateCollectionData($collection);
         }
 
+        $entities = array_merge(
+            $uow->getScheduledEntityDeletions(),
+            $uow->getScheduledEntityInsertions(),
+            $uow->getScheduledEntityUpdates()
+        );
+        foreach ($entities as $entity) {
+            $entityMeta = $this->em->getClassMetadata(ClassUtils::getClass($entity));
+            $this->calculateManyToOneData($entityMeta, $entity);
+        }
+
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $this->createLogEntity(self::ACTION_CREATE, $entity);
         }
@@ -162,6 +175,17 @@ class LoggableManager
         }
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             $this->createLogEntity(self::ACTION_REMOVE, $entity);
+        }
+
+        foreach ($this->collectionLogData as $className => $entityData) {
+            foreach ($entityData as $identifier => $values) {
+                if (!isset($this->updatedEntities[$identifier])) {
+                    continue;
+                }
+
+                $entity = $this->updatedEntities[$identifier];
+                $this->createLogEntity(static::ACTION_UPDATE, $entity);
+            }
         }
     }
 
@@ -220,9 +244,49 @@ class LoggableManager
     }
 
     /**
-     * @param PersistentCollection $collection
+     * @param DoctrineClassMetadata $entityMeta
+     * @param object $entity
      */
-    protected function calculateCollectionData(PersistentCollection $collection)
+    protected function calculateManyToOneData(DoctrineClassMetadata $entityMeta, $entity)
+    {
+        $requiredProperties = array_flip([
+            'type',
+            'fieldName',
+            'targetEntity',
+            'inversedBy',
+        ]);
+
+        foreach ($entityMeta->associationMappings as $assoc) {
+            if (count($requiredProperties) !== count(array_filter(array_intersect_key($assoc, $requiredProperties)))) {
+                continue;
+            }
+
+            if ($assoc['type'] !== DoctrineClassMetadata::MANY_TO_ONE) {
+                continue;
+            }
+
+            $owner = $entityMeta->getReflectionProperty($assoc['fieldName'])->getValue($entity);
+            if (!$owner) {
+                continue;
+            }
+
+            $ownerMeta = $this->em->getClassMetadata($assoc['targetEntity']);
+            $collection = $ownerMeta->getReflectionProperty($assoc['inversedBy'])->getValue($owner);
+            if (!$collection instanceof PersistentCollection || !$collection->isDirty()) {
+                continue;
+            }
+
+            $entityIdentifier = $this->getEntityIdentifierString($owner);
+            $this->calculateCollectionData($collection, $entityIdentifier);
+            $this->updatedEntities[$entityIdentifier] = $owner;
+        }
+    }
+
+    /**
+     * @param PersistentCollection $collection
+     * @param string $entityIdentifier
+     */
+    protected function calculateCollectionData(PersistentCollection $collection, $entityIdentifier = null)
     {
         $ownerEntity          = $collection->getOwner();
         $ownerEntityClassName = $this->getEntityClassName($ownerEntity);
@@ -252,7 +316,10 @@ class LoggableManager
                     }
                 );
 
-                $entityIdentifier = $this->getEntityIdentifierString($ownerEntity);
+                if (!$entityIdentifier) {
+                    $entityIdentifier = $this->getEntityIdentifierString($ownerEntity);
+                }
+
                 $fieldName = $collectionMapping['fieldName'];
                 $this->collectionLogData[$ownerEntityClassName][$entityIdentifier][$fieldName] = array(
                     'old' => $oldData,
@@ -399,6 +466,11 @@ class LoggableManager
                         $newValues[$field] = $changes;
                         $newValues[$field]['type'] = $this->getFieldType($entityMeta, $field);
                     }
+                }
+
+                unset($this->collectionLogData[$entityClassName][$entityIdentifier]);
+                if (!$this->collectionLogData[$entityClassName]) {
+                    unset($this->collectionLogData[$entityClassName]);
                 }
             }
 
