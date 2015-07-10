@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture;
+namespace Oro\Bundle\NoteBundle\Tests\Unit\Fixtures;
 
-class TestNonActiveTarget
+class TestEntity
 {
     /** @var int */
     protected $id;

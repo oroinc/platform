@@ -23,10 +23,12 @@ class AttachmentConfig
      * @param ConfigProvider $attachmentConfigProvider
      * @param ConfigProvider $entityConfigProvider
      */
-    public function __construct(ConfigProvider $attachmentConfigProvider, ConfigProvider $entityConfigProvider)
-    {
+    public function __construct(
+        ConfigProvider $attachmentConfigProvider,
+        ConfigProvider $entityConfigProvider
+    ) {
         $this->attachmentConfigProvider = $attachmentConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
+        $this->entityConfigProvider     = $entityConfigProvider;
     }
 
     /**
@@ -37,7 +39,7 @@ class AttachmentConfig
      */
     public function isAttachmentAssociationEnabled($entity)
     {
-        if (null === $entity || !is_object($entity)) {
+        if (!is_object($entity)) {
             return false;
         }
 

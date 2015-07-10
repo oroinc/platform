@@ -94,6 +94,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Entity aliases are introduced. You can use `php app/console oro:entity-alias:debug` CLI command to see all aliases. In most cases aliases are generated automatically, but you can use `entity_aliases` and `entity_alias_exclusions` section in the `Resources/config/oro/entity.yml` of your bundle to define your rules.
 - Methods `encodeClassName` and `decodeClassName` of `Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper` are deprecated. Use `getUrlSafeClassName` and `resolveEntityClass` instead. Also `Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper` can be used for same purposes.
 - The entity name resolver service was introduced to allow configuring an entity name formatting more flexible. Now `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` is used instead of `Oro\Bundle\LocaleBundle\Formatter\NameFormatter` and `Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter`. The list of affected services:
+- Added new method `\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::isNewEntity` to check entity is new.
 
 | Service ID | Class Name |
 |------------|------------|
@@ -167,6 +168,8 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 ####UiBundle
  - Macros `scrollData` in `Oro/Bundle/UIBundle/Resources/views/macros.html.twig` triggers event `oro_ui.scroll_data.before.<pageIdentifier>` before data rendering
  - Added `assets_version` parameter for outdating assets if needed
+ - Added parameters `EventDispatcherInterface $eventDispatcher` and `$pageType` to constructor of `Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider`
+ - Created new event `Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent` which dispatc in `Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider`
 
 ####LocaleBundle
 - Deprecated method {{localeSettings.getTimeZoneShift()}} (calendar-view.js, formatter/datetime.js, datepicker/datetimepicker-view-mixin.js)
@@ -251,3 +254,16 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
  - Added brackets for search queries. Now user available to do queries like 'from oro_test where all_text ~ test and (integer count > 10 or float price = 10)'
  - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
 
+####ActivirtBundle
+ - Added entity config parameter `show_on_page` to `Oro/Bundle/ActivityBundle/Resources/config/entity_config.yml`
+
+####ActivityListBundle
+ - Added parameter `ConfigProvider $configProvider` to constructor of `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+ - Added parameter `$pageType` to `isApplicable` method in `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+ - Added method `isAllowedButton` to `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+
+####AttachmentBundle
+ - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `\Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter`
+
+####NoteBundle
+ - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `\Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter`

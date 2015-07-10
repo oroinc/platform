@@ -75,38 +75,20 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function resolveSystemCall($val)
     {
-        switch (true) {
-            // static call class:method or class::const
-            case preg_match('#%([\w\.]+)%::([\w\._]+)#', $val, $match):
-                // with class as param
-                $class = $this->getParameter($match[1]);
-                // fall-through
-            case preg_match('#([^\'"%:\s]+)::([\w\.]+)(\([^\)]*\))?#', $val, $match):
-                // with class real name
-                if (!isset($class)) {
-                    $class = $match[1];
-                }
-                $method = $match[2];
-                if (is_callable([$class, $method])) {
-                    $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
-                    $val    = $this->replaceValue($val, $this->callStaticMethod($class, $method, $params), $match[0]);
-                } elseif (!isset($match[3]) && defined("$class::$method")) {
-                    $val = $this->replaceValue($val, constant("$class::$method"), $match[0]);
-                }
-                break;
-            // service method call @service->method
-            case preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match):
-                $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
-                $val    = $this->replaceValue($val, $this->callServiceMethod($match[1], $match[2], $params), $match[0]);
-                break;
-            // parameter %parameter name%
-            case preg_match('#%([\w\.]+)%#', $val, $match):
-                $val = $this->replaceValue($val, $this->getParameter($match[1]), $match[0]);
-                break;
-            // service pass @service
-            case preg_match('#@([\w\.]+)#', $val, $match):
-                $val = $this->getService($match[1]);
-                break;
+        if (!is_scalar($val)) {
+            return $val;
+        }
+
+        if (strpos($val, '%') !== false) {
+            $val = $this->resolveParameter($val);
+        }
+
+        if (is_scalar($val) && strpos($val, '::') !== false) {
+            $val = $this->resolveStatic($val);
+        }
+
+        if (is_scalar($val) && strpos($val, '@') !== false) {
+            $val = $this->resolveService($val);
         }
 
         return $val;
@@ -223,5 +205,81 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     protected function endsWith($haystack, $needle)
     {
         return substr($haystack, -strlen($needle)) == $needle;
+    }
+
+    /**
+     * Replace %parameter% with it's value.
+     *
+     * @param $val
+     * @return mixed
+     */
+    protected function resolveParameter($val)
+    {
+        if (preg_match('#%([\w\._]+)%#', $val, $match)) {
+            $val = $this->replaceValue(
+                $val,
+                $this->container->getParameter($match[1]),
+                $match[0]
+            );
+        }
+
+        return $val;
+    }
+
+    /**
+     * Resolve static call class:method or class::const
+     *
+     * @param $val
+     * @return mixed
+     */
+    protected function resolveStatic($val)
+    {
+        if (preg_match_all('#([^\(\'"%:\s]+)::([\w\._]+)(\([^\)]*\))?#', $val, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+
+                if (!is_scalar($val)) {
+                    break;
+                }
+
+                $class  = $match[1];
+                $method = $match[2];
+
+                $classMethod = [$class, $method];
+                if (is_callable($classMethod)) {
+                    $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
+                    $val    = $this->replaceValue($val, $this->callStaticMethod($class, $method, $params), $match[0]);
+                } elseif (defined(implode('::', $classMethod))) {
+                    $val =  $this->replaceValue(
+                        $val,
+                        constant(implode('::', $classMethod)),
+                        $match[0]
+                    );
+                }
+            }
+        }
+
+        return $val;
+    }
+
+    /**
+     * Resolve service or service->method call.
+     *
+     * @param $val
+     * @return mixed
+     */
+    protected function resolveService($val)
+    {
+        if (strpos($val, '->') === false && preg_match('#@([\w\.]+)#', $val, $match)) {
+            $val = $this->getService($match[1]);
+        } elseif (preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match)) {
+            $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
+            $val    = $this->replaceValue(
+                $val,
+                $this->callServiceMethod($match[1], $match[2], $params),
+                $match[0]
+            );
+        }
+
+        return $val;
     }
 }

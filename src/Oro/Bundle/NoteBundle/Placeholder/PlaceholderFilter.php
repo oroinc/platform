@@ -4,25 +4,31 @@ namespace Oro\Bundle\NoteBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class PlaceholderFilter
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $noteConfigProvider;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
      * @param ConfigProvider $noteConfigProvider
      * @param ConfigProvider $entityConfigProvider
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ConfigProvider $noteConfigProvider, ConfigProvider $entityConfigProvider)
-    {
+    public function __construct(
+        ConfigProvider $noteConfigProvider,
+        ConfigProvider $entityConfigProvider,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->noteConfigProvider   = $noteConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->doctrineHelper       = $doctrineHelper;
     }
 
     /**
@@ -33,7 +39,7 @@ class PlaceholderFilter
      */
     public function isNoteAssociationEnabled($entity)
     {
-        if (null === $entity || !is_object($entity)) {
+        if (!is_object($entity) || $this->doctrineHelper->isNewEntity($entity) === true) {
             return false;
         }
 

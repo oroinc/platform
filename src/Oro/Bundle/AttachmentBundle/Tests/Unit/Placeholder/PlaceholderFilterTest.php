@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Placeholder;
 
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|AttachmentConfig */
     protected $attachmentConfig;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var PlaceholderFilter */
     protected $filter;
@@ -18,24 +23,33 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->filter = new PlaceholderFilter($this->attachmentConfig);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->filter = new PlaceholderFilter($this->attachmentConfig, $this->doctrineHelper);
     }
 
     /**
-     * @param boolean $return
+     * @param      $entity
+     * @param bool $attachmentConfigReturn
+     * @param bool $isNewRecord
+     * @param bool $expected
      * @dataProvider configResultProvider
      */
-    public function testIsAttachmentAssociationEnabled($return)
+    public function testIsAttachmentAssociationEnabled($entity, $attachmentConfigReturn, $isNewRecord, $expected)
     {
-        $entity = $this->getMock('\stdClass');
-
-        $this->attachmentConfig->expects($this->once())
+        $this->attachmentConfig->expects(is_object($entity) && !$isNewRecord ? $this->once() : $this->never())
             ->method('isAttachmentAssociationEnabled')
             ->with($entity)
-            ->willReturn($return);
+            ->willReturn($attachmentConfigReturn);
+
+        $this->doctrineHelper->expects(is_object($entity) ? $this->once() : $this->never())
+            ->method('isNewEntity')
+            ->willReturn($isNewRecord);
 
         $actual = $this->filter->isAttachmentAssociationEnabled($entity);
-        $this->assertEquals($return, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -44,8 +58,30 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     public function configResultProvider()
     {
         return [
-            ['return' => true],
-            ['return' => false],
+            'null entity'                         => [
+                'entity'                 => null,
+                'attachmentConfigReturn' => true,
+                'isNewRecord'            => true,
+                'expected'               => false
+            ],
+            'existing entity with association'    => [
+                'entity'                 => $this->getMock('\stdClass'),
+                'attachmentConfigReturn' => true,
+                'isNewRecord'            => false,
+                'expected'               => true
+            ],
+            'existing entity without association' => [
+                'entity'                 => $this->getMock('\stdClass'),
+                'attachmentConfigReturn' => false,
+                'isNewRecord'            => false,
+                'expected'               => false
+            ],
+            'new entity without association'      => [
+                'entity'                 => $this->getMock('\stdClass'),
+                'attachmentConfigReturn' => false,
+                'isNewRecord'            => true,
+                'expected'               => false
+            ]
         ];
     }
 }
