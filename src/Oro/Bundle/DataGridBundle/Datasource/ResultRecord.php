@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
-use Doctrine\Common\Inflector\Inflector;
-
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Doctrine\Common\Inflector\Inflector;
 
 class ResultRecord implements ResultRecordInterface
 {
@@ -17,6 +17,14 @@ class ResultRecord implements ResultRecordInterface
      * @param mixed $data
      */
     public function __construct($data)
+    {
+        $this->addData($data);
+    }
+
+    /**
+     * @param array|object $data
+     */
+    public function addData($data)
     {
         if (is_array($data)) {
             $arrayData = [];
@@ -33,14 +41,6 @@ class ResultRecord implements ResultRecordInterface
         } elseif (is_object($data)) {
             $this->valueContainers[] = $data;
         }
-    }
-
-    /**
-     * @param array|object $container
-     */
-    public function addValueContainer($container)
-    {
-        $this->valueContainers[] = $container;
     }
 
     /**
