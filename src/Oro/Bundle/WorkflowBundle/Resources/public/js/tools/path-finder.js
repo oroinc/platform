@@ -104,9 +104,8 @@ var GraphConstant = (function () {
     return GraphConstant;
 })();
 var AbstractLocationStop = (function () {
-    function AbstractLocationStop(axis, previous) {
+    function AbstractLocationStop(axis) {
         this.axis = axis;
-        this.previous = previous;
     }
     Object.defineProperty(AbstractLocationStop.prototype, "bound", {
         get: function () {
@@ -122,10 +121,27 @@ var LeftLocationStop = (function (_super) {
     function LeftLocationStop() {
         _super.apply(this, arguments);
     }
+    Object.defineProperty(LeftLocationStop.prototype, "previous", {
+        get: function () {
+            var previous = null, currentBound = -Infinity, axisesAtLeft = this.axis.getCriticalAxisesAtLeft();
+            for (var i = axisesAtLeft.length - 1; i >= 0; i--) {
+                var axis = axisesAtLeft[i];
+                var currentDirective = axis.getLeftLocationStop();
+                if (currentDirective.bound > currentBound) {
+                    previous = currentDirective;
+                    currentBound = currentDirective.bound;
+                }
+            }
+            return previous;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(LeftLocationStop.prototype, "bound", {
         get: function () {
-            if (this.previous) {
-                return Math.max(this.previous.bound + GraphConstant.connectionWidth, this.axis.min);
+            var previous = this.previous;
+            if (previous && previous.bound > this.axis.min) {
+                return previous.bound;
             }
             return this.axis.min;
         },
@@ -139,10 +155,26 @@ var RightLocationStop = (function (_super) {
     function RightLocationStop() {
         _super.apply(this, arguments);
     }
+    Object.defineProperty(RightLocationStop.prototype, "previous", {
+        get: function () {
+            var previous = null, currentBound = Infinity, axisesAtRight = this.axis.getCriticalAxisesAtRight();
+            for (var i = axisesAtRight.length - 1; i >= 0; i--) {
+                var axis = axisesAtRight[i], currentDirective = axis.getRightLocationStop();
+                if (currentDirective.bound < currentBound) {
+                    previous = currentDirective;
+                    currentBound = currentDirective.bound;
+                }
+            }
+            return previous;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(RightLocationStop.prototype, "bound", {
         get: function () {
-            if (this.previous) {
-                return Math.min(this.previous.bound - GraphConstant.connectionWidth, this.axis.max);
+            var previous = this.previous;
+            if (previous && previous.bound < this.axis.max) {
+                return previous.bound;
             }
             return this.axis.max;
         },
@@ -151,31 +183,6 @@ var RightLocationStop = (function (_super) {
     });
     return RightLocationStop;
 })(AbstractLocationStop);
-var LocationDirective = (function () {
-    function LocationDirective(axis) {
-        this.axis = axis;
-    }
-    Object.defineProperty(LocationDirective.prototype, "coordinate", {
-        get: function () {
-            var coordinate;
-            switch (this.axis.getPreferredLocation()) {
-                case PreferredLocation.LEFT:
-                    coordinate = this.axis.getLeftLocationStop().bound;
-                    break;
-                case PreferredLocation.RIGHT:
-                    coordinate = this.axis.getRightLocationStop().bound;
-                    break;
-                case PreferredLocation.CENTER:
-                    coordinate = (this.axis.getLeftLocationStop().bound + this.axis.getRightLocationStop().bound) / 2;
-                    break;
-            }
-            return coordinate;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return LocationDirective;
-})();
 var Axis = (function () {
     function Axis(isHorizontal, bounds) {
         this.children = [];
@@ -206,109 +213,34 @@ var Axis = (function () {
         }
         return this.turnIn == Turn.LEFT ? PreferredLocation.LEFT : PreferredLocation.RIGHT;
     };
-    Axis.prototype.hasRightAlignedAxisesAtLeft = function () {
-        var hasRightAlignedAxisesAtLeft = false;
-        this.eachAxisAtLeft(function (axis) {
-            if (axis.getRawPreferredLocation() == PreferredLocation.RIGHT) {
-                hasRightAlignedAxisesAtLeft = true;
-                return true;
-            }
-            return false;
-        });
-        return hasRightAlignedAxisesAtLeft;
-    };
-    Axis.prototype.hasLeftAlignedAxisesAtRight = function () {
-        var hasLeftAlignedAxisesAtRight = false;
-        this.eachAxisAtRight(function (axis) {
-            if (axis.getRawPreferredLocation() == PreferredLocation.LEFT) {
-                hasLeftAlignedAxisesAtRight = true;
-                return true;
-            }
-            return false;
-        });
-        return hasLeftAlignedAxisesAtRight;
-    };
     /**
      * Returns preferred location, analyses siblings
      * @returns {PreferredLocation}
      */
     Axis.prototype.getPreferredLocation = function () {
-        var preferredLocation = this.getRawPreferredLocation();
-        if (preferredLocation == PreferredLocation.CENTER) {
-            if (this.hasRightAlignedAxisesAtLeft()) {
-                preferredLocation = PreferredLocation.RIGHT;
-            }
-            else if (this.hasLeftAlignedAxisesAtRight()) {
-                preferredLocation = PreferredLocation.LEFT;
-            }
-        }
-        switch (preferredLocation) {
-            case PreferredLocation.LEFT:
-                if (this.hasRightAlignedAxisesAtLeft()) {
-                    preferredLocation = PreferredLocation.CENTER;
-                }
-                break;
-            case PreferredLocation.RIGHT:
-                if (this.hasLeftAlignedAxisesAtRight()) {
-                    preferredLocation = PreferredLocation.CENTER;
-                }
-                break;
-        }
+        var preferredLocation = this.getRawPreferredLocation(), leftStop = this.getLeftLocationStop(), rightStop = this.getRightLocationStop();
         return preferredLocation;
     };
     Axis.prototype.getBestDivisionCoordinate = function () {
-        /*this.getCriticalAxisesAtLeft();
-         this.getCriticalAxisesAtRight();
-         new LocationDirective(this).coordinate;
-         console.log(PreferredLocation[this.getPreferredLocation()],
-         this.id, this.isHorizontal, new LocationDirective(this).coordinate, this.getLeftLocationStop(), this.getRightLocationStop(),
-         "left", this.getCriticalAxisesAtLeft(), "right", this.getCriticalAxisesAtRight());*/
-        return new LocationDirective(this).coordinate;
-        /*
-         console.log(PreferredLocation[this.getPreferredLocation()],
-         this.id, this.isHorizontal,
-         "left", this.getCriticalAxisesAtLeft(), "right", this.getCriticalAxisesAtRight());
-
-         var left = this.getLeftLocationDirective();
-         var right = this.getRightLocationDirective();
-
-         console.log(left, right);
-
-         switch (this.getPreferredLocation()) {
-         case PreferredLocation.LEFT:
-         case PreferredLocation.RIGHT:
-         return (this.min + this.max) / 2;
-         default:
-         return (this.min + this.max) / 2;
-         }*/
+        var coordinate;
+        console.log(this.id, PreferredLocation[this.getPreferredLocation()], this.getLeftLocationStop().bound, this.getRightLocationStop().bound);
+        switch (this.getPreferredLocation()) {
+            case PreferredLocation.LEFT:
+                coordinate = this.getLeftLocationStop().bound;
+                break;
+            case PreferredLocation.RIGHT:
+                coordinate = this.getRightLocationStop().bound;
+                break;
+            case PreferredLocation.CENTER:
+                coordinate = (this.getLeftLocationStop().bound + this.getRightLocationStop().bound) / 2;
+                break;
+        }
+        return coordinate;
     };
     Axis.prototype.getLeftLocationStop = function () {
-        var stop = null, currentBound = -Infinity, axisesAtLeft = this.getCriticalAxisesAtLeft();
-        for (var i = axisesAtLeft.length - 1; i >= 0; i--) {
-            var axis = axisesAtLeft[i];
-            var currentDirective = axis.getLeftLocationStop();
-            if (currentDirective.bound > currentBound) {
-                stop = currentDirective;
-                currentBound = currentDirective.bound;
-            }
-        }
-        if (stop) {
-            return new LeftLocationStop(this, stop);
-        }
         return new LeftLocationStop(this);
     };
     Axis.prototype.getRightLocationStop = function () {
-        var stop = null, currentBound = Infinity, axisesAtRight = this.getCriticalAxisesAtRight();
-        for (var i = axisesAtRight.length - 1; i >= 0; i--) {
-            var axis = axisesAtRight[i], currentDirective = axis.getRightLocationStop();
-            if (currentDirective.bound < currentBound) {
-                stop = currentDirective;
-                currentBound = currentDirective.bound;
-            }
-        }
-        if (stop) {
-            return new RightLocationStop(this, stop);
-        }
         return new RightLocationStop(this);
     };
     Axis.prototype.updateMinimalMargins = function () {
@@ -345,9 +277,9 @@ var Axis = (function () {
         var result = false;
         this.eachAxisAtLeft(function (axis) {
             if (axis === needle) {
-                return (result = true);
+                result = true;
+                return true;
             }
-            return undefined;
         });
         return result;
     };
@@ -355,9 +287,9 @@ var Axis = (function () {
         var result = false;
         this.eachAxisAtRight(function (axis) {
             if (axis === needle) {
-                return (result = true);
+                result = true;
+                return true;
             }
-            return undefined;
         });
         return result;
     };
@@ -368,7 +300,7 @@ var Axis = (function () {
             criticalAxises = current.getCriticalAxisesAtLeft();
             for (var i = criticalAxises.length - 1; i >= 0; i--) {
                 var axis = criticalAxises[i];
-                if (processed.indexOf(axis) !== -1) {
+                if (processed.indexOf(axis) == -1) {
                     processed.push(axis);
                     if (cb(axis)) {
                         return;
@@ -384,7 +316,7 @@ var Axis = (function () {
             criticalAxises = current.getCriticalAxisesAtRight();
             for (var i = criticalAxises.length - 1; i >= 0; i--) {
                 var axis = criticalAxises[i];
-                if (processed.indexOf(axis) !== -1) {
+                if (processed.indexOf(axis) == -1) {
                     processed.push(axis);
                     if (cb(axis)) {
                         return;
@@ -1418,22 +1350,22 @@ var RectangularGraphNode = (function (_super) {
         var destination = connection.destination, topOrBottom = destination.left < node.right && destination.right > node.left, leftOrRight = destination.top < node.bottom && destination.bottom > node.top, a, b;
         switch (connection.direction) {
             case connectionDirection.LEFT_TO_RIGHT:
-                if (leftOrRight && destination.horizontalInterval.contains(node.right)) {
+                if (leftOrRight && destination.horizontalInterval.contains(node.right) && destination.verticalInterval.intersection(node.verticalInterval)) {
                     this.cloneConnection(node, connection);
                 }
                 break;
             case connectionDirection.RIGHT_TO_LEFT:
-                if (leftOrRight && destination.horizontalInterval.contains(node.left)) {
+                if (leftOrRight && destination.horizontalInterval.contains(node.left) && destination.verticalInterval.intersection(node.verticalInterval)) {
                     this.cloneConnection(node, connection);
                 }
                 break;
             case connectionDirection.TOP_TO_BOTTOM:
-                if (topOrBottom && destination.verticalInterval.contains(node.bottom)) {
+                if (topOrBottom && destination.verticalInterval.contains(node.bottom) && destination.horizontalInterval.intersection(node.horizontalInterval)) {
                     this.cloneConnection(node, connection);
                 }
                 break;
             case connectionDirection.BOTTOM_TO_TOP:
-                if (topOrBottom && destination.verticalInterval.contains(node.top)) {
+                if (topOrBottom && destination.verticalInterval.contains(node.top) && destination.horizontalInterval.intersection(node.horizontalInterval)) {
                     this.cloneConnection(node, connection);
                 }
                 break;
@@ -1451,11 +1383,13 @@ var RectangularGraphNode = (function (_super) {
         this.isShared = true;
         this.usedAxisForShare = axis;
         if (isHorizontal) {
-            return this.shareHeight(axis, connectionCost);
+            this.shareHeight(axis, connectionCost);
         }
         else {
-            return this.shareWidth(axis, connectionCost);
+            this.shareWidth(axis, connectionCost);
         }
+        console.log(this.id, ' ::: ', this.sharedChildren.first.id, ' => ', this.sharedChildren.first.leavingConnections.map(function (conn) { return conn.destination.id; }), ',   ', this.sharedChildren.second.id, ' => ', this.sharedChildren.second.leavingConnections.map(function (conn) { return conn.destination.id; }));
+        return this.sharedChildren;
     };
     RectangularGraphNode.prototype.shareWidth = function (axis, connectionCost) {
         this.isSharedHorizontally = false;
@@ -1471,7 +1405,6 @@ var RectangularGraphNode = (function (_super) {
         this.divideInternal(this.sharedChildren, 0, connectionCost);
         this.sharedConnect(this.sharedChildren, axis);
         this.disconnect();
-        return this.sharedChildren;
     };
     RectangularGraphNode.prototype.shareHeight = function (axis, connectionCost) {
         this.isSharedHorizontally = true;
@@ -1487,7 +1420,6 @@ var RectangularGraphNode = (function (_super) {
         this.divideInternal(this.sharedChildren, 8, connectionCost);
         this.sharedConnect(this.sharedChildren, axis);
         this.disconnect();
-        return this.sharedChildren;
     };
     RectangularGraphNode.prototype.sharedConnect = function (siblings, mainAxis) {
         var _this = this;
@@ -1613,6 +1545,11 @@ var Connection = (function (_super) {
     Connection.prototype.destroy = function () {
         this.origin.leavingConnections.splice(this.origin.leavingConnections.indexOf(this), 1);
         this.destination.enteringConnections.splice(this.destination.enteringConnections.indexOf(this), 1);
+        if (this.oppositeConnection) {
+            // remove link to _this
+            this.oppositeConnection.oppositeConnection = null;
+            this.oppositeConnection.destroy();
+        }
     };
     Connection.prototype.getPosition = function () {
         switch (this.direction) {
