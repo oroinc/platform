@@ -9,6 +9,7 @@ define(function (require) {
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
+        autoRender: true,
         /**
          * @type {Constructor.<FlowchartJsPlumbOverlayView>}
          */
@@ -36,8 +37,24 @@ define(function (require) {
 
         className: 'workflow-flowchart-viewer',
 
-        defaultConnectionConfiguration: {
-            detachable: false
+        /**
+         * @type {function(): Object|Object}
+         */
+        defaultConnectionOptions: function () {
+            return {
+                detachable: false
+            };
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function (options) {
+            FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
+            this.defaultConnectionOptions = _.extend(
+                _.result(this, 'defaultConnectionOptions'),
+                options.connectionOptions || {}
+            );
         },
 
         findStepModelByElement: function (el) {
@@ -52,7 +69,7 @@ define(function (require) {
             this.$el.addClass(this.className);
             var stepCollectionView,
                 transitionOverlayView = this.transitionOverlayView,
-                defaultConnectionConfiguration = this.defaultConnectionConfiguration,
+                connectionOptions = _.extend({}, this.defaultConnectionOptions),
                 StepView = this.stepView,
                 TransitionView = this.transitionView,
                 that = this,
@@ -81,7 +98,7 @@ define(function (require) {
                         stepCollection: steps,
                         stepCollectionView: stepCollectionView,
                         transitionOverlayView: transitionOverlayView,
-                        defaultConnectionConfiguration: _.extend({}, defaultConnectionConfiguration)
+                        connectionOptions: connectionOptions
                     }, options);
                     return new TransitionView(options);
                 },

@@ -5,8 +5,8 @@ define(function (require) {
 
     var WorkflowEditorComponent,
         WorkflowViewerComponent = require('./workflow-viewer-component'),
+        HistoryNavigationComponent = require('oroui/js/app/components/history-navigation-component'),
         FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
-        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
         mediator = require('oroui/js/mediator'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
@@ -28,26 +28,24 @@ define(function (require) {
      * @class WorkflowEditorComponent
      * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = WorkflowViewerComponent.extend(
-        /** @lends WorkflowEditorComponent.prototype */{
+    WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
 
-        initViews: function () {
-            flowchartTools.checkPositions(this.model);
-
+        /**
+         * @inheritDoc
+         */
+        initViews: function ($el, flowchartOptions) {
             this.workflowManagementView = new WorkflowManagementView({
-                el: this._sourceElement,
+                el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
             });
-
-            this.workflowManagementView.render();
-
-            this.flowchartView = new FlowchartEditorWorkflowView({
-                el: this._sourceElement.find('.workflow-flowchart'),
-                model: this.model
+            this.historyManager = new HistoryNavigationComponent({
+                observedModel: this.model,
+                _sourceElement: $el.find('.workflow-history-container')
             });
-
-            this.flowchartView.render();
+            this.workflowManagementView.render();
+            this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
         },
 
         /**
@@ -56,6 +54,7 @@ define(function (require) {
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
             'requestAddStep model': 'addNewStep',
+            'requestRefreshChart model': 'refreshChart',
             'requestEditStep model': 'openManageStepForm',
             'requestCloneStep model': 'cloneStep',
             'requestRemoveStep model': 'removeStep',
@@ -64,6 +63,10 @@ define(function (require) {
             'requestEditTransition model': 'openManageTransitionForm',
             'change:entity model': 'resetWorkflow',
             'saveWorkflow model': 'saveConfiguration'
+        },
+
+        refreshChart: function () {
+            this.flowchartView.jsPlumbManager.organizeBlocks();
         },
 
         /**

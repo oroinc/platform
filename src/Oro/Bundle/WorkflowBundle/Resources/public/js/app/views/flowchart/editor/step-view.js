@@ -1,11 +1,19 @@
 define(function (require) {
     'use strict';
+
     var FlowchartViewerStepView = require('../viewer/step-view'),
-        mediator = require('oroui/js/mediator'),
         FlowchartEditorStepView;
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),
+
+        className: function () {
+            var classNames = [FlowchartEditorStepView.__super__.className.call(this)];
+            if (!this.model.get('_is_start')) {
+                classNames.push('dropdown');
+            }
+            return classNames.join(' ');
+        },
 
         events: {
             'dblclick': 'triggerEditStep',

@@ -1,13 +1,27 @@
 define(function (require) {
     'use strict';
-    var FlowchartJsPlubmBoxView = require('../jsplumb/box-view'),
+
+    var FlowchartJsPlumbBoxView = require('../jsplumb/box-view'),
         $ = require('jquery'),
         _ = require('underscore'),
+        mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
         FlowchartViewerStepView;
 
-    FlowchartViewerStepView = FlowchartJsPlubmBoxView.extend({
+    FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
+
+        className: function () {
+            var classNames = [FlowchartViewerStepView.__super__.className.call(this)];
+            classNames.push('workflow-step');
+            if (this.model.get('_is_start')) {
+                classNames.push('start-step');
+            }
+            if (this.model.get('is_final')) {
+                classNames.push('final-step');
+            }
+            return classNames.join(' ');
+        },
 
         targetDefaults: {
             dropOptions: {hoverClass: 'dragHover'},
@@ -18,7 +32,7 @@ define(function (require) {
         sourceDefaults: {
             filter: '.jsplumb-source',
             anchor: 'Continuous',
-            connector: ['StateMachine', {curviness: 20}],
+            connector: ['Smartline', { cornerRadius: 5 }],
             maxConnections: 100
         },
 
