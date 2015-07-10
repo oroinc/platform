@@ -1,5 +1,8 @@
 /* jshint browser:true */
 /* global require */
+/**
+ * @deprecated since 1.8 because of vulnerability for "phishing" attack
+ */
 require(['jquery'],
 function($) {
     'use strict';
