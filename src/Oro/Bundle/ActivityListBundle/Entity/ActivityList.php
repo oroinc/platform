@@ -183,7 +183,7 @@ class ActivityList extends ExtendActivityList
      */
     public function addActivityOwner(ActivityOwner $activityOwner)
     {
-        if (!$this->activityOwners->contains($activityOwner)) {
+        if (!$this->hasActivityOwner($activityOwner)) {
             $this->activityOwners->add($activityOwner);
         }
 
@@ -197,11 +197,22 @@ class ActivityList extends ExtendActivityList
      */
     public function removeActivityOwner(ActivityOwner $activityOwner)
     {
-        if ($this->activityOwners->contains($activityOwner)) {
+        if ($this->hasActivityOwner($activityOwner)) {
             $this->activityOwners->removeElement($activityOwner);
         }
 
         return $this;
+    }
+
+    /**
+     * Whether activity list has specified owner
+     *
+     * @param ActivityOwner $activityOwner
+     * @return bool
+     */
+    public function hasActivityOwner(ActivityOwner $activityOwner)
+    {
+        return $this->getActivityOwners()->contains($activityOwner);
     }
 
     /**
