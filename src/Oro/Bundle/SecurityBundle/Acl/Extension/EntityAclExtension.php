@@ -172,6 +172,11 @@ class EntityAclExtension extends AbstractAclExtension
             return true;
         }
 
+        $delim = strpos($type, '@');
+        if ($delim) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
         if ($id === $this->getExtensionKey()) {
             $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
         } else {
@@ -228,10 +233,10 @@ class EntityAclExtension extends AbstractAclExtension
         if (is_string($val)) {
             return $this->fromDescriptor($val);
         } elseif ($val instanceof AclAnnotation) {
-            return new ObjectIdentity(
-                $val->getType(),
-                $this->entityClassResolver->getEntityClass($val->getClass())
-            );
+            $class = $this->entityClassResolver->getEntityClass($val->getClass());
+            $group = $val->getGroup();
+
+            return new ObjectIdentity($val->getType(), !empty($group) ? $group . '@' . $class : $class);
         }
 
         return $this->fromDomainObject($val);
@@ -514,14 +519,13 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function fromDescriptor($descriptor)
     {
-        $type = $id = null;
-        $this->parseDescriptor($descriptor, $type, $id);
+        $type = $id = $group = null;
+        $this->parseDescriptor($descriptor, $type, $id, $group);
+
+        $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
 
         if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity(
-                $id,
-                $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type))
-            );
+            return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
         }
 
         throw new \InvalidArgumentException(
@@ -660,8 +664,8 @@ class EntityAclExtension extends AbstractAclExtension
         if ($object instanceof ObjectIdentity) {
             $className = $object->getType();
         } elseif (is_string($object)) {
-            $className = $id = null;
-            $this->parseDescriptor($object, $className, $id);
+            $className = $id = $group = null;
+            $this->parseDescriptor($object, $className, $id, $group);
         } else {
             $className = ClassUtils::getClass($object);
         }

@@ -2,14 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -35,6 +41,9 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var OwnerTree */
     private $tree;
+
+    /** @var EntityOwnershipDecisionMaker */
+    private $decisionMaker;
 
     /** @var Organization */
     private $org1;
@@ -130,19 +139,19 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $decisionMaker = new EntityOwnershipDecisionMaker(
+        $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor(),
             new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
-        $decisionMaker->setContainer($container);
+        $this->decisionMaker->setContainer($container);
 
         $this->extension = TestHelper::get($this)->createEntityAclExtension(
             $this->metadataProvider,
             $this->tree,
             new ObjectIdAccessor(),
-            $decisionMaker
+            $this->decisionMaker
         );
     }
 
@@ -1047,5 +1056,133 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             array(EntityMaskBuilder::MASK_VIEW_SYSTEM | EntityMaskBuilder::MASK_VIEW_GLOBAL),
             array(EntityMaskBuilder::MASK_VIEW_GLOBAL | EntityMaskBuilder::MASK_VIEW_DEEP),
         );
+    }
+
+    /**
+     * @dataProvider supportsDataProvider
+     *
+     * @param mixed $id
+     * @param string $type
+     * @param string $class
+     * @param bool $isEntity
+     * @param bool $expected
+     */
+    public function testSupports($id, $type, $class, $isEntity, $expected)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver $entityClassResolverMock */
+        $entityClassResolverMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityClassResolverMock->expects($isEntity ? $this->once() : $this->never())
+            ->method('getEntityClass')
+            ->with($class)
+            ->willReturn($class);
+        $entityClassResolverMock->expects($this->once())
+            ->method('isEntity')
+            ->with($class)
+            ->willReturn($expected);
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
+        $entityMetadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $extension = new EntityAclExtension(
+            new ObjectIdAccessor(),
+            $entityClassResolverMock,
+            $entityMetadataProvider,
+            $this->metadataProvider,
+            $this->decisionMaker
+        );
+
+        $this->assertEquals($expected, $extension->supports($type, $id));
+    }
+
+    /**
+     * @return array
+     */
+    public function supportsDataProvider()
+    {
+        return [
+            [
+                'id' => 'action',
+                'type' => '\stdClass',
+                'class' => '\stdClass',
+                'isEntity' => false,
+                'expected' => false
+            ],
+            [
+                'id' => 'entity',
+                'type' => '\stdClass',
+                'class' => '\stdClass',
+                'isEntity' => true,
+                'expected' => true
+            ],
+            [
+                'id' => 'entity',
+                'type' => 'group@\stdClass',
+                'class' => '\stdClass',
+                'isEntity' => true,
+                'expected' => true
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getObjectIdentityDataProvider
+     *
+     * @param mixed $val
+     * @param ObjectIdentity $expected
+     */
+    public function testGetObjectIdentity($val, $expected)
+    {
+        $this->assertEquals($expected, $this->extension->getObjectIdentity($val));
+    }
+
+    /**
+     * @return array
+     */
+    public function getObjectIdentityDataProvider()
+    {
+        $annotation = new AclAnnotation([
+            'id' => 'test_id',
+            'type' => 'entity',
+            'permission' => 'VIEW',
+            'class' => '\stdClass'
+        ]);
+
+        $annotation2 = new AclAnnotation([
+            'id' => 'test_id',
+            'type' => 'entity',
+            'permission' => 'VIEW',
+            'class' => '\stdClass',
+            'group_name' => 'group'
+        ]);
+
+        $domainObject = new Stub\DomainObjectStub();
+
+        return [
+            [
+                'val' => 'entity:\stdClass',
+                'expected' => new ObjectIdentity('entity', '\stdClass')
+            ],
+            [
+                'val' => 'entity:group@\stdClass',
+                'expected' => new ObjectIdentity('entity', 'group@\stdClass')
+            ],
+            [
+                'val' => $annotation,
+                'expected' => new ObjectIdentity('entity', '\stdClass')
+            ],
+            [
+                'val' => $annotation2,
+                'expected' => new ObjectIdentity('entity', 'group@\stdClass')
+            ],
+            [
+                'val' => $domainObject,
+                'expected' => new ObjectIdentity(Stub\DomainObjectStub::IDENTIFIER, ClassUtils::getClass($domainObject))
+            ]
+        ];
     }
 }
