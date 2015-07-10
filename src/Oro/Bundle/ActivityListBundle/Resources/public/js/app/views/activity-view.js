@@ -1,17 +1,15 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var ActivityView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        routing = require('routing'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
-        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
-        CommentComponent = require('orocomment/js/app/components/comment-component');
-    
+    var ActivityView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var routing = require('routing');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var CommentComponent = require('orocomment/js/app/components/comment-component');
+
     ActivityView = BaseView.extend({
         options: {
             configuration: {
@@ -38,7 +36,7 @@ define(function (require) {
             'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
-            'addedToParent': function () {
+            'addedToParent': function() {
                 var emailTreadComponent = this.pageComponent('email-thread');
                 if (emailTreadComponent) {
                     emailTreadComponent.view.refreshEmails();
@@ -49,7 +47,7 @@ define(function (require) {
             'change:isContentLoading model': '_onContentLoadingStatusChange'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collapsed = true;
             if (this.options.template) {
@@ -63,7 +61,7 @@ define(function (require) {
             ActivityView.__super__.initialize.apply(this, arguments);
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = ActivityView.__super__.getTemplateData.call(this);
             data.has_comments = this.options.configuration.has_comments;
             data.ignoreHead = this.options.ignoreHead;
@@ -87,27 +85,27 @@ define(function (require) {
             return data;
         },
 
-        render: function () {
+        render: function() {
             ActivityView.__super__.render.apply(this, arguments);
-            this.$('.dropdown-toggle.activity-item').on('mouseover', function () {
+            this.$('.dropdown-toggle.activity-item').on('mouseover', function() {
                 $(this).trigger('click');
             });
-            this.$('.dropdown-menu.activity-item').on('mouseleave', function () {
+            this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
             this.initLayout();
             return this;
         },
 
-        onEdit: function () {
+        onEdit: function() {
             this.model.collection.trigger('toEdit', this.model);
         },
 
-        onDelete: function () {
+        onDelete: function() {
             this.model.collection.trigger('toDelete', this.model);
         },
 
-        onAccordionHeaderClick: function (e) {
+        onAccordionHeaderClick: function(e) {
             var ignoreItems = 'a, button, .accordition-toggle';
             if ($(e.target).is(ignoreItems) || $(e.target).parents(ignoreItems).length) {
                 // ignore clicks on links, buttons and accordition-toggle
@@ -116,12 +114,12 @@ define(function (require) {
             this.getAccorditionToggle().trigger('click');
         },
 
-        onToggle: function (e) {
+        onToggle: function(e) {
             e.preventDefault();
             this.toggle();
         },
 
-        toggle: function () {
+        toggle: function() {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
             } else {
@@ -129,39 +127,39 @@ define(function (require) {
             }
         },
 
-        getAccorditionToggle: function () {
+        getAccorditionToggle: function() {
             return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
         },
 
-        getAccorditionBody: function () {
+        getAccorditionBody: function() {
             return this.$('> .accordion-group > .accordion-body');
         },
 
-        isCollapsed: function () {
+        isCollapsed: function() {
             return this.getAccorditionToggle().hasClass('collapsed');
         },
 
-        _onContentChange: function () {
+        _onContentChange: function() {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
-            this.initLayout().done(_.bind(function () {
+            this.initLayout().done(_.bind(function() {
                 // if the activity has an emailTreadComponent -- handle comment count change in own way
                 var threadComponent = this.pageComponent('email-thread');
                 if (threadComponent) {
-                    this.listenTo(threadComponent.view, 'commentCountChanged', function (diff) {
+                    this.listenTo(threadComponent.view, 'commentCountChanged', function(diff) {
                         this.model.set('commentCount', this.model.get('commentCount') + diff);
                     });
                 }
             }, this));
         },
 
-        _onCommentCountChange: function () {
-            var quantity = this.model.get('commentCount'),
-                $elem = this.$(this.options.commentsCountBlock);
+        _onCommentCountChange: function() {
+            var quantity = this.model.get('commentCount');
+            var $elem = this.$(this.options.commentsCountBlock);
             $elem.html(quantity);
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
 
-        _onContentLoadingStatusChange: function () {
+        _onContentLoadingStatusChange: function() {
             if (this.model.get('isContentLoading')) {
                 this.subview('loading', new LoadingMaskView({
                     container: this.$el
@@ -177,7 +175,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initCommentsComponent: function (options) {
+        initCommentsComponent: function(options) {
             var commentsComponent;
             if (!this.isCommentComponentRequired()) {
                 return;
@@ -192,14 +190,14 @@ define(function (require) {
          * Check if comments component have to be initialized
          * @returns {boolean}
          */
-        isCommentComponentRequired: function () {
+        isCommentComponentRequired: function() {
             // comments component is not initialized yet, activity is "commentable" and it has place to be initialized
             return !this.pageComponent('comments') &&
                 this.model.get('commentable') &&
                 Boolean(this.$(this.options.commentsBlock).length);
         },
 
-        updateCommentsQuantity: function () {
+        updateCommentsQuantity: function() {
             var component = this.pageComponent('comments');
             if (component !== null) {
                 this.model.set('commentCount', component.collection.getState().totalItemsQuantity);

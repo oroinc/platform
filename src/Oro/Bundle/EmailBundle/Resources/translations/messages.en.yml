@@ -46,6 +46,10 @@ oro:
                         auto.label: Auto
                         manual.label: Manual
 
+            reply_configuration:
+                label: Reply
+                default_button.label: Default Reply Button
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
@@ -203,6 +207,7 @@ oro:
                         available_in_template: Available in email templates
 
         reply:                    Reply
+        reply_all:                Reply All
         forward:                  Forward
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"

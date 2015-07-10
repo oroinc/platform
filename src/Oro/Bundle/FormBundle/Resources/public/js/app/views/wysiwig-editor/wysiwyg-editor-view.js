@@ -1,12 +1,12 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var WysiwygEditorView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        _ = require('underscore'),
-        $ = require('tinymce/jquery.tinymce.min'),
-        txtHtmlTransformer = require('./txt-html-transformer'),
-        LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var WysiwygEditorView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var _ = require('underscore');
+    var $ = require('tinymce/jquery.tinymce.min');
+    var txtHtmlTransformer = require('./txt-html-transformer');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
         TINYMCE_UI_HEIGHT: 15,
@@ -22,23 +22,23 @@ define(function (require) {
         defaults: {
             enabled: true,
             plugins: ['textcolor', 'code', 'bdesk_photo'],
-            menubar : false,
+            menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
-            statusbar : false
+            statusbar: false
         },
 
         events: {
             'set-focus': 'setFocus'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
             this.options = _.omit(options, ['enabled']);
             WysiwygEditorView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             if (this.tinymceConnected) {
                 if (!this.tinymceInstance) {
                     throw new Error('Cannot disable tinyMCE before its instance is created');
@@ -64,9 +64,9 @@ define(function (require) {
             this.trigger('resize');
         },
 
-        connectTinyMCE: function () {
-            var loadingMaskContainer,
-                self = this;
+        connectTinyMCE: function() {
+            var loadingMaskContainer;
+            var self = this;
             loadingMaskContainer = this.$el.parents('.ui-dialog');
             if (!loadingMaskContainer.length) {
                 loadingMaskContainer = this.$el.parent();
@@ -89,13 +89,13 @@ define(function (require) {
                 options.readonly = true;
             }
             this.$el.tinymce(_.extend({
-                'init_instance_callback': function (editor) {
+                'init_instance_callback': function(editor) {
                     /**
                      * fix of https://magecore.atlassian.net/browse/BAP-7130
                      * "WYSWING editor does not work with IE"
                      * Please check if it's still required after tinyMCE update
                      */
-                    setTimeout(function () {
+                    setTimeout(function() {
                         var focusedElement = $(':focus');
                         editor.focus();
                         focusedElement.focus();
@@ -103,7 +103,7 @@ define(function (require) {
 
                     self.removeSubview('loadingMask');
                     self.tinymceInstance = editor;
-                    _.defer(function () {
+                    _.defer(function() {
                         /**
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)
@@ -115,7 +115,7 @@ define(function (require) {
             this.tinymceConnected = true;
         },
 
-        setEnabled: function (enabled) {
+        setEnabled: function(enabled) {
             if (this.enabled === enabled) {
                 return;
             }
@@ -123,17 +123,17 @@ define(function (require) {
             this.render();
         },
 
-        setFocus: function (e) {
+        setFocus: function(e) {
             if (this.enabled) {
                 this.tinymceInstance.focus();
             }
         },
 
-        getHeight: function () {
+        getHeight: function() {
             return this.$el.parent().height();
         },
 
-        setHeight: function (newHeight) {
+        setHeight: function(newHeight) {
             var currentToolbarHeight;
             if (this.tinymceConnected) {
                 currentToolbarHeight = this.$el.parent().find('.mce-toolbar-grp').outerHeight();
@@ -143,7 +143,7 @@ define(function (require) {
             }
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

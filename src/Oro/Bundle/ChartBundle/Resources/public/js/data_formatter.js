@@ -1,6 +1,6 @@
-/*global define*/
-define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
-    function (numberFormatter, dateTimeFormatter) {
+define([
+    'moment', 'orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'
+], function(moment, numberFormatter, dateTimeFormatter) {
         'use strict';
 
         /**
@@ -14,6 +14,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @return {*}
              */
             formatValue: function(data, format) {
+                var date;
                 switch (format) {
                     case 'integer':
                     case 'smallint':
@@ -25,19 +26,19 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     case 'boolean':
                         return numberFormatter.formatInteger(data);
                     case 'year':
-                        var date = new Date();
+                        date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.getMomentForBackendDate(date).format('YYYY');
                     case 'month':
-                        var date = new Date();
+                        date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.getMomentForBackendDate(date).format('MMM YYYY');
                     case 'date':
-                        var date = new Date();
+                        date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.formatDate(date);
                     case 'datetime':
-                        var date = new Date();
+                        date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.formatDateTime(date);
                     case 'money': case 'currency':
@@ -45,7 +46,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
                     case 'percent':
                         return numberFormatter.formatPercent(data);
                     case 'day':
-                        var date = new Date();
+                        date = new Date();
                         date.setTime(data);
                         return dateTimeFormatter.getMomentForBackendDate(date).format('MMM DD');
                     case 'time':
@@ -95,7 +96,7 @@ define(['orolocale/js/formatter/number', 'orolocale/js/formatter/datetime'],
              * @param {string} format
              * @return {boolean}
              */
-            isValueNumerical: function(format){
+            isValueNumerical: function(format) {
                 switch (format) {
                     case 'integer':
                     case 'smallint':

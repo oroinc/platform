@@ -1,12 +1,10 @@
-/*jslint browser: true, nomen: true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal',
     './abstract-listener'
-], function ($, _, __, Modal, AbstractListener) {
+], function($, _, __, Modal, AbstractListener) {
     'use strict';
 
     var AbstractGridChangeListener;
@@ -24,11 +22,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.confirmModal, function (modal) {
+            _.each(this.confirmModal, function(modal) {
                 modal.dispose();
             });
             delete this.confirmModal;
@@ -38,7 +36,7 @@ define([
         /**
          * Set datagrid instance
          */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             AbstractGridChangeListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             this._clearState();
@@ -48,7 +46,7 @@ define([
         /**
          * @inheritDoc
          */
-        getGridEvents: function () {
+        getGridEvents: function() {
             var events = AbstractGridChangeListener.__super__.getGridEvents.call(this);
             events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
             events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
@@ -61,7 +59,7 @@ define([
          * @protected
          * @abstract
          */
-        _clearState: function () {
+        _clearState: function() {
             throw new Error('_clearState method is abstract and must be implemented');
         },
 
@@ -71,7 +69,7 @@ define([
          * @protected
          * @abstract
          */
-        _synchronizeState: function () {
+        _synchronizeState: function() {
             throw new Error('_synchronizeState method is abstract and must be implemented');
         },
 
@@ -81,7 +79,7 @@ define([
          * @protected
          * @abstract
          */
-        _restoreState: function () {
+        _restoreState: function() {
             throw new Error('_restoreState method is abstract and must be implemented');
         },
 
@@ -93,7 +91,7 @@ define([
          * @param {Object} options
          * @protected
          */
-        _onExecuteRefreshAction: function (e, action, options) {
+        _onExecuteRefreshAction: function(e, action, options) {
             this._confirmAction(action, options, 'refresh', {
                 title: __('Refresh Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to refresh grid?')
@@ -108,7 +106,7 @@ define([
          * @param {Object} options
          * @protected
          */
-        _onExecuteResetAction: function (e, action, options) {
+        _onExecuteResetAction: function(e, action, options) {
             this._confirmAction(action, options, 'reset', {
                 title: __('Reset Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to reset grid?')
@@ -124,11 +122,11 @@ define([
          * @param {Object} confirmModalOptions Options for confirm dialog
          * @protected
          */
-        _confirmAction: function (action, actionOptions, type, confirmModalOptions) {
+        _confirmAction: function(action, actionOptions, type, confirmModalOptions) {
             this.confirmed = this.confirmed || {};
             if (!this.confirmed[type] && this._hasChanges()) {
                 actionOptions.doExecute = false; // do not execute action until it's confirmed
-                this._openConfirmDialog(type, confirmModalOptions, function () {
+                this._openConfirmDialog(type, confirmModalOptions, function() {
                     // If confirmed, clear state and run action
                     this.confirmed[type] = true;
                     this._clearState();
@@ -146,7 +144,7 @@ define([
          * @protected
          * @abstract
          */
-        _hasChanges: function () {
+        _hasChanges: function() {
             throw new Error('_hasChanges method is abstract and must be implemented');
         },
 
@@ -158,7 +156,7 @@ define([
          * @param {Object} callback
          * @protected
          */
-        _openConfirmDialog: function (type, options, callback) {
+        _openConfirmDialog: function(type, options, callback) {
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
