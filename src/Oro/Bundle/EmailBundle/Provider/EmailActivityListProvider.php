@@ -5,10 +5,10 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
@@ -335,10 +335,16 @@ class EmailActivityListProvider implements
      */
     public function getActivityOwners(Email $entity, ActivityList $activity)
     {
+        $filter = ['email' => $entity];
+        $organization = $this->getOrganization($entity);
+        if ($organization) {
+            $filter['organization'] = $organization;
+        }
+
         $activityArray = [];
         $owners = $this->doctrineRegistryLink->getService()
             ->getRepository('OroEmailBundle:EmailUser')
-            ->findBy(['email' => $entity]);
+            ->findBy($filter);
 
         if ($owners) {
             foreach ($owners as $owner) {
