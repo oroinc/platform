@@ -1,14 +1,13 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var WidgetComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools'),
-        mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
+    var WidgetComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var mapWidgetModuleName = require('oroui/js/widget/map-widget-module-name');
 
     /**
      * @export oroui/js/app/components/widget-component
@@ -34,7 +33,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (options.initialized) {
                 // widget is initialized from server, there's nothing to do
                 return;
@@ -58,7 +57,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (!this.disposed && this.$element) {
                 this.$element.off('.' + this.cid);
             }
@@ -70,10 +69,9 @@ define(function (require) {
          *
          * @protected
          */
-        _bindOpenEvent: function () {
-            var eventName, handler;
-            eventName = this.options.createOnEvent;
-            handler = _.bind(function (e) {
+        _bindOpenEvent: function() {
+            var eventName = this.options.createOnEvent;
+            var handler = _.bind(function(e) {
                 e.preventDefault();
                 this.openWidget();
             }, this);
@@ -86,12 +84,12 @@ define(function (require) {
          *
          * @protected
          */
-        openWidget: function () {
+        openWidget: function() {
             var widgetModuleName;
             if (!this.widget) {
                 // defines module name and load the module, before open widget
                 widgetModuleName = mapWidgetModuleName(this.options.type);
-                tools.loadModules(widgetModuleName, function (Widget) {
+                tools.loadModules(widgetModuleName, function(Widget) {
                     this.widget = Widget;
                     this._openWidget();
                 }, this);
@@ -105,10 +103,10 @@ define(function (require) {
          *
          * @protected
          */
-        _openWidget: function () {
-            var widget,
-                Widget = this.widget,
-                options = $.extend(true, {}, this.options.options);
+        _openWidget: function() {
+            var widget;
+            var Widget = this.widget;
+            var options = $.extend(true, {}, this.options.options);
 
             if (!this.options.multiple && this.opened) {
                 // single instance is already opened
@@ -122,7 +120,7 @@ define(function (require) {
 
             if (!this.options.multiple) {
                 this.opened = true;
-                this.listenTo(widget, 'widgetRemove', _.bind(function () {
+                this.listenTo(widget, 'widgetRemove', _.bind(function() {
                     this.opened = false;
                 }, this));
             }
@@ -145,30 +143,30 @@ define(function (require) {
          * @param {oroui.widget.AbstractWidget} widget
          * @protected
          */
-        _bindEnvironmentEvent: function (widget) {
-            var reloadEvent = this.options['reload-event'],
-                reloadGridName = this.options['reload-grid-name'],
-                refreshWidgetAlias = this.options['refresh-widget-alias'],
-                reloadWidgetAlias = this.options['reload-widget-alias'];
+        _bindEnvironmentEvent: function(widget) {
+            var reloadEvent = this.options['reload-event'];
+            var reloadGridName = this.options['reload-grid-name'];
+            var refreshWidgetAlias = this.options['refresh-widget-alias'];
+            var reloadWidgetAlias = this.options['reload-widget-alias'];
 
             reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
 
             if (refreshWidgetAlias) {
-                widget.listenTo(mediator, reloadEvent, function () {
+                widget.listenTo(mediator, reloadEvent, function() {
                     mediator.trigger('widget:doRefresh:' + refreshWidgetAlias);
                 });
             }
 
             if (reloadWidgetAlias) {
-                widget.listenTo(mediator, reloadEvent, function () {
-                    mediator.execute('widgets:getByAliasAsync', reloadWidgetAlias, function (widget) {
+                widget.listenTo(mediator, reloadEvent, function() {
+                    mediator.execute('widgets:getByAliasAsync', reloadWidgetAlias, function(widget) {
                         widget.loadContent();
                     });
                 });
             }
 
             if (reloadGridName) {
-                widget.listenTo(mediator, reloadEvent, function () {
+                widget.listenTo(mediator, reloadEvent, function() {
                     mediator.trigger('datagrid:doRefresh:' + reloadGridName);
                 });
             }

@@ -1,17 +1,17 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var FlowchartJsPlumbBoxView = require('../jsplumb/box-view'),
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        __ = require('orotranslation/js/translator'),
-        FlowchartViewerStepView;
+    var FlowchartViewerStepView;
+    var FlowchartJsPlumbBoxView = require('../jsplumb/box-view');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
+    var __ = require('orotranslation/js/translator');
 
     FlowchartViewerStepView = FlowchartJsPlumbBoxView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/viewer/step.html'),
 
-        className: function () {
+        className: function() {
             var classNames = [FlowchartViewerStepView.__super__.className.call(this)];
             classNames.push('workflow-step');
             if (this.model.get('_is_start')) {
@@ -32,20 +32,20 @@ define(function (require) {
         sourceDefaults: {
             filter: '.jsplumb-source',
             anchor: 'Continuous',
-            connector: ['Smartline', { cornerRadius: 5 }],
+            connector: ['Smartline', {cornerRadius: 5}],
             maxConnections: 100
         },
 
-        connect: function () {
+        connect: function() {
             FlowchartViewerStepView.__super__.connect.apply(this, arguments);
             var instance = this.areaView.jsPlumbInstance;
 
-            instance.batch(_.bind(function () {
+            instance.batch(_.bind(function() {
                 // add element as source to jsPlumb
                 if (this.model.get('draggable') !== false) {
                     instance.draggable(this.$el, {
                         containment: 'parent',
-                        stop: _.bind(function (e) {
+                        stop: _.bind(function(e) {
                             // update model position when dragging stops
                             this.model.set({position: e.pos});
                         }, this)
@@ -56,18 +56,18 @@ define(function (require) {
             }, this));
         },
 
-        makeTarget: function () {
+        makeTarget: function() {
             var instance = this.areaView.jsPlumbInstance;
             instance.makeTarget(this.$el, $.extend(true, {}, _.result(this, 'targetDefaults')));
         },
 
-        makeSource: function () {
+        makeSource: function() {
             var instance = this.areaView.jsPlumbInstance;
             instance.makeSource(this.$el, $.extend(true,
                 {},
                 _.result(this, 'sourceDefaults'),
                 {
-                    onMaxConnections: function (info, e) {
+                    onMaxConnections: function(info, e) {
                         mediator.execute(
                             'showErrorMessage',
                             __('Maximum connections ({{ maxConnections }}) reached', info),

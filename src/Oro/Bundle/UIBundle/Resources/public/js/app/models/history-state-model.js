@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var HistoryStateModel,
-        BaseModel = require('oroui/js/app/models/base/model');
+    var HistoryStateModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     HistoryStateModel = BaseModel.extend({
-        defaults: function () {
+        defaults: function() {
             return {
                 data: {}
             };
