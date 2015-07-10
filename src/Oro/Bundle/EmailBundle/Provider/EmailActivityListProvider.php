@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
@@ -334,5 +335,36 @@ class EmailActivityListProvider implements
             ->setParameter('thread', $email->getThread());
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param Email $entity
+     * @param ActivityList $activity
+     * @return array
+     */
+    public function getActivityOwners(Email $entity, ActivityList $activity)
+    {
+        $filter = ['email' => $entity];
+        $organization = $this->getOrganization($entity);
+        if ($organization) {
+            $filter['organization'] = $organization;
+        }
+
+        $activityArray = [];
+        $owners = $this->doctrineRegistryLink->getService()
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findBy($filter);
+
+        if ($owners) {
+            foreach ($owners as $owner) {
+                $activityOwner = new ActivityOwner();
+                $activityOwner->setActivity($activity);
+                $activityOwner->setOrganization($owner->getOrganization());
+                $activityOwner->setUser($owner->getOwner());
+                $activityArray[] = $activityOwner;
+            }
+        }
+
+        return $activityArray;
     }
 }

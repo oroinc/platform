@@ -289,6 +289,13 @@ class ActivityListChainProvider
                 $list = new ActivityList();
             }
 
+            $activityOwnersArray = $provider->getActivityOwners($entity, $list);
+            if ($activityOwnersArray) {
+                foreach ($activityOwnersArray as $owner) {
+                    $list->addActivityOwner($owner);
+                }
+            }
+
             $list->setSubject($provider->getSubject($entity));
             $description = $this->htmlTagHelper->stripTags(
                 $this->htmlTagHelper->purify($provider->getDescription($entity))
