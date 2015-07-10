@@ -52,7 +52,6 @@ define(function (require) {
             this.xIncrement = 200;
             this.yIncrement = 100;
             this.stepForNew = 10;
-            this._debounceRecalculateConnections = _.debounce(_.bind(this.recalculateConnections, this), 100);
         };
 
     _.extend(JsPlumbManager.prototype, {

@@ -30,6 +30,18 @@ var intervalSiblingType;
     intervalSiblingType[intervalSiblingType["MIN"] = 0] = "MIN";
     intervalSiblingType[intervalSiblingType["MAX"] = 1] = "MAX";
 })(intervalSiblingType || (intervalSiblingType = {}));
+var isConnectionForward = {
+    0: true,
+    1: false,
+    8: true,
+    9: false
+};
+var oppositeDirection = {
+    0: 1,
+    1: 0,
+    8: 9,
+    9: 8
+};
 var graphUtil = {
     xor: function (a, b) {
         return a ? !b : b;
@@ -328,6 +340,26 @@ var Axis = (function () {
             var siblings = this.children[i];
             cb(siblings);
         }
+    };
+    Axis.prototype.isAxisAtLeft = function (needle) {
+        var result = false;
+        this.eachAxisAtLeft(function (axis) {
+            if (axis === needle) {
+                return (result = true);
+            }
+            return undefined;
+        });
+        return result;
+    };
+    Axis.prototype.isAxisAtRight = function (needle) {
+        var result = false;
+        this.eachAxisAtRight(function (axis) {
+            if (axis === needle) {
+                return (result = true);
+            }
+            return undefined;
+        });
+        return result;
     };
     Axis.prototype.eachAxisAtLeft = function (cb) {
         var queue = [this], processed = [], criticalAxises, current;
@@ -1123,7 +1155,7 @@ var NodePath = (function () {
                     lastAxis.turnIn = !isCenterForward ? Turn.RIGHT : Turn.LEFT;
                     this.addAxis(centerAxis);
                     this.addAxis(lastAxis);
-                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0, previousDivision);
+                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0);
                     nextGraphItem = (previousAxis.bounds.min < this.previous.leavingInterval.min) ? firstDivision.second : firstDivision.first;
                     secondDivision = nextGraphItem.share(isConnectionHorizontal, lastAxis, 0);
                     nextGraphItem = (previousAxis.bounds.min < this.previous.leavingInterval.min) ? secondDivision.first : secondDivision.second;
@@ -1145,7 +1177,7 @@ var NodePath = (function () {
                     }
                 }
                 else {
-                    secondDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, crossPathCost, previousDivision);
+                    secondDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, crossPathCost);
                     this.previous.put(previousAxis, secondDivision);
                 }
                 break;
@@ -1161,7 +1193,7 @@ var NodePath = (function () {
                     lastAxis.turnIn = !isCenterForward ? Turn.RIGHT : Turn.LEFT;
                     this.addAxis(centerAxis);
                     this.addAxis(lastAxis);
-                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0, previousDivision);
+                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0);
                     secondDivision = firstDivision.second.share(isConnectionHorizontal, lastAxis, 0);
                     centralDivision = secondDivision.first.share(!isConnectionHorizontal, centerAxis, crossPathCost);
                     // add path cross costs
@@ -1189,7 +1221,7 @@ var NodePath = (function () {
                     lastAxis.turnIn = !isCenterForward ? Turn.RIGHT : Turn.LEFT;
                     this.addAxis(centerAxis);
                     this.addAxis(lastAxis);
-                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0, previousDivision);
+                    firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0);
                     secondDivision = firstDivision.first.share(isConnectionHorizontal, lastAxis, 0);
                     centralDivision = secondDivision.second.share(!isConnectionHorizontal, centerAxis, crossPathCost);
                     // add path cross costs
@@ -1214,7 +1246,7 @@ var NodePath = (function () {
                 lastAxis = new Axis(!isConnectionHorizontal, this.previous.leavingInterval);
                 lastAxis.turnIn = this.connection.isForward ? Turn.RIGHT : Turn.LEFT;
                 this.addAxis(lastAxis);
-                firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0, previousDivision);
+                firstDivision = this.connection.origin.share(isConnectionHorizontal, previousAxis, 0);
                 nextGraphItem = this.previous.connection.isForward ? firstDivision.first : firstDivision.second;
                 secondDivision = nextGraphItem.share(!isConnectionHorizontal, lastAxis, crossPathCost);
                 // add path cross costs
@@ -1318,6 +1350,7 @@ var RectangularGraphNode = (function (_super) {
         _super.call(this, left, top, width, height);
         this.leavingConnections = [];
         this.enteringConnections = [];
+        this.isShared = false;
         this.id = UUID.counter++;
         this.graph = graph;
     }
@@ -1348,54 +1381,6 @@ var RectangularGraphNode = (function (_super) {
             }
         });
     };
-    RectangularGraphNode.prototype.connect = function (conns, ignoreConnectionsTo) {
-        var _this = this;
-        conns.forEach(function (connection) {
-            var isConnectionCreated = false;
-            if (connection.destination == ignoreConnectionsTo) {
-                return;
-            }
-            var destination = connection.destination, topOrBottom = destination.left < _this.right && destination.right > _this.left, leftOrRight = destination.top < _this.bottom && destination.bottom > _this.top, a, b;
-            switch (connection.direction) {
-                case connectionDirection.LEFT_TO_RIGHT:
-                    if (leftOrRight && destination.horizontalInterval.contains(_this.right)) {
-                        a = new Connection(_this, connection.destination, connectionDirection.LEFT_TO_RIGHT, connection.cost);
-                        b = new Connection(connection.destination, _this, connectionDirection.RIGHT_TO_LEFT, connection.cost);
-                        a.oppositeConnection = b;
-                        b.oppositeConnection = a;
-                        isConnectionCreated = true;
-                    }
-                    break;
-                case connectionDirection.RIGHT_TO_LEFT:
-                    if (leftOrRight && destination.horizontalInterval.contains(_this.left)) {
-                        a = new Connection(_this, connection.destination, connectionDirection.RIGHT_TO_LEFT, connection.cost);
-                        b = new Connection(connection.destination, _this, connectionDirection.LEFT_TO_RIGHT, connection.cost);
-                        a.oppositeConnection = b;
-                        b.oppositeConnection = a;
-                        isConnectionCreated = true;
-                    }
-                    break;
-                case connectionDirection.TOP_TO_BOTTOM:
-                    if (topOrBottom && destination.verticalInterval.contains(_this.bottom)) {
-                        a = new Connection(_this, connection.destination, connectionDirection.TOP_TO_BOTTOM, connection.cost);
-                        b = new Connection(connection.destination, _this, connectionDirection.BOTTOM_TO_TOP, connection.cost);
-                        a.oppositeConnection = b;
-                        b.oppositeConnection = a;
-                        isConnectionCreated = true;
-                    }
-                    break;
-                case connectionDirection.BOTTOM_TO_TOP:
-                    if (topOrBottom && destination.verticalInterval.contains(_this.top)) {
-                        a = new Connection(_this, connection.destination, connectionDirection.BOTTOM_TO_TOP, connection.cost);
-                        b = new Connection(connection.destination, _this, connectionDirection.TOP_TO_BOTTOM, connection.cost);
-                        a.oppositeConnection = b;
-                        b.oppositeConnection = a;
-                        isConnectionCreated = true;
-                    }
-                    break;
-            }
-        });
-    };
     RectangularGraphNode.prototype.divideWidth = function (left) {
         if (this.width <= left || left <= 0) {
             throw new Error('Cannot divide');
@@ -1406,6 +1391,8 @@ var RectangularGraphNode = (function (_super) {
             second: new RectangularGraphNode(this.graph, this.left + left, this.top, this.width - left, this.height)
         };
         this.divideInternal(result, 0);
+        this.simpleConnect(result);
+        this.disconnect();
         return result;
     };
     RectangularGraphNode.prototype.divideHeight = function (top) {
@@ -1418,17 +1405,59 @@ var RectangularGraphNode = (function (_super) {
             second: new RectangularGraphNode(this.graph, this.left, this.top + top, this.width, this.height - top)
         };
         this.divideInternal(result, 8);
+        this.simpleConnect(result);
+        this.disconnect();
         return result;
     };
-    RectangularGraphNode.prototype.share = function (isHorizontal, axis, connectionCost, previousDivision) {
-        if (isHorizontal) {
-            return this.shareHeight(axis, connectionCost, previousDivision);
-        }
-        else {
-            return this.shareWidth(axis, connectionCost, previousDivision);
+    RectangularGraphNode.prototype.cloneConnection = function (node, connection) {
+        var a = new Connection(node, connection.destination, connection.direction, connection.cost), b = new Connection(connection.destination, node, oppositeDirection[connection.direction], connection.cost);
+        a.oppositeConnection = b;
+        b.oppositeConnection = a;
+    };
+    RectangularGraphNode.prototype.internalSimpleConnect = function (node, connection) {
+        var destination = connection.destination, topOrBottom = destination.left < node.right && destination.right > node.left, leftOrRight = destination.top < node.bottom && destination.bottom > node.top, a, b;
+        switch (connection.direction) {
+            case connectionDirection.LEFT_TO_RIGHT:
+                if (leftOrRight && destination.horizontalInterval.contains(node.right)) {
+                    this.cloneConnection(node, connection);
+                }
+                break;
+            case connectionDirection.RIGHT_TO_LEFT:
+                if (leftOrRight && destination.horizontalInterval.contains(node.left)) {
+                    this.cloneConnection(node, connection);
+                }
+                break;
+            case connectionDirection.TOP_TO_BOTTOM:
+                if (topOrBottom && destination.verticalInterval.contains(node.bottom)) {
+                    this.cloneConnection(node, connection);
+                }
+                break;
+            case connectionDirection.BOTTOM_TO_TOP:
+                if (topOrBottom && destination.verticalInterval.contains(node.top)) {
+                    this.cloneConnection(node, connection);
+                }
+                break;
         }
     };
-    RectangularGraphNode.prototype.shareWidth = function (axis, connectionCost, previousDivision) {
+    ;
+    RectangularGraphNode.prototype.simpleConnect = function (siblings) {
+        var _this = this;
+        this.leavingConnections.forEach(function (connection) {
+            _this.internalSimpleConnect(siblings.first, connection);
+            _this.internalSimpleConnect(siblings.second, connection);
+        });
+    };
+    RectangularGraphNode.prototype.share = function (isHorizontal, axis, connectionCost) {
+        this.isShared = true;
+        this.usedAxisForShare = axis;
+        if (isHorizontal) {
+            return this.shareHeight(axis, connectionCost);
+        }
+        else {
+            return this.shareWidth(axis, connectionCost);
+        }
+    };
+    RectangularGraphNode.prototype.shareWidth = function (axis, connectionCost) {
         this.isSharedHorizontally = false;
         var intervalDivision = this.horizontalInterval.createSharedSiblings(GraphConstant.connectionWidth, axis);
         this.sharedChildren = {
@@ -1439,18 +1468,14 @@ var RectangularGraphNode = (function (_super) {
         this.sharedChildren.second.horizontalInterval = intervalDivision.second;
         this.sharedChildren.first.sharedParent = this;
         this.sharedChildren.second.sharedParent = this;
-        this.divideInternal(this.sharedChildren, 0, connectionCost, previousDivision);
+        this.divideInternal(this.sharedChildren, 0, connectionCost);
+        this.sharedConnect(this.sharedChildren, axis);
+        this.disconnect();
         return this.sharedChildren;
     };
-    RectangularGraphNode.prototype.shareHeight = function (axis, connectionCost, previousDivision) {
+    RectangularGraphNode.prototype.shareHeight = function (axis, connectionCost) {
         this.isSharedHorizontally = true;
         var intervalDivision = this.verticalInterval.createSharedSiblings(GraphConstant.connectionWidth, axis);
-        if (DEBUG_ENABLED) {
-            var closestSharedParentInfo = this.getClosestSharedParent(true);
-            if (closestSharedParentInfo.parent && !(this.verticalInterval instanceof SharedInterval)) {
-                throw Error("Something goes wrong!");
-            }
-        }
         this.sharedChildren = {
             first: this.clone(),
             second: this.clone()
@@ -1459,21 +1484,53 @@ var RectangularGraphNode = (function (_super) {
         this.sharedChildren.second.verticalInterval = intervalDivision.second;
         this.sharedChildren.first.sharedParent = this;
         this.sharedChildren.second.sharedParent = this;
-        this.divideInternal(this.sharedChildren, 8, connectionCost, previousDivision);
+        this.divideInternal(this.sharedChildren, 8, connectionCost);
+        this.sharedConnect(this.sharedChildren, axis);
+        this.disconnect();
         return this.sharedChildren;
     };
-    RectangularGraphNode.prototype.getClosestSharedParent = function (isSharedHorizontally) {
-        var current = this.sharedParent, isLocationAtMaxSide = this.sharedParent && (this.sharedParent.sharedChildren.first == this);
-        while (current && (current.isSharedHorizontally !== isSharedHorizontally)) {
-            isLocationAtMaxSide = current.sharedParent && (current.sharedParent.sharedChildren.first == current);
-            current = current.sharedParent;
-        }
-        return {
-            parent: current,
-            mineLocation: isLocationAtMaxSide ? intervalSiblingType.MAX : intervalSiblingType.MIN
-        };
+    RectangularGraphNode.prototype.sharedConnect = function (siblings, mainAxis) {
+        var _this = this;
+        this.leavingConnections.forEach(function (connection) {
+            if (graphUtil.xor(_this.isSharedHorizontally, connection.isHorizontal)) {
+                _this.cloneConnection(isConnectionForward[connection.direction] ? siblings.second : siblings.first, connection);
+            }
+            else {
+                // must find what connection it is related
+                var usedAxis = connection.destination[_this.isSharedHorizontally ? 'verticalInterval' : 'horizontalInterval'].axis;
+                if (connection.destination.isShared) {
+                    throw new Error('It should not be there');
+                }
+                else if (usedAxis && connection.destination.sharedParent) {
+                    if (usedAxis === mainAxis) {
+                        if (connection.destination.isLeft()) {
+                            _this.cloneConnection(siblings.first, connection);
+                        }
+                        else {
+                            _this.cloneConnection(siblings.second, connection);
+                        }
+                    }
+                    else {
+                        if (mainAxis.isAxisAtLeft(usedAxis)) {
+                            _this.cloneConnection(siblings.second, connection);
+                        }
+                        else if (mainAxis.isAxisAtRight(usedAxis)) {
+                            _this.cloneConnection(siblings.first, connection);
+                        }
+                        else {
+                            _this.internalSimpleConnect(siblings.first, connection);
+                            _this.internalSimpleConnect(siblings.second, connection);
+                        }
+                    }
+                }
+                else {
+                    _this.internalSimpleConnect(siblings.first, connection);
+                    _this.internalSimpleConnect(siblings.second, connection);
+                }
+            }
+        });
     };
-    RectangularGraphNode.prototype.divideInternal = function (result, isHorizontal, connectionCost, ignoreConnectionsTo) {
+    RectangularGraphNode.prototype.divideInternal = function (result, isHorizontal, connectionCost) {
         if (connectionCost === void 0) { connectionCost = 0; }
         // replace
         this.graph.items.splice(this.graph.items.indexOf(this), 1);
@@ -1483,9 +1540,6 @@ var RectangularGraphNode = (function (_super) {
         var a = new Connection(result.first, result.second, connectionDirection.LEFT_TO_RIGHT + isHorizontal, connectionCost), b = new Connection(result.second, result.first, connectionDirection.RIGHT_TO_LEFT + isHorizontal, connectionCost);
         a.oppositeConnection = b;
         b.oppositeConnection = a;
-        result.first.connect(this.leavingConnections, ignoreConnectionsTo ? ignoreConnectionsTo.second : undefined);
-        result.second.connect(this.leavingConnections, ignoreConnectionsTo ? ignoreConnectionsTo.first : undefined);
-        this.disconnect();
     };
     RectangularGraphNode.prototype.findTopParent = function () {
         var current = this;
@@ -1517,11 +1571,17 @@ var RectangularGraphNode = (function (_super) {
     };
     RectangularGraphNode.prototype.getDividedInterval = function () {
         if (this.isSharedHorizontally) {
-            return { interval: this.verticalInterval, isHorizontal: false };
+            return this.verticalInterval;
         }
         else {
-            return { interval: this.horizontalInterval, isHorizontal: true };
+            return this.horizontalInterval;
         }
+    };
+    RectangularGraphNode.prototype.isLeft = function () {
+        return this.sharedParent.sharedChildren.first === this;
+    };
+    RectangularGraphNode.prototype.isRight = function () {
+        return this.sharedParent.sharedChildren.second === this;
     };
     return RectangularGraphNode;
 })(Rectangle);
@@ -1545,7 +1605,7 @@ var Connection = (function (_super) {
     }
     Object.defineProperty(Connection.prototype, "isForward", {
         get: function () {
-            return (this.direction == connectionDirection.TOP_TO_BOTTOM || this.direction == connectionDirection.LEFT_TO_RIGHT);
+            return isConnectionForward[this.direction];
         },
         enumerable: true,
         configurable: true
@@ -1790,6 +1850,7 @@ var Finder = (function () {
     };
     return Finder;
 })();
+//# sourceMappingURL=Graph.js.map
 
 define({});
 /*jslint ignore:end*/

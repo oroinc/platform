@@ -100,7 +100,6 @@ define(function (require) {
                 }
             }
             this.removeStaleConnections();
-            this.areaView.jsPlumbManager.debounceRecalculateConnections();
         },
 
         addStaleMark: function () {
