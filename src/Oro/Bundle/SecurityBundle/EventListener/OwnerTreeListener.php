@@ -5,10 +5,13 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class OwnerTreeListener
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+
+class OwnerTreeListener implements ContainerAwareInterface
 {
     /**
      * Array with classes need to be checked for
@@ -18,7 +21,7 @@ class OwnerTreeListener
     protected $securityClasses = [];
 
     /**
-     * @var ServiceLink
+     * @var OwnerTreeProviderInterface
      */
     protected $treeProvider;
 
@@ -28,9 +31,24 @@ class OwnerTreeListener
     protected $needWarmup;
 
     /**
-     * @param ServiceLink $treeProviderLink
+     * @var ContainerInterface
      */
-    public function __construct(ServiceLink $treeProviderLink)
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @param ServiceLink $treeProviderLink
+     *
+     * @deprecated 1.8:2.1 use $container property instead
+     */
+    public function __construct(ServiceLink $treeProviderLink = null)
     {
         $this->treeProviderLink = $treeProviderLink;
     }
@@ -80,10 +98,18 @@ class OwnerTreeListener
     }
 
     /**
-     * @return OwnerTreeProvider
+     * @return OwnerTreeProviderInterface
      */
     protected function getTreeProvider()
     {
-        return $this->treeProviderLink->getService();
+        if (!$this->container) {
+            throw new \InvalidArgumentException('ContainerInterface not injected');
+        }
+
+        if (!$this->treeProvider) {
+            $this->treeProvider = $this->container->get('oro_security.ownership_tree_provider.chain');
+        }
+
+        return $this->treeProvider;
     }
 }

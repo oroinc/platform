@@ -4,7 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
 
 class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
@@ -20,16 +21,13 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnFlush($supportedClass, array $inserts, array $updates, array $deletions, $isExpectedCache)
     {
-        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $serviceLink */
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $serviceLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($treeProvider));
+        /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject $args */
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->any())->method('get')->with('oro_security.ownership_tree_provider.chain')
+            ->willReturn($treeProvider);
         /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
@@ -63,7 +61,8 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
                 ->method('clear');
         }
 
-        $treeListener = new OwnerTreeListener($serviceLink);
+        $treeListener = new OwnerTreeListener();
+        $treeListener->setContainer($container);
         $treeListener->addSupportedClass($supportedClass);
         $treeListener->onFlush($args);
     }
@@ -107,13 +106,6 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFlushNoEntities()
     {
-        /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject $serviceLink */
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $serviceLink->expects($this->never())
-            ->method($this->anything());
-
         /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
@@ -121,7 +113,44 @@ class OwnerTreeListenerTest extends \PHPUnit_Framework_TestCase
         $args->expects($this->never())
             ->method($this->anything());
 
-        $treeListener = new OwnerTreeListener($serviceLink);
+        $treeListener = new OwnerTreeListener();
+        $treeListener->onFlush($args);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage ContainerInterface not injected
+     */
+    public function testMissingContainer()
+    {
+        /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
+        $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $args->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($em));
+        $em->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+        $uow->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->will($this->returnValue([new \stdClass()]));
+        $uow->expects($this->any())
+            ->method('getScheduledEntityUpdates')
+            ->will($this->returnValue([]));
+        $uow->expects($this->any())
+            ->method('getScheduledEntityDeletions')
+            ->will($this->returnValue([]));
+
+        $treeListener = new OwnerTreeListener();
+        $treeListener->addSupportedClass('stdClass');
         $treeListener->onFlush($args);
     }
 }
