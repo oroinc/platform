@@ -28,7 +28,7 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-    oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
+    oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Entity\Provider\MailboxEmailOwnerProvider
     oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
     oro_email.mailbox_processor.manual.class:     Oro\Bundle\EmailBundle\Provider\ManualMailboxProcessor
 
