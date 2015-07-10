@@ -24,6 +24,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             'jsmessages' => array(
                 'foo' => 'foo (EN)',
                 'bar' => 'bar (EN)',
+                'baz' => 'baz (EN)',
             ),
             'messages' => array(
                 'foo' => 'foo messages (EN)',
@@ -84,6 +85,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                         'foobar' => 'foobar (ES)',
                         'foo' => 'foo (FR)',
                         'bar' => 'bar (EN)',
+                        'baz' => 'baz (EN)',
                     ),
                 )
             ),
@@ -100,6 +102,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                         'foobar' => 'foobar (ES)',
                         'foo' => 'foo (FR)',
                         'bar' => 'bar (EN)',
+                        'baz' => 'baz (EN)',
                     ),
                 )
             ),
@@ -116,6 +119,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                         'foobar' => 'foobar (ES)',
                         'foo' => 'foo (EN)',
                         'bar' => 'bar (EN)',
+                        'baz' => 'baz (EN)',
                     ),
                 )
             ),
@@ -254,6 +258,22 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($translator->hasTrans('foo11111'));
     }
 
+    public function testGetFallbackTranslations()
+    {
+        $locale = 'pt-PT';
+        $locales = array_keys($this->messages);
+        $translateKey = 'baz';
+        $message = $this->messages['en']['jsmessages'][$translateKey];
+
+        $translator = $this->getTranslator($this->getLoader());
+        $translator->setLocale($locale);
+        $translator->setFallbackLocales($locales);
+        $result = $translator->trans($translateKey, [], 'jsmessages', $locale);
+
+        $this->assertTrue($translator->hasTrans($translateKey, 'jsmessages'));
+        $this->assertEquals($message, $result);
+    }
+
     public function testEnsureDatabaseLoaderAddedWithNoDatabaseTranslationMetadataCache()
     {
         $locale     = 'en';
@@ -271,7 +291,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testEnsureDatabaseLoaderAddedWithNoLoadedResources()
     {
         $locale        = 'en';
-        $domains       = ['domain1', 'domain2', 'domain3'];
+        $translate     = [
+            ['locale' => $locale, 'domain' => 'domain1'],
+            ['locale' => $locale, 'domain' => 'domain2'],
+            ['locale' => $locale, 'domain' => 'domain3'],
+        ];
+
         $container     = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
         $repository    = $this
@@ -312,10 +337,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($repository);
         $repository
             ->expects($this->any())
-            ->method('findAvailableDomains')
-            ->willReturn($domains);
+            ->method('findAvailableDomainsForLocales')
+            ->willReturn($translate);
 
-        $translator->expects($this->exactly(count($domains)))->method('addResource');
+        $translator->expects($this->exactly(count($translate)))->method('addResource');
         $translator->hasTrans('foo');
     }
 }
