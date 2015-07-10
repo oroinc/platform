@@ -1,6 +1,8 @@
 define(function (require) {
     'use strict';
+
     var FlowchartEditorWorkflowView,
+        $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
@@ -10,28 +12,49 @@ define(function (require) {
 
     FlowchartEditorWorkflowView = FlowchartViewerWorkflowView.extend({
 
+        autoRender: true,
         isConnected: false,
 
         transitionOverlayView: FlowChartEditorTransitionOverlayView,
         stepView: FlowchartEditorStepView,
         className: 'workflow-flowchart-editor',
 
-        defaultConnectionConfiguration: {
-            detachable: true
+        /**
+         * @type {function(): Object|Object}
+         */
+        defaultConnectionOptions: function () {
+            return {
+                detachable: true
+            };
         },
 
         connect: function () {
             FlowchartEditorWorkflowView.__super__.connect.apply(this, arguments);
+            this.jsPlumbInstance.bind('connectionDrag', _.bind(this.onConnectionDragStart, this));
+            this.jsPlumbInstance.bind('connectionDragStop', _.bind(this.onConnectionDragStop, this));
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
         },
 
+        onConnectionDragStart: function (connection) {
+            $('#' + connection.sourceId).addClass('connection-source');
+            this.$el.addClass('workflow-drag-connection');
+        },
+
+        onConnectionDragStop: function (connection) {
+            $('#' + connection.sourceId).removeClass('connection-source');
+            this.$el.removeClass('workflow-drag-connection');
+        },
+
         onBeforeConnectionDrop: function (data) {
-            var transitionModel, startingSteps, suspendedStep,
+            var transitionModel, transitionName, startingSteps, suspendedStep,
                 stepFrom = this.findStepModelByElement(data.connection.source),
                 stepTo = this.findStepModelByElement(data.connection.target);
             if (data.connection.suspendedElement && !stepTo.get('_is_start')) {
                 transitionModel = data.connection.overlayView.model;
-                startingSteps = transitionModel.getStartingSteps();
+                transitionName = transitionModel.get('name');
+                startingSteps = this.model.get('steps').filter(function (item) {
+                    return item.get('allowed_transitions').indexOf(transitionName) !== -1;
+                });
                 if (stepTo.get('name') !== transitionModel.get('step_to')) {
                     // stepTo changed
                     transitionModel.set({
