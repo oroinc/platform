@@ -71,7 +71,6 @@ class ActivityListAclCriteriaHelper
             'VIEW',
             $mapFields
         );
-
         $criteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
 
         return $criteria;
