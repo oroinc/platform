@@ -35,7 +35,7 @@ define(function (require) {
                         eventName = 'change add remove';
                         prop.on(eventName, this.debouncedOnStateChange, this);
                         this.on('change:' + attrName, function (model, collection) {
-                            collection.off(eventName, this.debouncedOnStateChange, this);
+                            prop.off(eventName, this.debouncedOnStateChange, this);
                             collection.on(eventName, this.debouncedOnStateChange, this);
                         }, this);
                     } else {
