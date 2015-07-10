@@ -36,6 +36,14 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
+     * @param array|object $container
+     */
+    public function addValueContainer($container)
+    {
+        $this->valueContainers[] = $container;
+    }
+
+    /**
      * Get value of property by name
      *
      * @param  string $name
