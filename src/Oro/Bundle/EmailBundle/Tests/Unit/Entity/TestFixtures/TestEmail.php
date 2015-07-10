@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
 class TestEmail implements EmailInterface
 {
@@ -13,7 +13,7 @@ class TestEmail implements EmailInterface
     /** @var string */
     protected $email;
 
-    /** @var EmailOwnerInterface */
+    /** @var EmailAddressOwnerInterface */
     protected $owner;
 
     public function __construct($id = null, $owner = null, $email = null)

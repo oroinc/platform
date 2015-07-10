@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 class EmailQueryFactoryTest extends OrmTestCase
@@ -12,7 +12,7 @@ class EmailQueryFactoryTest extends OrmTestCase
     const TEST_ENTITY             = 'Oro\Bundle\UserBundle\Entity\User';
     const TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
 
-    /** @var EmailOwnerProviderStorage */
+    /** @var EmailAddressOwnerProviderStorage */
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -23,7 +23,7 @@ class EmailQueryFactoryTest extends OrmTestCase
 
     public function setUp()
     {
-        $this->registry  = new EmailOwnerProviderStorage();
+        $this->registry  = new EmailAddressOwnerProviderStorage();
 
         $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()->getMock();

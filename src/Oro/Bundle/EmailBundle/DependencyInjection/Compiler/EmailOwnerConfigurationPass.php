@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EmailOwnerConfigurationPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_email.email.owner.provider.storage';
+    const SERVICE_KEY = 'oro_email.email.address_owner.provider.storage';
     const TAG = 'oro_email.owner.provider';
 
     /**

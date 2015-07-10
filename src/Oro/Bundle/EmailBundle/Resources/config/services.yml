@@ -6,9 +6,9 @@ parameters:
     oro_email.email_holder_helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
-    oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
-    oro_email.email.owner.provider.storage.class: Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage
-    oro_email.email.owner.manager.class:          Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager
+    oro_email.email.address_owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider
+    oro_email.email.address_owner.provider.storage.class: Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage
+    oro_email.email.address_owner.manager.class:          Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressOwnerManager
     oro_email.email.model.builder.helper.class:   Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
     oro_email.email.entity.builder.class:         Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder
     oro_email.email.model.builder.class:          Oro\Bundle\EmailBundle\Builder\EmailModelBuilder
@@ -28,7 +28,7 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-    oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Entity\Provider\MailboxEmailOwnerProvider
+    oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Entity\Provider\MailboxEmailAddressOwnerProvider
     oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
     oro_email.mailbox_processor.manual.class:     Oro\Bundle\EmailBundle\Provider\ManualMailboxProcessor
 
@@ -88,7 +88,7 @@ services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - @oro_email.email.address_owner.provider.storage
             - %oro_email.entity.cache_dir%
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
@@ -131,21 +131,21 @@ services:
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
 
-    oro_email.email.owner.provider.storage:
+    oro_email.email.address_owner.provider.storage:
         public: false
-        class: %oro_email.email.owner.provider.storage.class%
+        class: %oro_email.email.address_owner.provider.storage.class%
 
-    oro_email.email.owner.provider:
+    oro_email.email.address_owner.provider:
         public: false
-        class: %oro_email.email.owner.provider.class%
+        class: %oro_email.email.address_owner.provider.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - @oro_email.email.address_owner.provider.storage
 
-    oro_email.email.owner.manager:
+    oro_email.email.address_owner.manager:
         public: false
-        class: %oro_email.email.owner.manager.class%
+        class: %oro_email.email.address_owner.manager.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - @oro_email.email.address_owner.provider.storage
             - @oro_email.email.address.manager
 
     oro_email.email.model.builder.helper:
@@ -186,13 +186,13 @@ services:
         scope: prototype
         arguments:
             - @oro_email.email.address.manager
-            - @oro_email.email.owner.provider
+            - @oro_email.email.address_owner.provider
             - @event_dispatcher
 
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
         arguments:
-            - @oro_email.email.owner.manager
+            - @oro_email.email.address_owner.manager
             - @oro_email.email.activity.manager
             - @oro_email.email.thread.manager
         tags:
@@ -335,7 +335,7 @@ services:
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - @oro_email.email.address_owner.provider.storage
             - @oro_entity.entity_name_resolver
 
     oro_email.emailtemplate.datagrid_view_list:
@@ -361,7 +361,7 @@ services:
             - @oro_email.direct_mailer
             - @oro_email.email.address.helper
             - @oro_email.email.entity.builder=
-            - @oro_email.email.owner.provider
+            - @oro_email.email.address_owner.provider
             - @oro_email.email.activity.manager
             - @oro_security.security_facade.link
             - @event_dispatcher
@@ -445,7 +445,7 @@ services:
             - @doctrine
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper
-            - @oro_email.email.owner.provider.storage
+            - @oro_email.email.address_owner.provider.storage
             - %oro_email.email_sync_exclusions%
 
     oro_email.email.activity.manager:

@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
 
 class EmailEntityBatchProcessor implements EmailEntityBatchInterface
@@ -24,7 +24,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected $emailAddressManager;
 
     /**
-     * @var EmailOwnerProvider
+     * @var EmailAddressOwnerProvider
      */
     protected $emailOwnerProvider;
 
@@ -62,12 +62,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * Constructor
      *
      * @param EmailAddressManager $emailAddressManager
-     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param EmailAddressOwnerProvider $emailOwnerProvider
      * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         EmailAddressManager $emailAddressManager,
-        EmailOwnerProvider $emailOwnerProvider,
+        EmailAddressOwnerProvider $emailOwnerProvider,
         EventDispatcher $eventDispatcher
     ) {
         $this->emailAddressManager = $emailAddressManager;

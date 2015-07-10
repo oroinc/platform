@@ -27,7 +27,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *      },
  * )
  */
-class Mailbox implements EmailOwnerInterface, EmailHolderInterface
+class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
 {
 
     /**

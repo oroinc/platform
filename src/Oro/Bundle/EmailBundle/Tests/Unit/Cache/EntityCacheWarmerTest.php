@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 
 class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class EntityCacheWarmerTest extends \PHPUnit_Framework_TestCase
             ->method('getEmailOwnerClass')
             ->will($this->returnValue('Acme\TestUser'));
 
-        $storage = new EmailOwnerProviderStorage();
+        $storage = new EmailAddressOwnerProviderStorage();
         $storage->addProvider($oroProvider);
         $storage->addProvider($oroCrmProvider);
         $storage->addProvider($acmeProvider);

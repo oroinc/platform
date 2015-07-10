@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 
@@ -330,7 +330,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return EmailOwnerProviderStorage
+     * @return EmailAddressOwnerProviderStorage
      */
     public function getEmailOwnerProviderStorage()
     {

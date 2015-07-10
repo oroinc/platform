@@ -5,19 +5,19 @@ namespace Oro\Bundle\EmailBundle\Entity\Provider;
 /**
  * A storage of email owner providers
  */
-class EmailOwnerProviderStorage
+class EmailAddressOwnerProviderStorage
 {
     /**
-     * @var EmailOwnerProviderInterface[]
+     * @var EmailAddressOwnerProviderInterface[]
      */
     private $emailOwnerProviders = array();
 
     /**
      * Add email owner provider
      *
-     * @param EmailOwnerProviderInterface $provider
+     * @param EmailAddressOwnerProviderInterface $provider
      */
-    public function addProvider(EmailOwnerProviderInterface $provider)
+    public function addProvider(EmailAddressOwnerProviderInterface $provider)
     {
         $this->emailOwnerProviders[] = $provider;
     }
@@ -25,7 +25,7 @@ class EmailOwnerProviderStorage
     /**
      * Get all email owner providers
      *
-     * @return EmailOwnerProviderInterface[]
+     * @return EmailAddressOwnerProviderInterface[]
      */
     public function getProviders()
     {
@@ -35,11 +35,12 @@ class EmailOwnerProviderStorage
     /**
      * Gets field name for email owner for the given provider
      *
-     * @param EmailOwnerProviderInterface $provider
-     * @return string
+     * @param EmailAddressOwnerProviderInterface $provider
+     *
+*@return string
      * @throws \RuntimeException
      */
-    public function getEmailOwnerFieldName(EmailOwnerProviderInterface $provider)
+    public function getEmailOwnerFieldName(EmailAddressOwnerProviderInterface $provider)
     {
         $key = 0;
         for ($i = 0, $size = count($this->emailOwnerProviders); $i < $size; $i++) {
@@ -51,7 +52,7 @@ class EmailOwnerProviderStorage
 
         if ($key === 0) {
             throw new \RuntimeException(
-                'The provider for "%s" must be registers in EmailOwnerProviderStorage',
+                'The provider for "%s" must be registers in EmailAddressOwnerProviderStorage',
                 $provider->getEmailOwnerClass()
             );
         }
@@ -62,10 +63,11 @@ class EmailOwnerProviderStorage
     /**
      * Gets column name for email owner for the given provider
      *
-     * @param EmailOwnerProviderInterface $provider
-     * @return string
+     * @param EmailAddressOwnerProviderInterface $provider
+     *
+*@return string
      */
-    public function getEmailOwnerColumnName(EmailOwnerProviderInterface $provider)
+    public function getEmailOwnerColumnName(EmailAddressOwnerProviderInterface $provider)
     {
         $emailOwnerClass = $provider->getEmailOwnerClass();
         $prefix = strtolower(substr($emailOwnerClass, 0, strpos($emailOwnerClass, '\\')));

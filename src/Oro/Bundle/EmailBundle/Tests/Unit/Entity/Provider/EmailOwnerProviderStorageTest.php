@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 
 class EmailOwnerProviderStorageTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,7 @@ class EmailOwnerProviderStorageTest extends \PHPUnit_Framework_TestCase
         $provider1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
         $provider2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
 
-        $storage = new EmailOwnerProviderStorage();
+        $storage = new EmailAddressOwnerProviderStorage();
         $storage->addProvider($provider1);
         $storage->addProvider($provider2);
 

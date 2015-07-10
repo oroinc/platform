@@ -3,16 +3,16 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddress as OriginalEmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
 class TestEmailAddressProxy extends OriginalEmailAddress
 {
     /**
-     * @var EmailOwnerInterface
+     * @var EmailAddressOwnerInterface
      */
     private $owner;
 
-    public function __construct(EmailOwnerInterface $owner = null)
+    public function __construct(EmailAddressOwnerInterface $owner = null)
     {
         $this->owner = $owner;
     }
@@ -22,7 +22,7 @@ class TestEmailAddressProxy extends OriginalEmailAddress
         return $this->owner;
     }
 
-    public function setOwner(EmailOwnerInterface $owner = null)
+    public function setOwner(EmailAddressOwnerInterface $owner = null)
     {
         $this->owner = $owner;
 

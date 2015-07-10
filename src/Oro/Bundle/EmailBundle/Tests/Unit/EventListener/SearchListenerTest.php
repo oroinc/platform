@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestOrganization;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 
@@ -43,7 +43,7 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
     {
         $badEmail = new Email();
         $badEmailAddress = new EmailAddress();
-        $badEmailOwner = new TestEmailOwner();
+        $badEmailOwner = new TestEmailAddressOwner();
         $badEmailAddress->setOwner($badEmailOwner);
         $badRecipient = new EmailRecipient();
         $badRecipient->setEmailAddress($badEmailAddress);

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures;
 
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
-class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
+class TestEmailOwnerWithoutEmailAddress implements EmailAddressOwnerInterface
 {
     /** @var int */
     protected $id;

@@ -11,7 +11,7 @@ use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -61,7 +61,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  */
 class User extends ExtendUser implements
     Taggable,
-    EmailOwnerInterface,
+    EmailAddressOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,

@@ -14,7 +14,7 @@ use JMS\Serializer\Annotation as JMS;
  *   - Resources/cache/Entity/EmailAddress.orm.yml.twig
  *   - Cache/EmailAddressCacheWarmer.php
  *   - Cache/EmailAddressCacheClearer.php
- *   - Entity/Provider/EmailOwnerProviderStorage.php
+ *   - Entity/Provider/EmailAddressOwnerProviderStorage.php
  *   - DependencyInjection/Compiler/EmailOwnerConfigurationPass.php
  *   - OroEmailBundle.php
  *
@@ -182,17 +182,18 @@ abstract class EmailAddress
     /**
      * Get email owner
      *
-     * @return EmailOwnerInterface
+     * @return EmailAddressOwnerInterface
      */
     abstract public function getOwner();
 
     /**
      * Set email owner
      *
-     * @param EmailOwnerInterface|null $owner
-     * @return EmailAddress
+     * @param EmailAddressOwnerInterface|null $owner
+     *
+*@return EmailAddress
      */
-    abstract public function setOwner(EmailOwnerInterface $owner = null);
+    abstract public function setOwner(EmailAddressOwnerInterface $owner = null);
 
     /**
      * Get a human-readable representation of this object.

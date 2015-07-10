@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddress as OriginalEmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
 class EmailAddress extends OriginalEmailAddress
 {
@@ -25,7 +25,7 @@ class EmailAddress extends OriginalEmailAddress
         return $this->owner;
     }
 
-    public function setOwner(EmailOwnerInterface $owner = null)
+    public function setOwner(EmailAddressOwnerInterface $owner = null)
     {
         $this->owner = $owner;
 

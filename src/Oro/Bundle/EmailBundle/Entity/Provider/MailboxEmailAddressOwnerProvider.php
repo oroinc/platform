@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\MailboxEmail;
 
-class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
+class MailboxEmailAddressOwnerProvider implements EmailAddressOwnerProviderInterface
 {
 
     /**

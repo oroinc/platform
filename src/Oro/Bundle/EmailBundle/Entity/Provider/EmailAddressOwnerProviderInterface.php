@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Entity\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
 /**
  * Defines an interface of an email owner provider
  */
-interface EmailOwnerProviderInterface
+interface EmailAddressOwnerProviderInterface
 {
     /**
      * Get full name of email owner class
@@ -22,7 +22,8 @@ interface EmailOwnerProviderInterface
      *
      * @param \Doctrine\ORM\EntityManager $em
      * @param string $email
-     * @return EmailOwnerInterface
+     *
+*@return EmailAddressOwnerInterface
      */
     public function findEmailOwner(EntityManager $em, $email);
 }

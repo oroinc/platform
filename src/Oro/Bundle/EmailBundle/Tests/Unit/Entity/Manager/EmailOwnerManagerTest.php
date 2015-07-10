@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressOwnerManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressOwner;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmailAddress;
 
 class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,20 +27,20 @@ class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase
         $emailAddrManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $manager          = new EmailOwnerManager(
+        $manager          = new EmailAddressOwnerManager(
             $this->getEmailOwnerProviderStorage(),
             $emailAddrManager
         );
 
-        $owner1         = new TestEmailOwner(1);
-        $owner2         = new TestEmailOwner(2);
-        $owner3         = new TestEmailOwner(3);
-        $owner4         = new TestEmailOwnerWithoutEmail(4);
-        $newOwner1      = new TestEmailOwner(null, 'newOwner1');
-        $newOwner2      = new TestEmailOwner(null, 'newOwner2');
-        $deletingOwner1 = new TestEmailOwner(100);
-        $deletingOwner2 = new TestEmailOwnerWithoutEmail(100);
-        $deletingOwner3 = new TestEmailOwner(200);
+        $owner1         = new TestEmailAddressOwner(1);
+        $owner2         = new TestEmailAddressOwner(2);
+        $owner3         = new TestEmailAddressOwner(3);
+        $owner4         = new TestEmailOwnerWithoutEmailAddress(4);
+        $newOwner1      = new TestEmailAddressOwner(null, 'newOwner1');
+        $newOwner2      = new TestEmailAddressOwner(null, 'newOwner2');
+        $deletingOwner1 = new TestEmailAddressOwner(100);
+        $deletingOwner2 = new TestEmailOwnerWithoutEmailAddress(100);
+        $deletingOwner3 = new TestEmailAddressOwner(200);
 
         $owner1NewEmail = new TestEmail(null, $owner1);
         $owner2Email    = new TestEmail(1, $owner2);
@@ -309,7 +309,7 @@ class EmailOwnerManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $storage = new EmailOwnerProviderStorage();
+        $storage = new EmailAddressOwnerProviderStorage();
         $storage->addProvider($provider1);
         $storage->addProvider($provider2);
 

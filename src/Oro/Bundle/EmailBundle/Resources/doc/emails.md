@@ -21,13 +21,13 @@ UserBundle/Entity/User.php
 namespace Oro\Bundle\UserBundle\Entity;
 
 ...
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
 
 class User extends ExtendUser implements
     AdvancedUserInterface,
     \Serializable,
     Taggable,
-    EmailOwnerInterface,
+    EmailAddressOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
@@ -51,7 +51,7 @@ class Email implements EmailInterface
     ...
 }
 ```
-UserBundle/Entity/Provider/EmailOwnerProvider.php
+UserBundle/Entity/Provider/EmailAddressOwnerProvider.php
 
 ``` php
 <?php
@@ -61,9 +61,9 @@ namespace Oro\Bundle\UserBundle\Entity\Provider;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderInterface;
 
-class EmailOwnerProvider implements EmailOwnerProviderInterface
+class EmailAddressOwnerProvider implements EmailAddressOwnerProviderInterface
 {
     /**
      * {@inheritdoc}
@@ -97,7 +97,7 @@ UserBundle/Resources/config/services.yml
 ``` yaml
 parameters:
     ...
-    oro_user.email.owner.provider.class: Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
+    oro_user.email.owner.provider.class: Oro\Bundle\UserBundle\Entity\Provider\EmailAddressOwnerProvider
 
 services:
     ...
@@ -108,9 +108,9 @@ services:
 ```
 As you have seen in code blocks above, it is pretty easy to configure new owner. Just do the following:
 
- - Implement EmailOwnerInterface in entity which you wish to made an email address owner
+ - Implement EmailAddressOwnerInterface in entity which you wish to made an email address owner
  - Implement EmailInterface in entity which is responsible to store emails
- - Implement EmailOwnerProviderInterface in your bundle. This interface has two methods. The getEmailOwnerClass one should return full name of your entity class. The findEmailOwner method searches an owner entity by given email address.
+ - Implement EmailAddressOwnerProviderInterface in your bundle. This interface has two methods. The getEmailOwnerClass one should return full name of your entity class. The findEmailOwner method searches an owner entity by given email address.
  - Register your email owner provider as a service and mark it by oro_email.owner.provider tag. The order attribute is optional and can be used to resolve ambiguous when several email address owners have the same email address. In this case wins an owner with lower value of the order attribute.
 Before the system can work with your email address owner you have to do two things:
  - Update the database schema using **php app/console doctrine:schema:update** command. The new foreign key will be created in oro_email_address table.
@@ -165,9 +165,9 @@ Here is a list of key classes of EmailBundle:
  - EmailEntityBuilder - provides a way to easy build email related entities and responsible to correct building of a batch of email entities when you need to add a lot of emails in one database transaction.
  - EntityCacheWarmer and EntityCacheClearer - create/remove a proxy class for EmailAddress entity in app/entities folder.
  - EmailAddressManager - responsible to correct creation of a proxy object for EmailAddress entity and allow to get correct doctrine repository for this entity. This class must be used because EmailAddress is doctrine mapped superclass and it cannot be created directly.
- - EmailOwnerManager - responsible to bind/unbind EmailAddress to the correct owner. This class handles modifications of all entities implement EmailOwnerInterface and EmailInterface and makes necessary changes in oro_email_address table.
- - EmailOwnerProviderStorage - holds all available email owner providers.
- - EmailOwnerProvider - implements a chain of email owner providers.
+ - EmailAddressOwnerManager - responsible to bind/unbind EmailAddress to the correct owner. This class handles modifications of all entities implement EmailAddressOwnerInterface and EmailInterface and makes necessary changes in oro_email_address table.
+ - EmailAddressOwnerProviderStorage - holds all available email owner providers.
+ - EmailAddressOwnerProvider - implements a chain of email owner providers.
  - EmailBodyLoaderInterface - provides an interface for classes responsible for load email body and attachments from different sort of email servers, for example IMAP or EWS.
  - EmailBodyLoaderSelector - implements a functionality to find appropriate email body and attachments loader.
  - AbstractEmailSynchronizer - provides a base algorithm which can be used to synchronize emails from different sort of mailboxes, for example IMAP or EWS. In derived class you need just implement two methods: getEmailOriginClass and createSynchronizationProcessor. Example you can see in OroImapBundle/Sync/ImapEmailSynchronizer.php.

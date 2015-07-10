@@ -8,7 +8,7 @@ use Doctrine\ORM\Query;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
@@ -28,7 +28,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
-    /** @var EmailOwnerProviderStorage */
+    /** @var EmailAddressOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
     /** @var array */
@@ -49,14 +49,14 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
      * @param EntityManager             $em
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
      * @param string[]                  $exclusions Class names of email address owners which should be excluded
      */
     public function __construct(
         EntityManager $em,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
-        EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        EmailAddressOwnerProviderStorage $emailOwnerProviderStorage,
         array $exclusions = []
     ) {
         $this->em                        = $em;
