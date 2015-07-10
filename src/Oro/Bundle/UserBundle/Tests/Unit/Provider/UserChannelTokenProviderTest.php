@@ -1,11 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Provider;
-
-//use Symfony\Component\Routing\RouterInterface;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use OroCRM\Bundle\ChannelBundle\Provider\UserChannelTokenProvider;
+use Oro\Bundle\UserBundle\Provider\UserChannelTokenProvider;
 
 class UserChannelTokenProviderTest extends \PHPUnit_Framework_TestCase
 {
