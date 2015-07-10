@@ -151,69 +151,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager->getList($testClass, $testId, $filter, $page);
     }
 
-    public function testGetListWithProviders()
-    {
-        $classMeta     = new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
-        $repo          = new ActivityListRepository($this->em, $classMeta);
-        $testClass     = 'Acme\TestBundle\Entity\TestEntity';
-        $testId        = 12;
-        $page          = 2;
-        $filter        = [];
-        $configPerPare = 10;
-
-        $this->config->expects($this->any())->method('get')
-            ->willReturnCallback(
-                function ($configKey) {
-                    if ($configKey === 'oro_activity_list.per_page') {
-                        return 10;
-                    }
-                    if ($configKey === 'oro_activity_list.sorting_field') {
-                        return 'createdBy';
-                    }
-                    if ($configKey === 'oro_activity_list.grouping') {
-                        return false;
-                    }
-                    return 'ASC';
-                }
-            );
-
-        $activityListmanager = $this->getMockBuilder('ActivityListManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['applyCriteriaToQb'])
-            ->getMock();
-
-        $activityListmanager->expects($this->once())->method('applyCriteriaToQb')->willReturn(true);
-
-        $qb = new QueryBuilder($this->em);
-        $this->em->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
-        $this->em->expects($this->once())->method('getRepository')->willReturn($repo);
-        $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
-        $this->pager->expects($this->once())->method('setQueryBuilder')->with($qb);
-        $this->pager->expects($this->once())->method('setPage')->with($page);
-
-        $this->pager->expects($this->once())->method('setMaxPerPage')->with($configPerPare);
-        $this->pager->expects($this->once())->method('init');
-        $this->pager->expects($this->once())->method('getResults')->willReturn([]);
-
-        $emailActivityListProvider = $this->mockEmailActivityListProvider();
-        $this->provider->expects($this->once())->method('getProviders')->willReturn([$emailActivityListProvider]);
-
-        $comparison = $this->getMockBuilder('Doctrine\Common\Collections\Expr\Comparison')
-            ->disableOriginalConstructor()->getMock();
-
-        $expression = $this->getMockBuilder('Doctrine\Common\Collections\Expr\Expression')
-            ->disableOriginalConstructor()->getMock();
-        $expression->expects($this->any())->method('getExpressionList')->willReturn([$comparison]);
-
-        $criteria = $this->getMockBuilder('Doctrine\Common\Collections\Criteria')
-            ->disableOriginalConstructor()->getMock();
-
-        $criteria->expects($this->once())->method('getWhereExpression')->willReturn($expression);
-        $this->aclHelper->expects($this->once())->method('applyAclToCriteria')->willReturn($criteria);
-
-        $activityListmanager->getList($testClass, $testId, $filter, $page);
-    }
-
     public function testGetListCount()
     {
         $classMeta = new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
