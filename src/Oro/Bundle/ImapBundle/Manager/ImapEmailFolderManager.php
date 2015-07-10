@@ -54,25 +54,39 @@ class ImapEmailFolderManager
      */
     public function getFolders()
     {
+        // retrieve folders from imap
         $folders = $this->connector->findFolders();
 
+        // transform folders into tree of models
         $emailFolderModels = $this->processFolders($folders);
 
         if ($this->origin->getId()) {
+            // renew existing folders if origin already exists
             $existingFolders = $this->getExistingFolders();
 
+            // merge synced and existing folders
             $emailFolderModels = $this->mergeFolders($emailFolderModels, $existingFolders);
-            $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-            /** @var ImapEmailFolder $existingFolder */
-            foreach ($existingFolders as $existingFolder) {
-                $emailFolder = $existingFolder->getFolder();
-                $this->em->refresh($emailFolder);
-                $emailFolder->setOutdatedAt($outdatedAt);
-            }
+            // mark old folders as outdated
+            $this->markAsOutdated($existingFolders);
+
+            // flush changes
             $this->em->flush();
         }
 
         return $this->extractEmailFolders($emailFolderModels);
+    }
+
+    /**
+     * @param ArrayCollection|ImapEmailFolder[] $existingFolders
+     */
+    protected function markAsOutdated($existingFolders)
+    {
+        $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        /** @var ImapEmailFolder $existingFolder */
+        foreach ($existingFolders as $existingFolder) {
+            $emailFolder = $existingFolder->getFolder();
+            $emailFolder->setOutdatedAt($outdatedAt);
+        }
     }
 
     /**
@@ -135,7 +149,6 @@ class ImapEmailFolderManager
                 /** @var ImapEmailFolder $existingImapFolder */
                 $existingImapFolder = $f->first();
                 $emailFolder = $existingImapFolder->getFolder();
-                $this->em->refresh($emailFolder);
                 $emailFolder->setName($syncedFolderModel->getEmailFolder()->getName());
                 $emailFolder->setFullName($syncedFolderModel->getEmailFolder()->getFullName());
                 $emailFolder->setType($syncedFolderModel->getEmailFolder()->getType());

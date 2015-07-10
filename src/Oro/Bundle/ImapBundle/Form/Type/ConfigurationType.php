@@ -60,8 +60,7 @@ class ConfigurationType extends AbstractType
     {
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
-        $this->addMergeFoldersListener($builder);
-        $this->addPostSubmitFoldersListener($builder);
+        $this->addRetrieveFoldersListener($builder);
 
         $builder
             ->add(
@@ -101,80 +100,17 @@ class ConfigurationType extends AbstractType
             ]);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addMergeFoldersListener(FormBuilderInterface $builder)
+    protected function addRetrieveFoldersListener(FormBuilderInterface $builder)
     {
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            /** @var ImapEmailOrigin $origin */
-            $origin = $event->getForm()->getData();
-            if ($origin !== null) {
-                $data = $event->getData();
-                if ($origin->getId() && !$origin->getFolders()->isEmpty() && isset($data['folders'])) {
-                    $result = [];
-                    $this->expandFolderTree($data['folders'], $result);
-                    $this->applySyncEnabled($result, $origin->getFolders());
-                    unset($data['folders']);
-                    $event->setData($data);
-                }
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                /** @var array $origin */
+                $origin = $event->getData();
+                /** @var ImapEmailOrigin $origin */
+                $formData = $event->getForm()->getData();
             }
-        });
-    }
-
-    protected function addPostSubmitFoldersListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-            /** @var ImapEmailOrigin $origin */
-            $origin = $event->getData();
-            if ($origin->getId()) {
-                foreach ($origin->getFolders() as $folder) {
-                    $this->em->refresh($folder);
-                }
-            }
-        });
-    }
-
-    /**
-     * @param array $submittedFolders
-     * @param ArrayCollection|EmailFolder[] $existingFolders
-     */
-    protected function applySyncEnabled($submittedFolders, $existingFolders)
-    {
-        $submittedFolders = new ArrayCollection($submittedFolders);
-        foreach ($existingFolders as $existingFolder) {
-            $this->em->refresh($existingFolder);
-            $f = $submittedFolders->filter(function ($item) use ($existingFolder) {
-                return $item['fullName'] === $existingFolder->getFullName();
-            });
-            if (!$f->isEmpty()) {
-                $item = $f->first();
-                $existingFolder->setSyncEnabled($item['syncEnabled']);
-/*                $imapEmailFolder = new ImapEmailFolder();
-                $imapEmailFolder->setUidValidity($item['uidValidity']);
-                $imapEmailFolder->setFolder($existingFolder);
-                $this->em->persist($imapEmailFolder);*/
-                $this->em->flush($existingFolder);
-                $submittedFolders->removeElement($item);
-            }
-            if (!$existingFolder->getSubFolders()->isEmpty()) {
-                $this->applySyncEnabled($submittedFolders, $existingFolder->getSubFolders());
-            }
-        }
-    }
-
-    /**
-     * @param array $folders
-     * @param array $result
-     */
-    protected function expandFolderTree($folders, &$result)
-    {
-        foreach ($folders as $folder) {
-            $result[] = $folder;
-            if (isset($folder['subFolders'])) {
-                $this->expandFolderTree($folder['subFolders'], $result);
-            }
-        }
+        );
     }
 
     /**
