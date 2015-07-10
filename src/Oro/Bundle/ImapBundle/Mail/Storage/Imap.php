@@ -92,7 +92,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         if (!isset($params->user)) {
-            throw new Exception\InvalidArgumentException('need at least user in params');
+            throw new \Zend\Mail\Storage\Exception\InvalidArgumentException('need at least user in params');
         }
 
         $host     = isset($params->host)     ? $params->host     : 'localhost';

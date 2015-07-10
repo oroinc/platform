@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        filter.inactive: inactive
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""
@@ -151,6 +152,7 @@ oro:
             trash:                Trash
             drafts:               Drafts
         contact.label:            Contact
+        mailbox.label:            Mailbox
         date.label:               Date
         date_time.label:          Date/Time
         from_email_address.label: From
