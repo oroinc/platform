@@ -1,0 +1,8 @@
+oro:
+    dataaudit:
+        data_audit_condition:
+            changed: has been changed
+            changed_to_value: has been changed to
+            in_the_interval: in the interval of time
+            value: value
+            value_that: value that
