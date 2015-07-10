@@ -1,4 +1,3 @@
-/*jshint devel:true*/
 define([
     'jquery',
     'underscore',
@@ -8,6 +7,8 @@ define([
     'jquery.validate'
 ], function($, _, __, tools, validationHandler) {
     'use strict';
+
+    var console = window.console;
 
     /**
      * Collects all ancestor elements that have validation rules
@@ -81,7 +82,7 @@ define([
         _.each(validationsOf(element), function(param, method) {
             if ($.validator.methods[method]) {
                 rules[method] = {param: param};
-            } else if ($(element.form).data('validator').settings.debug) {
+            } else if ($(element.form).data('validator').settings.debug && console) {
                 console.error('Validation method "' + method + '" does not exist');
             }
         });

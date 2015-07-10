@@ -7,6 +7,8 @@ define([
 ], function($, _, __, tools, BaseComponent) {
     'use strict';
 
+    var console = window.console;
+
     function ComponentManager($el) {
         this.$el = $el;
         this.components = {};
@@ -228,7 +230,6 @@ define([
          * @protected
          */
         _handleError: function(message, error) {
-            /*jshint devel:true*/
             if (tools.debug) {
                 if (console && console.error) {
                     console.error(message);

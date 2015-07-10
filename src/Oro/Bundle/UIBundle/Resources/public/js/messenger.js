@@ -1,5 +1,10 @@
-define(['jquery', 'underscore', 'oroui/js/tools', 'cryptojs/sha256', 'bootstrap'],
-function($, _, tools, CryptoJS) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/tools',
+    'cryptojs/sha256',
+    'bootstrap'
+], function($, _, tools, CryptoJS) {
     'use strict';
 
     var defaults = {
@@ -10,6 +15,7 @@ function($, _, tools, CryptoJS) {
     };
     var queue = [];
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    var console = window.console;
 
     /**
      * Same arguments as for Oro.NotificationMessage
@@ -110,7 +116,6 @@ function($, _, tools, CryptoJS) {
             showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
-                    /*jshint devel:true*/
                     if (!_.isUndefined(console)) {
                         console.error(_.isUndefined(err.stack) ? err : err.stack);
                     }

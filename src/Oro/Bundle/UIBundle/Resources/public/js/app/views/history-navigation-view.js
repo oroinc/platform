@@ -1,8 +1,9 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var HistoryNavigationView,
-        BaseView = require('./base/view');
+    var HistoryNavigationView;
+    var BaseView = require('./base/view');
+
     HistoryNavigationView = BaseView.extend({
         autoRender: true,
         template: require('tpl!oroui/templates/history.html'),
@@ -15,12 +16,12 @@ define(function (require) {
             'change:index model': 'render'
         },
 
-        onUndo: function () {
+        onUndo: function() {
             var index = this.model.get('index');
             this.trigger('navigate', index - 1);
         },
 
-        onRedo: function () {
+        onRedo: function() {
             var index = this.model.get('index');
             this.trigger('navigate', index + 1);
         }

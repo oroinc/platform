@@ -1,4 +1,3 @@
-/*jshint devel:true*/
 define([
     'jquery',
     'underscore',
@@ -6,6 +5,8 @@ define([
     'oroui/js/tools'
 ], function($, _, __, tools) {
     'use strict';
+
+    var console = window.console;
 
     return {
         /**

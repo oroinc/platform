@@ -3,6 +3,8 @@ define(
     function($, sync, messenger, routing, _, mediator) {
         'use strict';
 
+        var console = window.console;
+
         /**
          * @export ororeminder/js/reminder-handler
          * @class ororeminder.ReminderHandler
@@ -165,7 +167,6 @@ define(
                     }
                     message += _.template(template)(reminder);
                 } catch (ex) {
-                    /*jshint devel:true*/
                     // Suppress possible exceptions during template processing
                     if (console && (typeof console.log === 'function')) {
                         console.log('Exception occurred when compiling reminder template', ex);

@@ -8,6 +8,7 @@ define([
     'use strict';
 
     var LoadingMaskView;
+    var console = window.console;
 
     /**
      * Loading mask widget
@@ -51,8 +52,7 @@ define([
         initialize: function(options) {
             options = options || {};
 
-            if (mediator.execute('retrieveOption', 'debug') && window.console) {
-                /*jshint devel:true*/
+            if (mediator.execute('retrieveOption', 'debug') && console) {
                 console.warn('Module "oroui/js/loading-mask" is deprecated, ' +
                     'use "oroui/js/app/views/loading-mask-view" instead');
             }

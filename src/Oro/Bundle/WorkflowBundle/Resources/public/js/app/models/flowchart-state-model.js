@@ -1,9 +1,8 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var FlowchartStateModel,
-        BaseModel = require('oroui/js/app/models/base/model');
+    var FlowchartStateModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     FlowchartStateModel = BaseModel.extend({
         defaults: {
