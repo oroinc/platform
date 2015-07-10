@@ -11,6 +11,9 @@ define([
 
     var MultiSelectOriginFolder;
 
+    // @const
+    var FILTER_EMPTY_VALUE = "";
+
     MultiSelectOriginFolder = MultiSelect.extend({
         /**
          * Template selector for filter criteria
@@ -18,6 +21,20 @@ define([
          * @property
          */
         templateSelector: '#multiselect-origin-folder-template',
+
+        /**
+         * Selector for widget button
+         *
+         * @property
+         */
+        buttonSelector: '.filter-criteria-selector',
+
+        /**
+         * Minimal width of dropdown
+         *
+         * @private
+         */
+        minimumDropdownWidth: 150,
 
         /**
          * Select widget options
@@ -28,6 +45,8 @@ define([
             multiple: true,
             classes: 'select-filter-widget multiselect-filter-widget multiselect-origin-folder'
         },
+
+        emptyValue: {value:[FILTER_EMPTY_VALUE]},
 
         /**
         * Initialize.

@@ -619,3 +619,4 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @security.context
+            - @translator

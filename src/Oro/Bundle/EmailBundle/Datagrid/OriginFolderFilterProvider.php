@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -22,15 +22,22 @@ class OriginFolderFilterProvider
      */
     protected $em;
 
+    /** @var Translator */
+    protected $translator;
+
     /**
-     * @param RegistryInterface $registry
+     * @param OroEntityManager $em
+     * @param SecurityContext $securityContext
+     * @param Translator $translator
      */
     public function __construct(
         OroEntityManager $em,
-        SecurityContext $securityContext
+        SecurityContext $securityContext,
+        Translator $translator
     ) {
         $this->em = $em;
         $this->securityContext = $securityContext;
+        $this->translator = $translator;
     }
 
     /**
@@ -48,11 +55,15 @@ class OriginFolderFilterProvider
          */
         foreach ($origins as $origin) {
             $folders = $origin->getFolders();
-
+            $mailbox = $origin->getMailboxName();
+            if ($origin->isActive()) {
+                $mailbox = $mailbox . ' (' . $this->translator->trans('oro.email.filter.inactive') . ')';
+            }
             if (count($folders)>0) {
-                $results[(string)$origin]= [];
+                $results[$mailbox]= [];
+                $results[$mailbox]['active'] = $origin->isActive();
                 foreach ($folders as $folder) {
-                    $results[(string)$origin][$folder->getId()] = $folder->getFullName();
+                    $results[$mailbox]['folder'][$folder->getId()] = $folder->getFullName();
                 }
             }
         }

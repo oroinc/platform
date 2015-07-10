@@ -15,6 +15,9 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::addEmailFolderFields($schema);
+        self::addEmailOriginFields($schema);
+
+        $this->updateMailboxName($schema, $queries);
     }
 
     /**
@@ -35,5 +38,48 @@ class OroEmailBundle implements Migration
             ['onDelete' => 'CASCADE', 'onUpdate' => null],
             'FK_EB940F1C421FFFC'
         );
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function addEmailOriginFields(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_origin');
+
+        $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => true]);
+        $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
+    }
+
+    /**
+     * @param Schema $schema
+     * @param QueryBag $queries
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    protected function updateMailboxName(Schema $schema, QueryBag $queries)
+    {
+        $table = $schema->getTable('oro_email_origin');
+        $queries->addPostQuery('UPDATE oro_email_origin SET mailbox_name = internal_name
+            WHERE
+                mailbox_name = ""
+                AND internal_name IS NOT NULL
+
+            ');
+        if ($table->hasColumn('imap_user')) {
+            $queries->addPostQuery('UPDATE oro_email_origin SET mailbox_name = imap_user
+                WHERE
+                    mailbox_name = ""
+                    AND imap_user IS NOT NULL
+                ');
+        }
+        if ($table->hasColumn('ews_user_email')) {
+            $queries->addPostQuery('UPDATE oro_email_origin SET mailbox_name = ews_user_email
+                WHERE
+                    mailbox_name = ""
+                    AND ews_user_email IS NOT NULL
+                ');
+        }
     }
 }
