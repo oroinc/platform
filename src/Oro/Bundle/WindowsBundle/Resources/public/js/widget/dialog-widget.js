@@ -325,10 +325,10 @@ define(function(require) {
 
         _fixBorderShifting: function() {
             var dialogWidget = this.widget.dialog('widget');
-            var widthShift
-                = parseInt(dialogWidget.css('border-left-width')) + parseInt(dialogWidget.css('border-right-width'));
-            var heightShift
-                = parseInt(dialogWidget.css('border-top-width')) + parseInt(dialogWidget.css('border-bottom-width'));
+            var widthShift = parseInt(dialogWidget.css('border-left-width')) +
+                parseInt(dialogWidget.css('border-right-width'));
+            var heightShift = parseInt(dialogWidget.css('border-top-width')) +
+                parseInt(dialogWidget.css('border-bottom-width'));
             this.widget.width(this.widget.width() - widthShift);
             this.widget.height(this.widget.height() - heightShift);
             this._fixScrollableHeight();

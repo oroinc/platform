@@ -529,7 +529,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             if (qsi !== -1) {
                 var nvp = url.slice(qsi + 1).split('&');
                 for (var i = 0 ; i < nvp.length ; i++) {
-                    var pair  = nvp[i].split('=');
+                    var pair = nvp[i].split('=');
                     data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
             }

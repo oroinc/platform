@@ -6,7 +6,7 @@ define(function(require) {
     var _ = require('underscore');
     var moment = require('moment');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var localeSettings  = require('orolocale/js/locale-settings');
+    var localeSettings = require('orolocale/js/locale-settings');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     /**

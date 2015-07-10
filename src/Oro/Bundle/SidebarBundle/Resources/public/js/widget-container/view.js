@@ -29,8 +29,8 @@ define(['jquery', 'underscore', 'backbone', '../constants',
         },
 
         render: function() {
-            var view     = this;
-            var model    = view.model;
+            var view = this;
+            var model = view.model;
             var template = null;
 
             if (model.get('state') === constants.WIDGET_MINIMIZED) {

@@ -45,8 +45,8 @@ define(['jquery', 'underscore'], function($, _) {
             var nvp = query.split('&');
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
-                var pair  = nvp[i].split('=');
-                var name  = this.decodeUriComponent(pair[0]);
+                var pair = nvp[i].split('=');
+                var name = this.decodeUriComponent(pair[0]);
                 var value = this.decodeUriComponent(pair[1]);
 
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);

@@ -103,8 +103,8 @@ define([
             var context = options.context;
             var shape = this.shapes[i];
             context.save();
-            context.lineJoin    = 'round';
-            context.lineWidth   = options.lineWidth;
+            context.lineJoin = 'round';
+            context.lineWidth = options.lineWidth;
             context.strokeStyle = '#FF3F19';
             context.beginPath();
             context.moveTo(shape.x1 + options.lineWidth * 2, shape.y1);
@@ -138,10 +138,10 @@ define([
         plot: function(shape, options) {
             var context = options.context;
             context.save();
-            context.lineJoin    = 'round';
-            context.lineWidth   = options.lineWidth;
+            context.lineJoin = 'round';
+            context.lineWidth = options.lineWidth;
             context.strokeStyle = shape.color;
-            context.fillStyle   = Flotr.Color.parse(shape.color).alpha(options.fillOpacity).toString();
+            context.fillStyle = Flotr.Color.parse(shape.color).alpha(options.fillOpacity).toString();
             context.translate(0.5, 0.5);
             context.beginPath();
             context.moveTo(shape.x1, shape.y1);
@@ -249,10 +249,10 @@ define([
                     color: options.fontColor,
                     weight: 1.5
                 };
-            options.htmlText   = true;
-            style.textAlign    = 'left';
+            options.htmlText = true;
+            style.textAlign = 'left';
             style.textBaseline = 'top';
-            style.wordWrap     = 'break-word';
+            style.wordWrap = 'break-word';
 
             var html = [];
             var divStyle =

@@ -52,11 +52,11 @@ define([
         },
 
         render: function() {
-            var o               = this.options;
+            var o = this.options;
             var currentDatePart = o.part;
-            var dateVars        = this._getVariablesByPart(currentDatePart);
+            var dateVars = this._getVariablesByPart(currentDatePart);
             var tooltipTemplate = _.template(o.tooltipTemplate);
-            var htmlTemplate    = _.template(o.htmlTemplate);
+            var htmlTemplate = _.template(o.htmlTemplate);
 
             var $dv = $(htmlTemplate({
                 attributes:  '',

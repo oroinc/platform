@@ -91,10 +91,10 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $(myItem).find('.sn-opener').click(function() {
                     $(myItem).find('div.nav-box').fadeToggle('slow');
 
-                    var $barOverlay   = $('#bar-drop-overlay');
-                    var $page         = $('#page');
+                    var $barOverlay = $('#bar-drop-overlay');
+                    var $page = $('#page');
                     var overlayHeight = $page.height();
-                    var overlayWidth  = $page.children('.wrapper').width();
+                    var overlayWidth = $page.children('.wrapper').width();
                     $barOverlay.width(overlayWidth).height(overlayHeight);
                     $barOverlay.toggleClass('bar-open-overlay');
                 });

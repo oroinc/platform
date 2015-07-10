@@ -45,7 +45,7 @@ define(['numeral', '../locale-settings', 'underscore'
             },
             addPrefixSuffix: function(formattedNumber, options, originalNumber) {
                 var prefix = '';
-                var suffix  = '';
+                var suffix = '';
                 if (originalNumber >= 0) {
                     prefix = options.positive_prefix;
                     suffix = options.positive_suffix;

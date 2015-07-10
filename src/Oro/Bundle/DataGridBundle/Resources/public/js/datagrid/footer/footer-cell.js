@@ -46,8 +46,8 @@ define([
         render: function() {
             this.$el.empty();
             var columnName = this.column.get('name');
-            var state      = this.collection.state || {};
-            var totals     = state.totals || {};
+            var state = this.collection.state || {};
+            var totals = state.totals || {};
 
             if (_.isUndefined(totals[this.options.rowName])) {
                 this.$el.hide();

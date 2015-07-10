@@ -85,7 +85,7 @@ define([
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash   = notFlashTypes.indexOf(type) === -1;
+                var isFlash = notFlashTypes.indexOf(type) === -1;
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {

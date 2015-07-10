@@ -204,10 +204,10 @@ define(function(require) {
          */
         _renderCriteria: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            var part  = {value: value.part, type: value.part};
+            var part = {value: value.part, type: value.part};
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
+            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
             this.dateWidgetOptions.part = part.type;
 
             var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
@@ -310,8 +310,8 @@ define(function(require) {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             if (value.value) {
                 var start = value.value.start;
-                var end   = value.value.end;
-                var type  = value.type ? value.type.toString() : '';
+                var end = value.value.end;
+                var type = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():

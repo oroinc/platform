@@ -81,7 +81,7 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         removeAll: function() {
-            this.addedCollectionItems   = [];
+            this.addedCollectionItems = [];
             this.$addedEl.val('');
 
             this.removedCollectionItems = _.clone(this.initialCollectionItems);

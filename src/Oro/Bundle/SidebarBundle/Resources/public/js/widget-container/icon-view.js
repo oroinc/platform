@@ -4,7 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
     var iconTemplate = require('text!./templates/icon-template.html');
-    var constants    = require('../constants');
+    var constants = require('../constants');
 
     /**
      * @export  orosidebar/js/widget-container/icon-view
@@ -25,7 +25,7 @@ define(function(require) {
         },
 
         render: function() {
-            var view  = this;
+            var view = this;
             var model = view.model;
 
             view.$el.html(view.template(model.toJSON()));

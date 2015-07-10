@@ -98,8 +98,8 @@ define([
 
                         if (status !== 'success' || response.success !== true) {
                             response = response.responseJSON ? response.responseJSON : (response || {});
-                            message  = _.isUndefined(response.message) ? __('unknown') : __(response.message);
-                            message  = __('Could not download translations, error: ') + message;
+                            message = _.isUndefined(response.message) ? __('unknown') : __(response.message);
+                            message = __('Could not download translations, error: ') + message;
                         } else {
                             message = actionMediator.action === 'download' ?
                                 __('Download finished.')

@@ -93,7 +93,7 @@ define([
          * @param field {jQuery|string} The jQuery object or jQuery selector for a form field element.
          */
         removeFieldErrors: function(field) {
-            var $field     = $(field);
+            var $field = $(field);
             var $container = $field.closest('.controls');
 
             $container
@@ -109,7 +109,7 @@ define([
          * @param errorMessages {string[]|string} The localized error string(s).
          */
         addFieldErrors: function(field, errorMessages) {
-            var $field     = $(field);
+            var $field = $(field);
             var $container = $field.closest('div.controls');
 
             if (!$field.is(':visible')) {

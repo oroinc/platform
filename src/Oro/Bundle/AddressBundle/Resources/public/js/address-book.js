@@ -62,7 +62,7 @@ define([
         },
 
         _initMainContainers: function() {
-            this.$noDataContainer   = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
+            this.$noDataContainer = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
             this.$addressesContainer = $('<div class="map-address-list"/>');
             this.$mapContainerFrame = $('<div class="map-visual-frame"/>');
 

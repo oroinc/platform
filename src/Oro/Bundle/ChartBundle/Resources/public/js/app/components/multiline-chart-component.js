@@ -20,7 +20,7 @@ define(function(require) {
          */
         draw: function() {
             var options = this.options;
-            var $chart  = this.$chart;
+            var $chart = this.$chart;
             var xFormat = options.data_schema.label.type;
             var yFormat = options.data_schema.value.type;
             if (!$chart.get(0).clientWidth) {

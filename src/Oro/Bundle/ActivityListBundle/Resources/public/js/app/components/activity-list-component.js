@@ -6,15 +6,15 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var tools         = require('oroui/js/tools');
-    var mediator      = require('oroui/js/mediator');
-    var ActivityView       = require('../views/activity-view');
-    var ActivityListView   = require('../views/activity-list-view');
-    var ActivityModel      = require('../models/activity-list-model');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
+    var ActivityView = require('../views/activity-view');
+    var ActivityListView = require('../views/activity-list-view');
+    var ActivityModel = require('../models/activity-list-model');
     var ActivityCollection = require('../models/activity-list-collection');
-    var MultiSelectFilter  = require('oro/filter/multiselect-filter');
-    var DatetimeFilter     = require('oro/filter/datetime-filter');
-    var dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
+    var MultiSelectFilter = require('oro/filter/multiselect-filter');
+    var DatetimeFilter = require('oro/filter/datetime-filter');
+    var dataFilterWrapper = require('orofilter/js/datafilter-wrapper');
 
     ActivityListComponent = BaseComponent.extend({
         defaults: {
@@ -70,7 +70,7 @@ define(function(require) {
             _.defaults(this.options.commentOptions, defaults.commentOptions);
 
             activityListData = JSON.parse(this.options.activityListData);
-            this.options.activityListData  = activityListData.data;
+            this.options.activityListData = activityListData.data;
             this.options.activityListCount = activityListData.count;
 
             this.options.activityListOptions.el = this.options._sourceElement;

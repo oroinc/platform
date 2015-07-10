@@ -32,7 +32,7 @@ define(function(require) {
                 } else {
                     // or exclude can be an object with data to compare
                     cut = _.pick(item, _.keys(rule));
-                    result  = _.isEqual(cut, rule);
+                    result = _.isEqual(cut, rule);
                 }
 
                 return result;

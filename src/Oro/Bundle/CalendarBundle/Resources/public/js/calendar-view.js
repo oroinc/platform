@@ -14,12 +14,12 @@ define(function(require) {
     var EventCollection = require('orocalendar/js/calendar/event/collection');
     var EventModel = require('orocalendar/js/calendar/event/model');
     var EventView = require('orocalendar/js/calendar/event/view');
-    var ConnectionView  = require('orocalendar/js/calendar/connection/view');
-    var eventDecorator  = require('orocalendar/js/calendar/event-decorator');
-    var ColorManager  = require('orocalendar/js/calendar/color-manager');
+    var ConnectionView = require('orocalendar/js/calendar/connection/view');
+    var eventDecorator = require('orocalendar/js/calendar/event-decorator');
+    var ColorManager = require('orocalendar/js/calendar/color-manager');
     var colorUtil = require('oroui/js/tools/color-util');
     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
-    var localeSettings  = require('orolocale/js/locale-settings');
+    var localeSettings = require('orolocale/js/locale-settings');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
     require('jquery.fullcalendar');

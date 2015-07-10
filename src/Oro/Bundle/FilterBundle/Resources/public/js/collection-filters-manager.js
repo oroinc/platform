@@ -123,7 +123,7 @@ define([
          * @return {*}
          */
         _applyState: function(state) {
-            var toEnable  = [];
+            var toEnable = [];
             var toDisable = [];
 
             _.each(this.filters, function(filter, name) {

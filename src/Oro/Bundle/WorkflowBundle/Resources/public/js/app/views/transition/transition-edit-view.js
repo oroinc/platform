@@ -118,7 +118,7 @@ define(function(require) {
             var result = '';
             var formOptions = this.model.get('frontend_options');
             if (formOptions && formOptions.hasOwnProperty(key)) {
-                result  = formOptions[key];
+                result = formOptions[key];
             }
             return result;
         },
