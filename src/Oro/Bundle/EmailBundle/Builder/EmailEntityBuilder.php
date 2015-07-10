@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -52,7 +52,7 @@ class EmailEntityBuilder
     }
 
     /**
-     * Create EmailUser entity object
+     * Create UserEmailOwner entity object
      *
      * @param string               $subject             The email subject
      * @param string $from                              The FROM email address,
@@ -71,7 +71,7 @@ class EmailEntityBuilder
      * @param User|null $owner                          Owner of the email
      * @param OrganizationInterface|null $organization
      *
-     * @return EmailUser
+     * @return UserEmailOwner
      *
      * @SuppressWarnings(ExcessiveParameterList)
      */
@@ -88,7 +88,7 @@ class EmailEntityBuilder
         $owner = null,
         $organization = null
     ) {
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
 
         $email = $this->email($subject, $from, $to, $sentAt, $internalDate, $importance, $cc, $bcc);
         $emailUser->setReceivedAt($receivedAt);
@@ -102,7 +102,7 @@ class EmailEntityBuilder
             $emailUser->setOrganization($owner->getOrganization());
         }
 
-        $this->batch->addEmailUser($emailUser);
+        $this->batch->addEmailOwner($emailUser);
 
         return $emailUser;
     }
@@ -436,7 +436,7 @@ class EmailEntityBuilder
      */
     public function removeEmails()
     {
-        $this->batch->removeEmailUsers();
+        $this->batch->removeEmailOwners();
     }
 
     /**
@@ -456,8 +456,8 @@ class EmailEntityBuilder
      */
     public function setObject($obj)
     {
-        if ($obj instanceof EmailUser) {
-            $this->batch->addEmailUser($obj);
+        if ($obj instanceof UserEmailOwner) {
+            $this->batch->addEmailOwner($obj);
         } elseif ($obj instanceof EmailAddress) {
             $this->batch->addAddress($obj);
         } elseif ($obj instanceof EmailFolder) {

@@ -14,7 +14,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
@@ -100,7 +100,7 @@ class Processor
      *
      * @param EmailModel $model
      *
-     * @return EmailUser
+     * @return UserEmailOwner
      * @throws \Swift_SwiftException
      */
     public function process(EmailModel $model)

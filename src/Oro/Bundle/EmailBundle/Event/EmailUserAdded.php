@@ -4,27 +4,27 @@ namespace Oro\Bundle\EmailBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 
 class EmailUserAdded extends Event
 {
     const NAME = 'oro_email.email_user_added';
 
     /**
-     * @var EmailUser
+     * @var UserEmailOwner
      */
     protected $emailUser;
 
     /**
-     * @param EmailUser $emailUser
+     * @param UserEmailOwner $emailUser
      */
-    public function __construct(EmailUser $emailUser)
+    public function __construct(UserEmailOwner $emailUser)
     {
         $this->setEmailUser($emailUser);
     }
 
     /**
-     * @return EmailUser
+     * @return UserEmailOwner
      */
     public function getEmailUser()
     {
@@ -32,7 +32,7 @@ class EmailUserAdded extends Event
     }
 
     /**
-     * @param EmailUser $emailUser
+     * @param UserEmailOwner $emailUser
      *
      * @return $this
      */

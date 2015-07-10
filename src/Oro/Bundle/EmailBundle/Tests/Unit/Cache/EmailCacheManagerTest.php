@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 
 class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,13 +64,13 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
     {
         $email     = new Email();
         $emailBody = new EmailBody();
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
 
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
         $emailUser->setFolder($folder);
-        $email->addEmailUser($emailUser);
+        $email->addEmailOwner($emailUser);
 
         $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
 
@@ -113,13 +113,13 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');
         $emailBody = new EmailBody();
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
 
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
         $emailUser->setFolder($folder);
-        $email->addEmailUser($emailUser);
+        $email->addEmailOwner($emailUser);
 
         $exception = new \Exception('some exception');
 
@@ -162,13 +162,13 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');
         $emailBody = new EmailBody();
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
 
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
         $emailUser->setFolder($folder);
-        $email->addEmailUser($emailUser);
+        $email->addEmailOwner($emailUser);
 
         $exception = new EmailBodyNotFoundException($email);
 

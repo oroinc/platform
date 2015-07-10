@@ -563,7 +563,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailOwnerByFolder($imapEmail->getImapFolder()->getFolder());
         if ($emailUser != null) {
             $emailUser->setFolder($newImapFolder->getFolder());
         }
@@ -587,9 +587,9 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             )
         );
 
-        $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
+        $emailUser = $imapEmail->getEmail()->getEmailOwnerByFolder($imapEmail->getImapFolder()->getFolder());
         if ($emailUser != null) {
-            $imapEmail->getEmail()->getEmailUsers()->removeElement($emailUser);
+            $imapEmail->getEmail()->getEmailOwners()->removeElement($emailUser);
         }
         $this->em->remove($imapEmail);
     }

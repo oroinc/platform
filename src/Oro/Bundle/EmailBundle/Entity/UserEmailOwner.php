@@ -13,7 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * EmailUser
+ * UserEmailOwner
  *
  * @ORM\Table(
  *      name="oro_email_user"
@@ -21,8 +21,25 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
+ *
+ * @Config(
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT",
+ *              "group_name"=""
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          }
+ *      }
+ * )
  */
-class EmailUser extends EmailOwner
+class UserEmailOwner extends EmailOwner
 {
 
     /**

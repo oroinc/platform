@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 
@@ -48,8 +48,8 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testAddEmail()
     {
-        $this->batch->addEmailUser(new EmailUser());
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'emailUsers'));
+        $this->batch->addEmailOwner(new UserEmailOwner());
+        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'emailOwners'));
     }
 
     public function testAddAddress()
@@ -130,53 +130,53 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email1->setXMessageId('email1');
         $email1->setMessageId('email1');
         $email1->setFromEmailAddress($addr);
-        $emailUser1 = new EmailUser();
+        $emailUser1 = new UserEmailOwner();
         $emailUser1->setFolder($folder);
-        $email1->addEmailUser($emailUser1);
+        $email1->addEmailOwner($emailUser1);
         $this->addEmailRecipient($email1, $addr);
         $this->addEmailRecipient($email1, $newAddr);
-        $this->batch->addEmailUser($emailUser1);
+        $this->batch->addEmailOwner($emailUser1);
 
         $email2 = new Email();
         $email2->setXMessageId('email2');
         $email2->setMessageId('email2');
         $email2->setFromEmailAddress($newAddr);
-        $emailUser2 = new EmailUser();
+        $emailUser2 = new UserEmailOwner();
         $emailUser2->setFolder($newFolder);
-        $email2->addEmailUser($emailUser2);
+        $email2->addEmailOwner($emailUser2);
         $this->addEmailRecipient($email2, $addr);
         $this->addEmailRecipient($email2, $newAddr);
-        $this->batch->addEmailUser($emailUser2);
+        $this->batch->addEmailOwner($emailUser2);
 
         $email3 = new Email();
         $email3->setXMessageId('email3');
         $email3->setMessageId('some_email');
         $email3->setFromEmailAddress($newAddr);
-        $emailUser3 = new EmailUser();
+        $emailUser3 = new UserEmailOwner();
         $emailUser3->setFolder($folder);
-        $email3->addEmailUser($emailUser3);
+        $email3->addEmailOwner($emailUser3);
         $this->addEmailRecipient($email3, $addr);
         $this->addEmailRecipient($email3, $newAddr);
-        $this->batch->addEmailUser($emailUser3);
+        $this->batch->addEmailOwner($emailUser3);
 
         $email4 = new Email();
         $email4->setXMessageId('email4');
         $email4->setMessageId('some_email');
         $email4->setFromEmailAddress($newAddr);
-        $emailUser4 = new EmailUser();
+        $emailUser4 = new UserEmailOwner();
         $emailUser4->setFolder($folder);
-        $email4->addEmailUser($emailUser4);
+        $email4->addEmailOwner($emailUser4);
         $this->addEmailRecipient($email4, $addr);
         $this->addEmailRecipient($email4, $newAddr);
-        $this->batch->addEmailUser($emailUser4);
+        $this->batch->addEmailOwner($emailUser4);
 
         $existingEmail = new Email();
         $existingEmail->setXMessageId('existing_email');
         $existingEmail->setMessageId('some_email');
         $existingEmail->setFromEmailAddress($newAddr);
-        $emailUser5 = new EmailUser();
+        $emailUser5 = new UserEmailOwner();
         $emailUser5->setFolder($dbFolder);
-        $existingEmail->addEmailUser($emailUser5);
+        $existingEmail->addEmailOwner($emailUser5);
         $this->addEmailRecipient($existingEmail, $addr);
         $this->addEmailRecipient($existingEmail, $newAddr);
 
@@ -235,8 +235,8 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->batch->persist($em);
 
-        $this->assertCount(1, $email1->getEmailUsers());
-        $this->assertCount(1, $email2->getEmailUsers());
+        $this->assertCount(1, $email1->getEmailOwners());
+        $this->assertCount(1, $email2->getEmailOwners());
         $this->assertTrue($origin === $emailUser1->getFolder()->getOrigin());
         $this->assertTrue($origin === $emailUser2->getFolder()->getOrigin());
         $this->assertSame($newFolder, $emailUser2->getFolder());

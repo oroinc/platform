@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -12,7 +12,7 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetterSetter()
     {
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
         $email = new Email();
         $owner = new User();
         $organization = new Organization();
@@ -37,7 +37,7 @@ class EmailUserTest extends \PHPUnit_Framework_TestCase
 
     public function testBeforeSave()
     {
-        $emailUser = new EmailUser();
+        $emailUser = new UserEmailOwner();
         $emailUser->beforeSave();
 
         $this->assertInstanceOf('\DateTime', $emailUser->getCreatedAt());

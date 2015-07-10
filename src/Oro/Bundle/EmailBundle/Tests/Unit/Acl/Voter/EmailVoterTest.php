@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -97,12 +97,12 @@ class EmailVoterTest extends \PHPUnit_Framework_TestCase
     {
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $email = new Email();
-        $emailUser1 = new EmailUser();
-        $emailUser2 = new EmailUser();
-        $emailUser3 = new EmailUser();
-        $email->addEmailUser($emailUser1);
-        $email->addEmailUser($emailUser2);
-        $email->addEmailUser($emailUser3);
+        $emailUser1 = new UserEmailOwner();
+        $emailUser2 = new UserEmailOwner();
+        $emailUser3 = new UserEmailOwner();
+        $email->addEmailOwner($emailUser1);
+        $email->addEmailOwner($emailUser2);
+        $email->addEmailOwner($emailUser3);
         $attributes = ['VIEW'];
 
         if ($atLeastOneGranted) {

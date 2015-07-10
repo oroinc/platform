@@ -6,7 +6,7 @@ datagrid:
                 select:
                     - partial eu.{id, email}
                 from:
-                    - { table: OroEmailBundle:EmailUser, alias: eu }
+                    - { table: OroEmailBundle:UserEmailOwner, alias: eu }
                 join:
                     left:
                         -
@@ -122,7 +122,7 @@ datagrid:
                     - partial eu.{ id, receivedAt, email }
                     - a
                 from:
-                    - { table: OroEmailBundle:EmailUser, alias: eu }
+                    - { table: OroEmailBundle:UserEmailOwner, alias: eu }
                 join:
                     left:
                         -

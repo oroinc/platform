@@ -51,7 +51,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
             'SELECT imap_email '
             . 'FROM Oro\Bundle\ImapBundle\Entity\ImapEmail imap_email '
             . 'INNER JOIN imap_email.email email '
-            . 'INNER JOIN email.emailUsers email_users '
+            . 'INNER JOIN email.emailOwners email_users '
             . 'INNER JOIN email_users.folder folder '
             . 'WHERE folder = :folder AND imap_email.uid IN (:uids)',
             $query->getDQL()
@@ -77,7 +77,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
             . 'FROM Oro\Bundle\ImapBundle\Entity\ImapEmail imap_email '
             . 'INNER JOIN imap_email.imapFolder imap_folder '
             . 'INNER JOIN imap_email.email email '
-            . 'INNER JOIN email.emailUsers email_users '
+            . 'INNER JOIN email.emailOwners email_users '
             . 'INNER JOIN email_users.folder folder '
             . 'WHERE folder.origin = :origin AND email.messageId IN (:messageIds)',
             $query->getDQL()
