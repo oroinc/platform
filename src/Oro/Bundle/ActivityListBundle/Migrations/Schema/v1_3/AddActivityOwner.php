@@ -14,7 +14,7 @@ class AddActivityOwner implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->addActivityOwner($schema);
+        self::addActivityOwner($schema);
     }
 
     /**
@@ -36,7 +36,7 @@ class AddActivityOwner implements Migration
      *
      * @param Schema $schema
      */
-    protected function createOroActivityOwnerTable(Schema $schema)
+    protected static function createOroActivityOwnerTable(Schema $schema)
     {
         $table = $schema->createTable('oro_activity_owner');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -55,7 +55,7 @@ class AddActivityOwner implements Migration
      *
      * @param Schema $schema
      */
-    protected function addOroActivityOwnerForeignKeys(Schema $schema)
+    protected static function addOroActivityOwnerForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_activity_owner');
         $table->addForeignKeyConstraint(
