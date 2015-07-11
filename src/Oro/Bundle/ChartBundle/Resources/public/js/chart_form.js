@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'jquery'],
-    function (_, $) {
+    function(_, $) {
         'use strict';
 
         /**
@@ -29,7 +28,7 @@ define(['underscore', 'jquery'],
              * @param {String} selector
              * @param {Array} options
              */
-            initialize: function (selector, options) {
+            initialize: function(selector, options) {
                 var $container = $(selector);
                 options = $.extend(true, {}, this.options, options, {
                     baseName: $container.data('ftid'),
@@ -40,14 +39,14 @@ define(['underscore', 'jquery'],
                 this.getNameChoiceElement(options).on('change', _.bind(this.updateChartFormVisibility, this, options));
             },
 
-            getNameChoiceElement: function (options) {
+            getNameChoiceElement: function(options) {
                 var selector = options.templates.name({
                     baseName: options.baseName
                 });
                 return options.$container.find(selector);
             },
 
-            getParentElement: function (options, block) {
+            getParentElement: function(options, block) {
                 var selector = options.templates.parent({
                     baseName: options.baseName,
                     block: block
@@ -55,7 +54,7 @@ define(['underscore', 'jquery'],
                 return options.$container.find(selector);
             },
 
-            getTargetElement: function (options, block, chart) {
+            getTargetElement: function(options, block, chart) {
                 var selector = options.templates.target({
                     baseName: options.baseName,
                     block: block,
@@ -64,9 +63,9 @@ define(['underscore', 'jquery'],
                 return options.$container.find(selector);
             },
 
-            updateChartFormVisibility: function (options) {
+            updateChartFormVisibility: function(options) {
                 var name = this.getNameChoiceElement(options).val();
-                _.each(options.blocks, function (block) {
+                _.each(options.blocks, function(block) {
                     this.getParentElement(options, block).hide();
                     this.getTargetElement(options, block, name).show();
                 }, this);

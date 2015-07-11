@@ -1,5 +1,3 @@
-/*jslint nomen: true, vars: true*/
-/*global define*/
 
 define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     'use strict';

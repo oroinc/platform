@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     './abstract-filter'
-], function ($, _, __, AbstractFilter) {
+], function($, _, __, AbstractFilter) {
     'use strict';
 
     var NoneFilter;
@@ -72,7 +70,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = _.pick(options || {}, 'popupHint');
             _.extend(this, opts);
 
@@ -83,7 +81,7 @@ define([
         /**
          * Makes sure the criteria popup dialog is closed
          */
-        ensurePopupCriteriaClosed: function () {
+        ensurePopupCriteriaClosed: function() {
             if (this.popupCriteriaShowed) {
                 this._hideCriteria();
             }
@@ -95,7 +93,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickCriteriaSelector: function (e) {
+        _onClickCriteriaSelector: function(e) {
             e.stopPropagation();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
@@ -110,7 +108,7 @@ define([
          *
          * @private
          */
-        _onClickCloseCriteria: function () {
+        _onClickCloseCriteria: function() {
             this._hideCriteria();
             this._updateDOMValue();
         },
@@ -120,7 +118,7 @@ define([
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function (e) {
+        _onClickDisableFilter: function(e) {
             e.preventDefault();
             this.disable();
         },
@@ -131,7 +129,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickOutsideCriteria: function (e) {
+        _onClickOutsideCriteria: function(e) {
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
@@ -144,7 +142,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var $filter = $(this.template({
                 popupHint: this._getPopupHint()
             }));
@@ -152,7 +150,7 @@ define([
             return this;
         },
 
-        _wrap: function ($filter) {
+        _wrap: function($filter) {
             this.$el.append($filter);
         },
 
@@ -161,10 +159,10 @@ define([
          *
          * @protected
          */
-        _showCriteria: function () {
+        _showCriteria: function() {
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
-            setTimeout(_.bind(function () {
+            setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
         },
@@ -174,10 +172,10 @@ define([
          *
          * @protected
          */
-        _hideCriteria: function () {
+        _hideCriteria: function() {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
-            setTimeout(_.bind(function () {
+            setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
                 }
@@ -187,14 +185,14 @@ define([
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             return this;
         },
 
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {};
         },
 
@@ -204,8 +202,8 @@ define([
          * @return {String}
          * @protected
          */
-        _getPopupHint: function () {
-            return this.popupHint ? this.popupHint: this.popupHint;
+        _getPopupHint: function() {
+            return this.popupHint ? this.popupHint : this.popupHint;
         },
 
         /**
@@ -214,8 +212,8 @@ define([
          * @return {String}
          * @protected
          */
-        _getCriteriaHint: function () {
-            return this.criteriaHint ? this.criteriaHint: this.placeholder;
+        _getCriteriaHint: function() {
+            return this.criteriaHint ? this.criteriaHint : this.placeholder;
         }
     });
 

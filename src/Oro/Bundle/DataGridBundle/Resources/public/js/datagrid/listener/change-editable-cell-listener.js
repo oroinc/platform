@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'oroui/js/mediator',
     './abstract-grid-change-listener'
-], function ($, _, mediator, AbstractGridChangeListener) {
+], function($, _, mediator, AbstractGridChangeListener) {
     'use strict';
 
     var ChangeEditableCellListener;
@@ -23,7 +21,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'selector')) {
                 throw new Error('Parameter selector is not specified');
             }
@@ -39,11 +37,11 @@ define([
         /**
          * @inheritDoc
          */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             ChangeEditableCellListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             /** Restore cells state */
-            mediator.bind('grid_load:complete', function () {
+            mediator.bind('grid_load:complete', function() {
                 this._restoreState();
             }, this);
         },
@@ -51,11 +49,11 @@ define([
         /**
          * @inheritDoc
          */
-        _onModelEdited: function (e, model) {
+        _onModelEdited: function(e, model) {
             var changes = model.changed;
             var columns = this.columnName;
 
-            _.each(changes, function (value, column) {
+            _.each(changes, function(value, column) {
                 if (_.indexOf(columns, column) === -1) {
                     delete changes[column];
                 }
@@ -78,7 +76,7 @@ define([
          * @param {*}      id      Value of model property with name of this.dataField
          * @param {Object} changes
          */
-        _processValue: function (id, changes) {
+        _processValue: function(id, changes) {
             var changeset = this.get('changeset');
             if (!_.has(changeset, id)) {
                 changeset[id] = {};
@@ -94,25 +92,25 @@ define([
         /**
          * @inheritDoc
          */
-        _clearState: function () {
+        _clearState: function() {
             this.set('changeset', {});
         },
 
         /**
          * @inheritDoc
          */
-        _synchronizeState: function () {
+        _synchronizeState: function() {
             this.$selector.val(JSON.stringify(this.get('changeset')));
         },
 
-       /**
-        * String into object
-        *
-        * @param string
-        * @return {Object}
-        * @private
-        */
-        _toObject: function (string) {
+        /**
+         * String into object
+         *
+         * @param string
+         * @return {Object}
+         * @private
+         */
+        _toObject: function(string) {
             if (!string) {
                 return {};
             }
@@ -122,7 +120,7 @@ define([
         /**
          * @inheritDoc
          */
-        _restoreState: function () {
+        _restoreState: function() {
             var changeset = {};
             if (this.$selector.length) {
                 changeset = this._toObject(this.$selector.val());
@@ -136,7 +134,7 @@ define([
         /**
          * @inheritDoc
          */
-        _hasChanges: function () {
+        _hasChanges: function() {
             return !_.isEmpty(this.get('changeset'));
         }
     });
@@ -152,22 +150,20 @@ define([
      * @param {Object} [options.data] data for grid's collection
      * @param {Object} [options.metadata] configuration for the grid
      */
-    ChangeEditableCellListener.init = function (deferred, options) {
-        var gridOptions, gridInitialization;
-        gridOptions = options.metadata.options || {};
-        gridInitialization = options.gridPromise;
+    ChangeEditableCellListener.init = function(deferred, options) {
+        var gridOptions = options.metadata.options || {};
+        var gridInitialization = options.gridPromise;
 
         if (gridOptions.cellSelection) {
-            gridInitialization.done(function (grid) {
-                var listener, listenerOptions;
-                listenerOptions = _.defaults({
+            gridInitialization.done(function(grid) {
+                var listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name
                 }, gridOptions.cellSelection);
 
-                listener = new ChangeEditableCellListener(listenerOptions);
+                var listener = new ChangeEditableCellListener(listenerOptions);
                 deferred.resolve(listener);
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         } else {
