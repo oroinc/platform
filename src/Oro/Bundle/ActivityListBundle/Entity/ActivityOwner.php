@@ -11,7 +11,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * @ORM\Table(name="oro_activity_owner")
+ * @ORM\Table(
+ *      name="oro_activity_owner",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(
+ *              name="UNQ_activity_owner",
+ *              columns={"activity_id", "user_id"}
+ *          )
+ *      }
+ * )
  * @ORM\Entity()
  */
 class ActivityOwner
@@ -30,7 +38,7 @@ class ActivityOwner
      * @var ActivityList
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\ActivityListBundle\Entity\ActivityList", inversedBy="activityOwners")
-     * @ORM\JoinColumn(name="activity_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $activity;
 
@@ -50,6 +58,14 @@ class ActivityOwner
      * @Soap\ComplexType("Oro\Bundle\UserBundle\Entity\User")
      */
     protected $user;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Get organization
