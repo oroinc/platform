@@ -1,14 +1,13 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailEditorComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        _ = require('underscore'),
-        EmailEditorView = require('../views/email-editor-view'),
-        emailTemplatesProvider = require('../../util/email-templates-provider'),
-        EmailEditorModel = require('../models/email-editor-model'),
-        EmailModel = require('../models/email-model');
+    var EmailEditorComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var _ = require('underscore');
+    var EmailEditorView = require('../views/email-editor-view');
+    var emailTemplatesProvider = require('../../util/email-templates-provider');
+    var EmailEditorModel = require('../models/email-editor-model');
+    var EmailModel = require('../models/email-model');
 
     EmailEditorComponent = BaseComponent.extend({
         /**
@@ -26,7 +25,7 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
             this._deferredInit();
             this.view = new EmailEditorView({
@@ -35,14 +34,14 @@ define(function (require) {
                 templatesProvider: emailTemplatesProvider
             });
             this.view.render();
-            this.view.renderPromise.done(_.bind(function () {
+            this.view.renderPromise.done(_.bind(function() {
                 this.autosizeBodyEditor();
                 this._resolveDeferredInit();
                 this.listenTo(this.view.pageComponent('bodyEditor').view, 'resize', this.onResize, this);
             }, this));
         },
 
-        createEditorModelFromComponentOptions: function (options) {
+        createEditorModelFromComponentOptions: function(options) {
             var $el = options._sourceElement;
             return new EmailEditorModel({
                 appendSignature: options.appendSignature,
@@ -61,12 +60,12 @@ define(function (require) {
             });
         },
 
-        autosizeBodyEditor: function () {
-            var component = this.view.pageComponent('bodyEditor'),
-                outerHeight = this.view.$el.closest('.ui-widget-content').height(),
-                innerHeight = this.view.$el.height(),
-                editorHeight = component.view.getHeight(),
-                availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
+        autosizeBodyEditor: function() {
+            var component = this.view.pageComponent('bodyEditor');
+            var outerHeight = this.view.$el.closest('.ui-widget-content').height();
+            var innerHeight = this.view.$el.height();
+            var editorHeight = component.view.getHeight();
+            var availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
             component.view.setHeight(Math.max(availableHeight, this.options.minimalWysiwygEditorHeight));
         }
     });

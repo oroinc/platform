@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define, require*/
 define([
     'jquery',
     'underscore',
@@ -10,7 +8,7 @@ define([
     'oroui/js/error',
     'oroui/js/modal',
     'orodatagrid/js/datagrid/action-launcher'
-], function ($, _, Backbone, routing, __, mediator, error, Modal, ActionLauncher) {
+], function($, _, Backbone, routing, __, mediator, error, Modal, ActionLauncher) {
     'use strict';
 
     var AbstractAction;
@@ -89,9 +87,9 @@ define([
          * @param {Object} options
          * @param {Object} [options.launcherOptions] Options for new instance of launcher object
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!options.datagrid) {
-                throw new TypeError("'datagrid' is required");
+                throw new TypeError('"datagrid" is required');
             }
             this.subviews = [];
             this.datagrid = options.datagrid;
@@ -108,7 +106,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -125,7 +123,7 @@ define([
          * @param {Object=} options Launcher options
          * @return {orodatagrid.datagrid.ActionLauncher}
          */
-        createLauncher: function (options) {
+        createLauncher: function(options) {
             var launcher;
             options = options || {};
             if (_.isUndefined(options.icon) && !_.isUndefined(this.icon)) {
@@ -140,7 +138,7 @@ define([
         /**
          * Run action
          */
-        run: function () {
+        run: function() {
             var options = {
                 doExecute: true
             };
@@ -154,11 +152,11 @@ define([
         /**
          * Execute action
          */
-        execute: function () {
+        execute: function() {
             this._confirmationExecutor(_.bind(this.executeConfiguredAction, this));
         },
 
-        executeConfiguredAction: function () {
+        executeConfiguredAction: function() {
             switch (this.frontend_handle) {
             case 'ajax':
                 this._handleAjax();
@@ -171,7 +169,7 @@ define([
             }
         },
 
-        _confirmationExecutor: function (callback) {
+        _confirmationExecutor: function(callback) {
             if (this.confirmation) {
                 this.getConfirmDialog(callback).open();
             } else {
@@ -179,20 +177,20 @@ define([
             }
         },
 
-        _handleWidget: function () {
+        _handleWidget: function() {
             if (this.dispatched) {
                 return;
             }
             this.frontend_options = this.frontend_options || {};
             this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
-            require(['oro/' + this.frontend_handle + '-widget'], _.bind(function (WidgetType) {
+            require(['oro/' + this.frontend_handle + '-widget'], _.bind(function(WidgetType) {
                 var widget = new WidgetType(this.frontend_options);
                 widget.render();
             }, this));
         },
 
-        _handleRedirect: function () {
+        _handleRedirect: function() {
             if (this.dispatched) {
                 return;
             }
@@ -200,7 +198,7 @@ define([
             mediator.execute('redirectTo', {url: url}, {redirect: true});
         },
 
-        _handleAjax: function () {
+        _handleAjax: function() {
             if (this.dispatched) {
                 return;
             }
@@ -210,7 +208,7 @@ define([
             this._doAjaxRequest();
         },
 
-        _doAjaxRequest: function () {
+        _doAjaxRequest: function() {
             $.ajax({
                 url: this.getLink(),
                 data: this.getActionParameters(),
@@ -221,14 +219,14 @@ define([
             });
         },
 
-        _onAjaxError: function (jqXHR) {
+        _onAjaxError: function(jqXHR) {
             error.handle({}, jqXHR, {enforce: true});
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
         },
 
-        _onAjaxSuccess: function (data) {
+        _onAjaxSuccess: function(data) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch({reset: true});
@@ -236,10 +234,10 @@ define([
             this._showAjaxSuccessMessage(data);
         },
 
-        _showAjaxSuccessMessage: function (data) {
-            var defaultMessage = data.successful ? this.messages.success : this.messages.error,
-                type = data.successful ? 'success' : 'error',
-                message = data.message || __(defaultMessage);
+        _showAjaxSuccessMessage: function(data) {
+            var defaultMessage = data.successful ? this.messages.success : this.messages.error;
+            var type = data.successful ? 'success' : 'error';
+            var message = data.message || __(defaultMessage);
             if (message) {
                 mediator.execute('showFlashMessage', type, message);
             }
@@ -251,7 +249,7 @@ define([
          * @return {String}
          * @private
          */
-        getLink: function (parameters) {
+        getLink: function(parameters) {
             if (_.isUndefined(parameters)) {
                 parameters = {};
             }
@@ -269,7 +267,7 @@ define([
          *
          * @returns {String}
          */
-        getLinkWithParameters: function () {
+        getLinkWithParameters: function() {
             return this.getLink(this.getActionParameters());
         },
 
@@ -278,7 +276,7 @@ define([
          *
          * @returns {Object}
          */
-        getActionParameters: function () {
+        getActionParameters: function() {
             return {};
         },
 
@@ -287,7 +285,7 @@ define([
          *
          * @return {oroui.Modal}
          */
-        getConfirmDialog: function (callback) {
+        getConfirmDialog: function(callback) {
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
                     title: __(this.messages.confirm_title),

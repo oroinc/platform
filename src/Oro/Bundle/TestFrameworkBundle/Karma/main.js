@@ -1,5 +1,3 @@
-/*global requirejs*/
-/*jshint browser:true*/
 (function (files, callback) {
     'use strict';
     var file, match, tests = [], libs = {};

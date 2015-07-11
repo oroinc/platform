@@ -1,15 +1,14 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
+    'jquery',
     'underscore',
     'chaplin',
     'oroui/js/app/views/base/collection-view'
-], function (_, Chaplin, BaseCollectionView) {
+], function($, _, Chaplin, BaseCollectionView) {
     'use strict';
 
-    var DropdownCollectionView, utils;
+    var DropdownCollectionView;
+    var utils = Chaplin.utils;
 
-    utils = Chaplin.utils;
     DropdownCollectionView = BaseCollectionView.extend({
         listen: {
             'visibilityChange': 'updateVisibility',
@@ -18,19 +17,19 @@ define([
             'page-rendered mediator': 'updateDropdown'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['position']));
             DropdownCollectionView.__super__.initialize.apply(this, arguments);
             // handle resize event once per frame (1000 ms / 25 frames)
             $(window).on('resize.' + this.cid, _.debounce(_.bind(this.updateDropdown, this), 40));
         },
 
-        dispose: function () {
+        dispose: function() {
             $(window).off('.' + this.cid);
             DropdownCollectionView.__super__.dispose.call(this);
         },
 
-        render: function () {
+        render: function() {
             DropdownCollectionView.__super__.render.call(this);
             this.positionUpdate();
             return this;
@@ -39,7 +38,7 @@ define([
         /**
          * Updates dropdown content and its position
          */
-        updateDropdown: function () {
+        updateDropdown: function() {
             this.recheckItems();
             this.positionUpdate();
         },
@@ -47,7 +46,7 @@ define([
         /**
          * Updates position of root element
          */
-        positionUpdate: function () {
+        positionUpdate: function() {
             var pos = _.result(this, 'position');
             if (pos) {
                 this.$el.css('left', pos.left);
@@ -57,13 +56,13 @@ define([
         /**
          * Runs filterer and filterCallback methods for each model and its view
          */
-        recheckItems: function () {
+        recheckItems: function() {
             var visibilityChanged;
 
-            this.collection.each(function (model, index) {
-                var view, included, visibleItemsIndex;
-                view = this.subview("itemView:" + model.cid);
-                included = this.filterer(model, index);
+            this.collection.each(function(model, index) {
+                var visibleItemsIndex;
+                var view = this.subview('itemView:' + model.cid);
+                var included = this.filterer(model, index);
                 this.filterCallback(view, included);
 
                 visibleItemsIndex = utils.indexOf(this.visibleItems, model);
@@ -89,11 +88,11 @@ define([
          * @param {Chaplin.View} view
          * @param {boolean} included
          */
-        filterCallback: function (view, included) {
+        filterCallback: function(view, included) {
             view.$el.css('display', included ? '' : 'none');
         },
 
-        renderAllItems: function () {
+        renderAllItems: function() {
             DropdownCollectionView.__super__.renderAllItems.apply(this, arguments);
             this.updateVisibility();
         },
@@ -101,7 +100,7 @@ define([
         /**
          * Handles visibility change
          */
-        updateVisibility: function () {
+        updateVisibility: function() {
             this.$el[this.visibleItems.length > 0 ? 'show' : 'hide']();
         }
     });

@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backgrid',
     'orodatagrid/js/datagrid/formatter/cell-formatter'
-], function (Backgrid, CellFormatter) {
+], function(Backgrid, CellFormatter) {
     'use strict';
 
     var StringCell;
@@ -24,8 +22,8 @@ define([
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
-            if (this.column.get("editable")) {
+        enterEditMode: function(e) {
+            if (this.column.get('editable')) {
                 e.stopPropagation();
             }
             return StringCell.__super__.enterEditMode.apply(this, arguments);

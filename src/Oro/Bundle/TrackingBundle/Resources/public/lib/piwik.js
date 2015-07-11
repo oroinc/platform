@@ -29,8 +29,6 @@
  * @version 2012-10-08
  * @link http://www.JSON.org/js.html
  ************************************************************/
-/*jslint evil: true, regexp: false, bitwise: true*/
-/*global JSON2:true */
 /*members "", "\b", "\t", "\n", "\f", "\r", "\"", "\\", apply,
     call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
     getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
@@ -386,10 +384,6 @@ if (typeof JSON2 !== 'object') {
  * end JSON
  ************************************************************/
 
-/*jslint browser:true, plusplus:true, vars:true, nomen:true, evil:true */
-/*global window */
-/*global unescape */
-/*global ActiveXObject */
 /*members encodeURIComponent, decodeURIComponent, getElementsByTagName,
     shift, unshift, piwikAsyncInit,
     createElement, appendChild, characterSet, charset,
@@ -432,16 +426,10 @@ if (typeof JSON2 !== 'object') {
     deleteCookies,
     setUserId, setCampaignName
  */
-/*global _paq:true */
 /*members push */
-/*global Piwik:true */
 /*members addPlugin, getTracker, getAsyncTracker */
-/*global Piwik_Overlay_Client */
-/*global AnalyticsTracker:true */
 /*members initialize */
-/*global define */
 /*members amd */
-/*global console:true */
 /*members error */
 
 // asynchronous tracker (or proxy)
@@ -3277,14 +3265,12 @@ if (window && window.piwikAsyncInit) {
     window.piwikAsyncInit();
 }
 
-/*jslint sloppy: true */
 (function () {
     var jsTrackerType = (typeof AnalyticsTracker);
     if (jsTrackerType === 'undefined') {
         AnalyticsTracker = Piwik;
     }
 }());
-/*jslint sloppy: false */
 
 /************************************************************
  * Deprecated functionality below
@@ -3296,8 +3282,6 @@ if (window && window.piwikAsyncInit) {
  *
  *   var piwik_install_tracker, piwik_tracker_pause, piwik_download_extensions, piwik_hosts_alias, piwik_ignore_classes;
  */
-/*global piwik_log:true */
-/*global piwik_track:true */
 
 /**
  * Track page visit

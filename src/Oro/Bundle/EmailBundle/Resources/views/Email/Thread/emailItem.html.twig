@@ -43,7 +43,13 @@
                     routeParameters: routeParameters
                 } : {} %}
                 {% set buttonsHtml %}
-                    {{ Actions.replyButton(email, actionParameters) }}
+                    {% if defaultReplyButton is not defined or defaultReplyButton == 1 %}
+                        {{ Actions.replyButton(email, actionParameters) }}
+                        {{ Actions.replyAllButton(email, actionParameters) }}
+                    {% else %}
+                        {{ Actions.replyAllButton(email, actionParameters) }}
+                        {{ Actions.replyButton(email, actionParameters) }}
+                    {% endif %}
                     {{ Actions.forwardButton(email, actionParameters ) }}
                 {% endset %}
                 {{ UI.pinnedDropdownButton({
