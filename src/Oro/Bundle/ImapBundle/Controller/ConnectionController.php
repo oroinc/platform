@@ -38,7 +38,14 @@ class ConnectionController extends Controller
             $data = $this->getDoctrine()->getRepository('OroImapBundle:ImapEmailOrigin')->find($id);
         }
 
-        $form = $this->createForm('oro_imap_configuration', $data, ['csrf_protection' => false]);
+        $form = $this->createForm(
+            'oro_imap_configuration',
+            $data,
+            [
+                'csrf_protection' => false,
+                'validation_groups' => ['Check'],
+            ]
+        );
         $form->submit($this->getRequest());
         /** @var ImapEmailOrigin $origin */
         $origin = $form->getData();
@@ -56,14 +63,11 @@ class ConnectionController extends Controller
                 $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
                 $this->manager = new ImapEmailFolderManager($connector, $this->getDoctrine()->getManager(), $origin);
 
-                $connector->getCapability();
-
                 $emailFolders = $this->manager->getFolders();
                 $origin->setFolders($emailFolders);
 
                 $user = new User();
                 $user->setImapConfiguration($origin);
-
                 $userForm = $this->get('oro_user.form.user');
                 $userForm->setData($user);
 

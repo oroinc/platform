@@ -38,7 +38,7 @@ function ($, _, routing, __, mediator, messenger) {
                         return field;
                     });
                     // clear folders data
-                    data = data.splice(0, 5);
+                    data = data.splice(0, 6);
                 }
 
                 url = routing.generate(routeName);
@@ -50,13 +50,9 @@ function ($, _, routing, __, mediator, messenger) {
                 }
 
                 mediator.execute('showLoading');
+                $el.parent().parent().parent().find('div.control-group').slice(7).remove();
                 $.post(url, data)
                     .done(function (response) {
-/*                        messenger.notificationFlashMessage('success', __('oro.imap.connection.success'), {
-                            container: $el.parent()
-                        });*/
-
-                        $el.parent().parent().parent().find('div.control-group').slice(6).remove();
                         $el.parent().parent().parent().append(response);
                     })
                     .error(function () {

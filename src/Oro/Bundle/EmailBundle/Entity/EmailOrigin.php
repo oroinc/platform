@@ -105,7 +105,6 @@ abstract class EmailOrigin
     {
         $this->folders   = new ArrayCollection();
         $this->syncCount = 0;
-        $this->setMailboxName($this->__toString());
     }
 
     /**
@@ -146,6 +145,16 @@ abstract class EmailOrigin
     public function getFolders()
     {
         return $this->folders;
+    }
+
+    /**
+     * @return ArrayCollection|EmailFolder[]
+     */
+    public function getRootFolders()
+    {
+        return $this->folders->filter(function (EmailFolder $emailFolder) {
+            return $emailFolder->getParentFolder() === null;
+        });
     }
 
     /**

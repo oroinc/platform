@@ -60,58 +60,115 @@ class ConfigurationType extends AbstractType
     {
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
-        $this->addRetrieveFoldersListener($builder);
+        $this->addListener($builder);
 
         $builder
             ->add(
+                'mailboxName',
+                'text',
+                ['label' => 'oro.email.mailbox.label', 'required' => true]
+            )
+            ->add(
                 'host',
                 'text',
-                array('label' => 'oro.imap.configuration.host.label', 'required' => true)
+                ['label' => 'oro.imap.configuration.host.label', 'required' => true]
             )
             ->add(
                 'port',
                 'number',
-                array('label' => 'oro.imap.configuration.port.label', 'required' => true)
+                ['label' => 'oro.imap.configuration.port.label', 'required' => true]
             )
             ->add(
                 'ssl',
                 'choice',
-                array(
+                [
                     'label'       => 'oro.imap.configuration.ssl.label',
-                    'choices'     => array('ssl' => 'SSL', 'tls' => 'TLS'),
+                    'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
                     'empty_data'  => null,
                     'empty_value' => '',
                     'required'    => false
-                )
+                ]
             )
             ->add(
                 'user',
                 'text',
-                array('label' => 'oro.imap.configuration.user.label', 'required' => true)
+                ['label' => 'oro.imap.configuration.user.label', 'required' => true]
             )
             ->add(
                 'password',
                 'password',
-                array('label' => 'oro.imap.configuration.password.label', 'required' => true)
+                ['label' => 'oro.imap.configuration.password.label', 'required' => true]
             )
-            ->add('check_connection', new CheckButtonType())
+            ->add('check_connection', new CheckButtonType(), [
+                'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
+            ])
             ->add('folders', 'oro_email_email_folder_tree', [
                 'label' => $this->translator->trans('oro.email.folders.label'),
             ]);
     }
 
-    protected function addRetrieveFoldersListener(FormBuilderInterface $builder)
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
-                /** @var array $origin */
-                $origin = $event->getData();
-                /** @var ImapEmailOrigin $origin */
-                $formData = $event->getForm()->getData();
+                $data = $event->getData();
+                if (array_key_exists('folders', $data)) {
+                    $form = $event->getForm();
+
+                    /** @var ImapEmailOrigin $origin */
+                    $origin = $form->getData();
+
+                    if ($origin !== null && $origin->getId() !== null) {
+                        $this->applySyncEnabled($origin->getRootFolders(), $data['folders']);
+
+                        $form->remove('folders');
+                        unset($data['folders']);
+                    }
+                }
+                $event->setData($data);
             }
         );
     }
+
+    /**
+     * @param ArrayCollection $folders
+     * @param array $data
+     */
+    protected function applySyncEnabled($folders, $data)
+    {
+        /** @var EmailFolder $folder */
+        foreach ($folders as $folder) {
+            $f = array_filter($data, function ($item) use ($folder) {
+                return $folder->getFullName() === $item['fullName'];
+            });
+
+            $matched = reset($f);
+            $syncEnabled = array_key_exists('syncEnabled', $matched);
+            $folder->setSyncEnabled($syncEnabled);
+
+            if ($folder->hasSubFolders() && array_key_exists('subFolders', $matched)) {
+                $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
+            }
+        }
+    }
+
+    /**
+     * @param array $tree
+     * @param array $result
+     */
+/*    protected function expandDataTree($tree, &$result)
+    {
+        foreach ($tree as $leaf) {
+            if (array_key_exists('subFolders', $leaf)) {
+                $this->expandDataTree($leaf['subFolders'], $result);
+                unset($leaf['subFolders']);
+            }
+        }
+    }*/
 
     /**
      * @param FormBuilderInterface $builder
@@ -190,12 +247,10 @@ class ConfigurationType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\ImapEmailOrigin',
-                'required'   => false
-            )
-        );
+        $resolver->setDefaults([
+            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\ImapEmailOrigin',
+            'required'   => false
+        ]);
     }
 
     /**

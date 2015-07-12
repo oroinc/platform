@@ -15,7 +15,7 @@ class EmailFolderType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailFolder',
-            'nesting_level' => 3,
+            'nesting_level' => 10,
         ]);
     }
 
@@ -30,7 +30,6 @@ class EmailFolderType extends AbstractType
                 ->add('fullName', 'hidden')
                 ->add('name', 'hidden')
                 ->add('type', 'hidden')
-                ->add('uidValidity', 'hidden', ['mapped' => false])
                 ->add('subFolders', 'collection', [
                     'type' => 'oro_email_email_folder',
                     'allow_add' => true,

@@ -1,18 +1,20 @@
 Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin:
     properties:
-        host:
+        mailboxName:
             - NotBlank:     ~
+        host:
+            - NotBlank:     { groups: [Check] }
             - Length:
                 min:        3
                 max:        255
         port:
-            - NotBlank:     ~
+            - NotBlank:     { groups: [Check] }
             - Type:
                 type: integer
         ssl:
             - Choice:
                 choices:  [ssl, tls]
         user:
-            - NotBlank:     ~
+            - NotBlank:     { groups: [Check] }
             - Type:
                 type: string

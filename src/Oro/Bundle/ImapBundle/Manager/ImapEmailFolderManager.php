@@ -67,7 +67,7 @@ class ImapEmailFolderManager
             // merge synced and existing folders
             $emailFolderModels = $this->mergeFolders($emailFolderModels, $existingFolders);
             // mark old folders as outdated
-            $this->markAsOutdated($existingFolders);
+            $this->removeOutdated($existingFolders);
 
             // flush changes
             $this->em->flush();
@@ -77,15 +77,47 @@ class ImapEmailFolderManager
     }
 
     /**
+     * Gets UIDVALIDITY of the given folder
+     *
+     * @param EmailFolder|Folder|string $folder
+     *
+     * @return int|null
+     */
+    public function getUidValidity($folder)
+    {
+        if ($folder instanceof Folder) {
+            $folderName = $folder->getGlobalName();
+        } elseif ($folder instanceof EmailFolder) {
+            $folderName = $folder->getFullName();
+        } elseif (is_string($folder)) {
+            $folderName = $folder;
+        }
+
+        if (!isset($folderName)) {
+            throw new \RuntimeException('Invalid argument passed to getUidValidity method');
+        }
+
+        try {
+            $this->connector->selectFolder($folderName);
+
+            return $this->connector->getUidValidity();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * @param ArrayCollection|ImapEmailFolder[] $existingFolders
      */
-    protected function markAsOutdated($existingFolders)
+    protected function removeOutdated($existingFolders)
     {
         $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         /** @var ImapEmailFolder $existingFolder */
         foreach ($existingFolders as $existingFolder) {
             $emailFolder = $existingFolder->getFolder();
-            $emailFolder->setOutdatedAt($outdatedAt);
+            //$emailFolder->setOutdatedAt($outdatedAt);
+            $this->em->remove($existingFolder);
+            $this->em->remove($emailFolder);
         }
     }
 
@@ -141,7 +173,7 @@ class ImapEmailFolderManager
 
             if ($f->isEmpty()) {
                 // there is a new folder on server, create it
-                $imapEmailFolder = $this->createImapEmailFodler($syncedFolderModel);
+                $imapEmailFolder = $this->createImapEmailFolder($syncedFolderModel);
 
                 // persist ImapEmailFolder and (by cascade) EmailFolder
                 $this->em->persist($imapEmailFolder);
@@ -149,6 +181,7 @@ class ImapEmailFolderManager
                 /** @var ImapEmailFolder $existingImapFolder */
                 $existingImapFolder = $f->first();
                 $emailFolder = $existingImapFolder->getFolder();
+                $this->em->refresh($emailFolder);
                 $emailFolder->setName($syncedFolderModel->getEmailFolder()->getName());
                 $emailFolder->setFullName($syncedFolderModel->getEmailFolder()->getFullName());
                 $emailFolder->setType($syncedFolderModel->getEmailFolder()->getType());
@@ -197,7 +230,7 @@ class ImapEmailFolderManager
      *
      * @return ImapEmailFolder
      */
-    protected function createImapEmailFodler(EmailFolderModel $emailFolderModel)
+    protected function createImapEmailFolder(EmailFolderModel $emailFolderModel)
     {
         $imapEmailFolder = new ImapEmailFolder();
         $emailFolder = $emailFolderModel->getEmailFolder();
@@ -209,24 +242,6 @@ class ImapEmailFolderManager
         $imapEmailFolder->setUidValidity($emailFolderModel->getUidValidity());
 
         return $imapEmailFolder;
-    }
-
-    /**
-     * Gets UIDVALIDITY of the given folder
-     *
-     * @param Folder $folder
-     *
-     * @return int|null
-     */
-    protected function getUidValidity(Folder $folder)
-    {
-        try {
-            $this->connector->selectFolder($folder->getGlobalName());
-
-            return $this->connector->getUidValidity();
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 
     /**
@@ -242,6 +257,8 @@ class ImapEmailFolderManager
             $emailFolder = $emailFolderModel->getEmailFolder();
             if ($emailFolderModel->hasSubFolderModels()) {
                 $emailFolder->setSubFolders($this->extractEmailFolders($emailFolderModel->getSubFolderModels()));
+            } else {
+                $emailFolder->setSubFolders([]);
             }
             $emailFolders->add($emailFolder);
         }
