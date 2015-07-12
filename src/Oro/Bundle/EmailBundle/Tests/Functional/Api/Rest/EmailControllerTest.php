@@ -130,6 +130,21 @@ class EmailControllerTest extends WebTestCase
         );
     }
 
+    public function testCreateEmailWithoutSubjectAndBody()
+    {
+        $email = $this->email;
+        $email['messageId'] = 'new.test@email-bundle.func-test';
+        unset($email['subject'], $email['body'], $email['bodyType']);
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertNotNull($email['subject'], "The Subject cannot be null. It should be empty string");
+        $this->assertNotNull($email['body'], "The Body cannot be null. It should be empty string");
+    }
+
     /**
      * @depends testCreateEmail
      *

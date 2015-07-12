@@ -276,6 +276,7 @@ class DictionaryValueListProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'exclusion_policy' => 'all',
+                'hints'            => ['HINT_TRANSLATABLE'],
                 'fields'           => [
                     'id'        => null,
                     'name'      => null,
