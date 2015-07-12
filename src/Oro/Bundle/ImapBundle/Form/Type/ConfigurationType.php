@@ -32,25 +32,19 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var EntityManager */
-    protected $em;
-
     /**
      * @param Mcrypt              $encryptor
      * @param SecurityFacade      $securityFacade
      * @param TranslatorInterface $translator
-     * @param Registry            $doctrine
      */
     public function __construct(
         Mcrypt $encryptor,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator,
-        Registry $doctrine
+        TranslatorInterface $translator
     ) {
         $this->encryptor = $encryptor;
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
-        $this->em = $doctrine->getManager();
     }
 
     /**

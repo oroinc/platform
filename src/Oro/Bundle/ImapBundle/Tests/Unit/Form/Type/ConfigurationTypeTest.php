@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -54,6 +57,19 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         parent::setUp();
+    }
+
+    protected function getExtensions()
+    {
+        return array_merge(parent::getExtensions(), [
+            new PreloadedExtension(
+                [
+                    'oro_email_email_folder' => new EmailFolderType(),
+                    'oro_email_email_folder_tree' => new EmailFolderTreeType(),
+                ],
+                []
+            )]
+        );
     }
 
     protected function tearDown()

@@ -33,6 +33,7 @@ class EmailFolderTypeTest extends FormIntegrationTestCase
             ->method('setDefaults')
             ->with([
                 'data_class' => 'Oro\Bundle\EmailBundle\Entity\EmailFolder',
+                'nesting_level' => 10,
             ]);
 
         $this->emailFolderType->setDefaultOptions($resolver);
@@ -51,10 +52,31 @@ class EmailFolderTypeTest extends FormIntegrationTestCase
 
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('subFolders', 'collection', ['type' => 'oro_email_email_folder',])
+            ->with('fullName', 'hidden')
             ->willReturn($builder);
 
-        $this->emailFolderType->buildForm($builder, []);
+        $builder->expects($this->at(2))
+            ->method('add')
+            ->with('name', 'hidden')
+            ->willReturn($builder);
+
+        $builder->expects($this->at(3))
+            ->method('add')
+            ->with('type', 'hidden')
+            ->willReturn($builder);
+
+        $builder->expects($this->at(4))
+            ->method('add')
+            ->with('subFolders', 'collection', [
+                'type' => 'oro_email_email_folder',
+                'allow_add' => true,
+                'options' => [
+                    'nesting_level' => 4,
+                ],
+            ])
+            ->willReturn($builder);
+
+        $this->emailFolderType->buildForm($builder, ['nesting_level' => 5]);
     }
 
     public function testGetName()
