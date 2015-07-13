@@ -146,3 +146,13 @@ services:
             - %kernel.bundles%
             - %kernel.root_dir%
             - %oro_distribution.composer_cache_home%
+
+    oro_translation.query_hint.translatable:
+        public: false
+        abstract: true
+        tags:
+            -
+                name: oro_entity.query_hint
+                hint: oro_translation.translatable
+                alias: HINT_TRANSLATABLE
+                output_walker: %oro_translation.translation_walker.class%

@@ -1,12 +1,11 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var VariableDateTimePickerView,
-        _ = require('underscore'),
-        VariableDatePickerView = require('./variable-datepicker-view'),
-        dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin'),
-        moment = require('moment');
+    var VariableDateTimePickerView;
+    var _ = require('underscore');
+    var VariableDatePickerView = require('./variable-datepicker-view');
+    var dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
+    var moment = require('moment');
 
     VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
@@ -21,7 +20,7 @@ define(function (require) {
          * @final
          * @protected
          */
-        _super: function () {
+        _super: function() {
             return VariableDateTimePickerView.__super__;
         },
 
@@ -29,10 +28,10 @@ define(function (require) {
          * Updates state of time field
          *  - hides/shows the field, depending on whether date has variable value or not
          */
-        updateTimeFieldState: function () {
+        updateTimeFieldState: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                this.$frontTimeField.val('').attr('disabled','disabled');
+                this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
                 this.$frontTimeField.removeAttr('disabled');
             }
@@ -43,15 +42,14 @@ define(function (require) {
          *
          * @param target
          */
-        checkConsistency: function (target) {
-            var date, time, isVariable, isValidDate, isValidTime;
+        checkConsistency: function(target) {
             dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
 
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            isVariable = this.dateVariableHelper.isDateVariable(date);
-            isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var isVariable = this.dateVariableHelper.isDateVariable(date);
+            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
             if (!target && !isVariable && (!isValidDate || !isValidTime)) {
                 this.$frontDateField.val('');
@@ -64,7 +62,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
+        getBackendFormattedValue: function() {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
@@ -79,7 +77,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
+        getFrontendFormattedDate: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);

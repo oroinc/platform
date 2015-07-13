@@ -1,7 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'backbone', 'routing', 'moment'
-    ], function (_, Backbone, routing, moment) {
+define([
+    'underscore',
+    'backbone',
+    'routing',
+    'moment'
+], function(_, Backbone, routing, moment) {
     'use strict';
 
     var EventModel;
@@ -17,9 +19,10 @@ define(['underscore', 'backbone', 'routing', 'moment'
         originalId: null, // original id received from a server
 
         defaults: {
-            id: null, // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
-            title : null,
-            description : null,
+            // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
+            id: null,
+            title: null,
+            description: null,
             start: null,
             end: null,
             allDay: false,
@@ -35,15 +38,15 @@ define(['underscore', 'backbone', 'routing', 'moment'
             calendarUid: null // calculated automatically, equals to calendarAlias + calendarId
         },
 
-        initialize: function () {
+        initialize: function() {
             this.urlRoot = routing.generate(this.route);
             this._updateComputableAttributes();
             this.on('change:id change:calendarAlias change:calendar', this._updateComputableAttributes, this);
         },
 
-        url: function () {
-            var url,
-                id = this.id;
+        url: function() {
+            var url;
+            var id = this.id;
 
             this.id = this.originalId;
             url = Backbone.Model.prototype.url.call(this, arguments);
@@ -52,11 +55,12 @@ define(['underscore', 'backbone', 'routing', 'moment'
             return url;
         },
 
-        save: function (key, val, options) {
-            var attrs, modelData;
+        save: function(key, val, options) {
+            var attrs;
+            var modelData;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
-            if (key == null || typeof key === 'object') {
+            if (key === null || key === undefined || typeof key === 'object') {
                 attrs = key || {};
                 options = val;
             } else {
@@ -80,10 +84,10 @@ define(['underscore', 'backbone', 'routing', 'moment'
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
 
-        _updateComputableAttributes: function () {
-            var calendarAlias = this.get('calendarAlias'),
-                calendarId = this.get('calendar'),
-                calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
+        _updateComputableAttributes: function() {
+            var calendarAlias = this.get('calendarAlias');
+            var calendarId = this.get('calendar');
+            var calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
 
             this.set('calendarUid', calendarUid);
 
@@ -93,7 +97,7 @@ define(['underscore', 'backbone', 'routing', 'moment'
             }
         },
 
-        validate: function (attrs) {
+        validate: function(attrs) {
             var errors = [];
 
             if (moment(attrs.end).diff(attrs.start) < 0) {
@@ -103,9 +107,9 @@ define(['underscore', 'backbone', 'routing', 'moment'
             return errors.length ? errors : null;
         },
 
-        getInvitationStatus: function () {
-            var invitationStatus = this.get('invitationStatus'),
-                invitedUsers = this.get('invitedUsers');
+        getInvitationStatus: function() {
+            var invitationStatus = this.get('invitationStatus');
+            var invitedUsers = this.get('invitedUsers');
             if (!invitationStatus && invitedUsers && invitedUsers.length) {
                 invitationStatus = 'accepted';
             }

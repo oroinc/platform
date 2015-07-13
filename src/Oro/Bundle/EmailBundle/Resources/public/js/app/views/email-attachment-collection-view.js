@@ -1,11 +1,10 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailAttachmentCollectionView,
-        $ = require('jquery'),
-        EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var EmailAttachmentCollectionView;
+    var $ = require('jquery');
+    var EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     /**
      * @exports EmailAttachmentCollectionView

@@ -1,7 +1,5 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger'
-    ], function ($, _, __, routing, messenger) {
+    ], function($, _, __, routing, messenger) {
     'use strict';
 
     function loadEnumChoices(className, successCallback, errorCallback) {
@@ -10,22 +8,22 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
                 'oro_api_get_dictionary_values',
                 {dictionary: className.replace(/\\/g, '_'), limit: -1}
             ),
-            success: function (data) {
+            success: function(data) {
                 data = _.sortBy(data, 'order');
-                var choices = _.map(data, function (item) {
+                var choices = _.map(data, function(item) {
                     return {value: item.id, label: item.name};
                 });
 
                 successCallback(choices);
             },
-            error: function (jqXHR) {
+            error: function(jqXHR) {
                 messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                if (errorCallback)
+                if (errorCallback) {
                     errorCallback(jqXHR);
+                }
             }
         });
-    };
-
+    }
 
     /**
      * Resolves filter options
@@ -35,18 +33,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
      *
      * @return {jQuery.Deferred} promise
      */
-    return function (filterOptions, context) {
-        var promise = new jQuery.Deferred(),
-            className = _.last(context).field.related_entity_name;
+    return function(filterOptions, context) {
+        var promise = new $.Deferred();
+        var className = _.last(context).field.related_entity_name;
 
-        loadEnumChoices(className, function (choices) {
-            var nullValue = null,
-                filterParams = {'class': className};
+        loadEnumChoices(className, function(choices) {
+            var nullValue = null;
+            var filterParams = {'class': className};
 
             // keep null value option if defined in options
             if (filterOptions.nullValue) {
                 filterParams.null_value = filterOptions.nullValue;
-                nullValue = _.find(filterOptions.choices, function (choice) {
+                nullValue = _.find(filterOptions.choices, function(choice) {
                     return choice.value === filterOptions.nullValue;
                 });
                 if (nullValue) {

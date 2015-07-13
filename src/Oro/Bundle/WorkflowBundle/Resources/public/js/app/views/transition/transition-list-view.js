@@ -1,12 +1,11 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var TransitionsListView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionRowView = require('./transition-row-view');
+    var TransitionsListView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionRowView = require('./transition-row-view');
 
     TransitionsListView = BaseView.extend({
         options: {
@@ -17,7 +16,7 @@ define(function (require) {
             stepFrom: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-list-template').html();
             this.template = _.template(template);
@@ -58,7 +57,7 @@ define(function (require) {
         },
 
         resetView: function() {
-            _.each(this.rowViews, function (rowView) {
+            _.each(this.rowViews, function(rowView) {
                 rowView.remove();
             });
             this.rowViews = [];

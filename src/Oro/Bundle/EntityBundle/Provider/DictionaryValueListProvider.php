@@ -95,6 +95,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
 
         return [
             'exclusion_policy' => 'all',
+            'hints'            => ['HINT_TRANSLATABLE'],
             'fields'           => $fields
         ];
     }

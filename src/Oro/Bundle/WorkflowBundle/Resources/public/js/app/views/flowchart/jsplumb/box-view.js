@@ -1,48 +1,63 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var FlowchartJsPlubmBaseView = require('./base-view'),
-        FlowchartJsPlubmAreaView = require('./area-view'),
-        FlowchartJsPlubmBoxView;
 
-    FlowchartJsPlubmBoxView = FlowchartJsPlubmBaseView.extend({
+    var FlowchartJsPlumbBoxView;
+    var FlowchartJsPlumbBaseView = require('./base-view');
+    var FlowchartJsPlumbAreaView = require('./area-view');
+    var _ = require('underscore');
+
+    FlowchartJsPlumbBoxView = FlowchartJsPlumbBaseView.extend({
         areaView: null,
 
-        className: 'jsplumb-box',
+        className: function() {
+            return 'jsplumb-box';
+        },
 
         isConnected: false,
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'change:position model': 'refreshPosition'
         },
 
-        initialize: function (options) {
-            if (!(options.areaView instanceof FlowchartJsPlubmAreaView)) {
+        initialize: function(options) {
+            if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {
                 throw new Error('areaView options is required and must be a JsplumbAreaView');
             }
             this.areaView = options.areaView;
-            FlowchartJsPlubmBoxView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlumbBoxView.__super__.initialize.apply(this, arguments);
 
             // append $el to the area view
             this.areaView.$el.append(this.$el);
         },
 
-        connect: function () {
+        connect: function() {
             // set position once, right after render
             // all other changes should be done by jsPlumb
             // or jsPlumb.redraw must be called
             if (this.model.get('position')) {
+                this.refreshPosition();
+            } else {
+                this.model.set('position', this.areaView.jsPlumbManager.getPositionForNew());
+            }
+        },
+
+        refreshPosition: function() {
+            var instance = this.areaView.jsPlumbInstance;
+            instance.batch(_.bind(function() {
                 this.$el.css({
                     top: this.model.get('position')[1],
                     left: this.model.get('position')[0]
                 });
-            }
+            }, this));
+            this.areaView.jsPlumbInstance.repaintEverything();
         },
 
-        cleanup: function () {
+        cleanup: function() {
             var instance = this.areaView.jsPlumbInstance;
             instance.detach(this.$el);
         }
     });
 
-    return FlowchartJsPlubmBoxView;
+    return FlowchartJsPlumbBoxView;
 });

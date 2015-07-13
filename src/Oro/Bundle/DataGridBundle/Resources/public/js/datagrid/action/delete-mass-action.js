@@ -1,8 +1,7 @@
-/*global define*/
 define([
     'oroui/js/delete-confirmation',
     './mass-action'
-], function (DeleteConfirmation, MassAction) {
+], function(DeleteConfirmation, MassAction) {
     'use strict';
 
     var DeleteMassAction;
