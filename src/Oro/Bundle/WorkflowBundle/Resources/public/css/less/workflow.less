@@ -1,12 +1,14 @@
 @import "../../../oroui/css/less/mixins";
 @import "./jsplumb";
 
-.workflow-step-list {
-    list-style: none outside none;
-    margin: 0;
+.workflow-definition-buttons {
+  margin-top: -13px;
+  margin-bottom: 15px;
 }
-
-.workflow-step-list li:before{
+.workflow-step-list {
+  list-style: none outside none;
+  margin: 0;
+  li:before {
     background: url("../../images/workflow-sprite.png") no-repeat 50% -8px;
     width:100%;
     height: 4px;
@@ -15,14 +17,8 @@
     position: absolute;
     bottom: 0;
     left: 0;
-}
-.workflow-step-list.more-than-one-step li:first-child:before{
-    background-position: 50% 0;
-}
-.workflow-step-list.more-than-one-step li:last-child:before{
-    background-position: 50% -4px;
-}
-.workflow-step-list li {
+  }
+  li {
     display: inline-block;
     color: #a2a2a2;
     padding: 0 14px 5px;
@@ -31,45 +27,61 @@
     position: relative;
     overflow: hidden;
     font-size: 11px;
+  }
 }
-
+.workflow-step-list.more-than-one-step {
+  li:first-child:before {
+    background-position: 50% 0;
+  }
+  li:last-child:before {
+    background-position: 50% -4px;
+  }
+  li.current:last-child:before {
+    background-position: 50% -28px;
+  }
+  li.current:first-child:before {
+    background-position: 50% -32px;
+  }
+}
 li.processed {
-    color: #62626f;
+  color: #62626f;
 }
-.more-than-one-step li.processed:before {
+.more-than-one-step {
+  li.processed:before {
     background-position: 50% -20px;
-}
-.more-than-one-step li.processed:first-child:before {
+  }
+  li.processed:first-child:before {
     background-position: 50% -12px;
-}
-.more-than-one-step li.processed:last-child:before {
+  }
+  li.processed:last-child:before {
     background-position: 50% -16px;
+  }
 }
 li.current {
-    color: #68b93c;
+  color: #68b93c;
 }
-li.current:before{
-    background-position: 50% -24px;
+li.current:before {
+  background-position: 50% -24px;
 }
-.workflow-step-list.more-than-one-step li.current:last-child:before{
-    background-position: 50% -28px;
+.workflow-steps-container {
+  text-align: center;
+  position: absolute;
+  left: 25%;
+  width: 50%;
+  margin: -25px auto 0;
+  .forScreen (959px; display; none);// less than Nexus 7 landscape
+  .box-type1 {
+    background: transparent;
+  }
+  .widget-content {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+  }
 }
-.workflow-step-list.more-than-one-step li.current:first-child:before{
-    background-position: 50% -32px;
-}
-.workflow-steps-container{
-    text-align: center;
-    position: absolute;
-    left: 25%;
-    width: 50%;
-    margin: -25px auto 0;
-    .forScreen (959px; display; none);// less than Nexus 7 landscape
-    .box-type1 {
-        background: transparent;
-    }
-    .widget-content{
-        box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-    }
+.workflow-history-container {
+  margin-right: 10px;
+  .btn {
+    padding-left: 6px;
+  }
 }

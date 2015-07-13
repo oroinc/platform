@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oro/datagrid/cell/html-cell',
     'orodatagrid/js/datagrid/formatter/phone-formatter'
-], function (HtmlCell, PhoneFormatter) {
+], function(HtmlCell, PhoneFormatter) {
     'use strict';
 
     var PhoneCell;
@@ -17,11 +15,11 @@ define([
      */
     PhoneCell = HtmlCell.extend({
         /** @property */
-        className: "phone-cell",
+        className: 'phone-cell',
 
         /** @property */
         events: {
-            "click": "stopPropagation"
+            click: 'stopPropagation'
         },
 
         /**
@@ -32,7 +30,7 @@ define([
         /**
          * If don't stop propagation click will select row
          */
-        stopPropagation: function (e) {
+        stopPropagation: function(e) {
             e.stopPropagation();
         }
     });

@@ -63,11 +63,16 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
+        $queryHintResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\QueryHintResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->serializer = new EntitySerializer(
             $doctrine,
             $this->configManager,
             new EntityDataAccessor(),
-            new EntityDataTransformer($this->container)
+            new EntityDataTransformer($this->container),
+            $queryHintResolver
         );
     }
 
