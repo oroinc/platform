@@ -28,7 +28,7 @@ The main goal of processing(parsing) tracking events is to identify object(s) fo
 - Tracking data saved by writer to db
 - Then command "oro:cron:tracking:parse" started by cron, and use `Oro\Bundle\TrackingBundle\Processor\TrackingProcessor` to process web events.
 - `Oro\Bundle\TrackingBundle\Processor\TrackingProcessor` read data from table "oro_tracking_event", events data table "oro_tracking_data", and calls `Oro\Bundle\TrackingBundle\Provider\TrackingEventIdentificationProvider` (chain provider that use another concrete providers) to fill tables "oro_tracking_visit" and "oro_tracking_visit_event". 
-- At the same time it collects web tracking event's names and fills dictionary that represented with table "oro_tracking_visit_dictionary". All this things is done because tracking data comes from outside as JSON, so we can't guarantee identification and future reports, segments or charts building will be fast enough. So, to avoid bottle necks we are optimizing data structure.
+- At the same time it collects web tracking event's names and fills dictionary that represented with table "oro_tracking_event_dictionary". All this things is done because tracking data comes from outside as JSON, so we can't guarantee identification and future reports, segments or charts building will be fast enough. So, to avoid bottle necks we are optimizing data structure.
 
 - This command can be executed manually via command line. By default it will be executed every 15mins via JobQueue (cronjob).
 
@@ -37,6 +37,20 @@ The main goal of processing(parsing) tracking events is to identify object(s) fo
 - Please note, that the input data for such provider is "**TrackingVisit**" object.
 
 - To connect tracking event with your data, provider should have 3 additional methods: **isApplicableVisitEvent**, **processEvent**, **getEventTargets**
+
+## Request parameters expected by tracking
+
+Actuall mapping can be seen in `Oro\Bundle\TrackingBundle\ImportExport\DataConverter`,
+can be filled by Piwik automatically, otherwise client should fill them in custom code.
+
+* e_n - event name
+* e_v - event value
+* action_name
+* idsite - site id
+* _uid - user identifier
+* _rcn - code (e.g. Campaign code)
+* _id - visit id, required, should represent unique visit id
+
 
 ## Example
 
