@@ -8,14 +8,20 @@ class AclBiConditionTest extends \PHPUnit_Framework_TestCase
     /** @var AclBiCondition */
     protected $obj;
 
+    protected function setUp()
+    {
+        $this->obj = new AclBiCondition('aclEntries', 'record', 'c1', 'id1');
+    }
+
     public function testConstruct()
     {
-        $this->obj = new AclBiCondition('', '', '', '', '');
+        $this->assertEquals('aclEntries', $this->obj->getEntityAliasLeft());
+        $this->assertEquals('record', $this->obj->getEntityFieldLeft());
+        $this->assertEquals('c1', $this->obj->getEntityAliasRight());
+        $this->assertEquals('id1', $this->obj->getEntityFieldRight());
     }
 
     /**
-     * @depends testConstruct
-     *
      * @dataProvider flatPropertiesDataProvider
      */
     public function testGetSet($property, $value, $expected)
