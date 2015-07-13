@@ -95,6 +95,8 @@ class CollectListManager
     }
 
     /**
+     * Fill Activity list owners from activity entity
+     *
      * @param array $entities
      * @param EntityManager $entityManager
      */

@@ -107,19 +107,6 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param CalendarEvent $activityEntity
-     * @return null|User
-     */
-    public function getOwner($activityEntity)
-    {
-        /** @var $activityEntity CalendarEvent */
-        if ($activityEntity->getCalendar()) {
-            return $activityEntity->getCalendar()->getOwner();
-        }
-        return null;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getTemplate()
@@ -182,5 +169,20 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
         return [$activityOwner];
+    }
+
+    /**
+     * Get calendar owner
+     *
+     * @param CalendarEvent $activityEntity
+     * @return null|User
+     */
+    protected function getOwner($activityEntity)
+    {
+        /** @var $activityEntity CalendarEvent */
+        if ($activityEntity->getCalendar()) {
+            return $activityEntity->getCalendar()->getOwner();
+        }
+        return null;
     }
 }

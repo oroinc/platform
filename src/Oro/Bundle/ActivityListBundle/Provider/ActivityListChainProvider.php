@@ -150,6 +150,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list by class and id of entity
+     *
      * @param object $entity
      * @param EntityManager $entityManager
      * @return mixed
