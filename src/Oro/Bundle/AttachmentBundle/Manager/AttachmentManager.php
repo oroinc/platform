@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Gaufrette\Stream;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -454,24 +455,12 @@ class AttachmentManager
     }
 
     /**
-     * Generate unique file name with specific extension
-     *
-     * @param string $extension
-     *
-     * @return string
-     */
-    protected function generateFileName($extension)
-    {
-        return sprintf('%s.%s', uniqid(), $extension);
-    }
-
-    /**
      * Copy stream to storage
      *
      * @param Stream $srcStream
      * @param string $destinationFileName
      */
-    public function copyStreamToStorage(Stream $srcStream, $destinationFileName)
+    protected function copyStreamToStorage(Stream $srcStream, $destinationFileName)
     {
         $dstStream = $this->filesystem->createStream($destinationFileName);
 
@@ -484,5 +473,17 @@ class AttachmentManager
 
         $dstStream->close();
         $srcStream->close();
+    }
+
+    /**
+     * Generate unique file name with specific extension
+     *
+     * @param string $extension
+     *
+     * @return string
+     */
+    protected function generateFileName($extension)
+    {
+        return sprintf('%s.%s', uniqid(), $extension);
     }
 }

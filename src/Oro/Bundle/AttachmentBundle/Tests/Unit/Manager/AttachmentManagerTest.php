@@ -322,34 +322,6 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->attachmentManager->parseFileKey('Invalid Key');
     }
 
-    public function testCopyStreamToStorage()
-    {
-        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
-
-        $storageFile = 'test.txt';
-        $newStorageFile = 'test2.txt';
-
-        $sourceStream = new InMemoryBuffer($this->filesystem, $storageFile);
-        $sourceStream->open(new StreamMode('wb+'));
-        $sourceStream->write(file_get_contents($localFilePath));
-        $sourceStream->seek(0);
-        $sourceStream->close();
-
-        $resultStream = new InMemoryBuffer($this->filesystem, $newStorageFile);
-
-        $this->filesystem->expects($this->once())
-            ->method('createStream')
-            ->with($newStorageFile)
-            ->will($this->returnValue($resultStream));
-
-
-        $this->attachmentManager->copyStreamToStorage($sourceStream, $newStorageFile);
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-
-        $this->assertEquals('Test data', $resultStream->read(100));
-    }
-
     public function testCopyLocalFileToStorage()
     {
         $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
@@ -363,7 +335,6 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->with($newFileName)
             ->will($this->returnValue($resultStream));
 
-
         $this->attachmentManager->copyLocalFileToStorage($localFilePath, $newFileName);
         $resultStream->open(new StreamMode('rb+'));
         $resultStream->seek(0);
@@ -373,22 +344,33 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCopyAttachmentFile()
     {
-        $memoryBuffer = new InMemoryBuffer($this->filesystem, 'test.txt');
-        $dstBuffer = new InMemoryBuffer($this->filesystem, 'test2.txt');
+        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $sourceStream = new InMemoryBuffer($this->filesystem, $this->attachment->getFilename());
+        $sourceStream->open(new StreamMode('wb+'));
+        $sourceStream->write(file_get_contents($localFilePath));
+        $sourceStream->seek(0);
+        $sourceStream->close();
+
+        $resultStream = new InMemoryBuffer($this->filesystem, 'test2.txt');
 
         $this->filesystem->expects($this->at(0))
             ->method('createStream')
             ->with($this->attachment->getFilename())
-            ->will($this->returnValue($memoryBuffer));
+            ->will($this->returnValue($sourceStream));
 
         $this->filesystem->expects($this->at(1))
             ->method('createStream')
             ->with($this->anything())
-            ->will($this->returnValue($dstBuffer));
+            ->will($this->returnValue($resultStream));
 
         $newAttachment = $this->attachmentManager->copyAttachmentFile($this->attachment);
 
         $this->assertEquals($this->attachment->getOriginalFilename(), $newAttachment->getOriginalFilename());
         $this->assertNotEquals($this->attachment->getFilename(), $newAttachment->getFilename());
+
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+        $this->assertEquals('Test data', $resultStream->read(100));
     }
 }
