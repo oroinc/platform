@@ -1,29 +1,28 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailVariableComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        EmailVariableView = require('oroemail/js/app/views/email-variable-view'),
-        EmailVariableModel = require('oroemail/js/app/models/email-variable-model'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailVariableComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var EmailVariableView = require('oroemail/js/app/views/email-variable-view');
+    var EmailVariableModel = require('oroemail/js/app/models/email-variable-model');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     EmailVariableComponent = BaseComponent.extend({
         /**
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var attributes;
 
             _.defaults(options, {model: {}, view: {}});
 
             // create model
             attributes = options.model.attributes;
-            attributes = attributes ? JSON.parse(attributes): {};
+            attributes = attributes ? JSON.parse(attributes) : {};
             this.model = new EmailVariableModel(attributes);
             this.model.setEntity(options.model.entityName, options.model.entityLabel);
 
@@ -39,11 +38,11 @@ define(function (require) {
             this.view.render();
         },
 
-        onEntityChange: function (e) {
-            var view = this.view,
-                $el = $(e.currentTarget),
-                entityName = $el.val(),
-                entityLabel = $el.find(':selected').data('label');
+        onEntityChange: function(e) {
+            var view = this.view;
+            var $el = $(e.currentTarget);
+            var entityName = $el.val();
+            var entityLabel = $el.find(':selected').data('label');
 
             if (!this.view.isEmpty()) {
                 if (this.confirm) {
@@ -54,7 +53,7 @@ define(function (require) {
                     okText: __('Yes'),
                     content: __('oro.email.emailtemplate.change_entity_confirmation')
                 });
-                this.confirm.on('ok', function () {
+                this.confirm.on('ok', function() {
                     view.clear();
                 });
                 this.confirm.open();
@@ -62,7 +61,7 @@ define(function (require) {
             this.model.setEntity(entityName, entityLabel);
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

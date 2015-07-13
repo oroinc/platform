@@ -1,5 +1,3 @@
-/* jshint browser:true */
-/* global require */
 /**
  * @deprecated since 1.8 because of vulnerability for "phishing" attack
  */
@@ -8,10 +6,9 @@ function($) {
     'use strict';
 
     $(function() {
-
-        var hashUrl = window.location.hash,
-            hashUrlTag = '#url=',
-            hashArray;
+        var hashUrl = window.location.hash;
+        var hashUrlTag = '#url=';
+        var hashArray;
         if (hashUrl.length && hashUrl.match(hashUrlTag)) {
             if (hashUrl.indexOf('|') !== -1) {
                 hashUrl = hashUrl.substring(0, hashUrl.indexOf('|'));

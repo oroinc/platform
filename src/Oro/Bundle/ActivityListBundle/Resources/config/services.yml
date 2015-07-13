@@ -25,6 +25,8 @@ parameters:
     oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
     oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
 
+    # helper
+    oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -38,6 +40,7 @@ services:
             - @oro_activity_list.filter.helper
             - @oro_comment.comment.api_manager
             - @oro_entity.doctrine_helper
+            - @oro_activity_list.helper.acl_criteria
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -158,3 +161,8 @@ services:
             - @oro_query_designer.grid.datagrid_configuration_builder
             - @oro_activity_list.datagrid.builder.link
             - @event_dispatcher
+
+    oro_activity_list.helper.acl_criteria:
+        class: %oro_activity_list.helper.acl_criteria.class%
+        arguments:
+            - @oro_security.acl_helper

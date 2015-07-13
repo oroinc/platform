@@ -1,6 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
+define([
+    'underscore',
+    'oroui/js/tools/color-util'
+], function(_, colorUtil) {
     'use strict';
 
     /**
@@ -20,7 +21,7 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
         /** @property {Object} */
         calendarColors: null,
 
-        initialize: function (options) {
+        initialize: function(options) {
             // server could return object instead of array
             // read them to array
             this.colors = [];
@@ -31,24 +32,24 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
             this.calendarColors = {};
         },
 
-        setCalendarColors: function (calendarId, backgroundColor) {
+        setCalendarColors: function(calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
                 color: this.getContrastColor(backgroundColor),
                 backgroundColor: backgroundColor
             };
         },
 
-        removeCalendarColors: function (calendarId) {
+        removeCalendarColors: function(calendarId) {
             if (!_.isUndefined(this.calendarColors[calendarId])) {
                 delete this.calendarColors[calendarId];
             }
         },
 
-        getCalendarColors: function (calendarId) {
+        getCalendarColors: function(calendarId) {
             return this.calendarColors[calendarId];
         },
 
-        applyColors: function (obj, getLastBackgroundColor) {
+        applyColors: function(obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this._findNextColor(getLastBackgroundColor());
                 obj.color = this.getContrastColor(obj.backgroundColor);
@@ -65,13 +66,13 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
          * @param {string} hex A color in six-digit hexadecimal form.
          * @returns {string}
          */
-        getContrastColor: function (hex) {
+        getContrastColor: function(hex) {
             return colorUtil.getContrastColor(hex);
         },
 
-        _findColorIndex: function (color) {
+        _findColorIndex: function(color) {
             var i = -1;
-            _.each(this.colors, function (clr, index) {
+            _.each(this.colors, function(clr, index) {
                 if (clr === color) {
                     i = index;
                 }
@@ -79,8 +80,10 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
             return i;
         },
 
-        _findNextColor: function (color) {
-            var i, j, unusedColors;
+        _findNextColor: function(color) {
+            var i;
+            var j;
+            var unusedColors;
             if (_.isEmpty(color)) {
                 return this.defaultColor;
             }
@@ -109,7 +112,7 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
         }
     };
 
-    return function (options) {
+    return function(options) {
         var obj = _.extend({}, ColorManager);
         obj.initialize(options);
         return obj;

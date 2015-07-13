@@ -78,6 +78,13 @@ interface ActivityListProviderInterface
     public function getActivityClass();
 
     /**
+     * returns a class name of entity for which we verify ACL
+     *
+     * @return string
+     */
+    public function getAclClass();
+
+    /**
      * @param object $entity
      *
      * @return integer

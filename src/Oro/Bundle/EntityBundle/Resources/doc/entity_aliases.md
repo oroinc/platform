@@ -1,10 +1,10 @@
 ## Entity aliases ##
 
-[Entity aliases](./Model/EntityAlias.php) were introduced to provide a simple and elegant way of referring to entities.
+[Entity aliases](./../../Model/EntityAlias.php) were introduced to provide a simple and elegant way of referring to entities.
 
 The usages for entity aliases can be numerous but they come especially handy when specifying entities in the API, removing the need of using bulky FQCNs.
 
-You can use entity aliases with the help of [EntityAliasResolver](./ORM/EntityAliasResolver.php) which provides necessary functions for getting aliases for given class names and visa versa.
+You can use entity aliases with the help of [EntityAliasResolver](./../../ORM/EntityAliasResolver.php) which provides necessary functions for getting aliases for given class names and visa versa.
 
 **Defining entity aliases**
 
@@ -43,7 +43,7 @@ oro_entity:
 There can be situations when you need more complicated rules for creating entity aliases that can not be simply configured via `entity.yml` file.
 In this case you'll need to create an entity alias provider.
 
-For this you need to implement the [EntityAliasProviderInterface](./Provider/EntityAliasProviderInterface.php) interface in your provider class:
+For this you need to implement the [EntityAliasProviderInterface](./../../Provider/EntityAliasProviderInterface.php) interface in your provider class:
 
 ```php
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;

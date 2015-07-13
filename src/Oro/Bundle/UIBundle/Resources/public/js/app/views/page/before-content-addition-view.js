@@ -1,6 +1,5 @@
-/*global define*/
 define(['./../base/page-region-view'],
-function (PageRegionView) {
+function(PageRegionView) {
     'use strict';
 
     var PageBeforeContentAdditionView;
@@ -8,7 +7,7 @@ function (PageRegionView) {
     PageBeforeContentAdditionView = PageRegionView.extend({
         pageItems: ['beforeContentAddition'],
 
-        template: function (data) {
+        template: function(data) {
             return data.beforeContentAddition;
         }
     });
