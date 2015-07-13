@@ -150,6 +150,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list by class and id of entity
+     *
      * @param object $entity
      * @param EntityManager $entityManager
      * @return mixed
@@ -298,7 +300,7 @@ class ActivityListChainProvider
             if (!$list) {
                 $list = new ActivityList();
             }
-            $this->setActivityOwners($entity, $provider, $list);
+
             $list->setSubject($provider->getSubject($entity));
             $list->setDescription($this->htmlTagHelper->stripTags(
                 $this->htmlTagHelper->purify($provider->getDescription($entity))
@@ -352,23 +354,6 @@ class ActivityListChainProvider
     protected function hasGrouping(ActivityListProviderInterface $provider)
     {
         return $provider instanceof ActivityListGroupProviderInterface;
-    }
-
-    /**
-     * Set owners for list
-     *
-     * @param $entity
-     * @param ActivityListProviderInterface $provider
-     * @param ActivityList $list
-     */
-    protected function setActivityOwners($entity, ActivityListProviderInterface $provider, $list)
-    {
-        $activityOwnersArray = $provider->getActivityOwners($entity, $list);
-        if ($activityOwnersArray) {
-            foreach ($activityOwnersArray as $owner) {
-                $list->addActivityOwner($owner);
-            }
-        }
     }
 
     /**

@@ -74,7 +74,7 @@ class AddActivityOwner implements Migration
             $schema->getTable('oro_activity_list'),
             ['activity_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 }

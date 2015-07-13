@@ -4,9 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -97,6 +95,8 @@ class CollectListManager
     }
 
     /**
+     * Fill Activity list owners from activity entity
+     *
      * @param array $entities
      * @param EntityManager $entityManager
      */
@@ -128,32 +128,17 @@ class CollectListManager
         $newActivityOwners = new ArrayCollection($newActivityOwners);
 
         foreach ($oldActivityOwners as $oldOwner) {
-            if (!$this->isMatchOwner($oldOwner, $newActivityOwners)) {
+            if (!$oldOwner->isOwnerInCollection($newActivityOwners)) {
                 $activityList->removeActivityOwner($oldOwner);
             }
         }
 
         if ($newActivityOwners) {
             foreach ($newActivityOwners as $newOwner) {
-                if (!$this->isMatchOwner($newOwner, $oldActivityOwners)) {
+                if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
                     $activityList->addActivityOwner($newOwner);
                 }
             }
         }
-    }
-
-    /**
-     * @param ActivityOwner $needle
-     * @param ArrayCollection $stack
-     * @return bool
-     */
-    protected function isMatchOwner(ActivityOwner $needle, $stack)
-    {
-        $criteria = new Criteria();
-        $criteria
-            ->andWhere($criteria->expr()->eq('organization', $needle->getOrganization()))
-            ->andWhere($criteria->expr()->eq('user', $needle->getUser()));
-
-        return (bool) count($stack->matching($criteria));
     }
 }

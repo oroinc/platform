@@ -24,6 +24,9 @@ class ActivityListAclCriteriaHelper
     }
 
     /**
+     * Apply additional criteria for query based on provided ACL classes and use standard ACL rules
+     * to correct select activity lists
+     *
      * @param QueryBuilder $qb
      * @param $providers
      */
