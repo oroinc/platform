@@ -1,9 +1,9 @@
 parameters:
     # entity
-    oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
+    oro_activity_list.entity.class: Oro\Bundle\ActivityListBundle\Entity\ActivityList
 
     # managers
-    oro_activity_list.manager.class:     Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
+    oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
     oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
@@ -82,11 +82,11 @@ services:
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%
         arguments:
-           - @oro_entity.doctrine_helper
-           - @oro_entity_config.config_manager
-           - @translator
-           - @oro_entity.routing_helper
-           - @oro_ui.html_tag_helper
+            - @oro_entity.doctrine_helper
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_entity.routing_helper
+            - @oro_ui.html_tag_helper
 
     oro_activity_list.event_listener.segment_widget_options_listener:
         class: %oro_activity_list.event_listener.segment_widget_options_listener.class%

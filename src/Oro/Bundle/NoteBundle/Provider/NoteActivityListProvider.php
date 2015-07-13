@@ -4,6 +4,7 @@ namespace Oro\Bundle\NoteBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -145,6 +146,25 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $entity->getOwner();
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
     }
 
     /**
