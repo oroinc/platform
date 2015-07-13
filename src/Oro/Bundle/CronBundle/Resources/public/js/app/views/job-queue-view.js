@@ -1,11 +1,12 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var JobQueueView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var JobQueueView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     JobQueueView = BaseView.extend({
         events: {
@@ -21,7 +22,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['intervalUpdate']));
             this.intervalId = setInterval(_.bind(this.checkStatus, this), this.intervalUpdate);
             JobQueueView.__super__.initialize.apply(this, arguments);
@@ -30,7 +31,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -46,18 +47,17 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        changeDemonState: function (e) {
-            var $link, $loader;
+        changeDemonState: function(e) {
             e.preventDefault();
 
-            $link = this.$(e.currentTarget);
-            $loader = this.getActionElement('status').closest('div').find('img');
+            var $link = this.$(e.currentTarget);
+            var $loader = this.getActionElement('status').closest('div').find('img');
 
             $loader.show();
 
-            $.getJSON($link.attr('href'), _.bind(function (data) {
+            $.getJSON($link.attr('href'), _.bind(function(data) {
                 if (data.error) {
-                    alert(data.message);
+                    mediator.execute('showErrorMessage', data.message, data);
                 } else {
                     $link.closest('div')
                             .find('span:first')
@@ -78,12 +78,11 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        toggleStateTrace: function (e) {
-            var $link, $traces;
+        toggleStateTrace: function(e) {
             e.preventDefault();
 
-            $link = this.$(e.currentTarget);
-            $traces = $link.closest('.stack-trace').find('.traces');
+            var $link = this.$(e.currentTarget);
+            var $traces = $link.closest('.stack-trace').find('.traces');
 
             if ($link.next('.trace').length) {
                 $link.next('.trace').toggle();
@@ -98,16 +97,16 @@ define(function (require) {
         /**
          * Checks state of the daemon
          */
-        checkStatus: function () {
-            var $statusLink = this.getActionElement('status'),
-                $loader = $statusLink.closest('div').find('img');
+        checkStatus: function() {
+            var $statusLink = this.getActionElement('status');
+            var $loader = $statusLink.closest('div').find('img');
             if (!$statusLink.length) {
                 return;
             }
 
             $loader.show();
 
-            $.get($statusLink.attr('href'), _.bind(function (data) {
+            $.get($statusLink.attr('href'), _.bind(function(data) {
                 data = parseInt(data, 10);
 
                 $statusLink
@@ -131,7 +130,7 @@ define(function (require) {
          * @param {string} action
          * @returns {jQuery.Element}
          */
-        getActionElement: function (action) {
+        getActionElement: function(action) {
             return this.$('[data-action-name="' + action + '-daemon"]');
         },
 
@@ -140,7 +139,7 @@ define(function (require) {
          *
          * @param {boolean} run
          */
-        updateButtons: function (run) {
+        updateButtons: function(run) {
             this.getActionElement('run').toggle(run);
             this.getActionElement('stop').toggle(!run);
         }

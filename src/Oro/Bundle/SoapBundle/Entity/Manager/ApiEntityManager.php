@@ -44,6 +44,9 @@ class ApiEntityManager
     /** @var EntitySerializer */
     protected $entitySerializer;
 
+    /** @var mixed */
+    private $serializationConfig = false;
+
     /**
      * Constructor
      *
@@ -249,6 +252,20 @@ class ApiEntityManager
     }
 
     /**
+     * Returns query builder that could be used for fetching entity by its id
+     *
+     * @param mixed $id The id of an entity
+     *
+     * @return QueryBuilder
+     */
+    public function getItemQueryBuilder($id)
+    {
+        return $this->getRepository()->createQueryBuilder('e')
+            ->where(sprintf('e.%s = :id', $this->doctrineHelper->getSingleEntityIdentifierFieldName($this->class)))
+            ->setParameter('id', $id);
+    }
+
+    /**
      * Serializes the list of entities
      *
      * @param QueryBuilder $qb A query builder is used to get data
@@ -257,7 +274,7 @@ class ApiEntityManager
      */
     public function serialize(QueryBuilder $qb)
     {
-        return $this->entitySerializer->serialize($qb, $this->getSerializationConfig());
+        return $this->entitySerializer->serialize($qb, $this->getCachedSerializationConfig());
     }
 
     /**
@@ -269,11 +286,8 @@ class ApiEntityManager
      */
     public function serializeOne($id)
     {
-        $qb = $this->getRepository()->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', $id);
-
-        $config = $this->getSerializationConfig();
+        $qb     = $this->getItemQueryBuilder($id);
+        $config = $this->getCachedSerializationConfig();
         $this->entitySerializer->prepareQuery($qb, $config);
         $entity = $qb->getQuery()->getResult();
         if (!$entity) {
@@ -306,17 +320,32 @@ class ApiEntityManager
      */
     public function isSerializerConfigured()
     {
-        return null !== $this->getSerializationConfig();
+        return null !== $this->getCachedSerializationConfig();
     }
 
     /**
-     * Returns the configuration of the entity serializer is used for process GET reruests
+     * Returns the configuration of the entity serializer is used for process GET requests
      *
      * @return array|null
      */
     protected function getSerializationConfig()
     {
         return null;
+    }
+
+    /**
+     * Returns the configuration of the entity serializer is used for process GET requests
+     * This method uses a local cache to avoid building the config several times
+     *
+     * @return array|null
+     */
+    protected function getCachedSerializationConfig()
+    {
+        if (false === $this->serializationConfig) {
+            $this->serializationConfig = $this->getSerializationConfig();
+        }
+
+        return $this->serializationConfig;
     }
 
     /**

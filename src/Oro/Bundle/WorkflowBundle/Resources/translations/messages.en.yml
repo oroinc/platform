@@ -60,6 +60,7 @@ Clone this transition: Clone this transition
 Delete this transition: Delete this transition
 General: General
 Add step: Add step
+Auto sort: Auto sort
 Designer: Designer
 Workflow steps and transitions: Workflow steps and transitions
 Unmet conditions: Unmet conditions
@@ -70,6 +71,7 @@ Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
 Reset workflow data: Reset workflow data
+Show Transition Labels: Show Transition Labels
 
 oro:
     workflow:

@@ -9,11 +9,12 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigTranslationTest extends WebTestCase
 {
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->initClient();
@@ -36,6 +37,20 @@ class ConfigTranslationTest extends WebTestCase
 
             foreach ($options['fields'] as $field) {
                 if (!$configProvider->hasConfig($className, $field['name'])) {
+                    continue;
+                }
+
+                /**
+                 * We should not check translations of entities being created/used only in test environment.
+                 * It's done to avoid adding and accumulation of unnecessary test entity/field/relation translations.
+                 */
+                if (isset($field['related_entity_name'])
+                    && is_a(
+                        $field['related_entity_name'],
+                        'Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface',
+                        true
+                    )
+                ) {
                     continue;
                 }
 

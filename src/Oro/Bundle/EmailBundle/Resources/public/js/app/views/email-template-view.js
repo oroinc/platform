@@ -1,11 +1,10 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailTemplateView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView= require('oroui/js/app/views/base/view');
+    var EmailTemplateView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @export oroemail/js/app/views/email-template-view
@@ -21,7 +20,7 @@ define(function (require) {
          *
          * @param options {Object}
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.template = _.template($('#emailtemplate-chooser-template').html());
             this.target = options.target;
 
@@ -34,7 +33,7 @@ define(function (require) {
         /**
          * onChange event listener
          */
-        selectionChanged: function () {
+        selectionChanged: function() {
             var entityId = this.$el.val();
             this.collection.setEntityId(entityId.split('\\').join('_'));
             if (entityId) {
@@ -44,7 +43,7 @@ define(function (require) {
             }
         },
 
-        render: function () {
+        render: function() {
             $(this.target).val('').trigger('change');
             $(this.target).find('option[value!=""]').remove();
             if (this.collection.models.length > 0) {

@@ -99,6 +99,33 @@ class ResponseHashnavListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onResponse($this->event);
     }
 
+    public function testHashRequestWithFullRedirectAttribute()
+    {
+        $this->response->setStatusCode(302);
+        $this->response->headers->add(['location' => self::TEST_URL]);
+
+        $this->request->attributes->set('_fullRedirect', true);
+
+        $this->securityContext->expects($this->never())
+            ->method('getToken');
+
+        $this->event->expects($this->once())
+            ->method('setResponse');
+
+        $this->templating->expects($this->once())
+            ->method('renderResponse')
+            ->with(
+                self::TEMPLATE,
+                [
+                    'full_redirect' => true,
+                    'location'      => self::TEST_URL
+                ]
+            )
+            ->will($this->returnValue(new Response()));
+
+        $this->listener->onResponse($this->event);
+    }
+
     public function testHashRequestNotFound()
     {
         $this->response->setStatusCode(404);

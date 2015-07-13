@@ -1,36 +1,113 @@
-/* jshint browser:true */
-/*global define*/
-define(['jquery', 'underscore', 'backbone', 'autobahn'
-    ], function ($, _, Backbone, ab) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'autobahn'
+], function($, _, Backbone, ab) {
     'use strict';
+
     var defaultOptions = {
-            port: 80,
-            debug: false
+        port: 80,
+        debug: false
+    };
+
+    /**
+     * Wraps callback in order to make it compatible with autobahn event callback
+     */
+    function wrapCallback(callback) {
+        var wrapper = function(channel, attributes) {
+            callback(attributes);
+        };
+        wrapper.origCallback = callback;
+        return wrapper;
+    }
+
+    /**
+     * Synchronizer service build over WAMP (autobahn.js implementation)
+     *
+     * @constructor
+     * @param {Object} options to configure service
+     * @param {string} options.secure is wss protocol should be used, otherwise will be used ws protocol
+     * @param {string} options.host is required
+     * @param {number=} options.port default is 80
+     * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
+     * @param {number=} options.maxRetries quantity of attempts before stop reconnection, default is 10
+     * @param {boolean=} options.skipSubprotocolCheck, default is false
+     * @param {boolean=} options.skipSubprotocolAnnounce, default is false
+     * @param {boolean=} options.debug, default is false
+     *
+     * @export  orosync/js/sync/wamp
+     * @class   orosync.sync.Wamp
+     */
+    function Wamp(options) {
+        this.options = _.extend({}, defaultOptions, options);
+        if (!this.options.host) {
+            throw new Error('host option is required');
+        }
+        this.channels = {};
+        if (this.options.debug) {
+            ab.debug(true, true, true);
+        }
+        this.connect();
+        // fixes premature connection close in FF on page reload
+        $(window).on('beforeunload', _.bind(function() {
+            this.session.close();
+        }, this));
+    }
+
+    Wamp.prototype = {
+        /**
+         * Initiate connection process
+         */
+        connect: function() {
+            if (!this.session) {
+                var protocol = this.options.secure ? 'wss' : 'ws';
+                var wsuri = protocol + '://' + this.options.host + ':' + this.options.port;
+                ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
+            }
         },
 
         /**
-         * Wraps callback in order to make it compatible with autobahn event callback
+         * Subscribes update callback function on a channel
+         *
+         * @param {string} channel is an URL which broadcasts updates
+         * @param {function (Object)} callback is a function which accepts JSON
+         *      with attributes' values and performs update
          */
-        wrapCallback = function (callback) {
-            var wrapper = function (channel, attributes) {
-                callback(attributes);
-            };
-            wrapper.origCallback = callback;
-            return wrapper;
+        subscribe: function(channel, callback) {
+            callback = wrapCallback(callback);
+            (this.channels[channel] = this.channels[channel] || []).push(callback);
+            if (this.session) {
+                this.session.subscribe(channel, callback);
+            }
         },
 
         /**
-         * Handler on start connection
-         * if list of subscriptions is not empty, auto subscribe all of them
+         * Removes subscription of update callback function for a channel
+         *
+         * @param {string} channel is an URL which broadcasts updates
+         * @param {function (Object)=} callback an optional parameter,
+         *      if was no function corresponded then removes all callbacks for a channel
          */
-        onConnect = function (session) {
-            this.session = session;
-            this.trigger('connection_established');
-            _.each(this.channels, function (callbacks, channel) {
-                _.each(callbacks, function (callback) {
-                    session.subscribe(channel, callback);
-                });
-            });
+        unsubscribe: function(channel, callback) {
+            var callbacks = this.channels[channel];
+            if (!callbacks) {
+                return;
+            }
+            if (callback) {
+                // maps corresponded callback to a wrapped one
+                callback = _.findWhere(callbacks, {origCallback: callback});
+                // removes that callback from collection
+                callbacks = this.channels[channel] = _.without(callbacks, callback);
+            }
+            if (!callbacks.length || !callback) {
+                delete this.channels[channel];
+            }
+            if (this.session) {
+                try {
+                    this.session.unsubscribe(channel, callback);
+                } catch (e) {}
+            }
         },
 
         /**
@@ -50,7 +127,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * @param {number} details.maxretries max number of attempts
          * @param {number} details.retries number of scheduled attempt
          */
-        onHangup = function (code, msg, details) {
+        onHangup: function(code, msg, details) {
             if (code !== 0) {
                 this.trigger('connection_lost', _.extend({code: code}, details || {}));
             }
@@ -58,91 +135,17 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
         },
 
         /**
-         * Synchronizer service build over WAMP (autobahn.js implementation)
-         *
-         * @constructor
-         * @param {Object} options to configure service
-         * @param {string} options.secure is wss protocol should be used, otherwise will be used ws protocol
-         * @param {string} options.host is required
-         * @param {number=} options.port default is 80
-         * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
-         * @param {number=} options.maxRetries quantity of attempts before stop reconnection, default is 10
-         * @param {boolean=} options.skipSubprotocolCheck, default is false
-         * @param {boolean=} options.skipSubprotocolAnnounce, default is false
-         * @param {boolean=} options.debug, default is false
-         *
-         * @export  orosync/js/sync/wamp
-         * @class   orosync.sync.Wamp
+         * Handler on start connection
+         * if list of subscriptions is not empty, auto subscribe all of them
          */
-        Wamp = function (options) {
-            this.options = _.extend({}, defaultOptions, options);
-            if (!this.options.host) {
-                throw new Error('host option is required');
-            }
-            this.channels = {};
-            if (this.options.debug) {
-                ab.debug(true, true, true);
-            }
-            this.connect();
-            // fixes premature connection close in FF on page reload
-            $(window).on('beforeunload', _.bind(function () {
-                this.session.close();
-            }, this));
-        };
-
-    Wamp.prototype = {
-        /**
-         * Initiate connection process
-         */
-        connect: function () {
-            if (!this.session) {
-                var protocol = this.options.secure ? 'wss' : 'ws';
-                var wsuri = protocol + '://' + this.options.host + ':' + this.options.port;
-                ab.connect(wsuri, _.bind(onConnect, this), _.bind(onHangup, this), this.options);
-            }
-        },
-
-        /**
-         * Subscribes update callback function on a channel
-         *
-         * @param {string} channel is an URL which broadcasts updates
-         * @param {function (Object)} callback is a function which accepts JSON
-         *      with attributes' values and performs update
-         */
-        subscribe: function (channel, callback) {
-            callback = wrapCallback(callback);
-            (this.channels[channel] = this.channels[channel] || []).push(callback);
-            if (this.session) {
-                this.session.subscribe(channel, callback);
-            }
-        },
-
-        /**
-         * Removes subscription of update callback function for a channel
-         *
-         * @param {string} channel is an URL which broadcasts updates
-         * @param {function (Object)=} callback an optional parameter,
-         *      if was no function corresponded then removes all callbacks for a channel
-         */
-        unsubscribe: function (channel, callback) {
-            var callbacks = this.channels[channel];
-            if (!callbacks) {
-                return;
-            }
-            if (callback) {
-                // maps corresponded callback to a wrapped one
-                callback = _.findWhere(callbacks, {origCallback: callback});
-                // removes that callback from collection
-                callbacks = this.channels[channel] = _.without(callbacks, callback);
-            }
-            if (!callbacks.length || !callback) {
-                delete this.channels[channel];
-            }
-            if (this.session) {
-                try {
-                    this.session.unsubscribe(channel, callback);
-                } catch (e) {}
-            }
+        onConnect: function(session) {
+            this.session = session;
+            this.trigger('connection_established');
+            _.each(this.channels, function(callbacks, channel) {
+                _.each(callbacks, function(callback) {
+                    session.subscribe(channel, callback);
+                });
+            });
         }
     };
 

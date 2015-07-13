@@ -1,9 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
-    'backgrid'
-], function (_, Backgrid) {
+    'backgrid',
+    'orodatagrid/js/datagrid/editor/select-cell-radio-editor'
+], function(_, Backgrid, SelectCellRadioEditor) {
     'use strict';
 
     var SelectCell;
@@ -19,24 +18,53 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
+            if (this.expanded && !this.multiple) {
+                this.editor = SelectCellRadioEditor;
+            }
+
             if (this.choices) {
                 this.optionValues = [];
-                _.each(this.choices, function (value, key) {
+                _.each(this.choices, function(value, key) {
                     this.optionValues.push([value, key]);
                 }, this);
             }
             SelectCell.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
+                this.enterEditMode();
+            });
         },
 
         /**
          * @inheritDoc
          */
-        enterEditMode: function (e) {
-            if (this.column.get("editable")) {
-                e.stopPropagation();
+        render: function() {
+            var render = SelectCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
+            if (this.column.get('editable')) {
+                SelectCell.__super__.enterEditMode.apply(this, arguments);
+
+                this.$el.find('select').uniform();
             }
-            return SelectCell.__super__.enterEditMode.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            this.$el.removeClass('error');
+            this.stopListening(this.currentEditor);
+            delete this.currentEditor;
         }
     });
 

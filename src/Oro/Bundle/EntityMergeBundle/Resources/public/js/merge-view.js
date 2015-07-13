@@ -1,11 +1,6 @@
-/*global define*/
-define(['jquery'],
+define(['jquery'],  function($) {
+    'use strict';
 
-    /**
-     * @param {jquery} $
-     * @return mergeView
-     */
-    function ($) {
     /**
      * @typedef mergeView
      * @function entitySelectAllHandler
@@ -25,7 +20,7 @@ define(['jquery'],
          * @callback
          * @desc {HTMLElement} this
          */
-        entitySelectAllHandler: function () {
+        entitySelectAllHandler: function() {
             var entityId = $(this).data('entity-key');
             $('.entity-merge-field-choice[value="' + entityId + '"]').click();
         },
@@ -36,14 +31,14 @@ define(['jquery'],
          * @callback
          * @desc {HTMLElement} this
          */
-        entityValueSelectHandler: function (event) {
+        entityValueSelectHandler: function(event) {
             event.stopImmediatePropagation();
             var $this = $(this);
             var fieldName = $this.attr('name');
             var entityKey = $this.val();
-            $('.merge-entity-representative[data-entity-field-name="' + fieldName + '"]').each(function (index, item) {
+            $('.merge-entity-representative[data-entity-field-name="' + fieldName + '"]').each(function(index, item) {
                 var $this = $(item);
-                if ($this.data('entity-key') != entityKey) {
+                if ($this.data('entity-key') !== entityKey) {
                     $this.addClass('entity-merge-not-selected');
                 } else {
                     $this.removeClass('entity-merge-not-selected');
@@ -55,33 +50,33 @@ define(['jquery'],
          * @desc reset entity values class states
          * @desc All selected classes will have larger weight then not selected
          */
-        resetViewState: function () {
+        resetViewState: function() {
             $('input[type="radio"]:checked').click();
         },
 
         /**
          * @desc calculate columns width
          */
-        fixTableWidth: function(){
+        fixTableWidth: function() {
             var columns = $('.entity-merge-column');
             var master = $('.merge-first-column');
             var firstColumnWidth = parseInt(master.css('width'));
             var tableWidth = parseInt($('.entity-merge-table').css('width'));
-            var columnWidth = ((tableWidth - firstColumnWidth)/columns.length);
+            var columnWidth = ((tableWidth - firstColumnWidth) / columns.length);
             columns.css('width', columnWidth);
         },
 
         /**
          * @desc select radio button if column clicked
          */
-        columnClickHandler: function(){
+        columnClickHandler: function() {
             $(this).find('.entity-merge-field-choice').click();
         },
 
         /**
          * @constructs
          */
-        init: function () {
+        init: function() {
             $('.entity-merge-select-all').click(this.entitySelectAllHandler);
             $('.entity-merge-field-choice').click(this.entityValueSelectHandler);
             $(document).ready(this.fixTableWidth);

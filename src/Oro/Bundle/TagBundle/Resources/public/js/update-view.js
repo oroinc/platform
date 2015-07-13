@@ -1,6 +1,5 @@
-/*global define*/
 define(['jquery', 'underscore', './view', 'json'
-    ], function ($, _, TagView) {
+    ], function($, _, TagView) {
     'use strict';
 
     /**
@@ -38,20 +37,20 @@ define(['jquery', 'underscore', './view', 'json'
          * @param {string} options.ownFieldId DomElement ID of hidden field with own tags
          * @throws {TypeError} If mandatory options are undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
             this.options = _.defaults(options, this.options);
 
             if (!options.autocompleteFieldId) {
-                throw new TypeError("'autocompleteFieldId' is required");
+                throw new TypeError('"autocompleteFieldId" is required');
             }
 
             if (!options.fieldId) {
-                throw new TypeError("'fieldId' is required");
+                throw new TypeError('"fieldId" is required');
             }
 
             if (!options.ownFieldId) {
-                throw new TypeError("'ownFieldId' is required");
+                throw new TypeError('"ownFieldId" is required');
             }
 
             this.$tagOverlayId = $(this.options.tagOverlayId);
@@ -61,7 +60,7 @@ define(['jquery', 'underscore', './view', 'json'
 
             this._prepareCollections();
 
-            var onCollectionChange = _.bind(function () {
+            var onCollectionChange = _.bind(function() {
                 this.render();
                 this._updateHiddenInputs();
             }, this);
@@ -76,7 +75,7 @@ define(['jquery', 'underscore', './view', 'json'
          *
          * @returns {}
          */
-        render: function () {
+        render: function() {
             TagView.prototype.render.apply(this, arguments);
             var _this = this;
 
@@ -118,12 +117,12 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _removeItem: function (e) {
+        _removeItem: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
-            var $el = $(e.currentTarget).parents('li'),
-                id = $($el).data('id');
+            var $el = $(e.currentTarget).parents('li');
+            var id = $($el).data('id');
             if (!_.isUndefined(id)) {
                 this.getCollection().removeItem(id, this.options.filter);
             }
@@ -136,7 +135,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _renderOverlay: function () {
+        _renderOverlay: function() {
             this.$tagOverlayId.append(this.tagsOverlayTemplate());
             return this;
         },
@@ -147,7 +146,7 @@ define(['jquery', 'underscore', './view', 'json'
          * @returns {*}
          * @private
          */
-        _prepareCollections: function () {
+        _prepareCollections: function() {
             var allTags = $.parseJSON($(this.options.fieldId).val());
             if (!_.isArray(allTags)) {
                 allTags = [];
@@ -162,7 +161,7 @@ define(['jquery', 'underscore', './view', 'json'
          *
          * @private
          */
-        _updateHiddenInputs: function () {
+        _updateHiddenInputs: function() {
             $(this.options.fieldId).val(JSON.stringify(this.getCollection()));
             $(this.options.ownFieldId).val(JSON.stringify(this.getCollection().getFilteredCollection('owner')));
         }

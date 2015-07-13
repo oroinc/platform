@@ -1,15 +1,15 @@
-/*global define*/
-define(function () {
+define(function() {
     'use strict';
-    var moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell',
-        types = {
+
+    var moduleNameTemplate = 'oro/datagrid/cell/{{type}}-cell';
+    var types = {
             integer:   'number',
             decimal:   'number',
             percent:   'number',
             currency:  'number'
         };
 
-    return function (type) {
+    return function(type) {
         return moduleNameTemplate.replace('{{type}}', types[type] || type);
     };
 });

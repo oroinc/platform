@@ -325,7 +325,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function entitiesToClear()
     {
         return [
-            'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
         ];

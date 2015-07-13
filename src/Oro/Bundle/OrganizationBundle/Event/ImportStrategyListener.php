@@ -67,7 +67,7 @@ class ImportStrategyListener
         /** @var OwnershipMetadataProvider $metadataProvider */
         $metadataProvider = $this->metadataProviderLink->getService();
 
-        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getOrganizationFieldName();
+        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getGlobalOwnerFieldName();
         if (!$organizationField) {
             return;
         }
