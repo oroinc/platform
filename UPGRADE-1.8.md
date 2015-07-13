@@ -145,6 +145,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `oro_security.ownership_tree.cache.cleaner`
     * `oro_security.ownership_tree.cache.warmer`
     * `oro_security.orm.ownership_sql_walker_builder`
+- Service `@oro_security.link.ownership_tree_provider` is deprecated, please use `Symfony\Component\DependencyInjection\ContainerInterface` directly
 
 ####AddressBundle
 - `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.
