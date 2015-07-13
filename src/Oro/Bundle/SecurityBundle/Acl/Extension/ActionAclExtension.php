@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
 
 class ActionAclExtension extends AbstractAclExtension
 {
@@ -49,6 +50,11 @@ class ActionAclExtension extends AbstractAclExtension
             return true;
         }
 
+        $delim = strpos($type, '@');
+        if ($delim !== false) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
         return $id === $this->getExtensionKey()
             && $this->actionMetadataProvider->isKnownAction($type);
     }
@@ -81,15 +87,16 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getObjectIdentity($val)
     {
-        $type = $id = null;
+        $type = $id = $group = null;
         if (is_string($val)) {
-            $this->parseDescriptor($val, $type, $id);
+            $this->parseDescriptor($val, $type, $id, $group);
         } elseif ($val instanceof AclAnnotation) {
             $type = $val->getId();
             $id = $val->getType();
+            $group = $val->getGroup();
         }
 
-        return new ObjectIdentity($id, $type);
+        return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
     }
 
     /**

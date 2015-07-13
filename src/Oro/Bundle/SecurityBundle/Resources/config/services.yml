@@ -16,6 +16,7 @@ parameters:
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
+    oro_security.acl.group_provider.chain.class:               Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
 
     oro_security.owner.tree.class:                             Oro\Bundle\SecurityBundle\Owner\OwnerTree
     oro_security.owner.decision_maker.class:                   Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker
@@ -183,6 +184,9 @@ services:
     oro_security.acl.object_id_accessor:
         public: false
         class: %oro_security.acl.object_id_accessor.class%
+
+    oro_security.acl.group_provider.chain:
+        class: %oro_security.acl.group_provider.chain.class%
 
     oro_security.owner.tree:
         public: false
