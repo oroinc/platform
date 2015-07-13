@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone'
-], function (_, Backbone) {
+], function(_, Backbone) {
     'use strict';
 
     var ActionsPanel;
@@ -31,7 +29,7 @@ define([
          * @param {Object} options
          * @param {Array} [options.actions] List of actions
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             this.subviews = [];
@@ -45,7 +43,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -59,10 +57,10 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             this.$el.empty();
 
-            _.each(this.launchers, function (launcher) {
+            _.each(this.launchers, function(launcher) {
                 this.$el.append(launcher.render().$el);
             }, this);
 
@@ -72,7 +70,7 @@ define([
         /**
          * Checks if there is at least one action in this panel
          */
-        haveActions: function () {
+        haveActions: function() {
             return !_.isEmpty(this.actions);
         },
 
@@ -81,10 +79,10 @@ define([
          *
          * @param {Array.<oro.datagrid.action.AbstractAction>} actions
          */
-        setActions: function (actions) {
+        setActions: function(actions) {
             this.actions = [];
             this.launchers = [];
-            _.each(actions, function (action) {
+            _.each(actions, function(action) {
                 this.actions.push(action);
                 this.launchers.push(action.createLauncher());
             }, this);
@@ -96,8 +94,8 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
-            _.each(this.launchers, function (launcher) {
+        disable: function() {
+            _.each(this.launchers, function(launcher) {
                 launcher.disable();
             });
 
@@ -109,8 +107,8 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
-            _.each(this.launchers, function (launcher) {
+        enable: function() {
+            _.each(this.launchers, function(launcher) {
                 launcher.enable();
             });
 

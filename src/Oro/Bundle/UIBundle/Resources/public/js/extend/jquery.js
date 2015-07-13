@@ -1,5 +1,4 @@
-/*global define*/
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     'use strict';
 
     $.ajaxSetup({
@@ -7,7 +6,7 @@ define(['jquery'], function ($) {
             'X-CSRF-Header': 1
         }
     });
-    $.expr[':'].parents = function (a, i, m) {
+    $.expr[':'].parents = function(a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };
 
@@ -27,11 +26,10 @@ define(['jquery'], function ($) {
         /**
          * Sets focus on first form field
          */
-        focusFirstInput: function () {
-            var $autoFocus,
-                $input = this.find(':input:visible, [data-focusable]')
+        focusFirstInput: function() {
+            var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            $autoFocus = $input.filter('[autofocus]');
+            var $autoFocus = $input.filter('[autofocus]');
             ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
         },
 
@@ -51,7 +49,7 @@ define(['jquery'], function ($) {
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
-        getBorders: function (el) {
+        getBorders: function(el) {
             var computed = window.getComputedStyle(el || this[0], null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
@@ -85,10 +83,10 @@ define(['jquery'], function ($) {
          */
         insertAtCursor: function(str) {
             return this.each(function() {
-                var start,
-                    end,
-                    el = this,
-                    value = el.value;
+                var start;
+                var end;
+                var el = this;
+                var value = el.value;
                 if ('selectionStart' in el) {
                     start = el.selectionStart;
                     end = el.selectionEnd;

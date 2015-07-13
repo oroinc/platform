@@ -1,14 +1,11 @@
-/*jslint browser:true, eqeq:true*/
-/*global define, window*/
 define([
     'oroui/js/mediator',
     'oroui/js/app/views/base/page-region-view'
-], function (mediator, PageRegionView) {
+], function(mediator, PageRegionView) {
     'use strict';
 
-    var BookmarkButtonView, document;
-
-    document = window.document;
+    var BookmarkButtonView;
+    var document = window.document;
 
     BookmarkButtonView = PageRegionView.extend({
         pageItems: ['navigationElements', 'titleShort', 'titleSerialized'],
@@ -31,7 +28,7 @@ define([
             'reset collection': 'updateState'
         },
 
-        initialize: function(options){
+        initialize: function(options) {
             if (!options.navigationElementType) {
                 throw new Error('"navigationItemElementType" is required option for bookmark button');
             }
@@ -39,12 +36,13 @@ define([
             this.navigationElementType = options.navigationElementType;
         },
 
-        render: function () {
-            var data, titleSerialized, titleShort;
+        render: function() {
+            var titleSerialized;
+            var titleShort;
 
             this.updateState();
 
-            data = this.getTemplateData();
+            var data = this.getTemplateData();
             if (!data || !data.navigationElements) {
                 // no data, it is initial auto render, skip rendering
                 return this;
@@ -68,15 +66,16 @@ define([
             return this;
         },
 
-        updateState: function () {
+        updateState: function() {
             var model;
             model = this.collection.getCurrentModel();
-            this.$el.toggleClass('gold-icon', model != null);
+            this.$el.toggleClass('gold-icon', Boolean(model));
         },
 
-        onToggle: function () {
-            var model, attrs, Model;
-            model = this.collection.getCurrentModel();
+        onToggle: function() {
+            var attrs;
+            var Model;
+            var model = this.collection.getCurrentModel();
             if (model) {
                 this.collection.trigger('toRemove', model);
             } else {
@@ -87,16 +86,14 @@ define([
             }
         },
 
-        getItemAttrs: function () {
-            var attrs, title;
-            title = this.$el.data('title');
-            attrs = {
+        getItemAttrs: function() {
+            var title = this.$el.data('title');
+            return {
                 url: mediator.execute('currentUrl'),
-                'title_rendered': document.title,
-                'title_rendered_short': this.$el.data('title-rendered-short') || document.title,
+                title_rendered: document.title,
+                title_rendered_short: this.$el.data('title-rendered-short') || document.title,
                 title: title ? JSON.stringify(title) : '{"template": "' + document.title + '"}'
             };
-            return attrs;
         }
     });
 

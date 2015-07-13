@@ -135,15 +135,6 @@ class EmailApiEntityManager extends ApiEntityManager
         $config = [
             'excluded_fields' => ['fromEmailAddress'],
             'fields'          => [
-                'folders'    => [
-                    'exclusion_policy' => 'all',
-                    'fields'           => [
-                        'origin'   => ['fields' => 'id'],
-                        'fullName' => null,
-                        'name'     => null,
-                        'type'     => null
-                    ]
-                ],
                 'created'    => [
                     'result_name' => 'createdAt'
                 ],
@@ -169,6 +160,25 @@ class EmailApiEntityManager extends ApiEntityManager
                         'bodyIsText'  => [
                             'data_transformer' => 'oro_email.email_body_type_transformer',
                             'result_name'      => 'bodyType'
+                        ]
+                    ]
+                ],
+                'emailUsers' => [
+                    'exclusion_policy' => 'all',
+                    'hints'            => ['HINT_FILTER_BY_CURRENT_USER'],
+                    'fields'           => [
+                        'seen'       => null,
+                        'receivedAt' => null,
+                        // @todo: 'folder' should be changed to 'folders' in BAP-8538
+                        'folder'     => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'       => null,
+                                'origin'   => ['fields' => 'id'],
+                                'fullName' => null,
+                                'name'     => null,
+                                'type'     => null
+                            ]
                         ]
                     ]
                 ]
@@ -202,5 +212,18 @@ class EmailApiEntityManager extends ApiEntityManager
             $result['bodyType'] = $result['emailBody']['bodyType'];
         }
         unset($result['emailBody']);
+
+        if (empty($result['emailUsers'])) {
+            $result['seen']       = false;
+            $result['receivedAt'] = null;
+            $result['folders']    = [];
+        } else {
+            $emailUser            = reset($result['emailUsers']);
+            $result['seen']       = $emailUser['seen'];
+            $result['receivedAt'] = $emailUser['receivedAt'];
+            // @todo: [$emailUser['folder']] should be changed to $emailUser['folders'] in BAP-8538
+            $result['folders'] = [$emailUser['folder']];
+        }
+        unset($result['emailUsers']);
     }
 }

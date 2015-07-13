@@ -1,10 +1,8 @@
-/*jslint nomen:true, eqeq:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/mediator',
     './base/model'
-], function (_, mediator, BaseModel) {
+], function(_, mediator, BaseModel) {
     'use strict';
 
     var PageModel;
@@ -28,7 +26,7 @@ define([
          * @param {Object=} options
          * @override
          */
-        fetch: function (options) {
+        fetch: function(options) {
             options = this._extendOptions(options);
             PageModel.__super__.fetch.call(this, options);
         },
@@ -42,8 +40,8 @@ define([
          * @param options
          * @returns {XMLHttpRequest}
          */
-        save: function (key, value, options) {
-            if (key == null || typeof key === 'object') {
+        save: function(key, value, options) {
+            if (key === null || key === void 0 || typeof key === 'object') {
                 options = value;
             }
             options = this._extendOptions(options);
@@ -59,7 +57,7 @@ define([
          * @returns {Object|undefined}
          * @override
          */
-        validate: function (attrs, options) {
+        validate: function(attrs, options) {
             var result;
             if (attrs.redirect) {
                 result = _.pick(attrs, ['redirect', 'fullRedirect', 'location']);
@@ -74,13 +72,13 @@ define([
          * @returns {Object}
          * @private
          */
-        _extendOptions: function (options) {
+        _extendOptions: function(options) {
             var headerId;
             options = options || {};
             _.extend(options, {
                 accepts: {
                     // @TODO refactor server side action point to accept 'application/json'
-                    "json": "*/*"
+                    json: '*/*'
                 }
             });
 

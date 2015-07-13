@@ -536,3 +536,20 @@ services:
             - @doctrine
         tags:
             - { name: oro_layout.expression, alias: acl|acl_granted }
+
+    oro_security.walker_hint_provider.current_user:
+        public: false
+        class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
+        arguments:
+             - @security.context
+
+    oro_security.query_hint.filter_by_current_user:
+        public: false
+        abstract: true
+        tags:
+            -
+                name: oro_entity.query_hint
+                hint: oro_security.filter_by_current_user
+                alias: HINT_FILTER_BY_CURRENT_USER
+                tree_walker: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker
+                walker_hint_provider: oro_security.walker_hint_provider.current_user

@@ -1,7 +1,5 @@
-/*global define*/
-/*jslint nomen: true*/
 define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
-    ], function ($, _, routing) {
+    ], function($, _, routing) {
     'use strict';
 
     $.widget('orosegment.segmentChoice', {
@@ -17,9 +15,9 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             fieldsLoaderSelector: ''
         },
 
-        _create: function () {
+        _create: function() {
             this._on({
-                change: function (e) {
+                change: function(e) {
                     if (e.added) {
                         this.element.trigger('changed', e.added.id);
                     }
@@ -29,12 +27,12 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             this._bindFieldsLoader();
         },
 
-        _init: function () {
+        _init: function() {
             this._processSelect2Options();
             this._updateData(this.options.entity, this.options.segmentData);
         },
 
-        _setOption: function (key, value) {
+        _setOption: function(key, value) {
             if ($.isPlainObject(value)) {
                 $.extend(this.options[key], value);
             } else {
@@ -43,17 +41,17 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             return this;
         },
 
-        _getCreateOptions: function () {
+        _getCreateOptions: function() {
             return $.extend(true, {}, this.options);
         },
 
-        _processSelect2Options: function () {
-            var template,
-                options = this.options.select2;
+        _processSelect2Options: function() {
+            var template;
+            var options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
-                options.formatSelection = function (item) {
+                options.formatSelection = function(item) {
                     return item && item.id ? template(item) : '';
                 };
             }
@@ -70,7 +68,7 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
                 this.options.select2.ajax,
                 {
                     url: url,
-                    data: _.bind(function (term, page) {
+                    data: _.bind(function(term, page) {
                         return {
                             page: page,
                             pageLimit: this.options.pageLimit,
@@ -78,21 +76,21 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
                             currentSegment: this.options.currentSegment
                         };
                     }, this),
-                    results: function (data) {
+                    results: function(data) {
                         return data;
                     }
                 }
             );
 
-            this.options.select2.initSelection = function (element, callback) {
+            this.options.select2.initSelection = function(element, callback) {
                 var data = element.data('data');
                 if (!$.isEmptyObject(data)) {
                     callback(data);
                 }
-            }
+            };
         },
 
-        _bindFieldsLoader: function () {
+        _bindFieldsLoader: function() {
             var $fieldsLoader;
             if (!this.options.fieldsLoaderSelector) {
                 return;
@@ -102,7 +100,7 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             this._updateData($fieldsLoader.val(), this.options.segmentData);
         },
 
-        _updateData: function (entity, segmentData) {
+        _updateData: function(entity, segmentData) {
             this.options.entity = entity;
             this.element
                 .data('entity', entity)
@@ -110,11 +108,11 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             this.element.select2(this.options.select2);
         },
 
-        setValue: function (value) {
+        setValue: function(value) {
             this.element.select2('val', value, true);
         },
 
-        setSelectedData: function (data) {
+        setSelectedData: function(data) {
             this.element.select2('data', data);
         }
     });
