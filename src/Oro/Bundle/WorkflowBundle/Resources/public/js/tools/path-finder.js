@@ -140,10 +140,13 @@ var LeftLocationStop = (function (_super) {
     Object.defineProperty(LeftLocationStop.prototype, "bound", {
         get: function () {
             var previous = this.previous;
-            if (previous && previous.bound > this.axis.min) {
-                return previous.bound;
+            // please keep in mind that
+            // axis includes connection width
+            // and bound doesn't
+            if (previous && previous.bound + GraphConstant.connectionWidth > this.axis.min - GraphConstant.connectionWidth) {
+                return previous.bound + GraphConstant.connectionWidth;
             }
-            return this.axis.min;
+            return this.axis.min - GraphConstant.connectionWidth;
         },
         enumerable: true,
         configurable: true
@@ -173,10 +176,13 @@ var RightLocationStop = (function (_super) {
     Object.defineProperty(RightLocationStop.prototype, "bound", {
         get: function () {
             var previous = this.previous;
-            if (previous && previous.bound < this.axis.max) {
-                return previous.bound;
+            // please keep in mind that
+            // axis includes connection width
+            // and bound doesn't
+            if (previous && previous.bound - GraphConstant.connectionWidth < this.axis.max + GraphConstant.connectionWidth) {
+                return previous.bound - GraphConstant.connectionWidth;
             }
-            return this.axis.max;
+            return this.axis.max + GraphConstant.connectionWidth;
         },
         enumerable: true,
         configurable: true
@@ -223,7 +229,9 @@ var Axis = (function () {
     };
     Axis.prototype.getBestDivisionCoordinate = function () {
         var coordinate;
-        console.log(this.id, PreferredLocation[this.getPreferredLocation()], this.getLeftLocationStop().bound, this.getRightLocationStop().bound);
+        //console.log(this.id, PreferredLocation[this.getPreferredLocation()], this.getLeftLocationStop().bound, this.getRightLocationStop().bound);
+        this.getLeftLocationStop().bound;
+        this.getRightLocationStop().bound;
         switch (this.getPreferredLocation()) {
             case PreferredLocation.LEFT:
                 coordinate = this.getLeftLocationStop().bound;
@@ -674,6 +682,10 @@ var AbstractInterval = (function () {
                     add = false;
                     recur(siblings.first, true);
                 }
+                else if (siblings.first.axis) {
+                    add = false;
+                    uniquePush(siblings.first.axis);
+                }
             }
             if (add) {
                 uniquePush(interval.axis);
@@ -694,7 +706,11 @@ var AbstractInterval = (function () {
                 var siblings = interval.divisions[i];
                 if (siblings.second.divisions.length > 0) {
                     add = false;
-                    recur(siblings.first, true);
+                    recur(siblings.second, true);
+                }
+                else if (siblings.second.axis) {
+                    add = false;
+                    uniquePush(siblings.second.axis);
                 }
             }
             if (add) {
@@ -1388,7 +1404,7 @@ var RectangularGraphNode = (function (_super) {
         else {
             this.shareWidth(axis, connectionCost);
         }
-        console.log(this.id, ' ::: ', this.sharedChildren.first.id, ' => ', this.sharedChildren.first.leavingConnections.map(function (conn) { return conn.destination.id; }), ',   ', this.sharedChildren.second.id, ' => ', this.sharedChildren.second.leavingConnections.map(function (conn) { return conn.destination.id; }));
+        // console.log(this.id, ' ::: ', this.sharedChildren.first.id, ' => ', this.sharedChildren.first.leavingConnections.map(function (conn) { return conn.destination.id; }), ',   ', this.sharedChildren.second.id, ' => ', this.sharedChildren.second.leavingConnections.map(function (conn) { return conn.destination.id; }));
         return this.sharedChildren;
     };
     RectangularGraphNode.prototype.shareWidth = function (axis, connectionCost) {
@@ -1430,10 +1446,7 @@ var RectangularGraphNode = (function (_super) {
             else {
                 // must find what connection it is related
                 var usedAxis = connection.destination[_this.isSharedHorizontally ? 'verticalInterval' : 'horizontalInterval'].axis;
-                if (connection.destination.isShared) {
-                    throw new Error('It should not be there');
-                }
-                else if (usedAxis && connection.destination.sharedParent) {
+                if (usedAxis) {
                     if (usedAxis === mainAxis) {
                         if (connection.destination.isLeft()) {
                             _this.cloneConnection(siblings.first, connection);
@@ -1443,16 +1456,8 @@ var RectangularGraphNode = (function (_super) {
                         }
                     }
                     else {
-                        if (mainAxis.isAxisAtLeft(usedAxis)) {
-                            _this.cloneConnection(siblings.second, connection);
-                        }
-                        else if (mainAxis.isAxisAtRight(usedAxis)) {
-                            _this.cloneConnection(siblings.first, connection);
-                        }
-                        else {
-                            _this.internalSimpleConnect(siblings.first, connection);
-                            _this.internalSimpleConnect(siblings.second, connection);
-                        }
+                        _this.internalSimpleConnect(siblings.first, connection);
+                        _this.internalSimpleConnect(siblings.second, connection);
                     }
                 }
                 else {
@@ -1607,6 +1612,16 @@ var Graph = (function () {
             }
         }
         return null;
+    };
+    Graph.prototype.getNodeById = function (id) {
+        var i, selected;
+        for (i = 0; i < this.items.length; i++) {
+            if (this.items[i].id === id) {
+                selected = this.items[i];
+                break;
+            }
+        }
+        return selected;
     };
     Graph.prototype.findLeavingConnectionsByCid = function (cid, direction) {
         var i, result = [];

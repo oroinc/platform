@@ -185,14 +185,17 @@ define(['jsplumb', 'underscore', './jsplumb-smartline-manager'], function (_jp, 
                 targetRect = params.targetEndpoint.element.getBoundingClientRect(),
                 sourcePoint = points.shift(),
                 targetPoint = points.pop(),
-                correction = {
-                    x: Math.min(sourcePoint.x, targetPoint.x),
-                    y: Math.min(sourcePoint.y, targetPoint.y)
-                };
+                connectionWidth = 16,
+                correction;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - sourceRect.left)/ sourceRect.width;
-            params.sourceEndpoint.anchor.y = (sourcePoint.y - sourceRect.top)/ sourceRect.height;
+            params.sourceEndpoint.anchor.y = (sourcePoint.y - 16 - sourceRect.top)/ sourceRect.height;
             params.targetEndpoint.anchor.x = (targetPoint.x - targetRect.left)/ targetRect.width;
-            params.targetEndpoint.anchor.y = (targetPoint.y - targetRect.top)/ targetRect.height;
+            params.targetEndpoint.anchor.y = (targetPoint.y + 16 - targetRect.top)/ targetRect.height;
+            correction = {
+                x: Math.min(sourcePoint.x, targetPoint.x),
+                y: Math.min(sourcePoint.y - 16, targetPoint.y + 16)
+            }
+
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
                     addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
@@ -201,10 +204,10 @@ define(['jsplumb', 'underscore', './jsplumb-smartline-manager'], function (_jp, 
                 addSegment(segments, sourcePoint.x - correction.x, sourcePoint.y - correction.y, paintInfo);
             }
 
-            //addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
+            // addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
 
             // end stub to end
-            addSegment(segments, targetPoint.x - correction.x, targetPoint.y - correction.y, paintInfo);
+            addSegment(segments, targetPoint.x - correction.x, targetPoint.y + 16 - correction.y, paintInfo);
 
             writeSegments(this, segments, paintInfo);
         };

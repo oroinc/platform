@@ -29,7 +29,7 @@ define(function(require){
                         return;
                     }
                     var rect = el.getBoundingClientRect(),
-                        clientRect = new Rectangle(rect.left, rect.top, rect.width, rect.height);
+                        clientRect = new Rectangle(rect.left - 16, rect.top - 16, rect.width + 32, rect.height+ 32);
                     rects[id] = clientRect;
                     //console.log(rect);
                     clientRect.cid = id;
