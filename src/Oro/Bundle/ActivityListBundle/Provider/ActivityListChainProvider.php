@@ -288,23 +288,12 @@ class ActivityListChainProvider
             if (!$list) {
                 $list = new ActivityList();
             }
-
-            $activityOwnersArray = $provider->getActivityOwners($entity, $list);
-            if ($activityOwnersArray) {
-                foreach ($activityOwnersArray as $owner) {
-                    $list->addActivityOwner($owner);
-                }
-            }
-
+            $this->setActivityOwners($entity, $provider, $list);
             $list->setSubject($provider->getSubject($entity));
-            $description = $this->htmlTagHelper->stripTags(
+            $list->setDescription($this->htmlTagHelper->stripTags(
                 $this->htmlTagHelper->purify($provider->getDescription($entity))
-            );
-            $list->setDescription($description);
-            if ($this->hasCustomDate($provider)) {
-                $list->setCreatedAt($provider->getDate($entity));
-                $list->setUpdatedAt($provider->getDate($entity));
-            }
+            ));
+            $this->setDate($entity, $provider, $list);
             if ($this->hasGrouping($provider)) {
                 $list->setHead($provider->isHead($entity));
             }
@@ -353,5 +342,37 @@ class ActivityListChainProvider
     protected function hasGrouping(ActivityListProviderInterface $provider)
     {
         return $provider instanceof ActivityListGroupProviderInterface;
+    }
+
+    /**
+     * Set owners for list
+     *
+     * @param $entity
+     * @param ActivityListProviderInterface $provider
+     * @param ActivityList $list
+     */
+    protected function setActivityOwners($entity, ActivityListProviderInterface $provider, $list)
+    {
+        $activityOwnersArray = $provider->getActivityOwners($entity, $list);
+        if ($activityOwnersArray) {
+            foreach ($activityOwnersArray as $owner) {
+                $list->addActivityOwner($owner);
+            }
+        }
+    }
+
+    /**
+     * Set Create and Update fields
+     *
+     * @param $entity
+     * @param ActivityListProviderInterface $provider
+     * @param ActivityList $list
+     */
+    protected function setDate($entity, ActivityListProviderInterface $provider, $list)
+    {
+        if ($this->hasCustomDate($provider)) {
+            $list->setCreatedAt($provider->getDate($entity));
+            $list->setUpdatedAt($provider->getDate($entity));
+        }
     }
 }
