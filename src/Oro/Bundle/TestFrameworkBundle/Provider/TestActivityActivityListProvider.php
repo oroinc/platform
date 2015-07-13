@@ -139,11 +139,9 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param $entity
-     * @param $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         return [];
     }

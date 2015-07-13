@@ -166,11 +166,9 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param $entity
-     * @param ActivityList $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         $organization = $this->getOrganization($entity);
         $owner = $this->getOwner($entity);
@@ -180,7 +178,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         }
 
         $activityOwner = new ActivityOwner();
-        $activityOwner->setActivity($activity);
+        $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
         return [$activityOwner];

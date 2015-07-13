@@ -338,11 +338,9 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * @param $entity
-     * @param ActivityList $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         $filter = ['email' => $entity];
         $organization = $this->getOrganization($entity);
@@ -358,7 +356,7 @@ class EmailActivityListProvider implements
         if ($owners) {
             foreach ($owners as $owner) {
                 $activityOwner = new ActivityOwner();
-                $activityOwner->setActivity($activity);
+                $activityOwner->setActivity($activityList);
                 $activityOwner->setOrganization($owner->getOrganization());
                 $activityOwner->setUser($owner->getOwner());
                 $activityArray[] = $activityOwner;

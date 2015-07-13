@@ -34,11 +34,14 @@ interface ActivityListProviderInterface
     public function getDescription($entity);
 
     /**
+     * Get array of ActivityOwners for list entity
+     *
      * @param object $entity
-     * @param ActivityList $activity
+     * @param ActivityList $activityList
+     *
      * @return array
      */
-    public function getActivityOwners($entity, ActivityList $activity);
+    public function getActivityOwners($entity, ActivityList $activityList);
 
     /**
      * @param ActivityList $activityListEntity
@@ -49,6 +52,7 @@ interface ActivityListProviderInterface
 
     /**
      * @param object $activityEntity
+     *
      * @return Organization|null
      */
     public function getOrganization($activityEntity);

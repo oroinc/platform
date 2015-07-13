@@ -126,7 +126,10 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
         return true;
     }
 
-    public function getActivityOwners($entity, $activity)
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, $activityList)
     {
         return [];
     }
