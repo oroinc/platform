@@ -78,6 +78,16 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get array providers
+     *
+     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
+
+    /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
      * @param bool $regenerateCaches

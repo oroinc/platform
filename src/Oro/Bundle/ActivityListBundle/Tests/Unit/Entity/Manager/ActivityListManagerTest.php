@@ -48,6 +48,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $aclHelper;
+
     public function setUp()
     {
         $this->doctrine           = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -72,6 +75,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->commentManager = $this->getMockBuilder('Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager')
             ->disableOriginalConstructor()->getMock();
 
+        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper')
+            ->disableOriginalConstructor()->getMock();
+
         $this->doctrine->expects($this->any())->method('getManager')->willReturn($this->em);
 
         $this->activityListManager = new ActivityListManager(
@@ -83,8 +89,11 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->provider,
             $this->activityListFilterHelper,
             $this->commentManager,
-            $this->doctrineHelper
+            $this->doctrineHelper,
+            $this->aclHelper
         );
+
+
     }
 
     public function testGetRepository()
@@ -119,9 +128,11 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $this->aclHelper->expects($this->any())->method('applyAclCriteria')->willReturn('');
+
         $qb = new QueryBuilder($this->em);
-        $this->em->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
-        $this->em->expects($this->once())->method('getRepository')->willReturn($repo);
+        $this->em->expects($this->any())->method('createQueryBuilder')->willReturn($qb);
+        $this->em->expects($this->any())->method('getRepository')->willReturn($repo);
         $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
         $this->pager->expects($this->once())->method('setQueryBuilder')->with($qb);
         $this->pager->expects($this->once())->method('setPage')->with($page);
@@ -130,10 +141,14 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->pager->expects($this->once())->method('init');
         $this->pager->expects($this->once())->method('getResults')->willReturn([]);
 
+        $this->provider->expects($this->once())->method('getProviders')->willReturn([]);
+
         $this->activityListManager->getList($testClass, $testId, $filter, $page);
 
         $expectedDQL = 'SELECT activity FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId ORDER BY activity.createdBy ASC';
+            . 'INNER JOIN activity.test_entity_9d8125dd r LEFT JOIN activity.activityOwners ao '
+            . 'WHERE r.id = :entityId GROUP BY activity.id ORDER BY activity.createdBy ASC';
+
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
@@ -163,6 +178,11 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([$this->em])
             ->setMethods(['getQuery'])->getMock();
 
+        $q1 = $this->getMockBuilder('Doctrine\ORM\Query')
+            ->setMethods(['getSingleScalarResult','getSQL','_doExecute'])
+            ->setConstructorArgs([$this->em])
+            ->disableOriginalConstructor()->getMock();
+
         $query = $this->getMockForAbstractClass(
             'Doctrine\ORM\AbstractQuery',
             [$this->em],
@@ -172,17 +192,20 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             true,
             ['getSingleScalarResult']
         );
-        $qb->expects($this->once())->method('getQuery')->willReturn($query);
-        $query->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
+        $qb->expects($this->once())->method('getQuery')->willReturn($q1 );
+        $q1->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
 
         $this->em->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
         $this->em->expects($this->once())->method('getRepository')->willReturn($repo);
         $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
 
+        $this->provider->expects($this->once())->method('getProviders')->willReturn([]);
+
         $this->activityListManager->getListCount($testClass, $testId, $filter);
 
         $expectedDQL = 'SELECT COUNT(activity.id) FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
             . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId AND activity.head = true';
+
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
@@ -271,5 +294,16 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviderForEntity')
             ->willReturn($this->returnValue(new TestActivityProvider()));
         $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), '', '', 0, []));
+    }
+
+    protected function mockEmailActivityListProvider() {
+        $emailActivityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+        ->disableOriginalConstructor()->getMock();
+
+        $emailActivityListProvider->expects($this->once())->method('getActivityClass')->willReturn('ActivityClass');
+        $emailActivityListProvider->expects($this->once())->method('getAclClass')->willReturn('AclClass');
+
+
+        return $emailActivityListProvider;
     }
 }

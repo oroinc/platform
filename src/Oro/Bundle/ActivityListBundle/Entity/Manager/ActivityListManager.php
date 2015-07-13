@@ -19,6 +19,8 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 
 class ActivityListManager
 {
@@ -46,6 +48,9 @@ class ActivityListManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ActivityListAclCriteriaHelper */
+    protected $ActivityListAclHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
@@ -66,7 +71,8 @@ class ActivityListManager
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        ActivityListAclCriteriaHelper $aclHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -77,6 +83,7 @@ class ActivityListManager
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
+        $this->ActivityListAclHelper    = $aclHelper;
     }
 
     /**
@@ -100,6 +107,7 @@ class ActivityListManager
         $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->ActivityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -125,13 +133,23 @@ class ActivityListManager
     public function getListCount($entityClass, $entityId, $filter)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
-
-        $qb->select('COUNT(activity.id)');
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->ActivityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
 
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $query = $qb->getQuery();
+        $parserResult      = QueryUtils::parseQuery($query);
+        $parameterMappings = $parserResult->getParameterMappings();
+        list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
+        $statement = $query->getEntityManager()->getConnection()->executeQuery(
+            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+            $params,
+            $types
+        );
 
-        return $qb->getQuery()->getSingleScalarResult();
+        $result = $statement->fetchColumn();
+
+        return $result;
     }
 
     /**
@@ -256,7 +274,7 @@ class ActivityListManager
     public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
         $results = [];
-        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
             $activityResults = $this->getEntityViewModels($groupedActivities, [

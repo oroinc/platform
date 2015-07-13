@@ -13,6 +13,7 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 class NoteActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+    const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -55,6 +56,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**
