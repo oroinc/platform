@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -18,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DynamicFieldsExtension extends \Twig_Extension
 {
