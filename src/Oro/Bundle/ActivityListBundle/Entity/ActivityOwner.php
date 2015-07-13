@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Criteria;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -117,5 +118,19 @@ class ActivityOwner
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @param array $stack
+     * @return bool
+     */
+    public function isMatchInCollection($stack)
+    {
+        $criteria = new Criteria();
+        $criteria
+            ->andWhere($criteria->expr()->eq('organization', $this->getOrganization()))
+            ->andWhere($criteria->expr()->eq('user', $this->getUser()));
+
+        return (bool) count($stack->matching($criteria));
     }
 }
