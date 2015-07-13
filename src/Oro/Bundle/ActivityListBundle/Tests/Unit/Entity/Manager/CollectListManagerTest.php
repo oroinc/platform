@@ -119,9 +119,9 @@ class CollectListManagerTest extends \PHPUnit_Framework_TestCase
     public function testProcessFillOwners()
     {
         $activityOwner = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityOwner')
-            ->setMethods(['isMatchInCollection'])->disableOriginalConstructor()->getMock();
+            ->setMethods(['isOwnerInCollection'])->disableOriginalConstructor()->getMock();
         $activityOwner->expects($this->exactly(2))
-            ->method('isMatchInCollection')
+            ->method('isOwnerInCollection')
             ->willReturn(false);
         $activity = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()->getMock();

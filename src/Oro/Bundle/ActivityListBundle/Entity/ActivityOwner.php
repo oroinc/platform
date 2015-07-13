@@ -140,7 +140,7 @@ class ActivityOwner
      * @param array $stack
      * @return bool
      */
-    public function isMatchInCollection($stack)
+    public function isOwnerInCollection($stack)
     {
         $criteria = new Criteria();
         $criteria

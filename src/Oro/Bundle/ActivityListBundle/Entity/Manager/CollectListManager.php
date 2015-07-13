@@ -126,14 +126,14 @@ class CollectListManager
         $newActivityOwners = new ArrayCollection($newActivityOwners);
 
         foreach ($oldActivityOwners as $oldOwner) {
-            if (!$oldOwner->isMatchInCollection($newActivityOwners)) {
+            if (!$oldOwner->isOwnerInCollection($newActivityOwners)) {
                 $activityList->removeActivityOwner($oldOwner);
             }
         }
 
         if ($newActivityOwners) {
             foreach ($newActivityOwners as $newOwner) {
-                if (!$newOwner->isMatchInCollection($oldActivityOwners)) {
+                if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
                     $activityList->addActivityOwner($newOwner);
                 }
             }
