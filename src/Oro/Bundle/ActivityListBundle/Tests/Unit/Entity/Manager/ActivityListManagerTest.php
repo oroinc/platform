@@ -92,8 +92,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->aclHelper
         );
-
-
     }
 
     public function testGetRepository()
@@ -192,7 +190,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             true,
             ['getSingleScalarResult']
         );
-        $qb->expects($this->once())->method('getQuery')->willReturn($q1 );
+        $qb->expects($this->once())->method('getQuery')->willReturn($q1);
         $q1->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
 
         $this->em->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
@@ -296,13 +294,13 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), '', '', 0, []));
     }
 
-    protected function mockEmailActivityListProvider() {
+    protected function mockEmailActivityListProvider()
+    {
         $emailActivityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
         ->disableOriginalConstructor()->getMock();
 
         $emailActivityListProvider->expects($this->once())->method('getActivityClass')->willReturn('ActivityClass');
         $emailActivityListProvider->expects($this->once())->method('getAclClass')->willReturn('AclClass');
-
 
         return $emailActivityListProvider;
     }

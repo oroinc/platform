@@ -274,7 +274,7 @@ class ActivityListManager
     public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
         $results = [];
-         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
             $activityResults = $this->getEntityViewModels($groupedActivities, [
