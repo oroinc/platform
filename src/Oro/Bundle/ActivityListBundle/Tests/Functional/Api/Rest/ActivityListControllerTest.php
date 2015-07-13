@@ -52,7 +52,8 @@ class ActivityListControllerTest extends WebTestCase
             ->andWhere('list.relatedActivityId = :relatedActivityId')
             ->setParameter('relatedActivityClass', 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity')
             ->setParameter('relatedActivityId', $activityId)
-            ->getQuery()->getSingleScalarResult();
+            ->getQuery()
+            ->getSingleScalarResult();
 
         $this->client->request(
             'GET',
