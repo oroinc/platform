@@ -272,7 +272,7 @@ class LoggableManager
 
             $ownerMeta = $this->em->getClassMetadata($assoc['targetEntity']);
             $collection = $ownerMeta->getReflectionProperty($assoc['inversedBy'])->getValue($owner);
-            if (!$collection instanceof PersistentCollection || !$collection->isDirty()) {
+            if (!$collection instanceof PersistentCollection) {
                 continue;
             }
 
@@ -302,8 +302,13 @@ class LoggableManager
                 $newCollection = $collection->toArray();
                 $oldCollection = $collection->getSnapshot();
 
+                $oldCollectionWithOldData = [];
+                foreach ($oldCollection as $entity) {
+                    $oldCollectionWithOldData[] = $this->getOldEntity($entity);
+                }
+
                 $oldData = array_reduce(
-                    $oldCollection,
+                    $oldCollectionWithOldData,
                     function ($result, $item) use ($method) {
                         return $result . ($result ? ', ' : '') . $item->{$method}();
                     }
@@ -327,6 +332,28 @@ class LoggableManager
                 );
             }
         }
+    }
+
+    /**
+     * @param object $currentEntity
+     *
+     * @return object
+     */
+    protected function getOldEntity($currentEntity)
+    {
+        $changeSet = $this->em->getUnitOfWork()->getEntityChangeSet($currentEntity);
+
+        if (!$changeSet) {
+            return $currentEntity;
+        }
+
+        $metadata = $this->em->getClassMetadata(ClassUtils::getClass($currentEntity));
+        $oldEntity = clone $currentEntity;
+        foreach ($changeSet as $property => $values) {
+            $metadata->getReflectionProperty($property)->setValue($oldEntity, $values[0]);
+        }
+
+        return $oldEntity;
     }
 
     /**
