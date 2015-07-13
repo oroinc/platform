@@ -117,7 +117,6 @@ class CollectListManager
      * @param ActivityListProviderInterface $provider
      * @param object $entity
      * @param ActivityList $activityList
-     * @param EntityManager $entityManager
      */
     protected function fillOwners(
         ActivityListProviderInterface $provider,
