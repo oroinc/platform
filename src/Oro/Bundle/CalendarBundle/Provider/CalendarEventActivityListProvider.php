@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -106,6 +107,19 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
+     * @param CalendarEvent $activityEntity
+     * @return null|User
+     */
+    public function getOwner($activityEntity)
+    {
+        /** @var $activityEntity CalendarEvent */
+        if ($activityEntity->getCalendar()) {
+            return $activityEntity->getCalendar()->getOwner();
+        }
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getTemplate()
@@ -149,5 +163,26 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    /**
+     * @param $entity
+     * @param ActivityList $activity
+     * @return array
+     */
+    public function getActivityOwners($entity, ActivityList $activity)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $this->getOwner($entity);
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activity);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
     }
 }

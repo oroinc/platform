@@ -338,11 +338,11 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * @param Email $entity
+     * @param $entity
      * @param ActivityList $activity
      * @return array
      */
-    public function getActivityOwners(Email $entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activity)
     {
         $filter = ['email' => $entity];
         $organization = $this->getOrganization($entity);

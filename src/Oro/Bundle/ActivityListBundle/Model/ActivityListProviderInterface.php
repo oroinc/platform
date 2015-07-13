@@ -34,6 +34,13 @@ interface ActivityListProviderInterface
     public function getDescription($entity);
 
     /**
+     * @param object $entity
+     * @param ActivityList $activity
+     * @return array
+     */
+    public function getActivityOwners($entity, ActivityList $activity);
+
+    /**
      * @param ActivityList $activityListEntity
      *
      * @return array

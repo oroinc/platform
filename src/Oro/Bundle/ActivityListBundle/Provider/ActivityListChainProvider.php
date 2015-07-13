@@ -150,6 +150,21 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param object $entity
+     * @param EntityManager $entityManager
+     * @return mixed
+     */
+    public function getActivityListByEntity($entity, EntityManager $entityManager)
+    {
+        return $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
+            [
+                'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
+                'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
+            ]
+        );
+    }
+
+    /**
      * Returns updated activity list entity for given activity
      *
      * @param object        $entity
@@ -160,12 +175,7 @@ class ActivityListChainProvider
     public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
         $provider        = $this->getProviderForEntity($entity);
-        $existListEntity = $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
-            [
-                'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
-                'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
-            ]
-        );
+        $existListEntity = $this->getActivityListByEntity($entity, $entityManager);
 
         if ($existListEntity) {
             return $this->getActivityListEntityForEntity(

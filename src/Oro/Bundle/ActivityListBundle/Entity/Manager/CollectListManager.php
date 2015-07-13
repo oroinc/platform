@@ -3,9 +3,13 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 
 class CollectListManager
 {
@@ -90,5 +94,66 @@ class CollectListManager
         }
 
         return false;
+    }
+
+    /**
+     * @param array $entities
+     * @param EntityManager $entityManager
+     */
+    public function processFillOwners($entities, EntityManager $entityManager)
+    {
+        if ($entities) {
+            foreach ($entities as $entity) {
+                $activityProvider = $this->chainProvider->getProviderForEntity($entity);
+                $activityList = $this->chainProvider->getActivityListByEntity($entity, $entityManager);
+                if ($activityList) {
+                    $this->fillOwners($activityProvider, $entity, $activityList);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ActivityListProviderInterface $provider
+     * @param object $entity
+     * @param ActivityList $activityList
+     */
+    protected function fillOwners(
+        ActivityListProviderInterface $provider,
+        $entity,
+        ActivityList $activityList
+    ) {
+        $oldActivityOwners = $activityList->getActivityOwners();
+        $newActivityOwners = $provider->getActivityOwners($entity, $activityList);
+        $newActivityOwners = new ArrayCollection($newActivityOwners);
+
+        foreach ($oldActivityOwners as $oldOwner) {
+            if (!$this->isMatchOwner($oldOwner, $newActivityOwners)) {
+                $activityList->removeActivityOwner($oldOwner);
+            }
+        }
+
+        if ($newActivityOwners) {
+            foreach ($newActivityOwners as $newOwner) {
+                if (!$this->isMatchOwner($newOwner, $oldActivityOwners)) {
+                    $activityList->addActivityOwner($newOwner);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ActivityOwner $needle
+     * @param ArrayCollection $stack
+     * @return bool
+     */
+    protected function isMatchOwner(ActivityOwner $needle, $stack)
+    {
+        $criteria = new Criteria();
+        $criteria
+            ->andWhere($criteria->expr()->eq('organization', $needle->getOrganization()))
+            ->andWhere($criteria->expr()->eq('user', $needle->getUser()));
+
+        return (bool) count($stack->matching($criteria));
     }
 }
