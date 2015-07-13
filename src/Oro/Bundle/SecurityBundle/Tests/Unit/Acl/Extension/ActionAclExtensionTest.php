@@ -75,11 +75,18 @@ class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'id' => 'action',
-                'type' => 'group@action_id',
+                'type' => '@action_id',
                 'action' => 'action_id',
                 'isKnownAction' => true,
                 'expected' => true
             ],
+            [
+                'id' => 'action',
+                'type' => 'group@action_id',
+                'action' => 'action_id',
+                'isKnownAction' => true,
+                'expected' => true
+            ]
         ];
     }
 
@@ -118,6 +125,10 @@ class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'val' => 'action:group@action_id',
                 'expected' => new ObjectIdentity('action', 'group@action_id')
+            ],
+            [
+                'val' => 'action:@action_id',
+                'expected' => new ObjectIdentity('action', 'action_id')
             ],
             [
                 'val' => $annotation,

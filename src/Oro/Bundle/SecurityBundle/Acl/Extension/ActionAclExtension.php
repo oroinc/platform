@@ -51,7 +51,7 @@ class ActionAclExtension extends AbstractAclExtension
         }
 
         $delim = strpos($type, '@');
-        if ($delim) {
+        if ($delim !== false) {
             $type = ltrim(substr($type, $delim + 1), ' ');
         }
 

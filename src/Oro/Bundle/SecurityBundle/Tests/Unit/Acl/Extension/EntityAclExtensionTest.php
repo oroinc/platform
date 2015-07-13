@@ -1121,11 +1121,18 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'id' => 'entity',
-                'type' => 'group@\stdClass',
+                'type' => '@\stdClass',
                 'class' => '\stdClass',
                 'isEntity' => true,
                 'expected' => true
             ],
+            [
+                'id' => 'entity',
+                'type' => 'group@\stdClass',
+                'class' => '\stdClass',
+                'isEntity' => true,
+                'expected' => true
+            ]
         ];
     }
 
@@ -1170,6 +1177,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'val' => 'entity:group@\stdClass',
                 'expected' => new ObjectIdentity('entity', 'group@\stdClass')
+            ],
+            [
+                'val' => 'entity:@\stdClass',
+                'expected' => new ObjectIdentity('entity', '\stdClass')
             ],
             [
                 'val' => $annotation,

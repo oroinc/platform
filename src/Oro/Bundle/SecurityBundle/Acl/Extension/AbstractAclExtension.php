@@ -94,7 +94,7 @@ abstract class AbstractAclExtension implements AclExtensionInterface
         $type = ltrim(substr($descriptor, $delim + 1), ' ');
 
         $delim = strpos($type, '@');
-        if ($delim) {
+        if ($delim !== false) {
             $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
             $type = ltrim(substr($type, $delim + 1), ' ');
         }
