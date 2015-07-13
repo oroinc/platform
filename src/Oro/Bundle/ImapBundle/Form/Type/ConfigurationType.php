@@ -151,20 +151,6 @@ class ConfigurationType extends AbstractType
     }
 
     /**
-     * @param array $tree
-     * @param array $result
-     */
-/*    protected function expandDataTree($tree, &$result)
-    {
-        foreach ($tree as $leaf) {
-            if (array_key_exists('subFolders', $leaf)) {
-                $this->expandDataTree($leaf['subFolders'], $result);
-                unset($leaf['subFolders']);
-            }
-        }
-    }*/
-
-    /**
      * @param FormBuilderInterface $builder
      */
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
