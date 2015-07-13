@@ -137,6 +137,7 @@ class ActivityOwner
     }
 
     /**
+     * Check existing owner in given array stack
      * @param array $stack
      * @return bool
      */
