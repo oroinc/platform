@@ -66,7 +66,9 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                 'fields'           => [
                     'id'     => null,
                     'name'   => null,
-                    'groups' => null,
+                    'groups' => [
+                        'excluded_fields' => ['isException']
+                    ],
                 ],
             ]
         );
