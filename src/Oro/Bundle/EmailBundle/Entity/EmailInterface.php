@@ -28,7 +28,7 @@ interface EmailInterface
     /**
      * Get email owner entity
      *
-     * @return EmailAddressOwnerInterface
+     * @return EmailOwnerInterface
      */
     public function getEmailOwner();
 }

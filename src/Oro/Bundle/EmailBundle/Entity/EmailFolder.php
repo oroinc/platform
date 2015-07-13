@@ -84,10 +84,10 @@ class EmailFolder
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOwner", mappedBy="folder",
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    protected $emailOwners;
+    protected $emailUsers;
 
     /**
      * Get id

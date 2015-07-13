@@ -52,8 +52,8 @@ class ImapEmailFolderRepository extends EntityRepository
     {
         return $this->createQueryBuilder('imap_folder')
             ->innerJoin('imap_folder.folder', 'folder')
-            ->leftJoin('folder.emailOwners', 'emailOwners')
-            ->where('folder.outdatedAt IS NOT NULL AND emailOwners.id IS NULL')
+            ->leftJoin('folder.emailUsers', 'emailUsers')
+            ->where('folder.outdatedAt IS NOT NULL AND emailUsers.id IS NULL')
             ->andWhere('folder.origin = :origin')
             ->setParameter('origin', $origin);
     }

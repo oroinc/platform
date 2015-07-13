@@ -8,7 +8,7 @@ use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 /**
  * Represents an email owner
  */
-interface EmailAddressOwnerInterface
+interface EmailOwnerInterface
 {
     /**
      * Get entity class name.

@@ -16,7 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
-use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
@@ -201,20 +201,20 @@ class EmailApiHandler extends ApiFormHandler
             $this->processRefs($email, $model->getRefs());
         }
 
-        // process UserEmailOwner entities for each folder
-        $emailOwners = $this->processFolders($email, $model->getFolders());
-        foreach ($emailOwners as $emailOwner) {
+        // process EmailUser entities for each folder
+        $emailUsers = $this->processFolders($email, $model->getFolders());
+        foreach ($emailUsers as $emailUser) {
             // ReceivedAt
             if ($model->getReceivedAt()) {
-                $emailOwner->setReceivedAt($model->getReceivedAt());
+                $emailUser->setReceivedAt($model->getReceivedAt());
             } elseif (!$email->getId()) {
-                $emailOwner->setReceivedAt($messageDate);
+                $emailUser->setReceivedAt($messageDate);
             }
             // Seen
             if (null !== $model->isSeen()) {
-                $emailOwner->setSeen($model->isSeen());
+                $emailUser->setSeen($model->isSeen());
             }
-            $this->emailEntityBuilder->setObject($emailOwner);
+            $this->emailEntityBuilder->setObject($emailUser);
         }
 
         $this->emailEntityBuilder->getBatch()->persist($this->entityManager);
@@ -318,7 +318,7 @@ class EmailApiHandler extends ApiFormHandler
      * @param Email $email
      * @param array $folders
      *
-     * @return EmailOwner[]
+     * @return EmailUser[]
      */
     protected function processFolders(Email $email, $folders)
     {
@@ -338,7 +338,7 @@ class EmailApiHandler extends ApiFormHandler
                 $this->emailEntityBuilder->setFolder($folder);
             }
 
-            $emailUser = new UserEmailOwner();
+            $emailUser = new EmailUser();
             $emailUser->setEmail($email);
             $emailUser->setOwner($apiOrigin->getOwner());
             $emailUser->setOrganization($apiOrigin->getOrganization());

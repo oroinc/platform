@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
 /**
- * @ORM\Table(name="oro_mailbox")
+ * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity
  *
  * @Config(
@@ -19,15 +17,10 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *          "entity"={
  *              "icon"="icon-envelope"
  *          }
- *      },
- *      ownership={
- *          "owner_type"="ORGANIZATION",
- *          "organization_field_name"="organization",
- *          "organization_column_name"="organization_id"
- *      },
+ *      }
  * )
  */
-class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
+class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
 
     /**
@@ -45,16 +38,6 @@ class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
      * @ORM\Column(name="email", type="string", length=255)
      */
     protected $email;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\MailboxEmail",
-     *    mappedBy="owner", cascade={"all"}, orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"primary" = "DESC"})
-     */
-    protected $emails;
 
     /**
      * @var string
@@ -90,14 +73,6 @@ class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
      */
     protected $smtpSettings;
 
-    /**
-     * @var OrganizationInterface
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", cascade={"remove"})
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $organization;
-
     public function __construct()
     {
         $this->smtpSettings = [];
@@ -109,6 +84,14 @@ class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
     }
 
     /**
@@ -245,150 +228,6 @@ class Mailbox implements EmailAddressOwnerInterface, EmailHolderInterface
     public function setOrigin($origin)
     {
         $this->origin = $origin;
-
-        return $this;
-    }
-
-    /**
-     * @return OrganizationInterface
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * @param OrganizationInterface $organization
-     *
-     * @return $this
-     */
-    public function setOrganization($organization)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Set emails.
-     *
-     * This method could not be named setEmails because of bug CRM-253.
-     *
-     * @param Collection|MailboxEmail[] $emails
-     *
-     * @return $this
-     */
-    public function resetEmails($emails)
-    {
-        $this->emails->clear();
-
-        foreach ($emails as $email) {
-            $this->addEmail($email);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add email
-     *
-     * @param MailboxEmail $email
-     *
-     * @return $this
-     */
-    public function addEmail(MailboxEmail $email)
-    {
-        if (!$this->emails->contains($email)) {
-            $this->emails->add($email);
-            $email->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Remove email
-     *
-     * @param MailboxEmail $email
-     *
-     * @return $this
-     */
-    public function removeEmail(MailboxEmail $email)
-    {
-        if ($this->emails->contains($email)) {
-            $this->emails->removeElement($email);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get emails
-     *
-     * @return Collection|MailboxEmail[]
-     */
-    public function getEmails()
-    {
-        return $this->emails;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmail()
-    {
-        $primaryEmail = $this->getPrimaryEmail();
-        if (!$primaryEmail) {
-            return null;
-        }
-
-        return $primaryEmail->getEmail();
-    }
-
-    /**
-     * @param MailboxEmail $email
-     *
-     * @return bool
-     */
-    public function hasEmail(MailboxEmail $email)
-    {
-        return $this->getEmails()->contains($email);
-    }
-
-    /**
-     * Gets primary email if it's available.
-     *
-     * @return MailboxEmail|null
-     */
-    public function getPrimaryEmail()
-    {
-        $result = null;
-
-        foreach ($this->getEmails() as $email) {
-            if ($email->isPrimary()) {
-                $result = $email;
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param MailboxEmail $email
-     *
-     * @return $this
-     */
-    public function setPrimaryEmail(MailboxEmail $email)
-    {
-        if ($this->hasEmail($email)) {
-            $email->setPrimary(true);
-            foreach ($this->getEmails() as $otherEmail) {
-                if (!$email->isEqual($otherEmail)) {
-                    $otherEmail->setPrimary(false);
-                }
-            }
-        }
 
         return $this;
     }

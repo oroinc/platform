@@ -3,13 +3,13 @@
 namespace {{ namespace }};
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
 class {{ className }} extends EmailAddress
 {
 {% for owner in owners %}
     /**
-     * @var EmailAddressOwnerInterface
+     * @var EmailOwnerInterface
      */
     private ${{ owner.fieldName }};
 {% endfor %}
@@ -31,7 +31,7 @@ class {{ className }} extends EmailAddress
     /**
      * {@inheritdoc}
      */
-    public function setOwner(EmailAddressOwnerInterface $owner = null)
+    public function setOwner(EmailOwnerInterface $owner = null)
     {
 {% for owner in owners %}
         if ($owner !== null && is_a($owner, '{{ owner.targetEntity }}')) {

@@ -1,4 +1,4 @@
-Oro\Bundle\EmailBundle\Entity\UserEmailOwner:
+Oro\Bundle\EmailBundle\Entity\EmailUser:
     alias: oro_email
     label: Emails
     search_template: OroEmailBundle:Email:searchResult.html.twig

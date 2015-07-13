@@ -11,7 +11,7 @@ use Psr\Log\LoggerAwareTrait;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -243,7 +243,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      * @param User                  $owner
      * @param OrganizationInterface $organization
      *
-     * @return UserEmailOwner
+     * @return EmailUser
      */
     protected function addEmailUser(
         EmailHeader $email,

@@ -8,15 +8,39 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
+ * EmailUser
+ *
  * @ORM\Table(
- *      name="oro_email_owner"
+ *      name="oro_email_user"
  * )
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
+ * @ORM\Entity()
+ * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
+ *
+ * @Config(
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT",
+ *              "group_name"=""
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          }
+ *      }
+ * )
  */
-class EmailOwner
+class EmailUser
 {
     /**
      * @var integer
@@ -34,8 +58,32 @@ class EmailOwner
      *
      * @ORM\Column(name="created_at", type="datetime")
      * @JMS\Type("dateTime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
+
+    /**
+     * @var OrganizationInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $owner;
 
     /**
      * @var \DateTime
@@ -58,7 +106,7 @@ class EmailOwner
     /**
      * @var EmailFolder $folder
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emailOwners", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emailUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
@@ -67,7 +115,7 @@ class EmailOwner
     /**
      * @var Email $email
      *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailOwners", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
@@ -91,6 +139,53 @@ class EmailOwner
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param OrganizationInterface $organization
+     * @return $this
+     */
+    public function setOrganization(OrganizationInterface $organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get owning user
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set owning user
+     *
+     * @param User $owningUser
+     *
+     * @return $this
+     */
+    public function setOwner($owningUser)
+    {
+        $this->owner = $owningUser;
+
+        return $this;
     }
 
     /**

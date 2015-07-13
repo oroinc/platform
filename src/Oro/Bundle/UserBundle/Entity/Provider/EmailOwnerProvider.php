@@ -5,9 +5,9 @@ namespace Oro\Bundle\UserBundle\Entity\Provider;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderInterface;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 
-class EmailAddressOwnerProvider implements EmailAddressOwnerProviderInterface
+class EmailOwnerProvider implements EmailOwnerProviderInterface
 {
     /**
      * {@inheritdoc}

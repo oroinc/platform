@@ -8,14 +8,14 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 /**
  * This class responsible for binging EmailAddress to owner entities
  */
-class EmailAddressOwnerManager
+class EmailOwnerManager
 {
     /**
      * A list of class names of all email owners
@@ -34,11 +34,11 @@ class EmailAddressOwnerManager
     /**
      * Constructor.
      *
-     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EmailAddressManager       $emailAddressManager
      */
     public function __construct(
-        EmailAddressOwnerProviderStorage $emailOwnerProviderStorage,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EmailAddressManager $emailAddressManager
     ) {
         foreach ($emailOwnerProviderStorage->getProviders() as $provider) {
@@ -59,9 +59,9 @@ class EmailAddressOwnerManager
         $uow = $em->getUnitOfWork();
 
         $bindings = [
-            // array of array('email' => email address, 'owner' => EmailAddressOwnerInterface or false)
+            // array of array('email' => email address, 'owner' => EmailOwnerInterface or false)
             'changes'   => [],
-            // array of EmailAddressOwnerInterface
+            // array of EmailOwnerInterface
             'deletions' => []
         ];
 
@@ -80,7 +80,7 @@ class EmailAddressOwnerManager
     protected function handleInsertionsOrUpdates(array &$bindings, array $entities, UnitOfWork $uow)
     {
         foreach ($entities as $entity) {
-            if ($entity instanceof EmailAddressOwnerInterface) {
+            if ($entity instanceof EmailOwnerInterface) {
                 $emailFields = $entity->getEmailFields();
                 if (!empty($emailFields)) {
                     foreach ($emailFields as $emailField) {
@@ -109,14 +109,14 @@ class EmailAddressOwnerManager
      * @param array               $bindings
      * @param                     $emailField
      * @param mixed               $entity
-     * @param EmailAddressOwnerInterface $owner
+     * @param EmailOwnerInterface $owner
      * @param UnitOfWork          $uow
      */
     protected function processInsertionOrUpdateEntity(
         array &$bindings,
         $emailField,
         $entity,
-        EmailAddressOwnerInterface $owner,
+        EmailOwnerInterface $owner,
         UnitOfWork $uow
     ) {
         $changeSet = $uow->getEntityChangeSet($entity);
@@ -148,7 +148,7 @@ class EmailAddressOwnerManager
     protected function handleDeletions(array &$bindings, array $entities)
     {
         foreach ($entities as $entity) {
-            if ($entity instanceof EmailAddressOwnerInterface) {
+            if ($entity instanceof EmailOwnerInterface) {
                 $key                         = sprintf(
                     '%s:%d',
                     ClassUtils::getClass($entity),

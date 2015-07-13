@@ -3,24 +3,24 @@
 namespace Oro\Bundle\EmailBundle\Entity\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
 /**
  * Email owner provider chain
  */
-class EmailAddressOwnerProvider
+class EmailOwnerProvider
 {
     /**
-     * @var EmailAddressOwnerProviderStorage
+     * @var EmailOwnerProviderStorage
      */
     private $emailOwnerProviderStorage;
 
     /**
      * Constructor
      *
-     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      */
-    public function __construct(EmailAddressOwnerProviderStorage $emailOwnerProviderStorage)
+    public function __construct(EmailOwnerProviderStorage $emailOwnerProviderStorage)
     {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
     }
@@ -30,8 +30,7 @@ class EmailAddressOwnerProvider
      *
      * @param \Doctrine\ORM\EntityManager $em
      * @param string $email
-     *
-*@return EmailAddressOwnerInterface
+     * @return EmailOwnerInterface
      */
     public function findEmailOwner(EntityManager $em, $email)
     {

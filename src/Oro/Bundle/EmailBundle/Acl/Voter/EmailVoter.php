@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
 class EmailVoter implements VoterInterface
 {
@@ -74,14 +74,12 @@ class EmailVoter implements VoterInterface
 
         $object = $this->convertToSupportedObject($object, $objectClass);
 
-        /** @var UserEmailOwner[] $emailOwners */
-        $emailOwners = $object->getEmailOwners();
+        /** @var EmailUser[] $emailUsers */
+        $emailUsers = $object->getEmailUsers();
         foreach ($attributes as $attribute) {
-            foreach ($emailOwners as $emailUser) {
-                if ($emailUser instanceof UserEmailOwner) {
-                    if ($this->container->get('oro_security.security_facade')->isGranted($attribute, $emailUser)) {
-                        return self::ACCESS_GRANTED;
-                    }
+            foreach ($emailUsers as $emailUser) {
+                if ($this->container->get('oro_security.security_facade')->isGranted($attribute, $emailUser)) {
+                    return self::ACCESS_GRANTED;
                 }
             }
         }

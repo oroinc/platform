@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * @ORM\Table(
- *      name="oro_mailbox_processor"
+ *      name="oro_email_mailbox_processor"
  * )
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")

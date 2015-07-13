@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class KnownEmailAddressCheckerFactory
@@ -20,7 +20,7 @@ class KnownEmailAddressCheckerFactory
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
-    /** @var EmailAddressOwnerProviderStorage */
+    /** @var EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
     /** @var string[] */
@@ -30,14 +30,14 @@ class KnownEmailAddressCheckerFactory
      * @param ManagerRegistry           $doctrine
      * @param EmailAddressManager       $emailAddressManager
      * @param EmailAddressHelper        $emailAddressHelper
-     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param string[]                  $exclusions Class names of email address owners which should be excluded
      */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
-        EmailAddressOwnerProviderStorage $emailOwnerProviderStorage,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
         $exclusions = []
     ) {
         $this->doctrine                  = $doctrine;

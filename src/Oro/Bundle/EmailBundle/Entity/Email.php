@@ -219,11 +219,11 @@ class Email extends ExtendEmail
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOwner", mappedBy="email",
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
-    protected $emailOwners;
+    protected $emailUsers;
 
     public function __construct()
     {
@@ -231,7 +231,7 @@ class Email extends ExtendEmail
 
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailOwners = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
     }
 
     /**
@@ -723,55 +723,55 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return ArrayCollection|UserEmailOwner[]
+     * @return ArrayCollection|EmailUser[]
      */
-    public function getEmailOwners()
+    public function getEmailUsers()
     {
-        return $this->emailOwners;
+        return $this->emailUsers;
     }
 
     /**
      * @param EmailFolder $emailFolder
      *
-     * @return EmailOwner|null
+     * @return EmailUser|null
      */
-    public function getEmailOwnerByFolder(EmailFolder $emailFolder)
+    public function getEmailUserByFolder(EmailFolder $emailFolder)
     {
-        $emailOwners = $this->getEmailOwners()->filter(function ($entry) use ($emailFolder) {
-            /** @var UserEmailOwner $entry */
+        $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
+            /** @var EmailUser $entry */
             return $entry->getFolder() === $emailFolder;
         });
-        if ($emailOwners != null && count($emailOwners) > 0) {
-            return $emailOwners->first();
+        if ($emailUsers != null && count($emailUsers) > 0) {
+            return $emailUsers->first();
         }
 
         return null;
     }
 
     /**
-     * @param EmailOwner $emailOwner
+     * @param EmailUser $emailUser
      *
      * @return $this
      */
-    public function addEmailOwner(EmailOwner $emailOwner)
+    public function addEmailUser(EmailUser $emailUser)
     {
-        if (!$this->emailOwners->contains($emailOwner)) {
-            $this->emailOwners->add($emailOwner);
-            $emailOwner->setEmail($this);
+        if (!$this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->add($emailUser);
+            $emailUser->setEmail($this);
         }
 
         return $this;
     }
 
     /**
-     * @param UserEmailOwner $emailUser
+     * @param EmailUser $emailUser
      *
      * @return $this
      */
-    public function removeEmailUser(UserEmailOwner $emailUser)
+    public function removeEmailUser(EmailUser $emailUser)
     {
-        if ($this->emailOwners->contains($emailUser)) {
-            $this->emailOwners->removeElement($emailUser);
+        if ($this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->removeElement($emailUser);
         }
 
         return $this;

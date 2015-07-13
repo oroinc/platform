@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 
 class EmailOwnerProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +31,7 @@ class EmailOwnerProviderTest extends \PHPUnit_Framework_TestCase
         $provider2->expects($this->never())
             ->method('findEmailOwner');
 
-        $provider = new EmailAddressOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
         $this->assertEquals($result, $provider->findEmailOwner($em, 'test'));
     }
 
@@ -52,7 +52,7 @@ class EmailOwnerProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($em), $this->equalTo('test'))
             ->will($this->returnValue($result));
 
-        $provider = new EmailAddressOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
         $this->assertEquals($result, $provider->findEmailOwner($em, 'test'));
     }
 
@@ -72,7 +72,7 @@ class EmailOwnerProviderTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($em), $this->equalTo('test'))
             ->will($this->returnValue(null));
 
-        $provider = new EmailAddressOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
+        $provider = new EmailOwnerProvider($this->getEmailOwnerProviderStorageMock(array($provider1, $provider2)));
         $this->assertNull($provider->findEmailOwner($em, 'test'));
     }
 }

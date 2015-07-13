@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailAddressOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -163,7 +163,7 @@ class EmailModelBuilderHelper
     /**
      * Get the current authenticated user
      *
-     * @return User|UserInterface|EmailHolderInterface|EmailAddressOwnerInterface|null
+     * @return User|UserInterface|EmailHolderInterface|EmailOwnerInterface|null
      */
     public function getUser()
     {
@@ -260,6 +260,6 @@ class EmailModelBuilderHelper
     {
         return $entity instanceof UserInterface
         && $entity instanceof EmailHolderInterface
-        && $entity instanceof EmailAddressOwnerInterface;
+        && $entity instanceof EmailOwnerInterface;
     }
 }

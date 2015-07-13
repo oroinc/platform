@@ -91,8 +91,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
             'SELECT imap_folder'
             . ' FROM Oro\Bundle\ImapBundle\Entity\ImapEmailFolder imap_folder'
             . ' INNER JOIN imap_folder.folder folder'
-            . ' LEFT JOIN folder.emailOwners emailOwners'
-            . ' WHERE (folder.outdatedAt IS NOT NULL AND emailOwners.id IS NULL) AND folder.origin = :origin',
+            . ' LEFT JOIN folder.emailUsers emailUsers'
+            . ' WHERE (folder.outdatedAt IS NOT NULL AND emailUsers.id IS NULL) AND folder.origin = :origin',
             $query->getDQL()
         );
 

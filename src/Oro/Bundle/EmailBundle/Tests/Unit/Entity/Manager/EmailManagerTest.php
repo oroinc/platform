@@ -44,7 +44,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->method('updateThreadHead');
         $this->em->expects($this->never())
             ->method('flush');
-        $this->manager->setEmailOwnerSeen($emailUser);
+        $this->manager->setEmailUserSeen($emailUser);
     }
 
     public function testSetEmailSeenChanges()
@@ -59,6 +59,6 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())
             ->method('flush');
 
-        $this->manager->setEmailOwnerSeen($emailUser);
+        $this->manager->setEmailUserSeen($emailUser);
     }
 }

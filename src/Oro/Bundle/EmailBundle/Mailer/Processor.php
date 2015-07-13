@@ -14,10 +14,10 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -50,7 +50,7 @@ class Processor
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /** @var  EmailAddressOwnerProvider */
+    /** @var  EmailOwnerProvider */
     protected $emailOwnerProvider;
 
     /** @var  EmailActivityManager */
@@ -70,7 +70,7 @@ class Processor
      * @param \Swift_Mailer $mailer
      * @param EmailAddressHelper $emailAddressHelper
      * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailAddressOwnerProvider $emailOwnerProvider
+     * @param EmailOwnerProvider $emailOwnerProvider
      * @param EmailActivityManager $emailActivityManager
      * @param ServiceLink $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
@@ -80,7 +80,7 @@ class Processor
         \Swift_Mailer $mailer,
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressOwnerProvider $emailOwnerProvider,
+        EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
         EventDispatcherInterface $eventDispatcher
@@ -100,7 +100,7 @@ class Processor
      *
      * @param EmailModel $model
      *
-     * @return UserEmailOwner
+     * @return EmailUser
      * @throws \Swift_SwiftException
      */
     public function process(EmailModel $model)

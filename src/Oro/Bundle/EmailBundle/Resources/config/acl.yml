@@ -6,7 +6,7 @@ oro_email_email_view:
 
 oro_email_email_create:
     type: entity
-    class: OroEmailBundle:UserEmailOwner
+    class: OroEmailBundle:EmailUser
     permission: CREATE
     group_name: ""
 

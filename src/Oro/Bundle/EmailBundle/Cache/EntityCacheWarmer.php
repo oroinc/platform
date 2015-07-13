@@ -6,12 +6,12 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EntityCacheWarmer extends CacheWarmer
 {
     /**
-     * @var EmailAddressOwnerProviderStorage
+     * @var EmailOwnerProviderStorage
      */
     protected $emailOwnerProviderStorage;
 
@@ -38,14 +38,14 @@ class EntityCacheWarmer extends CacheWarmer
     /**
      * Constructor.
      *
-     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param string                    $entityCacheDir
      * @param string                    $entityCacheNamespace
      * @param string                    $entityProxyNameTemplate
      * @param KernelInterface           $kernel
      */
     public function __construct(
-        EmailAddressOwnerProviderStorage $emailOwnerProviderStorage,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
         $entityCacheDir,
         $entityCacheNamespace,
         $entityProxyNameTemplate,

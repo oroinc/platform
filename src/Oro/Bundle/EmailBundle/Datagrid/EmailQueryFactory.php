@@ -5,11 +5,11 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProviderStorage;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 class EmailQueryFactory
 {
-    /** @var EmailAddressOwnerProviderStorage */
+    /** @var EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
     /** @var EntityNameResolver */
@@ -19,11 +19,11 @@ class EmailQueryFactory
     protected $fromEmailExpression;
 
     /**
-     * @param EmailAddressOwnerProviderStorage $emailOwnerProviderStorage
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
      */
     public function __construct(
-        EmailAddressOwnerProviderStorage $emailOwnerProviderStorage,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;

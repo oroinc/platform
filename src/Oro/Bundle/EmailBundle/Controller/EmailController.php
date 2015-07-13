@@ -51,9 +51,9 @@ class EmailController extends Controller
 
         // TODO Should be refactored in CRM-2482
         $em = $this->getDoctrine()->getManager();
-        $emailUser = $em->getRepository('OroEmailBundle:UserEmailOwner')->findByEmailAndOwner($entity, $this->getUser());
+        $emailUser = $em->getRepository('OroEmailBundle:EmailUser')->findByEmailAndOwner($entity, $this->getUser());
         if ($emailUser) {
-            $this->getEmailManager()->setEmailOwnerSeen($emailUser);
+            $this->getEmailManager()->setEmailUserSeen($emailUser);
         }
 
         return [

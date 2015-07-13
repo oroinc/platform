@@ -21,7 +21,7 @@ class ImapEmailRepository extends EntityRepository
     {
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.emailOwners', 'email_users')
+            ->innerJoin('email.emailUsers', 'email_users')
             ->innerJoin('email_users.folder', 'folder')
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
@@ -60,7 +60,7 @@ class ImapEmailRepository extends EntityRepository
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.imapFolder', 'imap_folder')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.emailOwners', 'email_users')
+            ->innerJoin('email.emailUsers', 'email_users')
             ->innerJoin('email_users.folder', 'folder')
             ->where('folder.origin = :origin AND email.messageId IN (:messageIds)')
             ->setParameter('origin', $origin)

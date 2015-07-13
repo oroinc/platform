@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Builder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\EmailBundle\Entity\EmailOwner;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Doctrine\ORM\EntityManager;
@@ -12,9 +11,9 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\UserEmailOwner;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailAddressOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
 
 class EmailEntityBatchProcessor implements EmailEntityBatchInterface
@@ -25,7 +24,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected $emailAddressManager;
 
     /**
-     * @var EmailAddressOwnerProvider
+     * @var EmailOwnerProvider
      */
     protected $emailOwnerProvider;
 
@@ -40,9 +39,9 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected $changes = [];
 
     /**
-     * @var EmailOwner[]
+     * @var EmailUser[]
      */
-    protected $emailOwners = [];
+    protected $emailUsers = [];
 
     /**
      * @var EmailAddress[]
@@ -63,12 +62,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * Constructor
      *
      * @param EmailAddressManager $emailAddressManager
-     * @param EmailAddressOwnerProvider $emailOwnerProvider
+     * @param EmailOwnerProvider $emailOwnerProvider
      * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         EmailAddressManager $emailAddressManager,
-        EmailAddressOwnerProvider $emailOwnerProvider,
+        EmailOwnerProvider $emailOwnerProvider,
         EventDispatcher $eventDispatcher
     ) {
         $this->emailAddressManager = $emailAddressManager;
@@ -77,13 +76,13 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
-     * Register UserEmailOwner object
+     * Register EmailUser object
      *
-     * @param EmailOwner $obj
+     * @param EmailUser $obj
      */
-    public function addEmailOwner(EmailOwner $obj)
+    public function addEmailUser(EmailUser $obj)
     {
-        $this->emailOwners[] = $obj;
+        $this->emailUsers[] = $obj;
     }
 
     /**
@@ -158,7 +157,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         $this->persistFolders($em);
         $this->persistAddresses($em);
-        $this->persistEmailOwners($em);
+        $this->persistEmailUsers($em);
     }
 
     /**
@@ -178,7 +177,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function clear()
     {
         $this->changes = [];
-        $this->emailOwners = [];
+        $this->emailUsers = [];
         $this->folders = [];
         $this->origins = [];
         $this->addresses = [];
@@ -187,21 +186,21 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     /**
      * Removes all email objects from this batch processor
      */
-    public function removeEmailOwners()
+    public function removeEmailUsers()
     {
-        $this->emailOwners = [];
+        $this->emailUsers = [];
     }
 
     /**
-     * Persist UserEmailOwner objects
+     * Persist EmailUser objects
      *
      * @param EntityManager $em
      */
-    protected function persistEmailOwners(EntityManager $em)
+    protected function persistEmailUsers(EntityManager $em)
     {
         $this->processDuplicateEmails($em);
 
-        foreach ($this->emailOwners as $emailUser) {
+        foreach ($this->emailUsers as $emailUser) {
             $em->persist($emailUser);
 
             $this->eventDispatcher->dispatch(EmailUserAdded::NAME, new EmailUserAdded($emailUser));
@@ -219,7 +218,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         if (!empty($existingEmails)) {
             // add existing emails to new folders and remove these emails from the list
             foreach ($existingEmails as $existingEmail) {
-                foreach ($this->emailOwners as $key => $emailUser) {
+                foreach ($this->emailUsers as $key => $emailUser) {
                     if ($this->areEmailsEqual($emailUser->getEmail(), $existingEmail)) {
                         $oldEmail = $emailUser->getEmail();
                         $emailUser->setEmail($existingEmail);
@@ -241,7 +240,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     {
         // get distinct list of Message-ID
         $messageIds = [];
-        foreach ($this->emailOwners as $emailUser) {
+        foreach ($this->emailUsers as $emailUser) {
             $messageId = $emailUser->getEmail()->getMessageId();
             if (!empty($messageId)) {
                 $messageIds[$messageId] = $messageId;
@@ -340,7 +339,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function updateAddressReferences(EmailAddress $old, EmailAddress $new)
     {
-        foreach ($this->emailOwners as $emailUser) {
+        foreach ($this->emailUsers as $emailUser) {
             if ($emailUser->getEmail()->getFromEmailAddress() === $old) {
                 $emailUser->getEmail()->setFromEmailAddress($new);
             }
@@ -360,9 +359,9 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      */
     protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {
-        foreach ($this->emailOwners as $emailOwner) {
-            if ($emailOwner->getFolder() === $oldFolder) {
-                $emailOwner->setFolder($newFolder);
+        foreach ($this->emailUsers as $emailUser) {
+            if ($emailUser->getFolder() === $oldFolder) {
+                $emailUser->setFolder($newFolder);
             }
         }
     }

@@ -7,11 +7,11 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressOwnerManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 
 class EntityListener
 {
-    /** @var EmailAddressOwnerManager */
+    /** @var EmailOwnerManager */
     protected $emailOwnerManager;
 
     /** @var EmailActivityManager */
@@ -21,12 +21,12 @@ class EntityListener
     protected $emailThreadManager;
 
     /**
-     * @param EmailAddressOwnerManager    $emailOwnerManager
+     * @param EmailOwnerManager    $emailOwnerManager
      * @param EmailActivityManager $emailActivityManager
      * @param EmailThreadManager   $emailThreadManager
      */
     public function __construct(
-        EmailAddressOwnerManager    $emailOwnerManager,
+        EmailOwnerManager    $emailOwnerManager,
         EmailActivityManager $emailActivityManager,
         EmailThreadManager   $emailThreadManager
     ) {
