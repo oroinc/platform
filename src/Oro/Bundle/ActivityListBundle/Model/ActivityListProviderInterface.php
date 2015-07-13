@@ -6,6 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 
 interface ActivityListProviderInterface
 {
@@ -39,7 +40,7 @@ interface ActivityListProviderInterface
      * @param object $entity
      * @param ActivityList $activityList
      *
-     * @return array
+     * @return ActivityOwner[]
      */
     public function getActivityOwners($entity, ActivityList $activityList);
 
