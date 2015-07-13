@@ -25,6 +25,7 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
     /**
      * {@inheritdoc}
      */
