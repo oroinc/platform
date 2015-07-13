@@ -73,8 +73,10 @@ class ActivityListListener
         $this->deletedEntities = [];
 
         if ($this->activityListManager->processInsertEntities($this->insertedEntities, $entityManager)) {
-            $this->activityListManager->processFillOwners($this->insertedEntities, $entityManager);
+            $insertedEntitiesForOwners = $this->insertedEntities;
             $this->insertedEntities = [];
+            $entityManager->flush();
+            $this->activityListManager->processFillOwners($insertedEntitiesForOwners, $entityManager);
             $entityManager->flush();
         }
     }

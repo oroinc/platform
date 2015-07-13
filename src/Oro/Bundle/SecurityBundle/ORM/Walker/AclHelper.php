@@ -69,13 +69,22 @@ class AclHelper
      *
      * @return Criteria
      */
-    public function applyAclToCriteria($className, Criteria $criteria, $permission)
+    public function applyAclToCriteria($className, Criteria $criteria, $permission, $mapField = [])
     {
         $conditionData = $this->builder->getAclConditionData($className, $permission);
         if (!empty($conditionData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
                 = $conditionData;
+
+            if (isset($mapField[$organizationField])) {
+                $organizationField = $mapField[$organizationField];
+            }
+
+            if (isset($mapField[$entityField])) {
+                $entityField = $mapField[$entityField];
+            }
+
             if (!is_null($organizationField) && !is_null($organizationValue)) {
                 $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
             }

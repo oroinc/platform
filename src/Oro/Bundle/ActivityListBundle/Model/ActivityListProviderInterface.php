@@ -6,6 +6,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 
 interface ActivityListProviderInterface
 {
@@ -34,11 +35,14 @@ interface ActivityListProviderInterface
     public function getDescription($entity);
 
     /**
+     * Get array of ActivityOwners for list entity
+     *
      * @param object $entity
-     * @param ActivityList $activity
-     * @return array
+     * @param ActivityList $activityList
+     *
+     * @return ActivityOwner[]
      */
-    public function getActivityOwners($entity, ActivityList $activity);
+    public function getActivityOwners($entity, ActivityList $activityList);
 
     /**
      * @param ActivityList $activityListEntity
@@ -49,6 +53,7 @@ interface ActivityListProviderInterface
 
     /**
      * @param object $activityEntity
+     *
      * @return Organization|null
      */
     public function getOrganization($activityEntity);
@@ -76,6 +81,13 @@ interface ActivityListProviderInterface
      * @return string
      */
     public function getActivityClass();
+
+    /**
+     * returns a class name of entity for which we verify ACL
+     *
+     * @return string
+     */
+    public function getAclClass();
 
     /**
      * @param object $entity

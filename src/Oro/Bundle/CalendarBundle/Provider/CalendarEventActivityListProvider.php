@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 class CalendarEventActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ACL_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -55,6 +56,14 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**
@@ -157,11 +166,9 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param $entity
-     * @param ActivityList $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         $organization = $this->getOrganization($entity);
         $owner = $this->getOwner($entity);
@@ -171,7 +178,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         }
 
         $activityOwner = new ActivityOwner();
-        $activityOwner->setActivity($activity);
+        $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
         return [$activityOwner];

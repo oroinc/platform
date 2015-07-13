@@ -78,6 +78,16 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get array providers
+     *
+     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     */
+    public function getProviders()
+    {
+        return $this->providers;
+    }
+
+    /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
      * @param bool $regenerateCaches
@@ -290,14 +300,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            $description = $this->htmlTagHelper->stripTags(
+            $list->setDescription($this->htmlTagHelper->stripTags(
                 $this->htmlTagHelper->purify($provider->getDescription($entity))
-            );
-            $list->setDescription($description);
-            if ($this->hasCustomDate($provider)) {
-                $list->setCreatedAt($provider->getDate($entity));
-                $list->setUpdatedAt($provider->getDate($entity));
-            }
+            ));
+            $this->setDate($entity, $provider, $list);
             if ($this->hasGrouping($provider)) {
                 $list->setHead($provider->isHead($entity));
             }
@@ -346,5 +352,20 @@ class ActivityListChainProvider
     protected function hasGrouping(ActivityListProviderInterface $provider)
     {
         return $provider instanceof ActivityListGroupProviderInterface;
+    }
+
+    /**
+     * Set Create and Update fields
+     *
+     * @param $entity
+     * @param ActivityListProviderInterface $provider
+     * @param ActivityList $list
+     */
+    protected function setDate($entity, ActivityListProviderInterface $provider, $list)
+    {
+        if ($this->hasCustomDate($provider)) {
+            $list->setCreatedAt($provider->getDate($entity));
+            $list->setUpdatedAt($provider->getDate($entity));
+        }
     }
 }

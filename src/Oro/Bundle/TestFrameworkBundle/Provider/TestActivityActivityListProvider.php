@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 class TestActivityActivityListProvider implements ActivityListProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
+    const ACL_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -104,6 +105,14 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
@@ -130,11 +139,9 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * @param $entity
-     * @param $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         return [];
     }

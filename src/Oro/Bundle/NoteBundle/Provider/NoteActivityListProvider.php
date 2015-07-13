@@ -14,6 +14,7 @@ use Oro\Bundle\NoteBundle\Entity\Note;
 class NoteActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+    const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -56,6 +57,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**
@@ -140,11 +149,9 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     }
 
     /**
-     * @param $entity
-     * @param ActivityList $activity
-     * @return array
+     * {@inheritdoc}
      */
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         $organization = $this->getOrganization($entity);
         $owner = $entity->getOwner();
@@ -154,7 +161,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
         }
 
         $activityOwner = new ActivityOwner();
-        $activityOwner->setActivity($activity);
+        $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
         return [$activityOwner];
