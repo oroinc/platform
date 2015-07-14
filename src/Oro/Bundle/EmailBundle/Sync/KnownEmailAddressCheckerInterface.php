@@ -35,10 +35,11 @@ interface KnownEmailAddressCheckerInterface
     /**
      * Checks if at least one of given addresses belongs to a mailbox.
      *
-     * @param mixed $_ Email address(es) to check
-     *                 Each parameter can be a string or array of strings
+     * @param integer $mailboxId
+     * @param mixed   $_ Email address(es) to check
+     *                   Each parameter can be a string or array of strings
      *
      * @return bool
      */
-    public function isAtLeastOneMailboxEmailAddress($_);
+    public function isAtLeastOneMailboxEmailAddress($mailboxId, $_);
 }

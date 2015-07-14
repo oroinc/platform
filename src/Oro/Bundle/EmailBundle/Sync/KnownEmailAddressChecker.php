@@ -176,7 +176,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     /**
      * {@inheritdoc}
      */
-    public function isAtLeastOneMailboxEmailAddress($_)
+    public function isAtLeastOneMailboxEmailAddress($mailboxId, $_)
     {
         $emailsToLoad = [];
 
@@ -203,7 +203,11 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         if (!empty($emailsToLoad)) {
             $this->loadKnownEmailAddresses($emailsToLoad);
             foreach ($emailsToLoad as $email) {
-                if ($this->emails[$email]['known'] && isset($this->emails[$email]['mailbox'])) {
+                if (
+                    $this->emails[$email]['known'] &&
+                    isset($this->emails[$email]['mailbox']) &&
+                    ($this->emails[$email]['mailbox'] === $mailboxId)
+                ) {
                     return true;
                 }
             }

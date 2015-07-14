@@ -7,15 +7,21 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * @ORM\Table(name="oro_email_mailbox")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
  *
  * @Config(
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-envelope"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          }
  *      }
  * )
@@ -72,6 +78,14 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @ORM\Column(name="smtp_settings", type="array")
      */
     protected $smtpSettings;
+
+    /**
+     * @var OrganizationInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     public function __construct()
     {
@@ -228,6 +242,26 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function setOrigin($origin)
     {
         $this->origin = $origin;
+
+        return $this;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
 
         return $this;
     }
