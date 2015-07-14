@@ -35,11 +35,11 @@ define([
         },
 
         initSync: function(options) {
-            sync.subscribe('oro/email/user_%s', this.onNewEmail);
-            sync.publish('oro/email/user_%s', ['Hello, world!']);
+            sync.subscribe('oro/email/user_34', this.onNewEmail);
         },
 
         onNewEmail:function(e) {
+            alert(1);
             console.log(e);
         }
     });
