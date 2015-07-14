@@ -15,11 +15,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $email;
 
     /**
@@ -41,11 +36,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->setMethods(['getToken', 'getUser'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
@@ -62,15 +52,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($userId));
 
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($this->securityContext));
-
-        $this->securityContext->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($this->user));
-
-        $this->processor = new WebSocketSendProcessor($this->topicPublisher, $this->securityContext);
+        $this->processor = new WebSocketSendProcessor($this->topicPublisher);
     }
 
     public function testSendSuccess()
@@ -84,6 +66,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
         $emailUser = new EmailUser();
         $emailUser->setEmail($this->email);
+        $emailUser->setOwner($this->user);
 
         $this->processor->send($emailUser);
     }

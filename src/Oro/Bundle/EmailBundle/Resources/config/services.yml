@@ -191,7 +191,6 @@ services:
         class: %oro_email.email_websocket.processor.class%
         arguments:
             - @oro_wamp.publisher
-            - @security.context
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
