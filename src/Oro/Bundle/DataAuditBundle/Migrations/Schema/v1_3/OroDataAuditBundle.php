@@ -47,6 +47,10 @@ class OroDataAuditBundle implements Migration
         $oroAuditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('old_datetimetz', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $oroAuditFieldTable->addColumn('new_datetimetz', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $oroAuditFieldTable->setPrimaryKey(['id']);
         $oroAuditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 

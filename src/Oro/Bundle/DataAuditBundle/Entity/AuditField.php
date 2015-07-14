@@ -14,25 +14,27 @@ class AuditField
 {
     /** @var string[] */
     protected static $typeMap = [
-        'boolean'   => 'boolean',
-        'text'      => 'text',
-        'string'    => 'text',
-        'guid'      => 'text',
-        'manyToOne' => 'text',
-        'enum'      => 'text',
-        'multiEnum' => 'text',
-        'ref-many'  => 'text',
-        'ref-one'   => 'text',
-        'smallint'  => 'integer',
-        'integer'   => 'integer',
-        'bigint'    => 'integer',
-        'decimal'   => 'float',
-        'float'     => 'float',
-        'money'     => 'float',
-        'percent'   => 'float',
-        'date'      =>  'date',
-        'time'      => 'time',
-        'datetime'  => 'datetime',
+        'boolean'    => 'boolean',
+        'text'       => 'text',
+        'string'     => 'text',
+        'guid'       => 'text',
+        'manyToOne'  => 'text',
+        'enum'       => 'text',
+        'multiEnum'  => 'text',
+        'ref-many'   => 'text',
+        'ref-one'    => 'text',
+        'smallint'   => 'integer',
+        'integer'    => 'integer',
+        'bigint'     => 'integer',
+        'decimal'    => 'float',
+        'float'      => 'float',
+        'money'      => 'float',
+        'percent'    => 'float',
+        'date'       =>  'date',
+        'time'       => 'time',
+        'datetime'   => 'datetime',
+        'datetimetz' => 'datetimetz',
+        'object'     => 'object',
     ];
 
     /**
@@ -116,6 +118,20 @@ class AuditField
     protected $oldDatetime;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="old_datetimetz", type="datetimetz", nullable=true)
+     */
+    protected $oldDatetimetz;
+
+    /**
+     * @var object
+     *
+     * @ORM\Column(name="old_object", type="object", nullable=true)
+     */
+    protected $oldObject;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="new_integer", type="bigint", nullable=true)
@@ -163,6 +179,20 @@ class AuditField
      * @ORM\Column(name="new_datetime", type="datetime", nullable=true)
      */
     protected $newDatetime;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="new_datetimetz", type="datetimetz", nullable=true)
+     */
+    protected $newDatetimetz;
+
+    /**
+     * @var object
+     *
+     * @ORM\Column(name="new_object", type="object", nullable=true)
+     */
+    protected $newObject;
 
     /**
      * @param Audit $audit
