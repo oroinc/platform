@@ -44,9 +44,7 @@ class ActivityListAclCriteriaHelper
     {
         $aclCriteria = new Criteria();
         $mapFields = $this->getMapFields();
-        /**
-         * @var ActivityListProviderInterface $provider
-         */
+        /** @var ActivityListProviderInterface $provider */
         foreach ($providers as $provider) {
             $criteria = $this->getCriteriaByProvider($provider, $mapFields);
             $aclCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
@@ -68,15 +66,20 @@ class ActivityListAclCriteriaHelper
         $aclClass = $provider->getAclClass();
 
         $criteria = new Criteria();
-        $criteria = $this->aclHelper->applyAclToCriteria(
+        $appliedCriteria = $this->aclHelper->applyAclToCriteria(
             $aclClass,
             $criteria,
             'VIEW',
             $mapFields
         );
-        $criteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
+        // do not show without exists permissions on class
+        if (!$appliedCriteria->getWhereExpression()) {
+            $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityId', -1));
+        } else {
+            $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
+        }
 
-        return $criteria;
+        return $appliedCriteria;
     }
 
     /**
