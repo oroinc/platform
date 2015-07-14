@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface as TokenFactory;
 
 class OrganizationBasicAuthenticationListener
 {
@@ -38,12 +38,27 @@ class OrganizationBasicAuthenticationListener
     /** @var OrganizationManager */
     protected $manager;
 
+    /**
+     * @var TokenFactory
+     */
+    protected $tokenFactory;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     * @param AuthenticationManagerInterface $authenticationManager
+     * @param string $providerKey
+     * @param AuthenticationEntryPointInterface $authenticationEntryPoint
+     * @param OrganizationManager $manager
+     * @param TokenFactory $tokenFactory
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         SecurityContextInterface $securityContext,
         AuthenticationManagerInterface $authenticationManager,
         $providerKey,
         AuthenticationEntryPointInterface $authenticationEntryPoint,
         OrganizationManager $manager,
+        TokenFactory $tokenFactory,
         LoggerInterface $logger = null
     ) {
         if (empty($providerKey)) {
@@ -57,6 +72,7 @@ class OrganizationBasicAuthenticationListener
         $this->logger = $logger;
         $this->manager = $manager;
         $this->ignoreFailure = false;
+        $this->tokenFactory = $tokenFactory;
     }
 
     /**
@@ -86,12 +102,13 @@ class OrganizationBasicAuthenticationListener
         try {
             $organizationId = $request->headers->get('PHP_AUTH_ORGANIZATION');
             if ($organizationId) {
-                $authToken = new UsernamePasswordOrganizationToken(
-                    $username,
-                    $request->headers->get('PHP_AUTH_PW'),
-                    $this->providerKey,
-                    $this->manager->getOrganizationById($organizationId)
-                );
+                $authToken = $this->tokenFactory
+                    ->create(
+                        $username,
+                        $request->headers->get('PHP_AUTH_PW'),
+                        $this->providerKey,
+                        $this->manager->getOrganizationById($organizationId)
+                    );
             } else {
                 $authToken = new UsernamePasswordToken(
                     $username,

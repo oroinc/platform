@@ -45,6 +45,9 @@ parameters:
 
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
+    oro_security.token.factory.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
+    oro_security.token.factory.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
+
     oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
@@ -396,6 +399,12 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
+    oro_security.token.factory.username_password_organization:
+        class: %oro_security.token.factory.username_password_organization.class%
+
+    oro_security.token.factory.organization_rememberme:
+        class: %oro_security.token.factory.organization_rememberme.class%
+
     oro_security.authentication.listener.basic:
         class: %oro-security.authentication.listener.basic.class%
         arguments:
@@ -404,6 +413,7 @@ services:
             - null
             - null
             - @oro_organization.organization_manager
+            - @oro_security.token.factory.username_password_organization
             - @?logger
         public: false
         abstract: true
@@ -416,6 +426,8 @@ services:
             - null
             - @security.encoder_factory
             - %security.authentication.hide_user_not_found%
+        calls:
+            - [setTokenFactory, [@oro_security.token.factory.username_password_organization]]
         abstract: true
         public: false
 
@@ -423,6 +435,8 @@ services:
         class: %oro_security.authentication.provider.organization_rememberme.class%
         arguments:
             - @security.user_checker
+        calls:
+            - [setTokenFactory, [@oro_security.token.factory.organization_rememberme]]
         abstract: true
         public: false
 
