@@ -194,7 +194,6 @@ services:
         class: %oro_email.email_websocket.processor.class%
         arguments:
             - @oro_wamp.publisher
-            - @security.context
 
     oro_email.event_listener.email_user_listener:
         class: %oro_email.event_listener.email_user_listener.class%

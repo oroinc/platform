@@ -17,20 +17,12 @@ class WebSocketSendProcessor
     protected $publisher;
 
     /**
-     * @var SecurityContext
-     */
-    protected $securityContext;
-
-    /**
      * @param TopicPublisher $publisher
-     * @param SecurityContext $securityContext
      */
     public function __construct(
-        TopicPublisher $publisher,
-        SecurityContext $securityContext
+        TopicPublisher $publisher
     ) {
         $this->publisher = $publisher;
-        $this->securityContext = $securityContext;
     }
 
     /**
@@ -41,12 +33,10 @@ class WebSocketSendProcessor
      */
     public function send(EmailUser $emailUser)
     {
-        $token = $this->securityContext->getToken();
-
-        if ($token) {
+        if ($emailUser->getOwner()) {
             $messageData = ['email_id' => $emailUser->getEmail()->getId()];
             return $this->publisher->send(
-                sprintf(self::TOPIC, $token->getUser()->getId()),
+                sprintf(self::TOPIC, $emailUser->getOwner()->getId()),
                 json_encode($messageData)
             );
         }
