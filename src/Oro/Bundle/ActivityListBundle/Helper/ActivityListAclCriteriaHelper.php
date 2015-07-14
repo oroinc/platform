@@ -75,9 +75,8 @@ class ActivityListAclCriteriaHelper
         // do not show without exists permissions on class
         if (!$appliedCriteria->getWhereExpression()) {
             $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityId', -1));
-        } else {
-            $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
         }
+        $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
 
         return $appliedCriteria;
     }
