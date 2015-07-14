@@ -202,4 +202,47 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
     }
+
+    public function testGetSupportedOwnerActivities()
+    {
+        $ownerClasses = $this->provider->getSupportedOwnerActivities();
+        $this->assertCount(1, $ownerClasses);
+        $this->assertEquals([TestActivityProvider::ACL_CLASS], $ownerClasses);
+    }
+
+    public function testIsSupportedOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->with($testEntity)
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertTrue($this->provider->isSupportedEntity($testEntity));
+    }
+
+    public function testGetProviderForOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderForOwnerEntity($testEntity)
+        );
+    }
+
+    public function testGetProviderByOwnerClass()
+    {
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderByOwnerClass(TestActivityProvider::ACTIVITY_CLASS_NAME)
+        );
+    }
 }
