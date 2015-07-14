@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
-use Symfony\Component\Security\Core\SecurityContext;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class WebSocketSendProcessor
 {
@@ -19,10 +18,20 @@ class WebSocketSendProcessor
     /**
      * @param TopicPublisher $publisher
      */
-    public function __construct(
-        TopicPublisher $publisher
-    ) {
+    public function __construct(TopicPublisher $publisher)
+    {
         $this->publisher = $publisher;
+    }
+
+    /**
+     * Get user topic
+     *
+     * @param User $user
+     * @return string
+     */
+    public static function getUserTopic(User $user)
+    {
+        return sprintf(self::TOPIC, $user->getId());
     }
 
     /**
@@ -36,7 +45,7 @@ class WebSocketSendProcessor
         if ($emailUser->getOwner()) {
             $messageData = ['email_id' => $emailUser->getEmail()->getId()];
             return $this->publisher->send(
-                sprintf(self::TOPIC, $emailUser->getOwner()->getId()),
+                self::getUserTopic($emailUser->getOwner()),
                 json_encode($messageData)
             );
         }

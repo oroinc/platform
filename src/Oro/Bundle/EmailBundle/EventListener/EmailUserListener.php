@@ -3,16 +3,10 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-
-use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\UnitOfWork;
-use Doctrine\ORM\PersistentCollection;
-
-use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EmailUserListener
 {
@@ -37,8 +31,7 @@ class EmailUserListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $entities = $uow->getScheduledEntityInsertions();
-        $this->addEmailUserEntities($entities);
+        $this->collectEmailUserEntities($uow->getScheduledEntityInsertions());
     }
 
     /**
@@ -50,10 +43,17 @@ class EmailUserListener
             return;
         }
 
-
+        foreach ($this->insertedEmailUsersEntities as $insertedEntity) {
+            $this->processor->send($insertedEntity);
+        }
     }
 
-    protected function addEmailUserEntities($entities)
+    /**
+     * Collect EmailUser entities
+     *
+     * @param array $entities
+     */
+    protected function collectEmailUserEntities($entities)
     {
         if ($entities) {
             foreach ($entities as $entity) {
