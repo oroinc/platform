@@ -18,24 +18,10 @@ class ShareType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'users',
-                'entity',
+                'oro_user_organization_acl_multiselect',
                 [
-                    'class'    => 'OroUserBundle:User',
-                    'property' => 'username',
                     'label'    => 'oro.user.entity_plural_label',
                     'required' => false,
-                    'multiple' => true,
-                ]
-            )
-            ->add(
-                'businessunits',
-                'entity',
-                [
-                    'class'    => 'OroOrganizationBundle:BusinessUnit',
-                    'property' => 'name',
-                    'label'    => 'oro.organization.businessunit.entity_plural_label',
-                    'required' => false,
-                    'multiple' => true,
                 ]
             );
     }
