@@ -11,7 +11,7 @@ use Doctrine\Common\Cache\CacheProvider;
 class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var RouterInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface
      */
     protected $router;
 
@@ -51,7 +51,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider optionsWithResourceIdDataProvider
-     * @param array   $options
+     * @param array $options
      * @param boolean $isAllowed
      */
     public function testBuildOptionsWithResourceId($options, $isAllowed)
@@ -73,28 +73,36 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'allowed' => array(
-                array('aclResourceId' => 'test'), true
+                array('aclResourceId' => 'test'),
+                true
             ),
             'not allowed' => array(
-                array('aclResourceId' => 'test'), false
+                array('aclResourceId' => 'test'),
+                false
             ),
             'allowed with uri' => array(
-                array('aclResourceId' => 'test', 'uri' => '#'), true
+                array('aclResourceId' => 'test', 'uri' => '#'),
+                true
             ),
             'not allowed with uri' => array(
-                array('aclResourceId' => 'test', 'uri' => '#'), false
+                array('aclResourceId' => 'test', 'uri' => '#'),
+                false
             ),
             'allowed with route' => array(
-                array('aclResourceId' => 'test', 'route' => 'test'), true
+                array('aclResourceId' => 'test', 'route' => 'test'),
+                true
             ),
             'not allowed with route' => array(
-                array('aclResourceId' => 'test', 'route' => 'test'), false
+                array('aclResourceId' => 'test', 'route' => 'test'),
+                false
             ),
             'allowed with route and uri' => array(
-                array('aclResourceId' => 'test', 'uri' => '#', 'route' => 'test'), true
+                array('aclResourceId' => 'test', 'uri' => '#', 'route' => 'test'),
+                true
             ),
             'not allowed with route and uri' => array(
-                array('aclResourceId' => 'test', 'uri' => '#', 'route' => 'test'), false
+                array('aclResourceId' => 'test', 'uri' => '#', 'route' => 'test'),
+                false
             ),
         );
     }
@@ -121,6 +129,32 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $item = $this->factory->createItem('test', $options);
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
         $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
+    }
+
+    /**
+     * @param array $options
+     * @param bool $expected
+     *
+     * @dataProvider aclPolicyProvider
+     */
+    public function testDefaultPolicyOverride(array $options, $expected)
+    {
+        $item = $this->factory->createItem('test', $options);
+        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertEquals($expected, $item->getExtra('isAllowed'));
+    }
+
+    /**
+     * @return array
+     */
+    public function aclPolicyProvider()
+    {
+        return [
+            [[], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY],
+            [['extras' => []], AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY],
+            [['extras' => [AclAwareMenuFactoryExtension::ACL_POLICY_KEY => true]], true],
+            [['extras' => [AclAwareMenuFactoryExtension::ACL_POLICY_KEY => false]], false],
+        ];
     }
 
     public function testBuildOptionsWithUnknownUri()
