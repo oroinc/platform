@@ -124,6 +124,20 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get array with supported activity owner classes
+     *
+     * @return array
+     */
+    public function getSupportedOwnerActivities()
+    {
+        $ownerClasses = [];
+        foreach ($this->providers as $provider) {
+            $ownerClasses[] = $provider->getAclClass();
+        }
+        return $ownerClasses;
+    }
+
+    /**
      * Check if given activity entity supports by activity list providers
      *
      * @param $entity
@@ -133,6 +147,22 @@ class ActivityListChainProvider
     public function isSupportedEntity($entity)
     {
         return in_array($this->doctrineHelper->getEntityClass($entity), array_keys($this->providers));
+    }
+
+    /**
+     * Check if given owner activity entity supports by activity list providers
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function isSupportedOwnerEntity($entity)
+    {
+        $ownerClasses = [];
+        foreach ($this->providers as $provider) {
+            $ownerClasses[] = $provider->getAclClass();
+        }
+        return in_array($this->doctrineHelper->getEntityClass($entity), $ownerClasses);
     }
 
     /**
@@ -154,14 +184,24 @@ class ActivityListChainProvider
      *
      * @param object $entity
      * @param EntityManager $entityManager
+     *
      * @return mixed
      */
     public function getActivityListByEntity($entity, EntityManager $entityManager)
     {
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $entityId = $this->doctrineHelper->getEntityClass($entity);
+        foreach ($this->providers as $provider) {
+            if ($entityClass === $provider->getAclClass()) {
+                $entityClass = $provider->getActivityClass();
+                $entityId = $provider->getActivityId($entity);
+            }
+        }
+
         return $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
             [
-                'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
-                'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
+                'relatedActivityClass' => $entityClass,
+                'relatedActivityId'    => $entityId
             ]
         );
     }
@@ -259,6 +299,22 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list provider for given activity owner entity
+     *
+     * @param $activityOwnerEntity
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderForOwnerEntity($activityOwnerEntity)
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->getAclClass() === $this->doctrineHelper->getEntityClass($activityOwnerEntity)) {
+                return $this->getProviderForEntity($provider->getActivityClass());
+            }
+        }
+    }
+
+    /**
      * Get activity list provider for given activity entity
      *
      * @param $activityEntity
@@ -278,6 +334,18 @@ class ActivityListChainProvider
      * @return ActivityListProviderInterface
      */
     public function getProviderByClass($className)
+    {
+        return $this->providers[$className];
+    }
+
+    /**
+     * Get activity list provider for entity owner class name
+     *
+     * @param string $className
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderByOwnerClass($className)
     {
         return $this->providers[$className];
     }

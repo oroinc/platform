@@ -34,6 +34,17 @@ class CollectListManager
     }
 
     /**
+     * Check if given owner entity supports by activity list providers
+     *
+     * @param $entity
+     * @return bool
+     */
+    public function isSupportedOwnerEntity($entity)
+    {
+        return $this->chainProvider->isSupportedOwnerEntity($entity);
+    }
+
+    /**
      * @param array         $deletedEntities
      * @param EntityManager $entityManager
      */
@@ -76,6 +87,7 @@ class CollectListManager
     /**
      * @param array         $insertedEntities
      * @param EntityManager $entityManager
+     *
      * @return bool
      */
     public function processInsertEntities($insertedEntities, EntityManager $entityManager)
@@ -99,18 +111,24 @@ class CollectListManager
      *
      * @param array $entities
      * @param EntityManager $entityManager
+     *
+     * @return bool
      */
     public function processFillOwners($entities, EntityManager $entityManager)
     {
         if ($entities) {
             foreach ($entities as $entity) {
-                $activityProvider = $this->chainProvider->getProviderForEntity($entity);
+                $activityProvider = $this->chainProvider->getProviderForOwnerEntity($entity);
                 $activityList = $this->chainProvider->getActivityListByEntity($entity, $entityManager);
                 if ($activityList) {
                     $this->fillOwners($activityProvider, $entity, $activityList);
                 }
             }
+
+            return false;
         }
+
+        return false;
     }
 
     /**

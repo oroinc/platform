@@ -284,6 +284,9 @@ class EmailActivityListProvider implements
      */
     public function getActivityId($entity)
     {
+        if ($this->doctrineHelper->getEntityClass($entity) === self::ACL_CLASS) {
+            $entity = $entity->getEmail();
+        }
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
@@ -342,6 +345,7 @@ class EmailActivityListProvider implements
      */
     public function getActivityOwners($entity, ActivityList $activityList)
     {
+        $entity = $entity->getEmail();
         $filter = ['email' => $entity];
         $organization = $this->getOrganization($entity);
         if ($organization) {
@@ -355,11 +359,13 @@ class EmailActivityListProvider implements
 
         if ($owners) {
             foreach ($owners as $owner) {
-                $activityOwner = new ActivityOwner();
-                $activityOwner->setActivity($activityList);
-                $activityOwner->setOrganization($owner->getOrganization());
-                $activityOwner->setUser($owner->getOwner());
-                $activityArray[] = $activityOwner;
+                if ($owner->getOrganization() && $owner->getOwner()) {
+                    $activityOwner = new ActivityOwner();
+                    $activityOwner->setActivity($activityList);
+                    $activityOwner->setOrganization($owner->getOrganization());
+                    $activityOwner->setUser($owner->getOwner());
+                    $activityArray[] = $activityOwner;
+                }
             }
         }
 
