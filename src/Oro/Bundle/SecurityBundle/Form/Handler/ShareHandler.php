@@ -111,19 +111,57 @@ class ShareHandler
             $acl = $this->aclProvider->createAcl($objectIdentity);
         }
 
-        // remove previous aces
-        $oldAces = $acl->getObjectAces();
-        for ($i = 0; $i < count($oldAces); $i++) {
-            $acl->deleteObjectAce(0);
-        }
+        $fillOldSidsHandler = function($acl) {
+            $oldSids = [];
+            foreach ($acl->getObjectAces() as $ace) {
+                /** @var Entry $ace */
+                $oldSids[] = $ace->getSecurityIdentity();
+            }
 
+            return $oldSids;
+        };
+        $oldSids = $fillOldSidsHandler($acl);
+        // saves original value of old sids to extract new added elements
+        $oldSidsCopy = $oldSids;
+
+        $newSids = [];
         $users = $this->getUsers($model);
         foreach ($users as $user) {
-            $securityIdentity = UserSecurityIdentity::fromAccount($user);
-            $acl->insertObjectAce($securityIdentity, EntityMaskBuilder::MASK_VIEW_BASIC);
+            $newSids[] = UserSecurityIdentity::fromAccount($user);
+        }
+        // $oldSids - $newSids: to delete
+        foreach (array_diff($oldSids, $newSids) as $sid) {
+            $acl->deleteObjectAce(array_search($sid, $oldSids));
+            // fills array again because index was recalculated
+            $oldSids = $fillOldSidsHandler($acl);
+        }
+        // $newSids - $oldSids: to insert
+        foreach (array_diff($newSids, $oldSidsCopy) as $sid) {
+            $acl->insertObjectAce($sid, EntityMaskBuilder::MASK_VIEW_BASIC);
         }
 
         $this->aclProvider->updateAcl($acl);
+
+        if ((int)$objectIdentity->getIdentifier()) {
+            /** @var \Doctrine\ORM\EntityRepository $repo */
+            $repo = $this->manager->getRepository('OroSecurityBundle:AclEntry');
+            $queryBuilder = $repo->createQueryBuilder('ae');
+            $aceIds = [];
+
+            foreach ($acl->getObjectAces() as $ace) {
+                /** @var Entry $ace */
+                $aceIds[] = $ace->getId();
+            }
+
+            if ($aceIds) {
+                $queryBuilder
+                    ->update()
+                    ->set('ae.recordId', ':recordId')
+                    ->where($queryBuilder->expr()->in('ae.id', $aceIds))
+                    ->setParameter('recordId', $objectIdentity->getIdentifier());
+                $queryBuilder->getQuery()->execute();
+            }
+        }
     }
 
     /**
