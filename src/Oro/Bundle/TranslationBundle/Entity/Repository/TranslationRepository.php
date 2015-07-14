@@ -70,19 +70,19 @@ class TranslationRepository extends EntityRepository
     }
 
     /**
-     * Returns the list of all existing in the database translation domains for the given and fallback locales.
+     * Returns the list of all existing in the database translation domains for the given locales.
      *
-     * @param array $locales
+     * @param string[] $locales
      *
-     * @return array
+     * @return array [['locale' = '...', 'domain' => '...'], ...]
      */
-    public function findAvailableDomainsForLocales(array $locales = [])
+    public function findAvailableDomainsForLocales(array $locales)
     {
         $qb = $this->createQueryBuilder('t')
             ->distinct(true)
             ->select('t.locale', 't.domain')
-            ->andWhere('t.locale IN (:locales)')
-            ->setParameter('locales', $locales, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+            ->where('t.locale IN (:locales)')
+            ->setParameter('locales', $locales);
 
         return $qb->getQuery()->getArrayResult();
     }

@@ -178,12 +178,12 @@ class Translator extends BaseTranslator
                 $availableDomainsData = $this->container->get('doctrine')
                     ->getRepository(Translation::ENTITY_NAME)
                     ->findAvailableDomainsForLocales($locales);
-                foreach ($availableDomainsData as $translate) {
+                foreach ($availableDomainsData as $item) {
                     $this->addResource(
                         'oro_database_translation',
                         new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
-                        $translate['locale'],
-                        $translate['domain']
+                        $item['locale'],
+                        $item['domain']
                     );
                 }
             }
