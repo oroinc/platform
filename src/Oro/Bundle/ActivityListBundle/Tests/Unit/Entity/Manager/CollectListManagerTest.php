@@ -140,7 +140,7 @@ class CollectListManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getActivityOwners')
             ->willReturn([$activityOwner]);
         $this->chainProvider->expects($this->once())
-            ->method('getProviderForEntity')
+            ->method('getProviderForOwnerEntity')
             ->willReturn($emailProvider);
         $activity->expects($this->once())
             ->method('removeActivityOwner');
@@ -148,5 +148,17 @@ class CollectListManagerTest extends \PHPUnit_Framework_TestCase
             ->method('addActivityOwner');
 
         $this->manager->processFillOwners([$testEntity], $em);
+    }
+
+    public function testIsSupportedOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->chainProvider->expects($this->once())
+            ->method('isSupportedOwnerEntity')
+            ->with($testEntity)
+            ->willReturn(true);
+
+        $this->assertTrue($this->manager->isSupportedOwnerEntity($testEntity));
     }
 }
