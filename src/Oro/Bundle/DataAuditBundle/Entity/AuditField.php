@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use LogicException;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
+use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_audit_field")
+ * @Config
  */
-class AuditField
+class AuditField extends ExtendAuditField
 {
     /** @var string[] */
     protected static $typeMap = [
@@ -30,7 +35,7 @@ class AuditField
         'float'      => 'float',
         'money'      => 'float',
         'percent'    => 'float',
-        'date'       =>  'date',
+        'date'       => 'date',
         'time'       => 'time',
         'datetime'   => 'datetime',
         'datetimetz' => 'datetimetz',
@@ -203,6 +208,8 @@ class AuditField
      */
     public function __construct(Audit $audit, $field, $dataType, $newValue, $oldValue)
     {
+        parent::__construct();
+
         $this->audit = $audit;
         $this->field = $field;
 
@@ -282,6 +289,31 @@ class AuditField
     }
 
     /**
+     * @param type $doctrineType
+     * @param type $auditType
+     *
+     * @throws LogicException If type already exists
+     */
+    public static function addType($doctrineType, $auditType)
+    {
+        if (isset(static::$typeMap[$doctrineType])) {
+            throw new LogicException(sprintf('Type %s already exists.', $doctrineType));
+        }
+
+        static::$typeMap[$doctrineType] = $auditType;
+    }
+
+    /**
+     * @param string $doctrineType
+     *
+     * @return bool
+     */
+    public static function supportsType($doctrineType)
+    {
+        return isset(static::$typeMap[$doctrineType]);
+    }
+
+    /**
      * @param mixed $value
      *
      * @return this
@@ -314,6 +346,20 @@ class AuditField
      */
     protected function getPropertyName($type)
     {
-        return sprintf('%s%s', $type, ucfirst($this->dataType));
+        $name = sprintf('%s%s', $type, ucfirst($this->dataType));
+        if (property_exists(get_class($this), $name)) {
+            return $name;
+        }
+
+        $customName = sprintf('%s_%s', $type, $this->dataType);
+        if (property_exists(get_class($this), $customName)) {
+            return $customName;
+        }
+
+        throw new LogicException(sprintf(
+            'Neither property "%s" nor "%s" was found. Maybe you forget to add migration?',
+            $name,
+            $customName
+        ));
     }
 }

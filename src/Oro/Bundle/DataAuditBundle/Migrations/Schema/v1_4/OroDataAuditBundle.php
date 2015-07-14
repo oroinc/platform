@@ -19,9 +19,9 @@ class OroDataAuditBundle implements Migration
             return; // all columns were added in version 1.3
         }
 
-        $auditFieldTable->addColumn('old_datetimetz', 'datetime', ['notnull' => false]);
+        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', ['notnull' => false]);
         $auditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
-        $auditFieldTable->addColumn('new_datetimetz', 'datetime', ['notnull' => false]);
+        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
         $auditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
     }
 }

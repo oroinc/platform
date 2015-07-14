@@ -6,12 +6,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 
-use LogicException;
-
 use PDO;
 
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
@@ -21,31 +20,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 
     /** @var Connection */
     private $connection;
-
-    /** @var string[] */
-    protected static $typeMap = [
-        'boolean'    => 'boolean',
-        'text'       => 'text',
-        'string'     => 'text',
-        'guid'       => 'text',
-        'manyToOne'  => 'text',
-        'enum'       => 'text',
-        'multiEnum'  => 'text',
-        'ref-many'   => 'text',
-        'ref-one'    => 'text',
-        'smallint'   => 'integer',
-        'integer'    => 'integer',
-        'bigint'     => 'integer',
-        'decimal'    => 'float',
-        'float'      => 'float',
-        'money'      => 'float',
-        'percent'    => 'float',
-        'date'       =>  'date',
-        'time'       => 'time',
-        'datetime'   => 'datetime',
-        'datetimetz' => 'datetimetz',
-        'object'     => 'object',
-    ];
 
     /**
      * {@inheritdoc}
@@ -94,7 +68,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
         foreach ($fields as $field => $values) {
             $fieldType = $this->getFieldType($row['entity_id'], $field);
-            $dataType = $this->normalizeDataTypeName($fieldType);
+            $dataType = AuditField::normalizeDataTypeName($fieldType);
 
             $data = [
                 'audit_id' => $row['id'],
@@ -171,19 +145,5 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             ->select('a.id AS id, a.data AS data, ec.id AS entity_id')
             ->from('oro_audit', 'a')
             ->join('a', 'oro_entity_config', 'ec', 'a.object_class = ec.class_name');
-    }
-
-    /**
-     * @param string $dataType
-     *
-     * @return string|null
-     */
-    private function normalizeDataTypeName($dataType)
-    {
-        if (isset(static::$typeMap[$dataType])) {
-            return static::$typeMap[$dataType];
-        }
-
-        throw new LogicException(sprintf('Cannot normalize type "%s".', $dataType));
     }
 }
