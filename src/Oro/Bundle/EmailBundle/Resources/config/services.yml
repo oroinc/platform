@@ -42,6 +42,9 @@ parameters:
     # Entity config event listener
     oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
 
+    # Entity email user listener
+    oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
+
     # Providers
     oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
     oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
@@ -192,6 +195,14 @@ services:
         arguments:
             - @oro_wamp.publisher
             - @security.context
+
+    oro_email.event_listener.email_user_listener:
+        class: %oro_email.event_listener.email_user_listener.class%
+        arguments:
+            - @oro_email.email_websocket.processor
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
