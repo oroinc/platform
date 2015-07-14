@@ -6,13 +6,13 @@ How to add new auditable types
     ```php
     <?php
 
-    use Oro\Bundle\DataAuditBundle\Entity\AuditField;
+    use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
     class MyBundle extends Bundle
     {
         public function boot()
         {
-            AuditField::addType($doctrineType = 'datetimetz', $auditType = 'datetimetz');
+            AuditFieldTypeRegistry::addType($doctrineType = 'datetimetz', $auditType = 'datetimetz');
         }
     }
 ```

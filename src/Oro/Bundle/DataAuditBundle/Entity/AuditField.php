@@ -7,6 +7,7 @@ use LogicException;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -17,31 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class AuditField extends ExtendAuditField
 {
-    /** @var string[] */
-    protected static $typeMap = [
-        'boolean'    => 'boolean',
-        'text'       => 'text',
-        'string'     => 'text',
-        'guid'       => 'text',
-        'manyToOne'  => 'text',
-        'enum'       => 'text',
-        'multiEnum'  => 'text',
-        'ref-many'   => 'text',
-        'ref-one'    => 'text',
-        'smallint'   => 'integer',
-        'integer'    => 'integer',
-        'bigint'     => 'integer',
-        'decimal'    => 'float',
-        'float'      => 'float',
-        'money'      => 'float',
-        'percent'    => 'float',
-        'date'       => 'date',
-        'time'       => 'time',
-        'datetime'   => 'datetime',
-        'datetimetz' => 'datetimetz',
-        'object'     => 'object',
-    ];
-
     /**
      * @var int
      *
@@ -212,11 +188,7 @@ class AuditField extends ExtendAuditField
 
         $this->audit = $audit;
         $this->field = $field;
-
-        $this->dataType = static::normalizeDataTypeName($dataType);
-        if (is_null($this->dataType)) {
-            throw new UnsupportedDataTypeException($dataType);
-        }
+        $this->dataType = AuditFieldTypeRegistry::getAuditType($dataType);
 
         $this->setOldValue($oldValue);
         $this->setNewValue($newValue);
@@ -272,45 +244,6 @@ class AuditField extends ExtendAuditField
     public function getDataType()
     {
         return $this->dataType;
-    }
-
-    /**
-     * @param string $dataType
-     *
-     * @return string|null
-     */
-    public static function normalizeDataTypeName($dataType)
-    {
-        if (isset(static::$typeMap[$dataType])) {
-            return static::$typeMap[$dataType];
-        }
-
-        return null;
-    }
-
-    /**
-     * @param type $doctrineType
-     * @param type $auditType
-     *
-     * @throws LogicException If type already exists
-     */
-    public static function addType($doctrineType, $auditType)
-    {
-        if (isset(static::$typeMap[$doctrineType])) {
-            throw new LogicException(sprintf('Type %s already exists.', $doctrineType));
-        }
-
-        static::$typeMap[$doctrineType] = $auditType;
-    }
-
-    /**
-     * @param string $doctrineType
-     *
-     * @return bool
-     */
-    public static function supportsType($doctrineType)
-    {
-        return isset(static::$typeMap[$doctrineType]);
     }
 
     /**

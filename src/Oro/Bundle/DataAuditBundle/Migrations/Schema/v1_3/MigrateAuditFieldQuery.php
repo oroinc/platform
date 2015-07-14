@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 {
@@ -68,7 +69,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
         foreach ($fields as $field => $values) {
             $fieldType = $this->getFieldType($row['entity_id'], $field);
-            $dataType = AuditField::normalizeDataTypeName($fieldType);
+            $dataType = AuditFieldTypeRegistry::getAuditType($fieldType);
 
             $data = [
                 'audit_id' => $row['id'],
