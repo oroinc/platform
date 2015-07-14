@@ -50,6 +50,14 @@ class AuditFieldTypeRegistry
 
     /**
      * @param string $doctrineType
+     */
+    public static function removeType($doctrineType)
+    {
+        unset(static::$typeMap[$doctrineType]);
+    }
+
+    /**
+     * @param string $doctrineType
      * @param string $auditType
      */
     public static function overrideType($doctrineType, $auditType)
