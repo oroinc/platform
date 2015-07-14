@@ -1,10 +1,11 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var MultilineChartComponent,
-        Flotr = require('flotr2'),
-        dataFormatter = require('orochart/js/data_formatter'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var MultilineChartComponent;
+    var _ = require('underscore');
+    var Flotr = require('flotr2');
+    var dataFormatter = require('orochart/js/data_formatter');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.MultilineChartComponent
@@ -19,7 +20,7 @@ define(function (require) {
          */
         draw: function() {
             var options = this.options;
-            var $chart  = this.$chart;
+            var $chart = this.$chart;
             var xFormat = options.data_schema.label.type;
             var yFormat = options.data_schema.value.type;
             if (!$chart.get(0).clientWidth) {
@@ -29,12 +30,12 @@ define(function (require) {
             var rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
-                var sort = function (rawData) {
-                    rawData.sort(function (first, second) {
-                        if (first.label == null) {
+                var sort = function(rawData) {
+                    rawData.sort(function(first, second) {
+                        if (first.label === null || first.label === undefined) {
                             return -1;
                         }
-                        if (second.label == null) {
+                        if (second.label === null || second.label === undefined) {
                             return 1;
                         }
                         var firstLabel = dataFormatter.parseValue(first.label, xFormat);
@@ -57,9 +58,9 @@ define(function (require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[number]['label'] === null
-                            ? 'N/A'
-                            : rawData[number]['label'];
+                        label = rawData[number].label === null ?
+                            'N/A'
+                            : rawData[number].label;
                     } else {
                         label = '';
                     }
@@ -71,9 +72,9 @@ define(function (require) {
                 if (label === null) {
                     var number = parseInt(data);
                     if (rawData.length > number) {
-                        label = rawData[data]['value'] === null
-                            ? 'N/A'
-                            : rawData[data]['value'];
+                        label = rawData[data].value === null ?
+                            'N/A'
+                            : rawData[data].value;
                     } else {
                         label = '';
                     }
@@ -81,13 +82,16 @@ define(function (require) {
                 return label;
             };
 
-            var makeChart = function (rawData, count, key) {
+            var makeChart = function(rawData, count, key) {
                 var chartData = [];
 
                 for (var i in rawData) {
-                    var yValue = dataFormatter.parseValue(rawData[i]['value'], yFormat);
+                    if (!rawData.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    var yValue = dataFormatter.parseValue(rawData[i].value, yFormat);
                     yValue = yValue === null ? parseInt(i) : yValue;
-                    var xValue = dataFormatter.parseValue(rawData[i]['label'], xFormat);
+                    var xValue = dataFormatter.parseValue(rawData[i].label, xFormat);
                     xValue = xValue === null ? parseInt(i) : xValue;
 
                     var item = [xValue, yValue];
@@ -107,7 +111,7 @@ define(function (require) {
                 };
             };
 
-            _.each(rawData, function (rawData, key) {
+            _.each(rawData, function(rawData, key) {
                 var result = makeChart(rawData, count, key);
                 count++;
 
@@ -127,16 +131,16 @@ define(function (require) {
                     mouse: {
                         track: true,
                         relative: true,
-                        trackFormatter: function (pointData) {
-                            return pointData.series.label
-                                + ', ' + getXLabel(pointData.x)
-                                + ': ' + getYLabel(pointData.y);
+                        trackFormatter: function(pointData) {
+                            return pointData.series.label +
+                                ', ' + getXLabel(pointData.x) +
+                                ': ' + getYLabel(pointData.y);
                         }
                     },
                     yaxis: {
                         autoscale: true,
                         autoscaleMargin: 1,
-                        tickFormatter: function (y) {
+                        tickFormatter: function(y) {
                             return getYLabel(y);
                         },
                         title: options.data_schema.value.label
@@ -144,7 +148,7 @@ define(function (require) {
                     xaxis: {
                         autoscale: true,
                         autoscaleMargin: 0,
-                        tickFormatter: function (x) {
+                        tickFormatter: function(x) {
                             return getXLabel(x);
                         },
                         title:   options.data_schema.label.label,

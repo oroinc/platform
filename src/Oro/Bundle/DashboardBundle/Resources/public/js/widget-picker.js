@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'],
-    function (_, modal, mediator, __, routing) {
+define([
+    'jquery', 'underscore', 'backbone', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'
+], function($, _, Backbone, modal, mediator, __, routing) {
     'use strict';
 
     /**
@@ -60,7 +60,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         /**
          * @private
          */
-        _collapseDelegate: function(){
+        _collapseDelegate: function() {
             var $this = $(this);
             var container = $this.parents('.dashboard-widget-container');
             $this.toggleClass('collapsed-state');
@@ -71,7 +71,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @param {Event} event
          * @private
          */
-        _onClickAddToDashboard: function(event){
+        _onClickAddToDashboard: function(event) {
             var $control = $(event.target);
             if ($control.hasClass('disabled')) {
                 return;
@@ -87,7 +87,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
                     dashboardId: this.dashboardId,
                     targetColumn: this.targetColumn
                 },
-                function (response) {
+                function(response) {
                     mediator.trigger('dashboard:widget:add', response);
                     self._endLoading(controls, widgetContainer);
                 }, 'json'
@@ -99,7 +99,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @param {jQuery} widgetContainer current widget container
          * @private
          */
-        _startLoading: function(controls, widgetContainer){
+        _startLoading: function(controls, widgetContainer) {
             controls.addClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
             widgetButtonWrapper.addClass('loading-content');
@@ -111,21 +111,21 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @param {jQuery} widgetContainer current widget container
          * @private
          */
-        _endLoading: function(controls, widgetContainer){
+        _endLoading: function(controls, widgetContainer) {
             controls.removeClass('disabled');
             var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
             widgetButtonWrapper.removeClass('loading-content');
             //fix case if modal window closed after press and before loading complete
             widgetButtonWrapper.find('.add-widget-button').css('display', 'inline-block');
             var previous = widgetContainer.css('background-color');
-            var animateFinish = function () {
+            var animateFinish = function() {
                 animateFinish = function() {
                     widgetContainer.css({backgroundColor: ''});
                 };
                 widgetContainer.animate({backgroundColor: previous}, animateFinish);
             };
 
-            widgetContainer.animate({backgroundColor: "#F5F55B"}, 50, animateFinish);
+            widgetContainer.animate({backgroundColor: '#F5F55B'}, 50, animateFinish);
         },
 
         /**
@@ -135,7 +135,7 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _onClickAddWidget: function(event) {
             event.preventDefault();
             var columnIndex = $(event.target).closest('.dashboard-column').index();
-            this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
+            this.targetColumn = (columnIndex === -1) ? 0 : columnIndex;
             this.dialog.open();
         }
     };

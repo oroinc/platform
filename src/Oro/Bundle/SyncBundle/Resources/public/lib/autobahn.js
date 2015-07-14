@@ -13,7 +13,6 @@
  * See license text at http://www.opensource.org/licenses/mit-license.php
  */
 
-/*global console: false, MozWebSocket: false, when: false, CryptoJS: false */
 
 "use strict";
 

@@ -1,31 +1,29 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var SecurityAccessLevelsComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        routing = require('routing'),
-        _ = require('underscore'),
-        $ = require('jquery');
+    var SecurityAccessLevelsComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var routing = require('routing');
+    var _ = require('underscore');
+    var $ = require('jquery');
 
     SecurityAccessLevelsComponent = BaseComponent.extend({
-        element : null,
+        element: null,
 
-        defaultOptions : {
-            accessLevelLinkSelector : '.access_level_value a',
-            selectDivSelector : '.access_level_value_choice',
-            linkDivSelector : 'access_level_value_link',
-            accessLevelRoute : 'oro_security_access_levels',
-            objectIdentityAttribute : 'data-identity',
-            selectorNameAttribute : 'data-selector-name',
-            selectorIdAttribute : 'data-selector-id',
-            valueAttribute : 'data-value'
+        defaultOptions: {
+            accessLevelLinkSelector: '.access_level_value a',
+            selectDivSelector: '.access_level_value_choice',
+            linkDivSelector: 'access_level_value_link',
+            accessLevelRoute: 'oro_security_access_levels',
+            objectIdentityAttribute: 'data-identity',
+            selectorNameAttribute: 'data-selector-name',
+            selectorIdAttribute: 'data-selector-id',
+            valueAttribute: 'data-value'
         },
 
-        options : {},
+        options: {},
 
-        selectTemplate : _.template(
+        selectTemplate: _.template(
             '<select name="<%= name %>" id="<%= id %>" class="<%= className %>">' +
                 '<% $.each(options, function (value, text) { %>' +
                     '<option value="<%= value %>"' +
@@ -35,13 +33,13 @@ define(function (require) {
             '</select>'
         ),
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.extend({}, this.defaultOptions, options);
 
             this.element = options._sourceElement;
 
             var self = this;
-            this.element.on('click.' + this.cid, self.options.accessLevelLinkSelector, function () {
+            this.element.on('click.' + this.cid, self.options.accessLevelLinkSelector, function() {
                 var link = $(this);
                 var parentDiv = link.parents('.access_level_value').first();
                 var selectDiv = parentDiv.find(self.options.selectDivSelector);
@@ -51,13 +49,13 @@ define(function (require) {
                 oid = oid.replace(/\\/g, '_');
                 $.ajax({
                     url: routing.generate(self.options.accessLevelRoute, {oid: oid}),
-                    success: function (data) {
+                    success: function(data) {
                         var selector = $(self.selectTemplate({
-                            name : parentDiv.attr(self.options.selectorNameAttribute),
-                            id : parentDiv.attr(self.options.selectorIdAttribute),
-                            className : 'security-permission',
-                            options : _.omit(data, 'template_name'),
-                            selectedOption : parentDiv.attr(self.options.valueAttribute)
+                            name: parentDiv.attr(self.options.selectorNameAttribute),
+                            id: parentDiv.attr(self.options.selectorIdAttribute),
+                            className: 'security-permission',
+                            options: _.omit(data, 'template_name'),
+                            selectedOption: parentDiv.attr(self.options.valueAttribute)
                         }));
 
                         selectDiv.append(selector);
@@ -65,7 +63,7 @@ define(function (require) {
                         linkDiv.remove();
                         selector.uniform('update');
                     },
-                    error: function () {
+                    error: function() {
                         link.show();
                     }
                 });
@@ -77,7 +75,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
