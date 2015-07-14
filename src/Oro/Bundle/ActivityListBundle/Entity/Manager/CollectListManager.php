@@ -125,7 +125,7 @@ class CollectListManager
                 }
             }
 
-            return false;
+            return true;
         }
 
         return false;
