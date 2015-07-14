@@ -326,7 +326,7 @@ class TypesRegistry
      *
      * @return boolean
      */
-    public function supportsForceSync($integration)
+    public function supportsForceSync(Integration $integration)
     {
         $connectors = $this->getRegisteredConnectorsTypes($integration->getType());
 
