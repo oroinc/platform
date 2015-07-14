@@ -32,7 +32,7 @@ parameters:
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
-
+    oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -186,6 +186,11 @@ services:
           - @oro_email.activity_list.provider
           - @oro_email.provider.email_attachment_provider
           - @oro_email.form.factory
+
+    oro_email.email_websocket.processor:
+        class: %oro_email.email_websocket.processor.class%
+        arguments:
+            - @oro_wamp.publisher
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
