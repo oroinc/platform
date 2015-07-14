@@ -1,21 +1,23 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var _ = require('underscore'),
-        Backbone = require('backbone'),
-        Rule = function (context) {
-            this.context = context || this;
-            this.root = null;
-            this.items = [];
-        }
+
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+
+    function Rule(context) {
+        this.context = context || this;
+        this.root = null;
+        this.items = [];
+    }
     _.extend(Rule.prototype, {
 
         priority: 10,
 
-        match: function(){
+        match: function() {
             return false;
         },
 
-        apply: function(){
+        apply: function() {
             return;
         }
     });

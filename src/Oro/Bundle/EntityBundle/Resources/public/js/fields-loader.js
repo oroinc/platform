@@ -1,5 +1,3 @@
-/*global define*/
-/*jslint nomen: true*/
 define([
     'jquery',
     'underscore',
@@ -8,7 +6,7 @@ define([
     'oroui/js/messenger',
     'oroui/js/tools',
     'jquery-ui'
-], function ($, _, routing, __, messenger, tools) {
+], function($, _, routing, __, messenger, tools) {
     'use strict';
 
     /**
@@ -21,10 +19,10 @@ define([
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog
             confirm: null,
-            requireConfirm: function () { return true; }
+            requireConfirm: function() { return true; }
         },
 
-        _create: function () {
+        _create: function() {
             this.setFieldsData(this.element.data('fields') || []);
 
             this._on({
@@ -32,9 +30,10 @@ define([
             });
         },
 
-        _onChange: function (e, extraArgs) {
+        _onChange: function(e, extraArgs) {
             _.extend(e, extraArgs);
-            var oldVal, confirm = this.options.confirm;
+            var oldVal;
+            var confirm = this.options.confirm;
             if (confirm && this.options.requireConfirm()) {
                 // @todo support also other kind of inputs than select2
                 oldVal = (e.removed && e.removed.id) || null;
@@ -44,13 +43,13 @@ define([
             }
         },
 
-        loadFields: function () {
-            var routeName = this.options.router,
-                routeParams = this.options.routingParams;
+        loadFields: function() {
+            var routeName = this.options.router;
+            var routeParams = this.options.routingParams;
 
             var additionalRequestParams = this.element.data('select2_query_additional_params');
             if (additionalRequestParams) {
-                routeParams = $.extend({}, routeParams, additionalRequestParams )
+                routeParams = $.extend({}, routeParams, additionalRequestParams);
             }
 
             $.ajax({
@@ -62,27 +61,27 @@ define([
             });
         },
 
-        getEntityName: function () {
+        getEntityName: function() {
             return this.element.val();
         },
 
-        setFieldsData: function (data) {
+        setFieldsData: function(data) {
             var fields = this._convertData(data);
             this.element.data('fields', fields);
             this._trigger('update', null, [fields]);
         },
 
-        getFieldsData: function () {
+        getFieldsData: function() {
             return this.element.data('fields');
         },
 
-        _confirm: function (confirm, newVal, oldVal) {
+        _confirm: function(confirm, newVal, oldVal) {
             if (!oldVal) {
                 return;
             }
-            var $el = this.element,
-                load = $.proxy(this.loadFields, this),
-                revert = $.proxy(function () {
+            var $el = this.element;
+            var load = $.proxy(this.loadFields, this);
+            var revert = $.proxy(function() {
                     var $entityChoice = $el.data('relatedChoice');
                     if ($entityChoice && $entityChoice.val() !== oldVal) {
                         $entityChoice.val(oldVal).change();
@@ -94,20 +93,20 @@ define([
                 }, this);
             confirm.on('ok', load);
             confirm.on('cancel', revert);
-            confirm.once('hidden', function () {
+            confirm.once('hidden', function() {
                 confirm.off('ok', load);
                 confirm.off('cancel', revert);
             });
             confirm.open();
         },
 
-        _onLoaded: function (data) {
+        _onLoaded: function(data) {
             this.setFieldsData(data);
         },
 
-        _onError: function (jqXHR) {
-            var err = jqXHR.responseJSON,
-                msg = __('Sorry, unexpected error was occurred');
+        _onError: function(jqXHR) {
+            var err = jqXHR.responseJSON;
+            var msg = __('Sorry, unexpected error was occurred');
             if (tools.debug) {
                 if (err.message) {
                     msg += ': ' + err.message;
@@ -127,11 +126,11 @@ define([
          * @returns {Array}
          * @private
          */
-        _convertData: function (data) {
-            $.each(data, function () {
+        _convertData: function(data) {
+            $.each(data, function() {
                 var entity = this;
                 entity.fieldsIndex = {};
-                $.each(entity.fields, function () {
+                $.each(entity.fields, function() {
                     var field = this;
                     if (field.relation_type && field.related_entity_name) {
                         field.related_entity = data[field.related_entity_name];

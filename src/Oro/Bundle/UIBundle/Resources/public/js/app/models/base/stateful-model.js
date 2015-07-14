@@ -1,15 +1,15 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var StatefulModel,
-        _ = require('underscore'),
-        Backbone = require('backbone'),
-        BaseModel = require('./model'),
-        HistoryModel = require('../history-model'),
-        HistoryStateModel = require('../history-state-model');
+    var StatefulModel;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var BaseModel = require('./model');
+    var HistoryModel = require('../history-model');
+    var HistoryStateModel = require('../history-state-model');
 
     StatefulModel = BaseModel.extend({
-        initialize: function () {
+        initialize: function() {
             var historyOptions = {};
             StatefulModel.__super__.initialize.apply(this, arguments);
             if ('MAX_HISTORY_LENGTH' in this) {
@@ -21,20 +21,19 @@ define(function (require) {
             this.bindEvents();
         },
 
-        destroy: function () {
+        destroy: function() {
             StatefulModel.__super__.destroy.apply(this, arguments);
             this.unbindEvents();
         },
 
-        bindEvents: function () {
+        bindEvents: function() {
             if ('observedAttributes' in this) {
-                _.each(this.observedAttributes, function (attrName){
-                    var eventName,
-                        prop = this.get(attrName);
+                _.each(this.observedAttributes, function(attrName) {
+                    var prop = this.get(attrName);
                     if (prop instanceof Backbone.Collection) {
-                        eventName = 'change add remove';
+                        var eventName = 'change add remove';
                         prop.on(eventName, this.debouncedOnStateChange, this);
-                        this.on('change:' + attrName, function (model, collection) {
+                        this.on('change:' + attrName, function(model, collection) {
                             prop.off(eventName, this.debouncedOnStateChange, this);
                             collection.on(eventName, this.debouncedOnStateChange, this);
                         }, this);
@@ -47,9 +46,9 @@ define(function (require) {
             }
         },
 
-        unbindEvents: function () {
+        unbindEvents: function() {
             if ('observedAttributes' in this) {
-                _.each(this.observedAttributes, function (attrName){
+                _.each(this.observedAttributes, function(attrName) {
                     var prop = this.get(attrName);
                     if (prop instanceof Backbone.Collection) {
                         prop.off('change add remove', this.debouncedOnStateChange, this);
@@ -63,18 +62,18 @@ define(function (require) {
             }
         },
 
-        onStateChange: function () {
+        onStateChange: function() {
             var state = new HistoryStateModel({
                 data: this.getState()
-            })
+            });
             this.history.pushState(state);
         },
 
-        getState: function () {
+        getState: function() {
             throw new Error('Method getState should be defined in a inherited class.');
         },
 
-        setState: function () {
+        setState: function() {
             throw new Error('Method getState should be defined in a inherited class.');
         }
     });

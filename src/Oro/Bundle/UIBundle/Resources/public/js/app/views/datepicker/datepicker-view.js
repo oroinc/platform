@@ -1,13 +1,12 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DatePickerView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        moment = require('moment'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        localeSettings  = require('orolocale/js/locale-settings');
+    var DatePickerView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var moment = require('moment');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     DatePickerView = BaseView.extend({
@@ -43,7 +42,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = {};
             $.extend(true, opts, this.defaults, options);
             $.extend(this, _.pick(opts, ['nativeMode']));
@@ -70,7 +69,7 @@ define(function (require) {
          *
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -87,7 +86,7 @@ define(function (require) {
          *
          * @param {string} value
          */
-        setValue: function (value) {
+        setValue: function(value) {
             this.$el.val(value).trigger('change');
         },
 
@@ -96,7 +95,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        createFrontField: function (options) {
+        createFrontField: function(options) {
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
@@ -106,10 +105,10 @@ define(function (require) {
 
         /**
          * Initializes date picker widget
-         * 
+         *
          * @param {Object} options
          */
-        initPickerWidget: function (options) {
+        initPickerWidget: function(options) {
             var widgetOptions = options.datePickerOptions;
             _.extend(widgetOptions, {
                 onSelect: _.bind(this.onSelect, this)
@@ -120,14 +119,14 @@ define(function (require) {
         /**
          * Destroys picker widget
          */
-        destroyPickerWidget: function () {
+        destroyPickerWidget: function() {
             this.$frontDateField.datepicker('destroy');
         },
 
         /**
          * Handles pick date event
          */
-        onSelect: function () {
+        onSelect: function() {
             var form = this.$frontDateField.parents('form');
             if (form.length && form.data('validator')) {
                 form.validate()
@@ -141,14 +140,14 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        updateOrigin: function (e) {
+        updateOrigin: function(e) {
             this.$el.val(this.getBackendFormattedValue());
         },
 
         /**
          * Update front date field value
          */
-        updateFront: function () {
+        updateFront: function() {
             this.$frontDateField.val(this.getFrontendFormattedDate());
         },
 
@@ -157,10 +156,10 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
-            var value = '',
-                momentInstance = this.getFrontendMoment(),
-                format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+        getBackendFormattedValue: function() {
+            var value = '';
+            var momentInstance = this.getFrontendMoment();
+            var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
                 value = momentInstance.format(format);
             }
@@ -172,9 +171,9 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
-            var value = '',
-                momentInstance = this.getOriginalMoment();
+        getFrontendFormattedDate: function() {
+            var value = '';
+            var momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.format(this.getDateFormat());
             }
@@ -186,11 +185,10 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getOriginalMoment: function () {
-            var value, format, momentInstance;
-            value = this.$el.val();
-            format = this.backendFormat;
-            momentInstance = moment.utc(value, format, true);
+        getOriginalMoment: function() {
+            var value = this.$el.val();
+            var format = this.backendFormat;
+            var momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }
@@ -201,11 +199,10 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getFrontendMoment: function () {
-            var value, format, momentInstance;
-            value = this.$frontDateField.val();
-            format = this.getDateFormat();
-            momentInstance = moment.utc(value, format, true);
+        getFrontendMoment: function() {
+            var value = this.$frontDateField.val();
+            var format = this.getDateFormat();
+            var momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }
@@ -216,7 +213,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getDateFormat: function () {
+        getDateFormat: function() {
             return this.nativeMode ? this.nativeDateFormat : datetimeFormatter.getDateFormat();
         }
     });

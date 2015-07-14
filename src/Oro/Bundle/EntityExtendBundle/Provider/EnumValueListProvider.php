@@ -84,6 +84,7 @@ class EnumValueListProvider implements DictionaryValueListProviderInterface
 
         return [
             'exclusion_policy' => 'all',
+            'hints'            => ['HINT_TRANSLATABLE'],
             'fields'           => $fields
         ];
     }

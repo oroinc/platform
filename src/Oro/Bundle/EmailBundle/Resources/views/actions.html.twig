@@ -40,6 +40,41 @@
     {% endif %}
 {% endmacro -%}
 
+{% macro replyAllButton(emailEntity, parameters = {}) -%}
+    {% if resource_granted('oro_email_email_create') %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {%- set routeParameters = {
+        id: emailEntity.id
+        } -%}
+        {%- if parameters.routeParameters is defined %}
+            {%- set routeParameters = routeParameters|merge(parameters.routeParameters) -%}
+        {% endif -%}
+        {{- UI.clientButton({
+            'dataUrl': path('oro_email_email_reply_all', routeParameters),
+            'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply-all' : 'icon-reply-all',
+            'label': 'oro.email.reply_all'|trans,
+            'widget': {
+                'type': 'dialog',
+                'multiple': false,
+                'refresh-widget-alias': 'activity-list-widget',
+                'reload-widget-alias': 'thread-view',
+                'options': {
+                    'alias': 'reply-all-dialog',
+                    'dialogOptions' : {
+                        'title' : 'oro.email.reply_all'|trans,
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'width': 1000
+                    }
+                }
+            }
+        }) -}}
+    {% endif %}
+{% endmacro -%}
+
 {% macro replyButton(emailEntity, parameters = {}) -%}
     {% if resource_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}

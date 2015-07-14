@@ -1,6 +1,7 @@
 parameters:
     oro_email.email.entity.class:                 Oro\Bundle\EmailBundle\Entity\Email
     oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
+    oro_email.email_origin.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailOrigin
     oro_email.email_user.entity.class:            Oro\Bundle\EmailBundle\Entity\EmailUser
     oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
@@ -18,6 +19,7 @@ parameters:
     oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
+    oro_email.manager.email_origin.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailOriginApiEntityManager
     oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
@@ -232,6 +234,13 @@ services:
             - @oro_entity_config.config_manager
             - @oro_security.security_facade
             - @router
+
+    oro_email.manager.email_origin.api:
+        class: %oro_email.manager.email_origin.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email_origin.entity.class%
+            - @doctrine.orm.entity_manager
 
     oro_email.direct_mailer:
         class: %oro_email.direct_mailer.class%

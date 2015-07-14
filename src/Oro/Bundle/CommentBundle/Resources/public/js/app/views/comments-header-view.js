@@ -1,10 +1,9 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var CommentsHeaderView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        template = require('text!../../../templates/comment/comments-header-view.html');
+    var CommentsHeaderView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('text!../../../templates/comment/comments-header-view.html');
 
     CommentsHeaderView = BaseView.extend({
         template: template,
@@ -21,7 +20,7 @@ define(function (require) {
             'click a.load-more': 'onLoadMoreClick'
         },
 
-        onLoadMoreClick: function (e) {
+        onLoadMoreClick: function(e) {
             e.stopImmediatePropagation();
             this.$el.trigger('comment-load-more');
         }
