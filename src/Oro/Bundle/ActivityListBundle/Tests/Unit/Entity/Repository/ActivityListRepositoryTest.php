@@ -36,13 +36,13 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider paramsProvider
      *
-     * @param string $entityClass
-     * @param integer $entityId
-     * @param array $activityClasses
+     * @param string    $entityClass
+     * @param integer   $entityId
+     * @param array     $activityClasses
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
-     * @param integer $andWhereCount Number of andWhere() calls
-     * @param integer $setParameterCount Number of setParameter() calls
+     * @param integer   $andWhereCount Number of andWhere() calls
+     * @param integer   $setParameterCount Number of setParameter() calls
      */
     public function testGetActivityListQueryBuilder(
         $entityClass,
@@ -52,8 +52,7 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
         $dateTo,
         $andWhereCount,
         $setParameterCount
-    )
-    {
+    ) {
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -124,19 +123,19 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function paramsProvider()
     {
-        $now = new \DateTime();
-        $past = clone $now;
-        $past = $past->sub(new \DateInterval("P2M"));
-        $className = 'Acme\Bundle\AcmeBundle\Entity\Test';
+        $now          = new \DateTime();
+        $past         = clone $now;
+        $past         = $past->sub(new \DateInterval("P2M"));
+        $className    = 'Acme\Bundle\AcmeBundle\Entity\Test';
         $activityName = 'Acme\Bundle\AcmeBundle\Activity\Test';
 
         return [
-            'default' => [$className, 1, [], null, null, 0, 1],
-            'both_date_empty' => [$className, 1, [$activityName], null, null, 1, 2],
-            'dateFrom_empty' => [$className, 1, [$activityName], null, $now, 1, 2],
+            'default'              => [$className, 1, [], null, null, 0, 1],
+            'both_date_empty'      => [$className, 1, [$activityName], null, null, 1, 2],
+            'dateFrom_empty'       => [$className, 1, [$activityName], null, $now, 1, 2],
             'dateTo_classes_empty' => [$className, 1, [], $past, null, 1, 2],
-            'dateTo_empty' => [$className, 1, [$activityName], $past, null, 2, 3],
-            'all_params' => [$className, 1, [$activityName], $past, $now, 2, 4]
+            'dateTo_empty'         => [$className, 1, [$activityName], $past, null, 2, 3],
+            'all_params'           => [$className, 1, [$activityName], $past, $now, 2, 4]
         ];
     }
 }
