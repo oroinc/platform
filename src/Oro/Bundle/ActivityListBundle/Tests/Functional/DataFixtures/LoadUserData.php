@@ -35,7 +35,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $manager->flush();
     }
 
-    protected function initUser (ObjectManager $manager)
+    protected function initUser(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
