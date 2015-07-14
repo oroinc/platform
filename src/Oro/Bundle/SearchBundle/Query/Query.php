@@ -2,108 +2,108 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 
 class Query
 {
     const SELECT = 'select';
 
-    const ORDER_ASC = 'asc';
+    const ORDER_ASC  = 'asc';
     const ORDER_DESC = 'desc';
 
-    const KEYWORD_FROM = 'from';
-    const KEYWORD_WHERE = 'where';
-    const KEYWORD_AND = 'and';
-    const KEYWORD_OR = 'or';
-    const KEYWORD_OFFSET = 'offset';
+    const KEYWORD_FROM        = 'from';
+    const KEYWORD_WHERE       = 'where';
+    const KEYWORD_AND         = 'and';
+    const KEYWORD_OR          = 'or';
+    const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
-    const KEYWORD_ORDER_BY = 'order_by';
+    const KEYWORD_ORDER_BY    = 'order_by';
 
-    const OPERATOR_EQUALS = '=';
-    const OPERATOR_NOT_EQUALS = '!=';
-    const OPERATOR_GREATER_THAN = '>';
+    const OPERATOR_EQUALS              = '=';
+    const OPERATOR_NOT_EQUALS          = '!=';
+    const OPERATOR_GREATER_THAN        = '>';
     const OPERATOR_GREATER_THAN_EQUALS = '>=';
-    const OPERATOR_LESS_THAN = '<';
-    const OPERATOR_LESS_THAN_EQUALS = '<=';
-    const OPERATOR_CONTAINS = '~';
-    const OPERATOR_NOT_CONTAINS = '!~';
-    const OPERATOR_IN = 'in';
-    const OPERATOR_NOT_IN = '!in';
+    const OPERATOR_LESS_THAN           = '<';
+    const OPERATOR_LESS_THAN_EQUALS    = '<=';
+    const OPERATOR_CONTAINS            = '~';
+    const OPERATOR_NOT_CONTAINS        = '!~';
+    const OPERATOR_IN                  = 'in';
+    const OPERATOR_NOT_IN              = '!in';
 
-    const TYPE_TEXT = 'text';
-    const TYPE_INTEGER = 'integer';
+    const TYPE_TEXT     = 'text';
+    const TYPE_INTEGER  = 'integer';
     const TYPE_DATETIME = 'datetime';
-    const TYPE_DECIMAL = 'decimal';
+    const TYPE_DECIMAL  = 'decimal';
 
     const INFINITY = 10000000;
     const FINITY   = 0.000001;
 
     const DELIMITER = ' ';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options;
 
-    /**
-     * @var  string
-     */
+    /** @var  string */
     protected $query;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $maxResults;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $firstResult;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $from;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $orderType;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $orderBy;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $orderDirection;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $mappingConfig;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fields;
 
-    /**
-     * @var ObjectManager
-     */
-    private $em;
+    /** @var Criteria */
+    protected $criteria;
 
+    /**
+     * @param null|string $queryType
+     */
     public function __construct($queryType = null)
     {
         if ($queryType) {
             $this->createQuery($queryType);
         }
 
-        $this->options    = array();
         $this->maxResults = 0;
         $this->from       = false;
+
+        $this->options  = [];
+        $this->criteria = Criteria::create();
+    }
+
+    /**
+     * @return Criteria
+     */
+    public function getCriteria()
+    {
+        return $this->criteria;
+    }
+
+    /**
+     * @param Criteria $criteria
+     */
+    public function setCriteria(Criteria $criteria)
+    {
+        $this->criteria = $criteria;
     }
 
     /**
@@ -131,7 +131,7 @@ class Query
      */
     public function setMappingConfig($mappingConfig)
     {
-        $fields = array();
+        $fields = [];
 
         foreach ($mappingConfig as $entity => $config) {
             foreach ($config['fields'] as $field) {
