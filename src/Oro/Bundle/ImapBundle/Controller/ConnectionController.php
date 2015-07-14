@@ -40,12 +40,13 @@ class ConnectionController extends Controller
 
         $form = $this->createForm(
             'oro_imap_configuration',
-            $data,
+            null,
             [
                 'csrf_protection' => false,
                 'validation_groups' => ['Check'],
             ]
         );
+        $form->setData($data);
         $form->submit($this->getRequest());
         /** @var ImapEmailOrigin $origin */
         $origin = $form->getData();

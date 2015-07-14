@@ -54,7 +54,8 @@ class ConfigurationType extends AbstractType
     {
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
-        $this->addListener($builder);
+        $this->addApplySyncListener($builder);
+        $this->addSetOriginToFoldersListener($builder);
 
         $builder
             ->add(
@@ -65,7 +66,13 @@ class ConfigurationType extends AbstractType
             ->add(
                 'host',
                 'text',
-                ['label' => 'oro.imap.configuration.host.label', 'required' => true]
+                [
+                    'label' => 'oro.imap.configuration.host.label',
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'critical-field',
+                    ],
+                ]
             )
             ->add(
                 'port',
@@ -86,7 +93,13 @@ class ConfigurationType extends AbstractType
             ->add(
                 'user',
                 'text',
-                ['label' => 'oro.imap.configuration.user.label', 'required' => true]
+                [
+                    'label' => 'oro.imap.configuration.user.label',
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'critical-field',
+                    ],
+                ]
             )
             ->add(
                 'password',
@@ -98,21 +111,44 @@ class ConfigurationType extends AbstractType
             ])
             ->add('folders', 'oro_email_email_folder_tree', [
                 'label' => $this->translator->trans('oro.email.folders.label'),
+                'attr' => [
+                    'class' => 'folder-tree',
+                ],
             ]);
     }
 
     /**
      * @param FormBuilderInterface $builder
      */
-    protected function addListener(FormBuilderInterface $builder)
+    protected function addSetOriginToFoldersListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if ($data !== null && $data instanceof ImapEmailOrigin) {
+                    foreach ($data->getFolders() as $folder) {
+                        $folder->setOrigin($data);
+                    }
+
+                    $event->setData($data);
+                }
+            }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addApplySyncListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = $event->getData();
-                if (array_key_exists('folders', $data)) {
-                    $form = $event->getForm();
+                $form = $event->getForm();
 
+                if (array_key_exists('folders', $data)) {
                     /** @var ImapEmailOrigin $origin */
                     $origin = $form->getData();
 
@@ -122,6 +158,8 @@ class ConfigurationType extends AbstractType
                         $form->remove('folders');
                         unset($data['folders']);
                     }
+                } else {
+                    $form->remove('folders');
                 }
                 $event->setData($data);
             }
@@ -183,7 +221,7 @@ class ConfigurationType extends AbstractType
                     $event->setData($data);
 
                     if ($entity instanceof ImapEmailOrigin
-                        && ($entity->getHost() != $data['host'] || $entity->getUser() != $data['user'])
+                        && ($entity->getHost() !== $data['host'] || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new ImapEmailOrigin();

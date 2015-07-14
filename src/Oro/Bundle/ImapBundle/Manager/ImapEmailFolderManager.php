@@ -111,13 +111,9 @@ class ImapEmailFolderManager
      */
     protected function removeOutdated($existingFolders)
     {
-        $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         /** @var ImapEmailFolder $existingFolder */
         foreach ($existingFolders as $existingFolder) {
-            $emailFolder = $existingFolder->getFolder();
-            //$emailFolder->setOutdatedAt($outdatedAt);
-            $this->em->remove($existingFolder);
-            $this->em->remove($emailFolder);
+            $this->em->getRepository('OroImapBundle:ImapEmailFolder')->removeFolder($existingFolder);
         }
     }
 
@@ -271,7 +267,6 @@ class ImapEmailFolderManager
      */
     protected function getExistingFolders()
     {
-        // todo move to repository
         $qb = $this->em->createQueryBuilder()
             ->select('ief')
             ->from('OroImapBundle:ImapEmailFolder', 'ief')

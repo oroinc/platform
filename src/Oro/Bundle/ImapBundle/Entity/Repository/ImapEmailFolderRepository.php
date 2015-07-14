@@ -80,4 +80,45 @@ class ImapEmailFolderRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     */
+    public function removeFolder(ImapEmailFolder $imapFolder)
+    {
+        $em = $this->getEntityManager();
+
+        $folder = $imapFolder->getFolder();
+        $emailUsers = $em->getRepository('OroEmailBundle:EmailUser')->findBy(['folder' => $folder]);
+
+        foreach ($emailUsers as $emailUser) {
+            $em->remove($emailUser);
+
+            $email = $emailUser->getEmail();
+            $imapEmail = $em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
+                'email' => $email,
+                'imapFolder' => $imapFolder,
+            ]);
+            $em->remove($imapEmail);
+        }
+
+        $em->remove($imapFolder);
+        $em->remove($folder);
+
+        $em->flush();
+
+        foreach ($emailUsers as $emailUser) {
+            $email = $emailUser->getEmail();
+            if ($email->getEmailUsers()->isEmpty()) {
+                $emailRecipients = $email->getRecipients();
+                foreach ($emailRecipients as $emailRecipient) {
+                    $em->remove($emailRecipient);
+                }
+
+                $em->remove($email);
+            }
+        }
+
+        $em->flush();
+    }
 }

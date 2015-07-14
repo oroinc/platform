@@ -1,0 +1,29 @@
+definitions:
+    clear_imap_email_origin_on_deactivation:
+        label: Clear email origin on deactivation
+        enabled: true
+        order: 150
+        entity: Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin
+        actions_configuration:
+            - @tree:
+                conditions:
+                    @equal: [$active, false]
+                actions:
+                    - @format_string:
+                        attribute: $.arguments
+                        string: '--id=%id%'
+                        arguments:
+                            id: $id
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - 'oro:imap:clear-mailbox'
+                            - [$.arguments]
+
+triggers:
+    clear_imap_email_origin_on_deactivation:
+        -
+            event: update
+            field: isActive

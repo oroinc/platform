@@ -1018,6 +1018,8 @@ class User extends ExtendUser implements
     {
         $this->emailOrigins->add($emailOrigin);
 
+        $emailOrigin->setOwner($this);
+
         return $this;
     }
 

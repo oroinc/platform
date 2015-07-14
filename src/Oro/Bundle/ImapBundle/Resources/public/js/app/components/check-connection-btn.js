@@ -23,6 +23,11 @@ function ($, _, routing, __, mediator, messenger) {
             isNestedForm = options.elementNamePrototype.indexOf('[') !== -1;
             elementNamePrototype = isNestedForm ? options.elementNamePrototype.replace(/(.+)\[\w+]$/, '$1') : '';
 
+            var $criticalFields = $('.critical-field :input');
+            $criticalFields.change(function() {
+                $('.folder-tree').remove();
+            });
+
             $el.click(function () {
                 var data = $form.serializeArray();
 
@@ -50,7 +55,8 @@ function ($, _, routing, __, mediator, messenger) {
                 }
 
                 mediator.execute('showLoading');
-                $el.parent().parent().parent().find('div.control-group').slice(7).remove();
+                //$el.parent().parent().parent().find('div.control-group').slice(7).remove();
+                $('.folder-tree').remove();
                 $.post(url, data)
                     .done(function (response) {
                         $el.parent().parent().parent().append(response);
