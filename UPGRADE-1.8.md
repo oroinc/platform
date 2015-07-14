@@ -148,3 +148,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####AddressBundle
 - `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.
+
+####DataGridBundle
+- `Oro\Bundle\DataGridBundle\Datasource\ResultRecord` now has method `addData` that allows to add additional information to record
