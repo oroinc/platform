@@ -62,6 +62,8 @@ class ActivityListManager
      * @param CommentApiManager         $commentManager
      * @param DoctrineHelper            $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Registry $doctrine,
