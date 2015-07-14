@@ -5,10 +5,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {

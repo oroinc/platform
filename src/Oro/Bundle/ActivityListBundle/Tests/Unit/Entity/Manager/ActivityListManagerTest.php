@@ -151,63 +151,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
 
-    public function testGetListCount()
-    {
-        $classMeta = new ClassMetadata('Oro\Bundle\ActivityListBundle\Entity\ActivityList');
-        $repo      = new ActivityListRepository($this->em, $classMeta);
-        $testClass = 'Acme\TestBundle\Entity\TestEntity';
-        $testId    = 50;
-        $filter    = [];
-
-        $this->config->expects($this->any())->method('get')
-            ->willReturnCallback(
-                function ($configKey) {
-                    if ($configKey === 'oro_activity_list.sorting_field') {
-                        return 'createdBy';
-                    }
-                    if ($configKey === 'oro_activity_list.grouping') {
-                        return true;
-                    }
-                    return 'DESC';
-                }
-            );
-
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setConstructorArgs([$this->em])
-            ->setMethods(['getQuery'])->getMock();
-
-        $q1 = $this->getMockBuilder('Doctrine\ORM\Query')
-            ->setMethods(['getSingleScalarResult','getSQL','_doExecute'])
-            ->setConstructorArgs([$this->em])
-            ->disableOriginalConstructor()->getMock();
-
-        $query = $this->getMockForAbstractClass(
-            'Doctrine\ORM\AbstractQuery',
-            [$this->em],
-            '',
-            false,
-            true,
-            true,
-            ['getSingleScalarResult']
-        );
-        $qb->expects($this->once())->method('getQuery')->willReturn($q1);
-        $q1->expects($this->once())->method('getSingleScalarResult')->willReturn(1);
-
-        $this->em->expects($this->once())->method('createQueryBuilder')->willReturn($qb);
-        $this->em->expects($this->once())->method('getRepository')->willReturn($repo);
-        $this->activityListFilterHelper->expects($this->once())->method('addFiltersToQuery')->with($qb, $filter);
-
-        $this->provider->expects($this->once())->method('getProviders')->willReturn([]);
-
-        $this->activityListManager->getListCount($testClass, $testId, $filter);
-
-        $expectedDQL = 'SELECT COUNT(activity.id) FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId AND activity.head = true';
-
-        $this->assertEquals($expectedDQL, $qb->getDQL());
-        $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
-    }
-
     public function testGetNonExistItem()
     {
         $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
