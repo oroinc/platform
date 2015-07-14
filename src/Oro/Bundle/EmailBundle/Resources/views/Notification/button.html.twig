@@ -1,0 +1,27 @@
+{% set emailBodyViewOptions = {} %}
+
+<li class="email-notification-menu dropdown "
+    data-page-component-module="oroemail/js/app/components/email-notification-component"
+    data-page-component-options="{{ emailBodyViewOptions|json_encode }}">
+    <a href="#" class="oro-dropdown-toggle">
+        <i class="icon-envelope"></i>
+    </a>
+    <div class="dropdown-menu pull-right" tabindex="0">
+        <div class="header">
+            <a class="my-emails">My Emails</a>
+            <a class="mark-as-read">mark all as read</a>
+        </div>
+        <ul>
+            <li class="new">
+                <div class="body">
+                    <div class="title">opportunities with MVP sports</div>
+                    <div class="description">Hi, it was great to meet up and discuss ways we can</div>
+                </div>
+                <div class="footer">
+                    <span>John Doe</span>
+                    <span>Replay</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</li>

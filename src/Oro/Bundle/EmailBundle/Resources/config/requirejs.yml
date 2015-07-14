@@ -17,13 +17,16 @@ config:
         'oroemail/js/app/views/email-attachment-list-row-view': 'bundles/oroemail/js/app/views/email-attachment-list-row-view.js'
         'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
         'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
+        'oroemail/js/app/views/email-notification-view': 'bundles/oroemail/js/app/views/email-notification-view.js'
 
         'oroemail/js/app/components/email-context-component': 'bundles/oroemail/js/app/components/email-context-component.js'
         'oroemail/js/app/components/email-context-activity-component': 'bundles/oroemail/js/app/components/email-context-activity-component.js'
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'
+        'oroemail/js/app/components/email-notification-component': 'bundles/oroemail/js/app/components/email-notification-component.js'
 
         'oroemail/js/app/components/mark-unread-button': 'bundles/oroemail/js/app/components/mark-unread-button.js'
 
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
         'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'
+
