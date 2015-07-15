@@ -5,12 +5,12 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_3;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\ConversionException;
 
 use PDO;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
@@ -65,18 +65,73 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function processRow(array $row)
     {
-        $fields = Type::getType(Type::TARRAY)
-            ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
-        foreach ($fields as $field => $values) {
-            $fieldType = $this->getFieldType($row['entity_id'], $field);
-            $dataType = AuditFieldTypeRegistry::getAuditType($fieldType);
+        $data = $row['data'];
 
-            $data = [
+        try {
+            $data = Type::getType(Type::TARRAY)
+                ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
+        } catch (ConversionException $ex) {}
+
+        if (is_array($data)) {
+            $this->processArrayData($row, $data);
+        } else {
+            $this->processTextData($row, $data);
+        }
+    }
+
+    /**
+     * @param array $row
+     * @param string $data
+     */
+    private function processTextData(array $row, $data)
+    {
+        $dataType = AuditFieldTypeRegistry::getAuditType('text');
+
+        $dbData = [
+            'audit_id' => $row['id'],
+            'data_type' => $dataType,
+            'field' => '__unknown__',
+            sprintf('old_%s', $dataType) => $data,
+            sprintf('new_%s', $dataType) => $data,
+            'visible' => false,
+        ];
+
+        $types = [
+            'integer',
+            'string',
+            'string',
+            $dataType,
+            $dataType,
+            'boolean',
+        ];
+
+        $this->connection->insert('oro_audit_field', $dbData, $types);
+    }
+
+    /**
+     * @param array $row
+     * @param array $data
+     */
+    private function processArrayData(array $row, array $data) {
+        foreach ($data as $field => $values) {
+            $visible = true;
+
+            $fieldType = $this->getFieldType($row['entity_id'], $field);
+            $dataType = null;
+            if (!AuditFieldTypeRegistry::hasType($fieldType) || !isset($values['old'], $values['new'])) {
+                $dataType = 'array';
+                $visible  = false;
+            } else {
+                $dataType = AuditFieldTypeRegistry::getAuditType($fieldType);
+            }
+
+            $dbData = [
                 'audit_id' => $row['id'],
                 'data_type' => $dataType,
                 'field' => $field,
-                sprintf('old_%s', $dataType) => $this->parseValue($values['old']),
-                sprintf('new_%s', $dataType) => $this->parseValue($values['new']),
+                sprintf('old_%s', $dataType) => $this->parseValue($values, 'old'),
+                sprintf('new_%s', $dataType) => $this->parseValue($values, 'new'),
+                'visible' => $visible,
             ];
 
             $types = [
@@ -84,21 +139,28 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
                 'string',
                 'string',
                 $dataType,
-                $dataType
+                $dataType,
+                'boolean',
             ];
 
-            $this->connection->insert('oro_audit_field', $data, $types);
+            $this->connection->insert('oro_audit_field', $dbData, $types);
         }
     }
 
     /**
-     * @param mixed $value
+     * @param mixed $values
+     * @param string $key
      *
      * @return mixed
      */
-    private function parseValue($value)
+    private function parseValue($values, $key)
     {
-        if (isset($value['value'])) {
+        if (!isset($values[$key])) {
+            return $values;
+        }
+
+        $value = $values[$key];
+        if (is_array($value) && isset($value['value'])) {
             return $value['value'];
         }
 
@@ -109,7 +171,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      * @param int $entityId
      * @param string $field
      *
-     * @return string
+     * @return string|false
      */
     private function getFieldType($entityId, $field)
     {

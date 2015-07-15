@@ -223,6 +223,18 @@ class Audit extends AbstractLogEntry
     }
 
     /**
+     * Get visible fields
+     *
+     * @return AuditField[]|Collection
+     */
+    protected function getVisibleFields()
+    {
+        return $this->getFields()->filter(function (AuditField $field) {
+            return $field->isVisible();
+        });
+    }
+
+    /**
      * Get field
      *
      * @param string $field
@@ -242,7 +254,7 @@ class Audit extends AbstractLogEntry
     public function getData()
     {
         $data = [];
-        foreach ($this->getFields() as $field) {
+        foreach ($this->getVisibleFields() as $field) {
             $newValue = $field->getNewValue();
             $oldValue = $field->getOldValue();
             if (in_array($field->getDataType(), ['date', 'datetime'])) {

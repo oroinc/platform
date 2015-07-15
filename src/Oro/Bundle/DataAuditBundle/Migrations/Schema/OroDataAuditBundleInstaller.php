@@ -90,6 +90,9 @@ class OroDataAuditBundleInstaller implements Installation
         $auditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
         $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
         $auditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $auditFieldTable->addColumn('visible', 'boolean', ['default' => '1']);
+        $auditFieldTable->addColumn('old_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $auditFieldTable->addColumn('new_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $auditFieldTable->setPrimaryKey(['id']);
         $auditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 

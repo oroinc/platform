@@ -31,6 +31,7 @@ class AuditFieldTypeRegistry
         'datetime'   => 'datetime',
         'datetimetz' => 'datetimetz',
         'object'     => 'object',
+        'array'      => 'array',
     ];
 
     /**

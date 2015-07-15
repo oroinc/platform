@@ -43,6 +43,13 @@ class AuditField extends ExtendAuditField
     protected $field;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", options={"default"=true})
+     */
+    protected $visible = true;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="data_type", type="string", nullable=false)
@@ -113,6 +120,13 @@ class AuditField extends ExtendAuditField
     protected $oldObject;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="old_array", type="array", nullable=true)
+     */
+    protected $oldArray;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="new_integer", type="bigint", nullable=true)
@@ -176,6 +190,13 @@ class AuditField extends ExtendAuditField
     protected $newObject;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="new_array", type="array", nullable=true)
+     */
+    protected $newArray;
+
+    /**
      * @param Audit $audit
      * @param string $field
      * @param string $dataType
@@ -192,6 +213,14 @@ class AuditField extends ExtendAuditField
 
         $this->setOldValue($oldValue);
         $this->setNewValue($newValue);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
     }
 
     /**
