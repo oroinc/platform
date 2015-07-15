@@ -1,8 +1,14 @@
 define(function(require){
     'use strict';
     require('./path-finder');
+    var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
+
     function JsPlumbSmartlineManager(jsPlumb) {
         this.jsPlumb = jsPlumb;
+        this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
+        this.debouncedCalculateOverlays = _.debounce(
+                _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
+                50);
     }
 
     window.getLastRequest = function () {
@@ -88,6 +94,9 @@ define(function(require){
 
         getConnectionPath: function (connector) {
             this.calculate();
+            if (this.cache.length === this.jsPlumb.instance.getConnections().length) {
+                this.debouncedCalculateOverlays();
+            }
             for (var i = 0; i < this.cache.length; i++) {
                 var item = this.cache[i];
                 if (item.connection.connector === connector) {
