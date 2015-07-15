@@ -1,5 +1,6 @@
-define(function (require) {
+define(function(require) {
     'use strict';
+
     var _ = require('underscore');
 
     /**
@@ -68,9 +69,9 @@ define(function (require) {
          * @param {string} value
          * @returns {boolean}
          */
-        isDateVariable: function (value) {
+        isDateVariable: function(value) {
             var result;
-            result = _.some(this.index, function (displayValue, index) {
+            result = _.some(this.index, function(displayValue, index) {
                 var rawValue = '{{' + index + '}}';
                 return rawValue === value.substr(0, rawValue.length) ||
                     displayValue === value.substr(0, displayValue.length);
@@ -84,10 +85,10 @@ define(function (require) {
          * @param {string} value
          * @returns {string}
          */
-        formatDisplayValue: function (value) {
+        formatDisplayValue: function(value) {
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp('\{+' + i + '\}+', 'gi'), this.index[i]);
+                    value = value.replace(new RegExp('\\{+' + i + '\\}+', 'gi'), this.index[i]);
                 }
             }
             return value;
@@ -99,10 +100,10 @@ define(function (require) {
          * @param {string} value
          * @returns {string}
          */
-        formatRawValue: function (value) {
+        formatRawValue: function(value) {
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp(this.index[i], 'g'), '{{' + i +'}}');
+                    value = value.replace(new RegExp(this.index[i], 'g'), '{{' + i + '}}');
                 }
             }
             return value;

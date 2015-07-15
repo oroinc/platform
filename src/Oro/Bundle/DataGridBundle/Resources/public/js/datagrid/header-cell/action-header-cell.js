@@ -1,15 +1,13 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone',
     'backgrid',
     '../actions-panel'
-], function (_, Backbone, Backgrid, ActionsPanel) {
-    "use strict";
+], function(_, Backbone, Backgrid, ActionsPanel) {
+    'use strict';
 
-    var $, ActionHeaderCell;
-    $ = Backbone.$;
+    var ActionHeaderCell;
+    var $ = Backbone.$;
 
     /**
      *
@@ -23,7 +21,7 @@ define([
         className: 'action-column',
 
         /** @property */
-        tagName: "th",
+        tagName: 'th',
 
         /** @property */
         template: '#template-datagrid-action-header-cell',
@@ -32,7 +30,7 @@ define([
             controls: '[data-toggle=dropdown]'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             var datagrid;
 
             this.column = options.column;
@@ -51,7 +49,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -60,11 +58,11 @@ define([
             ActionHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
-        createActionsPanel: function () {
-            var actions = [],
-                datagrid = this.column.get('datagrid');
+        createActionsPanel: function() {
+            var actions = [];
+            var datagrid = this.column.get('datagrid');
 
-            _.each(this.column.get('massActions'), function (Action) {
+            _.each(this.column.get('massActions'), function(Action) {
                 var action = new Action({
                     datagrid: datagrid
                 });
@@ -77,7 +75,7 @@ define([
             this.subviews.push(this.actionsPanel);
         },
 
-        render: function () {
+        render: function() {
             var panel = this.actionsPanel;
             this.$el.empty();
             if (panel.haveActions()) {
@@ -89,12 +87,12 @@ define([
             return this;
         },
 
-        enable: function () {
+        enable: function() {
             this.actionsPanel.enable();
             this.$(this.options.controls).removeClass('disabled');
         },
 
-        disable: function () {
+        disable: function() {
             this.actionsPanel.disable();
             this.$(this.options.controls).addClass('disabled');
         }

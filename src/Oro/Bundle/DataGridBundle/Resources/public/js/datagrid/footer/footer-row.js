@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backgrid',
     './footer-cell'
-], function (_, Backgrid, FooterCell) {
-    "use strict";
+], function(_, Backgrid, FooterCell) {
+    'use strict';
 
     var FooterRow;
 
@@ -20,9 +18,9 @@ define([
         /** @property */
         footerCell: FooterCell,
 
-        requiredOptions: ["columns", "collection", "footerCell"],
+        requiredOptions: ['columns', 'collection', 'footerCell'],
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             FooterRow.__super__.initialize.apply(this, arguments);
         },
@@ -30,11 +28,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.cells, function (cell) {
+            _.each(this.cells, function(cell) {
                 cell.dispose();
             });
             delete this.cells;
@@ -42,8 +40,8 @@ define([
             FooterRow.__super__.dispose.call(this);
         },
 
-        makeCell: function (column, options) {
-            var FooterCell = column.get("footerCell") || options.footerCell || this.footerCell;
+        makeCell: function(column, options) {
+            var FooterCell = column.get('footerCell') || options.footerCell || this.footerCell;
             return new FooterCell({
                 column: column,
                 collection: this.collection,

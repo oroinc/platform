@@ -1,11 +1,10 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var TransitionsShortListView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionsShortRowView = require('./transition-row-short-view');
+    var TransitionsShortListView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionsShortRowView = require('./transition-row-short-view');
 
     TransitionsShortListView = BaseView.extend({
         tagName: 'ul',
@@ -20,7 +19,7 @@ define(function (require) {
             stepFrom: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.rowViews = [];
 
@@ -52,7 +51,7 @@ define(function (require) {
         },
 
         resetView: function() {
-            _.each(this.rowViews, function (rowView) {
+            _.each(this.rowViews, function(rowView) {
                 rowView.remove();
             });
         },

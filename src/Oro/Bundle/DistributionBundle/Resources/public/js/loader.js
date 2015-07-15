@@ -1,22 +1,26 @@
+/*jshint -W098*/
 function Loader(element) {
+    'use strict';
+
     var clickedElement = null;
     var loadingElement = element;
 
     return {
-        setClickedElement: function (element) {
+        setClickedElement: function(element) {
             clickedElement = element;
         },
-        displayLoadingProgress: function () {
+        displayLoadingProgress: function() {
             if (clickedElement) {
                 clickedElement.hide();
                 loadingElement.insertAfter(clickedElement);
             }
             loadingElement.show();
         },
-        displayOriginalElement: function () {
-            clickedElement && clickedElement.show();
+        displayOriginalElement: function() {
+            if (clickedElement) {
+                clickedElement.show();
+            }
             loadingElement.hide();
         }
-
-    }
+    };
 }

@@ -1,10 +1,9 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var TransitionModel,
-        _ = require('underscore'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var TransitionModel;
+    var _ = require('underscore');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     TransitionModel = BaseModel.extend({
         defaults: {
@@ -20,7 +19,7 @@ define(function(require) {
             _is_clone: false
         },
 
-        initialize: function () {
+        initialize: function() {
             this.workflow = null;
 
             if (_.isEmpty(this.get('form_options'))) {
@@ -32,18 +31,18 @@ define(function(require) {
             }
         },
 
-        setWorkflow: function (workflow) {
+        setWorkflow: function(workflow) {
             this.workflow = workflow;
         },
 
-        getTransitionDefinition: function () {
+        getTransitionDefinition: function() {
             if (this.workflow) {
                 return this.workflow.getTransitionDefinitionByName(this.get('transition_definition'));
             }
             return null;
         },
 
-        destroy: function (options) {
+        destroy: function(options) {
             var transitionDefinition = this.getTransitionDefinition();
             if (transitionDefinition) {
                 transitionDefinition.destroy();
