@@ -11,6 +11,8 @@ parameters:
     oro_soap.entity_accessor.class:               Oro\Bundle\SoapBundle\Serializer\EntityDataAccessor
     oro_soap.entity_data_transformer.class:       Oro\Bundle\SoapBundle\Serializer\EntityDataTransformer
 
+    oro_soap.locale_listener.class:               Oro\Bundle\SoapBundle\EventListener\LocaleListener
+
 services:
     oro_soap.loader:
         class: %oro_soap.loader.class%
@@ -34,6 +36,8 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+            - [setDoctrineHelper, [@oro_entity.doctrine_helper]]
+            - [setEntityClassNameHelper, [@oro_entity.entity_class_name_helper]]
             - [setEntitySerializer, [@oro_soap.entity_serializer]]
 
     oro_soap.handler.include_delegate:
@@ -80,3 +84,11 @@ services:
         class: %oro_soap.entity_data_transformer.class%
         arguments:
             - @service_container
+
+    # event listeners
+    oro_soap.locale_listener:
+        class: %oro_soap.locale_listener.class%
+        arguments:
+            - @stof_doctrine_extensions.listener.translatable
+        tags:
+            - { name: kernel.event_subscriber }

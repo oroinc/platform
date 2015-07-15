@@ -34,6 +34,25 @@
             <% }); %>
         </ul>
     </script>
+    <script type="text/template" id="oro-email-template-variables-entity-variable-template">
+        <li>
+            <a href="javascript:void(0);"
+               class="variable"
+               title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
+            >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
+            <span>(</span>
+            <ul class="caption">
+                <% for (var i = 1; i < breadcrumbs.length; i++) { %>
+                <li>
+                    <span><%= pathLabels[breadcrumbs[i]] %></span>
+                    <span>/</span>
+                </li>
+                <% } %>
+                <li><%= variable.label %></li>
+            </ul>
+            <span>)</span>
+        </li>
+    </script>
     <script type="text/template" id="oro-email-template-variables-entity-template">
         <% var breadcrumbs = path.split('/'); breadcrumbs[0] = root; %>
         <ul class="breadcrumb">
@@ -60,24 +79,45 @@
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
                 <ul class="nav nav-list">
-                    <% _.each(fields, function(variable, varName) { %>
-                    <li>
-                        <a href="javascript:void(0);"
-                           class="variable"
-                           title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>(</span>
-                        <ul class="caption">
-                            <% for (var i = 1; i < breadcrumbs.length; i++) { %>
-                            <li>
-                                <span><%= pathLabels[breadcrumbs[i]] %></span>
-                                <span>/</span>
-                            </li>
-                            <% } %>
-                            <li><%= variable.label %></li>
-                        </ul>
-                        <span>)</span>
-                    </li>
-                    <% }); %>
+                <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
+                <% _.each(fields, function(variable, varName) { %>
+                    <%= variableTemplate({
+                        varValue:    varPrefix + '.' + varName,
+                        breadcrumbs: breadcrumbs,
+                        pathLabels:  pathLabels,
+                        variable:    variable
+                    }) %>
+                    {# shows variable with default formatter applied
+                     # code commented because it was rejected on demo but can be used in future implementation of variable formatters UI
+                     #
+                    <% if (!_.isUndefined(variable.default_formatter)) { %>
+                        <%= variableTemplate({
+                            varValue:    varPrefix + '.' + varName + '|oro_format(\'' + variable.default_formatter + '\')',
+                            breadcrumbs: breadcrumbs,
+                            pathLabels:  pathLabels,
+                            variable:    variable
+                        }) %>
+                    <% }; %>
+                    #}
+
+                    {# shows variable with all posible formatters applied (skiping default formatter)
+                     # code commented because it was rejected on demo but can be used in future implementation of variable formatters UI
+                     #
+                    <% if (!_.isUndefined(variable.formatters)) { %>
+                        <% _.each(variable.formatters, function(formatterName) { %>
+                            <% if (!_.isUndefined(variable.default_formatter) && formatterName === variable.default_formatter) { %>
+                                <% return; %>
+                            <% }; %>
+                            <%= variableTemplate({
+                                varValue:    varPrefix + '.' + varName + '|oro_format(\'' + formatterName + '\')',
+                                breadcrumbs: breadcrumbs,
+                                pathLabels:  pathLabels,
+                                variable:    variable
+                            }) %>
+                        <% }); %>
+                    <% }; %>
+                    #}
+                <% }); %>
                 </ul>
             </li>
             <% } %>
@@ -102,6 +142,7 @@
     </script>
 
     {% set options = {
+        name: 'email-template-variables',
         entityChoice: '#' ~ entityChoiceFieldId,
         view: {
             templateSelector:        '#oro-email-template-variables-template',
@@ -332,43 +373,37 @@
 #}
 {% macro attachments(attachments, target, hasGrantReattach) -%}
     {%- for attachment in attachments -%}
-        <li class="email-attachments-list-item">
+        {% if attachment.embeddedContentId is null %}
+            {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
+            <li class="email-attachments-list-item">
             <div class="dropdown link-to-record">
                 <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
                     <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
                 </a>
-                {% if hasGrantReattach and target is defined and oro_can_attache(attachment, target) %}
-                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
                     <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
                         {{ 'oro.email.attachment.save'|trans }}
                     </a>
-                    {% set options = {
-                        'view': 'oroemail/js/app/views/email-attachment-link-view',
-                        'url': path(
-                            'oro_email_attachment_link',
-                                {
-                                    id: attachment.id,
-                                    targetActivityClass: oro_class_name(target),
-                                    targetActivityId: target.id
-                                }
-                            )
-                    } %}
-                        <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
-                            data-page-component-options="{{ options|json_encode }}"
-                            class="attachment"
-                            href="{{ options.url }}">
-                            {{ 'oro.email.attachment.copy_to_record'|trans }}
-                        </a>
-                </ul>
-                {% else %}
-                <ul class="dropdown-menu one" role="menu" aria-labelledby="dropdownMenu">
-                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.save'|trans }}
+                    {% if (canCopyToRecord) %}
+                        {% set options = {
+                            'view': 'oroemail/js/app/views/email-attachment-link-view',
+                            'url': path('oro_email_attachment_link', {
+                                id: attachment.id,
+                                targetActivityClass: oro_class_name(target),
+                                targetActivityId: target.id
+                            })
+                        } %}
+                    <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
+                        class="attachment"
+                        data-page-component-options="{{ options|json_encode }}"
+                        href="{{ options.url }}">
+                        {{ 'oro.email.attachment.copy_to_record'|trans }}
                     </a>
+                    {% endif %}
                 </ul>
-                {% endif %}
             </div>
         </li>
+        {% endif %}
     {%- endfor -%}
 {%- endmacro %}
 
@@ -545,7 +580,7 @@
             'entityId': entity.id,
             'targetId': item.id,
             "targetClassName": itemClassNameEncoded,
-            'title': item|oro_format_name|default(item.email)|default(item.id),
+            'title': item|oro_format_name,
             'icon': oro_entity_config_value(itemClassName, 'icon' ),
             'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
         } %}

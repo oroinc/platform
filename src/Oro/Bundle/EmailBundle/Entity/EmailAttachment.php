@@ -18,6 +18,8 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class EmailAttachment
 {
+    const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailAttachment';
+
     /**
      * @var integer
      *
@@ -73,6 +75,15 @@ class EmailAttachment
      * @JMS\Exclude
      */
     protected $file;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="embedded_content_id", type="string", length=255, nullable=true)
+     * @Soap\ComplexType("string")
+     * @JMS\Type("string")
+     */
+    protected $embeddedContentId;
 
     /**
      * Get id
@@ -210,6 +221,25 @@ class EmailAttachment
     public function getExtension()
     {
         return pathinfo($this->fileName, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmbeddedContentId()
+    {
+        return $this->embeddedContentId;
+    }
+
+    /**
+     * @param string $embeddedContentId
+     * @return $this
+     */
+    public function setEmbeddedContentId($embeddedContentId)
+    {
+        $this->embeddedContentId = $embeddedContentId;
+
+        return $this;
     }
 
     /**

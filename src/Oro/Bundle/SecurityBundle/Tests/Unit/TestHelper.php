@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
@@ -11,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class TestHelper
 {
@@ -31,13 +32,15 @@ class TestHelper
     }
 
     /**
-     * @param  OwnershipMetadataProvider $metadataProvider
-     * @param  OwnerTree                 $ownerTree
+     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnerTree $ownerTree
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @return AclExtensionSelector
      */
     public function createAclExtensionSelector(
         OwnershipMetadataProvider $metadataProvider = null,
-        OwnerTree $ownerTree = null
+        OwnerTree $ownerTree = null,
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ) {
         $idAccessor = new ObjectIdAccessor();
         $selector = new AclExtensionSelector($idAccessor);
@@ -52,22 +55,24 @@ class TestHelper
             new ActionAclExtension($actionMetadataProvider)
         );
         $selector->addAclExtension(
-            $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor)
+            $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor, $decisionMaker)
         );
 
         return $selector;
     }
 
     /**
-     * @param  OwnershipMetadataProvider $metadataProvider
-     * @param  OwnerTree                 $ownerTree
-     * @param  ObjectIdAccessor          $idAccessor
+     * @param OwnershipMetadataProvider $metadataProvider
+     * @param OwnerTree $ownerTree
+     * @param ObjectIdAccessor $idAccessor
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
      * @return EntityAclExtension
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
-        ObjectIdAccessor $idAccessor = null
+        ObjectIdAccessor $idAccessor = null,
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ) {
         if ($idAccessor === null) {
             $idAccessor = new ObjectIdAccessor();
@@ -87,12 +92,14 @@ class TestHelper
             ->method('getTree')
             ->will($this->testCase->returnValue($ownerTree));
 
-        $decisionMaker = new EntityOwnershipDecisionMaker(
-            $treeProviderMock,
-            $idAccessor,
-            new EntityOwnerAccessor($metadataProvider),
-            $metadataProvider
-        );
+        if (!$decisionMaker) {
+            $decisionMaker = new EntityOwnershipDecisionMaker(
+                $treeProviderMock,
+                $idAccessor,
+                new EntityOwnerAccessor($metadataProvider),
+                $metadataProvider
+            );
+        }
 
         $config = $this->testCase->getMockBuilder('\Doctrine\ORM\Configuration')
             ->disableOriginalConstructor()

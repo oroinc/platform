@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -14,12 +15,22 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
+/**
+ * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
+ * we are trying to extract Organization from the current logged user.
+ *
+ * @todo Should be refactored in the BAP-8520
+ * @see EmailActivityListProvider::isApplicable
+ * @see EmailActivityListProvider::getOrganization
+ */
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
@@ -34,8 +45,8 @@ class EmailActivityListProvider implements
     /** @var ServiceLink */
     protected $doctrineRegistryLink;
 
-    /** @var ServiceLink */
-    protected $nameFormatterLink;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var Router */
     protected $router;
@@ -49,10 +60,13 @@ class EmailActivityListProvider implements
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
+    /** @var  ServiceLink */
+    protected $securityContextLink;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
-     * @param ServiceLink         $nameFormatterLink
+     * @param EntityNameResolver  $entityNameResolver
      * @param Router              $router
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
@@ -61,7 +75,7 @@ class EmailActivityListProvider implements
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $doctrineRegistryLink,
-        ServiceLink $nameFormatterLink,
+        EntityNameResolver $entityNameResolver,
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
@@ -69,11 +83,19 @@ class EmailActivityListProvider implements
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
-        $this->nameFormatterLink    = $nameFormatterLink;
+        $this->entityNameResolver   = $entityNameResolver;
         $this->router               = $router;
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
+    }
+
+    /**
+     * @param ServiceLink $securityContextLink
+     */
+    public function setSecurityContextLink(ServiceLink $securityContextLink)
+    {
+        $this->securityContextLink = $securityContextLink;
     }
 
     /**
@@ -166,7 +188,20 @@ class EmailActivityListProvider implements
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
-        return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        if ($activityEntity->getFromEmailAddress()->hasOwner() &&
+            $activityEntity->getFromEmailAddress()->getOwner()->getOrganization()
+        ) {
+            return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        }
+
+        /** @var SecurityContextInterface $securityContext */
+        $securityContext = $this->securityContextLink->getService();
+        $token           = $securityContext->getToken();
+        if ($token instanceof OrganizationContextTokenInterface) {
+            return $token->getOrganizationContext();
+        }
+
+        return null;
     }
 
     /**
@@ -206,7 +241,7 @@ class EmailActivityListProvider implements
 
         if ($email->getFromEmailAddress()->hasOwner()) {
             $owner = $email->getFromEmailAddress()->getOwner();
-            $data['headOwnerName'] = $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
+            $data['headOwnerName'] = $data['ownerName'] = $this->entityNameResolver->getName($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
             if (null !== $route) {
@@ -247,8 +282,9 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
-            && $entity->getFromEmailAddress()->hasOwner();
+        return
+            $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
+            && $this->getOrganization($entity);
     }
 
     /**

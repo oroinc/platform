@@ -5,8 +5,11 @@
     $(function() {
         {% set user = get_current_user() %}
         var userName = {{ user ? user.username|json_encode|raw : 'null' }},
-            apiKey = {{ user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
-            wsseAllowed = userName && apiKey;
+            apiKey = {{ user and user.apiKeys|first ? (user.apiKeys|first).apiKey|json_encode|raw : 'null' }},
+            wsseAllowed = userName && apiKey,
+            serverTime = {{ 'now'|date('c', 'UTC')|json_encode|raw }},
+            clientTime = new Date(),
+            serverTimeOffset = Date.parse(serverTime) - clientTime;
         $('#sandbox_configuration').prepend(
             'authentication: ' +
             '<select id="authentication_type">' +
@@ -29,7 +32,7 @@
                     '</div>'
                 );
                 $('input.authorization-header', this).val('WSSE profile="UsernameToken"');
-                $('input.x-wsse-header', this).val(wsseHeader(userName, apiKey));
+                $('input.x-wsse-header', this).val(wsseHeader(userName, apiKey, serverTimeOffset));
             }
         });
         $('li[data-pane="sandbox"]').on('click', function() {

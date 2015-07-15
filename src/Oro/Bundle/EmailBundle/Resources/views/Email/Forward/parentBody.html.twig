@@ -5,7 +5,13 @@
 <div class="quote">
     <div>
         <p>---------- {{ 'oro.email.forwarded_message'|trans }} ----------</p>
-        <p>{{ 'From'|trans }}: {{ EA.email_address_link(email.fromEmailAddress) }}</p>
+        <p>{{ 'From'|trans }}:
+            {% if (email.fromEmailAddress.owner is not empty) %}
+                {{ EA.email_address_link(email.fromEmailAddress) }}
+            {% else %}
+                {{ email.fromName }}
+            {% endif %}
+        </p>
         <p>{{ 'oro.email.sent_at.label'|trans }}: {{ email.sentAt|oro_format_datetime }}</p>
         <p>{{ 'Subject'|trans }}: {{ email.subject }}</p>
         <p>{{ 'To'|trans }}: {{ EA.recipient_email_addresses(email.toCc, false, false) }}</p>

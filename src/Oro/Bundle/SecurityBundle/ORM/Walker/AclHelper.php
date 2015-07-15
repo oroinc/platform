@@ -142,6 +142,10 @@ class AclHelper
     protected function processSubselects(SelectStatement $ast, AclConditionStorage $storage, $permission)
     {
         $conditionalExpression = $ast->whereClause->conditionalExpression;
+        if (isset($conditionalExpression->conditionalPrimary)) {
+            $conditionalExpression = $conditionalExpression->conditionalPrimary;
+        }
+
         if ($conditionalExpression instanceof ConditionalPrimary) {
             // we have request with only one where condition
             $expression = $conditionalExpression->simpleConditionalExpression;

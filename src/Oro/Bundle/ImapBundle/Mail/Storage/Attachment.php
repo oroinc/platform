@@ -34,7 +34,7 @@ class Attachment
     /**
      * Gets a header in specified format
      *
-     * @param  string $name The name of header, matches case-insensitive, but camel-case is replaced with dashes
+     * @param  string $name   The name of header, matches case-insensitive, but camel-case is replaced with dashes
      * @param  string $format change The type of return value to 'string' or 'array'
      * @return Headers
      */
@@ -50,18 +50,18 @@ class Attachment
      */
     public function getFileName()
     {
-        $value = '';
+        $value   = '';
         $headers = $this->part->getHeaders();
         if ($headers->has('Content-Disposition')) {
             $contentDisposition = $this->part->getHeader('Content-Disposition');
-            $value = Decode::splitContentType($contentDisposition->getFieldValue(), 'filename');
-            $encoding = $contentDisposition->getEncoding();
+            $value              = Decode::splitContentType($contentDisposition->getFieldValue(), 'filename');
+            $encoding           = $contentDisposition->getEncoding();
         }
         if (empty($value) && $headers->has('Content-Type')) {
             /** @var \Zend\Mail\Header\ContentType $contentType */
             $contentType = $this->part->getHeader('Content-Type');
-            $value = $contentType->getParameter('name');
-            $encoding = $contentType->getEncoding();
+            $value       = $contentType->getParameter('name');
+            $encoding    = $contentType->getEncoding();
         }
         if (empty($encoding)) {
             $encoding = 'ASCII';
@@ -88,20 +88,55 @@ class Attachment
         if ($this->part->getHeaders()->has('Content-Type')) {
             /** @var \Zend\Mail\Header\ContentType $contentTypeHeader */
             $contentTypeHeader = $this->part->getHeader('Content-Type');
-            $contentType = $contentTypeHeader->getType();
-            $charset = $contentTypeHeader->getParameter('charset');
-            $encoding = $charset !== null ? $charset : 'ASCII';
+            $contentType       = $contentTypeHeader->getType();
+            $charset           = $contentTypeHeader->getParameter('charset');
+            $encoding          = $charset !== null ? $charset : 'ASCII';
         } else {
             $contentType = 'text/plain';
-            $encoding = 'ASCII';
+            $encoding    = 'ASCII';
         }
 
+        $contentTransferEncoding = 'BINARY';
         if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
             $contentTransferEncoding = $this->part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        } else {
-            $contentTransferEncoding = 'BINARY';
         }
 
         return new Content($this->part->getContent(), $contentType, $contentTransferEncoding, $encoding);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmbeddedContentId()
+    {
+        $contentIdValue = $this->getContentIdValue();
+        if ($contentIdValue !== null) {
+            $contentDisposition = $this->getContentDispositionValue();
+            if (!$contentDisposition || Decode::splitContentType($contentDisposition, 'type') === 'inline') {
+                return substr($contentIdValue, 1, strlen($contentIdValue) - 2);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getContentIdValue()
+    {
+        return $this->part->getHeaders()->has('Content-ID')
+            ? $this->part->getHeader('Content-ID')->getFieldValue()
+            : null;
+    }
+
+    /**
+     * @return null|string
+     */
+    protected function getContentDispositionValue()
+    {
+        return $this->part->getHeaders()->has('Content-Disposition')
+            ? $this->part->getHeader('Content-Disposition')->getFieldValue()
+            : null;
     }
 }

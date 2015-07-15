@@ -38,18 +38,7 @@ class OroCRMAccountBundle implements Migration, NoteExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addNoteAssociations($schema, $this->noteExtension);
-    }
-
-    /**
-     * Enable notes for Account entity
-     *
-     * @param Schema        $schema
-     * @param NoteExtension $noteExtension
-     */
-    public static function addNoteAssociations(Schema $schema, NoteExtension $noteExtension)
-    {
-        $noteExtension->addNoteAssociation($schema, 'orocrm_account');
+        $this->noteExtension->addNoteAssociation($schema, 'orocrm_account');
     }
 }
 ```

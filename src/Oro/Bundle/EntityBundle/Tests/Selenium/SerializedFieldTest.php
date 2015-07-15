@@ -58,11 +58,10 @@ class SerializedFieldTest extends Selenium2TestCase
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', 'admin')
             ->open(array('admin'))
-            ->edit()
-            /** @var ConfigEntities $login */
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
+            ->edit();
+        /** @var ConfigEntity $login */
+        $login = $login->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
-            /** @var ConfigEntity $login */
             $login->checkEntityField(strtolower($field['type']).'_serialized');
         }
     }
@@ -77,11 +76,10 @@ class SerializedFieldTest extends Selenium2TestCase
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', 'admin')
             ->open(array('admin'))
-            ->edit()
-            /** @var ConfigEntities $login */
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
+            ->edit();
+        /** @var ConfigEntity $login */
+        $login = $login->openConfigEntity('Oro\Bundle\EntityConfigBundle');
         foreach ($this->fields as $field) {
-            /** @var ConfigEntity $login */
             $login->setCustomField(strtolower($field['type']).'_serialized', $field['value']);
         }
         $login->save()

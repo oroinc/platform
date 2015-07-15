@@ -92,12 +92,14 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
      */
     protected function loadEmailsDemo(ObjectManager $om)
     {
+        $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
+
         foreach ($this->templates as $index => $template) {
             $owner = $this->getReference('simple_user');
-            $simple_user2 = $this->getReference('simple_user2');
+            $simpleUser2 = $this->getReference('simple_user2');
             $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
 
-            $email = $this->emailEntityBuilder->email(
+            $emailUser = $this->emailEntityBuilder->emailUser(
                 $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
@@ -109,9 +111,12 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-            $email->addFolder($origin->getFolder(FolderType::SENT));
-            $email->addActivityTarget($owner);
-            $email->addActivityTarget($simple_user2);
+            $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+            $emailUser->getEmail()->addActivityTarget($owner);
+            $emailUser->getEmail()->addActivityTarget($simpleUser2);
+            $emailUser->getEmail()->setHead(true);
+            $emailUser->setOrganization($owner->getOrganization());
+            $emailUser->setOwner($owner);
 
             $emailBody = $this->emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
@@ -119,11 +124,16 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 true
             );
 
-            $email->setEmailBody($emailBody);
-            $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
-            $this->setReference('email_' . ($index + 1), $email);
+            $emailUser->getEmail()->setEmailBody($emailBody);
+            $emailUser->getEmail()->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
+            $this->setReference('email_' . ($index + 1), $emailUser->getEmail());
+            $this->setReference('emailUser_' . ($index + 1), $emailUser);
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
         }
+
+        $emailUser->setOwner($adminUser);
+        $this->setReference('emailUser_for_mass_mark_test', $emailUser);
+
         $this->emailEntityBuilder->getBatch()->persist($om);
     }
 }

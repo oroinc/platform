@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\Role\Role as BaseRole;
-
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Model\ExtendRole;
 
 /**
  * Role Entity
@@ -37,7 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Role extends BaseRole
+class Role extends ExtendRole
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -77,6 +74,8 @@ class Role extends BaseRole
      */
     public function __construct($role = '')
     {
+        parent::__construct($role);
+
         $this->role  =
         $this->label = $role;
     }
@@ -112,25 +111,6 @@ class Role extends BaseRole
     }
 
     /**
-     * Set role name only for newly created role
-     *
-     * @param  string            $role Role name
-     * @return Role
-     * @throws \RuntimeException
-     */
-    public function setRole($role)
-    {
-        $this->role = (string) strtoupper($role);
-
-        // every role should be prefixed with 'ROLE_'
-        if (strpos($this->role, self::PREFIX_ROLE) !== 0) {
-            $this->role = self::PREFIX_ROLE . $this->role;
-        }
-
-        return $this;
-    }
-
-    /**
      * Set the new label for role
      *
      * @param  string $label New label
@@ -138,68 +118,16 @@ class Role extends BaseRole
      */
     public function setLabel($label)
     {
-        $this->label = (string) $label;
+        $this->label = (string)$label;
 
         return $this;
     }
 
     /**
-     * Return the role name field
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function __toString()
+    public function getPrefix()
     {
-        return (string) $this->label;
-    }
-
-    /**
-     * Pre persist event listener
-     *
-     * @ORM\PrePersist
-     *
-     * @param LifecycleEventArgs $args
-     *
-     * @throws \LogicException
-     */
-    public function beforeSave(LifecycleEventArgs $args)
-    {
-        /**
-         * @var integer $count
-         * count of attempts to set unique role, maximum 10 else exception
-         */
-        $count = 1;
-
-        while (!$this->updateRole($args) && $count++ < 10) {
-        }
-
-        if ($count > 10) {
-            throw new \LogicException('10 attempts to generate unique role are failed.');
-        }
-    }
-
-    /**
-     * Update role field.
-     *
-     * @param LifecycleEventArgs $args
-     *
-     * @return bool
-     */
-    protected function updateRole(LifecycleEventArgs $args)
-    {
-        if ($this->getRole()) {
-            return true;
-        }
-
-        $roleValue  = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
-        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($roleValue);
-
-        if ($sameObject) {
-            return false;
-        }
-
-        $this->setRole($roleValue);
-
-        return true;
+        return static::PREFIX_ROLE;
     }
 }
