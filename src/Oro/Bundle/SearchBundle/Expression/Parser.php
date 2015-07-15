@@ -4,6 +4,8 @@ namespace Oro\Bundle\SearchBundle\Expression;
 
 use Doctrine\Common\Collections\Criteria;
 
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Exception\SyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -35,8 +37,8 @@ class Parser
     protected $mappingConfig;
 
     /**
-     * @param ObjectMapper $mapper;
-     * @param Query|null $query
+     * @param ObjectMapper $mapper ;
+     * @param Query|null   $query
      */
     public function __construct(ObjectMapper $mapper, $query = null)
     {
@@ -58,6 +60,10 @@ class Parser
             Query::KEYWORD_ORDER_BY    => ['precedence' => 500],
             Query::KEYWORD_OFFSET      => ['precedence' => 500],
             Query::KEYWORD_MAX_RESULTS => ['precedence' => 500],
+        ];
+
+        $this->reservedWords = [
+            Indexer::TEXT_ALL_DATA_FIELD
         ];
 
 //        $this->unaryOperators  = [
@@ -146,12 +152,10 @@ class Parser
 
             switch ($token->value) {
                 case Query::KEYWORD_FROM:
-                    //$this->stream->next();
                     $this->parseFromExpression();
                     break;
 
                 case Query::KEYWORD_WHERE:
-                    //$this->stream->next();
                     $this->parseWhereExpression();
                     break;
 
@@ -181,96 +185,151 @@ class Parser
 
     protected function parseWhereExpression()
     {
-        if ($this->stream->current->test(Token::KEYWORD_TYPE, 'where')) {
-            $this->stream->next();
-            while (!$this->stream->isEOF()) {
-                /** @var Token $token */
-                $token = $this->stream->current;
-                switch ($token->type) {
-                    case Token::PUNCTUATION_TYPE:
+        $exit = false;
+        $this->stream->next();
+        while (!$this->stream->isEOF() || $exit) {
+            /** @var Token $token */
+            $token = $this->stream->current;
+            switch ($token->type) {
+                case Token::PUNCTUATION_TYPE && $token->test(Token::PUNCTUATION_TYPE, '('):
+                    $this->parseCompositeCondition();
+                    break;
 
-                        break;
+                case Token::STRING_TYPE:
+                    list ($type, $expr) = $this->parseSimpleCondition();
+                    $this->query->getCriteria()->{$type}($expr);
+                    break;
 
-                    case Token::STRING_TYPE:
-                        $this->parseSimpleCondition();
-                        break;
+                case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
+                    list ($type, $expr) = $this->parseSimpleCondition($token->value);
+                    $this->query->getCriteria()->{$type}($expr);
+                    break;
 
-                    case Token::OPERATOR_TYPE:
-                        $this->parseCompositeCondition();
-                        break;
-
-                    default:
-                        break;
-                }
+                default:
+                    throw new SyntaxError(
+                        sprintf('Unexpected token "%s" in where statement', $this->stream->current->type),
+                        $this->stream->current->cursor
+                    );
             }
         }
     }
 
-    protected function parseSimpleCondition()
+    /**
+     * @param null|string $whereType can be 'and' | 'or'
+     *                               @ return \Doctrine\Common\Collections\ExpressionBuilder
+     * @return array
+     *                               key 0 -> type
+     *                               key 1 -> expression
+     */
+    protected function parseSimpleCondition($whereType = null)
     {
+        $expr = Criteria::expr();
+
+        if ($whereType) {
+            $whereType = $whereType . 'Where';
+            $this->stream->next();
+        } else {
+            $whereType = 'andWhere';
+        }
+
+        if ($this->stream->current->test(Token::PUNCTUATION_TYPE)) {
+            return [$whereType, $this->parseCompositeCondition()];
+        }
+
         /** @var Token $token */
-        $token = $this->stream->current;
-
-        //$criteria = $this->query->getCriteria();
-
-        $criteriaExpr = Criteria::expr();
+        $fieldNameToken = $this->stream->current;
 
         $this->stream->next();
-        switch ($this->stream->current->value) {
+
+        if ($this->stream->current->test(Token::STRING_TYPE)) {
+            /**
+             * TODO : field type parsing
+             */
+            //$fieldName = $fieldNameToken->value;
+            //$this->stream->next();
+
+        } elseif ($this->stream->current->test(Token::OPERATOR_TYPE)) {
+            $fieldType = Query::TYPE_TEXT;
+            //} elseif ($this->stream->current->test(Token::PUNCTUATION_TYPE)) {
+        } else {
+            throw new SyntaxError(
+                sprintf(
+                    'Unexpected token "%s" in comparison statement',
+                    $this->stream->current->type
+                ),
+                $this->stream->current->cursor
+            );
+        }
+
+        $fieldName = sprintf('%s.%s', $fieldType, $fieldNameToken->value);
+
+        /** @var Token $operatorToken */
+        $operatorToken = $this->stream->current;
+        if (!in_array($operatorToken->value, $this->typeOperators[$fieldType])) {
+            throw new SyntaxError(
+                sprintf('Not allowed operator "%s"', $operatorToken->value),
+                $operatorToken->cursor
+            );
+        }
+
+        $this->stream->next();
+        switch ($operatorToken->value) {
             case Query::OPERATOR_CONTAINS:
-                $this->stream->next();
-//                $criteria->where($expr->contains($token->value, $this->stream->current->value));
-                $this->stream->next();
+                //$criteria->where($expr->contains($fieldName, $this->stream->current->value));
+                //$criteria->{$whereType}(
+                $expr = $expr->contains($fieldName, $this->stream->current->value);
+                //);
                 break;
 
             case Query::OPERATOR_NOT_CONTAINS:
-                $this->stream->next();
-//                $criteria->where($criteria->expr()->($token->value, $this->stream->current->value));
-                $this->stream->next();
+                //$criteria->andwhere($expr()->  ($token->value, $this->stream->current->value));
                 break;
 
             case Query::OPERATOR_EQUALS:
-                $this->stream->next();
-
-//                $criteria->where($criteria->expr()->eq($token->value, $this->stream->current->value));
-//                $criteria->andWhere(
-//                    $criteria->expr()->andX(
-//                        $criteria->expr()->eq($token->value, $this->stream->current->value),
-//                        $criteria->expr()->eq('description', 'test')
-//                    )
-//                );
-
-                $this->stream->next();
+                //$criteria->{$whereType}($expr->eq($fieldName, $this->stream->current->value));
                 break;
 
             case Query::OPERATOR_NOT_EQUALS:
-                $this->stream->next();
-//                $criteria->where($criteria->expr()->neq($token->value, $this->stream->current->value));
-                $this->stream->next();
+                //$criteria->{$whereType}($expr->neq($fieldName, $this->stream->current->value));
                 break;
 
             default:
                 break;
         }
 
-        //$criteria->andWhere($expr->eq('name', 'Acuserv'))
+        $this->stream->next();
 
-        //$this->query->setCriteria($criteria);
-
-        return $criteriaExpr;
+        return [$whereType, $expr];
     }
 
     protected function parseCompositeCondition()
     {
-        /** @var Token $token */
-        $token = $this->stream->current;
+        $expressions = [];
 
-        throw new SyntaxError(
-            sprintf('composite expression.'),
-            $token->cursor
-        );
+        $this->stream->next();
+
+        while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
+            $type = null;
+            if ($this->stream->current->test(Token::OPERATOR_TYPE)) {
+                $type = $this->stream->current->value;
+            }
+
+            list($typeX, $expression) = $this->parseSimpleCondition($type);
+            $expressions[$typeX][] = $expression;
+        }
+
+        $expr = Criteria::expr();
+        if ($expressions) {
+            foreach ($expressions as $typeX => $subExpressions) {
+                $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $subExpressions);
+            }
+        } else {
+            throw new SyntaxError(sprintf('Syntax error in composite expression.'), $this->stream->current->cursor);
+        }
+
+        $this->stream->next();
+        return $expr;
     }
-
 
     /**
      * @return null
@@ -287,7 +346,20 @@ class Parser
         if ($token->test(Token::STRING_TYPE)) {
             $this->stream->next();
             $this->query->from($token->value);
+
             return null;
+        }
+
+        // if get operator - only '*' is supported in from statement
+        if ($token->test(Token::OPERATOR_TYPE)) {
+            if ($token->test(Token::OPERATOR_TYPE, '*')) {
+                $this->query->from(['*']);
+            } else {
+                throw new SyntaxError(
+                    sprintf('Unexpected operator in from statement of the expression.'),
+                    $token->cursor
+                );
+            }
         }
 
         // if punctuation '(' || ',' || ')' should collect all until closing bracket skipping any inner punctuation
@@ -302,12 +374,12 @@ class Parser
                 $this->query->from($fromParts);
             } else {
                 throw new SyntaxError(
-                    sprintf('Wrong "where" part of the expression.'),
+                    sprintf('Wrong "from" statement of the expression.'),
                     $token->cursor
                 );
             }
-            $this->stream->next();
         }
+        $this->stream->next();
 
         return null;
     }
