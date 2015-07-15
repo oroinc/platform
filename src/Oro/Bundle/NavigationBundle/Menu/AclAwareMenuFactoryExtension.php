@@ -18,6 +18,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     const ROUTE_CONTROLLER_KEY = '_controller';
     const CONTROLLER_ACTION_DELIMITER = '::';
     const DEFAULT_ACL_POLICY = true;
+    const ACL_POLICY_KEY = 'acl_policy';
     /**#@-*/
 
     /**
@@ -102,6 +103,10 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             && $this->securityFacade->hasLoggedUser();
 
         $isAllowed = self::DEFAULT_ACL_POLICY;
+        if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
+            $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+        }
+
         if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
             if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
                 $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
