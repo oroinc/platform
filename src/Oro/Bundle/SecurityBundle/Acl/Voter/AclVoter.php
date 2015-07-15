@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -226,7 +225,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
             if ($this->configProvider->hasConfig($className)) {
                 $config = $this->configProvider->getConfig($className);
                 $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
