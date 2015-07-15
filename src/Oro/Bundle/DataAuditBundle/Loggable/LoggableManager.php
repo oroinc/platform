@@ -48,14 +48,14 @@ class LoggableManager
     protected $organization;
 
     /**
-     * @deprecated 1.8:2.1 use AuditEntityMapper::getAuditEntryClass
+     * @deprecated 1.8.0:2.1.0 use AuditEntityMapper::getAuditEntryClass
      *
      * @var string
      */
     protected $logEntityClass;
 
     /**
-     * @deprecated 1.8:2.1 use AuditEntityMapper::getAuditEntryFieldClass
+     * @deprecated 1.8.0:2.1.0 use AuditEntityMapper::getAuditEntryFieldClass
      *
      * @var string
      */
