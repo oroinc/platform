@@ -22,6 +22,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
  * Class ActivityListChainProvider
  * @package Oro\Bundle\ActivityListBundle\Provider
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActivityListChainProvider
 {

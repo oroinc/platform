@@ -197,6 +197,10 @@ class ActivityListManager
     public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
+        $activity = $this->doctrineHelper->getEntity(
+            $entity->getRelatedActivityClass(),
+            $entity->getRelatedActivityId()
+        );
 
         $ownerName = '';
         $ownerId   = '';
@@ -238,8 +242,8 @@ class ActivityListManager
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
-            'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
-            'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
+            'editable'             => $this->securityFacade->isGranted('EDIT', $activity),
+            'removable'            => $this->securityFacade->isGranted('DELETE', $activity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
             'targetEntityData'     => $targetEntityData,

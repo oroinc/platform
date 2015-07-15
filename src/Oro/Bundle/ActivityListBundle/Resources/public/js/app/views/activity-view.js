@@ -81,6 +81,8 @@ define(function(require) {
             }
             data.routing = routing;
             data.dateFormatter = dateTimeFormatter;
+            data.editable = this.model.get('editable');
+            data.removable = this.model.get('removable');
 
             return data;
         },
@@ -93,6 +95,9 @@ define(function(require) {
             this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
+            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length == 0) {
+                this.$('.dropdown-menu.activity-item').hide();
+            }
             this.initLayout();
             return this;
         },
