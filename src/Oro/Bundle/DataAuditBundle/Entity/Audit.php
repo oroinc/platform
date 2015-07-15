@@ -133,7 +133,7 @@ class Audit extends AbstractAudit
     /**
      * {@inheritdoc}
      *
-     * @deprecated 1.8:2.1 Use method createField instead
+     * @deprecated 1.8.0:2.1.0 Use method createField instead
      */
     public function setData($data)
     {
@@ -141,7 +141,7 @@ class Audit extends AbstractAudit
     }
 
     /**
-     * @deprecated 1.8:2.1 This method is for internal use only. Use method getData or getFields instead
+     * @deprecated 1.8.0:2.1.0 This method is for internal use only. Use method getData or getFields instead
      *
      * @return array|null
      */
