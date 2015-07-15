@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -192,7 +189,7 @@ class ConfigurationType extends AbstractType
             $syncEnabled = array_key_exists('syncEnabled', $matched);
             $folder->setSyncEnabled($syncEnabled);
 
-            if ($folder->hasSubFolders() && array_key_exists('subFolders', $matched)) {
+            if (array_key_exists('subFolders', $matched) && $folder->hasSubFolders()) {
                 $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
             }
         }

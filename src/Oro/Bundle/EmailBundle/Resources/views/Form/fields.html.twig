@@ -197,12 +197,12 @@
 {% block oro_email_email_folder_row %}
     {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
         <div>
-            {{ form_widget(form.syncEnabled) }}<label style="margin-left: 5px">{{ form.vars.value.name }}</label>
+            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
             {{ form_widget(form.fullName) }}
             {{ form_widget(form.name) }}
             {{ form_widget(form.type) }}
             {% if form.vars.value.subFolders|length > 0 %}
-                <div style="margin-left: 20px">
+                <div class="folder-sub-folders">
                     {{ form_widget(form.subFolders) }}
                 </div>
             {% endif %}
@@ -217,9 +217,9 @@
 {% endblock %}
 
 {% block oro_email_email_folder_tree_widget %}
-    <div style="margin-top: 5px">
-        <input id="check-all" type="checkbox" style="margin: 0"/><label style="margin-left: 5px">All</label>
-        <div id="folder-list" style="margin-left: 20px">
+    <div class="folder-tree-widget">
+        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
+        <div id="folder-list">
             {% for child in form.children %}
                 {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
                     {{ form_row(child) }}

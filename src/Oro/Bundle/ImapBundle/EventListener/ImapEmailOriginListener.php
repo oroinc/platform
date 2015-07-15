@@ -44,18 +44,18 @@ class ImapEmailOriginListener
     }
 
     /**
+     * Create ImapEmailFolder instances for each newly created EmailFolder related to ImapEmailOrigin
+     *
      * @param LifecycleEventArgs $event
      */
     public function prePersist(LifecycleEventArgs $event)
     {
         $origin = $event->getObject();
-        if ($origin instanceof ImapEmailOrigin) {
-            if (!$origin->getFolders()->isEmpty()) {
-                $manager = $this->createManager($origin);
-                $folders = $origin->getRootFolders();
+        if ($origin instanceof ImapEmailOrigin && !$origin->getFolders()->isEmpty()) {
+            $manager = $this->createManager($origin);
+            $folders = $origin->getRootFolders();
 
-                $this->createImapEmailFolders($folders, $manager);
-            }
+            $this->createImapEmailFolders($folders, $manager);
         }
     }
 

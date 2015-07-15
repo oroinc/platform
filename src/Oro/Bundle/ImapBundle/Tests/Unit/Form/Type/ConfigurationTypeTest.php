@@ -61,14 +61,17 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
-        return array_merge(parent::getExtensions(), [
-            new PreloadedExtension(
-                [
-                    'oro_email_email_folder' => new EmailFolderType(),
-                    'oro_email_email_folder_tree' => new EmailFolderTreeType(),
-                ],
-                []
-            )]
+        return array_merge(
+            parent::getExtensions(),
+            [
+                new PreloadedExtension(
+                    [
+                        'oro_email_email_folder' => new EmailFolderType(),
+                        'oro_email_email_folder_tree' => new EmailFolderTreeType(),
+                    ],
+                    []
+                )
+            ]
         );
     }
 
@@ -88,7 +91,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindValidData($formData, $expectedViewData, $expectedModelData)
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator, false);
         $form = $this->factory->create($type);
         if ($expectedViewData) {
             $form->submit($formData);
@@ -158,7 +161,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindEmptyPassword()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator, false);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -184,7 +187,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testCreatingNewConfiguration()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator, false);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -213,7 +216,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitEmptyForm()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator, false);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
