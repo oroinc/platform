@@ -12,6 +12,7 @@ items:
         template: OroEmailBundle:Email:activityLink.html.twig
         acl: oro_email_email_create
     dots_menu_email:
-        template: OroEmailBundle:Notification:button.html.twig
+#        template: OroEmailBundle:Notification:button.html.twig
+        action: OroEmailBundle:Email:notification
         applicable: @oro_user.placeholder.filter->isUserApplicable()
 

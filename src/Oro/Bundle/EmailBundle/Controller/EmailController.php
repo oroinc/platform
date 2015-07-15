@@ -78,6 +78,17 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/new/natification", name="oro_email_new_natification_template")
+     * @Template("OroEmailBundle:Notification:button.html.twig")
+     */
+    public function notificationAction()
+    {
+        return [
+            'clank_event'=>'bbb'
+        ];
+    }
+
+    /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
