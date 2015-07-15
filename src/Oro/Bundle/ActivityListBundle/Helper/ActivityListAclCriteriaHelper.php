@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Criteria;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
@@ -18,9 +19,19 @@ class ActivityListAclCriteriaHelper
     /** @var AclHelper */
     protected $aclHelper;
 
-    public function __construct(AclHelper $aclHelper)
-    {
+    /** @var ServiceLink */
+    protected $securityContextLink;
+
+    /**
+     * @param AclHelper $aclHelper
+     * @param ServiceLink $securityContextLink
+     */
+    public function __construct(
+        AclHelper $aclHelper,
+        ServiceLink $securityContextLink
+    ) {
         $this->aclHelper = $aclHelper;
+        $this->securityContextLink = $securityContextLink;
     }
 
     /**
@@ -47,7 +58,9 @@ class ActivityListAclCriteriaHelper
         /** @var ActivityListProviderInterface $provider */
         foreach ($providers as $provider) {
             $criteria = $this->getCriteriaByProvider($provider, $mapFields);
-            $aclCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
+            if ($criteria->getWhereExpression()) {
+                $aclCriteria->orWhere(Criteria::expr()->orX($criteria->getWhereExpression()));
+            }
         }
         $this->addDefaultCriteria($aclCriteria);
 
@@ -72,11 +85,11 @@ class ActivityListAclCriteriaHelper
             'VIEW',
             $mapFields
         );
-        // do not show without exists permissions on class
-        if (!$appliedCriteria->getWhereExpression()) {
-            $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityId', -1));
+        $isGranted = $this->securityContextLink->getService()
+            ->isGranted('VIEW', 'entity:' . $activityClass);
+        if ($isGranted) {
+            $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
         }
-        $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
 
         return $appliedCriteria;
     }
