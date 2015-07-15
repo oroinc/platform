@@ -70,11 +70,15 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
         try {
             $data = Type::getType(Type::TARRAY)
                 ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
-        } catch (ConversionException $ex) {}
+        } catch (ConversionException $ex) {
+        }
 
         if (is_array($data)) {
             $this->processArrayData($row, $data);
         } else {
+            if (!is_scalar($data)) {
+                $data = serialize($data);
+            }
             $this->processTextData($row, $data);
         }
     }
@@ -112,13 +116,17 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      * @param array $row
      * @param array $data
      */
-    private function processArrayData(array $row, array $data) {
+    private function processArrayData(array $row, array $data)
+    {
         foreach ($data as $field => $values) {
             $visible = true;
 
             $fieldType = $this->getFieldType($row['entity_id'], $field);
             $dataType = null;
-            if (!AuditFieldTypeRegistry::hasType($fieldType) || !isset($values['old'], $values['new'])) {
+            if (!AuditFieldTypeRegistry::hasType($fieldType)
+                || !array_key_exists('old', $values)
+                || !array_key_exists('new', $values)
+            ) {
                 $dataType = 'array';
                 $visible  = false;
             } else {
@@ -155,12 +163,12 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function parseValue($values, $key)
     {
-        if (!isset($values[$key])) {
+        if (!array_key_exists($key, $values)) {
             return $values;
         }
 
         $value = $values[$key];
-        if (is_array($value) && isset($value['value'])) {
+        if (is_array($value) && array_key_exists('value', $value)) {
             return $value['value'];
         }
 
