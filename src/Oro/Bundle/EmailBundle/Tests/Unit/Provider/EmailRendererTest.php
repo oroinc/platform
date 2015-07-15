@@ -116,11 +116,17 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 $this->cacheKey,
                 serialize(
                     [
+                        'formatters' => [
+                            $entityClass => []
+                        ],
                         'properties' => [
                             $entityClass => ['field2']
                         ],
                         'methods'    => [
                             $entityClass => ['getField1']
+                        ],
+                        'default_formatter' => [
+                            $entityClass => []
                         ]
                     ]
                 )
@@ -148,7 +154,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $entityClass = get_class($entity);
         $systemVars  = ['testVar' => 'test_system'];
 
-        $this->cache->expects($this->once())->method('fetch')
+        $this->cache->expects($this->any())->method('fetch')
             ->with($this->cacheKey)
             ->will(
                 $this->returnValue(
@@ -208,7 +214,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $entity->setField2($entity2);
 
         $this->cache
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('fetch')
             ->with($this->cacheKey)
             ->will(
@@ -231,8 +237,8 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            'content oro.email.variable.not.found, {{ entity.field1|oro_format_datetime }}, ' .
-            '{{ entity.field2.field1|oro_format_datetime }}, oro.email.variable.not.found, {{ system.currentDate }}',
+            'content oro.email.variable.not.found, {{ entity.field1 }}, ' .
+            '{{ entity.field2.field1 }}, oro.email.variable.not.found, {{ system.currentDate }}',
             $renderedContent = $result[1]
         );
     }

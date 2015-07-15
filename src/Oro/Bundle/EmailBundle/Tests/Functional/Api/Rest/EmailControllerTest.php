@@ -25,7 +25,7 @@ class EmailControllerTest extends WebTestCase
         'importance' => 'low',
         'body'       => 'Test body',
         'bodyType'   => 'text',
-        'receivedAt' => '2015-06-19 12:17:51',
+        'receivedAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -128,6 +128,21 @@ class EmailControllerTest extends WebTestCase
             'The Subject cannot be changed for already existing email.'
             . ' Existing value: "New email". New value: "New subject".'
         );
+    }
+
+    public function testCreateEmailWithoutSubjectAndBody()
+    {
+        $email = $this->email;
+        $email['messageId'] = 'new.test@email-bundle.func-test';
+        unset($email['subject'], $email['body'], $email['bodyType']);
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertNotNull($email['subject'], "The Subject cannot be null. It should be empty string");
+        $this->assertNotNull($email['body'], "The Body cannot be null. It should be empty string");
     }
 
     /**

@@ -126,6 +126,29 @@ class ActivityListRepository extends EntityRepository
     }
 
     /**
+     * Return count of activity list records for current target class name
+     *
+     * @param string $className Target entity class name
+     *
+     * @return int Number of activity list records
+     */
+    public function getRecordsCountForTargetClass($className)
+    {
+        // we need try/catch here to avoid crash on non exist entity relation
+        try {
+            $result = $this->createQueryBuilder('list')
+                ->select('COUNT(list.id)')
+                ->join('list.' . $this->getAssociationName($className), 'r')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            $result = 0;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get Association name
      *
      * @param string $className

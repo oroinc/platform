@@ -1,4 +1,3 @@
-/* global define */
 define([
     'jquery',
     'underscore',
@@ -20,7 +19,7 @@ define([
          * Reset manager to initial state.
          */
         resetWidgets: function() {
-            _.each(this.widgets, function (widget) {
+            _.each(this.widgets, function(widget) {
                 // if widget is not actual any more -- remove it
                 if (!widget.isActual()) {
                     widget.remove();

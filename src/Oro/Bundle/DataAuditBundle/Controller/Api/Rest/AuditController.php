@@ -17,9 +17,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter;
 
 /**
  * @NamePrefix("oro_api_")
@@ -80,7 +80,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         $filterParameters = [
             'loggedAt'    => new HttpDateTimeParameterFilter(),
             'user'        => new IdentifierToReferenceFilter($this->getDoctrine(), 'OroUserBundle:User'),
-            'objectClass' => new HttpEntityNameParameterFilter($this->get('oro_entity.routing_helper'))
+            'objectClass' => new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
         ];
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters('cgetAction'), $filterParameters);

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 
 abstract class AbstractAclExtension implements AclExtensionInterface
 {
+    /**
+     * @var array
+     */
     protected $map;
 
     /**
@@ -75,22 +78,26 @@ abstract class AbstractAclExtension implements AclExtensionInterface
      * @param string $descriptor
      * @param string $type [output]
      * @param string $id [output]
+     * @param string $group
      * @throws \InvalidArgumentException
      */
-    protected function parseDescriptor($descriptor, &$type, &$id)
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
         $delim = strpos($descriptor, ':');
         if (!$delim) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    'Incorrect descriptor: %s. Expected "ExtensionKey:Class".',
-                    $descriptor
-                )
+                sprintf('Incorrect descriptor: %s. Expected "ExtensionKey:Class".', $descriptor)
             );
         }
 
         $id = strtolower(substr($descriptor, 0, $delim));
         $type = ltrim(substr($descriptor, $delim + 1), ' ');
+
+        $delim = strpos($type, '@');
+        if ($delim !== false) {
+            $group = strtolower(ltrim(substr($type, 0, $delim), ' '));
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
     }
 
     /**

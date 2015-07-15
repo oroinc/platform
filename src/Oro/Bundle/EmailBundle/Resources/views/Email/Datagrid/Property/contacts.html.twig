@@ -2,6 +2,8 @@
 
 {% set folder = record.getValue('folder') %}
 {% set thread = record.getValue('email.thread') %}
+{% set isNew = record.getValue('is_new') %}
+
 {% if thread is not null  %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
 {% else %}
@@ -22,9 +24,18 @@
 {% endif %}
 
 {% if (recipients|length > 0 and recipients|length < 3) %}
-    <strong>{{ EA.email_participants_name(recipients, true, false) }}</strong>
+    {% if isNew == 1 %}
+        <strong>
+    {% endif %}
+        {{ EA.email_participants_name(recipients, true, false) }}
+    {% if isNew == 1 %}
+        </strong>
+    {% endif %}
 {% else %}
-    <strong>
+        {% if isNew == 1 %}
+            <strong>
+        {% endif %}
+
         {% set firstEmail = recipients[0] %}
         {% set lastEmail = recipients[recipients|length - 1] %}
         {{
@@ -32,9 +43,19 @@
         }}..{{
             EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
         }}
-    </strong>
+        {% if isNew == 1 %}
+            </strong>
+        {% endif %}
+
 {% endif %}
 {% if thread is not null and thread.emails|length > 1 %}
-    <strong>({{ thread.emails|length }})</strong>
+    {% if isNew == 1 %}
+        <strong>
+    {% endif %}
+        ({{ thread.emails|length }})
+    {% if isNew == 1 %}
+        </strong>
+    {% endif %}
+
 {% endif %}
 </span>

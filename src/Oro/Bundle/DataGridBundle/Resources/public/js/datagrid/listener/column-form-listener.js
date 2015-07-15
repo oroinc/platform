@@ -1,13 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
-    'orotranslation/js/translator',
     'oroui/js/mediator',
-    'oroui/js/modal',
-    './abstract-listener'
-], function ($, _, __, mediator, Modal, AbstractListener) {
+    './abstract-grid-change-listener'
+], function($, _, mediator, AbstractGridChangeListener) {
     'use strict';
 
     var ColumnFormListener;
@@ -17,9 +13,9 @@ define([
      *
      * @export  orodatagrid/js/datagrid/listener/column-form-listener
      * @class   orodatagrid.datagrid.listener.ColumnFormListener
-     * @extends orodatagrid.datagrid.listener.AbstractListener
+     * @extends orodatagrid.datagrid.listener.AbstractGridChangeListener
      */
-    ColumnFormListener = AbstractListener.extend({
+    ColumnFormListener = AbstractGridChangeListener.extend({
 
         /** @param {Object} */
         selectors: {
@@ -28,11 +24,9 @@ define([
         },
 
         /**
-         * Initialize listener object
-         *
-         * @param {Object} options
+         * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'selectors')) {
                 throw new Error('Field selectors is not specified');
             }
@@ -45,30 +39,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
-            if (this.disposed) {
-                return;
-            }
-            _.each(this.confirmModal, function (modal) {
-                modal.dispose();
-            });
-            delete this.confirmModal;
-            ColumnFormListener.__super__.dispose.call(this);
-        },
-
-        /**
-         * Set datagrid instance
-         */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
-            this._clearState();
-            this._restoreState();
-
-            /**
-             * Restore include/exclude state from pagestate
-             */
-            mediator.bind("pagestate_restored", function () {
+            /** Restore include/exclude state from pagestate */
+            mediator.bind('pagestate_restored', function() {
                 this._restoreState();
             }, this);
         },
@@ -76,21 +51,7 @@ define([
         /**
          * @inheritDoc
          */
-        getGridEvents: function () {
-            var events = ColumnFormListener.__super__.getGridEvents.call(this);
-            events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
-            events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
-            return events;
-        },
-
-        /**
-         * Fills inputs referenced by selectors with ids need to be included and to excluded
-         *
-         * @param {*} id model id
-         * @param {Backbone.Model} model
-         * @protected
-         */
-        _processValue: function (id, model) {
+        _processValue: function(id, model) {
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
@@ -128,22 +89,18 @@ define([
         },
 
         /**
-         * Clears state of include and exclude properties to empty values
-         *
-         * @private
+         * @inheritDoc
          */
-        _clearState: function () {
+        _clearState: function() {
             this.set('included', []);
             this.set('excluded', []);
             this.set('original', {});
         },
 
         /**
-         * Synchronize values of include and exclude properties with form fields and datagrid parameters
-         *
-         * @private
+         * @inheritDoc
          */
-        _synchronizeState: function () {
+        _synchronizeState: function() {
             var included = this.get('included');
             var excluded = this.get('excluded');
             if (this.selectors.included) {
@@ -163,11 +120,11 @@ define([
          * @return {Array}
          * @private
          */
-        _explode: function (string) {
+        _explode: function(string) {
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function (val) { return val ? parseInt(val, 10) : null; });
+            return _.map(string.split(','), function(val) { return val ? parseInt(val, 10) : null; });
         },
 
         /**
@@ -175,7 +132,7 @@ define([
           *
           * @private
           */
-        _restoreState: function () {
+        _restoreState: function() {
             var included = '';
             var excluded = '';
             if (this.selectors.included && $(this.selectors.included).length) {
@@ -189,88 +146,16 @@ define([
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);
-                mediator.trigger('datagrid:restoreState:' + this.gridName, this.columnName, this.dataField, included, excluded);
+                mediator.trigger('datagrid:restoreState:' + this.gridName,
+                    this.columnName, this.dataField, included, excluded);
             }
         },
 
         /**
-         * Confirms refresh action that before it will be executed
-         *
-         * @param {$.Event} e
-         * @param {oro.datagrid.action.AbstractAction} action
-         * @param {Object} options
-         * @private
+         * @inheritDoc
          */
-        _onExecuteRefreshAction: function (e, action, options) {
-            this._confirmAction(action, options, 'refresh', {
-                title: __('Refresh Confirmation'),
-                content: __('Your local changes will be lost. Are you sure you want to refresh grid?')
-            });
-        },
-
-        /**
-         * Confirms reset action that before it will be executed
-         *
-         * @param {$.Event} e
-         * @param {oro.datagrid.action.AbstractAction} action
-         * @param {Object} options
-         * @private
-         */
-        _onExecuteResetAction: function (e, action, options) {
-            this._confirmAction(action, options, 'reset', {
-                title: __('Reset Confirmation'),
-                content: __('Your local changes will be lost. Are you sure you want to reset grid?')
-            });
-        },
-
-        /**
-         * Asks user a confirmation if there are local changes, if user confirms then clears state and runs action
-         *
-         * @param {oro.datagrid.action.AbstractAction} action
-         * @param {Object} actionOptions
-         * @param {String} type "reset" or "refresh"
-         * @param {Object} confirmModalOptions Options for confirm dialog
-         * @private
-         */
-        _confirmAction: function (action, actionOptions, type, confirmModalOptions) {
-            this.confirmed = this.confirmed || {};
-            if (!this.confirmed[type] && this._hasChanges()) {
-                actionOptions.doExecute = false; // do not execute action until it's confirmed
-                this._openConfirmDialog(type, confirmModalOptions, function () {
-                    // If confirmed, clear state and run action
-                    this.confirmed[type] = true;
-                    this._clearState();
-                    this._synchronizeState();
-                    action.run();
-                });
-            }
-            this.confirmed[type] = false;
-        },
-
-        /**
-         * Returns TRUE if listener contains user changes
-         *
-         * @return {Boolean}
-         * @private
-         */
-        _hasChanges: function () {
+        _hasChanges: function() {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
-        },
-
-        /**
-         * Opens confirm modal dialog
-         */
-        _openConfirmDialog: function (type, options, callback) {
-            if (!this.confirmModal[type]) {
-                this.confirmModal[type] = new Modal(_.extend({
-                    title: __('Confirmation'),
-                    okText: __('OK, got it.'),
-                    className: 'modal modal-primary',
-                    okButtonClass: 'btn-primary btn-large'
-                }, options));
-                this.confirmModal[type].on('ok', _.bind(callback, this));
-            }
-            this.confirmModal[type].open();
         }
     });
 
@@ -285,24 +170,22 @@ define([
      * @param {Object} [options.data] data for grid's collection
      * @param {Object} [options.metadata] configuration for the grid
      */
-    ColumnFormListener.init = function (deferred, options) {
-        var gridOptions, gridInitialization;
-        gridOptions = options.metadata.options || {};
-        gridInitialization = options.gridPromise;
+    ColumnFormListener.init = function(deferred, options) {
+        var gridOptions = options.metadata.options || {};
+        var gridInitialization = options.gridPromise;
 
         var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
 
         if (gridListenerOptions) {
-            gridInitialization.done(function (grid) {
-                var listener, listenerOptions;
-                listenerOptions = _.defaults({
+            gridInitialization.done(function(grid) {
+                var listenerOptions = _.defaults({
                     $gridContainer: grid.$el,
                     gridName: grid.name
                 }, gridListenerOptions);
 
-                listener = new ColumnFormListener(listenerOptions);
+                var listener = new ColumnFormListener(listenerOptions);
                 deferred.resolve(listener);
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         } else {

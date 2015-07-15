@@ -24,7 +24,7 @@ use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 class ActivityEntityController extends RestController
 {
     /**
-     * Returns the list of entities associated with the specified activity entity.
+     * Get entities associated with the specified activity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
@@ -45,7 +45,7 @@ class ActivityEntityController extends RestController
      * )
      *
      * @ApiDoc(
-     *      description="Returns the list of entities associated with the specified activity entity",
+     *      description="Get entities associated with the specified activity",
      *      resource=true
      * )
      *

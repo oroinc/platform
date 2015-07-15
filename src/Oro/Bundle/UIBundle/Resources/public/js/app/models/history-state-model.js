@@ -1,12 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var HistoryStateModel,
-        Backbone = require('backbone');
+    var HistoryStateModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
-    HistoryStateModel = Backbone.Model.extend({
-        defaults: {
-            data: {}
+    HistoryStateModel = BaseModel.extend({
+        defaults: function() {
+            return {
+                data: {}
+            };
         }
     });
 

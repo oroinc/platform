@@ -36,7 +36,7 @@ class EmailBodyBuilder
      * Sets an email body properties
      *
      * @param string $content
-     * @param bool $bodyIsText
+     * @param bool   $bodyIsText
      */
     public function setEmailBody($content, $bodyIsText)
     {
@@ -49,23 +49,26 @@ class EmailBodyBuilder
     /**
      * Adds an email attachment
      *
-     * @param string $fileName
-     * @param string $content
-     * @param string $contentType
-     * @param string $contentTransferEncoding
+     * @param string      $fileName
+     * @param string      $content
+     * @param string      $contentType
+     * @param string      $contentTransferEncoding
+     * @param null|string $embeddedContentId
+     *
      * @throws \LogicException
      */
     public function addEmailAttachment(
         $fileName,
         $content,
         $contentType,
-        $contentTransferEncoding
+        $contentTransferEncoding,
+        $embeddedContentId = null
     ) {
         if ($this->emailBody === null) {
             throw new \LogicException('Call setEmailBody first.');
         }
 
-        $emailAttachment = new EmailAttachment();
+        $emailAttachment        = new EmailAttachment();
         $emailAttachmentContent = new EmailAttachmentContent();
 
         $emailAttachmentContent
@@ -76,7 +79,8 @@ class EmailBodyBuilder
         $emailAttachment
             ->setFileName($fileName)
             ->setContentType($contentType)
-            ->setContent($emailAttachmentContent);
+            ->setContent($emailAttachmentContent)
+            ->setEmbeddedContentId($embeddedContentId);
 
         $this->emailBody->addAttachment($emailAttachment);
     }
