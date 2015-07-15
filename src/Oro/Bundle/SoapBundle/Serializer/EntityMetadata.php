@@ -58,6 +58,22 @@ class EntityMetadata
     }
 
     /**
+     * Returns the discriminator value of the given entity class
+     * This does only apply to the JOINED and SINGLE_TABLE inheritance mapping strategies
+     * where a discriminator column is used
+     *
+     * @param string $entityClass
+     *
+     * @return mixed
+     */
+    public function getDiscriminatorValue($entityClass)
+    {
+        $map = array_flip($this->metadata->discriminatorMap);
+
+        return $map[$entityClass];
+    }
+
+    /**
      * Returns the mapping of an association
      *
      * @param string $fieldName

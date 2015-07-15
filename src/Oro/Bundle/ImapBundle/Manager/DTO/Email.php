@@ -75,7 +75,7 @@ class Email extends EmailHeader
             $body = $this->message->getBody();
 
             $contentType = $this->message->getPriorContentType();
-            if ($contentType && $contentType->getType() === 'text/html') {
+            if ($contentType && strtolower($contentType->getType()) === 'text/html') {
                 $this->body->setContent($body->getContent(Body::FORMAT_HTML)->getDecodedContent());
                 $this->body->setBodyIsText(false);
             } else {
@@ -104,7 +104,8 @@ class Email extends EmailHeader
                     ->setFileName($a->getFileName()->getValue())
                     ->setContent($content->getContent())
                     ->setContentType($content->getContentType())
-                    ->setContentTransferEncoding($content->getContentTransferEncoding());
+                    ->setContentTransferEncoding($content->getContentTransferEncoding())
+                    ->setContentId($a->getEmbeddedContentId());
                 $this->attachments[] = $attachment;
             }
         }

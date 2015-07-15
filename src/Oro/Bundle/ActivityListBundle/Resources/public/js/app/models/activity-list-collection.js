@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/app/models/base/collection',
     './activity-list-model',
     'underscore',
     'routing',
-], function (BaseCollection, ActivityModel, _, routing) {
+], function(BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
     var ActivityCollection;
@@ -22,7 +20,7 @@ define([
             total:    1  //total pages
         },
 
-        url: function () {
+        url: function() {
             return routing.generate(
                 this.route,
                 _.extend(
@@ -32,26 +30,28 @@ define([
             );
         },
 
-        setFilter: function (filter) {
+        setFilter: function(filter) {
             this.filter = filter;
         },
 
-        getPage: function () {
+        getPage: function() {
             return parseInt(this.pager.current);
         },
-        setPage: function (page) {
+        setPage: function(page) {
             this.pager.current = page;
         },
 
-        getPageSize: function () {
+        getPageSize: function() {
             return parseInt(this.pager.pagesize);
         },
-        setPageSize: function (pagesize) {
+        setPageSize: function(pagesize) {
             this.pager.pagesize = pagesize;
         },
 
-        reset: function (models, options) {
-            var i, newModel, oldModel;
+        reset: function(models, options) {
+            var i;
+            var newModel;
+            var oldModel;
             if (options.parse) {
                 for (i = 0; i < models.data.length; i++) {
                     newModel = models.data[i];
@@ -75,24 +75,24 @@ define([
          *
          * @param model {Object|ActivityModel} attributes or model to compare
          */
-        findSameActivity: function (model) {
-            return this.find(function (item) {
+        findSameActivity: function(model) {
+            return this.find(function(item) {
                 return item.isSameActivity(model);
             });
         },
 
-        getCount: function () {
+        getCount: function() {
             return parseInt(this.pager.count);
         },
 
-        setCount: function (count) {
+        setCount: function(count) {
             this.pager.count = count;
-            this.pager.total = count == 0 ? 1 : Math.ceil(count/this.pager.pagesize);
+            this.pager.total = count === 0 ? 1 : Math.ceil(count / this.pager.pagesize);
 
             this.count = count;
         },
 
-        parse: function (response) {
+        parse: function(response) {
             this.setCount(parseInt(response.count));
 
             return response.data;

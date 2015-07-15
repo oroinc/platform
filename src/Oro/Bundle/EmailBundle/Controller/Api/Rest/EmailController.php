@@ -46,7 +46,7 @@ class EmailController extends RestController
      *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
      * )
      * @ApiDoc(
-     *      description="Get all emails",
+     *      description="Get emails",
      *      resource=true
      * )
      * @AclAncestor("oro_email_email_view")
@@ -69,7 +69,7 @@ class EmailController extends RestController
     }
 
     /**
-     * REST GET item
+     * Get email.
      *
      * @param string $id
      *
@@ -122,12 +122,12 @@ class EmailController extends RestController
     }
 
     /**
-     * Returns email context data.
+     * Get email context data.
      *
      * @param int $id The email id
      *
      * @ApiDoc(
-     *      description="Returns email context data",
+     *      description="Get email context data",
      *      resource=true
      * )
      *

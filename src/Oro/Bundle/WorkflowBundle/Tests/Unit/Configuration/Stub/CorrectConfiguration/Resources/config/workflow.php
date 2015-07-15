@@ -20,6 +20,7 @@ return array(
                     'first_attribute' => array('update' => false, 'delete' => true)
                 ),
                 'allowed_transitions' => array('first_transition'),
+                'position' => []
             )
         ),
         'attributes' => array(
@@ -118,6 +119,7 @@ return array(
                 'is_final' => false,
                 'allowed_transitions' => array(),
                 'entity_acl' => array(),
+                'position' => []
             )
         ),
         'attributes' => array(),

@@ -11,6 +11,7 @@ You can find additional information about the bundle's features in their dedicat
 
  - [Custom form types and options](./Resources/doc/custom_form_type.md)
  - [Associations](./Resources/doc/associations.md)
+ - [Creating API to Manage Associations](./Resources/doc/associations_api.md)
 
 
 Manage entities through UI

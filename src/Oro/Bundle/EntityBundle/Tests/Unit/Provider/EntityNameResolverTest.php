@@ -28,7 +28,7 @@ class EntityNameResolverTest extends \PHPUnit_Framework_TestCase
             ]
         );
         $this->entityNameResolver->addProvider($this->provider1);
-        $this->entityNameResolver->addProvider($this->provider2, -1);
+        $this->entityNameResolver->addProvider($this->provider2, 1);
     }
 
     /**

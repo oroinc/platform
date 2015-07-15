@@ -1,12 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone',
     'backgrid',
     './header-cell/header-cell'
-], function (_, Backbone, Backgrid, HeaderCell) {
-    "use strict";
+], function(_, Backbone, Backgrid, HeaderCell) {
+    'use strict';
 
     var Header;
 
@@ -19,7 +17,7 @@ define([
      */
     Header = Backgrid.Header.extend({
         /** @property */
-        tagName: "thead",
+        tagName: 'thead',
 
         /** @property */
         row: Backgrid.HeaderRow,
@@ -30,12 +28,12 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
             if (!options.columns) {
-                throw new TypeError("'columns' is required");
+                throw new TypeError('"columns" is required');
             }
 
             this.columns = options.columns;
@@ -55,11 +53,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.row.cells, function (cell) {
+            _.each(this.row.cells, function(cell) {
                 cell.dispose();
             });
             delete this.row.cells;
