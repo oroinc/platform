@@ -43,7 +43,7 @@ class WebSocketSendProcessor
     public function send(EmailUser $emailUser)
     {
         if ($emailUser->getOwner()) {
-            $messageData = ['email_id' => $emailUser->getEmail()->getId()];
+            $messageData = [['email_id' => $emailUser->getEmail()->getId()]];
             return $this->publisher->send(
                 self::getUserTopic($emailUser->getOwner()),
                 json_encode($messageData)

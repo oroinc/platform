@@ -61,7 +61,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with(
                 sprintf(WebSocketSendProcessor::TOPIC, $this->user->getId()),
-                json_encode(['email_id' => $this->email->getId()])
+                json_encode([['email_id' => $this->email->getId()]])
             );
 
         $emailUser = new EmailUser();

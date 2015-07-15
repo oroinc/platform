@@ -202,8 +202,8 @@ services:
         arguments:
             - @oro_email.email_websocket.processor
         tags:
-            - { name: doctrine.event_listener, event: onFlush }
-            - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onFlush, priority: 1 }
+            - { name: doctrine.event_listener, event: postFlush, priority: 1 }
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
