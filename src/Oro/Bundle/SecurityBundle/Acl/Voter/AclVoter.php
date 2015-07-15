@@ -286,7 +286,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
                 $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
                 $group = ltrim(substr($type, 0, $delim), ' ');
             }
-        } elseif (is_object($object)) {
+        } elseif (is_object($object) && $this->entitySecurityMetadataProvider) {
             $config = $this->entitySecurityMetadataProvider->getMetadata(ClassUtils::getRealClass($object));
             $group = $config->getGroup();
         }
