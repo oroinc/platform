@@ -31,6 +31,9 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike([])
                     ->prototype('scalar')->end()
                 ->end()
+                ->scalarNode('single_mailbox_mode')
+                    ->defaultValue(true)
+                ->end()
             ->end()
         ->end();
 

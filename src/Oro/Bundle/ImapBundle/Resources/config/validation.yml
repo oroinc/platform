@@ -1,7 +1,5 @@
 Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin:
     properties:
-        mailboxName:
-            - NotBlank:     ~
         host:
             - NotBlank:     { groups: [Check] }
             - Length:

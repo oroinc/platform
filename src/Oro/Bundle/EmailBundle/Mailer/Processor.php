@@ -350,6 +350,7 @@ class Processor
 
         $origin = new InternalEmailOrigin();
         $origin
+            ->setMailboxName($originName)
             ->setName($originName)
             ->addFolder($outboxFolder)
             ->setOwner($emailOwner)

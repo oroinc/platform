@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Command;
+namespace Oro\Bundle\ImapBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 
@@ -43,8 +43,15 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->em = $this->getContainer()->get('doctrine')->getManager();
         $this->logger = new OutputLogger($output);
+
+        if ($this->getContainer()->getParameter('oro_email.single_mailbox_mode') !== true) {
+            $this->logger->notice('Cannot proceed: single mailbox mode is switched off');
+
+            return;
+        }
+
+        $this->em = $this->getContainer()->get('doctrine')->getManager();
 
         $originId = $input->getOption('id');
         $origins = $this->getOriginsToClear($originId);
@@ -55,8 +62,14 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
         }
 
         foreach ($origins as $origin) {
+            $this->logger->notice(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
+
             $this->clearOrigin($origin);
+
+            $this->logger->notice('Origin removed');
         }
+
+        $this->logger->notice('Finished');
     }
 
     /**

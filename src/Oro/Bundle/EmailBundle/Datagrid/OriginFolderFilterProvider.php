@@ -22,22 +22,32 @@ class OriginFolderFilterProvider
      */
     protected $em;
 
-    /** @var Translator */
+    /**
+     * @var Translator
+     */
     protected $translator;
+
+    /**
+     * @var bool
+     */
+    protected $singleMailboxMode;
 
     /**
      * @param OroEntityManager $em
      * @param SecurityContext $securityContext
      * @param Translator $translator
+     * @param bool $singleMailboxMode
      */
     public function __construct(
         OroEntityManager $em,
         SecurityContext $securityContext,
-        Translator $translator
+        Translator $translator,
+        $singleMailboxMode
     ) {
         $this->em = $em;
         $this->securityContext = $securityContext;
         $this->translator = $translator;
+        $this->singleMailboxMode = $singleMailboxMode;
     }
 
     /**
@@ -47,16 +57,12 @@ class OriginFolderFilterProvider
      */
     public function getListTypeChoices()
     {
-        $user = $this->securityContext->getToken()->getUser();
-        $origins = $this->em->getRepository(self::EMAIL_ORIGIN)->findBy(['owner'=>$user->getId()]);
+        $origins = $this->getOrigins();
         $results = [];
-        /**
-         * @var EmailOrigin $origin
-         */
         foreach ($origins as $origin) {
             $folders = $origin->getFolders();
             $mailbox = $origin->getMailboxName();
-            if ($origin->isActive()) {
+            if (!$origin->isActive()) {
                 $mailbox = $mailbox . ' (' . $this->translator->trans('oro.email.filter.inactive') . ')';
             }
             if (count($folders)>0) {
@@ -69,5 +75,20 @@ class OriginFolderFilterProvider
         }
 
         return $results;
+    }
+
+    /**
+     * @return EmailOrigin[]
+     */
+    protected function getOrigins()
+    {
+        $criteria = [
+            'owner' => $this->securityContext->getToken()->getUser(),
+        ];
+        if ($this->singleMailboxMode) {
+            $criteria['isActive'] = true;
+        }
+
+        return $this->em->getRepository(self::EMAIL_ORIGIN)->findBy($criteria);
     }
 }

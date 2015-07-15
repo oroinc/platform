@@ -32,19 +32,25 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var bool */
+    protected $singleMailboxMode;
+
     /**
      * @param Mcrypt              $encryptor
      * @param SecurityFacade      $securityFacade
      * @param TranslatorInterface $translator
+     * @param bool                $singleMailboxMode
      */
     public function __construct(
         Mcrypt $encryptor,
         SecurityFacade $securityFacade,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        $singleMailboxMode
     ) {
         $this->encryptor = $encryptor;
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
+        $this->singleMailboxMode = $singleMailboxMode;
     }
 
     /**
@@ -57,12 +63,16 @@ class ConfigurationType extends AbstractType
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
 
+        if (!$this->singleMailboxMode) {
+            $builder
+                ->add(
+                    'mailboxName',
+                    'text',
+                    ['label' => 'oro.email.mailbox.label', 'required' => true]
+                );
+        }
+
         $builder
-            ->add(
-                'mailboxName',
-                'text',
-                ['label' => 'oro.email.mailbox.label', 'required' => true]
-            )
             ->add(
                 'host',
                 'text',
