@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**

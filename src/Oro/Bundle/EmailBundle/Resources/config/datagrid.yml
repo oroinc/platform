@@ -14,6 +14,9 @@ datagrid:
                             join: eu.email
                             alias: e
                         -
+                            join: eu.mailboxOwner
+                            alias: mb
+                        -
                             join: e.thread
                             alias: thread
                         -
@@ -99,6 +102,14 @@ datagrid:
                                 false: oro.email.status.unread.label
                                 true: oro.email.status.read.label
                     data_name: eu.seen
+                mailbox:
+                    label: oro.email.mailbox.entity_label
+                    type: choice
+                    options:
+                        field_options:
+                            required: false
+                            choices: @oro_email.mailbox_choice_list->getChoiceList()
+                    data_name: eu.mailboxOwner
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:

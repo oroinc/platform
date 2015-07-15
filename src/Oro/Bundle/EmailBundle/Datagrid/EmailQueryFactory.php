@@ -51,7 +51,10 @@ class EmailQueryFactory
     public function filterQueryByUserId(QueryBuilder $qb, $userId)
     {
         if ($userId) {
-            $qb->andWhere('eu.owner = :owner')->setParameter('owner', $userId);
+            $qb->andWhere(
+                $qb->expr()->orX('eu.owner = :owner', 'eu.mailboxOwner IS NOT NULL')
+            );
+            $qb->setParameter('owner', $userId);
         }
     }
 
