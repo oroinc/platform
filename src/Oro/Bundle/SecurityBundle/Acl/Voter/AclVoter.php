@@ -18,7 +18,6 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -75,11 +74,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
-     * @var ConfigProvider
-     */
-    protected $securityConfigProvider;
-
-    /**
      * @param ConfigProvider $configProvider
      */
     public function setConfigProvider(ConfigProvider $configProvider)
@@ -103,14 +97,6 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
-    }
-
-    /**
-     * @param ConfigProvider $securityConfigProvider
-     */
-    public function setSecurityConfigProvider(ConfigProvider $securityConfigProvider)
-    {
-        $this->securityConfigProvider = $securityConfigProvider;
     }
 
     /**
@@ -276,7 +262,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function separateAclGroupFromObject($object)
     {
-        $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+        $group = null;
 
         if ($object instanceof ObjectIdentity) {
             $type = $object->getType();
@@ -285,12 +271,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             if ($delim) {
                 $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
                 $group = ltrim(substr($type, 0, $delim), ' ');
-            }
-        } elseif (is_object($object)) {
-            $className = ClassUtils::getRealClass($object);
-
-            if ($this->securityConfigProvider && $this->securityConfigProvider->hasConfig($className)) {
-                $group = (string) $this->securityConfigProvider->getConfig($className)->get('group_name');
+            } else {
+                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
             }
         }
 
@@ -303,7 +285,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function checkAclGroup($group)
     {
-        if (!$this->groupProvider || !$this->object) {
+        if ($group=== null || !$this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
