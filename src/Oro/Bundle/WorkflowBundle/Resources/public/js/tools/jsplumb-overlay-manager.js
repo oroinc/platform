@@ -78,7 +78,7 @@ define(function(require) {
     _.extend(Block.prototype, {
         isOverlapped: function (block) {
             if (this === block) {
-                return false;
+                throw new Error('Incorrect overlap checking with itself.');
             }
             if (block.y - block.h / 2 > this.y + this.h / 2 || block.y + block.h / 2 < this.y - this.h / 2) {
                 return false;
@@ -171,13 +171,12 @@ define(function(require) {
                     passed += max - min;
                 }
             }, this);
-            locations.sort(function (a, b) {
-                return a.distance - b.distance;
+            location = _.min(locations, function (location) {
+                return location.distance;
             });
             this.moveX = 0;
             this.moveY = 0;
-            if (locations.length) {
-                location = locations[0];
+            if (_.isObject(location)) {
                 if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
                     // to prevent situation when vector is perpendicular to path segment we move it a bit
                     if (this.x == location.x && location.segment.orientation === 'h') {
@@ -254,7 +253,6 @@ define(function(require) {
 
     JsPlumbOverlayManager = function (smartlineManager) {
         this.smartlineManager = smartlineManager;
-        this._lastConnectionState = null;
     }
     _.extend(JsPlumbOverlayManager.prototype, {
         calculate: function () {
@@ -265,23 +263,19 @@ define(function(require) {
             var i,
                 blocks,
                 changed,
-                connectionState,
                 steps = [],
                 overlays = [];
             _.each(this.smartlineManager.cache, function (cacheItem) {
                 var points = cacheItem.path.toPointsArray([]).reverse();
                 _.each(cacheItem.connection.getOverlays(), function (overlay) {
+                    var block;
                     if (overlay.type === 'Custom') {
-                        overlays.push(new OverlayBlock(overlay.canvas, overlay, _.clone(points)));
+                        block = new OverlayBlock(overlay.canvas, overlay, _.clone(points));
+                        block.setLocation(0.5);
+                        overlays.push(block);
                     }
                 }, this);
             });
-            connectionState = JSON.stringify(_.pluck(overlays, 'segments'));
-            // to avoid reclculating label positions for the same set of connections and their jumping as result just go out
-            if (this._lastConnectionState !== null && connectionState === this._lastConnectionState) {
-                return;
-            }
-            this._lastConnectionState = connectionState;
             _.each(_.keys(this.smartlineManager.jsPlumb.instance.sourceEndpointDefinitions), function (id) {
                 var el = document.getElementById(id);
                 if (el) {
@@ -293,7 +287,7 @@ define(function(require) {
                 _.each(blocks, function (block) {
                     _.each(overlays, function (overlay) {
                         var deltaX, deltaY, multiplier;
-                        if (block.isOverlapped(overlay)) {
+                        if (block !== overlay && block.isOverlapped(overlay)) {
                             deltaX = overlay.x - block.x;
                             deltaY = overlay.y - block.y;
                             multiplier = 5 / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -321,22 +315,10 @@ define(function(require) {
                 }
             }
             _.each(overlays, function (overlay) {
-                var overlapped,
-                    clonedOverlay = overlay.clone();
-                clonedOverlay.setLocation(0.5);
-                overlapped = _.find(blocks, function (block) {
-                    return overlay !== block && clonedOverlay.isOverlapped(block);
-                });
-                if (typeof overlapped === 'undefined') {
-                    overlay.setLocation(0.5);
-                }
-            });
-
-            _.each(overlays, function (overlay) {
                 var overlapped;
                 if (overlay.isChanged() ) {
                     overlapped = _.find(blocks, function (block) {
-                        var deny = overlay.isOverlapped(block);
+                        var deny = block !== overlay && overlay.isOverlapped(block);
                         return deny;
                     });
                     if (typeof overlapped === 'undefined') {
