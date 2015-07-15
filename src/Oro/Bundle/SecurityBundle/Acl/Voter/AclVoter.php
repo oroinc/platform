@@ -75,9 +75,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
-     * @var EntitySecurityMetadataProvider
+     * @var ConfigProvider
      */
-    protected $entitySecurityMetadataProvider;
+    protected $securityConfigProvider;
 
     /**
      * @param ConfigProvider $configProvider
@@ -106,11 +106,11 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
-     * @param EntitySecurityMetadataProvider $entitySecurityMetadataProvider
+     * @param ConfigProvider $securityConfigProvider
      */
-    public function setEntitySecurityMetadataProvider(EntitySecurityMetadataProvider $entitySecurityMetadataProvider)
+    public function setSecurityConfigProvider(ConfigProvider $securityConfigProvider)
     {
-        $this->entitySecurityMetadataProvider = $entitySecurityMetadataProvider;
+        $this->securityConfigProvider = $securityConfigProvider;
     }
 
     /**
@@ -286,9 +286,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
                 $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
                 $group = ltrim(substr($type, 0, $delim), ' ');
             }
-        } elseif (is_object($object) && $this->entitySecurityMetadataProvider) {
-            $config = $this->entitySecurityMetadataProvider->getMetadata(ClassUtils::getRealClass($object));
-            $group = $config->getGroup();
+        } elseif (is_object($object)) {
+            $className = ClassUtils::getRealClass($object);
+
+            if ($this->securityConfigProvider && $this->securityConfigProvider->hasConfig($className)) {
+                $group = (string) $this->securityConfigProvider->getConfig($className)->get('group_name');
+            }
         }
 
         return [$object, $group];

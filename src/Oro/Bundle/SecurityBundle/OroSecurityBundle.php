@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -9,6 +10,7 @@ use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMake
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclAnnotationProviderPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclVoterPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipTreeProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OrganizationHttpBasicFactory;
@@ -30,6 +32,7 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
         $container->addCompilerPass(new OwnershipTreeProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
+        $container->addCompilerPass(new AclVoterPass(), PassConfig::TYPE_OPTIMIZE);
         $extension = $container->getExtension('security');
         $extension->addSecurityListenerFactory(new OrganizationFormLoginFactory());
         $extension->addSecurityListenerFactory(new OrganizationHttpBasicFactory());

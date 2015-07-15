@@ -32,7 +32,6 @@ class AclConfigurationPass implements CompilerPassInterface
 
     const OWNERSHIP_CONFIG_PROVIDER = 'oro_entity_config.provider.ownership';
     const ACL_GROUP_PROVIDER_CHAIN_PROVIDER = 'oro_security.acl.group_provider.chain';
-    const ENTITY_SECURITY_METADATA_PROVIDER = 'oro_security.entity_security_metadata_provider';
 
     /**
      * {@inheritDoc}
@@ -150,13 +149,6 @@ class AclConfigurationPass implements CompilerPassInterface
                     $voterDef->addMethodCall(
                         'setAclGroupProvider',
                         [new Reference(self::ACL_GROUP_PROVIDER_CHAIN_PROVIDER)]
-                    );
-                }
-
-                if ($container->hasDefinition(self::ENTITY_SECURITY_METADATA_PROVIDER)) {
-                    $voterDef->addMethodCall(
-                        'setEntitySecurityMetadataProvider',
-                        [new Reference(self::ENTITY_SECURITY_METADATA_PROVIDER)]
                     );
                 }
             }
