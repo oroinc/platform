@@ -132,8 +132,6 @@ class ShareHandler
         // $oldSids - $newSids: to delete
         foreach (array_diff($oldSids, $newSids) as $sid) {
             $acl->deleteObjectAce(array_search($sid, $oldSids));
-            // fills array again because index was recalculated
-            $oldSids = $fillOldSidsHandler($acl);
         }
         // $newSids - $oldSids: to insert
         foreach (array_diff($newSids, $oldSidsCopy) as $sid) {
@@ -141,27 +139,6 @@ class ShareHandler
         }
 
         $this->aclProvider->updateAcl($acl);
-
-        if ((int)$objectIdentity->getIdentifier()) {
-            /** @var \Doctrine\ORM\EntityRepository $repo */
-            $repo = $this->manager->getRepository('OroSecurityBundle:AclEntry');
-            $queryBuilder = $repo->createQueryBuilder('ae');
-            $aceIds = [];
-
-            foreach ($acl->getObjectAces() as $ace) {
-                /** @var Entry $ace */
-                $aceIds[] = $ace->getId();
-            }
-
-            if ($aceIds) {
-                $queryBuilder
-                    ->update()
-                    ->set('ae.recordId', ':recordId')
-                    ->where($queryBuilder->expr()->in('ae.id', $aceIds))
-                    ->setParameter('recordId', $objectIdentity->getIdentifier());
-                $queryBuilder->getQuery()->execute();
-            }
-        }
     }
 
     /**
