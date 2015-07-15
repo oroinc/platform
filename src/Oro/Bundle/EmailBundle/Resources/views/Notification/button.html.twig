@@ -1,14 +1,15 @@
 {% set emailBodyViewOptions = {} %}
 
 <li class="email-notification-menu dropdown "
-    data-page-component-module="oroemail/js/app/components/email-notification-component"
     data-page-component-options="{{ emailBodyViewOptions|json_encode }}">
     <a href="#" class="oro-dropdown-toggle">
         <i class="icon-envelope"></i>
     </a>
     <div class="dropdown-menu pull-right" tabindex="0">
         <div class="header row-fluid">
-            <a class="my-emails pull-left">My Emails</a>
+            <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
+                {{ "oro.email.menu.user_emails"|trans }}
+            </a>
             <a class="mark-as-read pull-right">mark all as read</a>
         </div>
         <ul class="items">

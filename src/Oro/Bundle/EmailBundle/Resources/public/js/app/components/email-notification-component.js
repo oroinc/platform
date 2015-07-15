@@ -35,7 +35,7 @@ define([
         },
 
         initSync: function(options) {
-            sync.subscribe('oro/email/user_34', this.onNewEmail);
+            sync.subscribe('oro/email/user_36', this.onNewEmail);
         },
 
         onNewEmail:function(e) {

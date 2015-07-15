@@ -14,12 +14,7 @@ define([
         inputName: '',
 
         events: {
-            'click a.my-emails': 'onClickMyEmails',
             'click a.mark-as-read': 'onClickMarkAsRead'
-        },
-
-        onClickMyEmails: function () {
-            alert(1);
         },
 
         onClickMarkAsRead: function () {
