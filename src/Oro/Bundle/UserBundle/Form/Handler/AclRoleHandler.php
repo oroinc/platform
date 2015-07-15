@@ -16,6 +16,7 @@ use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 
@@ -255,6 +256,13 @@ class AclRoleHandler
             $formPrivileges = array_merge($formPrivileges, $privileges);
         }
 
+        array_walk(
+            $formPrivileges,
+            function (AclPrivilege $privilege) {
+                $privilege->setGroup($this->getAclGroup());
+            }
+        );
+
         $this->privilegeRepository->savePrivileges(
             $this->aclManager->getSid($role),
             new ArrayCollection($formPrivileges)
@@ -359,5 +367,13 @@ class AclRoleHandler
     protected function getManager(AbstractRole $role)
     {
         return $this->managerRegistry->getManagerForClass(ClassUtils::getClass($role));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAclGroup()
+    {
+        return AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
     }
 }
