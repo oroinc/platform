@@ -33,7 +33,7 @@ class ShareController extends Controller
             $entityRoutingHelper->getRouteParameters($entityClass, $entityId)
         );
 
-        return $this->update($this->get('oro_security.form.factory')->getShare(), $entity, $formAction);
+        return $this->update($this->get('oro_security.form.model.factory')->getShare(), $entity, $formAction);
     }
 
     /**

@@ -270,8 +270,18 @@ class MutableAclProvider extends BaseMutableAclProvider
     /**
      * {@inheritdoc}
      */
-    protected function getInsertAccessControlEntrySql($classId, $objectIdentityId, $field, $aceOrder, $securityIdentityId, $strategy, $mask, $granting, $auditSuccess, $auditFailure)
-    {
+    protected function getInsertAccessControlEntrySql(
+        $classId,
+        $objectIdentityId,
+        $field,
+        $aceOrder,
+        $securityIdentityId,
+        $strategy,
+        $mask,
+        $granting,
+        $auditSuccess,
+        $auditFailure
+    ) {
         $recordId = $this->updatedAcl && $this->updatedAcl->getObjectIdentity()
             ? $this->updatedAcl->getObjectIdentity()->getIdentifier()
             : null;
@@ -306,7 +316,7 @@ QUERY;
             $this->connection->quote($strategy),
             $this->connection->getDatabasePlatform()->convertBooleans($auditSuccess),
             $this->connection->getDatabasePlatform()->convertBooleans($auditFailure),
-            is_integer($recordId) ? $recordId : 'NULL'
+            is_int($recordId) ? $recordId : 'NULL'
         );
     }
 

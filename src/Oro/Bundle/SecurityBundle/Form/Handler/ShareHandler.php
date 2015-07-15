@@ -111,6 +111,7 @@ class ShareHandler
             $acl = $this->aclProvider->createAcl($objectIdentity);
         }
 
+        // @todo add handling of OrganizationSecurityIdentity, BusinessUnitSecurityIdentity
         $fillOldSidsHandler = function($acl) {
             $oldSids = [];
             foreach ($acl->getObjectAces() as $ace) {
@@ -131,7 +132,9 @@ class ShareHandler
         }
         // $oldSids - $newSids: to delete
         foreach (array_diff($oldSids, $newSids) as $sid) {
-            $acl->deleteObjectAce(array_search($sid, $oldSids));
+            $acl->deleteObjectAce(array_search($sid, $oldSids, true));
+            // fills array again because index was recalculated
+            $oldSids = $fillOldSidsHandler($acl);
         }
         // $newSids - $oldSids: to insert
         foreach (array_diff($newSids, $oldSidsCopy) as $sid) {

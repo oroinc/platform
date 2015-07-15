@@ -71,7 +71,7 @@ parameters:
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
     oro_security.form.type.share.class:                        Oro\Bundle\SecurityBundle\Form\Type\ShareType
     oro_security.form.handler.share.class:                     Oro\Bundle\SecurityBundle\Form\Handler\ShareHandler
-    oro_security.form.factory.class:                           Oro\Bundle\SecurityBundle\Form\Model\Factory
+    oro_security.form.model.factory.class:                     Oro\Bundle\SecurityBundle\Form\Model\Factory
 
     oro_security.placeholder.filter.class:                     Oro\Bundle\SecurityBundle\Placeholder\PlaceholderFilter
 
@@ -596,8 +596,8 @@ services:
             - @security.acl.provider
             - @doctrine.orm.entity_manager
 
-    oro_security.form.factory:
-        class: %oro_security.form.factory.class%
+    oro_security.form.model.factory:
+        class: %oro_security.form.model.factory.class%
 
     oro_security.placeholder.filter:
         class: %oro_security.placeholder.filter.class%
