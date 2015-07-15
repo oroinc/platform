@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivity;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="test_activity")
@@ -15,6 +16,18 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "grouping"={
  *              "groups"={"activity"}
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "permissions"="VIEW;CREATE;EDIT",
+ *              "group_name"=""
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          }
  *      }
  * )
@@ -51,6 +64,14 @@ class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInte
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @return int
@@ -124,6 +145,25 @@ class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInte
     public function setOrganization($organization)
     {
         $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param $owner
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
 
         return $this;
     }
