@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 
+use Oro\Bundle\UserBundle\Entity\UserApi;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -39,7 +40,9 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     {
         $userManager = $this->container->get('oro_user.manager');
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(array('role' => 'ROLE_MANAGER'));
+        $roleManager = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
+        $roleAdmin = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
+        $group = $manager->getRepository('OroUserBundle:Group')->findOneBy(array('name' => 'Administrators'));
 
         $user = $userManager->createUser();
         $user->setUsername('manager_user')
@@ -47,22 +50,22 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
             ->setEnabled(true)
-            ->addRole($role);
-
-        $folder = new EmailFolder();
-        $folder->setName('sent');
-        $folder->setFullName('sent');
-        $folder->setType('sent');
-        $origin = new InternalEmailOrigin();
-        $origin->setName('simple_user_origin_name');
-        $origin->setIsActive(true);
-        $origin->addFolder($folder);
-        $origin->setOwner($user);
-        $origin->setOrganization($organization);
-        $user->addEmailOrigin($origin);
-
+            ->setFirstname('Test')
+            ->setLastname('Test')
+            ->setSalt('')
+            ->removeRole($roleAdmin);
+        $user->addRole($roleManager);
+        if (0 === count($user->getApiKeys())) {
+            $api = new UserApi();
+            $api->setApiKey('manager_api_key')
+                ->setUser($user)
+                ->setOrganization($organization);
+            $user->addApiKey($api);
+        }
+        if (!$user->hasGroup($group)) {
+            $user->addGroup($group);
+        }
         $userManager->updateUser($user);
-
         $this->setReference($user->getUsername(), $user);
     }
 }
