@@ -10,7 +10,6 @@ define([
 
     EmailAttachmentView = BaseView.extend({
         contextsView: null,
-        //model: EmailAttachmentModel,
         inputName: '',
 
         events: {
@@ -19,6 +18,10 @@ define([
 
         onClickMarkAsRead: function () {
             alert(2);
+        },
+
+        getClankEvent:function() {
+            return $(this.el).data('clank-event');
         }
     });
 

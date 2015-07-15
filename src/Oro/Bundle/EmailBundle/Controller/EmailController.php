@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,7 +85,7 @@ class EmailController extends Controller
     public function notificationAction()
     {
         return [
-            'clank_event'=>'bbb'
+            'clank_event'=> WebSocketSendProcessor::getUserTopic($this->getUser())
         ];
     }
 

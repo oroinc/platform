@@ -11,31 +11,29 @@ define([
 ], function (jquery, __, routing, mediator, sync, BaseComponent, EmailNotificationView) {
     'use strict';
 
-    var EmailNotification
-        //options = {
-        //    successMessage: 'oro.email.menu.mark_unread.success.message',
-        //    errorMessage: 'oro.email.menu.mark_unread.error.message',
-        //    redirect: '/'
-        //}
-        ;
+    var EmailNotification;
 
     EmailNotification = BaseComponent.extend({
         view: null,
 
         initialize: function (options) {
-            console.log(options);
-            this.initView(options);
-            this.initSync();
+            this.initView()
+                .initSync();
         },
 
-        initView: function (options) {
+        initView: function () {
             this.view = new EmailNotificationView({
-                el: options._sourceElement
+                el: '.email-notification-menu'
             });
+
+            return this;
         },
 
         initSync: function(options) {
-            sync.subscribe('oro/email/user_36', this.onNewEmail);
+            var clankEvent = this.view.getClankEvent();
+            sync.subscribe(clankEvent, this.onNewEmail);
+
+            return this;
         },
 
         onNewEmail:function(e) {
