@@ -19,6 +19,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -75,6 +76,11 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
+     * @var EntitySecurityMetadataProvider
+     */
+    protected $entitySecurityMetadataProvider;
+
+    /**
      * @param ConfigProvider $configProvider
      */
     public function setConfigProvider(ConfigProvider $configProvider)
@@ -98,6 +104,14 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
+    }
+
+    /**
+     * @param EntitySecurityMetadataProvider $entitySecurityMetadataProvider
+     */
+    public function setEntitySecurityMetadataProvider(EntitySecurityMetadataProvider $entitySecurityMetadataProvider)
+    {
+        $this->entitySecurityMetadataProvider = $entitySecurityMetadataProvider;
     }
 
     /**
@@ -273,6 +287,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
                 $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
                 $group = ltrim(substr($type, 0, $delim), ' ');
             }
+        } elseif (is_object($object)) {
+            $config = $this->entitySecurityMetadataProvider->getMetadata(ClassUtils::getClass($object));
+            $group = $config->getGroup();
         }
 
         return [$object, $group];
