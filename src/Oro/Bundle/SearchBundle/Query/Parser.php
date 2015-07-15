@@ -83,7 +83,10 @@ class Parser
      */
     private $mappingConfig;
 
-    public function __construct($mappingConfig)
+    /**
+     * @param array $mappingConfig
+     */
+    public function __construct(array $mappingConfig)
     {
         $this->mappingConfig = $mappingConfig;
     }

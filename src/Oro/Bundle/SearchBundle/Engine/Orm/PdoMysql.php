@@ -58,7 +58,7 @@ class PdoMysql extends BaseDriver
      *
      * @return string
      */
-    protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $words = $this->getWords(
             $this->filterTextFieldValue($searchCondition['fieldValue']),
@@ -79,7 +79,7 @@ class PdoMysql extends BaseDriver
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
 
-        $whereExpr = $searchCondition['type'] . '(' . $whereExpr . ')';
+        //$whereExpr = $searchCondition['type'] . '(' . $whereExpr . ')';
 
         return $whereExpr;
     }
