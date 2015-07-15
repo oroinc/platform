@@ -24,7 +24,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager;
 class EmailActivityController extends RestGetController
 {
     /**
-     * Returns the list of entities where an email found by specified filters is an activity.
+     * Get entities where an email found by specified filters is an activity.
      *
      * @Get("/activities/emails/relations", name="")
      *
@@ -77,7 +77,7 @@ class EmailActivityController extends RestGetController
      *      description="The email subject."
      * )
      * @ApiDoc(
-     *      description="Returns the list of entities where an email found by specified filters is an activity",
+     *      description="Get entities where an email found by specified filters is an activity",
      *      resource=true
      * )
      *

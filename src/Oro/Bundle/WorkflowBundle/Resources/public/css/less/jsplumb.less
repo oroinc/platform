@@ -28,13 +28,13 @@
     margin-right: -10px;
   }
   .workflow-flowchart-container {
-    padding: 20px;
     background-color: #fafafa;
     border: 1px solid #f1f1f1;
     border-top-width: 0;
   }
 }
 .workflow-flowchart-controls {
+  padding: 10px 10px 0;
   .checkbox-group {
     vertical-align: middle;
     input[type=checkbox] {
@@ -43,11 +43,14 @@
     }
   }
 }
+.workflow-flowchart-wrapper {
+  overflow: auto;
+  height: 700px;
+}
 .workflow-flowchart {
   position: relative;
-  overflow-x: auto;
-  height: 700px;
-  overflow-y: hidden;
+  min-height: 650px;
+  margin: 10px 10px 20px;
   ._jsPlumb_endpoint {
     z-index: 100;
   }
@@ -217,6 +220,7 @@
     &.dropdown {
       .dropdown-menu {
         min-width: 100%;
+        text-shadow: none;
       }
       .dropdown-toggle {
         vertical-align: top;

@@ -3,12 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber;
-use Symfony\Component\Form\FormEvents;
-
 use Oro\Bundle\AddressBundle\Entity\AddressType;
-
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddressOwner;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TypedAddress;
+
+use Symfony\Component\Form\FormEvents;
 
 class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,7 +41,7 @@ class FixAddressesPrimaryAndTypesSubscriberTest extends \PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->getMock();
 
-        $event->expects($this->once())
+        $event->expects($this->exactly(2))
             ->method('getData')
             ->will($this->returnValue($allAddresses[$formAddressKey]));
 

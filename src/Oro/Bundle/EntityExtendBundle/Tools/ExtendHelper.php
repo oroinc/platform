@@ -96,16 +96,13 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
 
-        if (function_exists('iconv')) {
-            $enumName = iconv('utf-8', 'ascii//TRANSLIT', $enumName);
-        }
+        $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
+        $enumName = $tr->transliterate($enumName);
 
-        $result = strtolower(
-            preg_replace(
-                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
-                ['_', '_', '', '_'],
-                trim($enumName)
-            )
+        $result = preg_replace(
+            ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+            ['_', '_', '', '_'],
+            trim($enumName)
         );
         if ($result === '_') {
             $result = '';
@@ -169,16 +166,13 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumValueName must not be empty.');
         }
 
-        if (function_exists('iconv')) {
-            $enumValueName = iconv('utf-8', 'ascii//TRANSLIT', $enumValueName);
-        }
+        $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
+        $enumValueName = $tr->transliterate($enumValueName);
 
-        $result = strtolower(
-            preg_replace(
-                ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
-                ['_', '_', '', '_'],
-                trim($enumValueName)
-            )
+        $result = preg_replace(
+            ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
+            ['_', '_', '', '_'],
+            trim($enumValueName)
         );
         if ($result === '_') {
             $result = '';

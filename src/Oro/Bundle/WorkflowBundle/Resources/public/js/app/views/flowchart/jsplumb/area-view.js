@@ -1,10 +1,11 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var FlowchartJsPlumbAreaView,
-        _ = require('underscore'),
-        jsPlumb = require('jsplumb'),
-        JPManager = require('../../../../tools/jsplumb-manager'),
-        FlowchartJsPlumbBaseView = require('./base-view');
+
+    var FlowchartJsPlumbAreaView;
+    var _ = require('underscore');
+    var jsPlumb = require('jsplumb');
+    var JPManager = require('../../../../tools/jsplumb-manager');
+    var FlowchartJsPlumbBaseView = require('./base-view');
     require('../../../../tools/jsplumb-smartline');
 
     FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
@@ -19,7 +20,7 @@ define(function (require) {
         /**
          * @type {function(): Object|Object}
          */
-        defaultsChartOptions: function () {
+        defaultsChartOptions: function() {
             return {
                 detachable: false,
                 Endpoint: ['Dot', {
@@ -57,7 +58,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.defaultsChartOptions = _.extend(
                 _.result(this, 'defaultsChartOptions'),
                 options.chartOptions || {}
@@ -66,7 +67,7 @@ define(function (require) {
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             // do nothing except connect()
             if (!this.isConnected) {
                 this.isConnected = true;
@@ -75,14 +76,13 @@ define(function (require) {
             return this;
         },
 
-        connect: function () {
-            var stepWithPosition,
-                chartOptions = _.defaults({
+        connect: function() {
+            var chartOptions = _.defaults({
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
-            stepWithPosition = this.model.get('steps').find(function (step) {
+            var stepWithPosition = this.model.get('steps').find(function(step) {
                 var position = step.get('position');
                 return _.isArray(position) && position.length === 2;
             });

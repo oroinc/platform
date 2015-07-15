@@ -19,6 +19,7 @@ parameters:
     oro_datagrid.event_listener.datasource_bind_parameters.class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
     oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
     oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
+    oro_datagrid.event_listener.cell_selection.class:             Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener
     oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
@@ -114,6 +115,11 @@ services:
 
     oro_datagrid.event_listener.row_selection:
         class: %oro_datagrid.event_listener.row_selection.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
+
+    oro_datagrid.event_listener.cell_selection:
+        class: %oro_datagrid.event_listener.cell_selection.class%
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 

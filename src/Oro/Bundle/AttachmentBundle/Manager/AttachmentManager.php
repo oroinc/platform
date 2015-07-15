@@ -319,15 +319,18 @@ class AttachmentManager
     /**
      * Get resized image url
      *
-     * @param File $entity
-     * @param int  $width
-     * @param int  $height
+     * @param File        $entity
+     * @param int         $width
+     * @param int         $height
+     * @param bool|string $referenceType
+     *
      * @return string
      */
     public function getResizedImageUrl(
         File $entity,
         $width = self::DEFAULT_IMAGE_WIDTH,
-        $height = self::DEFAULT_IMAGE_HEIGHT
+        $height = self::DEFAULT_IMAGE_HEIGHT,
+        $referenceType = Router::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
             'oro_resize_attachment',
@@ -336,7 +339,8 @@ class AttachmentManager
                 'height'   => $height,
                 'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename()
-            ]
+            ],
+            $referenceType
         );
     }
 

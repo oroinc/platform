@@ -1,6 +1,6 @@
 {%- set userName = null -%}
-{%- if app.security.getToken() and app.security.getToken().getUser() -%}
-    {%- set userName = app.security.getToken().getUser().getUserName() -%}
+{%- if app.user -%}
+    {%- set userName = app.user.username -%}
 {%- endif -%}
 require({
     config: {

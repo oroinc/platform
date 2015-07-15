@@ -23,7 +23,7 @@ class EmailActivitySearchControllerTest extends WebTestCase
                 'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData'
             ]
         );
-        $this->baseUrl = $this->getUrl('oro_api_get_activity_search_relations', ['activity' => 'emails']);
+        $this->baseUrl = $this->getUrl('oro_api_get_email_search_relations');
     }
 
     public function testEmailSearch()
@@ -60,6 +60,56 @@ class EmailActivitySearchControllerTest extends WebTestCase
 
         // Check searching by non-existing user name. Should return no results.
         $this->client->request('GET', $this->baseUrl . sprintf('?search=%s&page=1', 'NonExistentEntityTitle'));
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEmpty($entities);
+    }
+
+    public function testEmailSearchWithEmailFilter()
+    {
+        // Check search by email
+        $this->client->request('GET', $this->baseUrl . '?email=richard_bradley@example.com');
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(1, $entities);
+
+        // Check search by email filtered by User entity only
+        $this->client->request(
+            'GET',
+            $this->baseUrl . '?email=richard_bradley@example.com&from=Oro\Bundle\UserBundle\Entity\User'
+        );
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(1, $entities);
+
+        // Check searching by non-existing email. Should return no results.
+        $this->client->request('GET', $this->baseUrl . sprintf('?email=%s&page=1', 'non_existent_email@example.com'));
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEmpty($entities);
+    }
+
+    public function testEmailSearchWithEmailAndSearchFilter()
+    {
+        $this->markTestSkipped('Due to BAP-8497');
+
+        // Check search by user name and email
+        $this->client->request(
+            'GET',
+            $this->baseUrl,
+            [
+                'search' => 'Richard',
+                'email'  => 'richard_bradley@example.com'
+            ]
+        );
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(1, $entities);
+
+        // Check search by user name and another email
+        $this->client->request(
+            'GET',
+            $this->baseUrl,
+            [
+                'search' => 'Brenda',
+                'email'  => 'richard_bradley@example.com'
+            ]
+        );
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEmpty($entities);
     }

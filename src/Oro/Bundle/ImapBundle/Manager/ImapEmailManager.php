@@ -119,6 +119,23 @@ class ImapEmailManager
     }
 
     /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     *
+     * @return ImapEmailIterator
+     */
+    public function getUnseenEmailUIDs($startDate, $endDate)
+    {
+        $query = sprintf(
+            'UNSEEN SINCE "%s" BEFORE "%s"',
+            $startDate->format('d-M-Y'),
+            $endDate->format('d-M-Y')
+        );
+
+        return $this->connector->findUIDs($query);
+    }
+
+    /**
      * Retrieve email by its UID
      *
      * @param int $uid The UID of an email message

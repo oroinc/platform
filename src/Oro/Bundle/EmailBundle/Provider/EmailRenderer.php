@@ -5,9 +5,11 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Util\Inflector;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
@@ -68,15 +70,7 @@ class EmailRenderer extends \Twig_Environment
      */
     protected function configureSandbox()
     {
-        $allowedData = $this->sandBoxConfigCache->fetch($this->cacheKey);
-
-        if (false === $allowedData) {
-            $allowedData = $this->prepareConfiguration();
-            $this->sandBoxConfigCache->save($this->cacheKey, serialize($allowedData));
-        } else {
-            $allowedData = unserialize($allowedData);
-        }
-
+        $allowedData = $this->getConfiguration();
         /** @var \Twig_Extension_Sandbox $sandbox */
         $sandbox = $this->getExtension('sandbox');
         /** @var \Twig_Sandbox_SecurityPolicy $security */
@@ -86,28 +80,55 @@ class EmailRenderer extends \Twig_Environment
     }
 
     /**
+     * @return array
+     */
+    protected function getConfiguration()
+    {
+        $allowedData = $this->sandBoxConfigCache->fetch($this->cacheKey);
+        if (false === $allowedData) {
+            $allowedData = $this->prepareConfiguration();
+            $this->sandBoxConfigCache->save($this->cacheKey, serialize($allowedData));
+        } else {
+            $allowedData = unserialize($allowedData);
+        }
+
+        return $allowedData;
+    }
+
+    /**
      * Prepare configuration from entity config
      *
      * @return array
      */
     private function prepareConfiguration()
     {
-        $configuration = array();
-
-        $allGetters = $this->variablesProvider->getEntityVariableGetters();
+        $configuration               = [];
+        $configuration['formatters'] = [];
+        $allGetters                  = $this->variablesProvider->getEntityVariableGetters();
         foreach ($allGetters as $className => $getters) {
-            $properties = [];
-            $methods    = [];
+            $properties        = [];
+            $methods           = [];
+            $formatters        = [];
+            $defaultFormatters = [];
             foreach ($getters as $varName => $getter) {
                 if (empty($getter)) {
                     $properties[] = $varName;
                 } else {
-                    $methods[] = $getter;
+                    if (!is_array($getter)) {
+                        $methods[] = $getter;
+                    } else {
+                        $methods[]                   = $getter['property_path'];
+                        $formatters[$varName]        = $getter['formatters'];
+                        $defaultFormatters[$varName] = $getter['default_formatter'];
+                    }
                 }
             }
 
             $configuration['properties'][$className] = $properties;
             $configuration['methods'][$className]    = $methods;
+
+            $configuration['formatters'][$className]        = $formatters;
+            $configuration['default_formatter'][$className] = $defaultFormatters;
         }
 
         return $configuration;
@@ -121,7 +142,7 @@ class EmailRenderer extends \Twig_Environment
      *
      * @return array first element is email subject, second - message
      */
-    public function compileMessage(EmailTemplateInterface $template, array $templateParams = array())
+    public function compileMessage(EmailTemplateInterface $template, array $templateParams = [])
     {
         $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
@@ -129,21 +150,21 @@ class EmailRenderer extends \Twig_Environment
         $content = $template->getContent();
 
         if (isset($templateParams['entity'])) {
-            $subject = $this->processDateTimeVariables($subject, $templateParams['entity']);
-            $content = $this->processDateTimeVariables($content, $templateParams['entity']);
+            $subject = $this->processDefaultFilters($subject, $templateParams['entity']);
+            $content = $this->processDefaultFilters($content, $templateParams['entity']);
         }
 
         $templateRendered = $this->render($content, $templateParams);
         $subjectRendered  = $this->render($subject, $templateParams);
 
-        return array($subjectRendered, $templateRendered);
+        return [$subjectRendered, $templateRendered];
     }
 
     /**
      * Compile preview content
      *
      * @param EmailTemplate $entity
-     * @param null|string $locale
+     * @param null|string   $locale
      *
      * @return string
      */
@@ -158,43 +179,56 @@ class EmailRenderer extends \Twig_Environment
                 }
             }
         }
-        
+
         return $this->render('{% verbatim %}' . $content . '{% endverbatim %}', []);
     }
 
     /**
-     * Process entity variables of dateTime type
-     *   -- datetime variables with formatting will be skipped, e.g. {{ entity.createdAt|date('F j, Y, g:i A') }}
-     *   -- processes ONLY variables that passed without formatting, e.g. {{ entity.createdAt }}
+     * Process entity variables what have default filters, for example, datetime form type field
      *
      * Note:
-     *  - add oro_format_datetime filter to all items which implement \DateTimeInterface
-     *  - if value does not exists and PropertyAccess::getValue throw an error
-     *    it will change on self::VARIABLE_NOT_FOUND
      *  - all tags that do not start with `entity` will be ignored
      *
-     * TODO find a common way for processing formatter
      * @param string $template
      * @param object $entity
      *
      * @return EmailTemplate
      */
-    protected function processDateTimeVariables($template, $entity)
+    protected function processDefaultFilters($template, $entity)
     {
         $that     = $this;
-        $callback = function ($match) use ($entity, $that) {
+        $config   = $that->getConfiguration();
+        $callback = function ($match) use ($entity, $that, $config) {
             $result = $match[0];
             $path   = $match[1];
             $split  = explode('.', $path);
 
             if ($split[0] && 'entity' === $split[0]) {
                 unset($split[0]);
-
                 try {
-                    $value = $that->getValue($entity, implode('.', $split));
+                    $propertyPath = array_pop($split);
+                    $value        = $entity;
+                    if (count($split)) {
+                        $value = $that->getValue($entity, implode('.', $split));
+                    }
 
-                    if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
-                        $result = sprintf('{{ %s|oro_format_datetime }}', $path);
+                    // check if value exists
+                    $that->getValue($value, $propertyPath);
+
+                    $propertyName = lcfirst(Inflector::classify($propertyPath));
+                    if (is_object($value) && array_key_exists('default_formatter', $config)) {
+                        $valueClass       = ClassUtils::getRealClass($value);
+                        $defaultFormatter = $config['default_formatter'];
+                        if (array_key_exists($valueClass, $defaultFormatter)
+                            && array_key_exists($propertyName, $defaultFormatter[$valueClass])
+                            && !is_null($defaultFormatter[$valueClass][$propertyName])
+                        ) {
+                            $result = sprintf(
+                                '{{ %s|oro_format(\'%s\') }}',
+                                $path,
+                                $config['default_formatter'][ClassUtils::getRealClass($value)][$propertyName]
+                            );
+                        }
                     }
                 } catch (\Exception $e) {
                     $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);

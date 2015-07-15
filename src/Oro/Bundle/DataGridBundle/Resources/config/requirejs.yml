@@ -40,6 +40,7 @@ config:
         'orodatagrid/js/datagrid/formatter/cell-formatter': 'bundles/orodatagrid/js/datagrid/formatter/cell-formatter.js'
         'orodatagrid/js/datagrid/formatter/datetime-formatter': 'bundles/orodatagrid/js/datagrid/formatter/datetime-formatter.js'
         'orodatagrid/js/datagrid/formatter/number-formatter': 'bundles/orodatagrid/js/datagrid/formatter/number-formatter.js'
+        'orodatagrid/js/datagrid/editor/select-cell-radio-editor': 'bundles/orodatagrid/js/datagrid/editor/select-cell-radio-editor.js'
         'orodatagrid/js/datagrid/grid': 'bundles/orodatagrid/js/datagrid/grid.js'
         'orodatagrid/js/datagrid/header-cell/header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/header-cell.js'
         'orodatagrid/js/datagrid/header-cell/select-all-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/select-all-header-cell.js'
@@ -52,8 +53,10 @@ config:
         'orodatagrid/js/datagrid/footer/footer-cell': 'bundles/orodatagrid/js/datagrid/footer/footer-cell.js'
 
         'orodatagrid/js/datagrid/listener/abstract-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-listener.js'
+        'orodatagrid/js/datagrid/listener/abstract-grid-change-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-grid-change-listener.js'
         'orodatagrid/js/datagrid/listener/column-form-listener': 'bundles/orodatagrid/js/datagrid/listener/column-form-listener.js'
         'orodatagrid/js/datagrid/listener/callback-listener': 'bundles/orodatagrid/js/datagrid/listener/callback-listener.js'
+        'orodatagrid/js/datagrid/listener/change-editable-cell-listener': 'bundles/orodatagrid/js/datagrid/listener/change-editable-cell-listener.js'
         'orodatagrid/js/datagrid/page-size': 'bundles/orodatagrid/js/datagrid/page-size.js'
         'orodatagrid/js/datagrid/grid-views/view': 'bundles/orodatagrid/js/datagrid/grid-views/view.js'
         'orodatagrid/js/datagrid/grid-views/model': 'bundles/orodatagrid/js/datagrid/grid-views/model.js'

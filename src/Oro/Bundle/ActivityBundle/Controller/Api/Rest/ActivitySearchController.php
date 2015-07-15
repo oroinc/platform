@@ -11,7 +11,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
@@ -22,7 +21,7 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 class ActivitySearchController extends RestGetController
 {
     /**
-     * Searches entities associated with the specified type of an activity entity.
+     * Searches entities associated with the specified type of activity.
      *
      * @param string $activity The type of the activity entity.
      *
@@ -54,7 +53,7 @@ class ActivitySearchController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Searches entities associated with the specified type of an activity entity",
+     *      description="Searches entities associated with the specified type of activity",
      *      resource=true
      * )
      *
@@ -81,9 +80,7 @@ class ActivitySearchController extends RestGetController
     }
 
     /**
-     * Gets the API entity manager
-     *
-     * @return ActivitySearchApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {

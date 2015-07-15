@@ -1,21 +1,20 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var WorkflowModel,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        StatefulModel = require('oroui/js/app/models/base/stateful-model'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        StepCollection = require('./step-collection'),
-        TransitionCollection = require('./transition-collection'),
-        TransitionDefinitionCollection = require('./transition-definition-collection'),
-        AttributeCollection = require('./attribute-collection'),
-        StepModel = require('./step-model'),
-        TransitionModel = require('./transition-model'),
-        TransitionDefinitionModel = require('./transition-definition-model'),
-        AttributeModel = require('./attribute-model'),
-        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var WorkflowModel;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var StatefulModel = require('oroui/js/app/models/base/stateful-model');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var StepCollection = require('./step-collection');
+    var TransitionCollection = require('./transition-collection');
+    var TransitionDefinitionCollection = require('./transition-definition-collection');
+    var AttributeCollection = require('./attribute-collection');
+    var StepModel = require('./step-model');
+    var TransitionModel = require('./transition-model');
+    var TransitionDefinitionModel = require('./transition-definition-model');
+    var AttributeModel = require('./attribute-model');
+    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
     WorkflowModel = StatefulModel.extend({
         defaults: {
@@ -31,6 +30,8 @@ define(function(require) {
             attributes: null
         },
 
+        MAX_HISTORY_LENGTH: 50,
+
         observedAttributes: ['steps', 'transitions'],
         entityFieldUtil: null,
         entityFieldsInitialized: false,
@@ -38,7 +39,6 @@ define(function(require) {
         positionIncrementPx: 35,
 
         initialize: function() {
-            var steps, transitions;
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
             }
@@ -51,8 +51,8 @@ define(function(require) {
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
-            steps = this.get('steps');
-            transitions = this.get('transitions');
+            var steps = this.get('steps');
+            var transitions = this.get('transitions');
             this.setWorkflowToCollection(steps);
             this.setWorkflowToCollection(transitions);
             this.listenTo(steps, 'add', this.setWorkflow);
@@ -62,15 +62,14 @@ define(function(require) {
             WorkflowModel.__super__.initialize.apply(this, arguments);
         },
 
-        setWorkflow: function (item) {
+        setWorkflow: function(item) {
             item.setWorkflow(this);
         },
 
-        setWorkflowToCollection: function (collection) {
-            var that = this;
-            collection.each( function (item) {
-                item.setWorkflow(that);
-            });
+        setWorkflowToCollection: function(collection) {
+            collection.each(function(item) {
+                item.setWorkflow(this);
+            }, this);
         },
 
         cloneTransitionDefinition: function(definition) {
@@ -133,7 +132,7 @@ define(function(require) {
                 cloned.position = [
                     cloned.position[0] + this.positionIncrementPx,
                     cloned.position[1] + this.positionIncrementPx
-                ]
+                ];
             }
 
             var clonedModel = new StepModel(cloned);
@@ -162,7 +161,7 @@ define(function(require) {
         getFieldIdByPropertyPath: function(propertyPath) {
             var pathData = propertyPath.split('.');
 
-            if (pathData.length > 1 && pathData[0] == this.get('entity_attribute')) {
+            if (pathData.length > 1 && pathData[0] === this.get('entity_attribute')) {
                 pathData.splice(0, 1);
                 return this.entityFieldUtil.getPathByPropertyPath(pathData);
             } else {
@@ -223,24 +222,16 @@ define(function(require) {
             return _.first(this.get(item).where({'name': name}));
         },
 
-        getState: function () {
-            this.lastState = new Backbone.Model({
+        getState: function() {
+            return {
                 steps: this.get('steps').toJSON(),
                 transitions: this.get('transitions').toJSON()
-            });
-            return this.lastState;
+            };
         },
-        setState: function (state) {
-            WorkflowModel.__super__.setState.apply(this, arguments);
-            if (state === this.lastState) {
-                return;
-            }
-            this.lastState = state;
-            var steps = state.get('steps'),
-                transitions = state.get('transitions');
-            if (steps && transitions) {
-                this.get('steps').reset(steps);
-                this.get('transitions').reset(transitions);
+        setState: function(data) {
+            if (data.steps && data.transitions) {
+                this.get('steps').reset(data.steps);
+                this.get('transitions').reset(data.transitions);
             }
         }
     });
