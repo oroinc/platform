@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -85,6 +86,13 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var AutoresponseRule[]|Collection
+     *
+     * @ORM\OneToMany(targetEntity="AutoresponseRule", mappedBy="mailbox")
+     */
+    protected $autoresponseRules;
 
     public function __construct()
     {
@@ -263,5 +271,13 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         $this->organization = $organization;
 
         return $this;
+    }
+
+    /**
+     * @return AutoresponseRule[]|Collection
+     */
+    public function getAutoresponseRules()
+    {
+        return $this->autoresponseRules;
     }
 }

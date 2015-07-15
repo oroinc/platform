@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBundle112_2;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\OroEmailBundle as OroEmailBundle116;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -73,5 +74,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle113::addColumnMultiMessageId($schema);
 
         OroEmailBundle114::addEmbeddedContentIdField($schema);
+
+        OroEmailBundle116::oroEmailAutoResponseRuleTable($schema);
     }
 }
