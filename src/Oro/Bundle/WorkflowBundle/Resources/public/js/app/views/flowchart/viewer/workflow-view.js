@@ -1,12 +1,13 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var FlowchartViewerWorkflowView,
-        _ = require('underscore'),
-        FlowchartJsPlumbAreaView = require('../jsplumb/area-view'),
-        FlowchartViewerStepView = require('./step-view'),
-        FlowchartViewerTransitionView = require('./transition-view'),
-        FlowchartViewerTransitionOverlayView = require('./transition-overlay-view'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+
+    var FlowchartViewerWorkflowView;
+    var _ = require('underscore');
+    var FlowchartJsPlumbAreaView = require('../jsplumb/area-view');
+    var FlowchartViewerStepView = require('./step-view');
+    var FlowchartViewerTransitionView = require('./transition-view');
+    var FlowchartViewerTransitionOverlayView = require('./transition-overlay-view');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     FlowchartViewerWorkflowView = FlowchartJsPlumbAreaView.extend({
         autoRender: true,
@@ -40,7 +41,7 @@ define(function (require) {
         /**
          * @type {function(): Object|Object}
          */
-        defaultConnectionOptions: function () {
+        defaultConnectionOptions: function() {
             return {
                 detachable: false
             };
@@ -49,7 +50,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             FlowchartViewerWorkflowView.__super__.initialize.apply(this, arguments);
             this.defaultConnectionOptions = _.extend(
                 _.result(this, 'defaultConnectionOptions'),
@@ -57,29 +58,29 @@ define(function (require) {
             );
         },
 
-        findStepModelByElement: function (el) {
+        findStepModelByElement: function(el) {
             var stepCollectionView = this.stepCollectionView;
-            return this.model.get('steps').find(function (model) {
+            return this.model.get('steps').find(function(model) {
                 return stepCollectionView.getItemView(model).el === el;
             });
         },
 
-        connect: function () {
+        connect: function() {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
             this.$el.addClass(this.className);
-            var stepCollectionView,
-                transitionOverlayView = this.transitionOverlayView,
-                connectionOptions = _.extend({}, this.defaultConnectionOptions),
-                StepView = this.stepView,
-                TransitionView = this.transitionView,
-                that = this,
-                steps = this.model.get('steps');
+            var stepCollectionView;
+            var transitionOverlayView = this.transitionOverlayView;
+            var connectionOptions = _.extend({}, this.defaultConnectionOptions);
+            var StepView = this.stepView;
+            var TransitionView = this.transitionView;
+            var that = this;
+            var steps = this.model.get('steps');
             this.stepCollectionView = stepCollectionView = new BaseCollectionView({
                 el: this.$el,
                 collection: steps,
                 animationDuration: 0,
                 // pass areaView to each model
-                itemView: function (options) {
+                itemView: function(options) {
                     options = _.extend({
                         areaView: that
                     }, options);
@@ -92,7 +93,7 @@ define(function (require) {
                 collection: this.model.get('transitions'),
                 animationDuration: 0,
                 // pass areaView to each model
-                itemView: function (options) {
+                itemView: function(options) {
                     options = _.extend({
                         areaView: that,
                         stepCollection: steps,

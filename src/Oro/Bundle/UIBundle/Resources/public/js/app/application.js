@@ -1,16 +1,14 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'chaplin',
     'oroui/js/mediator',
     './ready-state-tracker'
-], function (Chaplin, mediator, readyStateTracker) {
+], function(Chaplin, mediator, readyStateTracker) {
     'use strict';
 
     var Application;
 
     Application = Chaplin.Application.extend({
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             mediator.setHandler('retrieveOption', this.retrieveOption, this);
             mediator.setHandler('retrievePath', this.retrievePath, this);
@@ -18,21 +16,21 @@ define([
             mediator.setHandler('combineRouteUrl', this.combineRouteUrl, this);
 
             // stub handlers, should be defined in some modules
-            mediator.setHandler('showLoading', function () {});
-            mediator.setHandler('hideLoading', function () {});
-            mediator.setHandler('redirectTo', function () {});
-            mediator.setHandler('refreshPage', function () {});
+            mediator.setHandler('showLoading', function() {});
+            mediator.setHandler('hideLoading', function() {});
+            mediator.setHandler('redirectTo', function() {});
+            mediator.setHandler('refreshPage', function() {});
 
             Application.__super__.initialize.apply(this, arguments);
 
-            mediator.setHandler('changeRoute', function (route, options) {
+            mediator.setHandler('changeRoute', function(route, options) {
                 options = options || {};
                 options.changeURL = true;
                 this.router.changeURL(null, null, route, options);
                 mediator.trigger('route:change');
             }, this);
 
-            mediator.once('dispatcher:dispatch', function () {
+            mediator.once('dispatcher:dispatch', function() {
                 readyStateTracker.markReady('app');
             });
         },
@@ -43,7 +41,7 @@ define([
          * @param prop name of property
          * @returns {*}
          */
-        retrieveOption: function (prop) {
+        retrieveOption: function(prop) {
             return this.options.hasOwnProperty(prop) ? this.options[prop] : void 0;
         },
 
@@ -53,7 +51,7 @@ define([
          * @param {string} path
          * @returns {string}
          */
-        retrievePath: function (path) {
+        retrievePath: function(path) {
             return path.replace(this.router.removeRoot, '').replace(/^\//i, '');
         },
 
@@ -63,7 +61,7 @@ define([
          * @param {string=} query
          * @returns {string}
          */
-        combineRouteUrl: function (path, query) {
+        combineRouteUrl: function(path, query) {
             var routeUrl;
             // if first argument is a route object (or a current record from content-manager)
             if (typeof path === 'object') {
@@ -81,12 +79,11 @@ define([
          * @param {string=} query
          * @returns {string}
          */
-        combineFullUrl: function (path, query) {
-            var fullUrl, root, url;
+        combineFullUrl: function(path, query) {
             // root is always supposed to have trailing slash
-            root = this.options.root || '\/';
-            url = this.combineRouteUrl(path, query);
-            fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
+            var root = this.options.root || '\/';
+            var url = this.combineRouteUrl(path, query);
+            var fullUrl = url[0] === '\/' ? root + url.slice(1) : root + url;
             return fullUrl;
         }
     });

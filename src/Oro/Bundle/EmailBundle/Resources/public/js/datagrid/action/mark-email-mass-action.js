@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/messenger',
     'orotranslation/js/translator',
     'oro/datagrid/action/mass-action'
-], function (_, messenger, __, MassAction) {
+], function(_, messenger, __, MassAction) {
     'use strict';
 
     var MarkAction;

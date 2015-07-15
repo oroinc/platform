@@ -167,4 +167,56 @@ class EmailControllerTest extends WebTestCase
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
+
+    public function testReply()
+    {
+        $email = $this->getReference('email_1');
+        $id = $email->getId();
+        $url = $this->getUrl('oro_email_email_reply', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->getCrawler();
+        $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+        );
+        $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $cc . '\']')->count()
+        );
+        $bcc = $email->getBcc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
+        );
+    }
+
+    public function testReplyAll()
+    {
+        $email = $this->getReference('email_1');
+        $id = $email->getId();
+        $url = $this->getUrl('oro_email_email_reply_all', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->getCrawler();
+        $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+        );
+        $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $cc . '\']')->count()
+        );
+        $bcc = $email->getBcc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
+        );
+    }
 }

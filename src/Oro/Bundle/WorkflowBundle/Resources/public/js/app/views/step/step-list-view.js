@@ -1,12 +1,11 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var StepsListView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        StepRowView = require('./step-row-view');
+    var StepsListView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var StepRowView = require('./step-row-view');
 
     StepsListView = BaseView.extend({
         options: {
@@ -15,7 +14,7 @@ define(function (require) {
             workflow: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-list-template').html();
             this.template = _.template(template);
@@ -54,7 +53,7 @@ define(function (require) {
         },
 
         resetView: function() {
-            _.each(this.rowViews, function (rowView) {
+            _.each(this.rowViews, function(rowView) {
                 rowView.remove();
             });
             this.rowViews = [];
