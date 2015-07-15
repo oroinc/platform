@@ -97,6 +97,7 @@ define(function(require) {
             });
             if (this.$('.dropdown-menu.activity-item .launcher-item').children().length == 0) {
                 this.$('.dropdown-menu.activity-item').hide();
+                this.$('.dropdown-toggle.activity-item').text('');
             }
             this.initLayout();
             return this;
