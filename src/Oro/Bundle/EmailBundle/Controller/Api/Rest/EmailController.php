@@ -167,8 +167,8 @@ class EmailController extends RestController
     public function getNewEmail()
     {
         $emailProvider = $this->getEmailProvider();
-
-        $emails = $emailProvider->getNewEmails($this->getUser(), 3);
+        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
 
         $result = [
             'count' => $emailProvider->getCountNewEmails($this->getUser()),

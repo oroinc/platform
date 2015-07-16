@@ -85,7 +85,7 @@ class EmailController extends Controller
     public function notificationAction()
     {
         $emailProvider = $this->get('oro_email.email.provider');
-        $maxEmailsDisplay = 3;
+        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
 
         $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
         $count = $emailProvider->getCountNewEmails($this->getUser());
@@ -97,7 +97,7 @@ class EmailController extends Controller
         foreach ($emails as $email) {
             $emailsData[] = [
                 'subject' => $email->getSubject(),
-                'bodyContent' => $email->getEmailBody()->getBodyContent(),
+                'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
                 'author' => $email->getFromName()
             ];
         }

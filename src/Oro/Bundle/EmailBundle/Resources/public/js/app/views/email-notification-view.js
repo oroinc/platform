@@ -24,6 +24,14 @@ define([
 
         render:function () {
             this.$containerContextTargets.empty();
+            if (this.collection.models.length === 0) {
+                this.$el.find('.content').hide();
+                this.$el.find('.empty').show();
+            } else {
+                this.$el.find('.content').show();
+                this.$el.find('.empty').hide();
+            }
+
             for (var i in this.collection.models ) {
                 var view = this.template({
                     entity: this.collection.models[i]

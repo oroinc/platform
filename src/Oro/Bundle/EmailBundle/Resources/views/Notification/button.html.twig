@@ -1,55 +1,43 @@
 <script type="text/template" id="email-notification-item">
     <li class="new" id="<%= entity.cid %>">
         <div class="body">
-            <div class="title"><%= entity.get('subject') %></div>
-            <div class="description"><%= entity.get('bodyContent') %></div>
+            <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
+            <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>
         </div>
         <i class="icon-envelope new"></i>
         <div class="footer row-fluid">
             <span class="pull-left"><%= entity.get('author') %></span>
-            <span class="pull-right">{{ "Replay"|trans }}</span>
+            <span class="pull-right">{{ "oro.email.notification.replay.label"|trans }}</span>
         </div>
     </li>
 </script>
 
-<li class="email-notification-menu dropdown "
+{% if count > 0 %}
+    {%  set classNew = 'new' %}
+{% else %}
+    {%  set classNew = '' %}
+{% endif %}
+
+<li class="email-notification-menu dropdown"
     data-clank-event="{{ clank_event }}"
     data-emails="{{ emails }}"
-    data-count = "{{ count }}"
-        >
+    data-count = "{{ count }}">
     <a href="#" class="oro-dropdown-toggle">
-        <i class="icon-envelope"></i>
+        <i class="icon-envelope {{ classNew }}"><span>{{ count }}</span></i>
     </a>
     <div class="dropdown-menu pull-right" tabindex="0">
-        <div class="header row-fluid">
-            <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
-                {{ "oro.email.menu.user_emails"|trans }}
-            </a>
-            <a class="mark-as-read pull-right">mark all as read</a>
+        <div class="content" style="display: none">
+            <div class="header row-fluid">
+                <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
+                    {{ "oro.email.menu.user_emails"|trans }}
+                </a>
+                <a class="mark-as-read pull-right">{{ "oro.email.notification.mark_read.label"|trans }}</a>
+            </div>
+            <ul class="items">
+            </ul>
         </div>
-        <ul class="items">
-            {#<li class="new">#}
-                {#<div class="body">#}
-                    {#<div class="title">opportunities with MVP sports</div>#}
-                    {#<div class="description">Hi, it was great to meet up and discuss ways we can</div>#}
-                {#</div>#}
-                {#<i class="icon-envelope new"></i>#}
-                {#<div class="footer row-fluid">#}
-                    {#<span class="pull-left">John Doe</span>#}
-                    {#<span class="pull-right">Replay</span>#}
-                {#</div>#}
-            {#</li>#}
-            {#<li class="new">#}
-                {#<div class="body">#}
-                    {#<div class="title">opportunities with MVP sports</div>#}
-                    {#<div class="description">Hi, it was great to meet up and discuss ways we can</div>#}
-                {#</div>#}
-                {#<i class="icon-envelope new"></i>#}
-                {#<div class="footer row-fluid">#}
-                    {#<span class="pull-left">John Doe</span>#}
-                    {#<span class="pull-right">Replay</span>#}
-                {#</div>#}
-            {#</li>#}
-        </ul>
+        <div class="empty" style="display: none">
+            {{ "oro.email.notification.empty"|trans }}
+        </div>
     </div>
 </li>
