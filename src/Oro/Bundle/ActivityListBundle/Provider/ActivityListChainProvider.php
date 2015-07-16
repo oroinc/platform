@@ -191,7 +191,7 @@ class ActivityListChainProvider
     public function getActivityListByEntity($entity, EntityManager $entityManager)
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        $entityId = $this->doctrineHelper->getEntityClass($entity);
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         foreach ($this->providers as $provider) {
             if ($entityClass === $provider->getAclClass()) {
                 $entityClass = $provider->getActivityClass();
