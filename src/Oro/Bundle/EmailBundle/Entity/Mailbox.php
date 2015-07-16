@@ -87,13 +87,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     protected $organization;
 
-    /**
-     * @var AutoresponseRule[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="AutoresponseRule", mappedBy="mailbox")
-     */
-    protected $autoresponseRules;
-
     public function __construct()
     {
         $this->smtpSettings = [];

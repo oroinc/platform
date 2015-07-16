@@ -1,4 +1,76 @@
 datagrid:
+    email-auto-response-rules:
+        source:
+            type: orm
+            acl_resource: oro_email_autoresponserule_view
+            query:
+                select:
+                    - r.id
+                    - r.name
+                    - r.active
+                from:
+                    - { table: OroEmailBundle:AutoResponseRule, alias: r }
+        columns:
+            name:
+                label: oro.email.autoresponserule.name.label
+            active:
+                label: oro.email.autoresponserule.active.label
+                type: twig
+                frontend_type: html
+                template: OroEmailBundle:AutoResponseRule:Datagrid/Property/active.html.twig
+        properties:
+            id: ~
+            update_link:
+                type: url
+                route: oro_email_autoresponserule_update
+                params: [ id ]
+            delete_link:
+                type: url
+                route: oro_api_delete_autoresponserule
+                params: [ id ]
+        sorters:
+            columns:
+                name:
+                    data_name: r.name
+                active:
+                    data_name: r.active
+        actions:
+            update:
+                type:         dialog
+                acl_resource: oro_email_autoresponserule_update
+                label:        oro.grid.action.update
+                icon:         edit
+                link:         update_link
+                rowAction:    true
+                widget_options:
+                    reload-grid-name: email-auto-response-rules
+                    options:
+                        dialogOptions:
+                            title:         oro.email.autoresponserule.action.add.title
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 550
+            delete:
+                type:         delete
+                acl_resource: oro_email_autoresponserule_delete
+                label:        oro.grid.action.delete
+                icon:         trash
+                link:         delete_link
+        mass_actions:
+            delete:
+                type: delete
+                entity_name: %oro_email.autoresponserule.entity.class%
+                data_identifier: r.id
+                acl_resource: oro_email_autoresponserule_update
+                label: oro.grid.action.delete
+                icon: trash
+        options:
+            toolbarOptions:
+                hide: true
+
     base-email-grid:
         source:
             type: orm

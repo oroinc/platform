@@ -250,6 +250,16 @@ oro:
             action.create:            Add Mailbox
         mailbox_processor:
             label:                    Do Nothing
+        autoresponserule:
+            entity_plural_label: Autoresponse Rules
+            name.label:          Name
+            active.label:        Status
+            action:
+                add.label: Add Rule
+                add.title: Add Autoresponse Rule
+            status:
+                active:   Active
+                inactive: Inactive
 
         action:
             sync: Sync emails

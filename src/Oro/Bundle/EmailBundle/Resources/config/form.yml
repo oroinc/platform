@@ -1,5 +1,6 @@
 parameters:
     oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
+    oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
     oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
@@ -27,6 +28,11 @@ services:
         class: %oro_email.form.subscriber.emailtemplate.class%
         arguments:
             - @security.context
+
+    oro_email.form.type.autoresponserule:
+        class: %oro_email.form.type.autoresponserule.class%
+        tags:
+            - { name: form.type, alias: oro_email_autoresponserule }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
