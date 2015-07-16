@@ -32,7 +32,7 @@ datagrid:
                         -
                             join: eu.folder
                             alias: f
-                groupBy: e.sentAt, e.id
+                groupBy: eu.id, e.sentAt
         columns:
             contacts:
                 data_name: email.contacts
