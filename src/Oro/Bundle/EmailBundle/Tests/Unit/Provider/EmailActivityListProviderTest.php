@@ -77,11 +77,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $emailUser->setOwner($user);
         $owners = [$emailUser];
 
-        $emailUserMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['getEmail'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
+        $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(['getFromEmailAddress', 'hasOwner', 'getOwner', 'getOrganization'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -97,9 +93,6 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $emailMock->expects($this->exactly(2))
             ->method('getOrganization')
             ->willReturn($organization);
-        $emailUserMock->expects($this->exactly(1))
-            ->method('getEmail')
-            ->willReturn($emailMock);
 
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()
@@ -121,7 +114,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->willReturn($owners);
 
-        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($emailUserMock, $activityListMock);
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($emailMock, $activityListMock);
 
         $this->assertCount(1, $activityOwnerArray);
         $owner = $activityOwnerArray[0];
