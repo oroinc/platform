@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/messenger',
     './../base/page-region-view'
-], function (_, messenger, PageRegionView) {
+], function(_, messenger, PageRegionView) {
     'use strict';
 
     var PageMainMenuView;
@@ -17,7 +15,7 @@ define([
          *
          * @override
          */
-        render: function () {
+        render: function() {
             if (!this.actionArgs || !this.data) {
                 return this;
             }
@@ -37,9 +35,9 @@ define([
          *
          * @param {Object} messages
          */
-        _addMessages: function (messages) {
-            _.each(messages, function (messages, type) {
-                _.each(messages, function (message) {
+        _addMessages: function(messages) {
+            _.each(messages, function(messages, type) {
+                _.each(messages, function(message) {
                     messenger.notificationFlashMessage(type, message);
                 });
             });

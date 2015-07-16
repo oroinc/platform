@@ -1,10 +1,9 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailContextActivityCollection,
-        EmailContextActivityModel = require('./email-context-activity-model'),
-        BaseCollection = require('oroui/js/app/models/base/collection');
+    var EmailContextActivityCollection;
+    var EmailContextActivityModel = require('./email-context-activity-model');
+    var BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @export  oroemail/js/app/models/email-context-collection

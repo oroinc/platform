@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'backbone'
-], function ($, _, Backbone) {
+], function($, _, Backbone) {
     'use strict';
 
     var ActionLauncher;
@@ -48,7 +46,7 @@ define([
         className: undefined,
 
         /** @property {String} */
-        link: 'javascript:void(0);',
+        link: '#',
 
         /** @property {Array} */
         links: undefined,
@@ -123,12 +121,12 @@ define([
          * @param {Array} [options.links]
          * @throws {TypeError} If mandatory option is undefined
          */
-        initialize: function (options) {
-            var opts, linkSelector;
-            opts = options || {};
+        initialize: function(options) {
+            var linkSelector;
+            var opts = options || {};
 
             if (!opts.action) {
-                throw new TypeError("'action' is required");
+                throw new TypeError('"action" is required');
             }
 
             if (opts.template) {
@@ -183,7 +181,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -197,12 +195,11 @@ define([
          *
          * @return {*}
          */
-        render: function () {
-            var $el, label;
+        render: function() {
             this.$el.empty();
 
-            label = this.label || this.action.label;
-            $el = $(this.template({
+            var label = this.label || this.action.label;
+            var $el = $(this.template({
                 label: this.label || this.action.label,
                 icon: this.icon,
                 title: this.title || label,
@@ -227,8 +224,9 @@ define([
          * @protected
          * @return {Boolean}
          */
-        onClick: function (e) {
-            var $link, key;
+        onClick: function(e) {
+            var $link;
+            var key;
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
@@ -250,7 +248,7 @@ define([
             return this.onClickReturnValue;
         },
 
-        onToggle: function (e) {
+        onToggle: function(e) {
             var $link = $(e.currentTarget);
             if (!$link.closest('.btn-group').hasClass('open')) {
                 this.trigger('expand', this);
@@ -262,7 +260,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.$el.addClass('disabled');
             return this;
@@ -273,7 +271,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.$el.removeClass('disabled');
             return this;

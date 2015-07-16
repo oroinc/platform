@@ -1,11 +1,11 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var CommentItemView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        template = require('text!../../../templates/comment/comment-item-view.html'),
-        dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var CommentItemView;
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var template = require('text!../../../templates/comment/comment-item-view.html');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
     CommentItemView = BaseView.extend({
         template: template,
@@ -21,15 +21,15 @@ define(function (require) {
             'click .item-edit-button': 'onEditCommentClick',
 
             // open/close dropdown on hover
-            'mouseover .dropdown-toggle': function (e) {
+            'mouseover .dropdown-toggle': function(e) {
                 $(e.target).trigger('click');
             },
-            'mouseleave .dropdown-menu': function (e) {
+            'mouseleave .dropdown-menu': function(e) {
                 $(e.target).parent().find('a.dropdown-toggle').trigger('click');
             }
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = CommentItemView.__super__.getTemplateData.apply(this, arguments);
             if (data.createdAt) {
                 data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
@@ -40,12 +40,12 @@ define(function (require) {
             return data;
         },
 
-        onEditCommentClick: function (e) {
+        onEditCommentClick: function(e) {
             e.stopImmediatePropagation();
             this.$el.trigger('comment-edit', [this.model]);
         },
 
-        onRemoveCommentClick: function (e) {
+        onRemoveCommentClick: function(e) {
             e.stopImmediatePropagation();
             this.$el.trigger('comment-remove', [this.model]);
         }

@@ -1,13 +1,11 @@
-/*jslint nomen:true, browser:true*/
-/*global define*/
 define([
     'underscore',
     './abstract-action'
-], function (_, AbstractAction) {
+], function(_, AbstractAction) {
     'use strict';
 
-    var ModelAction, location;
-    location = window.location;
+    var ModelAction;
+    var location = window.location;
 
     /**
      * Basic model action class.
@@ -36,11 +34,11 @@ define([
          * @param {Backbone.Model} options.model Optional parameter
          * @throws {TypeError} If model is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             if (!opts.model) {
-                throw new TypeError("'model' is required");
+                throw new TypeError('"model" is required');
             }
             this.model = opts.model;
 
@@ -61,10 +59,11 @@ define([
          * @return {String}
          * @throws {TypeError} If route is undefined
          */
-        getLink: function () {
-            var result, backUrl;
+        getLink: function() {
+            var result;
+            var backUrl;
             if (!this.link) {
-                throw new TypeError("'link' is required");
+                throw new TypeError('"link" is required');
             }
 
             if (this.model.has(this.link)) {
@@ -91,9 +90,15 @@ define([
          * @return {string}
          * @protected
          */
-        addUrlParameter: function (url, parameterName, parameterValue) {
-            var urlHash, sourceUrl, cl, urlParts, newQueryString, parameters, parameterParts, i,
-                replaceDuplicates = true;
+        addUrlParameter: function(url, parameterName, parameterValue) {
+            var urlHash;
+            var cl;
+            var urlParts;
+            var newQueryString;
+            var parameters;
+            var parameterParts;
+            var i;
+            var replaceDuplicates = true;
             if (url.indexOf('#') > 0) {
                 cl = url.indexOf('#');
                 urlHash = url.substring(url.indexOf('#'), url.length);
@@ -101,32 +106,32 @@ define([
                 urlHash = '';
                 cl = url.length;
             }
-            sourceUrl = url.substring(0, cl);
+            var sourceUrl = url.substring(0, cl);
 
-            urlParts = sourceUrl.split("?");
-            newQueryString = "";
+            urlParts = sourceUrl.split('?');
+            newQueryString = '';
 
             if (urlParts.length > 1) {
-                parameters = urlParts[1].split("&");
-                for (i = 0; (i < parameters.length); i += 1) {
-                    parameterParts = parameters[i].split("=");
+                parameters = urlParts[1].split('&');
+                for (i = 0; i < parameters.length; i += 1) {
+                    parameterParts = parameters[i].split('=');
                     if (!(replaceDuplicates && parameterParts[0] === parameterName)) {
-                        if (newQueryString === "") {
-                            newQueryString = "?";
+                        if (newQueryString === '') {
+                            newQueryString = '?';
                         } else {
-                            newQueryString += "&";
+                            newQueryString += '&';
                         }
-                        newQueryString += parameterParts[0] + "=" + (parameterParts[1] || '');
+                        newQueryString += parameterParts[0] + '=' + (parameterParts[1] || '');
                     }
                 }
             }
-            if (newQueryString === "") {
-                newQueryString = "?";
+            if (newQueryString === '') {
+                newQueryString = '?';
             }
-            if (newQueryString !== "" && newQueryString !== '?') {
-                newQueryString += "&";
+            if (newQueryString !== '' && newQueryString !== '?') {
+                newQueryString += '&';
             }
-            newQueryString += parameterName + "=" + encodeURIComponent(parameterValue || '');
+            newQueryString += parameterName + '=' + encodeURIComponent(parameterValue || '');
             return urlParts[0] + newQueryString + urlHash;
         }
     });

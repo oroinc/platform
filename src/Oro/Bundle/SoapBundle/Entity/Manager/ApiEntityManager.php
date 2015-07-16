@@ -247,6 +247,20 @@ class ApiEntityManager
     }
 
     /**
+     * Returns query builder that could be used for fetching entity by its id
+     *
+     * @param mixed $id The id of an entity
+     *
+     * @return QueryBuilder
+     */
+    public function getItemQueryBuilder($id)
+    {
+        return $this->getRepository()->createQueryBuilder('e')
+            ->where(sprintf('e.%s = :id', $this->doctrineHelper->getSingleEntityIdentifierFieldName($this->class)))
+            ->setParameter('id', $id);
+    }
+
+    /**
      * Serializes the list of entities
      *
      * @param QueryBuilder $qb A query builder is used to get data
@@ -267,10 +281,7 @@ class ApiEntityManager
      */
     public function serializeOne($id)
     {
-        $qb = $this->getRepository()->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', $id);
-
+        $qb     = $this->getItemQueryBuilder($id);
         $config = $this->getCachedSerializationConfig();
         $this->entitySerializer->prepareQuery($qb, $config);
         $entity = $qb->getQuery()->getResult();

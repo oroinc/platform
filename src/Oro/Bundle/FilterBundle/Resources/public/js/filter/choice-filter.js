@@ -1,12 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
     './text-filter'
-], function ($, _, __, tools, TextFilter) {
+], function($, _, __, tools, TextFilter) {
     'use strict';
 
     var ChoiceFilter;
@@ -62,7 +60,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = _.pick(options || {}, 'choices');
             _.extend(this, opts);
 
@@ -72,7 +70,7 @@ define([
             }
             // temp code to keep backward compatible
             if ($.isPlainObject(this.choices)) {
-                this.choices = _.map(this.choices, function (option, i) {
+                this.choices = _.map(this.choices, function(option, i) {
                     return {value: i.toString(), label: option};
                 });
             }
@@ -91,7 +89,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -100,7 +98,7 @@ define([
             ChoiceFilter.__super__.dispose.call(this);
         },
 
-        render: function () {
+        render: function() {
             // render only wrapper (a button and a dropdown container e.g.)
             this._wrap('');
             // if there's no any wrapper, means it's embedded filter
@@ -113,12 +111,12 @@ define([
         /**
          * @inheritDoc
          */
-        _renderCriteria: function () {
+        _renderCriteria: function() {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function (choice) {
-                    return (choice.value == value.type);
+                var foundChoice = _.find(this.choices, function(choice) {
+                    return (choice.value === value.type);
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
@@ -134,37 +132,38 @@ define([
             this._criteriaRenderd = true;
         },
 
-        _showCriteria: function () {
+        _showCriteria: function() {
             if (!this._criteriaRenderd) {
                 this._renderCriteria();
             }
             ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
-        _onClickCriteriaSelector: function () {
+        _onClickCriteriaSelector: function() {
             ChoiceFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
             this._updateValueField();
         },
 
-        _onClickChoiceValue: function () {
+        _onClickChoiceValue: function() {
             ChoiceFilter.__super__._onClickChoiceValue.apply(this, arguments);
             this._updateValueField();
         },
 
-        _onClickResetFilter: function () {
+        _onClickResetFilter: function() {
             ChoiceFilter.__super__._onClickResetFilter.apply(this, arguments);
             this._updateValueField();
         },
 
-        _updateValueField: function () {
-            var leftWidth, rightWidth, type, isEmptyType,
-                valueFrame = this.$('.value-field-frame');
+        _updateValueField: function() {
+            var type;
+            var isEmptyType;
+            var valueFrame = this.$('.value-field-frame');
             if (!valueFrame.length) {
                 return;
             }
             // update left and right margins of value field frame
-            leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
-            rightWidth = this.$('.filter-update').outerWidth();
+            var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
+            var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
             valueFrame.css('margin-right', rightWidth);
             // update class of criteria dropdown
@@ -179,7 +178,7 @@ define([
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function () {
+        _getCriteriaHint: function() {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = null;
 
@@ -208,24 +207,23 @@ define([
          * @returns {{value: string, label: string}}
          * @private
          */
-        _getChoiceOption: function (valueType) {
+        _getChoiceOption: function(valueType) {
             return _.findWhere(this.choices, {value: valueType.toString()});
         },
 
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.value, value.value);
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
             return this;
         },
 
-
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value),
                 type: this._getInputValue(this.criteriaValueSelectors.type)
@@ -235,7 +233,7 @@ define([
         /**
          * @inheritDoc
          */
-        _triggerUpdate: function (newValue, oldValue) {
+        _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
@@ -244,14 +242,14 @@ define([
         /**
          * @inheritDoc
          */
-        _onValueUpdated: function (newValue, oldValue) {
+        _onValueUpdated: function(newValue, oldValue) {
             // synchronize choice selector with new value
             var menu = this.$('.choice-filter .dropdown-menu');
-            menu.find('li a').each(function () {
+            menu.find('li a').each(function() {
                 var item = $(this);
-                if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
+                if (item.data('value') === oldValue.type && item.parent().hasClass('active')) {
                     item.parent().removeClass('active');
-                } else if (item.data('value') == newValue.type && !item.parent().hasClass('active')) {
+                } else if (item.data('value') === newValue.type && !item.parent().hasClass('active')) {
                     item.parent().addClass('active');
                     menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
                 }

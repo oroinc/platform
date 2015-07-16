@@ -1,10 +1,10 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DateTimePickerView,
-        _ = require('underscore'),
-        DatePickerView = require('./datepicker-view'),
-        dateTimePickerViewMixin = require('./datetimepicker-view-mixin');
+    var DateTimePickerView;
+    var _ = require('underscore');
+    var DatePickerView = require('./datepicker-view');
+    var dateTimePickerViewMixin = require('./datetimepicker-view-mixin');
 
     DateTimePickerView = DatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
@@ -19,7 +19,7 @@ define(function (require) {
          * @final
          * @protected
          */
-        _super: function () {
+        _super: function() {
             return DateTimePickerView.__super__;
         }
     }));

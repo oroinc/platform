@@ -12,15 +12,17 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2, o0_.public AS public_3'
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
+            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id_0'     => 1,
-                    'name_1'   => 'test_name',
-                    'label_2'  => 'test_label',
-                    'public_3' => 1,
+                    'id_0'           => 1,
+                    'name_1'         => 'test_name',
+                    'label_2'        => 'test_label',
+                    'public_3'       => 1,
+                    'is_exception_4' => 0
                 ]
             ],
             [1 => 1],
@@ -32,10 +34,11 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'     => 1,
-                    'name'   => 'test_name',
-                    'label'  => 'test_label',
-                    'public' => true
+                    'id'          => 1,
+                    'name'        => 'test_name',
+                    'label'       => 'test_label',
+                    'public'      => true,
+                    'isException' => false
                 ]
             ],
             $result
@@ -67,7 +70,52 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $result = $this->serializer->serialize(
             $qb,
             [
-                'excluded_fields' => ['name'],
+                'excluded_fields' => ['name', 'isException'],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 1,
+                    'label'  => 'test_label',
+                    'public' => true
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSimpleEntityWithExclusionAndPartialLoadDisabled()
+    {
+        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id0, o0_.name AS name1, o0_.label AS label2'
+            . ', o0_.public AS public3, o0_.is_exception AS is_exception4'
+            . ' FROM oro_test_serializer_group o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id0'           => 1,
+                    'name1'         => 'test_name',
+                    'label2'        => 'test_label',
+                    'public3'       => 1,
+                    'is_exception4' => 0
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'excluded_fields'      => ['name', 'isException'],
+                'disable_partial_load' => true
             ]
         );
 
@@ -91,15 +139,17 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2, o0_.public AS public_3'
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
+            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id_0'     => 1,
-                    'name_1'   => 'test_name',
-                    'label_2'  => null,
-                    'public_3' => 0,
+                    'id_0'           => 1,
+                    'name_1'         => 'test_name',
+                    'label_2'        => null,
+                    'public_3'       => 0,
+                    'is_exception_4' => 0
                 ]
             ],
             [1 => 1],
@@ -119,10 +169,11 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'     => 1,
-                    'name'   => 'test_name',
-                    'label'  => null,
-                    'public' => false,
+                    'id'          => 1,
+                    'name'        => 'test_name',
+                    'label'       => null,
+                    'public'      => false,
+                    'isException' => false
                 ]
             ],
             $result
@@ -222,15 +273,17 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2, o0_.public AS public_3'
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
+            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id_0'     => 1,
-                    'name_1'   => 'test_name',
-                    'label_2'  => 'test_label',
-                    'public_3' => 1,
+                    'id_0'           => 1,
+                    'name_1'         => 'test_name',
+                    'label_2'        => 'test_label',
+                    'public_3'       => 1,
+                    'is_exception_4' => 0
                 ]
             ],
             [1 => 1],
@@ -249,11 +302,104 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'id'         => 1,
-                    'name'       => 'test_name',
-                    'label'      => 'test_label',
-                    'public'     => true,
-                    'additional' => 'test_name_additional'
+                    'id'          => 1,
+                    'name'        => 'test_name',
+                    'label'       => 'test_label',
+                    'public'      => true,
+                    'isException' => false,
+                    'additional'  => 'test_name_additional'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSimpleEntityWithMetadata()
+    {
+        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id0, o0_.label AS label1'
+            . ' FROM oro_test_serializer_group o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id0'    => 1,
+                    'label1' => 'test_label'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'excluded_fields' => ['name', 'public', 'isException'],
+                'fields'          => [
+                    '__class__' => [
+                        'result_name' => 'entity'
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 1,
+                    'label'  => 'test_label',
+                    'entity' => 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity\Group'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSimpleEntityWithMetadataAndExcludeAllPolicy()
+    {
+        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+            ->where('e.id = :id')
+            ->setParameter('id', 1);
+
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            'SELECT o0_.id AS id0, o0_.label AS label1'
+            . ' FROM oro_test_serializer_group o0_'
+            . ' WHERE o0_.id = ?',
+            [
+                [
+                    'id0'    => 1,
+                    'label1' => 'test_label'
+                ]
+            ],
+            [1 => 1],
+            [1 => \PDO::PARAM_INT]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'        => null,
+                    'label'     => null,
+                    '__class__' => [
+                        'result_name' => 'entity'
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'id'     => 1,
+                    'label'  => 'test_label',
+                    'entity' => 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity\Group'
                 ]
             ],
             $result
