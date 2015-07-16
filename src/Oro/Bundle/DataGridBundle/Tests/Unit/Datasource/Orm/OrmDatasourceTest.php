@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 
 class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +32,13 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 
         $this->parameterBinder = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datasource\\ParameterBinderInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->datasource      = new OrmDatasource($this->em, $this->eventDispatcher, $this->parameterBinder);
+        $queryHintResolver     = new QueryHintResolver();
+        $this->datasource      = new OrmDatasource(
+            $this->em,
+            $this->eventDispatcher,
+            $this->parameterBinder,
+            $queryHintResolver
+        );
     }
 
     /**

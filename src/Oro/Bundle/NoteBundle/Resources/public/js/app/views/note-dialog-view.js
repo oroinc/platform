@@ -1,11 +1,9 @@
-/* jslint browser:true, nomen:true */
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var NoteView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var NoteView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     NoteView = BaseView.extend({
         autoRender: true,
@@ -13,20 +11,20 @@ define(function (require) {
             'component:parentResize': 'onParentResize'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.editorComponentName = options.editorComponentName;
             NoteView.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             this._deferredRender();
-            this.initLayout().done(_.bind(function () {
+            this.initLayout().done(_.bind(function() {
                 this.onParentResize();
                 this._resolveDeferredRender();
             }, this));
         },
 
-        onParentResize: function () {
+        onParentResize: function() {
             var editor = this.pageComponent(this.editorComponentName);
             if (!editor) {
                 throw new Error('Could not find message editor');
