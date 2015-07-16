@@ -82,7 +82,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null, $organization = null)
     {
-        return true;
         if ($userId === null) {
             return $this->isKnownSender($email) && $this->isKnownRecipient($email);
         }
