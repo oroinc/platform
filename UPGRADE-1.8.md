@@ -78,6 +78,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####UiBundle
  - Macros `scrollData` in `Oro/Bundle/UIBundle/Resources/views/macros.html.twig` triggers event `oro_ui.scroll_data.before.<pageIdentifier>` before data rendering
+ - Added `assets_version` parameter for outdating assets if needed
 
 ####LocaleBundle
 - Deprecated method {{localeSettings.getTimeZoneShift()}} (calendar-view.js, formatter/datetime.js, datepicker/datetimepicker-view-mixin.js)
