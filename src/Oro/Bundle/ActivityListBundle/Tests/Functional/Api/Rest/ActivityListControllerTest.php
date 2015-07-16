@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\Api\Rest;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @outputBuffering enabled
@@ -17,8 +16,7 @@ class ActivityListControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
-            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData',
-            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadUserData'
+            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData'
         ]);
     }
 
@@ -82,36 +80,5 @@ class ActivityListControllerTest extends WebTestCase
         );
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertArrayHasKey('Oro_Bundle_TestFrameworkBundle_Entity_TestActivity', $result);
-    }
-
-    /**
-     * Test to verify access for user who does not have access to activity other user
-     */
-    public function testGetListForUserWithOutPermissions()
-    {
-        /**
-         * @var User $managerUser
-         */
-        $managerUser = $this->getReference('manager_user');
-
-        $this->initClient(
-            [],
-            $this->generateWsseAuthHeader($managerUser->getUsername(), $managerUser->getPassword()),
-            true
-        );
-
-        $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_activity_list_api_get_list',
-                [
-                    'entityClass' => 'Oro_Bundle_TestFrameworkBundle_Entity_TestActivityTarget',
-                    'entityId'    => $this->getReference('test_activity_target_1')->getId()
-                ]
-            )
-        );
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(0, $result['data']);
-        $this->assertEquals(0, $result['count']);
     }
 }
