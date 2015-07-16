@@ -81,9 +81,9 @@ class EmailQueryFactory
 
         $expression = '';
         foreach ($expressionsByOwner as $alias => $expressionPart) {
-            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s', $emailFromTableAlias, $alias, $expressionPart);
+            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s ', $emailFromTableAlias, $alias, $expressionPart);
         }
-        $expression = sprintf('CASE %s ELSE \'\' END', $expression);
+        $expression = sprintf('CASE %sELSE \'\' END', $expression);
 
         // if has owner then use expression to expose formatted name, use email otherwise
         return sprintf(
