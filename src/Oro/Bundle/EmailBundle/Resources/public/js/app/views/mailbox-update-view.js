@@ -5,9 +5,8 @@ define([
     'backbone',
     'underscore',
     'orotranslation/js/translator',
-    'oroui/js/mediator',
-    'oroui/js/delete-confirmation'
-], function ($, Backbone, _, __, mediator, DeleteConfirmation) {
+    'oroui/js/mediator'
+], function ($, Backbone, _, __, mediator) {
     'use strict';
 
     /**
