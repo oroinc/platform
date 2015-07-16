@@ -5,12 +5,9 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 
-use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 
 class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
@@ -32,40 +29,19 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
      */
     public function load(ObjectManager $manager)
     {
-        $this->initUser($manager);
+        $this->initUserPermissions($manager);
         $manager->flush();
     }
 
-    protected function initUser(ObjectManager $manager)
+    protected function initUserPermissions(ObjectManager $manager)
     {
-        $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $roleManager = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
+        /** @var AclManager $aclManager */
+        $aclManager = $this->container->get('oro_security.acl.manager');
         $roleAdmin = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
-        $group = $manager->getRepository('OroUserBundle:Group')->findOneBy(array('name' => 'Administrators'));
-
-        $user = $userManager->createUser();
-        $user->setUsername('manager_user')
-            ->setPlainPassword('simple_password')
-            ->setEmail('simple_user@example.com')
-            ->setOrganization($organization)
-            ->setEnabled(true)
-            ->setFirstname('Test')
-            ->setLastname('Test')
-            ->setSalt('')
-            ->removeRole($roleAdmin);
-        $user->addRole($roleManager);
-        if (0 === count($user->getApiKeys())) {
-            $api = new UserApi();
-            $api->setApiKey('manager_api_key')
-                ->setUser($user)
-                ->setOrganization($organization);
-            $user->addApiKey($api);
-        }
-        if (!$user->hasGroup($group)) {
-            $user->addGroup($group);
-        }
-        $userManager->updateUser($user);
-        $this->setReference($user->getUsername(), $user);
+        $sid = $aclManager->getSid($roleAdmin);
+        $oid = $aclManager->getOid('entity:Oro\Bundle\TestFrameworkBundle\Entity\TestActivity');
+        $maskBuilder = $aclManager->getMaskBuilder($oid)
+            ->reset();
+        $aclManager->setPermission($sid, $oid, $maskBuilder->get());
     }
 }

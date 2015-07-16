@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadActivityData extends AbstractFixture
 {

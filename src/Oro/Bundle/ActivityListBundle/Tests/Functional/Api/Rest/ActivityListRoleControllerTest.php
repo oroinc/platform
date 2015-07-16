@@ -13,11 +13,7 @@ class ActivityListRoleControllerTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient(
-            [],
-            $this->generateWsseAuthHeader('manager_user', 'manager_api_key'),
-            true
-        );
+        $this->initClient([], $this->generateWsseAuthHeader(), true);
         $this->loadFixtures([
             'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData',
             'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadUserData'
