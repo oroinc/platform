@@ -94,17 +94,17 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id0, o0_.name AS name1, o0_.label AS label2'
-            . ', o0_.public AS public3, o0_.is_exception AS is_exception4'
+            'SELECT o0_.id AS id_0, o0_.name AS name_1, o0_.label AS label_2'
+            . ', o0_.public AS public_3, o0_.is_exception AS is_exception_4'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id0'           => 1,
-                    'name1'         => 'test_name',
-                    'label2'        => 'test_label',
-                    'public3'       => 1,
-                    'is_exception4' => 0
+                    'id_0'           => 1,
+                    'name_1'         => 'test_name',
+                    'label_2'        => 'test_label',
+                    'public_3'       => 1,
+                    'is_exception_4' => 0
                 ]
             ],
             [1 => 1],
@@ -322,13 +322,13 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id0, o0_.label AS label1'
+            'SELECT o0_.id AS id_0, o0_.label AS label_1'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id0'    => 1,
-                    'label1' => 'test_label'
+                    'id_0'    => 1,
+                    'label_1' => 'test_label'
                 ]
             ],
             [1 => 1],
@@ -367,13 +367,13 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT o0_.id AS id0, o0_.label AS label1'
+            'SELECT o0_.id AS id_0, o0_.label AS label_1'
             . ' FROM oro_test_serializer_group o0_'
             . ' WHERE o0_.id = ?',
             [
                 [
-                    'id0'    => 1,
-                    'label1' => 'test_label'
+                    'id_0'    => 1,
+                    'label_1' => 'test_label'
                 ]
             ],
             [1 => 1],
