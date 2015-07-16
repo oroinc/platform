@@ -26,6 +26,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 abstract class EmailOrigin
 {
+    const MAILBOX_NAME = 'Base origin';
+
     /**
      * @var integer
      *
@@ -374,7 +376,7 @@ abstract class EmailOrigin
     public function beforeSave()
     {
         if ($this->mailboxName === null) {
-            $this->mailboxName = $this->__toString();
+            $this->mailboxName = static::MAILBOX_NAME;
         }
     }
 }

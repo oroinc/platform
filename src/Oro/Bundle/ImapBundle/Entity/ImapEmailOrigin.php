@@ -13,6 +13,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
  */
 class ImapEmailOrigin extends EmailOrigin
 {
+    const MAILBOX_NAME = 'IMAP';
+
     /**
      * @var string
      *
