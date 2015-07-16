@@ -1,18 +1,20 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var Select2GridComponent,
-        _ = require('underscore'),
-        Select2Component = require('oro/select2-component');
+
+    var Select2GridComponent;
+    var _ = require('underscore');
+    var Select2Component = require('oro/select2-component');
+
     Select2GridComponent = Select2Component.extend({
-        preConfig: function (config) {
+        preConfig: function(config) {
             Select2GridComponent.__super__.preConfig.call(this, config);
-            var that = this,
-                grid = config.grid,
-                gridName = grid.name;
+            var that = this;
+            var grid = config.grid;
+            var gridName = grid.name;
             _.extend(config.ajax, {
-                data: function (query, page, searchById) {
-                    var result = {},
-                        sortByKey;
+                data: function(query, page, searchById) {
+                    var result = {};
+                    var sortByKey;
                     if (searchById) {
                         result[gridName + '[_pager][_page]'] = 1;
                         result[gridName + '[_pager][_per_page]'] = 1;
@@ -28,7 +30,7 @@ define(function (require) {
                     }
                     return result;
                 },
-                results: function (data, page) {
+                results: function(data, page) {
                     return {
                         results: data.data,
                         more: page * that.perPage < data.options.totalRecords

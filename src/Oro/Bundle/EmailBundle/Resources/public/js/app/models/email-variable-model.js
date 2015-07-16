@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailVariableModel,
-        _ = require('underscore'),
-        BaseModel = require('oroui/js/app/models/base/model')
+    var EmailVariableModel;
+    var _ = require('underscore');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export oroemail/js/app/models/email-variable-model
@@ -34,14 +32,14 @@ define(function (require) {
         /**
          * @returns {string}
          */
-        getEntityName: function () {
+        getEntityName: function() {
             return this.entityName;
         },
 
         /**
          * @returns {string}
          */
-        getEntityLabel: function () {
+        getEntityLabel: function() {
             return this.entityLabel;
         },
 
@@ -49,7 +47,7 @@ define(function (require) {
          * @param {string} entityName
          * @param {string} entityLabel
          */
-        setEntity: function (entityName, entityLabel) {
+        setEntity: function(entityName, entityLabel) {
             this.entityName = entityName;
             this.entityLabel = entityLabel;
             this.path = [];
@@ -59,9 +57,9 @@ define(function (require) {
         /**
          * @returns {string} For example '/field1/field2'. The empty string represents the root
          */
-        getPath: function () {
+        getPath: function() {
             var result = '';
-            _.each(this.path, function (item) {
+            _.each(this.path, function(item) {
                 result += '/' + item.fieldName;
             });
             return result;
@@ -70,9 +68,9 @@ define(function (require) {
         /**
          * @returns {array}
          */
-        getPathLabels: function () {
+        getPathLabels: function() {
             var result = [];
-            _.each(this.path, function (item) {
+            _.each(this.path, function(item) {
                 result[item.fieldName] = item.fieldLabel;
             });
             return result;
@@ -81,9 +79,9 @@ define(function (require) {
         /**
          * @param {string} path For example '/field1/field2'. The empty string represents the root
          */
-        setPath: function (path) {
+        setPath: function(path) {
             this.path = [];
-            _.each(path.split('/'), function (fieldName) {
+            _.each(path.split('/'), function(fieldName) {
                 if (fieldName) {
                     this.path.push({
                         relatedEntityName: this._getRelatedEntityName(this._getCurrentEntityName(), fieldName),
@@ -98,14 +96,14 @@ define(function (require) {
         /**
          * @returns {Object}
          */
-        getSystemVariables: function () {
+        getSystemVariables: function() {
             return this.attributes.system;
         },
 
         /**
          * @returns {Object}
          */
-        getEntityVariables: function () {
+        getEntityVariables: function() {
             var entityName = this._getCurrentEntityName();
             if (entityName && _.has(this.attributes.entity, entityName)) {
                 return this.attributes.entity[entityName];
@@ -117,7 +115,7 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getCurrentEntityName: function () {
+        _getCurrentEntityName: function() {
             var lastItem = _.last(this.path);
             return lastItem ? lastItem.relatedEntityName : this.entityName;
         },
@@ -128,7 +126,7 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getRelatedEntityName: function (entityName, fieldName) {
+        _getRelatedEntityName: function(entityName, fieldName) {
             return this.attributes.entity[entityName][fieldName].related_entity_name;
         },
 
@@ -138,7 +136,7 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getEntityLabel: function (entityName, fieldName) {
+        _getEntityLabel: function(entityName, fieldName) {
             return this.attributes.entity[entityName][fieldName].label;
         }
     });
