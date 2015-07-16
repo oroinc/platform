@@ -75,7 +75,7 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
             foreach ($iterator as $entity) {
                 $entities[] = $entity;
                 $itemsCount++;
-                if (0 == $itemsCount % self::BATCH_SIZE) {
+                if (0 === $itemsCount % self::BATCH_SIZE) {
                     $this->saveActivityListOwner($manager, $activitiesProvider, $entities);
                     $entities = [];
                 }
