@@ -118,6 +118,8 @@ class ImapEmailFolderRepository extends EntityRepository
             $em->remove($imapEmail);
         }
 
+        $em->flush();
+
         foreach ($emailUsers as $emailUser) {
             $email = $emailUser->getEmail();
             if ($email->getEmailUsers()->isEmpty()) {
