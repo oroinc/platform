@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'backbone'
-], function ($, _, Backbone) {
+], function($, _, Backbone) {
     'use strict';
 
     var PageSize;
@@ -22,7 +20,7 @@ define([
 
         /** @property */
         events: {
-            "click a": "onChangePageSize"
+            'click a': 'onChangePageSize'
         },
 
         /** @property */
@@ -41,11 +39,11 @@ define([
          * @param {Backbone.Collection} options.collection
          * @param {Array} [options.items]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
 
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
 
             if (options.items) {
@@ -54,12 +52,12 @@ define([
 
             this.template = _.template($(options.template || this.template).html());
             this.collection = options.collection;
-            this.listenTo(this.collection, "add", this.render);
-            this.listenTo(this.collection, "remove", this.render);
-            this.listenTo(this.collection, "reset", this.render);
+            this.listenTo(this.collection, 'add', this.render);
+            this.listenTo(this.collection, 'remove', this.render);
+            this.listenTo(this.collection, 'reset', this.render);
 
-            this.enabled = options.enable != false;
-            this.hidden = options.hide == true;
+            this.enabled = options.enable !== false;
+            this.hidden = options.hide === true;
 
             PageSize.__super__.initialize.call(this, options);
         },
@@ -69,7 +67,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.render();
             return this;
@@ -80,7 +78,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.render();
             return this;
@@ -91,7 +89,7 @@ define([
          *
          * @param {Event} e
          */
-        onChangePageSize: function (e) {
+        onChangePageSize: function(e) {
             e.preventDefault();
             var pageSize = parseInt($(e.target).data('size'), 10);
             if (pageSize !== this.collection.state.pageSize) {
@@ -99,26 +97,28 @@ define([
             }
         },
 
-        changePageSize: function (pageSize) {
+        changePageSize: function(pageSize) {
             this.collection.state.pageSize = pageSize;
             this.collection.fetch({reset: true});
 
             return this;
         },
 
-        render: function () {
+        render: function() {
             this.$el.empty();
 
             var currentSizeLabel = _.filter(
                 this.items,
                 _.bind(
-                    function (item) {
-                        return item.size === undefined ? this.collection.state.pageSize == item : this.collection.state.pageSize == item.size;
+                    function(item) {
+                        return item.size === undefined ?
+                            this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
                     },
                     this
                 )
             );
-            currentSizeLabel = currentSizeLabel[0].label == undefined ? currentSizeLabel[0] : currentSizeLabel[0].label;
+            currentSizeLabel = _.isUndefined(currentSizeLabel[0].label) ?
+                currentSizeLabel[0] : currentSizeLabel[0].label;
 
             this.$el.append($(this.template({
                 disabled: !this.enabled || !this.collection.state.totalRecords,

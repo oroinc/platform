@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/messenger', 'oroui/js/error'],
 function($, __, Modal, Messenger, Error) {
     'use strict';
@@ -33,9 +32,9 @@ function($, __, Modal, Messenger, Error) {
                     Error.handle({}, xhr, {enforce: true});
                     element.trigger('activation_error', [xhr, textStatus, error]);
                 }
-            })
+            });
         });
 
         confirmActivation.open();
-    }
+    };
 });

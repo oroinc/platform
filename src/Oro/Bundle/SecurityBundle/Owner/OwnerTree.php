@@ -314,7 +314,7 @@ class OwnerTree implements OwnerTreeInterface
      * @param int|string      $businessUnitId
      * @param int|string|null $owningOrganizationId
      *
-     * @deprecated 1.8:2.1 use OwnerTree::addLocalEntity method
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addLocalEntity method
      */
     public function addBusinessUnit($businessUnitId, $owningOrganizationId)
     {
@@ -350,7 +350,7 @@ class OwnerTree implements OwnerTreeInterface
      * @param int|string      $businessUnitId
      * @param int|string|null $parentBusinessUnitId
      *
-     * @deprecated 1.8:2.1 use OwnerTree::addDeepEntity method
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addDeepEntity method
      */
     public function addBusinessUnitRelation($businessUnitId, $parentBusinessUnitId)
     {
@@ -385,7 +385,7 @@ class OwnerTree implements OwnerTreeInterface
      * @param int|string      $userId
      * @param int|string|null $owningBusinessUnitId
      *
-     * @deprecated 1.8:2.1 use OwnerTree::addBasicEntity method
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addBasicEntity method
      */
     public function addUser($userId, $owningBusinessUnitId)
     {
@@ -439,7 +439,7 @@ class OwnerTree implements OwnerTreeInterface
      * @param  int|string $businessUnitId
      * @throws \LogicException
      *
-     * @deprecated 1.8:2.1 use OwnerTree::addLocalEntityToBasic method
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addLocalEntityToBasic method
      */
     public function addUserBusinessUnit($userId, $organizationId, $businessUnitId)
     {
@@ -479,7 +479,7 @@ class OwnerTree implements OwnerTreeInterface
      * @param int|string $userId
      * @param int|string $organizationId
      *
-     * @deprecated 1.8:2.1 use OwnerTree::addGlobalEntity method
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addGlobalEntity method
      */
     public function addUserOrganization($userId, $organizationId)
     {

@@ -1,15 +1,16 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var BaseView = require('oroui/js/app/views/base/view'),
-        FlowchartJsPlubmBaseView;
 
-    FlowchartJsPlubmBaseView = BaseView.extend({
-        id: function () {
+    var FlowchartJsPlumbBaseView;
+    var BaseView = require('oroui/js/app/views/base/view');
+
+    FlowchartJsPlumbBaseView = BaseView.extend({
+        id: function() {
             return 'jsplumb-' + this.cid;
         },
 
-        render: function () {
-            FlowchartJsPlubmBaseView.__super__.render.apply(this, arguments);
+        render: function() {
+            FlowchartJsPlumbBaseView.__super__.render.apply(this, arguments);
 
             if (!this.isConnected) {
                 this.isConnected = true;
@@ -18,22 +19,21 @@ define(function (require) {
             return this;
         },
 
-        connect: function () {
+        connect: function() {
             // fill with stuff what should be done once element is rendered
         },
 
-        cleanup: function () {
+        cleanup: function() {
             // empty
         },
 
-        dispose: function () {
-            if (this.disposed) {
-                return;
+        dispose: function() {
+            if (!this.disposed) {
+                this.cleanup();
+                FlowchartJsPlumbBaseView.__super__.dispose.apply(this, arguments);
             }
-            this.cleanup();
-            FlowchartJsPlubmBaseView.__super__.dispose.apply(this, arguments);
         }
     });
 
-    return FlowchartJsPlubmBaseView;
+    return FlowchartJsPlumbBaseView;
 });

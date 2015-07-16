@@ -6,6 +6,9 @@ use Doctrine\Common\Util\ClassUtils;
 
 class EntityDataAccessor implements DataAccessorInterface
 {
+    /** @var \ReflectionClass[] */
+    private $reflCache = [];
+
     /**
      * {@inheritdoc}
      */
@@ -13,13 +16,20 @@ class EntityDataAccessor implements DataAccessorInterface
     {
         $suffix = $this->camelize($property);
 
-        if (method_exists($className, 'get' . $suffix)) {
+        $refl = $this->getReflectionClass($className);
+        if ($refl->hasMethod('get' . $suffix)) {
             return true;
         }
-        if (method_exists($className, 'is' . $suffix)) {
+        if ($refl->hasMethod('is' . $suffix)) {
             return true;
         }
-        if (method_exists($className, 'has' . $suffix)) {
+        if ($refl->hasMethod('has' . $suffix)) {
+            return true;
+        }
+        if ($refl->hasMethod($suffix)) {
+            return true;
+        }
+        if ($refl->hasProperty($property)) {
             return true;
         }
 
@@ -38,23 +48,42 @@ class EntityDataAccessor implements DataAccessorInterface
                 return true;
             }
         } else {
+            $refl = $this->getReflectionClass(get_class($object));
+
             $suffix = $this->camelize($property);
 
             $accessor = 'get' . $suffix;
-            if (method_exists($object, $accessor)) {
-                $value = $object->$accessor();
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
 
                 return true;
             }
             $accessor = 'is' . $suffix;
-            if (method_exists($object, $accessor)) {
-                $value = $object->$accessor();
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
 
                 return true;
             }
             $accessor = 'has' . $suffix;
-            if (method_exists($object, $accessor)) {
-                $value = $object->$accessor();
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
+
+                return true;
+            }
+            $accessor = $suffix;
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
+
+                return true;
+            }
+            if ($refl->hasProperty($property)) {
+                $prop = $refl->getProperty($property);
+                $prop->setAccessible(true);
+                $value = $prop->getValue($object);
 
                 return true;
             }
@@ -101,5 +130,24 @@ class EntityDataAccessor implements DataAccessorInterface
     protected function camelize($string)
     {
         return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+    }
+
+    /**
+     * Gets an instance of \ReflectionClass for the given class name
+     *
+     * @param string $className
+     *
+     * @return \ReflectionClass
+     */
+    protected function getReflectionClass($className)
+    {
+        if (isset($this->reflCache[$className])) {
+            return $this->reflCache[$className];
+        }
+
+        $reflClass                   = new \ReflectionClass($className);
+        $this->reflCache[$className] = $reflClass;
+
+        return $reflClass;
     }
 }

@@ -165,6 +165,11 @@ abstract class AbstractEntityVoter implements VoterInterface
     {
         if ($object instanceof ObjectIdentityInterface) {
             $class = $object->getType();
+
+            $delim = strpos($class, '@');
+            if ($delim) {
+                $class = ltrim(substr($class, $delim + 1), ' ');
+            }
         } else {
             $class = $this->doctrineHelper->getEntityClass($object);
         }

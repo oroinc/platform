@@ -1,12 +1,14 @@
-/*global define*/
 define(['underscore', './number'
-    ], function (_, numberValidator) {
+    ], function(_, numberValidator) {
     'use strict';
 
     var defaultParam = {
-        exactMessage: 'This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.',
-        maxMessage: 'This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.',
-        minMessage: 'This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.'
+        exactMessage: 'This collection should contain exactly {{ limit }} element.|' +
+            'This collection should contain exactly {{ limit }} elements.',
+        maxMessage: 'This collection should contain {{ limit }} element or less.|' +
+            'This collection should contain {{ limit }} elements or less.',
+        minMessage: 'This collection should contain {{ limit }} element or more.|' +
+            'This collection should contain {{ limit }} elements or more.'
     };
 
     /**
@@ -26,13 +28,13 @@ define(['underscore', './number'
      */
     return [
         'Count',
-        function (value, element, param) {
+        function(value, element, param) {
             value = getCount(this, element);
             return numberValidator[1].call(this, value, element, param);
         },
-        function (param, element) {
-            var value = getCount(this, element),
-                placeholders = {};
+        function(param, element) {
+            var value = getCount(this, element);
+            var placeholders = {};
             param = _.extend({}, defaultParam, param);
             placeholders.count = value;
             return numberValidator[2].call(this, param, element, value, placeholders);
