@@ -143,10 +143,39 @@ class EmailController extends RestController
             return $this->buildNotFoundResponse();
         }
 
-
         $result = $this->getManager()->getEmailContext($email);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
+    }
+
+    /**
+     * Get email.
+     *
+     * @param string $id
+     *
+     * @Get(
+     *      "/emails/notification/info",
+     *      name="api_emails_notification_info",
+     * )
+     * @ApiDoc(
+     *      description="Get email",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_email_email_view")
+     * @return Response
+     */
+    public function getNewEmail()
+    {
+        $emailProvider = $this->getEmailProvider();
+
+        $emails = $emailProvider->getNewEmails($this->getUser(), 3);
+
+        $result = [
+            'count' => $emailProvider->getCountNewEmails($this->getUser()),
+            'emails' => $this->getPreparedItems($emails)
+        ];
+
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
     }
 
     /**
@@ -157,6 +186,11 @@ class EmailController extends RestController
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email.api');
+    }
+
+    public function getEmailProvider()
+    {
+        return $this->container->get('oro_email.email.provider');
     }
 
     /**

@@ -1,5 +1,22 @@
+<script type="text/template" id="email-notification-item">
+    <li class="new" id="<%= entity.cid %>">
+        <div class="body">
+            <div class="title"><%= entity.get('subject') %></div>
+            <div class="description"><%= entity.get('bodyContent') %></div>
+        </div>
+        <i class="icon-envelope new"></i>
+        <div class="footer row-fluid">
+            <span class="pull-left"><%= entity.get('author') %></span>
+            <span class="pull-right">{{ "Replay"|trans }}</span>
+        </div>
+    </li>
+</script>
+
 <li class="email-notification-menu dropdown "
-    data-clank-event="{{ clank_event }}">
+    data-clank-event="{{ clank_event }}"
+    data-emails="{{ emails }}"
+    data-count = "{{ count }}"
+        >
     <a href="#" class="oro-dropdown-toggle">
         <i class="icon-envelope"></i>
     </a>
@@ -11,28 +28,28 @@
             <a class="mark-as-read pull-right">mark all as read</a>
         </div>
         <ul class="items">
-            <li class="new">
-                <div class="body">
-                    <div class="title">opportunities with MVP sports</div>
-                    <div class="description">Hi, it was great to meet up and discuss ways we can</div>
-                </div>
-                <i class="icon-envelope new"></i>
-                <div class="footer row-fluid">
-                    <span class="pull-left">John Doe</span>
-                    <span class="pull-right">Replay</span>
-                </div>
-            </li>
-            <li class="new">
-                <div class="body">
-                    <div class="title">opportunities with MVP sports</div>
-                    <div class="description">Hi, it was great to meet up and discuss ways we can</div>
-                </div>
-                <i class="icon-envelope new"></i>
-                <div class="footer row-fluid">
-                    <span class="pull-left">John Doe</span>
-                    <span class="pull-right">Replay</span>
-                </div>
-            </li>
+            {#<li class="new">#}
+                {#<div class="body">#}
+                    {#<div class="title">opportunities with MVP sports</div>#}
+                    {#<div class="description">Hi, it was great to meet up and discuss ways we can</div>#}
+                {#</div>#}
+                {#<i class="icon-envelope new"></i>#}
+                {#<div class="footer row-fluid">#}
+                    {#<span class="pull-left">John Doe</span>#}
+                    {#<span class="pull-right">Replay</span>#}
+                {#</div>#}
+            {#</li>#}
+            {#<li class="new">#}
+                {#<div class="body">#}
+                    {#<div class="title">opportunities with MVP sports</div>#}
+                    {#<div class="description">Hi, it was great to meet up and discuss ways we can</div>#}
+                {#</div>#}
+                {#<i class="icon-envelope new"></i>#}
+                {#<div class="footer row-fluid">#}
+                    {#<span class="pull-left">John Doe</span>#}
+                    {#<span class="pull-right">Replay</span>#}
+                {#</div>#}
+            {#</li>#}
         </ul>
     </div>
 </li>

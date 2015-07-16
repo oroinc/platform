@@ -8,6 +8,7 @@ config:
         'oroemail/js/app/models/email-context-activity-collection': 'bundles/oroemail/js/app/models/email-context-activity-collection.js'
         'oroemail/js/app/models/email-attachment-model': 'bundles/oroemail/js/app/models/email-attachment-model.js'
         'oroemail/js/app/models/email-attachment-collection': 'bundles/oroemail/js/app/models/email-attachment-collection.js'
+        'oroemail/js/app/models/email-notification-collection': 'bundles/oroemail/js/app/models/email-notification-collection.js'
 
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
         'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'

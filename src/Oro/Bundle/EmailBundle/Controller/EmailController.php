@@ -71,7 +71,7 @@ class EmailController extends Controller
      */
     public function testAction()
     {
-        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(1);
+        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(25);
         $sender = $this->get('oro_email.email_websocket.processor');
         $a = $sender->send($userEmail);
 
@@ -84,8 +84,28 @@ class EmailController extends Controller
      */
     public function notificationAction()
     {
+        $emailProvider = $this->get('oro_email.email.provider');
+        $maxEmailsDisplay = 3;
+
+        $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
+        $count = $emailProvider->getCountNewEmails($this->getUser());
+
+        $emailsData = [];
+        /**
+         * @var $email Email
+         */
+        foreach ($emails as $email) {
+            $emailsData[] = [
+                'subject' => $email->getSubject(),
+                'bodyContent' => $email->getEmailBody()->getBodyContent(),
+                'author' => $email->getFromName()
+            ];
+        }
+
         return [
-            'clank_event'=> WebSocketSendProcessor::getUserTopic($this->getUser())
+            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser()),
+            'emails' => json_encode($emailsData),
+            'count'=> $count
         ];
     }
 
