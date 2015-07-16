@@ -175,8 +175,11 @@ Here is a list of key classes of EmailBundle:
 
 Email flash popup
 -----------------
-You can add to config.yml this tree and have ability to set maximum visible emails in flash popup via $this->container->getParameter('oro_email.flash_notification.max_emails_display'); :
+You can add to config.yml this tree and have ability to set maximum visible emails in flash popup:
 
 oro_email:
     flash_notification:
         max_emails_display: %email_flash_max_emails_display%
+
+You can take this parameter in backend via:
+$this->container->getParameter('oro_email.flash_notification.max_emails_display');
