@@ -20,8 +20,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
  *          }
  *      }
  * )
