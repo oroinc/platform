@@ -421,7 +421,6 @@ services:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
             - @oro_email.datagrid_query_factory
-            - %oro_email.single_mailbox_mode%
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
@@ -621,4 +620,3 @@ services:
             - @doctrine.orm.entity_manager
             - @security.context
             - @translator
-            - %oro_email.single_mailbox_mode%

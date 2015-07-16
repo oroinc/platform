@@ -86,6 +86,22 @@ class ImapEmailFolderRepository extends EntityRepository
      */
     public function removeFolder(ImapEmailFolder $imapFolder)
     {
+        $this->clearFolder($imapFolder);
+
+        $em = $this->getEntityManager();
+
+        $folder = $imapFolder->getFolder();
+        $em->remove($imapFolder);
+        $em->remove($folder);
+
+        $em->flush();
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     */
+    public function clearFolder(ImapEmailFolder $imapFolder)
+    {
         $em = $this->getEntityManager();
 
         $folder = $imapFolder->getFolder();
@@ -101,11 +117,6 @@ class ImapEmailFolderRepository extends EntityRepository
             ]);
             $em->remove($imapEmail);
         }
-
-        $em->remove($imapFolder);
-        $em->remove($folder);
-
-        $em->flush();
 
         foreach ($emailUsers as $emailUser) {
             $email = $emailUser->getEmail();

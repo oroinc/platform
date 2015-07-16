@@ -14,18 +14,11 @@ class EmailGridListener
     protected $factory;
 
     /**
-     * @var bool
-     */
-    protected $singleMailboxMode;
-
-    /**
      * @param EmailQueryFactory $factory
-     * @param bool $singleMailboxMode
      */
-    public function __construct(EmailQueryFactory $factory, $singleMailboxMode)
+    public function __construct(EmailQueryFactory $factory)
     {
         $this->factory = $factory;
-        $this->singleMailboxMode = $singleMailboxMode;
     }
 
     /**
@@ -48,19 +41,6 @@ class EmailGridListener
                 $emailIds = explode(',', $emailIds);
             }
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
-        }
-
-        if ($this->singleMailboxMode) {
-            // remove mailbox name column
-            $config = $event->getDatagrid()->getConfig();
-            if (isset($config['columns']['mailbox'])) {
-                $config->offsetUnsetByPath('[columns][mailbox]');
-            }
-
-            // add isActive filter
-            $queryBuilder->leftJoin('f.origin', 'o')
-                ->andWhere('o.isActive = :isActive')
-                ->setParameter('isActive', true);
         }
     }
 }

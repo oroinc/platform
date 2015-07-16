@@ -74,7 +74,6 @@ services:
             - @oro_security.encoder.mcrypt
             - @oro_security.security_facade
             - @translator
-            - %oro_email.single_mailbox_mode%
         tags:
              - { name: form.type, alias: oro_imap_configuration }
 

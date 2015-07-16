@@ -28,26 +28,18 @@ class OriginFolderFilterProvider
     protected $translator;
 
     /**
-     * @var bool
-     */
-    protected $singleMailboxMode;
-
-    /**
      * @param OroEntityManager $em
      * @param SecurityContext $securityContext
      * @param Translator $translator
-     * @param bool $singleMailboxMode
      */
     public function __construct(
         OroEntityManager $em,
         SecurityContext $securityContext,
-        Translator $translator,
-        $singleMailboxMode
+        Translator $translator
     ) {
         $this->em = $em;
         $this->securityContext = $securityContext;
         $this->translator = $translator;
-        $this->singleMailboxMode = $singleMailboxMode;
     }
 
     /**
@@ -84,10 +76,8 @@ class OriginFolderFilterProvider
     {
         $criteria = [
             'owner' => $this->securityContext->getToken()->getUser(),
+            'isActive' => true,
         ];
-        if ($this->singleMailboxMode) {
-            $criteria['isActive'] = true;
-        }
 
         return $this->em->getRepository(self::EMAIL_ORIGIN)->findBy($criteria);
     }

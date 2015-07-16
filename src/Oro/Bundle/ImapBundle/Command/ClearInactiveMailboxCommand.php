@@ -45,12 +45,6 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
     {
         $this->logger = new OutputLogger($output);
 
-        if ($this->getContainer()->getParameter('oro_email.single_mailbox_mode') !== true) {
-            $this->logger->notice('Cannot proceed: single mailbox mode is switched off');
-
-            return;
-        }
-
         $this->em = $this->getContainer()->get('doctrine')->getManager();
 
         $originId = $input->getOption('id');
@@ -66,7 +60,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
 
             $this->clearOrigin($origin);
 
-            $this->logger->notice('Origin removed');
+            $this->logger->notice('Origin processed successfully');
         }
 
         $this->logger->notice('Finished');
@@ -90,15 +84,10 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
 
                 return [];
             }
-            if ($origin->isActive()) {
-                $this->logger->notice(sprintf('Origin with ID %s is not inactive', $originId));
-
-                return [];
-            }
 
             $origins = [$origin];
         } else {
-            $origins = $originRepository->findBy(['isActive' => false]);
+            $origins = $originRepository->findAll();
         }
 
         return $origins;
@@ -110,14 +99,22 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
     protected function clearOrigin(ImapEmailOrigin $origin)
     {
         $folders = $origin->getFolders();
+        $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
         foreach ($folders as $folder) {
-            $imapFolder = $this->em->getRepository('OroImapBundle:ImapEmailFolder')->findOneBy(['folder' => $folder]);
+            $imapFolder = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
+                ->findOneBy(['folder' => $folder]);
 
-            $this->em->getRepository('OroImapBundle:ImapEmailFolder')->removeFolder($imapFolder);
+            if (!$origin->isActive()) {
+                $folderRepository->removeFolder($imapFolder);
+            } elseif (!$folder->isSyncEnabled()) {
+                $folderRepository->clearFolder($imapFolder);
+            }
         }
 
-        $this->em->remove($origin);
-        $this->em->flush();
+        if (!$origin->isActive()) {
+            $this->em->remove($origin);
+            $this->em->flush();
+        }
     }
 }
