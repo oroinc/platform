@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Exception;
 
-class SyntaxError extends \LogicException
+class ExpressionSyntaxError extends \LogicException
 {
     public function __construct($message, $cursor = 0)
     {

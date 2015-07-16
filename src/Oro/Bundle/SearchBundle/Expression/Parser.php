@@ -2,19 +2,18 @@
 
 namespace Oro\Bundle\SearchBundle\Expression;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Exception\SyntaxError;
+use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * Class Parser
+ * @package Oro\Bundle\SearchBundle\Expression
+ */
 class Parser
 {
-    const OPERATOR_LEFT  = 1;
-    const OPERATOR_RIGHT = 2;
-
     /** @var TokenStream */
     protected $stream;
 
@@ -34,16 +33,13 @@ class Parser
     protected $typOperators;
 
     /** @var array */
-    protected $mappingConfig;
+    protected $orderDirections;
 
     /**
-     * @param ObjectMapper $mapper ;
-     * @param Query|null   $query
+     * @param Query|null $query
      */
-    public function __construct(ObjectMapper $mapper, $query = null)
+    public function __construct($query = null)
     {
-        $this->mappingConfig = $mapper->getMappingConfig();
-
         if (null === $query) {
             $this->query = new Query(Query::SELECT);
         } else {
@@ -51,39 +47,26 @@ class Parser
         }
 
         $this->keywords = [
-            Query::KEYWORD_FROM        => ['precedence' => 50],
-            Query::KEYWORD_WHERE       => ['precedence' => 50],
-
-            Query::KEYWORD_AND         => ['precedence' => 50],
-            Query::KEYWORD_OR          => ['precedence' => 50],
-
-            Query::KEYWORD_ORDER_BY    => ['precedence' => 500],
-            Query::KEYWORD_OFFSET      => ['precedence' => 500],
-            Query::KEYWORD_MAX_RESULTS => ['precedence' => 500],
+            Query::KEYWORD_FROM,
+            Query::KEYWORD_WHERE,
+            Query::KEYWORD_AND,
+            Query::KEYWORD_OR,
+            Query::KEYWORD_ORDER_BY,
+            Query::KEYWORD_OFFSET,
+            Query::KEYWORD_MAX_RESULTS,
         ];
-
-        $this->reservedWords = [
-            Indexer::TEXT_ALL_DATA_FIELD
-        ];
-
-//        $this->unaryOperators  = [
-//            'not' => ['precedence' => 50],
-//            '!'   => ['precedence' => 50],
-//            '-'   => ['precedence' => 500],
-//            '+'   => ['precedence' => 500],
-//        ];
 
         $this->operators = [
-            '='   => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '!='  => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '<'   => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '>'   => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '>='  => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '<='  => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            'in'  => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '!in' => ['precedence' => 20, 'associativity' => Parser::OPERATOR_LEFT],
-            '~'   => ['precedence' => 40, 'associativity' => Parser::OPERATOR_LEFT],
-            '!~'  => ['precedence' => 40, 'associativity' => Parser::OPERATOR_LEFT]
+            Query::OPERATOR_GREATER_THAN,
+            Query::OPERATOR_GREATER_THAN_EQUALS,
+            Query::OPERATOR_LESS_THAN,
+            Query::OPERATOR_LESS_THAN_EQUALS,
+            Query::OPERATOR_EQUALS,
+            Query::OPERATOR_NOT_EQUALS,
+            Query::OPERATOR_IN,
+            Query::OPERATOR_NOT_IN,
+            Query::OPERATOR_CONTAINS,
+            Query::OPERATOR_NOT_CONTAINS
         ];
 
         $this->types = [
@@ -134,6 +117,10 @@ class Parser
             ]
         ];
 
+        $this->orderDirections = [
+            Query::ORDER_ASC,
+            Query::ORDER_DESC,
+        ];
     }
 
     /**
@@ -143,14 +130,12 @@ class Parser
     {
         /** @var TokenStream stream */
         $this->stream = $stream;
+
         while (!$this->stream->isEOF()
             && $this->stream->current->test(Token::KEYWORD_TYPE)
-            && isset($this->keywords[$this->stream->current->value])
+            && in_array($this->stream->current->value, $this->keywords)
         ) {
-            /** @var Token $token */
-            $token = $this->stream->current;
-
-            switch ($token->value) {
+            switch ($this->stream->current->value) {
                 case Query::KEYWORD_FROM:
                     $this->parseFromExpression();
                     break;
@@ -159,14 +144,21 @@ class Parser
                     $this->parseWhereExpression();
                     break;
 
-                case Query::KEYWORD_OFFSET:
                 case Query::KEYWORD_ORDER_BY:
+                    $this->parseOrderByExpression();
+                    break;
+
+                case Query::KEYWORD_OFFSET:
+                    $this->parseOffsetExpression();
+                    break;
+
                 case Query::KEYWORD_MAX_RESULTS:
+                    $this->parseMaxResultsExpression();
                     break;
 
                 default:
-                    throw new SyntaxError(
-                        sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value),
+                    throw new ExpressionSyntaxError(
+                        sprintf('Unexpected token "%s", value "%s"', $stream->current->type, $stream->current->value),
                         $stream->current->cursor
                     );
                     break;
@@ -174,8 +166,8 @@ class Parser
         }
 
         if (!$stream->isEOF()) {
-            throw new SyntaxError(
-                sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value),
+            throw new ExpressionSyntaxError(
+                sprintf('Unexpected token "%s", value "%s"', $stream->current->type, $stream->current->value),
                 $stream->current->cursor
             );
         }
@@ -183,11 +175,58 @@ class Parser
         return $this->query;
     }
 
+    protected function parseFromExpression()
+    {
+        $this->stream->next();
+
+        /** @var Token $token */
+        $token = $this->stream->current;
+
+        // if get string token after "from" - pass it directly into Query
+        if ($token->test(Token::STRING_TYPE)) {
+            $this->stream->next();
+            $this->query->from($token->value);
+        } else {
+            // if got operator (only '*' is supported in from statement)
+            if ($token->test(Token::OPERATOR_TYPE)) {
+                if ($token->test(Token::OPERATOR_TYPE, '*')) {
+                    $this->query->from(['*']);
+                } else {
+                    throw new ExpressionSyntaxError(
+                        sprintf('Unexpected operator in from statement of the expression.'),
+                        $token->cursor
+                    );
+                }
+            }
+
+            // if opening bracket (punctuation '(') - collect all until closing bracket (skipping any inner punctuation)
+            if ($token->test(Token::PUNCTUATION_TYPE, '(')) {
+                $fromParts = [];
+                while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
+                    if ($this->stream->current->test(Token::STRING_TYPE)) {
+                        $fromParts[] = $this->stream->current->value;
+                    }
+                    $this->stream->next();
+                }
+                if (!empty($fromParts)) {
+                    $this->query->from($fromParts);
+                } else {
+                    throw new ExpressionSyntaxError(
+                        sprintf('Wrong "from" statement of the expression.'),
+                        $token->cursor
+                    );
+                }
+            }
+        }
+
+        $this->stream->next();
+    }
+
     protected function parseWhereExpression()
     {
         $exit = false;
         $this->stream->next();
-        while (!$this->stream->isEOF() || $exit) {
+        while (!$this->stream->isEOF() && !$exit) {
             /** @var Token $token */
             $token = $this->stream->current;
             switch ($token->type) {
@@ -205,8 +244,12 @@ class Parser
                     $this->query->getCriteria()->{$type}($expr);
                     break;
 
+                case Token::KEYWORD_TYPE:
+                    $exit = true;
+                    break;
+
                 default:
-                    throw new SyntaxError(
+                    throw new ExpressionSyntaxError(
                         sprintf('Unexpected token "%s" in where statement', $this->stream->current->type),
                         $this->stream->current->cursor
                     );
@@ -214,12 +257,49 @@ class Parser
         }
     }
 
+    protected function parseOrderByExpression()
+    {
+
+    }
+
+    protected function parseOffsetExpression()
+    {
+        $this->stream->next();
+        /** @var Token $token */
+        $token = $this->stream->current;
+        if ($token->test(Token::NUMBER_TYPE)) {
+            $this->query->getCriteria()->setFirstResult($token->value);
+            $this->stream->next();
+        } else {
+            throw new ExpressionSyntaxError(
+                sprintf('Unexpected token "%s", value "%s" in offset statements', $token->type, $token->value),
+                $token->cursor
+            );
+        }
+    }
+
+    protected function parseMaxResultsExpression()
+    {
+        $this->stream->next();
+        /** @var Token $token */
+        $token = $this->stream->current;
+        if ($token->test(Token::NUMBER_TYPE)) {
+            $this->query->getCriteria()->setMaxResults($token->value);
+            $this->stream->next();
+        } else {
+            throw new ExpressionSyntaxError(
+                sprintf('Unexpected token "%s", value "%s" in offset statements', $token->type, $token->value),
+                $token->cursor
+            );
+        }
+    }
+
     /**
-     * @param null|string $whereType can be 'and' | 'or'
-     *                               @ return \Doctrine\Common\Collections\ExpressionBuilder
+     * @param null|string $whereType can be 'and' | 'or' | 'null'
+     *
      * @return array
-     *                               key 0 -> type
-     *                               key 1 -> expression
+     *     key 0 -> type
+     *     key 1 -> expression
      */
     protected function parseSimpleCondition($whereType = null)
     {
@@ -242,17 +322,13 @@ class Parser
         $this->stream->next();
 
         if ($this->stream->current->test(Token::STRING_TYPE)) {
-            /**
-             * TODO : field type parsing
-             */
-            //$fieldName = $fieldNameToken->value;
-            //$this->stream->next();
-
+            $fieldType      = $fieldNameToken->value;
+            $fieldNameToken = $this->stream->current;
+            $this->stream->next();
         } elseif ($this->stream->current->test(Token::OPERATOR_TYPE)) {
             $fieldType = Query::TYPE_TEXT;
-            //} elseif ($this->stream->current->test(Token::PUNCTUATION_TYPE)) {
         } else {
-            throw new SyntaxError(
+            throw new ExpressionSyntaxError(
                 sprintf(
                     'Unexpected token "%s" in comparison statement',
                     $this->stream->current->type
@@ -266,8 +342,8 @@ class Parser
         /** @var Token $operatorToken */
         $operatorToken = $this->stream->current;
         if (!in_array($operatorToken->value, $this->typeOperators[$fieldType])) {
-            throw new SyntaxError(
-                sprintf('Not allowed operator "%s"', $operatorToken->value),
+            throw new ExpressionSyntaxError(
+                sprintf('Not allowed operator "%s" for field type "%s"', $operatorToken->value, $fieldType),
                 $operatorToken->cursor
             );
         }
@@ -275,26 +351,44 @@ class Parser
         $this->stream->next();
         switch ($operatorToken->value) {
             case Query::OPERATOR_CONTAINS:
-                //$criteria->where($expr->contains($fieldName, $this->stream->current->value));
-                //$criteria->{$whereType}(
                 $expr = $expr->contains($fieldName, $this->stream->current->value);
-                //);
                 break;
-
             case Query::OPERATOR_NOT_CONTAINS:
                 //$criteria->andwhere($expr()->  ($token->value, $this->stream->current->value));
+                throw new ExpressionSyntaxError(
+                    sprintf('For now is NOT supported "%s" operator', $operatorToken->value),
+                    $operatorToken->cursor
+                );
                 break;
-
             case Query::OPERATOR_EQUALS:
-                //$criteria->{$whereType}($expr->eq($fieldName, $this->stream->current->value));
+                $expr = $expr->eq($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_NOT_EQUALS:
+                $expr = $expr->neq($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_GREATER_THAN:
+                $expr = $expr->gt($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_GREATER_THAN_EQUALS:
+                $expr = $expr->gte($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_LESS_THAN:
+                $expr = $expr->lt($fieldName, $this->stream->current->value);
+                break;
+            case Query::OPERATOR_LESS_THAN_EQUALS:
+                $expr = $expr->lte($fieldName, $this->stream->current->value);
                 break;
 
-            case Query::OPERATOR_NOT_EQUALS:
-                //$criteria->{$whereType}($expr->neq($fieldName, $this->stream->current->value));
-                break;
+            case Query::OPERATOR_IN:
+                return [$whereType, $expr->in($fieldName, $this->parseArguments())];
+            case Query::OPERATOR_NOT_IN:
+                return [$whereType, $expr->notIn($fieldName, $this->parseArguments())];
 
             default:
-                break;
+                throw new ExpressionSyntaxError(
+                    sprintf('Unsupported operator "%s"', $operatorToken->value),
+                    $operatorToken->cursor
+                );
         }
 
         $this->stream->next();
@@ -324,88 +418,36 @@ class Parser
                 $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $subExpressions);
             }
         } else {
-            throw new SyntaxError(sprintf('Syntax error in composite expression.'), $this->stream->current->cursor);
+            throw new ExpressionSyntaxError(sprintf('Syntax error in composite expression.'), $this->stream->current->cursor);
         }
 
         $this->stream->next();
+
         return $expr;
-    }
-
-    /**
-     * @return null
-     */
-    protected function parseFromExpression()
-    {
-        $fromParts = [];
-        $this->stream->next();
-
-        /** @var Token $token */
-        $token = $this->stream->current;
-
-        // if get string token after "from" - pass it directly into Query
-        if ($token->test(Token::STRING_TYPE)) {
-            $this->stream->next();
-            $this->query->from($token->value);
-
-            return null;
-        }
-
-        // if get operator - only '*' is supported in from statement
-        if ($token->test(Token::OPERATOR_TYPE)) {
-            if ($token->test(Token::OPERATOR_TYPE, '*')) {
-                $this->query->from(['*']);
-            } else {
-                throw new SyntaxError(
-                    sprintf('Unexpected operator in from statement of the expression.'),
-                    $token->cursor
-                );
-            }
-        }
-
-        // if punctuation '(' || ',' || ')' should collect all until closing bracket skipping any inner punctuation
-        if ($token->test(Token::PUNCTUATION_TYPE, '(')) {
-            while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
-                if ($this->stream->current->test(Token::STRING_TYPE)) {
-                    $fromParts[] = $this->stream->current->value;
-                }
-                $this->stream->next();
-            }
-            if (!empty($fromParts)) {
-                $this->query->from($fromParts);
-            } else {
-                throw new SyntaxError(
-                    sprintf('Wrong "from" statement of the expression.'),
-                    $token->cursor
-                );
-            }
-        }
-        $this->stream->next();
-
-        return null;
     }
 
     public function parseArrayExpression()
     {
-        $this->stream->expect(Token::PUNCTUATION_TYPE, '[', 'An array element was expected');
+        $this->stream->expect(Token::PUNCTUATION_TYPE, '(', 'An array element was expected');
 
-        $node  = new ArrayNode();
+        $node  = new ArrayCollection();
         $first = true;
-        while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ']')) {
+        while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
             if (!$first) {
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'An array element must be followed by a comma');
 
                 // trailing ,?
-                if ($this->stream->current->test(Token::PUNCTUATION_TYPE, ']')) {
+                if ($this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
                     break;
                 }
             }
             $first = false;
 
-            $node->addElement($this->parseExpression());
+            //$node->add();
         }
-        $this->stream->expect(Token::PUNCTUATION_TYPE, ']', 'An opened array is not properly closed');
+        $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'An opened array is not properly closed');
 
-        return $node;
+        return $node->getValues();
     }
 
     public function parseArguments()
@@ -421,10 +463,11 @@ class Parser
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'Arguments must be separated by a comma');
             }
 
-            $args[] = $this->parseSimpleCondition();
+            $args[] = $this->stream->current->value;
+            $this->stream->next();
         }
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
-        //return new Node($args);
+        return $args;
     }
 }

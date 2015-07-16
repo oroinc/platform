@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 
 use Oro\Bundle\SearchBundle\Expression\Lexer;
+use Oro\Bundle\SearchBundle\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
@@ -32,7 +33,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class Indexer
 {
-    const TEXT_ALL_DATA_FIELD   = 'all_text';
+    const TEXT_ALL_DATA_FIELD = 'all_text';
 
     const RELATION_ONE_TO_ONE   = 'one-to-one';
     const RELATION_MANY_TO_MANY = 'many-to-many';
@@ -98,7 +99,6 @@ class Indexer
     {
         return $this->mapper->getEntitiesListAliases();
     }
-
 
     /**
      * Gets search aliases for entities
@@ -351,23 +351,21 @@ class Indexer
      */
     public function advancedSearch($expression)
     {
-        /** @var Parser $parser */
-        $parser = new Parser($this->mapper->getMappingConfig());
+//        /** @var Parser $parser */
+//        $parser = new Parser($this->mapper->getMappingConfig());
 
-        /** @var Query $query */
-        $query = $parser->getQueryFromString($expression);
-
-        /** @var Result $result */
-        //$result = $this->query($query);
+//        /** @var Query $query */
+//        $query = $parser->getQueryFromString($expression);
 
         $lexer     = new Lexer();
         $stream    = $lexer->tokenize($expression);
-        $ownParser = new \Oro\Bundle\SearchBundle\Expression\Parser($this->mapper, $query);
+        $ownParser = new ExpressionParser();
+        $query     = $ownParser->parse($stream);
 
-        $ownQuery = $ownParser->parse($stream);
-        //$ownQuery = $query;
+        $query->setMappingConfig($this->mapper->getMappingConfig());
 
-        $result = $this->query($ownQuery);
+        /** @var Result $result */
+        $result = $this->query($query);
 
         return $result;
     }

@@ -47,23 +47,23 @@ class Query
     /** @var  string */
     protected $query;
 
-    /** @var int */
-    protected $maxResults;
+//    /** @var int */
+//    protected $maxResults;
 
-    /** @var int */
-    protected $firstResult;
+//    /** @var int */
+//    protected $firstResult;
 
     /** @var array */
     protected $from;
 
-    /** @var string */
-    protected $orderType;
+//    /** @var string */
+//    protected $orderType;
 
-    /** @var string */
-    protected $orderBy;
+//    /** @var string */
+//    protected $orderBy;
 
-    /** @var string */
-    protected $orderDirection;
+//    /** @var string */
+//    protected $orderDirection;
 
     /** @var array */
     protected $mappingConfig;
@@ -88,6 +88,8 @@ class Query
 
         $this->options  = [];
         $this->criteria = Criteria::create();
+
+        $this->criteria->setMaxResults(0);
     }
 
     /**
@@ -289,101 +291,101 @@ class Query
         return $this->fields;
     }
 
-    /**
-     * Set max results
-     *
-     * @param int $maxResults
-     *
-     * @return Query
-     */
-    public function setMaxResults($maxResults)
-    {
-        $this->maxResults = (int) $maxResults;
+//    /**
+//     * Set max results
+//     *
+//     * @param int $maxResults
+//     *
+//     * @return Query
+//     */
+//    public function setMaxResults($maxResults)
+//    {
+//        $this->maxResults = (int) $maxResults;
+//
+//        return $this;
+//    }
 
-        return $this;
-    }
+//    /**
+//     * Get limit parameter
+//     *
+//     * @return int
+//     */
+//    public function getMaxResults()
+//    {
+//        return $this->maxResults;
+//    }
 
-    /**
-     * Get limit parameter
-     *
-     * @return int
-     */
-    public function getMaxResults()
-    {
-        return $this->maxResults;
-    }
+//    /**
+//     * Set first result offset
+//     *
+//     * @param int $firstResult
+//     *
+//     * @return Query
+//     */
+//    public function setFirstResult($firstResult)
+//    {
+//        $this->firstResult = (int) $firstResult;
+//
+//        return $this;
+//    }
 
-    /**
-     * Set first result offset
-     *
-     * @param int $firstResult
-     *
-     * @return Query
-     */
-    public function setFirstResult($firstResult)
-    {
-        $this->firstResult = (int) $firstResult;
+//    /**
+//     * Get first result offset
+//     *
+//     * @return int
+//     */
+//    public function getFirstResult()
+//    {
+//        return $this->firstResult;
+//    }
 
-        return $this;
-    }
+//    /**
+//     * Set order by
+//     *
+//     * @param string $fieldName
+//     * @param string $direction
+//     * @param string $type
+//     *
+//     * @return Query
+//     */
+//    public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
+//    {
+//        $this->orderBy        = $fieldName;
+//        $this->orderDirection = $direction;
+//        $this->orderType      = $type;
+//
+//        return $this;
+//    }
 
-    /**
-     * Get first result offset
-     *
-     * @return int
-     */
-    public function getFirstResult()
-    {
-        return $this->firstResult;
-    }
+//    /**
+//     * Get order by field
+//     *
+//     * @return string
+//     */
+//    public function getOrderBy()
+//    {
+//        return $this->orderBy;
+//    }
 
-    /**
-     * Set order by
-     *
-     * @param string $fieldName
-     * @param string $direction
-     * @param string $type
-     *
-     * @return Query
-     */
-    public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
-    {
-        $this->orderBy        = $fieldName;
-        $this->orderDirection = $direction;
-        $this->orderType      = $type;
+//    /**
+//     * Get "order by" field type
+//     *
+//     * @return string
+//     */
+//    public function getOrderType()
+//    {
+//        return $this->orderType;
+//    }
 
-        return $this;
-    }
-
-    /**
-     * Get order by field
-     *
-     * @return string
-     */
-    public function getOrderBy()
-    {
-        return $this->orderBy;
-    }
-
-    /**
-     * Get "order by" field type
-     *
-     * @return string
-     */
-    public function getOrderType()
-    {
-        return $this->orderType;
-    }
-
-    /**
-     * Get order by direction
-     *
-     * @return string
-     */
-    public function getOrderDirection()
-    {
-        return $this->orderDirection;
-    }
+//    /**
+//     * Get order by direction
+//     *
+//     * @return string
+//     */
+//    public function getOrderDirection()
+//    {
+//        return $this->orderDirection;
+//    }
 
     /**
      * Clear string

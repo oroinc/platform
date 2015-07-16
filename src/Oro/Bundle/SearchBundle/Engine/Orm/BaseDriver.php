@@ -60,13 +60,13 @@ abstract class BaseDriver
         $qb->distinct(true);
 
         // set max results count
-        if ($query->getMaxResults() > 0) {
-            $qb->setMaxResults($query->getMaxResults());
+        if ($query->getCriteria()->getMaxResults() > 0) {
+            $qb->setMaxResults($query->getCriteria()->getMaxResults());
         }
 
         // set first result offset
-        if ($query->getFirstResult() > 0) {
-            $qb->setFirstResult($query->getFirstResult());
+        if ($query->getCriteria()->getFirstResult() > 0) {
+            $qb->setFirstResult($query->getCriteria()->getFirstResult());
         }
 
         return $qb
@@ -395,13 +395,16 @@ abstract class BaseDriver
      */
     protected function addOrderBy(Query $query, QueryBuilder $qb)
     {
-        $orderBy = $query->getOrderBy();
+        $orderBy = $query->getCriteria()->getOrderings();
 
         if ($orderBy) {
-            $orderRelation = $query->getOrderType() . 'Fields';
-            $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
-                ->orderBy('orderTable.value', $query->getOrderDirection())
-                ->setParameter('orderField', $orderBy);
+            /**
+             * TODO: ordering from criteria
+             */
+//            $orderRelation = $query->getOrderType() . 'Fields';
+//            $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
+//                ->orderBy('orderTable.value', $query->getOrderDirection())
+//                ->setParameter('orderField', $orderBy);
         }
     }
 

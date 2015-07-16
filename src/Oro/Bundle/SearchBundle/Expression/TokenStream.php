@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Expression;
 
-use Oro\Bundle\SearchBundle\Exception\SyntaxError;
+use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 
 class TokenStream
 {
@@ -38,7 +38,7 @@ class TokenStream
     public function next()
     {
         if (!isset($this->tokens[$this->position])) {
-            throw new SyntaxError('Unexpected end of expression', $this->current->cursor);
+            throw new ExpressionSyntaxError('Unexpected end of expression', $this->current->cursor);
         }
 
         ++$this->position;
@@ -53,7 +53,7 @@ class TokenStream
     {
         $token = $this->current;
         if (!$token->test($type, $value)) {
-            throw new SyntaxError(
+            throw new ExpressionSyntaxError(
                 sprintf(
                     '%sUnexpected token "%s" of value "%s" ("%s" expected%s)',
                     $message ? $message.'. ' : '',
@@ -84,7 +84,7 @@ class TokenStream
     public function prev()
     {
         if (!isset($this->tokens[$this->position])) {
-            throw new SyntaxError('Unexpected end of expression', $this->current->cursor);
+            throw new ExpressionSyntaxError('Unexpected end of expression', $this->current->cursor);
         }
 
         --$this->position;
