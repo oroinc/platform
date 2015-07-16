@@ -95,7 +95,7 @@ define(function(require) {
             this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
-            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length == 0) {
+            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length === 0) {
                 this.$('.dropdown-menu.activity-item').hide();
                 this.$('.dropdown-toggle.activity-item').text('');
             }
