@@ -7,8 +7,8 @@ define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/delete-confirmation'
-], function($, Backbone, _, __, mediator, DeleteConfirmation) {
-    "use strict";
+], function ($, Backbone, _, __, mediator, DeleteConfirmation) {
+    'use strict';
 
     /**
      * @extends Backbone.View
@@ -26,14 +26,14 @@ define([
         /**
          * @param options Object
          */
-        initialize: function(options) {
+        initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
         },
 
-        changeHandler: function(event) {
-            var data = this.$el.serializeArray(),
-                url = this.$el.attr('action'),
-                method = this.$el.attr('method');
+        changeHandler: function (event) {
+            var data = this.$el.serializeArray();
+            var url = this.$el.attr('action');
+            var method = this.$el.attr('method');
 
             data.push({name: this.RELOAD_MARKER, value: true});
             mediator.execute('submitPage', {url: url, type: method, data: $.param(data)});
