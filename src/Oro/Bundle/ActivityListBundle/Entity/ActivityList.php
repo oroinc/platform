@@ -177,6 +177,19 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
+     * Set id
+     *
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param ActivityOwner $activityOwner
      *
      * @return self

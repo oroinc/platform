@@ -70,9 +70,11 @@ class ActivityOwnerTest extends \PHPUnit_Framework_TestCase
     public function testAddRemoveActivityOwner()
     {
         $activity = new ActivityList();
+        $activity->setId(1);
         $organization = new Organization();
 
         $user1 = new User();
+        $user1->setId(1);
         $user1->setFirstName('TestUserName1');
         $entity1 = new ActivityOwner();
         $entity1->setActivity($activity);
@@ -81,6 +83,7 @@ class ActivityOwnerTest extends \PHPUnit_Framework_TestCase
         $activity->addActivityOwner($entity1);
 
         $user2 = new User();
+        $user1->setId(2);
         $user2->setFirstName('TestUserName2');
         $entity2 = new ActivityOwner();
         $entity2->setActivity($activity);
