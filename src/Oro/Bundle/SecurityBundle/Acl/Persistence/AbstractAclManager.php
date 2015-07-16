@@ -9,6 +9,11 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OrganizationSecurityIdentity;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+
 class AbstractAclManager
 {
     /**
@@ -28,6 +33,10 @@ class AbstractAclManager
             return UserSecurityIdentity::fromAccount($identity);
         } elseif ($identity instanceof TokenInterface) {
             return UserSecurityIdentity::fromToken($identity);
+        } elseif ($identity instanceof OrganizationInterface) {
+            return OrganizationSecurityIdentity::fromOrganization($identity);
+        } elseif ($identity instanceof BusinessUnitInterface) {
+            return BusinessUnitSecurityIdentity::fromBusinessUnit($identity);
         }
 
         throw new \InvalidArgumentException(

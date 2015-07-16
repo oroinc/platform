@@ -7,6 +7,9 @@ use Oro\Bundle\SecurityBundle\Acl\Persistence\AbstractAclManager;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\OrganizationSecurityIdentity;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+
 class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var AbstractAclManager */
@@ -56,6 +59,24 @@ class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new UserSecurityIdentity('Test', get_class($user)),
             $this->manager->getSid($src)
+        );
+
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
+        $organization->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $this->assertEquals(
+            new OrganizationSecurityIdentity(1, get_class($organization)),
+            $this->manager->getSid($organization)
+        );
+
+        $businessUnit = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface');
+        $businessUnit->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $this->assertEquals(
+            new BusinessUnitSecurityIdentity(1, get_class($businessUnit)),
+            $this->manager->getSid($businessUnit)
         );
 
         $this->setExpectedException('\InvalidArgumentException');
