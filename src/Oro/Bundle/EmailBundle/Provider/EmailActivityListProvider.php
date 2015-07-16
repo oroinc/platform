@@ -345,7 +345,7 @@ class EmailActivityListProvider implements
      */
     public function getActivityOwners($entity, ActivityList $activityList)
     {
-        $entity = $entity->getEmail();
+        $entity = $this->getEmailEntity($entity);
         $filter = ['email' => $entity];
         $organization = $this->getOrganization($entity);
         if ($organization) {
@@ -370,5 +370,18 @@ class EmailActivityListProvider implements
         }
 
         return $activityArray;
+    }
+
+    /**
+     * @param $entity
+     * @return mixed
+     */
+    protected function getEmailEntity($entity)
+    {
+        if (ClassUtils::getClass($entity) === self::ACL_CLASS) {
+            $entity = $entity->getEmail();
+        }
+
+        return $entity;
     }
 }
