@@ -71,7 +71,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
 
             if (!empty($activities)) {
                 $activities = $this->adjustRoutes($route, $routes, $activities);
-                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+                if (!empty($activities)) {
+                    $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+                }
             }
             $this->completeRouteRequirements($route);
         } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
