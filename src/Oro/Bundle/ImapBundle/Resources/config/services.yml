@@ -90,6 +90,6 @@ services:
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
-            - @doctrine
+            - @doctrine.orm.entity_manager
         calls:
             - [setLogger, [@logger]]

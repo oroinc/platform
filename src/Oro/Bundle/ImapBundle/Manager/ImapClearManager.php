@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
 /**
- * Class ImapCleanManager
+ * Class ImapClearManager
  *
  * @package Oro\Bundle\EmailBundle\Manager
  */
