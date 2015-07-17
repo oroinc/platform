@@ -6,7 +6,6 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +16,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -66,7 +66,7 @@ class EmailController extends Controller
         ];
     }
 
-    /**
+    /** todo: remove this method
      * @Route("/testclank/email/testclank", name="oro_email_test_clank")
      */
     public function testAction()
@@ -78,6 +78,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Get new Unread Emails for email notification
+     *
      * @Route("/new/notification", name="oro_email_new_natification_template")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
@@ -455,6 +457,24 @@ class EmailController extends Controller
         }
 
         return new JsonResponse(['successful' => (bool)$email]);
+    }
+
+    /**
+     * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen")
+     * @AclAncestor("oro_email_email_user_edit")
+     * @return JsonResponse
+     */
+    public function markAllEmailsAsSeenAction()
+    {
+        $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
+        $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+        $result = false;
+
+        if ($loggedUser) {
+            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization);
+        }
+
+        return new JsonResponse(['successful' => (bool)$result]);
     }
 
     /**

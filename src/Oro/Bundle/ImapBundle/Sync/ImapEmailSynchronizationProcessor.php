@@ -19,6 +19,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
@@ -119,16 +120,20 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
     {
-        $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
+        try {
+            $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
 
-        $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+            $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
+            $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-        $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
-        $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
+            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
+            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
 
-        $emailUserRepository->setEmailUsersSeen($ids, false);
-        $emailUserRepository->setEmailUsersSeen($invertedIds, true);
+            $emailUserRepository->setEmailUsersSeen($ids, false);
+            $emailUserRepository->setEmailUsersSeen($invertedIds, true);
+        } catch (UnsupportException $e) {
+            $this->logger->notice(sprintf('Seen update unsupport - "%s"', $imapFolder->getFolder()->getOrigin()));
+        }
     }
 
     /**

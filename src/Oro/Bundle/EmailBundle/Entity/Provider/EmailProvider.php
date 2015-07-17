@@ -11,9 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailProvider
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $em;
 
     public function __construct(EntityManager $entityManager)

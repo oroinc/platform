@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -116,5 +117,23 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $prop->setAccessible(true);
 
         $prop->setValue($obj, $val);
+    }
+
+    public function testActivityOwner()
+    {
+        $user = new User();
+        $user->setFirstName('First Name');
+        $organization = new Organization();
+        $organization->setName('Organization One');
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setUser($user);
+        $activityOwner->setOrganization($organization);
+        $activityList = new ActivityList();
+        $activityList->addActivityOwner($activityOwner);
+
+        $this->assertCount(1, $activityList->getActivityOwners());
+        $firstOwner = $activityList->getActivityOwners()->first();
+        $this->assertEquals('First Name', $firstOwner->getUser()->getFirstName());
+        $this->assertEquals('Organization One', $firstOwner->getOrganization()->getName());
     }
 }

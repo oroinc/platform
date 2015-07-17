@@ -130,6 +130,15 @@ class EmailControllerTest extends WebTestCase
         $this->assertTrue($data['successful']);
     }
 
+    public function testMarkAllEmailsAsSeen()
+    {
+        $url = $this->getUrl('oro_email_mark_all_as_seen');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
     public function testMarkReadMass()
     {
         $url = $this->getUrl(

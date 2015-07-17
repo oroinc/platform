@@ -194,4 +194,38 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->toggleEmailUserSeen($emailUser);
     }
+
+    public function testMarkAllEmailsAsSeen()
+    {
+        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $euRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
+            ->setMethods(
+                ['createQueryBuilder', 'update', 'set', 'andWhere', 'setParameter', 'getQuery', 'execute', 'expr', 'eq']
+            )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $euRepository->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->once())->method('update')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->once())->method('set')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->exactly(3))->method('andWhere')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->exactly(2))->method('setParameter')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->once())->method('getQuery')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->exactly(3))->method('expr')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->exactly(3))->method('eq')->will($this->returnValue($euRepository));
+        $euRepository->expects($this->once())->method('execute');
+
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($euRepository));
+
+        $this->manager->markAllEmailsAsSeen($user, $organization);
+    }
 }

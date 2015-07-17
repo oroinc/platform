@@ -44,7 +44,6 @@ class EmailUserListener
     public function postFlush(PostFlushEventArgs $args)
     {
         $usersWithNewEmails = [];
-
         if (!$this->insertedEmailUsersEntities) {
             return;
         }
@@ -54,14 +53,11 @@ class EmailUserListener
             if (!$insertedEntity->getOwner() || $insertedEntity->isSeen()) {
                 continue;
             }
-
             $usersWithNewEmails[$insertedEntity->getOwner()->getId()] = $insertedEntity->getOwner();
         }
-
         if ($usersWithNewEmails) {
             $this->processor->send($usersWithNewEmails);
         }
-
         $this->insertedEmailUsersEntities = [];
     }
 
