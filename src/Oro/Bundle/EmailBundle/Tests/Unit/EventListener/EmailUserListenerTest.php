@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EmailBundle\EventListener\EmailUserListener;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +27,16 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
-        $emailUserArray = [new EmailUser(), new EmailUser()];
+        $user1 = new User();
+        $user1->setId(1);
+        $user2 = new User();
+        $user2->setId(2);
+        $emailUser1 = new EmailUser();
+        $emailUser1->setOwner($user1);
+        $emailUser2 = new EmailUser();
+        $emailUser2->setOwner($user2);
+
+        $emailUserArray = [$emailUser1, $emailUser2];
 
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
@@ -45,7 +55,7 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue($emailUserArray));
         $this->processor
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(1))
             ->method('send');
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->disableOriginalConstructor()
