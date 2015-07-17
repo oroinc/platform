@@ -6,7 +6,7 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/mediator'
-], function ($, Backbone, _, __, mediator) {
+], function($, Backbone, _, __, mediator) {
     'use strict';
 
     /**
@@ -25,11 +25,11 @@ define([
         /**
          * @param options Object
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
         },
 
-        changeHandler: function (event) {
+        changeHandler: function(event) {
             var data = this.$el.serializeArray();
             var url = this.$el.attr('action');
             var method = this.$el.attr('method');
