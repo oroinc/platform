@@ -119,6 +119,7 @@ define([
                 var $view = $(view);
                 $view.find('.replay a').attr('data-url', model.get('route'));
                 self.$containerContextTargets.prepend($view);
+                self.initLayout();
             });
         }
     });
