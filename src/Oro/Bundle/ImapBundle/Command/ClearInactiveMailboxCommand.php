@@ -45,7 +45,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var ImapClearManager $cleaner */
-        $cleaner = $this->getContainer()->get('oro_imap.manager.clean');
+        $cleaner = $this->getContainer()->get('oro_imap.manager.clear');
         $this->logger = new OutputLogger($output);
 
         $this->em = $this->getContainer()->get('doctrine')->getManager();
