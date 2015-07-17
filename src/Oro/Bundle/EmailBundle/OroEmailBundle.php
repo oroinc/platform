@@ -54,7 +54,6 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new EmailSynchronizerPass());
         $container->addCompilerPass(new EmailTemplateVariablesPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
-        $container->addCompilerPass(new EmailFolderLoaderPass());
     }
 
     /**

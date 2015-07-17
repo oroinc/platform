@@ -33,6 +33,7 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
             ->method('setDefaults')
             ->with([
                 'type' => 'oro_email_email_folder',
+                'allow_add' => true,
             ]);
 
         $this->emailFolderTreeType->setDefaultOptions($resolver);

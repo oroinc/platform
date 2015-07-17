@@ -306,6 +306,7 @@ class EmailApiHandler extends ApiFormHandler
         $origin->setName($originName);
         $origin->setOwner($originOwner);
         $origin->setOrganization($organization);
+        $origin->setMailboxName(InternalEmailOrigin::API_MAILBOX_NAME);
 
         $originOwner->addEmailOrigin($origin);
 

@@ -6,13 +6,13 @@ define([
     'orotranslation/js/translator',
     'oroui/js/tools',
     'oro/filter/multiselect-filter'
-], function ($, _, __, tools, MultiSelect) {
+], function($, _, __, tools, MultiSelect) {
     'use strict';
 
     var MultiSelectOriginFolder;
 
     // @const
-    var FILTER_EMPTY_VALUE = "";
+    var FILTER_EMPTY_VALUE = '';
 
     MultiSelectOriginFolder = MultiSelect.extend({
         /**
@@ -46,14 +46,14 @@ define([
             classes: 'select-filter-widget multiselect-filter-widget multiselect-origin-folder'
         },
 
-        emptyValue: {value:[FILTER_EMPTY_VALUE]},
+        emptyValue: {value: [FILTER_EMPTY_VALUE]},
 
         /**
         * Initialize.
         *
         * @param {Object} options
         */
-        initialize: function (options) {
+        initialize: function(options) {
             if (_.isUndefined(this.choices)) {
                 this.choices = [];
             }
@@ -68,7 +68,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var options = this.choices;
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});

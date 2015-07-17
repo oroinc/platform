@@ -14,6 +14,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 class InternalEmailOrigin extends EmailOrigin
 {
     const BAP = 'BAP';
+    const MAILBOX_NAME = 'Local';
+    const API_MAILBOX_NAME = 'Local API';
 
     /**
      * @var string

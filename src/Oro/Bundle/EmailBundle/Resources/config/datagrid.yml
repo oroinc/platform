@@ -32,12 +32,14 @@ datagrid:
                         -
                             join: eu.folder
                             alias: f
+                        -
+                            join: f.origin
+                            alias: o
+                where:
+                    and:
+                        - o.isActive = true
                 groupBy: eu.id, e.sentAt
         columns:
-            mailbox:
-                data_name: folder.origin.mailboxName
-                label: oro.email.mailbox.label
-                frontend_type: string
             contacts:
                 data_name: email.contacts
                 type: twig

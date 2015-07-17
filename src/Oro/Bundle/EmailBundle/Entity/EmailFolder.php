@@ -238,11 +238,35 @@ class EmailFolder
     /**
      * Get sub folders
      *
-     * @return EmailFolder[]
+     * @return EmailFolder[]|ArrayCollection
      */
     public function getSubFolders()
     {
         return $this->subFolders;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSubFolders()
+    {
+        return !$this->subFolders->isEmpty();
+    }
+
+    /**
+     * @param ArrayCollection|array $folders
+     *
+     * @return $this
+     */
+    public function setSubFolders($folders)
+    {
+        $this->subFolders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addSubFolder($folder);
+        }
+
+        return $this;
     }
 
     /**
@@ -256,13 +280,36 @@ class EmailFolder
     {
         $this->subFolders->add($folder);
 
+        $exParentFolder = $folder->getParentFolder();
+        if ($exParentFolder !== null && $exParentFolder !== $this) {
+            if ($exParentFolder->getSubFolders()->contains($folder)) {
+                $exParentFolder->getSubFolders()->removeElement($folder);
+            }
+        }
+
+        $folder->setParentFolder($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeSubFolder(EmailFolder $folder)
+    {
+        if ($this->subFolders->contains($folder)) {
+            $this->subFolders->removeElement($folder);
+        }
+
         return $this;
     }
 
     /**
      * Get parent folder
      *
-     * @return EmailFolder[]
+     * @return EmailFolder
      */
     public function getParentFolder()
     {
@@ -303,6 +350,12 @@ class EmailFolder
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
+
+        if (!$this->subFolders->isEmpty()) {
+            foreach ($this->subFolders as $subFolder) {
+                $subFolder->setOrigin($origin);
+            }
+        }
 
         return $this;
     }

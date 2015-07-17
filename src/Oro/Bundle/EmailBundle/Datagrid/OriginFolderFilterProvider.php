@@ -22,7 +22,9 @@ class OriginFolderFilterProvider
      */
     protected $em;
 
-    /** @var Translator */
+    /**
+     * @var Translator
+     */
     protected $translator;
 
     /**
@@ -47,18 +49,11 @@ class OriginFolderFilterProvider
      */
     public function getListTypeChoices()
     {
-        $user = $this->securityContext->getToken()->getUser();
-        $origins = $this->em->getRepository(self::EMAIL_ORIGIN)->findBy(['owner'=>$user->getId()]);
+        $origins = $this->getOrigins();
         $results = [];
-        /**
-         * @var EmailOrigin $origin
-         */
         foreach ($origins as $origin) {
             $folders = $origin->getFolders();
             $mailbox = $origin->getMailboxName();
-            if ($origin->isActive()) {
-                $mailbox = $mailbox . ' (' . $this->translator->trans('oro.email.filter.inactive') . ')';
-            }
             if (count($folders)>0) {
                 $results[$mailbox]= [];
                 $results[$mailbox]['active'] = $origin->isActive();
@@ -69,5 +64,18 @@ class OriginFolderFilterProvider
         }
 
         return $results;
+    }
+
+    /**
+     * @return EmailOrigin[]
+     */
+    protected function getOrigins()
+    {
+        $criteria = [
+            'owner' => $this->securityContext->getToken()->getUser(),
+            'isActive' => true,
+        ];
+
+        return $this->em->getRepository(self::EMAIL_ORIGIN)->findBy($criteria);
     }
 }

@@ -14,6 +14,7 @@ class EmailFolderTreeType extends AbstractType
     {
         $resolver->setDefaults([
             'type' => 'oro_email_email_folder',
+            'allow_add' => true,
         ]);
     }
 

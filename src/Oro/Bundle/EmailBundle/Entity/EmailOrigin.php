@@ -21,10 +21,13 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
+ * @ORM\HasLifecycleCallbacks()
  * @JMS\ExclusionPolicy("ALL")
  */
 abstract class EmailOrigin
 {
+    const MAILBOX_NAME = 'Base origin';
+
     /**
      * @var integer
      *
@@ -88,7 +91,7 @@ abstract class EmailOrigin
     /**
      * @var User
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins", cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $owner;
@@ -96,7 +99,7 @@ abstract class EmailOrigin
     /**
      * @var OrganizationInterface
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", cascade={"remove"})
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $organization;
@@ -105,7 +108,6 @@ abstract class EmailOrigin
     {
         $this->folders   = new ArrayCollection();
         $this->syncCount = 0;
-        $this->setMailboxName($this->__toString());
     }
 
     /**
@@ -149,15 +151,33 @@ abstract class EmailOrigin
     }
 
     /**
-     * Get root folders list
+     * Get root folders (where parent_folder_id is null)
      *
      * @return ArrayCollection|EmailFolder[]
      */
     public function getRootFolders()
     {
-        return $this->folders->filter(function (EmailFolder $folder) {
-            return $folder->getParentFolder() === null;
+        return $this->folders->filter(function (EmailFolder $emailFolder) {
+            return $emailFolder->getParentFolder() === null;
         });
+    }
+
+    /**
+     * Replace existing folders by new ones
+     *
+     * @param EmailFolder[]|ArrayCollection $folders
+     *
+     * @return $this
+     */
+    public function setFolders($folders)
+    {
+        $this->folders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addFolder($folder);
+        }
+
+        return $this;
     }
 
     /**
@@ -172,6 +192,22 @@ abstract class EmailOrigin
         $this->folders[] = $folder;
 
         $folder->setOrigin($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove folder
+     *
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            $this->folders->removeElement($folder);
+        }
 
         return $this;
     }
@@ -336,5 +372,17 @@ abstract class EmailOrigin
         $this->mailboxName = $name;
 
         return $this;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        if ($this->mailboxName === null) {
+            $this->mailboxName = static::MAILBOX_NAME;
+        }
     }
 }
