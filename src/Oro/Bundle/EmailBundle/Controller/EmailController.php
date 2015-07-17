@@ -6,6 +6,7 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,6 +67,29 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/testclank/email/testclank", name="oro_email_test_clank")
+     */
+    public function testAction()
+    {
+        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(1);
+        $sender = $this->get('oro_email.email_websocket.processor');
+        $a = $sender->send($userEmail);
+
+        return new JsonResponse([$a]);
+    }
+
+    /**
+     * @Route("/new/natification", name="oro_email_new_natification_template")
+     * @Template("OroEmailBundle:Notification:button.html.twig")
+     */
+    public function notificationAction()
+    {
+        return [
+            'clank_event'=> WebSocketSendProcessor::getUserTopic($this->getUser())
+        ];
+    }
+
+    /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
@@ -73,7 +97,7 @@ class EmailController extends Controller
     public function viewThreadAction(Email $entity)
     {
         $this->getEmailManager()->setSeenStatus($entity, true);
-        
+
         return ['entity' => $entity];
     }
 
@@ -387,7 +411,7 @@ class EmailController extends Controller
         if ($emailUser) {
             $this->getEmailManager()->toggleEmailUserSeen($emailUser);
         }
-    
+
         return new JsonResponse(['successful' => (bool)$emailUser]);
     }
 
@@ -430,7 +454,7 @@ class EmailController extends Controller
 
         $data = [
             'successful' => $response->isSuccessful(),
-            'message'    => $response->getMessage()
+            'message' => $response->getMessage()
         ];
 
         return new JsonResponse(array_merge($data, $response->getOptions()));
