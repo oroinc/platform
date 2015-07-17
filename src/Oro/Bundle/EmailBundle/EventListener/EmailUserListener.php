@@ -26,6 +26,8 @@ class EmailUserListener
     }
 
     /**
+     * Collecting added EmailUser entities for processing in postFlush
+     *
      * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
@@ -35,17 +37,32 @@ class EmailUserListener
     }
 
     /**
+     * Send notification to clank that user have new emails
+     *
      * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        $usersWithNewEmails = [];
+
         if (!$this->insertedEmailUsersEntities) {
             return;
         }
 
+        /** @var EmailUser $insertedEntity */
         foreach ($this->insertedEmailUsersEntities as $insertedEntity) {
-            $this->processor->send($insertedEntity);
+            if (!$insertedEntity->getOwner() || $insertedEntity->isSeen()) {
+                continue;
+            }
+
+            $usersWithNewEmails[$insertedEntity->getOwner()->getId()] = $insertedEntity->getOwner();
         }
+
+        if ($usersWithNewEmails) {
+            $this->processor->send($usersWithNewEmails);
+        }
+
+        $this->insertedEmailUsersEntities = [];
     }
 
     /**

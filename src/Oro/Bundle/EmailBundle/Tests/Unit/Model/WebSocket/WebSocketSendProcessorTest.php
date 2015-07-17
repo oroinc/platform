@@ -15,11 +15,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $email;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $user;
 
     /**
@@ -29,9 +24,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $emailId = 10;
-        $userId = 20;
-
         $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -44,14 +36,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->email->expects($this->exactly(2))
-            ->method('getId')
-            ->will($this->returnValue($emailId));
-
-        $this->user->expects($this->exactly(2))
-            ->method('getId')
-            ->will($this->returnValue($userId));
-
         $this->processor = new WebSocketSendProcessor($this->topicPublisher);
     }
 
@@ -61,13 +45,17 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with(
                 sprintf(WebSocketSendProcessor::TOPIC, $this->user->getId()),
-                json_encode([['email_id' => $this->email->getId()]])
+                json_encode([['new_email' => true]])
             );
 
-        $emailUser = new EmailUser();
-        $emailUser->setEmail($this->email);
-        $emailUser->setOwner($this->user);
+        $this->processor->send([$this->user]);
+    }
 
-        $this->processor->send($emailUser);
+    public function testSendFailure()
+    {
+        $this->topicPublisher->expects($this->never())
+            ->method('send');
+
+        $this->processor->send([]);
     }
 }

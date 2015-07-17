@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email/user_%s';
+    const TOPIC = 'oro/email_event/user_%s';
 
     /**
      * @var TopicPublisher
@@ -37,19 +36,15 @@ class WebSocketSendProcessor
     /**
      * Send message into topic
      *
-     * @param EmailUser $emailUser
-     * @return bool|null
+     * @param array $usersWithNewEmails
      */
-    public function send(EmailUser $emailUser)
+    public function send($usersWithNewEmails)
     {
-        if ($emailUser->getOwner()) {
-            $messageData = [['email_id' => $emailUser->getEmail()->getId()]];
-            return $this->publisher->send(
-                self::getUserTopic($emailUser->getOwner()),
-                json_encode($messageData)
-            );
+        if ($usersWithNewEmails) {
+            foreach ($usersWithNewEmails as $user) {
+                $messageData = [['new_email' => true]];
+                $this->publisher->send(self::getUserTopic($user), json_encode($messageData));
+            }
         }
-
-        return null;
     }
 }
