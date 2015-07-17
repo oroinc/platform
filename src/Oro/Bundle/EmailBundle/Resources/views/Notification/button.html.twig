@@ -23,7 +23,15 @@
     data-emails="{{ emails }}"
     data-count = "{{ count }}">
     <a href="#" class="oro-dropdown-toggle">
-        <i class="icon-envelope {{ classNew }}"><span>{{ count }}</span></i>
+        <i class="icon-envelope {{ classNew }}">
+            <span>
+                {% if (count > 10) %}
+                    10+
+                {% else %}
+                    {{ count }}
+                {% endif %}
+            </span>
+        </i>
     </a>
     <div class="dropdown-menu pull-right" tabindex="0">
         <div class="content" style="display: none">

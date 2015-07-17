@@ -71,7 +71,7 @@ class EmailController extends Controller
      */
     public function testAction()
     {
-        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(25);
+        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(43);
         $sender = $this->get('oro_email.email_websocket.processor');
         $a = $sender->send($userEmail);
 

@@ -59,15 +59,14 @@ define([
         onNewEmail:function(r) {
             var self = this;
             r = JSON.parse(r);
-            if (r.length > 0) {
-                r.forEach(function(currentValue) {
+            if (r) {
+
                     $.ajax({
-                        url: routing.generate('oro_api_get_email', {id: currentValue.email_id}),
+                        url: routing.generate('oro_api_api_emails_notification_info'),
                         success: function(r) {
                             self.view.collection.add(r);
                         }
                     })
-                })
             }
         }
     });
