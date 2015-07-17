@@ -1,5 +1,3 @@
-/* jshint browser:true */
-/* global require */
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger',
     'oro/dialog-widget', 'jquery.dialog.extended'],
 function($, _, __, mediator, messenger, DialogWidget) {
@@ -18,29 +16,29 @@ function($, _, __, mediator, messenger, DialogWidget) {
             messenger.setup();
         }
 
-        $(document).on('click', '#roles-list input', function () {
+        $(document).on('click', '#roles-list input', function() {
             checkRoleInputs();
         });
 
         /**
          * Process role checkboxes after navigation request is completed
          */
-        mediator.on("page:afterChange", checkRoleInputs);
+        mediator.on('page:afterChange', checkRoleInputs);
 
         /**
          * Process flash messages stored in queue or storage
          */
-        mediator.on("page:afterChange", initFlashMessages);
+        mediator.on('page:afterChange', initFlashMessages);
 
         $(document).on('change', '#btn-enable input', function() {
             $('.status-enabled').toggleClass('hide');
             $('.status-disabled').toggleClass('hide');
         });
 
-        $(document).on('click', '#view-activity-btn', function (e) {
+        $(document).on('click', '#view-activity-btn', function(e) {
             e.stopImmediatePropagation();
-            var $el = $(this),
-                dialog = /** @var oro.DialogWidget */ $el.data('dialog');
+            var $el = $(this);
+            var dialog = /** @var oro.DialogWidget */ $el.data('dialog');
             if (dialog) {
                 // dialog already is opened
                 return false;
@@ -53,7 +51,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
                     allowMinimize: true,
                     dblclick: 'maximize',
                     maximizedHeightDecreaseBy: 'minimize-bar',
-                    width : 1000,
+                    width: 1000,
                     title: $el.attr('title')
                 }
             }));
@@ -67,10 +65,10 @@ function($, _, __, mediator, messenger, DialogWidget) {
     /* ============================================================
      * from status.js
      * ============================================================ */
-    $(function () {
+    $(function() {
         var dialogBlock;
 
-        $(".update-status a").click(function () {
+        $('.update-status a').click(function() {
             $.get($(this).attr('href'), function(data) {
                 dialogBlock = $(data).dialog({
                     title: __('oro.user.update_status.label'),
@@ -86,11 +84,11 @@ function($, _, __, mediator, messenger, DialogWidget) {
 
         $(document).on('submit', '#create-status-form', function() {
             $.ajax({
-                type:'POST',
+                type: 'POST',
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function() {
-                    dialogBlock.dialog("destroy");
+                    dialogBlock.dialog('destroy');
                 }
             });
 

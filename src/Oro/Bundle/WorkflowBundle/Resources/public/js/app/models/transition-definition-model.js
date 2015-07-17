@@ -1,9 +1,8 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var TransitionDefinitionModel,
-        BaseModel = require('oroui/js/app/models/base/model');
+    var TransitionDefinitionModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     TransitionDefinitionModel = BaseModel.extend({
         defaults: {

@@ -32,7 +32,7 @@ class EntityAliasProviderPass implements CompilerPassInterface
         }
 
         // sort by priority and flatten
-        ksort($providers);
+        krsort($providers);
         $providers = call_user_func_array('array_merge', $providers);
 
         // register

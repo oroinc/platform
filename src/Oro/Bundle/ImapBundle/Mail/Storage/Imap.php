@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 
 /**
  * Class Imap
@@ -79,8 +80,12 @@ class Imap extends \Zend\Mail\Storage\Imap
             $this->protocol = $params;
             try {
                 $this->selectFolder('INBOX');
-            } catch (Exception\ExceptionInterface $e) {
-                throw new Exception\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+            } catch (\Zend\Mail\Storage\Exception\ExceptionInterface $e) {
+                throw new \Zend\Mail\Storage\Exception\RuntimeException(
+                    'cannot select INBOX, is this a valid transport?',
+                    0,
+                    $e
+                );
             }
             $this->postInit();
 
@@ -99,7 +104,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
         if (!$this->protocol->login($params->user, $password)) {
-            throw new Exception\RuntimeException('cannot login, user or password wrong');
+            throw new \Zend\Mail\Storage\Exception\RuntimeException('cannot login, user or password wrong');
         }
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 
@@ -283,6 +288,9 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function uidSearch(array $criteria)
     {
+        if (!$this->supportUidSearch()) {
+            throw new UnsupportException('The server do not support UID SEARCH.');
+        }
         if (empty($criteria)) {
             throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
         }
@@ -400,5 +408,13 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $headers->addHeaderLine(self::UID, $data[self::UID]);
         $headers->addHeaderLine('InternalDate', $data[self::INTERNALDATE]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function supportUidSearch()
+    {
+        return false;
     }
 }

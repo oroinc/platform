@@ -1,15 +1,13 @@
-/* jshint devel:true */
-/* global define */
 define(['underscore', 'translator', 'module', 'json'],
 function(_, Translator, module) {
-    "use strict";
+    'use strict';
 
-    var dict = {},
-        debug = false,
-        add = Translator.add,
-        get = Translator.get,
-        fromJSON = Translator.fromJSON,
-        config = module.config();
+    var dict = {};
+    var debug = false;
+    var add = Translator.add;
+    var get = Translator.get;
+    var fromJSON = Translator.fromJSON;
+    var config = module.config();
 
     Translator.placeHolderPrefix = '{{ ';
     Translator.placeHolderSuffix = ' }}';
@@ -20,7 +18,7 @@ function(_, Translator, module) {
      *
      * @param {string} id
      */
-    Translator.add = function (id) {
+    Translator.add = function(id) {
         dict[id] = 1;
         add.apply(Translator, arguments);
     };
@@ -32,7 +30,7 @@ function(_, Translator, module) {
      * @param {string} id
      * @returns {string}
      */
-    Translator.get = function (id) {
+    Translator.get = function(id) {
         var string = get.apply(Translator, arguments);
         var hasTranslation = checkTranslation(id);
 
@@ -41,13 +39,13 @@ function(_, Translator, module) {
         }
 
         if (hasTranslation) {
-            if (string.indexOf(']JS') == -1) {
+            if (string.indexOf(']JS') === -1) {
                 return '[' + string + ']JS';
             } else {
                 return string;
             }
         } else {
-            if (string.indexOf('---!!!JS') == -1) {
+            if (string.indexOf('---!!!JS') === -1) {
                 return '!!!---' + string + '---!!!JS';
             } else {
                 return string;
@@ -62,8 +60,8 @@ function(_, Translator, module) {
      * @param {Object} data
      * @returns {Object} Translator
      */
-    Translator.fromJSON = function (data) {
-        if (typeof data === "string") {
+    Translator.fromJSON = function(data) {
+        if (typeof data === 'string') {
             data = JSON.parse(data);
         }
         debug = data.debug || false;
@@ -80,13 +78,13 @@ function(_, Translator, module) {
         if (!debug) {
             return true;
         }
-        var domains = Translator.defaultDomains,
-            checker = function (domain) {
-                return dict.hasOwnProperty(domain ? domain + ':' + id : id);
-            };
+        var domains = Translator.defaultDomains;
+        var checker = function(domain) {
+            return dict.hasOwnProperty(domain ? domain + ':' + id : id);
+        };
         domains = _.union([undefined], _.isArray(domains) ? domains : [domains]);
         if (!_.some(domains, checker)) {
-            console.error('Untranslated: %s', id);
+            window.console.error('Untranslated: %s', id);
             return false;
         }
         return true;

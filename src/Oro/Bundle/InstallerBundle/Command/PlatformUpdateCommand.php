@@ -74,18 +74,22 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('oro:assets:install', $assetsOptions)
                 ->runCommand('assetic:dump')
-                ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
-                ->runCommand('oro:localization:dump')
-                ->runCommand('oro:translation:dump')
-                ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
+                ->runCommand('router:cache:clear', array('--process-isolation' => true))
+                ->runCommand(
+                    'fos:js-routing:dump',
+                    array('--target' => 'web/js/routes.js', '--process-isolation' => true)
+                )
+                ->runCommand('oro:localization:dump', array('--process-isolation' => true))
+                ->runCommand('oro:translation:dump', array('--process-isolation' => true))
+                ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
             );
             $output->writeln(
-                '           Please make sure that application cache is up-to-date before run this command.'
+                '           Please make sure that application cache is up-to-date or empty before run this command.'
             );
-            $output->writeln('           Use <info>cache:clear</info> if needed.');
+            $output->writeln('           Use <info>cache:clear --no-optional-warmers</info> if needed.');
             $output->writeln('');
             $output->writeln('To force execution run command with <info>--force</info> option:');
             $output->writeln(sprintf('    <info>%s --force</info>', $this->getName()));

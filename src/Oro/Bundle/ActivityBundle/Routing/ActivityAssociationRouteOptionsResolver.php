@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
+    const ROUTE_GROUP = 'activity_association';
     const ACTIVITY_ATTRIBUTE = 'activity';
     const ACTIVITY_PLACEHOLDER = '{activity}';
     const ACTIVITY_ID_ATTRIBUTE = 'id';
@@ -44,7 +45,7 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if ($route->getOption('group') !== 'activity_association') {
+        if ($route->getOption('group') !== self::ROUTE_GROUP) {
             return;
         }
 
@@ -69,8 +70,10 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
             );
 
             if (!empty($activities)) {
-                $this->adjustRoutes($route, $routes, $activities);
-                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+                $activities = $this->adjustRoutes($route, $routes, $activities);
+                if (!empty($activities)) {
+                    $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
+                }
             }
             $this->completeRouteRequirements($route);
         } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
@@ -82,9 +85,12 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
      * @param string[]                $activities
+     *
+     * @return string[] The list of activities handled by the default controller
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $activities)
     {
+        $result    = [];
         $routeName = $routes->getName($route);
 
         foreach ($activities as $activity) {
@@ -114,8 +120,11 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                     $routeName,
                     true
                 );
+                $result[] = $activity;
             }
         }
+
+        return $result;
     }
 
     /**

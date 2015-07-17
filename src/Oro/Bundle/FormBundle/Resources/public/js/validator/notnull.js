@@ -1,6 +1,5 @@
-/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-    ], function ($, _, __) {
+    ], function($, _, __) {
     'use strict';
 
     var defaultParam = {
@@ -12,10 +11,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
      */
     return [
         'NotNull',
-        function () {
+        function() {
             return $.validator.methods.required.apply(this, arguments);
         },
-        function (param) {
+        function(param) {
             param = _.extend({}, defaultParam, param);
             return __(param.message);
         }

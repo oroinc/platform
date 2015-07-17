@@ -1,5 +1,3 @@
-/*jslint nomen: true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
@@ -8,7 +6,7 @@ define([
     'oroui/js/messenger',
     'oroui/js/app/views/base/view',
     'oroui/js/mediator'
-], function ($, _, __, Backbone, messenger, BaseView, mediator) {
+], function($, _, __, Backbone, messenger, BaseView, mediator) {
     'use strict';
 
     var EmailAttachmentLink;
@@ -27,7 +25,7 @@ define([
         *
         * @param options {Object}
         */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             EmailAttachmentLink.__super__.initialize.apply(this, arguments);
         },
@@ -35,13 +33,13 @@ define([
         /**
          * onClick event listener
          */
-        linkAttachment: function (e) {
+        linkAttachment: function(e) {
             var self = this;
             e.preventDefault();
             $.getJSON(
                 this.options.url,
                 {},
-                function (response) {
+                function(response) {
                     if (_.isUndefined(response.error)) {
                         messenger.notificationFlashMessage('success', __('oro.email.attachment.added'));
                         self.$el.parent().addClass('one');

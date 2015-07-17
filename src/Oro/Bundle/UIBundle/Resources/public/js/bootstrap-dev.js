@@ -13,8 +13,9 @@ define([
     'oroui/lib/bootstrap/js/bootstrap-tooltip',
     'oroui/lib/bootstrap/js/bootstrap-transition',
     'oroui/lib/bootstrap/js/bootstrap-typeahead'
-], function ($) {
+], function($) {
     'use strict';
+
     /**
      * Dev Bootstrap build,
      * to use it switch bootstrap module in requirejs.yml

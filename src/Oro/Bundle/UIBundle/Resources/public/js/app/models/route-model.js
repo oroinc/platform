@@ -1,7 +1,5 @@
-/*jslint nomen:true, eqeq:true*/
-/*global define*/
 /** @lends RouteModel */
-define(function (require) {
+define(function(require) {
     'use strict';
 
     /**
@@ -33,17 +31,17 @@ define(function (require) {
      * @augment BaseModel
      * @exports RouteModel
      */
-    var RouteModel,
-        _ = require('underscore'),
-        routing = require('routing'),
-        BaseModel = require('./base/model');
+    var RouteModel;
+    var _ = require('underscore');
+    var routing = require('routing');
+    var BaseModel = require('./base/model');
 
     RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
         /**
          * @inheritDoc
          * @member {Object}
          */
-        defaults: function () {
+        defaults: function() {
             return /** lends RouteModel.attributes */ {
                 /**
                  * Name of the route
@@ -68,16 +66,15 @@ define(function (require) {
          *
          * @returns {Array.<string>}
          */
-        getAcceptableParameters: function () {
-            var route, variableTokens, routeParameters;
+        getAcceptableParameters: function() {
             if (!this.get('routeName')) {
                 throw new Error('routeName must be specified');
             }
-            route = routing.getRoute(this.get('routeName'));
-            variableTokens = _.filter(route.tokens, function (tokenPart){
+            var route = routing.getRoute(this.get('routeName'));
+            var variableTokens = _.filter(route.tokens, function(tokenPart) {
                 return tokenPart[0] === 'variable';
             });
-            routeParameters = _.map(variableTokens, function (tokenPart) {
+            var routeParameters = _.map(variableTokens, function(tokenPart) {
                 return tokenPart[3];
             });
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
@@ -90,9 +87,9 @@ define(function (require) {
          * @param parameters {Object=} parameters to override
          * @returns {string} route url
          */
-        getUrl: function (parameters) {
-            var routeParameters = _.extend(this.toJSON(), parameters),
-                acceptableParameters = this.getAcceptableParameters();
+        getUrl: function(parameters) {
+            var routeParameters = _.extend(this.toJSON(), parameters);
+            var acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
         }
     });
