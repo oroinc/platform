@@ -6,7 +6,6 @@ use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +16,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -66,20 +66,21 @@ class EmailController extends Controller
         ];
     }
 
-    /**
+    /** todo: remove this method
      * @Route("/testclank/email/testclank", name="oro_email_test_clank")
      */
     public function testAction()
     {
-        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(43);
         $sender = $this->get('oro_email.email_websocket.processor');
-        $a = $sender->send($userEmail);
+        $a = $sender->send([$this->getUser()]);
 
         return new JsonResponse([$a]);
     }
 
     /**
-     * @Route("/new/natification", name="oro_email_new_natification_template")
+     * Get new Unread Emails for email notification
+     *
+     * @Route("/new/notification", name="oro_email_new_natification_template")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
     public function notificationAction()
@@ -96,9 +97,10 @@ class EmailController extends Controller
          */
         foreach ($emails as $email) {
             $emailsData[] = [
+                'id' => $email->getId(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
-                'author' => $email->getFromName()
+                'fromName' => $email->getFromName()
             ];
         }
 

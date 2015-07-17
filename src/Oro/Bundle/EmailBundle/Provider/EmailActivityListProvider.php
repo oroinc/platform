@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
@@ -38,6 +39,7 @@ class EmailActivityListProvider implements
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
+    const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -127,6 +129,14 @@ class EmailActivityListProvider implements
     public function getActivityClass()
     {
         return self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
     }
 
     /**
@@ -274,6 +284,9 @@ class EmailActivityListProvider implements
      */
     public function getActivityId($entity)
     {
+        if ($this->doctrineHelper->getEntityClass($entity) === self::ACL_CLASS) {
+            $entity = $entity->getEmail();
+        }
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
@@ -325,5 +338,50 @@ class EmailActivityListProvider implements
             ->setParameter('thread', $email->getThread());
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $entity = $this->getEmailEntity($entity);
+        $filter = ['email' => $entity];
+        $organization = $this->getOrganization($entity);
+        if ($organization) {
+            $filter['organization'] = $organization;
+        }
+
+        $activityArray = [];
+        $owners = $this->doctrineRegistryLink->getService()
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findBy($filter);
+
+        if ($owners) {
+            foreach ($owners as $owner) {
+                if ($owner->getOrganization() && $owner->getOwner()) {
+                    $activityOwner = new ActivityOwner();
+                    $activityOwner->setActivity($activityList);
+                    $activityOwner->setOrganization($owner->getOrganization());
+                    $activityOwner->setUser($owner->getOwner());
+                    $activityArray[] = $activityOwner;
+                }
+            }
+        }
+
+        return $activityArray;
+    }
+
+    /**
+     * @param $entity
+     * @return mixed
+     */
+    protected function getEmailEntity($entity)
+    {
+        if (ClassUtils::getClass($entity) === self::ACL_CLASS) {
+            $entity = $entity->getEmail();
+        }
+
+        return $entity;
     }
 }

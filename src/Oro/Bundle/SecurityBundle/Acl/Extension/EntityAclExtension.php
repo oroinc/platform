@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Doctrine\Common\Util\ClassUtils;
-
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -550,7 +549,7 @@ class EntityAclExtension extends AbstractAclExtension
         try {
             return new ObjectIdentity(
                 $this->objectIdAccessor->getId($domainObject),
-                ClassUtils::getClass($domainObject)
+                ClassUtils::getRealClass($domainObject)
             );
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
@@ -667,7 +666,7 @@ class EntityAclExtension extends AbstractAclExtension
             $className = $id = $group = null;
             $this->parseDescriptor($object, $className, $id, $group);
         } else {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
         }
 
         return $className;

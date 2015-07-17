@@ -3,8 +3,9 @@ define([
     'jquery',
     'oroemail/js/app/models/email-attachment-model',
     'oroui/js/app/views/base/view',
+    'oroemail/js/app/models/email-notification-collection',
     'routing'
-], function ($, EmailAttachmentModel, BaseView, routing) {
+], function ($, EmailAttachmentModel, BaseView, EmailNotificationCollection, routing) {
     'use strict';
 
     var EmailAttachmentView;
@@ -13,25 +14,29 @@ define([
         contextsView: null,
         inputName: '',
         events: {
-            'click a.mark-as-read': 'onClickMarkAsRead'
+            'click a.mark-as-read': 'onClickMarkAsRead',
+            'click .email-info': 'onClickOpenEmail',
+            'click .replay': 'onClickReplay'
         },
 
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-
             this.template = _.template($('#email-notification-item').html());
             this.$containerContextTargets = $(options.el).find('.items');
+
+            this.initCollection().initEvents();
+        },
+
+        initCollection: function () {
+            var emails = this.getInitData();
+            this.collection = new EmailNotificationCollection(emails);
+
+            return this;
         },
 
         render:function () {
             this.$containerContextTargets.empty();
-            if (this.collection.models.length === 0) {
-                this.$el.find('.content').hide();
-                this.$el.find('.empty').show();
-            } else {
-                this.$el.find('.content').show();
-                this.$el.find('.empty').hide();
-            }
+            this.initViewType();
 
             for (var i in this.collection.models ) {
                 var view = this.template({
@@ -57,21 +62,47 @@ define([
             return $(this.el).data('clank-event');
         },
 
-        getEmails: function () {
+        getInitData: function () {
             return $(this.el).data('emails');
         },
 
-        setCollection:function(collection)
+        initViewType: function() {
+            if (this.collection.models.length === 0) {
+                this.$el.find('.content').hide();
+                this.$el.find('.empty').show();
+                this.$el.find('.icon-envelope').removeClass('new');
+            } else {
+                this.$el.find('.content').show();
+                this.$el.find('.empty').hide();
+                this.$el.find('.icon-envelope').addClass('new');
+            }
+        },
+
+        onClickOpenEmail:function (e)
         {
-            this.collection = collection;
+            document.location.href =  routing.generate('oro_email_view', {id: $(e.currentTarget).data('id')})
+        },
+
+        onClickReplay: function(e) {
+            alert('replay');
+        },
+
+        onChangeAmount: function(count) {
+            if (count > 10 ){
+                count = '10+';
+            }
+
+            this.$el.find('.icon-envelope span').html(count);
+            this.initViewType();
         },
 
         initEvents: function() {
             var self = this;
 
-            //this.collection.on('reset', function() {
-            //    self.$containerContextTargets.html('');
-            //});
+            this.collection.on('reset', function() {
+                self.$containerContextTargets.html('');
+                self.onChangeAmount(0);
+            });
 
             this.collection.on('add', function(model) {
                 var view = self.template({

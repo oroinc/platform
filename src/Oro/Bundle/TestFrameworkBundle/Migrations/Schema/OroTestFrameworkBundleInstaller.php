@@ -39,6 +39,7 @@ class OroTestFrameworkBundleInstaller implements Installation, ActivityExtension
         OroTestFrameworkBundle::addTestActivityTable($schema);
         OroTestFrameworkBundle::addTestActivityTargetTable($schema);
         OroTestFrameworkBundle::addOrganizationFields($schema);
+        OroTestFrameworkBundle::addOwnerFields($schema);
         OroTestFrameworkBundle::addActivityAssociations($schema, $this->activityExtension);
     }
 }

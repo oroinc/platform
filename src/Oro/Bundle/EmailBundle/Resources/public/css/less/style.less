@@ -609,6 +609,12 @@ a.sync-btn span.dots {
   .oro-dropdown-toggle {
     .icon-envelope {
       padding-top: 3px;
+      span {
+        font-size: 10px;
+        width: 15px;
+        display: inline-block;
+        text-align: center;
+      }
     }
   }
   .dropdown-menu {
@@ -620,11 +626,23 @@ a.sync-btn span.dots {
       padding: 0 17px;
     }
   }
+
+  .mark-as-read {
+    cursor: pointer;
+  }
+
+  .replay {
+    cursor: pointer;
+  }
+
   .icon-envelope {
     color: #FFFFFF;
   }
   .icon-envelope.new {
     color: #fabb18;
+  }
+  .empty {
+    padding: 5px 10px
   }
   .items {
     list-style-type: none;
@@ -637,6 +655,10 @@ a.sync-btn span.dots {
         position: absolute;
         right: 18px;
         top: 12px;
+      }
+
+      .info {
+        cursor: pointer;
       }
     }
     li.new {
