@@ -27,6 +27,8 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
+        $changesetAnswer = ['seen' => true];
+
         $user1 = new User();
         $user1->setId(1);
         $user2 = new User();
@@ -39,7 +41,15 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
         $emailUserArray = [$emailUser1, $emailUser2];
 
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
-            ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
+            ->setMethods(
+                [
+                    'getEntityManager',
+                    'getUnitOfWork',
+                    'getScheduledEntityInsertions',
+                    'getScheduledEntityUpdates',
+                    'getEntityChangeSet'
+                ]
+            )
             ->disableOriginalConstructor()
             ->getMock();
         $onFlushEventArgs
@@ -51,12 +61,21 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($onFlushEventArgs));
         $onFlushEventArgs
+            ->expects($this->exactly(2))
+            ->method('getEntityChangeSet')
+            ->will($this->returnValue($changesetAnswer));
+        $onFlushEventArgs
             ->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue($emailUserArray));
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getScheduledEntityUpdates')
+            ->will($this->returnValue($emailUserArray));
         $this->processor
             ->expects($this->exactly(1))
-            ->method('send');
+            ->method('send')
+            ->with([$user1->getId() => $user1, $user2->getId() => $user2]);
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();

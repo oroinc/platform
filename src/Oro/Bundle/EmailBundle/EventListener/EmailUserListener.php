@@ -18,7 +18,7 @@ class EmailUserListener
     /**
      * @var array
      */
-    protected $insertedEmailUsersEntities = [];
+    protected $processEmailUsersEntities = [];
 
     public function __construct(WebSocketSendProcessor $processor)
     {
@@ -33,7 +33,8 @@ class EmailUserListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $this->collectEmailUserEntities($uow->getScheduledEntityInsertions());
+        $this->collectNewEmailUserEntities($uow->getScheduledEntityInsertions());
+        $this->collectUpdatedEmailUserEntities($uow->getScheduledEntityUpdates(), $uow);
     }
 
     /**
@@ -44,34 +45,53 @@ class EmailUserListener
     public function postFlush(PostFlushEventArgs $args)
     {
         $usersWithNewEmails = [];
-        if (!$this->insertedEmailUsersEntities) {
+        if (!$this->processEmailUsersEntities) {
             return;
         }
 
-        /** @var EmailUser $insertedEntity */
-        foreach ($this->insertedEmailUsersEntities as $insertedEntity) {
-            if (!$insertedEntity->getOwner() || $insertedEntity->isSeen()) {
+        /** @var EmailUser $entity */
+        foreach ($this->processEmailUsersEntities as $entity) {
+            if (!$entity->getOwner()) {
                 continue;
             }
-            $usersWithNewEmails[$insertedEntity->getOwner()->getId()] = $insertedEntity->getOwner();
+            $usersWithNewEmails[$entity->getOwner()->getId()] = $entity->getOwner();
         }
         if ($usersWithNewEmails) {
             $this->processor->send($usersWithNewEmails);
         }
-        $this->insertedEmailUsersEntities = [];
+        $this->processEmailUsersEntities = [];
     }
 
     /**
-     * Collect EmailUser entities
+     * Collect new EmailUser entities
      *
      * @param array $entities
      */
-    protected function collectEmailUserEntities($entities)
+    protected function collectNewEmailUserEntities($entities)
+    {
+        if ($entities) {
+            foreach ($entities as $entity) {
+                if ($entity instanceof EmailUser && !$entity->isSeen()) {
+                    $this->processEmailUsersEntities[] = $entity;
+                }
+            }
+        }
+    }
+
+    /**
+     * Collect updated EmailUser entities
+     *
+     * @param array $entities
+     */
+    protected function collectUpdatedEmailUserEntities($entities, $uow)
     {
         if ($entities) {
             foreach ($entities as $entity) {
                 if ($entity instanceof EmailUser) {
-                    $this->insertedEmailUsersEntities[] = $entity;
+                    $changes = $uow->getEntityChangeSet($entity);
+                    if (array_key_exists('seen', $changes) === true) {
+                        $this->processEmailUsersEntities[] = $entity;
+                    }
                 }
             }
         }

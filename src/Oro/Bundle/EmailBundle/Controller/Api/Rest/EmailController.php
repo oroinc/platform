@@ -169,6 +169,7 @@ class EmailController extends RestController
     public function getNewemailAction()
     {
         $emailProvider = $this->getEmailProvider();
+        $htmlTagHelper = $this->get('oro_ui.html_tag_helper');
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
 
@@ -178,7 +179,9 @@ class EmailController extends RestController
             $bodyContent = '';
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-                $bodyContent = substr($email->getEmailBody()->getBodyContent(), 0, 100);
+                $bodyContent = $htmlTagHelper->shorten(
+                    $htmlTagHelper->stripTags($htmlTagHelper->purify($email->getEmailBody()->getBodyContent()))
+                );
             } catch (LoadEmailBodyException $e) {
                 // no content
             }
