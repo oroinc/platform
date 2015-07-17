@@ -420,10 +420,6 @@ datagrid:
                 label: oro.email.mailbox.email.label
             label:
                 label: oro.email.mailbox.label.label
-            processor:
-                type: translatable
-                data_name: processor.type
-                label: oro.email.mailbox.processor.label
 
         properties:
             id: ~

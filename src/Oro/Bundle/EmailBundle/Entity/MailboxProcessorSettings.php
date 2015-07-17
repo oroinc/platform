@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
  */
-abstract class MailboxProcessor
+abstract class MailboxProcessorSettings
 {
     /**
      * @ORM\Id

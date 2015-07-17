@@ -63,8 +63,12 @@ class MailboxConfigurationController extends Controller
                 $type = $form->get('processorType')->getViewData();
                 $data = $form->getData();
 
-                $processorEntity = $processorProvider->createConfigurationEntity($type);
-                $data->setProcessor($processorEntity);
+                if (!empty($type)) {
+                    $processorEntity = $processorProvider->createConfigurationEntity($type);
+                    $data->setProcessor($processorEntity);
+                } else {
+                    $data->clearProcessor();
+                }
 
                 $newForm = $this->createForm('oro_email_mailbox', $data, [
                     'block_config' => $bc,
@@ -76,8 +80,6 @@ class MailboxConfigurationController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($form->getData());
                     $em->flush();
-                } else {
-                    var_dump($form->getErrors()); die;
                 }
             }
         }

@@ -36,7 +36,6 @@ parameters:
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
     oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
     oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
-    oro_email.mailbox_processor.manual.class:     Oro\Bundle\EmailBundle\Provider\ManualMailboxProcessor
     oro_email.mailbox_choice_list.class:          Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -632,11 +631,6 @@ services:
         class: %oro_email.mailbox_email_owner_provider.class%
         tags:
             - { name: oro_email.owner.provider, order: 1 }
-
-    oro_email.mailbox_processor.manual:
-        class: %oro_email.mailbox_processor.manual.class%
-        tags:
-            - { name: oro_email.mailbox_processor, type: manual }
 
     oro_email.mailbox_choice_list:
         class: %oro_email.mailbox_choice_list.class%

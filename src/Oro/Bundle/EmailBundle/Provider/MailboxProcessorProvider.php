@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\MailboxProcessor as ProcessorEntity;
+use Oro\Bundle\EmailBundle\Entity\MailboxProcessorSettings as ProcessorEntity;
 
 class MailboxProcessorProvider
 {

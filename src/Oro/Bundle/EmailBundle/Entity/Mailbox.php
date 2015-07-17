@@ -52,12 +52,12 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $label;
 
     /**
-     * @var MailboxProcessor
+     * @var MailboxProcessorSettings
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\MailboxProcessor",
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\MailboxProcessorSettings",
      *     cascade={"all"}, orphanRemoval=true
      * )
-     * @ORM\JoinColumn(name="processor_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="processor_id", referencedColumnName="id", nullable=true)
      */
     protected $processor;
 
@@ -140,7 +140,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return MailboxProcessor
+     * @return MailboxProcessorSettings
      */
     public function getProcessor()
     {
@@ -148,11 +148,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param MailboxProcessor $processor
+     * @param MailboxProcessorSettings $processor
      *
      * @return $this
      */
-    public function setProcessor(MailboxProcessor $processor)
+    public function setProcessor($processor)
     {
         $this->processor = $processor;
 

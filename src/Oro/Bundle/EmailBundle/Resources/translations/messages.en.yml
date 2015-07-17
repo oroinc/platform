@@ -249,7 +249,7 @@ oro:
             smtp_password.label:      Password
             action.create:            Add Mailbox
         mailbox_processor:
-            label:                    Do Nothing
+            default.label:            Do Nothing
 
         action:
             sync: Sync emails
