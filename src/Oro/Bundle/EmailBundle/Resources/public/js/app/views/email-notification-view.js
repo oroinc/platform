@@ -43,8 +43,8 @@ define([
                 var view = this.template({
                     entity: this.collection.models[i]
                 });
-
                 var $view = $(view);
+                $view.find('.replay a').attr('data-url', this.collection.models[i].get('route'));
                 this.$containerContextTargets.append($view);
             }
         },
@@ -116,6 +116,7 @@ define([
                 });
 
                 var $view = $(view);
+                $view.find('.replay a').attr('data-url', model.get('route'));
                 self.$containerContextTargets.prepend($view);
             });
         }

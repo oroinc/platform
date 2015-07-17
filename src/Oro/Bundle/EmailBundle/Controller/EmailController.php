@@ -102,6 +102,7 @@ class EmailController extends Controller
                 // no content
             }
             $emailsData[] = [
+                'route'=> $this->container->get('router')->generate('oro_email_email_reply', ['id' => $email->getId()]),
                 'id' => $email->getId(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
