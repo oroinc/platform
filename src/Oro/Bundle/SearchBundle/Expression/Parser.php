@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Expression;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
 
@@ -42,6 +44,7 @@ class Parser
     {
         if (null === $query) {
             $this->query = new Query(Query::SELECT);
+            $this->query->from(['*']);
         } else {
             $this->query = $query;
         }
@@ -184,7 +187,6 @@ class Parser
 
         // if get string token after "from" - pass it directly into Query
         if ($token->test(Token::STRING_TYPE)) {
-            $this->stream->next();
             $this->query->from($token->value);
         } else {
             // if got operator (only '*' is supported in from statement)
@@ -241,7 +243,14 @@ class Parser
 
                 case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
                     list ($type, $expr) = $this->parseSimpleCondition($token->value);
-                    $this->query->getCriteria()->{$type}($expr);
+                    if ($type && $expr) {
+//                        if ($expr instanceof CompositeExpression) {
+//                            //$this->query->getCriteria()->andWhere($expr->)
+//                            $this->query->getCriteria()->andWhere($expr);
+//                        } else {
+                            $this->query->getCriteria()->{$type}($expr);
+//                        }
+                    }
                     break;
 
                 case Token::KEYWORD_TYPE:
@@ -409,14 +418,47 @@ class Parser
             }
 
             list($typeX, $expression) = $this->parseSimpleCondition($type);
-            $expressions[$typeX][] = $expression;
+//            if (empty($expressions)) {
+//                $typeX = null;
+//            }
+            $expressions[] = [
+                'type' => $typeX,
+                'expr' => $expression
+            ];
         }
 
         $expr = Criteria::expr();
         if ($expressions) {
-            foreach ($expressions as $typeX => $subExpressions) {
-                $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $subExpressions);
-            }
+            $expressions = array_reverse($expressions);
+            //$expressions = reset($expressions);
+//            foreach ($expressions as $typeX => $expression) {
+//                $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $subExpressions);
+//            }
+
+            $typeX = $expressions[0]['type'];
+            $expressions = array_map(
+                function ($item) use ($typeX, $expressions) {
+                    if ($item['type'] !== $typeX && $item != end($expressions)) {
+                        throw new ExpressionSyntaxError(
+                            sprintf(
+                                'Syntax error. Composite operators of different types are not allowed on single level.'
+                            ),
+                            $this->stream->current->cursor
+                        );
+                    }
+                    return $item['expr'];
+                },
+                $expressions
+            );
+
+            $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $expressions);
+
+
+
+//            $this->query->getCriteria()->andWhere(
+//                $expr->orX()
+//            )
+
         } else {
             throw new ExpressionSyntaxError(sprintf('Syntax error in composite expression.'), $this->stream->current->cursor);
         }
@@ -424,30 +466,30 @@ class Parser
         $this->stream->next();
 
         return $expr;
-    }
 
-    public function parseArrayExpression()
-    {
-        $this->stream->expect(Token::PUNCTUATION_TYPE, '(', 'An array element was expected');
+//        $this->query->getCriteria()->where(
+//            $expr->in('organization', [1,2,3])
+//        );
+//        $this->query->getCriteria()->andWhere(
+//            $expr->orX(
+//                $expr->contains('name', 'Price'),
+//                $expr->andX(
+//                    $expr->contains('name', 'Acuserv'),
+//                    $expr->contains('extend_description', 'test')
+//                )
+//            )
+//        );
+//
+//        $this->query->getCriteria()->andWhere(
+//            $expr->contains('a','a')
+//        );
+//        $this->query->getCriteria()->andWhere(
+//            $expr->orX(
+//                $expr->contains('b','b'),
+//                $expr->contains('c','c')
+//            )
+//        );
 
-        $node  = new ArrayCollection();
-        $first = true;
-        while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
-            if (!$first) {
-                $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'An array element must be followed by a comma');
-
-                // trailing ,?
-                if ($this->stream->current->test(Token::PUNCTUATION_TYPE, ')')) {
-                    break;
-                }
-            }
-            $first = false;
-
-            //$node->add();
-        }
-        $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'An opened array is not properly closed');
-
-        return $node->getValues();
     }
 
     public function parseArguments()

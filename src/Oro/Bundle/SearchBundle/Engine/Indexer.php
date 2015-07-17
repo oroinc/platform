@@ -357,10 +357,10 @@ class Indexer
 //        /** @var Query $query */
 //        $query = $parser->getQueryFromString($expression);
 
-        $lexer     = new Lexer();
-        $stream    = $lexer->tokenize($expression);
-        $ownParser = new ExpressionParser();
-        $query     = $ownParser->parse($stream);
+        $lexer  = new Lexer();
+        $parser = new ExpressionParser();
+
+        $query = $parser->parse($lexer->tokenize($expression));
 
         $query->setMappingConfig($this->mapper->getMappingConfig());
 
