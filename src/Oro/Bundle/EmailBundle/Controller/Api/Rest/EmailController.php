@@ -10,13 +10,13 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
 /**
