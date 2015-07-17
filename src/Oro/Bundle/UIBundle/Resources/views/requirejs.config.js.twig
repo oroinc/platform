@@ -2,6 +2,11 @@
 {%- if app.user -%}
     {%- set userName = app.user.username -%}
 {%- endif -%}
+{%- if  assets_version -%}
+require({
+    urlArgs: 'version={{ assets_version|escape('url') }}'
+});
+{%- endif -%}
 require({
     config: {
         'oroui/js/app': {

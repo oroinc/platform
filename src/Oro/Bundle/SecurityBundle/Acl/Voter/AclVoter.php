@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -226,7 +225,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
             if ($this->configProvider->hasConfig($className)) {
                 $config = $this->configProvider->getConfig($className);
                 $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
@@ -263,7 +262,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function separateAclGroupFromObject($object)
     {
-        $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+        $group = null;
 
         if ($object instanceof ObjectIdentity) {
             $type = $object->getType();
@@ -272,6 +271,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             if ($delim) {
                 $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
                 $group = ltrim(substr($type, 0, $delim), ' ');
+            } else {
+                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
             }
         }
 
@@ -284,7 +285,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function checkAclGroup($group)
     {
-        if (!$this->groupProvider) {
+        if ($group=== null || !$this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
