@@ -64,31 +64,6 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     public function getCountDataProvider()
     {
         return [
-/*<<<<<<< HEAD
-                'expectedCountQuery' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_',
-            ),
-            'empty with group by' => array(
-                'dql'                => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
-                'expectedCountQuery' => 'SELECT COUNT(*) FROM ' .
-                    '(SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b) AS e',
-            ),
-            'single parameters'   => array(
-                'dql'                => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
-                'expectedCountQuery' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
-                'sqlParameters'      => array(1, 2),
-                'types'              => array(Type::INTEGER, Type::INTEGER),
-                'queryParameters'    => array('a' => 1, 'b' => 2),
-            ),
-            'multiple parameters' => array(
-                'dql'
-                    => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
-                'expectedCountQuery'
-                    => 'SELECT DISTINCT count(DISTINCT t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
-                'sqlParameters'      => array(3, 3),
-                'types'              => array(Type::INTEGER, Type::INTEGER),
-                'queryParameters'    => array('value' => 3),
-            ),
-=======*/
             'empty'               => [
                 'dql'                => 'SELECT e FROM Stub:Entity e',
                 'expectedCountQuery' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_',
