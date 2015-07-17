@@ -4,7 +4,31 @@ UPGRADE FROM 1.7 to 1.8
 
 #####Start from doctrine/dbal version 2.5.0
 
-- Please take into account on DB schema migrations that create indices. `Doctrine\DBAL\Schema\Table` throws exception for already existing indexes, but before it skips them.
+- Please take into account on DB schema migrations that create indices. `Doctrine\DBAL\Schema\Table` throws exception for already existing indexes, but before it skips them
+
+- Please check that Column declaration of a primary key does not contain 'unique' attribute, otherwise 'doctrine:schema:update' may generate an additional unique index for the primary key.
+
+```php
+
+//In this declaration doctrine:schema:update generates unique index
+/**
+* @var string
+*
+* @ORM\Id
+* @ORM\Column(type="string", length=255, unique=true)
+*/
+protected $name;
+
+//In this declaration doctrine:schema:update does not generate unique index
+/**
+* @var string
+*
+* @ORM\Id
+* @ORM\Column(type="string", length=255)
+*/
+protected $name;
+```
+
 
 - Added support of json type for PostgreSQL >=9.2. So if you used this data type before (it stored json data in database like text), we recommended to create migration and convert your old data from text to json, e.g see [Oro\Bundle\ReportBundle\Migrations\Schema\v1_4\UpdateReportJsonArrayQuery](./src/Oro/Bundle/ReportBundle/Migrations/Schema/v1_4/UpdateReportJsonArrayQuery.php) .
 Do not foget construction `USING <column>::JSON`, it checks that your text data is valid json.
