@@ -1,6 +1,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 <script type="text/template" id="email-notification-item">
+
     <li class="new" id="<%= entity.cid %>">
         <div class="info" data-id="<%= entity.get('id') %>">
             <div class="body">
@@ -12,12 +13,12 @@
         <div class="footer row-fluid">
             <span class="pull-left"><%= entity.get('fromName') %></span>
             <span class="pull-right replay">
-                {#{{ "oro.email.notification.replay.label"|trans }}#}
+
                 {{- UI.clientLink({
                     'dataUrl': "<%= entity.get('route') %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
-                    'label': 'oro.email.notification.replay.label'|trans,
+                    'label': 'oro.email.reply'|trans,
                     'widget': {
                         'type': 'dialog',
                         'multiple': false,
@@ -51,7 +52,7 @@
 <li class="email-notification-menu dropdown"
     data-clank-event="{{ clank_event }}"
     data-emails="{{ emails }}"
-    data-count = "{{ count }}">
+    data-count = "{{ count }}" style="display: none;">
     <a href="#" class="oro-dropdown-toggle">
         <i class="icon-envelope {{ classNew }}">
             <span>

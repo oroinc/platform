@@ -176,7 +176,10 @@ class EmailController extends RestController
         $emailsData = [];
         /** @var $email Email */
         foreach ($emails as $email) {
+            $isSeen = $email['seen'];
+            $email = $email[0];
             $bodyContent = '';
+
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($email);
                 $bodyContent = $htmlTagHelper->shorten(
@@ -185,9 +188,11 @@ class EmailController extends RestController
             } catch (LoadEmailBodyException $e) {
                 // no content
             }
+
             $emailsData[] = [
                 'route'=> $this->container->get('router')->generate('oro_email_email_reply', ['id' => $email->getId()]),
                 'id' => $email->getId(),
+                'seen' => $isSeen,
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName()

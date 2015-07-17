@@ -95,6 +95,8 @@ class EmailController extends Controller
         $emailsData = [];
         /** @var $email Email */
         foreach ($emails as $email) {
+            $isSeen = $email['seen'];
+            $email = $email[0];
             $bodyContent = '';
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($email);
@@ -107,6 +109,7 @@ class EmailController extends Controller
             $emailsData[] = [
                 'route'=> $this->container->get('router')->generate('oro_email_email_reply', ['id' => $email->getId()]),
                 'id' => $email->getId(),
+                'seen' => $isSeen,
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName()

@@ -107,7 +107,6 @@ oro:
             mark_unread.label: Mark unread
         notification:
             mark_read.label: Mark all as Read
-            replay.label: replay
             empty: Sorry, you have not new email yet
         datagrid:
             emailtemplate:
