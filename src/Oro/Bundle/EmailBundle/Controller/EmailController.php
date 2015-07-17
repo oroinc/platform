@@ -92,14 +92,19 @@ class EmailController extends Controller
         $count = $emailProvider->getCountNewEmails($this->getUser());
 
         $emailsData = [];
-        /**
-         * @var $email Email
-         */
+        /** @var $email Email */
         foreach ($emails as $email) {
+            $bodyContent = '';
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+                $bodyContent = substr($email->getEmailBody()->getBodyContent(), 0, 100);
+            } catch (LoadEmailBodyException $e) {
+                // no content
+            }
             $emailsData[] = [
                 'id' => $email->getId(),
                 'subject' => $email->getSubject(),
-                'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
+                'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName()
             ];
         }

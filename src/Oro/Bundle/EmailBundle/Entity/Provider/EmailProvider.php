@@ -37,7 +37,7 @@ class EmailProvider
     public function getCountNewEmails(User $user)
     {
         return $this->em->getRepository('OroEmailBundle:Email')->createQueryBuilder('e')
-            ->select('COUNT(e)')
+            ->select('COUNT(DISTINCT e)')
             ->leftJoin('e.emailUsers', 'eu')
             ->where('eu.organization = :organizationId')
             ->andWhere('eu.owner = :ownerId')
