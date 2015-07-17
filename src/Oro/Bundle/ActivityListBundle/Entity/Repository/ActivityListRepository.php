@@ -70,9 +70,11 @@ class ActivityListRepository extends EntityRepository
     ) {
         $queryBuilder = $this->createQueryBuilder('activity')
             ->join('activity.' . $this->getAssociationName($entityClass), 'r')
+            ->leftJoin('activity.activityOwners', 'ao')
             ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
-            ->orderBy('activity.' . $orderField, $orderDirection);
+            ->orderBy('activity.' . $orderField, $orderDirection)
+            ->groupBy('activity.id');
 
         if ($grouping) {
             $queryBuilder->andWhere('activity.head = true');
