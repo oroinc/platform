@@ -77,7 +77,8 @@ class MailboxConfigurationController extends Controller
                 $form = $newForm;
             } else {
                 if ($form->isValid()) {
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $this->getDoctrine()
+                        ->getManager();
                     $em->persist($form->getData());
                     $em->flush();
 

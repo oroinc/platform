@@ -49,5 +49,4 @@ class SmtpType extends AbstractType
             'required' => false,
         ]);
     }
-
 }
