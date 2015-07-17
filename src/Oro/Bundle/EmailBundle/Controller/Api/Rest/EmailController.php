@@ -155,7 +155,7 @@ class EmailController extends RestController
      *
      * @Get(
      *      "/emails/notification/info",
-     *      name="api_emails_notification_info",
+     *      name="",
      * )
      * @ApiDoc(
      *      description="Get email",
@@ -164,15 +164,28 @@ class EmailController extends RestController
      * @AclAncestor("oro_email_email_view")
      * @return Response
      */
-    public function getNewEmail()
+    public function getNewemailAction()
     {
         $emailProvider = $this->getEmailProvider();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
 
+        $emailsData = [];
+        /**
+         * @var $email Email
+         */
+        foreach ($emails as $email) {
+            $emailsData[] = [
+                'id' => $email->getId(),
+                'subject' => $email->getSubject(),
+                'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
+                'fromName' => $email->getFromName()
+            ];
+        }
+
         $result = [
             'count' => $emailProvider->getCountNewEmails($this->getUser()),
-            'emails' => $this->getPreparedItems($emails)
+            'emails' => $emailsData
         ];
 
         return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);

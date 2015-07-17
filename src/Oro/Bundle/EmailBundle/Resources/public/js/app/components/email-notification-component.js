@@ -7,9 +7,8 @@ define([
     'oroui/js/mediator',
     'orosync/js/sync',
     'oroui/js/app/components/base/component',
-    'oroemail/js/app/views/email-notification-view',
-    'oroemail/js/app/models/email-notification-collection'
-], function (jquery, __, routing, mediator, sync, BaseComponent, EmailNotificationView, EmailNotificationCollection) {
+    'oroemail/js/app/views/email-notification-view'
+], function (jquery, __, routing, mediator, sync, BaseComponent, EmailNotificationView) {
     'use strict';
 
     var EmailNotification;
@@ -19,10 +18,8 @@ define([
         collection: null,
 
         initialize: function (options) {
-            //debugger;
             this.initView()
                 .initSync()
-                .initData()
                 .render();
         },
 
@@ -34,21 +31,12 @@ define([
             return this;
         },
 
-        initData: function() {
-            var emails = this.view.getEmails();
-            this.collection = new EmailNotificationCollection(emails);
-            this.view.setCollection(this.collection);
-            this.view.initEvents();
-
-            return this;
-        },
-
-        render: function() {
+        render: function () {
             // todo: to fix double execution
             this.view.render()
         },
 
-        initSync: function(options) {
+        initSync: function () {
             var clankEvent = this.view.getClankEvent();
             var f = this.onNewEmail.bind(this);
             sync.subscribe(clankEvent, f);
@@ -56,17 +44,18 @@ define([
             return this;
         },
 
-        onNewEmail:function(r) {
+        onNewEmail: function (r) {
             var self = this;
             r = JSON.parse(r);
             if (r) {
-
-                    $.ajax({
-                        url: routing.generate('oro_api_api_emails_notification_info'),
-                        success: function(r) {
-                            self.view.collection.add(r);
-                        }
-                    })
+                $.ajax({
+                    url: routing.generate('oro_api_get_email_newemail'),
+                    success: function (r) {
+                        self.view.collection.reset();
+                        self.view.collection.add(r.emails);
+                        self.view.onChangeAmount(r.count);
+                    }
+                })
             }
         }
     });

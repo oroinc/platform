@@ -1,13 +1,15 @@
 <script type="text/template" id="email-notification-item">
     <li class="new" id="<%= entity.cid %>">
-        <div class="body">
-            <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
-            <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>
+        <div class="info" data-id="<%= entity.get('id') %>">
+            <div class="body">
+                <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
+                <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>
+            </div>
+            <i class="icon-envelope new"></i>
         </div>
-        <i class="icon-envelope new"></i>
         <div class="footer row-fluid">
-            <span class="pull-left"><%= entity.get('author') %></span>
-            <span class="pull-right">{{ "oro.email.notification.replay.label"|trans }}</span>
+            <span class="pull-left"><%= entity.get('fromName') %></span>
+            <span class="pull-right replay">{{ "oro.email.notification.replay.label"|trans }}</span>
         </div>
     </li>
 </script>

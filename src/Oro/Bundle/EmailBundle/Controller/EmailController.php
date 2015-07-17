@@ -71,15 +71,14 @@ class EmailController extends Controller
      */
     public function testAction()
     {
-        $userEmail = $this->getDoctrine()->getManager()->getRepository('OroEmailBundle:EmailUser')->find(43);
         $sender = $this->get('oro_email.email_websocket.processor');
-        $a = $sender->send($userEmail);
+        $a = $sender->send([$this->getUser()]);
 
         return new JsonResponse([$a]);
     }
 
     /**
-     * @Route("/new/natification", name="oro_email_new_natification_template")
+     * @Route("/new/notification", name="oro_email_new_natification_template")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
     public function notificationAction()
@@ -96,9 +95,10 @@ class EmailController extends Controller
          */
         foreach ($emails as $email) {
             $emailsData[] = [
+                'id' => $email->getId(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
-                'author' => $email->getFromName()
+                'fromName' => $email->getFromName()
             ];
         }
 
