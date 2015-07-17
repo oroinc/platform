@@ -9,7 +9,8 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Class EmailManager
@@ -129,6 +130,21 @@ class EmailManager
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Mark all email as seen
+     *
+     * @param User $user
+     * @param Organization $organization
+     * @return mixed
+     */
+    public function markAllEmailsAsSeen(User $user, Organization $organization)
+    {
+        return $this
+            ->em
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->markAllEmailsAsSeen($user, $organization);
     }
 
     /**

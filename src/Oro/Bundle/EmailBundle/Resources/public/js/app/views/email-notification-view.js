@@ -2,8 +2,9 @@
 define([
     'jquery',
     'oroemail/js/app/models/email-attachment-model',
-    'oroui/js/app/views/base/view'
-], function ($, EmailAttachmentModel, BaseView) {
+    'oroui/js/app/views/base/view',
+    'routing'
+], function ($, EmailAttachmentModel, BaseView, routing) {
     'use strict';
 
     var EmailAttachmentView;
@@ -43,7 +44,13 @@ define([
         },
 
         onClickMarkAsRead: function () {
-
+            var self = this;
+            $.ajax({
+                url: routing.generate('oro_email_mark_all_as_seen'),
+                success: function() {
+                    self.collection.reset();
+                }
+            })
         },
 
         getClankEvent: function () {

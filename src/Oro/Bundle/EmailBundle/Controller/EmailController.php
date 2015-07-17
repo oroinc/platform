@@ -458,6 +458,24 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen")
+     * @AclAncestor("oro_email_email_user_edit")
+     * @return JsonResponse
+     */
+    public function markAllEmailsAsSeenAction()
+    {
+        $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
+        $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+        $result = false;
+
+        if ($loggedUser) {
+            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization);
+        }
+
+        return new JsonResponse(['successful' => (bool)$result]);
+    }
+
+    /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
      *
      * @param string $gridName
