@@ -55,6 +55,7 @@ define([
                 url: routing.generate('oro_email_mark_all_as_seen'),
                 success: function() {
                     self.collection.reset();
+                    mediator.trigger('datagrid:doRefresh:user-email-grid');
                 }
             })
         },
