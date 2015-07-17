@@ -84,8 +84,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         Translator $translator = null,
         LoggerInterface $logger = null,
         ServiceLink $serviceLink = null
-    )
-    {
+    ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
         $this->templating = $templating;

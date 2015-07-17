@@ -26,7 +26,7 @@ function($, _, routing, __, mediator, messenger) {
                 $('.folder-tree').remove();
             });
 
-            $el.click(function () {
+            $el.click(function() {
                 var data = $form.serializeArray();
 
                 if (isNestedForm) {
@@ -55,7 +55,7 @@ function($, _, routing, __, mediator, messenger) {
                 mediator.execute('showLoading');
                 $('.folder-tree').remove();
                 $.post(url, data)
-                    .done(function (response) {
+                    .done(function(response) {
                         $el.parent().parent().parent().append(response);
                     })
                     .error(function() {
