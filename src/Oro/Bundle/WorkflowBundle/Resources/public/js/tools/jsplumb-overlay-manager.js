@@ -3,7 +3,7 @@ define(function(require) {
     var JsPlumbOverlayManager,
         _ = require('underscore'),
         $ = require('jquery'),
-        BLOCK_MOVE_ITERATIONS = 12,
+        BLOCK_MOVE_ITERATIONS = 16,
     // TODO: remove debug information
         debugVisualization = false;
 
@@ -149,7 +149,7 @@ define(function(require) {
                     if (y - min >= 0 && max - y >= 0) {
                         locations.push({
                             distance: Math.abs(segment.x - x),
-                            passed: passed + y - min,
+                            passed: segment.y1 < segment.y2 ? passed + y - min : passed + max - y,
                             x : segment.x,
                             y : y,
                             segment: segment
@@ -162,7 +162,7 @@ define(function(require) {
                     if (x - min >= 0 && max - x >= 0) {
                         locations.push({
                             distance: Math.abs(segment.y - y),
-                            passed: passed + x - min,
+                            passed: segment.x1 < segment.x2 ? passed + x - min : passed + max - x,
                             x: x,
                             y: segment.y,
                             segment: segment
@@ -217,7 +217,7 @@ define(function(require) {
                     diff = this.pathLength * location - passed;
                     if (diff >= 0 && diff < passed + max - min) {
                         this.x = segment.x;
-                        this.y = min + diff;
+                        this.y = segment.y1 < segment.y2 ? min + diff : max - diff;
                         this.location = location;
                         return true;
                     }
@@ -227,7 +227,7 @@ define(function(require) {
                     max = Math.max(segment.x1, segment.x2);
                     diff = this.pathLength * location - passed;
                     if (diff >= 0 && diff < passed + max - min) {
-                        this.x = min + diff;
+                        this.x = segment.x1 < segment.x2 ? min + diff : max - diff;
                         this.y = segment.y;
                         this.location = location;
                         return true;
@@ -237,6 +237,10 @@ define(function(require) {
             }, this);
 
             return typeof segment !== 'undefined';
+        },
+
+        resetOriginalLocation: function () {
+            return this.setLocation(this._originalLocation);
         },
 
         isChanged: function() {
@@ -276,7 +280,7 @@ define(function(require) {
                     }
                 }, this);
             });
-            _.each(_.keys(this.smartlineManager.jsPlumb.instance.sourceEndpointDefinitions), function (id) {
+            _.each(_.keys(this.smartlineManager.jsPlumbInstance.sourceEndpointDefinitions), function (id) {
                 var el = document.getElementById(id);
                 if (el) {
                     steps.push(new Block(el));
@@ -314,6 +318,7 @@ define(function(require) {
                     break;
                 }
             }
+
             _.each(overlays, function (overlay) {
                 var overlapped;
                 if (overlay.isChanged() ) {
@@ -323,6 +328,8 @@ define(function(require) {
                     });
                     if (typeof overlapped === 'undefined') {
                         overlay.jsPlumbOverlayInstance.setLocation(overlay.location);
+                    } else {
+                        overlay.resetOriginalLocation();
                     }
                 }
             });

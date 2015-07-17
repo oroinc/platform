@@ -3,12 +3,18 @@ define(function(require){
     require('./path-finder');
     var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
 
-    function JsPlumbSmartlineManager(jsPlumb) {
-        this.jsPlumb = jsPlumb;
+    function matchEndpoints(paintInfo1, paintInfo2) {
+        var keys = ['sx', 'sy', 'tx', 'ty'];
+        return _.isEqual(_.pick(paintInfo1, keys), _.pick(paintInfo2, keys));
+    }
+
+    function JsPlumbSmartlineManager(jsPlumbInstance) {
+        this.jsPlumbInstance = jsPlumbInstance;
         this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
+        this.cache = {};
         this.debouncedCalculateOverlays = _.debounce(
                 _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
-                50);
+            50);
     }
 
     window.getLastRequest = function () {
@@ -16,41 +22,42 @@ define(function(require){
     }
 
     JsPlumbSmartlineManager.prototype = {
+
         getNaivePathLength: function (fromRect, toRect) {
             return Math.abs(fromRect.bottom - toRect.top)
                 + Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right)
                 + ((fromRect.bottom - toRect.top > 0) ? 2400 : 0);
         },
 
-        calculate: function () {
-            var _this = this,
-                rects = {},
-                sources = new Container();
-            var endPoints = this.jsPlumb.instance.sourceEndpointDefinitions;
+        calculate: function (connector, paintInfo) {
+            var builder;
+            var graph;
+            var cache = {};
+            var connections = [];
+            var rects = {};
+            var sources = new Container();
+            var endPoints = this.jsPlumbInstance.sourceEndpointDefinitions;
             for (var id in endPoints) {
                 if (endPoints.hasOwnProperty(id)) {
                     var el = document.getElementById(id);
                     if (!el) {
-                        this.cache = [];
+                        this.cache = {};
                         return;
                     }
                     var rect = el.getBoundingClientRect(),
                         clientRect = new Rectangle(rect.left - 16, rect.top - 16, rect.width + 32, rect.height+ 32);
                     rects[id] = clientRect;
-                    //console.log(rect);
                     clientRect.cid = id;
                     sources.boxes.push(clientRect);
                 }
             }
-            var builder = new GraphBuilder();
-            var graph = builder.build(sources);
-            var cache = [];
 
-            var connections = [];
+            builder = new GraphBuilder();
+            graph = builder.build(sources);
 
-            _.each(this.jsPlumb.instance.getConnections(), function (conn) {
-                connections.push([conn.sourceId, conn.targetId, _this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
-            });
+            _.each(this.jsPlumbInstance.getConnections(), function (conn) {
+                connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
+            }, this);
 
             connections.sort(function (a, b) {
                 return a[2] - b[2];
@@ -79,32 +86,48 @@ define(function(require){
                     console.warn("Cannot find path");
                 } else {
                     path.put();
-                    cache.push({
+                    cache[conn[3].connector.getId()] = {
                         connection: conn[3],
-                        path: path
-                    });
+                        path: path,
+                        paintInfo: conn[3].connector === connector ? paintInfo : undefined
+                    };
                 }
             });
-            for (var i = 0; i < cache.length; i++) {
-                var item = cache[i];
+            _.each(cache, function(item) {
                 item.points = item.path.toPointsArray([]).reverse();
-            }
-            this.cache = cache;
+            });
+            _.extend(this.cache, cache);
+            this.debouncedCalculateOverlays();
         },
 
-        getConnectionPath: function (connector) {
-            this.calculate();
-            if (this.cache.length === this.jsPlumb.instance.getConnections().length) {
-                this.debouncedCalculateOverlays();
+        getConnectionPath: function (connector, paintInfo) {
+            var connectorId = connector.getId();
+            var cached = this.retrieveCacheItem(connectorId, paintInfo);
+
+            if (cached === false) {
+                this.calculate(connector, paintInfo);
+                cached = this.retrieveCacheItem(connectorId, paintInfo);
             }
-            for (var i = 0; i < this.cache.length; i++) {
-                var item = this.cache[i];
-                if (item.connection.connector === connector) {
-                    return item.points;
-                }
+
+            if (cached !== false) {
+                return _.clone(cached.points);
             }
+
             console.warn("Path not found");
             return [];
+        },
+
+        retrieveCacheItem: function (connectorId, paintInfo) {
+            var cached = connectorId in this.cache ? this.cache[connectorId] : undefined;
+            if (cached) {
+                if (cached.points.length && (_.isUndefined(cached.paintInfo) || matchEndpoints(cached.paintInfo, paintInfo))) {
+                    cached.paintInfo = paintInfo;
+                    return cached;
+                } else {
+                    delete this.cache[connectorId];
+                }
+            }
+            return false;
         }
     };
 

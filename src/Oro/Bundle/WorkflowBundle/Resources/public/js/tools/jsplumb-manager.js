@@ -3,6 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var $ = require('jquery');
+    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
     var Matrix = require('./jsplumb-manager/jpm-matrix');
     var HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule');
     var CascadeRule = require('./jsplumb-manager/jpm-cascade-rule');
@@ -16,6 +17,7 @@ define(function(require) {
         left: [0, 0.5, -1, 0],
         right: [1, 0.5, 1, 0]
     };
+    var jsPlumbSmartlineManagers = [];
     var JsPlumbManager = function(jsPlumbInstance, workflow) {
         this.jsPlumbInstance = jsPlumbInstance;
         this.workflow = workflow;
@@ -31,6 +33,23 @@ define(function(require) {
         this.xIncrement = 200;
         this.yIncrement = 100;
         this.stepForNew = 10;
+        if (JsPlumbManager.getJsPlumbSmartlineManager(jsPlumbInstance) === null) {
+            jsPlumbSmartlineManagers.push({
+                jsPlumbInstance: jsPlumbInstance,
+                jsPlumbSmartlineManagerInstance: new JsPlumbSmartlineManager(jsPlumbInstance)
+            });
+        }
+    };
+
+    JsPlumbManager.getJsPlumbSmartlineManager = function (jsPlumbInstance) {
+        var item = _.find(jsPlumbSmartlineManagers, function (item) {
+            return item.jsPlumbInstance === jsPlumbInstance;
+        });
+        if (item) {
+            return item.jsPlumbSmartlineManagerInstance;
+        } else {
+            return null;
+        }
     };
 
     _.extend(JsPlumbManager.prototype, {

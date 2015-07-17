@@ -3,14 +3,16 @@ define(function(require) {
 
     var jsPlumb = require('jsplumb');
     var _ = require('underscore');
-    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
+    var JsPlumbManager = require('./jsplumb-manager');
 
     function Smartline(params) {
         this.type = 'Smartline';
+        this.idPrefix = 'smartline-connector-';
         params = params || {};
         params.stub = params.stub === null || params.stub === void 0 ? 30 : params.stub;
         var segments;
         var _super = jsPlumb.Connectors.AbstractConnector.apply(this, arguments);
+        this.smartlineManager = JsPlumbManager.getJsPlumbSmartlineManager(params._jsPlumb);
         var midpoint = params.midpoint === null || params.midpoint === void 0 ? 0.5 : params.midpoint;
         var alwaysRespectStubs = params.alwaysRespectStubs === true;
         var userSuppliedSegments = null;
@@ -161,12 +163,6 @@ define(function(require) {
             return userSuppliedSegments || segments;
         };
 
-        this.ensureSmartlineManager = function () {
-            if (!this._jsPlumb.smartlineManager) {
-                this._jsPlumb.smartlineManager = new JsPlumbSmartlineManager(this._jsPlumb);
-            }
-        };
-
         this._compute = function(paintInfo, params) {
             if (params.clearEdits) {
                 userSuppliedSegments = null;
@@ -184,8 +180,7 @@ define(function(require) {
             segments = [];
 
             // compute the rest of the line
-            this.ensureSmartlineManager();
-            var points = this._jsPlumb.smartlineManager.getConnectionPath(this);
+            var points = this.smartlineManager.getConnectionPath(this, paintInfo);
             if (points.length == 0) {
                 // leave everything as is
                 return;
@@ -195,17 +190,24 @@ define(function(require) {
                 targetRect = params.targetEndpoint.element.getBoundingClientRect(),
                 sourcePoint = points.shift(),
                 targetPoint = points.pop(),
-                connectionWidth = 16,
+                CONNECTION_WIDTH = 16,
                 correction;
+            var oldAnchorX = params.sourceEndpoint.anchor.x,
+                oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - sourceRect.left)/ sourceRect.width;
-            params.sourceEndpoint.anchor.y = (sourcePoint.y - 16 - sourceRect.top)/ sourceRect.height;
+            params.sourceEndpoint.anchor.y = (sourcePoint.y - CONNECTION_WIDTH - sourceRect.top)/ sourceRect.height;
             params.targetEndpoint.anchor.x = (targetPoint.x - targetRect.left)/ targetRect.width;
-            params.targetEndpoint.anchor.y = (targetPoint.y + 16 - targetRect.top)/ targetRect.height;
+            params.targetEndpoint.anchor.y = (targetPoint.y + CONNECTION_WIDTH - targetRect.top)/ targetRect.height;
             correction = {
                 x: Math.min(sourcePoint.x, targetPoint.x),
-                y: Math.min(sourcePoint.y - 16, targetPoint.y + 16)
+                y: Math.min(sourcePoint.y - CONNECTION_WIDTH, targetPoint.y + CONNECTION_WIDTH)
             }
-
+            if (oldAnchorX !== params.sourceEndpoint.anchor.x) {
+                paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * sourceRect.width;
+            }
+            if (oldAnchorY !== params.sourceEndpoint.anchor.y) {
+                paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * sourceRect.height;
+            }
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
                     addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
@@ -217,7 +219,7 @@ define(function(require) {
             // addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
 
             // end stub to end
-            addSegment(segments, targetPoint.x - correction.x, targetPoint.y + 16 - correction.y, paintInfo);
+            addSegment(segments, targetPoint.x - correction.x, targetPoint.y + CONNECTION_WIDTH - correction.y, paintInfo);
 
             writeSegments(this, segments, paintInfo);
         };
