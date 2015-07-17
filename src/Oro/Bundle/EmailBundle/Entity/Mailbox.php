@@ -198,14 +198,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getLabel();
-    }
-
-    /**
      * @return array
      */
     public function getSmtpSettings()
@@ -263,5 +255,25 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         $this->organization = $organization;
 
         return $this;
+    }
+
+    /**
+     * Get first name
+     *
+     * @return string
+     */
+    public function getFirstName()
+    {
+         return $this->getLabel();
+    }
+
+    /**
+     * Get last name
+     *
+     * @return string
+     */
+    public function getLastName()
+    {
+        return '';
     }
 }

@@ -8,7 +8,7 @@ use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 /**
  * Represents an email owner
  */
-interface EmailOwnerInterface
+interface EmailOwnerInterface extends FirstNameInterface, LastNameInterface
 {
     /**
      * Get entity class name.
@@ -34,9 +34,16 @@ interface EmailOwnerInterface
     public function getId();
 
     /**
-     * Returns email owner name.
+     * Get first name
      *
      * @return string
      */
-    public function getName();
+    public function getFirstName();
+
+    /**
+     * Get last name
+     *
+     * @return string
+     */
+    public function getLastName();
 }

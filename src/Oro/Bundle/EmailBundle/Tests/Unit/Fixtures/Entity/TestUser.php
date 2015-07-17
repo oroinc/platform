@@ -87,13 +87,4 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
     public function eraseCredentials()
     {
     }
-
-    public function getName()
-    {
-        return sprintf(
-            '%s %s',
-            $this->getFirstName(),
-            $this->getLastName()
-        );
-    }
 }
