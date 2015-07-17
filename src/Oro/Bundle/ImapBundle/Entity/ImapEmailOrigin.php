@@ -187,5 +187,4 @@ class ImapEmailOrigin extends EmailOrigin
             $this->mailboxName = $this->user;
         }
     }
-
 }
