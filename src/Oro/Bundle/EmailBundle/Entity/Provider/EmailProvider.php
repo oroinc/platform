@@ -26,6 +26,7 @@ class EmailProvider
                 ->where('eu.organization = :organizationId')
                 ->andWhere('eu.owner = :ownerId')
                 ->andWhere('eu.seen = 0')
+                ->groupBy('e')
                 ->orderBy('e.sentAt', 'DESC')
                 ->setParameter('organizationId', $user->getOrganization()->getId())
                 ->setParameter('ownerId', $user->getId())
