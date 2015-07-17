@@ -14,7 +14,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
  *
  * @package Oro\Bundle\EmailBundle\Manager
  */
-class ImapCleanManager implements LoggerAwareInterface
+class ImapClearManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -38,7 +38,7 @@ class ImapCleanManager implements LoggerAwareInterface
      *
      * @return bool
      */
-    public function clean($originId)
+    public function clear($originId)
     {
         $origins = $this->getOriginsToClear($originId);
         if (!$origins) {

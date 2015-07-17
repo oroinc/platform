@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Component\Log\OutputLogger;
-use Oro\Bundle\ImapBundle\Manager\CleanManager;
+use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 
 class ClearInactiveMailboxCommand extends ContainerAwareCommand
 {
@@ -44,7 +44,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var CleanManager $cleaner */
+        /** @var ImapClearManager $cleaner */
         $cleaner = $this->getContainer()->get('oro_imap.manager.clean');
         $this->logger = new OutputLogger($output);
 
@@ -52,7 +52,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
 
         $originId = $input->getOption('id');
 
-        if (!$cleaner->clean($originId)) {
+        if (!$cleaner->clear($originId)) {
             $this->logger->notice('Nothing to clear');
 
             return;

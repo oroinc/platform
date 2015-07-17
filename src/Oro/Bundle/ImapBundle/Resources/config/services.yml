@@ -10,7 +10,7 @@ parameters:
     oro_imap.email_flag_manager_loader.class:        Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
-    oro_imap.imap_clean_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapCleanManager
+    oro_imap.imap_clear_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapClearManager
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
     oro_imap.listener.imap_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\ImapEmailOriginListener
@@ -87,8 +87,8 @@ services:
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
-    oro_imap.manager.clean:
-        class: %oro_imap.imap_clean_manager.class%
+    oro_imap.manager.clear:
+        class: %oro_imap.imap_clear_manager.class%
         arguments:
             - @doctrine
         calls:
