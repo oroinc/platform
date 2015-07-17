@@ -73,7 +73,7 @@ SELECT c0_.id AS id_0 FROM table1 c0_
 #####Start from doctrine/doctrine-bundle version 1.4.0
 
 - `Doctrine\Bundle\DoctrineBundle\DoctrineBundle::shutdown` - clears own services.
-For the functional tests we recommended call `parent::tearDown()` when `tearDown` method is overridden.
+For the functional tests we recommend to call `parent::tearDown()` when `tearDown` method is overridden.
 
 #####More details you can find in Doctrine documentation:
 - http://docs.doctrine-project.org/en/latest/changelog/migration_2_5.html
