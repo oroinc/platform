@@ -221,21 +221,20 @@ class ActivityList extends ExtendActivityList
      * Whether activity list has specified owner
      *
      * @param ActivityOwner $activityOwner
+     *
      * @return bool
      */
     public function hasActivityOwner(ActivityOwner $activityOwner)
     {
-        /**
-         * @var $owner ActivityOwner
-         */
+        /** @var $owner ActivityOwner */
         foreach ($this->getActivityOwners() as $owner) {
-            if (
-                $owner->getUser()->getId() === $activityOwner->getUser()->getId()
+            if ($owner->getUser()->getId() === $activityOwner->getUser()->getId()
                 && $owner->getActivity()->getId() === $activityOwner->getActivity()->getId()
             ) {
                 return true;
             }
         }
+
         return false;
     }
 
