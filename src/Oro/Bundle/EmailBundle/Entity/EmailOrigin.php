@@ -151,6 +151,8 @@ abstract class EmailOrigin
     }
 
     /**
+     * Get root folders (where parent_folder_id is null)
+     *
      * @return ArrayCollection|EmailFolder[]
      */
     public function getRootFolders()
@@ -161,6 +163,8 @@ abstract class EmailOrigin
     }
 
     /**
+     * Replace existing folders by new ones
+     *
      * @param EmailFolder[]|ArrayCollection $folders
      *
      * @return $this
@@ -193,6 +197,8 @@ abstract class EmailOrigin
     }
 
     /**
+     * Remove folder
+     *
      * @param EmailFolder $folder
      *
      * @return $this

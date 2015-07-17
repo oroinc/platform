@@ -109,6 +109,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
                 $folderRepository->removeFolder($imapFolder);
             } elseif (!$folder->isSyncEnabled()) {
                 $folderRepository->clearFolder($imapFolder);
+                $imapFolder->getFolder()->setSynchronizedAt(null);
             }
         }
 

@@ -274,12 +274,13 @@ class EmailApiHandler extends ApiFormHandler
             /** @var User $originOwner */
             $originOwner = $this->securityFacade->getLoggedUser();
             $organization = $this->securityFacade->getOrganization();
-            $originName  = InternalEmailOrigin::BAP . '_User_' . $originOwner->getId();
+            $originName  = 'API_User_' . $originOwner->getId();
 
             $origins = $originOwner->getEmailOrigins()->filter(
-                function ($item) use ($organization) {
+                function ($item) use ($originName, $organization) {
                     return
                         $item instanceof InternalEmailOrigin
+                        && $item->getName() === $originName
                         && $item->getOrganization() === $organization;
                 }
             );
@@ -305,6 +306,7 @@ class EmailApiHandler extends ApiFormHandler
         $origin->setName($originName);
         $origin->setOwner($originOwner);
         $origin->setOrganization($organization);
+        $origin->setMailboxName(InternalEmailOrigin::API_MAILBOX_NAME);
 
         $originOwner->addEmailOrigin($origin);
 

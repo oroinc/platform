@@ -47,7 +47,7 @@ class OroEmailBundle implements Migration
     {
         $table = $schema->getTable('oro_email_origin');
 
-        $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => false]);
+        $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => true, 'default' => '']);
         $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
     }
 }
