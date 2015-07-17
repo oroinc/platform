@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
-use Symfony\Component\Security\Core\SecurityContext;
-
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email/user_%s';
+    const TOPIC = 'oro/email_event/user_%s';
 
     /**
      * @var TopicPublisher
@@ -19,28 +17,34 @@ class WebSocketSendProcessor
     /**
      * @param TopicPublisher $publisher
      */
-    public function __construct(
-        TopicPublisher $publisher
-    ) {
+    public function __construct(TopicPublisher $publisher)
+    {
         $this->publisher = $publisher;
+    }
+
+    /**
+     * Get user topic
+     *
+     * @param User $user
+     * @return string
+     */
+    public static function getUserTopic(User $user)
+    {
+        return sprintf(self::TOPIC, $user->getId());
     }
 
     /**
      * Send message into topic
      *
-     * @param EmailUser $emailUser
-     * @return bool|null
+     * @param array $usersWithNewEmails
      */
-    public function send(EmailUser $emailUser)
+    public function send($usersWithNewEmails)
     {
-        if ($emailUser->getOwner()) {
-            $messageData = ['email_id' => $emailUser->getEmail()->getId()];
-            return $this->publisher->send(
-                sprintf(self::TOPIC, $emailUser->getOwner()->getId()),
-                json_encode($messageData)
-            );
+        if ($usersWithNewEmails) {
+            foreach ($usersWithNewEmails as $user) {
+                $messageData = [['new_email' => true]];
+                $this->publisher->send(self::getUserTopic($user), json_encode($messageData));
+            }
         }
-
-        return null;
     }
 }
