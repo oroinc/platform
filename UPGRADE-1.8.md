@@ -1,5 +1,37 @@
 UPGRADE FROM 1.7 to 1.8
 =======================
+####Recommendations for migration to Doctrine 2.5
+
+#####Start from doctrine/dbal version 2.5.0
+
+- `Doctrine\DBAL\Schema\Table` - when trying to create index that already exists throws exception, before - returns existing index.
+
+- Added json type supports for PostgreSQL >=9.2. So if you use this data type before (it stored json data in database like text), you should create migration and convert your old data from text to json, f.e query should looks like:
+```sql
+ALTER TABLE <table> ALTER COLUMN <column> TYPE JSON USING <column>::JSON
+```
+Do not foget construction `USING <column>::JSON`, it helps convert your text data to json. If the text saved in the column is not valid json, query fails with next error:
+```
+ERROR:  invalid input syntax for type json
+```
+For the cases when you trying equals json data you should use `CAST` function to convert json data to the text:
+```php
+$qb->andWhere('cast(<table>.<column> as text) = :data')
+...
+$qb->expr()->like('cast(<table>.<column> as text)', ':data')
+```
+
+#####Start from doctrine/orm version 2.5.0
+
+- When using `Doctrine\ORM\QueryBuilder` it needs to specify the table name and column
+in the conditions. For more detailed information see - http://www.doctrine-project.org/jira/browse/DDC-2780.
+
+- `Doctrine\ORM\Mapping\DefaultQuoteStrategy::getColumnAlias` - small changes in the columns aliases.
+
+#####Start from doctrine/doctrine-bundle version 1.4.0
+
+- `Doctrine\Bundle\DoctrineBundle\DoctrineBundle::shutdown` - clears own services.
+
 
 ####PropertyAccess Component
 - Removed `Oro\Component\PropertyAccess\PropertyPath` and `Oro\Component\PropertyAccess\PropertyPathInterface`, `Symfony\Component\PropertyAccess\PropertyPath` and `Symfony\Component\PropertyAccess\PropertyPathInterface` should be used instead
