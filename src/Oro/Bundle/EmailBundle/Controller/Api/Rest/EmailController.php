@@ -18,6 +18,8 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 
 /**
  * @RouteResource("email")
@@ -171,14 +173,19 @@ class EmailController extends RestController
         $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
 
         $emailsData = [];
-        /**
-         * @var $email Email
-         */
+        /** @var $email Email */
         foreach ($emails as $email) {
+            $bodyContent = '';
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+                $bodyContent = substr($email->getEmailBody()->getBodyContent(), 0, 100);
+            } catch (LoadEmailBodyException $e) {
+                // no content
+            }
             $emailsData[] = [
                 'id' => $email->getId(),
                 'subject' => $email->getSubject(),
-                'bodyContent' => substr($email->getEmailBody()->getBodyContent(), 0, 100),
+                'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName()
             ];
         }
@@ -189,6 +196,16 @@ class EmailController extends RestController
         ];
 
         return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
+    }
+
+    /**
+     * Get email cache manager
+     *
+     * @return EmailCacheManager
+     */
+    protected function getEmailCacheManager()
+    {
+        return $this->container->get('oro_email.email.cache.manager');
     }
 
     /**
