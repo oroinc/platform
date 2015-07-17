@@ -141,6 +141,22 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             ['id'],
             ['onDelete' => 'CASCADE']
         );
+        $table1->addColumn(
+            'ref_column2',
+            'integer',
+            [
+                OroOptions::KEY => [
+                    ExtendOptionsManager::TYPE_OPTION => 'ref-one'
+                ]
+            ]
+        );
+        $table1->addIndex(['ref_column2'], 'idx_ref_column2');
+        $table1->addForeignKeyConstraint(
+            $table2,
+            ['ref_column2'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
 
         $table1->addOption('comment', 'test');
 
@@ -166,13 +182,17 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table2 (id INT AUTO_INCREMENT NOT NULL)',
                 'CREATE TABLE table1 ('
                 . 'ref_column1 INT NOT NULL, '
+                . 'ref_column2 INT NOT NULL, '
                 . 'column1 VARCHAR(100) NOT NULL, '
                 . 'configurable_column1 VARCHAR(100) NOT NULL, '
                 . 'extend_column1 VARCHAR(100) DEFAULT NULL, '
-                . 'INDEX idx_table1_ref_column1 (ref_column1)) '
+                . 'INDEX IDX_1C95229DF008B3DB (ref_column1), '
+                . 'INDEX idx_ref_column2 (ref_column2)) '
                 . 'COMMENT = \'test\' ',
                 'ALTER TABLE table1 ADD CONSTRAINT fk_table1_ref_column1 '
-                . 'FOREIGN KEY (ref_column1) REFERENCES table2 (id) ON DELETE CASCADE'
+                . 'FOREIGN KEY (ref_column1) REFERENCES table2 (id) ON DELETE CASCADE',
+                'ALTER TABLE table1 ADD CONSTRAINT fk_table1_ref_column2 '
+                . 'FOREIGN KEY (ref_column2) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
         $this->assertExtendOptions(
@@ -198,6 +218,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                             ]
                         ],
                         'ref_column1'          => [
+                            'type' => 'ref-one'
+                        ],
+                        'ref_column2'          => [
                             'type' => 'ref-one'
                         ]
                     ]
