@@ -634,7 +634,7 @@ a.sync-btn span.dots {
   .replay {
     cursor: pointer;
     a {
-      color: #c0b18a;
+      color: #b4b4b4;
     }
     .icon-reply {
       display: none !important;
@@ -651,6 +651,12 @@ a.sync-btn span.dots {
     padding: 5px 10px
   }
   .items {
+    .icon-envelope {
+      &.new {
+        color: #fabb18;
+      }
+      color: #b4b4b4;
+    }
     list-style-type: none;
     margin: 0;
     li {
@@ -667,30 +673,45 @@ a.sync-btn span.dots {
         cursor: pointer;
       }
     }
-    li.new {
-      background: #fff9e9;
+    li {
+      &.new {
+        background: #fff9e9;
+
+        .title {
+          color: #a38c62;
+        }
+
+        .description {
+          color: #615642;
+        }
+
+        .footer {
+          span {
+            color: #c0b18a;
+          }
+        }
+
+        .replay {
+          a {
+            color: #c0b18a;
+          }
+        }
+      }
       .body {
         padding-right: 20px;
         padding-bottom: 7px;
         .title {
-          color: #a38c62;
-
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
         }
         .description {
-          color: #615642;;
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
         }
       }
-      .footer {
-        span {
-          color: #c0b18a;
-        }
-      }
+
     }
   }
 }

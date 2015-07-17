@@ -16,15 +16,14 @@ define([
         inputName: '',
         events: {
             'click a.mark-as-read': 'onClickMarkAsRead',
-            'click .info': 'onClickOpenEmail',
-            'click .replay': 'onClickReplay'
+            'click .info': 'onClickOpenEmail'
         },
 
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
             this.$containerContextTargets = $(options.el).find('.items');
-
+            this.$el.show();
             this.initCollection().initEvents();
         },
 
@@ -45,6 +44,12 @@ define([
                 });
                 var $view = $(view);
                 $view.find('.replay a').attr('data-url', this.collection.models[i].get('route'));
+
+                if (this.collection.models[i].get('seen')) {
+                    $view.removeClass('new');
+                    $view.find('.icon-envelope').removeClass('new');
+                }
+
                 this.$containerContextTargets.append($view);
             }
         },
@@ -71,11 +76,11 @@ define([
             if (this.collection.models.length === 0) {
                 this.$el.find('.content').hide();
                 this.$el.find('.empty').show();
-                this.$el.find('.icon-envelope').removeClass('new');
+                this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
             } else {
                 this.$el.find('.content').show();
                 this.$el.find('.empty').hide();
-                this.$el.find('.icon-envelope').addClass('new');
+                this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
             }
         },
 
@@ -87,10 +92,6 @@ define([
                     url: routing.generate('oro_email_view', {id: $(e.currentTarget).data('id')})
                 }
             );
-        },
-
-        onClickReplay: function(e) {
-
         },
 
         onChangeAmount: function(count) {
@@ -117,6 +118,14 @@ define([
 
                 var $view = $(view);
                 $view.find('.replay a').attr('data-url', model.get('route'));
+
+                //console.log(model.get('seen'));
+                if (model.get('seen')) {
+                    $view.removeClass('new');
+                    console.log($view.find('.icon-envelope'));
+                    $view.find('.icon-envelope').removeClass('new');
+                }
+
                 self.$containerContextTargets.prepend($view);
             });
         }

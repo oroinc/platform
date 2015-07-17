@@ -5,6 +5,10 @@ require([
 ], function (BaseController, tools) {
     'use strict';
 
+    if (tools.isMobile()) {
+        return;
+    }
+
     /**
      * Init ShortcutsView
      */
