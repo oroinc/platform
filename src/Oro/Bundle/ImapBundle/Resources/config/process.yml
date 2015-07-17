@@ -19,7 +19,7 @@ definitions:
         actions_configuration:
             - @tree:
                 conditions:
-                    @equal: [syncEnabled, false]
+                    @equal: [$syncEnabled, false]
                 actions:
                     - @create_entity:
                         class: JMS\JobQueueBundle\Entity\Job
