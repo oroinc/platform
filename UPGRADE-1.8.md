@@ -73,13 +73,15 @@ SELECT c0_.id AS id_0 FROM table1 c0_
 #####Start from doctrine/doctrine-bundle version 1.4.0
 
 - `Doctrine\Bundle\DoctrineBundle\DoctrineBundle::shutdown` - clears own services.
-For the functional tests we recommended execute parent::tearDown function when it overwrited.
+For the functional tests we recommended call `parent::tearDown()` when `tearDown` method is overridden.
 
 #####More details you can find in Doctrine documentation:
-http://docs.doctrine-project.org/en/latest/changelog/migration_2_5.html
-https://github.com/doctrine/doctrine2/blob/2.5/UPGRADE.md
-https://github.com/doctrine/dbal/blob/v2.5.1/UPGRADE.md
-https://github.com/doctrine/DoctrineBundle/blob/v1.4.0/Changelog.md
+- http://docs.doctrine-project.org/en/latest/changelog/migration_2_5.html
+- https://github.com/doctrine/doctrine2/blob/2.5/UPGRADE.md
+- https://github.com/doctrine/dbal/blob/v2.5.1/UPGRADE.md
+- https://github.com/doctrine/DoctrineBundle/blob/v1.4.0/Changelog.md
+
+
 
 ####PropertyAccess Component
 - Removed `Oro\Component\PropertyAccess\PropertyPath` and `Oro\Component\PropertyAccess\PropertyPathInterface`, `Symfony\Component\PropertyAccess\PropertyPath` and `Symfony\Component\PropertyAccess\PropertyPathInterface` should be used instead
