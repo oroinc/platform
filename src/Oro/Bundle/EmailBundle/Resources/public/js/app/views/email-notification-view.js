@@ -4,8 +4,9 @@ define([
     'oroemail/js/app/models/email-attachment-model',
     'oroui/js/app/views/base/view',
     'oroemail/js/app/models/email-notification-collection',
-    'routing'
-], function ($, EmailAttachmentModel, BaseView, EmailNotificationCollection, routing) {
+    'routing',
+    'oroui/js/mediator'
+], function ($, EmailAttachmentModel, BaseView, EmailNotificationCollection, routing, mediator) {
     'use strict';
 
     var EmailAttachmentView;
@@ -15,7 +16,7 @@ define([
         inputName: '',
         events: {
             'click a.mark-as-read': 'onClickMarkAsRead',
-            'click .email-info': 'onClickOpenEmail',
+            'click .info': 'onClickOpenEmail',
             'click .replay': 'onClickReplay'
         },
 
@@ -80,11 +81,16 @@ define([
 
         onClickOpenEmail:function (e)
         {
-            document.location.href =  routing.generate('oro_email_view', {id: $(e.currentTarget).data('id')})
+            mediator.execute(
+                'redirectTo',
+                {
+                    url: routing.generate('oro_email_view', {id: $(e.currentTarget).data('id')})
+                }
+            );
         },
 
         onClickReplay: function(e) {
-            alert('replay');
+
         },
 
         onChangeAmount: function(count) {
