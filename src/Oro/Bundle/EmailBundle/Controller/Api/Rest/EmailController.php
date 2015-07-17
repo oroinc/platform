@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations\Delete;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -151,8 +152,6 @@ class EmailController extends RestController
     /**
      * Get email.
      *
-     * @param string $id
-     *
      * @Get(
      *      "/emails/notification/info",
      *      name="",
@@ -162,6 +161,7 @@ class EmailController extends RestController
      *      resource=true
      * )
      * @AclAncestor("oro_email_email_view")
+     *
      * @return Response
      */
     public function getNewemailAction()
@@ -201,6 +201,11 @@ class EmailController extends RestController
         return $this->container->get('oro_email.manager.email.api');
     }
 
+    /**
+     * Get email entity provider
+     *
+     * @return EmailProvider
+     */
     public function getEmailProvider()
     {
         return $this->container->get('oro_email.email.provider');
