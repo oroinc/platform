@@ -9,6 +9,7 @@ parameters:
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
+    oro_email.email.provider.class:               Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider
     oro_email.email.owner.provider.storage.class: Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage
     oro_email.email.owner.manager.class:          Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager
     oro_email.email.model.builder.helper.class:   Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
@@ -152,6 +153,11 @@ services:
         class: %oro_email.email.owner.provider.class%
         arguments:
             - @oro_email.email.owner.provider.storage
+
+    oro_email.email.provider:
+        class: %oro_email.email.provider.class%
+        arguments:
+            - @doctrine.orm.entity_manager
 
     oro_email.email.owner.manager:
         public: false

@@ -602,7 +602,6 @@ a.sync-btn span.dots {
 }
 
 .desktop-version #oroplatform-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
-  margin-top: 4px;
   right: 6px;
 }
 
@@ -647,9 +646,16 @@ a.sync-btn span.dots {
         padding-bottom: 7px;
         .title {
           color: #a38c62;
+
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
         }
         .description {
           color: #615642;;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
         }
       }
       .footer {
