@@ -129,7 +129,7 @@ class AclHelper
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
             list ($whereConditions, $joinConditions, $joinStatements) = $this->processSelect($ast, $permission, $query);
-            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : array());
+            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
                 $this->processSubselects($ast, $conditionStorage, $permission, $query);
             }
@@ -152,10 +152,10 @@ class AclHelper
                 $hints = $query->getHints();
                 if (!empty($hints[Query::HINT_CUSTOM_TREE_WALKERS])) {
                     $customHints = !in_array(self::ORO_ACL_WALKER, $hints[Query::HINT_CUSTOM_TREE_WALKERS])
-                        ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], array(self::ORO_ACL_WALKER))
+                        ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], [self::ORO_ACL_WALKER])
                         : $hints[Query::HINT_CUSTOM_TREE_WALKERS];
                 } else {
-                    $customHints = array(self::ORO_ACL_WALKER);
+                    $customHints = [self::ORO_ACL_WALKER];
                 }
                 $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
                 $query->setHint(AclWalker::ORO_ACL_JOIN, $joinStorage);
@@ -494,8 +494,7 @@ class AclHelper
     protected function processRangeVariableDeclarationShare(
         RangeVariableDeclaration $rangeVariableDeclaration,
         $permission
-    )
-    {
+    ) {
         $entityName = $rangeVariableDeclaration->abstractSchemaName;
         $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
 

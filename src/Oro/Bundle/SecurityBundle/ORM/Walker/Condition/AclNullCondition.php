@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker\Condition;
 
-class AclNullCondition
+class AclNullCondition implements AclConditionInterface
 {
     /**
      * @var string

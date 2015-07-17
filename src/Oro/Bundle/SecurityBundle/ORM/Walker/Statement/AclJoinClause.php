@@ -29,7 +29,7 @@ class AclJoinClause
     /**
      * @var int
      */
-    protected $joinType = Join::JOIN_TYPE_INNER;
+    protected $joinType;
 
     /**
      * @param string $abstractSchemaName
@@ -44,8 +44,7 @@ class AclJoinClause
         $identificationVariable,
         $associationField,
         $joinType = Join::JOIN_TYPE_INNER
-    )
-    {
+    ) {
         $this->abstractSchemaName           = $abstractSchemaName;
         $this->aliasIdentificationVariable  = $aliasIdentificationVariable;
         $this->identificationVariable       = $identificationVariable;
@@ -148,6 +147,11 @@ class AclJoinClause
         return $this;
     }
 
+    /**
+     * Method checks Join Clause that should add to query as dql association
+     *
+     * @return bool
+     */
     public function isAssociationJoin()
     {
         if ($this->associationField && $this->identificationVariable) {

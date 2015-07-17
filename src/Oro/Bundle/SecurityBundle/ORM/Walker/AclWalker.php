@@ -24,6 +24,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
@@ -44,7 +45,7 @@ class AclWalker extends TreeWalkerAdapter
 
     const EXPECTED_TYPE = 12;
 
-    /** @var   */
+    /** @var AclConditionInterface */
     protected $whereShareCondition;
 
     /**

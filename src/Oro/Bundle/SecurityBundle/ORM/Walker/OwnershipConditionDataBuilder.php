@@ -14,7 +14,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
-
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -25,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
@@ -56,11 +56,13 @@ class OwnershipConditionDataBuilder
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
+    /**
+     * @var ConfigProvider
+     */
+    protected $configProvider;
+
     /** @var null|mixed */
     protected $user = null;
-
-    /** @var null|int|string */
-    protected $userId = null;
 
     /**
      * @var ManagerRegistry
@@ -74,6 +76,7 @@ class OwnershipConditionDataBuilder
      * @param MetadataProviderInterface      $metadataProvider
      * @param OwnerTreeProviderInterface     $treeProvider
      * @param ManagerRegistry                $registry
+     * @param ConfigProvider                 $configProvider
      * @param AclVoter                       $aclVoter
      */
     public function __construct(
@@ -83,6 +86,7 @@ class OwnershipConditionDataBuilder
         MetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
         ManagerRegistry $registry,
+        ConfigProvider $configProvider,
         AclVoter $aclVoter = null
     ) {
         $this->securityContextLink    = $securityContextLink;
@@ -92,6 +96,7 @@ class OwnershipConditionDataBuilder
         $this->metadataProvider       = $metadataProvider;
         $this->treeProvider           = $treeProvider;
         $this->registry               = $registry;
+        $this->configProvider         = $configProvider;
     }
 
     /**
@@ -229,23 +234,13 @@ class OwnershipConditionDataBuilder
      */
     public function getUserId()
     {
-        if ($this->userId) {
-            return $this->userId;
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->objectIdAccessor->getId($user);
         }
 
-        $token = $this->getSecurityContext()->getToken();
-        if (!$token) {
-            return null;
-        }
-        $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
-            return null;
-        }
-
-        $this->user = $user;
-        $this->userId = $this->objectIdAccessor->getId($user);
-
-        return $this->userId;
+        return null;
     }
 
     /**
@@ -427,12 +422,18 @@ class OwnershipConditionDataBuilder
      *
      * @param string $entityName
      * @param string $entityAlias
-     * @param string $permission
+     * @param mixed $permissions
      *
      * @return array
      */
-    public function getAclShareData($entityName, $entityAlias, $permission = BasicPermissionMap::PERMISSION_VIEW)
+    public function getAclShareData($entityName, $entityAlias, $permissions = BasicPermissionMap::PERMISSION_VIEW)
     {
+        $excludeAccessLevels = [
+            AccessLevel::BASIC_LEVEL,
+            AccessLevel::LOCAL_LEVEL,
+            AccessLevel::DEEP_LEVEL,
+        ];
+
         $aclClass = $this->registry->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $entityName]);
         $sid = UserSecurityIdentity::fromAccount($this->getUser());
@@ -441,8 +442,23 @@ class OwnershipConditionDataBuilder
                 'identifier' => $sid->getClass().'-'.$sid->getUsername(),
                 'username' => true,
             ]);
+        $shareConfig = null;
 
-        if (!$aclClass || !$aclSId || $permission != BasicPermissionMap::PERMISSION_VIEW) {
+        if ($this->configProvider->hasConfig($entityName)) {
+            $shareConfig = $this->configProvider->getConfig($entityName)->get('share_scopes');
+        }
+
+        $observer = new OneShotIsGrantedObserver();
+        $this->aclVoter->addOneShotIsGrantedObserver($observer);
+        $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityName);
+
+        if (!$aclClass
+            || !$aclSId
+            || $permissions !== BasicPermissionMap::PERMISSION_VIEW
+            || !$shareConfig
+            || !$isGranted
+            || in_array($observer->getAccessLevel(), $excludeAccessLevels)
+        ) {
             return null;
         }
 
@@ -500,7 +516,7 @@ class OwnershipConditionDataBuilder
             return null;
         }
         $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getUserClass())) {
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
             return null;
         }
 
