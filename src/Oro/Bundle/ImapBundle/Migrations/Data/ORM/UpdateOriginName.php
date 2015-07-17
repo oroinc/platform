@@ -19,7 +19,7 @@ class UpdateOriginName extends AbstractFixture
         $origins = $repo->findAll();
         if ($origins) {
             foreach ($origins as $origin) {
-                $origin->setMailboxName(ImapEmailOrigin::MAILBOX_NAME);
+                $origin->setMailboxName($origin->getUser());
             }
 
             $manager->flush();

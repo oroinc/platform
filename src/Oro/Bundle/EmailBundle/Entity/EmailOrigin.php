@@ -21,13 +21,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
- * @ORM\HasLifecycleCallbacks()
  * @JMS\ExclusionPolicy("ALL")
  */
 abstract class EmailOrigin
 {
-    const MAILBOX_NAME = 'Base origin';
-
     /**
      * @var integer
      *
@@ -372,17 +369,5 @@ abstract class EmailOrigin
         $this->mailboxName = $name;
 
         return $this;
-    }
-
-    /**
-     * Pre persist event listener
-     *
-     * @ORM\PrePersist
-     */
-    public function beforeSave()
-    {
-        if ($this->mailboxName === null) {
-            $this->mailboxName = static::MAILBOX_NAME;
-        }
     }
 }

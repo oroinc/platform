@@ -10,12 +10,13 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * An Email Origin which can be used for emails sent by BAP
  *
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class InternalEmailOrigin extends EmailOrigin
 {
     const BAP = 'BAP';
+
     const MAILBOX_NAME = 'Local';
-    const API_MAILBOX_NAME = 'Local API';
 
     /**
      * @var string
@@ -57,5 +58,15 @@ class InternalEmailOrigin extends EmailOrigin
     public function __toString()
     {
         return sprintf('Internal - %s', $this->internalName);
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        if ($this->mailboxName === null) {
+            $this->mailboxName = self::MAILBOX_NAME;
+        }
     }
 }

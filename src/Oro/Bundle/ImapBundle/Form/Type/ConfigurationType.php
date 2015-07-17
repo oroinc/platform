@@ -64,6 +64,7 @@ class ConfigurationType extends AbstractType
                     'attr' => [
                         'class' => 'critical-field',
                     ],
+                    'tooltip' => 'oro.imap.configuration.tooltip',
                 ]
             )
             ->add(
@@ -91,6 +92,7 @@ class ConfigurationType extends AbstractType
                     'attr' => [
                         'class' => 'critical-field',
                     ],
+                    'tooltip' => 'oro.imap.configuration.tooltip',
                 ]
             )
             ->add(
@@ -106,6 +108,7 @@ class ConfigurationType extends AbstractType
                 'attr' => [
                     'class' => 'folder-tree',
                 ],
+                'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
     }
 
@@ -259,7 +262,7 @@ class ConfigurationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\ImapEmailOrigin',
-            'required'   => false
+            'required'   => false,
         ]);
     }
 

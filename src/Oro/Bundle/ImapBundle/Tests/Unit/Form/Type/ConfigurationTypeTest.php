@@ -6,10 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -61,6 +62,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     protected function getExtensions()
     {
+        $tooltipExtension = new TooltipFormExtension();
+
         return array_merge(
             parent::getExtensions(),
             [
@@ -69,8 +72,11 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                         'oro_email_email_folder' => new EmailFolderType(),
                         'oro_email_email_folder_tree' => new EmailFolderTreeType(),
                     ],
-                    []
-                )
+                    [
+                        'text' => [$tooltipExtension],
+                        'collection' => [$tooltipExtension],
+                    ]
+                ),
             ]
         );
     }
