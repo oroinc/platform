@@ -19,7 +19,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Table(
  *      name="oro_email_user"
  * )
- * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
  *

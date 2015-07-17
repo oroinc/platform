@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 use Zend\Mail\Storage\Exception as BaseException;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 
 /**
  * Class Imap
@@ -285,6 +286,9 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function uidSearch(array $criteria)
     {
+        if (!$this->supportUidSearch()) {
+            throw new UnsupportException('The server do not support UID SEARCH.');
+        }
         if (empty($criteria)) {
             throw new BaseException\RuntimeException('The search criteria must not be empty.');
         }
@@ -402,5 +406,13 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $headers->addHeaderLine(self::UID, $data[self::UID]);
         $headers->addHeaderLine('InternalDate', $data[self::INTERNALDATE]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function supportUidSearch()
+    {
+        return false;
     }
 }
