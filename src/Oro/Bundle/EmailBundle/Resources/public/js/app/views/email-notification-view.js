@@ -15,7 +15,7 @@ define([
         inputName: '',
         events: {
             'click a.mark-as-read': 'onClickMarkAsRead',
-            'click .email-info': 'onClickOpenEmail',
+            'click .info': 'onClickOpenEmail',
             'click .replay': 'onClickReplay'
         },
 
