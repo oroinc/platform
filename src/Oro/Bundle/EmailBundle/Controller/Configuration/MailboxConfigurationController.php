@@ -80,6 +80,16 @@ class MailboxConfigurationController extends Controller
                     $em = $this->getDoctrine()->getManager();
                     $em->persist($form->getData());
                     $em->flush();
+
+                    return $this->redirect(
+                        $this->get('router')->generate(
+                            'oro_config_configuration_system',
+                            [
+                                'activeGroup' => self::ACTIVE_GROUP,
+                                'activeSubGroup' => self::ACTIVE_SUBGROUP,
+                            ]
+                        )
+                    );
                 }
             }
         }

@@ -20,7 +20,7 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
 
 {% block content %}
-    {% set saveButton    = UI.saveAndCloseButton('Save'|trans) %}
+    {% set saveButton    = UI.saveAndCloseButton() %}
     {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
 
     <form

@@ -207,7 +207,9 @@
             </div>
         </div>
     </div>
-    {{ dataGrid.renderGrid('base-mailboxes-grid') }}
+    <div class="row" style="margin-right: -20px;">
+        {{ dataGrid.renderGrid('base-mailboxes-grid') }}
+    </div>
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
