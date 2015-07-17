@@ -17,12 +17,16 @@ definitions:
         order: 150
         entity: Oro\Bundle\EmailBundle\Entity\EmailFolder
         actions_configuration:
-            - @create_entity:
-                class: JMS\JobQueueBundle\Entity\Job
-                attribute: $.syncJob
-                flush: true
-                arguments:
-                    - 'oro:imap:clear-mailbox'
+            - @tree:
+                conditions:
+                    @equal: [syncEnabled, false]
+                actions:
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - 'oro:imap:clear-mailbox'
 
 triggers:
     clear_imap_email_origin_on_deactivation:

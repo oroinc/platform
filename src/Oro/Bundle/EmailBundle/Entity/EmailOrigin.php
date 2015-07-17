@@ -42,7 +42,7 @@ abstract class EmailOrigin
     /**
      * @var string
      *
-     * @ORM\Column(name="mailbox_name", type="string", length=64)
+     * @ORM\Column(name="mailbox_name", type="string", length=64, nullable=false, options={"default" = ""})
      */
     protected $mailboxName;
 
