@@ -50,4 +50,12 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->send([$this->user]);
     }
+
+    public function testSendFailure()
+    {
+        $this->topicPublisher->expects($this->never())
+            ->method('send');
+
+        $this->processor->send([]);
+    }
 }
