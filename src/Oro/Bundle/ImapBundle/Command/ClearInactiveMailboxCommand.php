@@ -42,7 +42,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
         $this->logger = new OutputLogger($output);
 
         $originId = $input->getOption('id');
-        
+
         if (!$cleaner->clear($originId)) {
             $this->logger->notice('Nothing to clear');
         } else {
