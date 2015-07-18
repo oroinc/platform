@@ -110,7 +110,7 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param ImapEmailFolder $imapFolder
      */
-    public function removeFolder(ImapEmailFolder $imapFolder)
+    protected function removeFolder(ImapEmailFolder $imapFolder)
     {
         $this->clearFolder($imapFolder);
 
@@ -124,7 +124,7 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param ImapEmailFolder $imapFolder
      */
-    public function clearFolder(ImapEmailFolder $imapFolder)
+    protected function clearFolder(ImapEmailFolder $imapFolder)
     {
         $folder = $imapFolder->getFolder();
         $emailUsers = $this->em->getRepository('OroEmailBundle:EmailUser')->findBy(['folder' => $folder]);
