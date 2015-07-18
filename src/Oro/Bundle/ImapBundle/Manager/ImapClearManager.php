@@ -147,7 +147,6 @@ class ImapClearManager implements LoggerAwareInterface
             /** @var EmailUser $emailUser */
             $emailUser = $row[0];
             $email = $emailUser->getEmail();
-            $emails[] = $email;
             $this->em->remove($emailUser);
 
             $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
