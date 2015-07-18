@@ -210,6 +210,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: postRemove }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%

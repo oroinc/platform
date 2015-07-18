@@ -16,6 +16,7 @@ class OroEmailBundle implements Migration
     {
         self::addEmailFolderFields($schema);
         self::addEmailOriginFields($schema);
+        self::updateEmailRecipientConstraint($schema);
     }
 
     /**
@@ -49,5 +50,24 @@ class OroEmailBundle implements Migration
 
         $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => true, 'default' => '']);
         $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function updateEmailRecipientConstraint(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_recipient');
+
+        $table->removeForeignKey('FK_7DAF9656A832C1C9');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email'),
+            ['email_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_7DAF9656A832C1C9'
+        );
     }
 }

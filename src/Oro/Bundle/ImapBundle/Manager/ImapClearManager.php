@@ -7,6 +7,7 @@ use Psr\Log\LoggerAwareTrait;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
@@ -18,6 +19,8 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 class ImapClearManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    const BATCH_SIZE = 50;
 
     /**
      * @var EntityManager
@@ -43,6 +46,8 @@ class ImapClearManager implements LoggerAwareInterface
     {
         $origins = $this->getOriginsToClear($originId);
         if (!$origins) {
+            $this->logger->notice('Nothing to clear');
+
             return false;
         }
         foreach ($origins as $origin) {
@@ -52,6 +57,7 @@ class ImapClearManager implements LoggerAwareInterface
 
             $this->logger->notice('Origin processed successfully');
         }
+
         return true;
     }
 
@@ -127,32 +133,37 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder(ImapEmailFolder $imapFolder)
     {
         $folder = $imapFolder->getFolder();
-        $emailUsers = $this->em->getRepository('OroEmailBundle:EmailUser')->findBy(['folder' => $folder]);
 
-        foreach ($emailUsers as $emailUser) {
+        $q = $this->em->createQueryBuilder()
+            ->select('eu')
+            ->from('OroEmailBundle:EmailUser', 'eu')
+            ->andWhere('eu.folder = :folder')
+            ->setParameter('folder', $folder)
+            ->getQuery();
+        $iterableResult = $q->iterate();
+
+        $i = 0;
+        while (($row = $iterableResult->next()) !== false) {
+            /** @var EmailUser $emailUser */
+            $emailUser = $row[0];
+            $email = $emailUser->getEmail();
+            $emails[] = $email;
             $this->em->remove($emailUser);
 
-            $email = $emailUser->getEmail();
             $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
                 'email' => $email,
                 'imapFolder' => $imapFolder,
             ]);
-            $this->em->remove($imapEmail);
-        }
-
-        $this->em->flush();
-
-        // todo: add batch
-        foreach ($emailUsers as $emailUser) {
-            $email = $emailUser->getEmail();
-            if ($email->getEmailUsers()->isEmpty()) {
-                $emailRecipients = $email->getRecipients();
-                foreach ($emailRecipients as $emailRecipient) {
-                    $this->em->remove($emailRecipient);
-                }
-
-                $this->em->remove($email);
+            if ($imapEmail !== null) {
+                $this->em->remove($imapEmail);
             }
+
+            if (($i % self::BATCH_SIZE) === 0) {
+                $this->em->flush();
+                $this->em->clear('OroEmailBundle:EmailUser');
+                $this->em->clear('OroImapBundle:ImapEmail');
+            }
+            ++$i;
         }
 
         $this->em->flush();

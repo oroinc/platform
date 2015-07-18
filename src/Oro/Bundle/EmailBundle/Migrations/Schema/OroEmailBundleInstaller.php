@@ -83,5 +83,6 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle115::addEmailFolderFields($schema);
         OroEmailBundle115::addEmailOriginFields($schema);
+        OroEmailBundle115::updateEmailRecipientConstraint($schema);
     }
 }
