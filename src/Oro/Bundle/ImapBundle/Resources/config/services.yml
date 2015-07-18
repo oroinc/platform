@@ -10,8 +10,10 @@ parameters:
     oro_imap.email_flag_manager_loader.class:        Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
+    oro_imap.imap_clear_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapClearManager
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
+    oro_imap.listener.imap_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\ImapEmailOriginListener
 
 services:
     oro_imap.connector.factory:
@@ -72,5 +74,22 @@ services:
         arguments:
             - @oro_security.encoder.mcrypt
             - @oro_security.security_facade
+            - @translator
         tags:
              - { name: form.type, alias: oro_imap_configuration }
+
+    oro_imap.listener.imap_email_origin:
+        class: %oro_imap.listener.imap_email_origin.class%
+        arguments:
+            - @oro_security.encoder.mcrypt
+            - @oro_imap.connector.factory
+            - @doctrine
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+
+    oro_imap.manager.clear:
+        class: %oro_imap.imap_clear_manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        calls:
+            - [setLogger, [@logger]]
