@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Command;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,11 +12,6 @@ use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 
 class ClearInactiveMailboxCommand extends ContainerAwareCommand
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
     /**
      * @var OutputLogger
      */
@@ -47,8 +40,6 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
         /** @var ImapClearManager $cleaner */
         $cleaner = $this->getContainer()->get('oro_imap.manager.clear');
         $this->logger = new OutputLogger($output);
-
-        $this->em = $this->getContainer()->get('doctrine')->getManager();
 
         $originId = $input->getOption('id');
 

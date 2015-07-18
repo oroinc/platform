@@ -7,6 +7,7 @@ use Psr\Log\LoggerAwareTrait;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 
 /**
@@ -90,13 +91,12 @@ class ImapClearManager implements LoggerAwareInterface
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
         foreach ($folders as $folder) {
-            $imapFolder = $this->em->getRepository('OroImapBundle:ImapEmailFolder')
-                ->findOneBy(['folder' => $folder]);
+            $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
 
             if (!$origin->isActive()) {
-                $folderRepository->removeFolder($imapFolder);
+                $this->removeFolder($imapFolder);
             } elseif (!$folder->isSyncEnabled()) {
-                $folderRepository->clearFolder($imapFolder);
+                $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
         }
@@ -105,5 +105,56 @@ class ImapClearManager implements LoggerAwareInterface
             $this->em->remove($origin);
             $this->em->flush();
         }
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     */
+    public function removeFolder(ImapEmailFolder $imapFolder)
+    {
+        $this->clearFolder($imapFolder);
+
+        $folder = $imapFolder->getFolder();
+        $this->em->remove($imapFolder);
+        $this->em->remove($folder);
+
+        $this->em->flush();
+    }
+
+    /**
+     * @param ImapEmailFolder $imapFolder
+     */
+    public function clearFolder(ImapEmailFolder $imapFolder)
+    {
+        $folder = $imapFolder->getFolder();
+        $emailUsers = $this->em->getRepository('OroEmailBundle:EmailUser')->findBy(['folder' => $folder]);
+
+        foreach ($emailUsers as $emailUser) {
+            $this->em->remove($emailUser);
+
+            $email = $emailUser->getEmail();
+            $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
+                'email' => $email,
+                'imapFolder' => $imapFolder,
+            ]);
+            $this->em->remove($imapEmail);
+        }
+
+        $this->em->flush();
+
+        // todo: add batch
+        foreach ($emailUsers as $emailUser) {
+            $email = $emailUser->getEmail();
+            if ($email->getEmailUsers()->isEmpty()) {
+                $emailRecipients = $email->getRecipients();
+                foreach ($emailRecipients as $emailRecipient) {
+                    $this->em->remove($emailRecipient);
+                }
+
+                $this->em->remove($email);
+            }
+        }
+
+        $this->em->flush();
     }
 }
