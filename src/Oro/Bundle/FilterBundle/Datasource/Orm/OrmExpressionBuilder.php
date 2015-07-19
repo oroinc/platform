@@ -59,8 +59,26 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     {
         /*
          * TODO: the correct expression cannot be used due a bud described in
-         * http://www.doctrine-project.org/jira/browse/DDC-1858
-         * It could be uncommented when doctrine version >= 2.4
+         * This problem still exists in doctrine 2.5, in the case when we try equals expression
+         * with IS NULL.
+         * An example of DQL which fails:
+         * SELECT u.id FROM OroUserBundle:User u
+         * WHERE (
+         *      CASE WHEN (:business_unit_id IS NOT NULL)
+         *           THEN CASE
+         *                  WHEN (:business_unit_id MEMBER OF u.businessUnits OR u.id IN (:data_in)) AND
+         *                        u.id NOT IN (:data_not_in)
+         *                  THEN true
+         *                  ELSE false
+         *              END
+         *      ELSE
+         *      CASE
+         *          WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
+         *          THEN true
+         *          ELSE false
+         *      END
+         * END) IS NULL
+         *
          * When it uncommented you can check that all works ok, for example, on edit business unit page,
          * just try to apply 'no' filter on users grid on this page
          *
@@ -160,9 +178,8 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
     {
         /*
          * TODO: the correct expression cannot be used due a workaround
-         * for http://www.doctrine-project.org/jira/browse/DDC-1858 implemented in
-         * Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter
-         * It could be uncommented when doctrine version >= 2.4 and the workaround removed
+         * This problem still exists in doctrine 2.5, in the case when we try equals expression
+         * with IS NULL. See neq method.
          *
          * Also we cannot use NOT (x LIKE y) due a bug in AclHelper, so we have to use NOT LIKE operator.
          * Here is the error: Notice: Undefined property: Doctrine\ORM\Query\AST\ConditionalFactor::$conditionalTerms

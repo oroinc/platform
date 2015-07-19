@@ -364,7 +364,9 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|Collection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"all"})
+     * @ORM\OneToMany(
+     *      targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"persist", "remove"}
+     * )
      */
     protected $emailOrigins;
 
@@ -983,9 +985,8 @@ class User extends ExtendUser implements
             function ($item) {
                 return
                     $item instanceof ImapEmailOrigin
-                    && (!$this->getCurrentOrganization()
-                        || $item->getOrganization() === $this->getCurrentOrganization())
-                    && $item->isActive();
+                    && $item->isActive()
+                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
 
@@ -1018,6 +1019,8 @@ class User extends ExtendUser implements
     public function addEmailOrigin(EmailOrigin $emailOrigin)
     {
         $this->emailOrigins->add($emailOrigin);
+
+        $emailOrigin->setOwner($this);
 
         return $this;
     }

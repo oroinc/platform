@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
+use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -18,6 +23,9 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
+
+    /** @var Translator|\PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
 
     protected function setUp()
     {
@@ -45,7 +53,32 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
+        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         parent::setUp();
+    }
+
+    protected function getExtensions()
+    {
+        $tooltipExtension = new TooltipFormExtension();
+
+        return array_merge(
+            parent::getExtensions(),
+            [
+                new PreloadedExtension(
+                    [
+                        'oro_email_email_folder' => new EmailFolderType(),
+                        'oro_email_email_folder_tree' => new EmailFolderTreeType(),
+                    ],
+                    [
+                        'text' => [$tooltipExtension],
+                        'collection' => [$tooltipExtension],
+                    ]
+                ),
+            ]
+        );
     }
 
     protected function tearDown()
@@ -64,7 +97,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindValidData($formData, $expectedViewData, $expectedModelData)
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
         if ($expectedViewData) {
             $form->submit($formData);
@@ -134,7 +167,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testBindEmptyPassword()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -160,7 +193,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testCreatingNewConfiguration()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();
@@ -189,7 +222,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     public function testSubmitEmptyForm()
     {
-        $type = new ConfigurationType($this->encryptor, $this->securityFacade);
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
         $entity = new ImapEmailOrigin();

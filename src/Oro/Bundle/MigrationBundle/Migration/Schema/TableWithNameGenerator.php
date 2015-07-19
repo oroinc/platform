@@ -24,7 +24,7 @@ class TableWithNameGenerator extends Table
     /**
      * {@inheritdoc}
      */
-    public function addIndex(array $columnNames, $indexName = null, array $flags = array())
+    public function addIndex(array $columnNames, $indexName = null, array $flags = [], array $options = [])
     {
         if (!$indexName) {
             $indexName = $this->nameGenerator->generateIndexName(
@@ -33,13 +33,13 @@ class TableWithNameGenerator extends Table
             );
         }
 
-        return parent::addIndex($columnNames, $indexName, $flags);
+        return parent::addIndex($columnNames, $indexName, $flags, $options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addUniqueIndex(array $columnNames, $indexName = null)
+    public function addUniqueIndex(array $columnNames, $indexName = null, array $options = [])
     {
         if (!$indexName) {
             $indexName = $this->nameGenerator->generateIndexName(
@@ -49,7 +49,7 @@ class TableWithNameGenerator extends Table
             );
         }
 
-        return parent::addUniqueIndex($columnNames, $indexName);
+        return parent::addUniqueIndex($columnNames, $indexName, $options);
     }
 
     /**
@@ -59,7 +59,7 @@ class TableWithNameGenerator extends Table
         $foreignTable,
         array $localColumnNames,
         array $foreignColumnNames,
-        array $options = array(),
+        array $options = [],
         $constraintName = null
     ) {
         if (!$constraintName) {

@@ -172,9 +172,13 @@ class WidgetControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
+
+        /** @var  EntityManager $em */
+        $em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $widgetRepository = $em->getRepository('OroDashboardBundle:Widget');
         foreach ($widgets as $key => $widget) {
-            $this->em->refresh($widget);
-            $this->assertEquals($expectedPositions[$key], $widget->getLayoutPosition());
+            $updatedWidget = $widgetRepository->findOneBy(['id' => $widget->getId()]);
+            $this->assertEquals($expectedPositions[$key], $updatedWidget->getLayoutPosition());
         }
     }
 
