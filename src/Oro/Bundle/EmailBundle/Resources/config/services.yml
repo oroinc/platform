@@ -55,6 +55,9 @@ parameters:
     oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
 
+    # Managers
+    oro_email.manager.notification.class: Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
+
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
 
@@ -641,3 +644,11 @@ services:
             - @doctrine.orm.entity_manager
         calls:
             - [setLogger, [@logger]]
+
+    oro_email.manager.notification:
+        class: %oro_email.manager.notification.class%
+        arguments:
+            - @oro_email.email.provider
+            - @oro_ui.html_tag_helper
+            - @router
+            - @oro_email.email.cache.manager

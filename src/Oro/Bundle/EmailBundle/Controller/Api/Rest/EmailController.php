@@ -155,7 +155,7 @@ class EmailController extends RestController
      * Get email.
      *
      * @Get(
-     *      "/emails/notification/info",
+     *      "/emails/notification/data",
      *      name="",
      * )
      * @ApiDoc(
@@ -166,42 +166,13 @@ class EmailController extends RestController
      *
      * @return Response
      */
-    public function getNewemailAction()
+    public function getNotificationDataAction()
     {
-        $emailProvider = $this->getEmailProvider();
-        $htmlTagHelper = $this->get('oro_ui.html_tag_helper');
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
-        $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
-
-        $emailsData = [];
-        /** @var $email Email */
-        foreach ($emails as $email) {
-            $isSeen = $email['seen'];
-            $email = $email[0];
-            $bodyContent = '';
-
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-                $bodyContent = $htmlTagHelper->shorten(
-                    $htmlTagHelper->stripTags($htmlTagHelper->purify($email->getEmailBody()->getBodyContent()))
-                );
-            } catch (LoadEmailBodyException $e) {
-                // no content
-            }
-
-            $emailsData[] = [
-                'route'=> $this->container->get('router')->generate('oro_email_email_reply', ['id' => $email->getId()]),
-                'id' => $email->getId(),
-                'seen' => $isSeen,
-                'subject' => $email->getSubject(),
-                'bodyContent' => $bodyContent,
-                'fromName' => $email->getFromName()
-            ];
-        }
-
+        $emailNotificationManager = $this->getEmailNotificationManager();
         $result = [
-            'count' => $emailProvider->getCountNewEmails($this->getUser()),
-            'emails' => $emailsData
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser()),
+            'emails' => $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)
         ];
 
         return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
@@ -228,13 +199,11 @@ class EmailController extends RestController
     }
 
     /**
-     * Get email entity provider
-     *
-     * @return EmailProvider
+     * @return \Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
      */
-    public function getEmailProvider()
+    public function getEmailNotificationManager()
     {
-        return $this->container->get('oro_email.email.provider');
+        return $this->container->get('oro_email.manager.notification');
     }
 
     /**

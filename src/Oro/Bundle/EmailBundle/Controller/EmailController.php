@@ -80,45 +80,20 @@ class EmailController extends Controller
     /**
      * Get new Unread Emails for email notification
      *
-     * @Route("/new/notification", name="oro_email_new_natification_template")
+     * @Route("/notification/data", name="oro_email_new_natification_data")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
-    public function notificationAction()
+    public function notificationDataAction()
     {
-        $emailProvider = $this->get('oro_email.email.provider');
-        $htmlTagHelper = $this->get('oro_ui.html_tag_helper');
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        $emailNotificationManager = $this->get('oro_email.manager.notification');
 
-        $emails = $emailProvider->getNewEmails($this->getUser(), $maxEmailsDisplay);
-        $count = $emailProvider->getCountNewEmails($this->getUser());
-
-        $emailsData = [];
-        /** @var $email Email */
-        foreach ($emails as $email) {
-            $isSeen = $email['seen'];
-            $email = $email[0];
-            $bodyContent = '';
-            try {
-                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
-                $bodyContent = $htmlTagHelper->shorten(
-                    $htmlTagHelper->stripTags($htmlTagHelper->purify($email->getEmailBody()->getBodyContent()))
-                );
-            } catch (LoadEmailBodyException $e) {
-                // no content
-            }
-            $emailsData[] = [
-                'route'=> $this->container->get('router')->generate('oro_email_email_reply', ['id' => $email->getId()]),
-                'id' => $email->getId(),
-                'seen' => $isSeen,
-                'subject' => $email->getSubject(),
-                'bodyContent' => $bodyContent,
-                'fromName' => $email->getFromName()
-            ];
-        }
+        $emails = $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay);
+        $count = $emailNotificationManager->getCountNewEmails($this->getUser());
 
         return [
             'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser()),
-            'emails' => json_encode($emailsData),
+            'emails' => json_encode($emails),
             'count'=> $count
         ];
     }

@@ -49,7 +49,7 @@ define([
             r = JSON.parse(r);
             if (r) {
                 $.ajax({
-                    url: routing.generate('oro_api_get_email_newemail'),
+                    url: routing.generate('oro_api_get_email_notification_data'),
                     success: function (r) {
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);

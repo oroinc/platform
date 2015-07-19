@@ -42,6 +42,7 @@ class EmailProvider
             ->leftJoin('e.emailUsers', 'eu')
             ->where('eu.organization = :organizationId')
             ->andWhere('eu.owner = :ownerId')
+            ->andWhere('eu.seen = 0')
             ->setParameter('organizationId', $user->getOrganization()->getId())
             ->setParameter('ownerId', $user->getId())
             ->getQuery()
