@@ -396,6 +396,8 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.ownership_tree_provider.chain
             - @doctrine
+            - @oro_entity_config.provider.security
+            - @security.acl.security_identity_retrieval_strategy
             - @?security.acl.voter.basic_permissions
 
     oro_security.abstract_ownership_tree_provider:

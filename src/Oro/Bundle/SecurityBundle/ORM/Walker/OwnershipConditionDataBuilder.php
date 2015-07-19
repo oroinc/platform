@@ -9,6 +9,8 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
@@ -22,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -69,6 +72,9 @@ class OwnershipConditionDataBuilder
      */
     protected $registry;
 
+    /** @var SecurityIdentityRetrievalStrategyInterface */
+    protected $sidStrategy;
+
     /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
@@ -77,6 +83,7 @@ class OwnershipConditionDataBuilder
      * @param OwnerTreeProviderInterface     $treeProvider
      * @param ManagerRegistry                $registry
      * @param ConfigProvider                 $configProvider
+     * @param SecurityIdentityRetrievalStrategyInterface $sidStrategy
      * @param AclVoter                       $aclVoter
      */
     public function __construct(
@@ -87,6 +94,7 @@ class OwnershipConditionDataBuilder
         OwnerTreeProviderInterface $treeProvider,
         ManagerRegistry $registry,
         ConfigProvider $configProvider,
+        SecurityIdentityRetrievalStrategyInterface $sidStrategy,
         AclVoter $aclVoter = null
     ) {
         $this->securityContextLink    = $securityContextLink;
@@ -97,6 +105,7 @@ class OwnershipConditionDataBuilder
         $this->treeProvider           = $treeProvider;
         $this->registry               = $registry;
         $this->configProvider         = $configProvider;
+        $this->sidStrategy            = $sidStrategy;
     }
 
     /**
@@ -436,12 +445,8 @@ class OwnershipConditionDataBuilder
 
         $aclClass = $this->registry->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $entityName]);
-        $sid = UserSecurityIdentity::fromAccount($this->getUser());
-        $aclSId = $this->registry->getRepository('OroSecurityBundle:AclSecurityIdentity')
-            ->findOneBy([
-                'identifier' => $sid->getClass().'-'.$sid->getUsername(),
-                'username' => true,
-            ]);
+        $aclSIds = $this->getSecurityIdentityIds();
+
         $shareConfig = null;
 
         if ($this->configProvider->hasConfig($entityName)) {
@@ -453,7 +458,7 @@ class OwnershipConditionDataBuilder
         $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityName);
 
         if (!$aclClass
-            || !$aclSId
+            || empty($aclSIds)
             || $permissions !== BasicPermissionMap::PERMISSION_VIEW
             || !$shareConfig
             || !$isGranted
@@ -489,15 +494,60 @@ class OwnershipConditionDataBuilder
             self::ACL_ENTRIES_ALIAS,
             self::ACL_ENTRIES_SHARE_RECORD
         );
-        //@TODO: should add Organization Security Id and Business Unit Id
         $joinConditions[] = new AclCondition(
             self::ACL_ENTRIES_ALIAS,
             self::ACL_ENTRIES_SECURITY_ID,
-            $aclSId->getId()
+            $aclSIds
         );
         $joinConditions[] = new AclCondition(self::ACL_ENTRIES_ALIAS, self::ACL_ENTRIES_CLASS_ID, $aclClass->getId());
 
         return [$joinClause, $joinConditions, $whereConditions, $queryComponents];
+    }
+
+    /**
+     * Get all Security Identity Ids
+     *
+     * @return array|int
+     */
+    protected function getSecurityIdentityIds()
+    {
+        $sids = $this->sidStrategy->getSecurityIdentities($this->getSecurityContext()->getToken());
+        $sidIds = [];
+
+        foreach ($sids as $sid) {
+            $entitySid = $this->getSecurityIdentityId($sid);
+            if ($entitySid) {
+                $sidIds[] = $entitySid->getId();
+            }
+        }
+
+        return count($sidIds) === 1 ? $sidIds[0] : $sidIds;
+    }
+
+    /**
+     * @param SecurityIdentityInterface $sid
+     * @return mixed
+     */
+    protected function getSecurityIdentityId(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            $identifier = $sid->getClass().'-'.$sid->getUsername();
+            $username = true;
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            $identifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
+        } else {
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity ' .
+                'or BusinessUnitSecurityIdentity.'
+            );
+        }
+
+        return $this->registry->getRepository('OroSecurityBundle:AclSecurityIdentity')
+            ->findOneBy([
+                'identifier' => $identifier,
+                'username' => $username,
+            ]);
     }
 
     /**

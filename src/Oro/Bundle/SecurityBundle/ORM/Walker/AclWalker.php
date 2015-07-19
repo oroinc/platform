@@ -500,14 +500,25 @@ class AclWalker extends TreeWalkerAdapter
                         $condition->getEntityField()
                     );
                     $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-                    $leftExpression                              = new ArithmeticExpression();
-                    $leftExpression->simpleArithmeticExpression  = $pathExpression;
-                    $rightExpression                             = new ArithmeticExpression();
-                    $rightExpression->simpleArithmeticExpression =
-                        new Literal(Literal::NUMERIC, (int)$condition->getValue());
                     $resultCondition      = new ConditionalPrimary();
-                    $resultCondition->simpleConditionalExpression =
-                         new ComparisonExpression($leftExpression, '=', $rightExpression);
+
+                    if (is_array($condition->getValue())) {
+                        $resultCondition->simpleConditionalExpression = $this->getInExpression(
+                            $condition,
+                            'value',
+                            'entityField'
+                        );
+                    } else {
+                        $leftExpression                              = new ArithmeticExpression();
+                        $leftExpression->simpleArithmeticExpression  = $pathExpression;
+                        $rightExpression                             = new ArithmeticExpression();
+                        $rightExpression->simpleArithmeticExpression =
+                            new Literal(Literal::NUMERIC, (int)$condition->getValue());
+
+                        $resultCondition->simpleConditionalExpression =
+                            new ComparisonExpression($leftExpression, '=', $rightExpression);
+                    }
+
                     $conditionalFactors[] = $resultCondition;
                     break;
             }

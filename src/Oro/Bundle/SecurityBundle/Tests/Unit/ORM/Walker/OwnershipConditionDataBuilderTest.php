@@ -38,6 +38,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aclVoter;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
     /** @var OwnerTree */
     private $tree;
 
@@ -89,6 +92,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $strategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
 
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
@@ -98,6 +102,7 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             $treeProvider,
             $this->registry,
             $configProvider,
+            $strategy,
             $this->aclVoter
         );
     }
