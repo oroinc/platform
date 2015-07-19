@@ -1,6 +1,7 @@
 parameters:
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
 
+    oro_security.acl.base_manager.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\BaseAclManager
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
     oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
@@ -16,6 +17,7 @@ parameters:
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
+
     oro_security.acl.group_provider.chain.class:               Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
     oro_security.acl.security_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy
 
@@ -95,6 +97,9 @@ services:
         tags:
             - { name: oro_service_link,  service: oro_security.security_facade }
 
+    oro_security.acl.base_manager:
+        class: %oro_security.acl.base_manager.class%
+
     oro_security.acl.manager:
         class: %oro_security.acl.manager.class%
         arguments:
@@ -102,6 +107,8 @@ services:
             - @oro_security.acl.extension_selector
             - @?security.acl.dbal.provider
             - @oro_security.acl.ace_provider
+        calls:
+            - [ setBaseAclManager, [ "@oro_security.acl.base_manager" ] ]
 
     oro_security.acl.privilege_repository:
         class: %oro_security.acl.privilege_repository.class%
@@ -113,6 +120,8 @@ services:
         class: %oro_security.acl.sid_manager.class%
         arguments:
             - @?security.acl.dbal.provider
+        calls:
+            - [ setBaseAclManager, [ "@oro_security.acl.base_manager" ] ]
 
     oro_security.link.sid_manager:
         tags:

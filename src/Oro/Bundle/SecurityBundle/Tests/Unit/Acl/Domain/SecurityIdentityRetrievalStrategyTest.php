@@ -4,11 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
-use Oro\Bundle\SecurityBundle\Acl\Domain\OrganizationSecurityIdentity;
 
 class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    const ORGANIZATION_ID = 1;
     const BUSINESS_UNIT_ID = 2;
 
     public function testGetSecurityIdentities()
@@ -37,21 +35,12 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
         $user->expects($this->once())
             ->method('getUsername')
             ->willReturn('');
-        $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $organization->expects($this->once())
-            ->method('getId')
-            ->willReturn(self::ORGANIZATION_ID);
         $businessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $businessUnit->expects($this->once())
             ->method('getId')
             ->willReturn(self::BUSINESS_UNIT_ID);
-        $user->expects($this->once())
-            ->method('getOrganizations')
-            ->willReturn([$organization]);
         $user->expects($this->once())
             ->method('getBusinessUnits')
             ->willReturn([$businessUnit]);
@@ -67,10 +56,8 @@ class SecurityIdentityRetrievalStrategyTest extends \PHPUnit_Framework_TestCase
         $strategy = new SecurityIdentityRetrievalStrategy($roleHierarchy, $authenticationTrustResolver);
         $sids = $strategy->getSecurityIdentities($token);
 
-        $this->assertCount(2, $sids);
-        list($organizationSid, $businessUnitSid) = $sids;
-        $this->assertTrue($organizationSid instanceof OrganizationSecurityIdentity);
-        $this->assertEquals(self::ORGANIZATION_ID, $organizationSid->getId());
+        $this->assertCount(1, $sids);
+        list($businessUnitSid) = $sids;
         $this->assertTrue($businessUnitSid instanceof BusinessUnitSecurityIdentity);
         $this->assertEquals(self::BUSINESS_UNIT_ID, $businessUnitSid->getId());
     }

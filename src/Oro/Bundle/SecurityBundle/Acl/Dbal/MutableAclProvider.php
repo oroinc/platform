@@ -15,7 +15,6 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\OrganizationSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 
 /**
@@ -206,7 +205,7 @@ class MutableAclProvider extends BaseMutableAclProvider
             $oldIdentifier = $oldName;
             $newIdentifier = $sid->getRole();
             $username = false;
-        } elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
             if ($sid->getId() === $oldName) {
                 throw new \InvalidArgumentException('There are no changes.');
             }
@@ -215,7 +214,8 @@ class MutableAclProvider extends BaseMutableAclProvider
             $username = false;
         } else {
             throw new \InvalidArgumentException(
-                '$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.'
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
             );
         }
 
@@ -337,11 +337,14 @@ QUERY;
         } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
-        } elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
             $identifier = $sid->getClass() . '-' . $sid->getId();
             $username = false;
         } else {
-            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
+            );
         }
 
         return sprintf(
@@ -369,11 +372,14 @@ QUERY;
         } elseif ($sid instanceof RoleSecurityIdentity) {
             $identifier = $sid->getRole();
             $username = false;
-        }  elseif ($sid instanceof OrganizationSecurityIdentity || $sid instanceof BusinessUnitSecurityIdentity) {
+        }  elseif ($sid instanceof BusinessUnitSecurityIdentity) {
             $identifier = $sid->getClass() . '-' . $sid->getId();
             $username = false;
         } else {
-            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
+            );
         }
 
         return sprintf(

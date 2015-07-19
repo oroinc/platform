@@ -7,13 +7,13 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface;
 
-final class BusinessUnitSecurityIdentity implements SecurityIdentityInterface
+class BusinessUnitSecurityIdentity implements SecurityIdentityInterface
 {
     /** @var string */
-    private $id;
+    protected $id;
 
     /** @var string */
-    private $class;
+    protected $class;
 
     /**
      * Constructor.
