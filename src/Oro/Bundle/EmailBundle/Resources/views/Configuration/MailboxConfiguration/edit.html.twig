@@ -67,7 +67,7 @@
                                             <div class="auto-response-rule-header">
                                                 <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
                                                 {{ UI.clientLink({
-                                                    'dataUrl': path('oro_email_autoresponserule_create'),
+                                                    'dataUrl': path('oro_email_autoresponserule_create', {mailbox: form.vars.value.id}),
                                                     'aCss': 'pull-right no-hash btn btn-primary',
                                                     'label' : 'oro.email.autoresponserule.action.add.label'|trans,
                                                     'widget' : {
@@ -78,12 +78,12 @@
                                                             'alias': 'auto-response-rules-dialog',
                                                             'dialogOptions' : {
                                                                 'title' : 'oro.email.autoresponserule.action.add.title'|trans,
-                                                                'allowMaximize': false,
-                                                                'allowMinimize': false,
+                                                                'allowMaximize': true,
+                                                                'allowMinimize': true,
                                                                 'modal': true,
                                                                 'dblclick': 'maximize',
                                                                 'maximizedHeightDecreaseBy': 'minimize-bar',
-                                                                'width': 550
+                                                                'width': 700,
                                                             }
                                                         }
                                                     },

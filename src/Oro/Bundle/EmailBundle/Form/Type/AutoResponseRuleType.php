@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -10,6 +11,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 class AutoResponseRuleType extends AbstractType
 {
     const NAME = 'oro_email_autoresponserule';
+
+    /** @var EventSubscriberInterface */
+    protected $templateFormSubscriber;
+
+    /**
+     * @param EventSubscriberInterface $templateFormSubscriber
+     */
+    public function __construct(EventSubscriberInterface $templateFormSubscriber)
+    {
+        $this->templateFormSubscriber = $templateFormSubscriber;
+    }
 
     /**
      * {@inheritdoc}
@@ -26,14 +38,23 @@ class AutoResponseRuleType extends AbstractType
                     ])
                 ]
             ])
-            ->add('active')
-            ->add('name')
-//            ->add('conditions')
-//            ->add('template', 'oro_email_template_list')
-            ->add('mailbox', 'entity', [
-                'class' => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
-                'property' => 'label',
+            ->add('active', 'checkbox', [
+                'label' => 'oro.email.autoresponserule.active.label',
+            ])
+            ->add('name', 'text', [
+                'label' => 'oro.email.autoresponserule.name.label',
+            ])
+            ->add('conditions', 'oro_collection', [
+                'label' => 'oro.email.autoresponserule.conditions.label',
+                'type' => AutoResponseRuleConditionType::NAME,
+                'handle_primary' => false,
+                'allow_add_after' => true,
+            ])
+            ->add('template', 'oro_email_template_list', [
+                'label' => 'oro.email.autoresponserule.template.label',
             ]);
+
+        $builder->addEventSubscriber($this->templateFormSubscriber);
     }
 
     /**

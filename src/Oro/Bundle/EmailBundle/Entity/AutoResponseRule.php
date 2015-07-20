@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -37,12 +39,13 @@ class AutoResponseRule
     protected $active = true;
 
     /**
-     * @var array
-     * @ORM\Column(type="array")
+     * @var AutoResponseRuleCondition[]|Collection
+     * @ORM\OneToMany(targetEntity="AutoResponseRuleCondition", mappedBy="rule", cascade={"persist"})
+     * @ORM\OrderBy({"position"="ASC"})
      *
      * @ Assert\NotBlank
      */
-    protected $conditions = [];
+    protected $conditions;
 
     /**
      * @var EmailTemplate
@@ -61,6 +64,11 @@ class AutoResponseRule
      * @Assert\NotBlank
      */
     protected $mailbox;
+
+    public function __construct()
+    {
+        $this->conditions = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -87,7 +95,7 @@ class AutoResponseRule
     }
 
     /**
-     * @return array
+     * @return AutoResponseRuleCondition[]|Collection
      */
     public function getConditions()
     {
@@ -135,12 +143,15 @@ class AutoResponseRule
     }
 
     /**
-     * @param array $conditions
+     * @param AutoResponseRuleCondition[]|Collection $conditions
      *
      * @return $this
      */
-    public function setConditions(array $conditions)
+    public function setConditions(Collection $conditions)
     {
+        foreach ($conditions as $condition) {
+            $condition->setRule($this);
+        }
         $this->conditions = $conditions;
 
         return $this;

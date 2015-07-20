@@ -1,3 +1,17 @@
+{% block _oro_email_autoresponserule_conditions_entry_operation_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _oro_email_autoresponserule_conditions_entry_field_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _oro_email_autoresponserule_conditions_entry_filter_row %}
+    {% for child in form %}
+        {{ form_widget(child, {'attr': {'class': child.vars['name']}}) }}
+    {% endfor %}
+{% endblock %}
+
 {% block oro_email_template_list_row %}
     <script type="text/javascript">
         require(['jquery',

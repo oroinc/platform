@@ -76,5 +76,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle114::addEmbeddedContentIdField($schema);
 
         OroEmailBundle116::oroEmailAutoResponseRuleTable($schema);
+        OroEmailBundle116::oroEmailAutoResponseRuleConditionTable($schema);
     }
 }

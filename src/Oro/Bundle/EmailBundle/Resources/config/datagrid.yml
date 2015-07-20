@@ -14,7 +14,7 @@ datagrid:
             name:
                 label: oro.email.autoresponserule.name.label
             active:
-                label: oro.email.autoresponserule.active.label
+                label: oro.email.autoresponserule.status.label
                 type: twig
                 frontend_type: html
                 template: OroEmailBundle:AutoResponseRule:Datagrid/Property/active.html.twig
@@ -42,17 +42,17 @@ datagrid:
                 icon:         edit
                 link:         update_link
                 rowAction:    true
-                widget_options:
+                widgetOptions:
                     reload-grid-name: email-auto-response-rules
                     options:
                         dialogOptions:
-                            title:         oro.email.autoresponserule.action.add.title
-                            allowMaximize: false
-                            allowMinimize: false
+                            title:         @translator->trans(oro.email.autoresponserule.action.update.title)
+                            allowMaximize: true
+                            allowMinimize: true
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
-                            width: 550
+                            width: 700
             delete:
                 type:         delete
                 acl_resource: oro_email_autoresponserule_delete

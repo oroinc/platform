@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
@@ -19,7 +20,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 class AutoResponseRuleController extends Controller
 {
     /**
-     * @Route("/create")
+     * @Route("/create/{mailbox}")
      * @Acl(
      *      id="oro_email_autoresponserule_create",
      *      type="entity",
@@ -28,9 +29,12 @@ class AutoResponseRuleController extends Controller
      * )
      * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
      */
-    public function createAction()
+    public function createAction(Mailbox $mailbox)
     {
-        return $this->update(new AutoResponseRule());
+        $rule = new AutoResponseRule();
+        $rule->setMailbox($mailbox);
+
+        return $this->update($rule);
     }
 
     /**

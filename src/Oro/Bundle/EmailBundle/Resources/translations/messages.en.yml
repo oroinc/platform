@@ -253,10 +253,14 @@ oro:
         autoresponserule:
             entity_plural_label: Autoresponse Rules
             name.label:          Name
-            active.label:        Status
+            active.label:        Active
+            status.label:        Status
+            conditions.label:    Satisfy
+            template.label:      Response Template
             action:
-                add.label: Add Rule
-                add.title: Add Autoresponse Rule
+                add.label:    Add Rule
+                add.title:    Add Autoresponse Rule
+                update.title: Update Autoresponse Rule
             status:
                 active:   Active
                 inactive: Inactive

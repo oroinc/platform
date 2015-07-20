@@ -297,17 +297,22 @@
         {% set name = widget.vars.prototype.vars.name %}
         {% set disabled = widget.vars.disabled %}
         {% set allow_delete = widget.vars.allow_delete %}
+        {% set allow_add_after = widget.vars.allow_add_after %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
         {% set disabled = widget.parent.vars.disabled %}
         {% set allow_delete = widget.parent.vars.allow_delete %}
+        {% set allow_add_after = widget.parent.vars.allow_add_after %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
+            {% if allow_add_after %}
+            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
             {% endif %}
         </div>
     </div>
