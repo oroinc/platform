@@ -185,10 +185,16 @@ define(function(require) {
                 // leave everything as is
                 return;
             }
+
+            // add space from center to line start
+            points[0].y += 18;
+            points[points.length - 1].y -= 18;
+
             // set valid archors
             var sourcePoint = points.shift(),
                 targetPoint = points.pop(),
-                correction;
+                correction,
+                ENDPOINT_SPACE_TO_LINE = 4;
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft)/ params.sourceEndpoint.element.offsetWidth;
@@ -205,6 +211,9 @@ define(function(require) {
             if (oldAnchorY !== params.sourceEndpoint.anchor.y) {
                 paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * params.sourceEndpoint.element.offsetHeight;
             }
+
+            paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
+
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
                     addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
@@ -213,10 +222,8 @@ define(function(require) {
                 addSegment(segments, sourcePoint.x - correction.x, sourcePoint.y - correction.y, paintInfo);
             }
 
-            // addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
-
             // end stub to end
-            addSegment(segments, targetPoint.x - correction.x, targetPoint.y - correction.y, paintInfo);
+            addSegment(segments, targetPoint.x - correction.x, targetPoint.y - correction.y - ENDPOINT_SPACE_TO_LINE, paintInfo);
 
             writeSegments(this, segments, paintInfo);
         };

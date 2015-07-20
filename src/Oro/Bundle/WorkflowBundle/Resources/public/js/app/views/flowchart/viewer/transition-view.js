@@ -138,7 +138,7 @@ define(function(require) {
             var connectionOptions = _.defaults({
                 source: startEl,
                 target: endEl,
-                connector: ['Smartline', {cornerRadius: 5}],
+                connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
                 paintStyle: _.result(this, 'connectorStyle'),
                 hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
                 anchors: anchors,
