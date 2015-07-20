@@ -78,4 +78,23 @@ class RefreshContextListenerTest extends WebTestCase
         $entityManager->clear();
         $this->assertNull($this->getContainer()->get('security.context')->getToken());
     }
+
+    public function testMergeNotExistingUser()
+    {
+        // any route just to initialize security context
+        $this->client->request('GET', $this->getUrl('oro_user_index'));
+        $user = new User();
+        $reflection = new \ReflectionProperty(get_class($user), 'id');
+        $reflection->setAccessible(true);
+        $reflection->setValue($user, 999);
+
+        $this->getContainer()->get('security.context')->getToken()->setUser($user);
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getContainer()->get('doctrine')->getManager();
+        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
+
+        $entityManager->clear();
+        $this->assertNull($this->getContainer()->get('security.context')->getToken());
+    }
 }
