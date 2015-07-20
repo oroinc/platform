@@ -24,8 +24,8 @@ define(function(require) {
                 paintStyle: {
                     strokeStyle: '#dcdcdc',
                     lineWidth: 2,
-                    outlineColor: 'transparent',
-                    outlineWidth: 7
+                    outlineColor: '#fafafa',
+                    outlineWidth: 2
                 }
             };
         },
