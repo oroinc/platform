@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
@@ -531,8 +532,11 @@ class OwnershipConditionDataBuilder
     protected function getSecurityIdentityId(SecurityIdentityInterface $sid)
     {
         if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getClass().'-'.$sid->getUsername();
+            $identifier = $sid->getClass() . '-' . $sid->getUsername();
             $username = true;
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            //skip Role SID because we didn't share records for Role
+            return null;
         } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
             $identifier = $sid->getClass() . '-' . $sid->getId();
             $username = false;
