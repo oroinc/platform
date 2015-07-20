@@ -88,18 +88,6 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
-
-        /**
-         * Need reset security context for next test case:
-         * 1. Create new user.
-         * 2. Create security context for this user.
-         * 3. Rollback(user already removed, security context still exists).
-         * 4. When Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener tries to refresh
-         * this entity and merge in Doctrine\ORM\UnitOfWork it falls with Doctrine\ORM\EntityNotFoundException.
-         */
-        if (self::$clientInstance) {
-            self::getContainer()->get('security.context')->setToken(null);
-        }
     }
 
     public static function tearDownAfterClass()
