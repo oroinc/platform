@@ -1,7 +1,6 @@
 ﻿'use strict';
 
-var DEBUG_ENABLED = true;
-
+var DEBUG_ENABLED = false;
 
 class GraphConstant {
     static recommendedConnectionWidth: number = 16;
@@ -32,8 +31,8 @@ class Point2d implements IPoint2d{
 
     get uid(): number {
         /*if (!this._uid) {
-            this._uid = Point2d.uidCounter++;
-        }*/
+         this._uid = Point2d.uidCounter++;
+         }*/
         return this._uid;
     }
 
@@ -254,9 +253,9 @@ class Interval2d {
 
     crossesRect(rect: Rectangle): boolean {
         return rect.topSide.crosses(this) ||
-                rect.bottomSide.crosses(this) ||
-                rect.leftSide.crosses(this) ||
-                rect.rightSide.crosses(this);
+            rect.bottomSide.crosses(this) ||
+            rect.leftSide.crosses(this) ||
+            rect.rightSide.crosses(this);
     }
 
     get line(): Line2d {
@@ -1252,8 +1251,8 @@ class Graph {
         crossRect.right = Math.max(a.center.x, b.center.x);
         crossRect.bottom = Math.max(a.center.y, b.center.y);
         /*aRect.draw();
-        bRect.draw();
-        crossRect.draw();*/
+         bRect.draw();
+         crossRect.draw();*/
         if (this.rectangleIntersectsAnyRectangle(crossRect)) {
             return;
         }
@@ -1313,8 +1312,8 @@ class Graph {
                             this.addMergeRequest(<BaseAxis>node.vAxis, vAxis);
                         }
                     }
-                    node.hAxis = hAxis;
-                    node.vAxis = vAxis;
+                    node.hAxis = <BaseAxis>hAxis;
+                    node.vAxis = <BaseAxis>vAxis;
                     node.stale = true;
                 }
             }
@@ -1528,47 +1527,47 @@ class Graph {
                 }
             }
         }
-/*
-        var leftConstraints: number[] = [];
-        var rightConstraints: number[] = [];
+        /*
+         var leftConstraints: number[] = [];
+         var rightConstraints: number[] = [];
 
-        // sum left constraints
-        for (i = 0; i < this.verticalAxises.length; i++) {
-            var axis = this.verticalAxises[i];
-            var atLeft = this.axisesConnectedAtLeft[axis.uid];
-            var minConstraint = axis.leftConstraint.recommendedStart;
-            if (atLeft) {
-                for (j = 0; j < atLeft.length; j++) {
-                    var leftAxis = atLeft[j];
-                    if (!minConstraint || leftAxis.leftConstraint.recommendedEnd > minConstraint) {
-                        minConstraint = leftAxis.leftConstraint.recommendedEnd;
-                    }
-                }
-            }
-            leftConstraints[axis.uid] = minConstraint;
-        }
-        console.log(leftConstraints);
-        // sum right constraints
-        for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-            var axis = this.verticalAxises[i];
-            var atRight = this.axisesConnectedAtLeft[axis.uid];
-            var minConstraint = axis.rightConstraint.recommendedStart;
-            if (atRight) {
-                for (j = 0; j < atRight.length; j++) {
-                    var rightAxis = atRight[j];
-                    if (!minConstraint || rightAxis.rightConstraint.recommendedEnd > minConstraint) {
-                        minConstraint = rightAxis.rightConstraint.recommendedEnd;
-                    }
-                }
-            }
-            rightConstraints[axis.uid] = minConstraint;
-        }
+         // sum left constraints
+         for (i = 0; i < this.verticalAxises.length; i++) {
+         var axis = this.verticalAxises[i];
+         var atLeft = this.axisesConnectedAtLeft[axis.uid];
+         var minConstraint = axis.leftConstraint.recommendedStart;
+         if (atLeft) {
+         for (j = 0; j < atLeft.length; j++) {
+         var leftAxis = atLeft[j];
+         if (!minConstraint || leftAxis.leftConstraint.recommendedEnd > minConstraint) {
+         minConstraint = leftAxis.leftConstraint.recommendedEnd;
+         }
+         }
+         }
+         leftConstraints[axis.uid] = minConstraint;
+         }
+         console.log(leftConstraints);
+         // sum right constraints
+         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
+         var axis = this.verticalAxises[i];
+         var atRight = this.axisesConnectedAtLeft[axis.uid];
+         var minConstraint = axis.rightConstraint.recommendedStart;
+         if (atRight) {
+         for (j = 0; j < atRight.length; j++) {
+         var rightAxis = atRight[j];
+         if (!minConstraint || rightAxis.rightConstraint.recommendedEnd > minConstraint) {
+         minConstraint = rightAxis.rightConstraint.recommendedEnd;
+         }
+         }
+         }
+         rightConstraints[axis.uid] = minConstraint;
+         }
 
-        // find intersected constraints
-        for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-            //if ()
-        }
-*/
+         // find intersected constraints
+         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
+         //if ()
+         }
+         */
     }
 
     isConnectionUnderRect(interval: Interval2d) {
@@ -1646,11 +1645,20 @@ class Path {
     }
 
     get points(): Point2d[] {
-        var nodes = this.allNodes,
-            points: Point2d[] = [];
-        for (var i = 0; i < nodes.length; i++) {
-            var point = nodes[i].recommendedPoint;
-            points.push(point);
+        var points: Point2d[] = [],
+            current = this,
+            currentAxis = this.connection.axis,
+            candidate: Point2d;
+        points.push(this.toNode.recommendedPoint);
+        while (current) {
+            if (current.connection.axis !== currentAxis) {
+                points.push(current.toNode.recommendedPoint);
+                currentAxis = current.connection.axis;
+            }
+            if (!current.previous) {
+                points.push(current.fromNode.recommendedPoint);
+            }
+            current = current.previous;
         }
         return points;
     }
@@ -1747,7 +1755,7 @@ class Finder {
     }
 
     addTo(path: Path) {
-       this.to.push.apply(this.to, path.getSiblings());
+        this.to.push.apply(this.to, path.getSiblings());
     }
 
     find(): Path {
