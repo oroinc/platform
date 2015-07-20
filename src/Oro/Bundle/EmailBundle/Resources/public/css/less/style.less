@@ -622,15 +622,16 @@ a.sync-btn span.dots {
       padding-top: 3px;
       span {
         font-size: 9px;
-        width: 15px;
+        width: 23px;
         display: inline-block;
         text-align: center;
         background: #36424c;
         border-radius: 8px;
         position: absolute;
-        left: 10px;
+        left: 12px;
         top: 6px;
         line-height: 10px;
+        padding-left: 3px;
       }
     }
   }
@@ -648,20 +649,13 @@ a.sync-btn span.dots {
     cursor: pointer;
   }
 
-  .replay {
-    cursor: pointer;
-
-    a {
-      color: #b4b4b4;
-      padding: 0;
-    }
-    .icon-reply {
-      display: none !important;
-    }
-  }
-
   .icon-envelope {
     color: #FFFFFF;
+  }
+  .oro-dropdown-toggle {
+    .icon-envelope.new {
+      width: 25px;
+    }
   }
   .icon-envelope.new {
     color: #fabb18;
@@ -678,6 +672,7 @@ a.sync-btn span.dots {
     }
     list-style-type: none;
     margin: 0;
+
     li {
       border-bottom: 1px solid #f5eff3;
       padding: 10px 17px 10px;
@@ -687,31 +682,16 @@ a.sync-btn span.dots {
         right: 18px;
         top: 12px;
       }
-
-      .info {
-        cursor: pointer;
-      }
-    }
-    li {
       &.new {
         background: #fff9e9;
-
         .title {
           color: #a38c62;
         }
-
         .description {
           color: #615642;
         }
-
         .footer {
-            span:hover {
-              color: #a59364;
-            }
           color: #c5b382;
-        }
-
-        .replay {
           a {
             &:hover{
               color: #a59364;
@@ -720,7 +700,9 @@ a.sync-btn span.dots {
           }
         }
       }
-
+      .info {
+        cursor: pointer;
+      }
       .body {
         padding-right: 20px;
       }
@@ -740,16 +722,15 @@ a.sync-btn span.dots {
       .footer {
         font-size: 12px;
         color: #b4b4b4;
-        span:hover{
-          cursor: pointer;
-          color: #777777;
-        }
-      }
-      .replay {
         a {
           &:hover {
             color: #777777;
           }
+          color: #b4b4b4;
+          padding: 0;
+        }
+        .icon-reply {
+          display: none !important;
         }
       }
     }

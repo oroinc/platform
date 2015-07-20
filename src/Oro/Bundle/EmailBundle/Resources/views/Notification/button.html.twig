@@ -1,7 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 <script type="text/template" id="email-notification-item">
-
     <li class="new" id="<%= entity.cid %>">
         <div class="info" data-id="<%= entity.get('id') %>">
             <div class="body">
@@ -11,7 +10,13 @@
             <i class="icon-envelope new"></i>
         </div>
         <div class="footer row-fluid">
-            <span class="pull-left"><%= entity.get('fromName') %></span>
+            <span class="pull-left fromName">
+                <% if (entity.get('linkFromName')) { %>
+                    <a href="<%= entity.get('linkFromName') %>"><%= entity.get('fromName') %></a>
+                <% } else { %>
+                    <%= entity.get('fromName') %>
+                <% } %>
+            </span>
             <span class="pull-right replay">
 
                 {{- UI.clientLink({
