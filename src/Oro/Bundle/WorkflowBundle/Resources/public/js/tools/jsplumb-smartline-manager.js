@@ -15,6 +15,12 @@ define(function(require){
         this.debouncedCalculateOverlays = _.debounce(
                 _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
             50);
+        this.debouncedRepaintEverything = _.debounce(
+            _.bind(function () {
+                this.jsPlumbInstance.repaintEverything();
+            }, this),
+            0
+        );
     }
 
     window.getLastRequest = function () {
@@ -30,6 +36,7 @@ define(function(require){
         },
 
         calculate: function (connector, paintInfo) {
+            var invalidateConnection;
             var cache = {};
             var connections = [];
             var rects = {};
@@ -78,24 +85,39 @@ define(function(require){
                 finder.addTo(new Path(toNode.connections[Direction2d.BOTTOM_TO_TOP.id], toNode, null));
                 finder.addFrom(new Path(fromNode.connections[Direction2d.TOP_TO_BOTTOM.id], fromNode, null));
 
+                var newCacheItem;
+                var points;
                 var path = finder.find();
+                var cacheKey = conn[3].connector.getId();
                 if (!path) {
                     console.warn("Cannot find path");
                 } else {
                     graph.updateWithPath(path);
-                    cache[conn[3].connector.getId()] = {
+                    points = path.points.reverse();
+                    points[0].y += 20;
+                    points[points.length - 1].y -= 20;
+                    newCacheItem = {
                         connection: conn[3],
                         path: path,
+                        points: points,
                         paintInfo: conn[3].connector === connector ? paintInfo : undefined
                     };
+                    if (conn[3].connector === connector) {
+                        newCacheItem.paintInfo = paintInfo;
+                    }
+                    cache[cacheKey] = newCacheItem;
                 }
             });
-            _.each(cache, function(item) {
-                item.points = item.path.points.reverse();
-                item.points[0].y += 20;
-                item.points[item.points.length - 1].y -= 20;
-            });
+
+            invalidateConnection = _.find(cache, function(item, cacheKey) {
+                return cacheKey in this.cache && !_.isEqual(this.cache[cacheKey].points, item.points);
+            }, this);
+
             _.extend(this.cache, cache);
+
+            if (invalidateConnection) {
+                this.debouncedRepaintEverything();
+            }
             this.debouncedCalculateOverlays();
         },
 
