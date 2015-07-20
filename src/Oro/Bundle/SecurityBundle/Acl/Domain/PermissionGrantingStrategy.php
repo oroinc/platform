@@ -8,7 +8,9 @@ use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
+
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AceAwareAclExtensionInterface;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
@@ -182,7 +184,11 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             // give an additional chance for the appropriate ACL extension to decide
                             // whether an access to a domain object is granted or not
-                            $decisionResult = $this->getContext()->getAclExtension()->decideIsGranting(
+                            $aclExtension = $this->getContext()->getAclExtension();
+                            if ($aclExtension instanceof AceAwareAclExtensionInterface) {
+                                $aclExtension->setAce($ace);
+                            }
+                            $decisionResult = $aclExtension->decideIsGranting(
                                 $requiredMask,
                                 $this->getContext()->getObject(),
                                 $this->getContext()->getSecurityToken()

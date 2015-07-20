@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AceAwareAclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker implements
-    OwnershipDecisionMakerInterface
+    OwnershipDecisionMakerInterface, AceAwareAclExtensionInterface
 {
     /**
      * @deprecated since 1.8, use getTreeProvider method instead
@@ -37,6 +42,11 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      * @var OwnershipMetadataProvider
      */
     protected $metadataProvider;
+
+    /**
+     * @var EntryInterface
+     */
+    protected $ace;
 
     /**
      * Constructor
@@ -96,6 +106,13 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
+        
         return $this->isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization);
     }
 
@@ -105,6 +122,14 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
+        $tree = $this->treeProvider->getTree();
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
+        
         return $this->isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
     }
 
@@ -114,6 +139,14 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
+        $userId = $this->getObjectId($user);
+        $this->validateUserObject($user);
+        $this->validateObject($domainObject);
+
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
+        
         return $this->isAssociatedWithBasicLevelEntity($user, $domainObject, $organization);
     }
 
@@ -123,5 +156,44 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
     public function supports()
     {
         return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAce(EntryInterface $ace)
+    {
+        $this->ace = $ace;
+    }
+
+    /**
+     * @param object $user
+     * @param object $domainObject
+     * @param object $organization
+     * @return bool
+     * @throws \Exception
+     */
+    public function isSharedWithUser($user, $domainObject, $organization)
+    {
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getObjectId($organization);
+        }
+        // todo rewrite method in pro
+        $tree = $this->treeProvider->getTree();
+        $securityIdentity = $this->ace->getSecurityIdentity();
+        // skip RoleSecurityIdentity because there is no way to share object for whole role
+        if ($securityIdentity instanceof UserSecurityIdentity) {
+            return $securityIdentity->equals(UserSecurityIdentity::fromAccount($securityIdentity));
+        } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
+            $ownerId = $this->getObjectIdIgnoreNull($this->getOwner($domainObject));
+            $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($ownerId, $organizationId);
+//            foreach ($user->getBusinessUnit() as $businessUnit) {
+//                if ($securityIdentity->equals(BusinessUnitSecurityIdentity::fromBusinessUnit()))
+//                return true;
+//            }
+        }
+
+        return false;
     }
 }

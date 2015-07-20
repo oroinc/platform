@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -16,13 +17,14 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AceAwareAclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EntityAclExtension extends AbstractAclExtension
+class EntityAclExtension extends AbstractAclExtension implements AceAwareAclExtensionInterface
 {
     /**
      * @var ObjectIdAccessor
@@ -64,6 +66,11 @@ class EntityAclExtension extends AbstractAclExtension
      * @var string[]
      */
     protected $maskBuilderClassNames = array();
+
+    /**
+     * @var EntryInterface
+     */
+    protected $ace;
 
     /**
      * Constructor
@@ -453,6 +460,9 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         $result = false;
+        if ($this->decisionMaker instanceof AceAwareAclExtensionInterface) {
+            $this->decisionMaker->setAce($this->ace);
+        }
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
@@ -493,6 +503,14 @@ class EntityAclExtension extends AbstractAclExtension
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAce(EntryInterface $ace)
+    {
+        $this->ace = $ace;
     }
 
     /**
