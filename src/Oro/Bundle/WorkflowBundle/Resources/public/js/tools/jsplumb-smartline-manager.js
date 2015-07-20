@@ -86,20 +86,15 @@ define(function(require){
                 finder.addFrom(new Path(fromNode.connections[Direction2d.TOP_TO_BOTTOM.id], fromNode, null));
 
                 var newCacheItem;
-                var points;
                 var path = finder.find();
                 var cacheKey = conn[3].connector.getId();
                 if (!path) {
                     console.warn("Cannot find path");
                 } else {
                     graph.updateWithPath(path);
-                    points = path.points.reverse();
-                    points[0].y += 20;
-                    points[points.length - 1].y -= 20;
                     newCacheItem = {
                         connection: conn[3],
                         path: path,
-                        points: points,
                         paintInfo: conn[3].connector === connector ? paintInfo : undefined
                     };
                     if (conn[3].connector === connector) {
@@ -108,6 +103,14 @@ define(function(require){
                     cache[cacheKey] = newCacheItem;
                 }
             });
+
+            _.each(cache, function (item) {
+                var points =  item.path.points.reverse();
+                points[0].y += 20;
+                points[points.length - 1].y -= 20;
+                item.points = points;
+
+            })
 
             invalidateConnection = _.find(cache, function(item, cacheKey) {
                 return cacheKey in this.cache && !_.isEqual(this.cache[cacheKey].points, item.points);

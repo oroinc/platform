@@ -30,8 +30,8 @@ define(function(require) {
         ];
         this.xPadding = 80;
         this.yPadding = 15;
-        this.xIncrement = 200;
-        this.yIncrement = 100;
+        this.xIncrement = 240;
+        this.yIncrement = 140;
         this.stepForNew = 10;
         if (JsPlumbManager.getJsPlumbSmartlineManager(jsPlumbInstance) === null) {
             jsPlumbSmartlineManagers.push({
