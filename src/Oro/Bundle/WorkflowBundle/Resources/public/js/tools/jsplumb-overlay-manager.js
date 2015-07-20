@@ -270,7 +270,7 @@ define(function(require) {
                 steps = [],
                 overlays = [];
             _.each(this.smartlineManager.cache, function (cacheItem) {
-                var points = cacheItem.path.toPointsArray([]).reverse();
+                var points = cacheItem.points;
                 _.each(cacheItem.connection.getOverlays(), function (overlay) {
                     var block;
                     if (overlay.type === 'Custom') {

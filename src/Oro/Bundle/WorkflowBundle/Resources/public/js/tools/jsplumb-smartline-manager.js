@@ -30,12 +30,10 @@ define(function(require){
         },
 
         calculate: function (connector, paintInfo) {
-            var builder;
-            var graph;
             var cache = {};
             var connections = [];
             var rects = {};
-            var sources = new Container();
+            var graph = new Graph();
             var endPoints = this.jsPlumbInstance.sourceEndpointDefinitions;
             for (var id in endPoints) {
                 if (endPoints.hasOwnProperty(id)) {
@@ -48,12 +46,11 @@ define(function(require){
                         clientRect = new Rectangle(rect.left - 16, rect.top - 16, rect.width + 32, rect.height+ 32);
                     rects[id] = clientRect;
                     clientRect.cid = id;
-                    sources.boxes.push(clientRect);
+                    graph.rectangles.push(clientRect);
                 }
             }
 
-            builder = new GraphBuilder();
-            graph = builder.build(sources);
+            graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
                 connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
@@ -64,7 +61,7 @@ define(function(require){
             });
 
             JsPlumbSmartlineManager.lastRequest = {
-                sources: sources.boxes.map(function (item) {
+                sources: graph.rectangles.map(function (item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
                 }),
                 connections: connections.map(function (item) {return item.slice(0,2);})
@@ -72,20 +69,20 @@ define(function(require){
 
             _.each(connections, function (conn) {
                 var finder = new Finder(graph);
-                var sourceConnections = graph.findLeavingConnectionsByCid(conn[0], connectionDirection.TOP_TO_BOTTOM),
-                    targetConnections = graph.findEnteringConnectionsByCid(conn[1], connectionDirection.TOP_TO_BOTTOM);
-                for (var i = 0; i < sourceConnections.length; i++) {
-                    finder.addFrom(sourceConnections[i]);
-                }
-                for (i = 0; i < targetConnections.length; i++) {
-                    finder.addTo(targetConnections[i]);
-                }
+
+                var fromRect = graph.getRectByCid(conn[0]);
+                var fromNode = graph.getNodeAt(new Point2d((fromRect.left + fromRect.right) / 2, (fromRect.top + fromRect.bottom) / 2));
+                var toRect = graph.getRectByCid(conn[1]);
+                var toNode = graph.getNodeAt(new Point2d((toRect.left + toRect.right) / 2, (toRect.top + toRect.bottom) / 2));
+
+                finder.addTo(new Path(toNode.connections[Direction2d.BOTTOM_TO_TOP.id], toNode, null));
+                finder.addFrom(new Path(fromNode.connections[Direction2d.TOP_TO_BOTTOM.id], fromNode, null));
 
                 var path = finder.find();
                 if (!path) {
                     console.warn("Cannot find path");
                 } else {
-                    path.put();
+                    graph.updateWithPath(path);
                     cache[conn[3].connector.getId()] = {
                         connection: conn[3],
                         path: path,
@@ -94,7 +91,7 @@ define(function(require){
                 }
             });
             _.each(cache, function(item) {
-                item.points = item.path.toPointsArray([]).reverse();
+                item.points = item.path.points.reverse();
             });
             _.extend(this.cache, cache);
             this.debouncedCalculateOverlays();
