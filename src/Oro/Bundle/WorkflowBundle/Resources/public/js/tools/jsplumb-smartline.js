@@ -214,6 +214,8 @@ define(function(require) {
 
             paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
 
+            console.log (sourcePoint.x, sourcePoint.y, paintInfo.sx, paintInfo.sy);
+
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
                     addSegment(segments, points[i].x - correction.x, points[i].y - correction.y, paintInfo);
