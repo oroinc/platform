@@ -462,7 +462,7 @@ class OwnershipConditionDataBuilder
             || $permissions !== BasicPermissionMap::PERMISSION_VIEW
             || !$shareConfig
             || !$isGranted
-            || in_array($observer->getAccessLevel(), $excludeAccessLevels)
+            || !in_array($observer->getAccessLevel(), $excludeAccessLevels)
         ) {
             return null;
         }
