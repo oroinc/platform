@@ -9,12 +9,16 @@ use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @dbIsolation
+ */
 class RefreshContextListenerTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
     }
 
     public function testSecurityContextAfterClear()
@@ -58,5 +62,20 @@ class RefreshContextListenerTest extends WebTestCase
                 $unitOfWork->getEntityState($token->getOrganizationContext())
             );
         }
+    }
+
+    public function testUserReloadFailed()
+    {
+        // any route just to initialize security context
+        $this->client->request('GET', $this->getUrl('oro_user_index'));
+
+        $this->getContainer()->get('security.context')->getToken()->setUser(new User());
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getContainer()->get('doctrine')->getManager();
+        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
+
+        $entityManager->clear();
+        $this->assertNull($this->getContainer()->get('security.context')->getToken());
     }
 }
