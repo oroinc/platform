@@ -47,8 +47,8 @@ define(function(require) {
                     ['Arrow', {
                         location: 1,
                         id: 'arrow',
-                        length: 12,
-                        width: 10,
+                        length: 10,
+                        width: 8,
                         foldback: 0.7
                     }]
                 ]

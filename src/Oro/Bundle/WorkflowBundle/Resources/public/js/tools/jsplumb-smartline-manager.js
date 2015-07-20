@@ -100,10 +100,7 @@ define(function(require){
 
             _.each(cache, function (item) {
                 var points =  item.path.points.reverse();
-                points[0].y += 20;
-                points[points.length - 1].y -= 20;
                 item.points = points;
-
             })
 
             invalidateConnection = _.find(cache, function(item, cacheKey) {
