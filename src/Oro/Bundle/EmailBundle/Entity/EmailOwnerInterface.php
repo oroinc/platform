@@ -35,5 +35,5 @@ interface EmailOwnerInterface
      *
      * @return string
      */
-    public function getName();
+    public function getEmailOwnerName();
 }

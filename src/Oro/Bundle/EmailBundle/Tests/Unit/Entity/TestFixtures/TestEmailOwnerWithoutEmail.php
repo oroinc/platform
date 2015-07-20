@@ -52,14 +52,8 @@ class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getEmailOwnerName()
     {
-        return implode(
-            ' ',
-            [
-                $this->getFirstName(),
-                $this->getLastName(),
-            ]
-        );
+        return $this->firstName . ' ' . $this->lastName;
     }
 }
