@@ -55,7 +55,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
             if (!empty($entities)) {
                 $entities = $this->adjustRoutes($route, $routes, $entities);
-                $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
+                if (!empty($entities)) {
+                    $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ class SearchEntityConfigListener
         $job = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('job')
             ->select('job')
             ->where('job.command = :command')
-            ->andWhere('job.args = :args')
+            ->andWhere('cast(job.args as text) = :args')
             ->andWhere('job.state in (\'pending\', \'running\')')
             ->setParameter('command', ReindexCommand::COMMAND_NAME)
             ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)

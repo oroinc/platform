@@ -3,16 +3,17 @@
 namespace Oro\Bundle\TestFrameworkBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class TestActivityActivityListProvider implements ActivityListProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
+    const ACL_CLASS = 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -104,6 +105,14 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
@@ -127,5 +136,24 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     public function getTargetEntities($entity)
     {
         return $entity->getActivityTargetEntities();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $entity->getOwner();
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
     }
 }

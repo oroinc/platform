@@ -30,6 +30,7 @@ class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterfa
         self::addTestActivityTable($schema);
         self::addTestActivityTargetTable($schema);
         self::addOrganizationFields($schema);
+        self::addOwnerFields($schema);
         self::addActivityAssociations($schema, $this->activityExtension);
     }
 
@@ -67,6 +68,23 @@ class OroTestFrameworkBundle implements Migration, ActivityExtensionAwareInterfa
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_organization'),
             ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public static function addOwnerFields(Schema $schema)
+    {
+        $table = $schema->getTable('test_activity');
+
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['owner_id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
