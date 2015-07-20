@@ -9,7 +9,6 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEmailBundle implements Migration
 {
-
     /**
      * {@inheritdoc}
      */
@@ -17,8 +16,12 @@ class OroEmailBundle implements Migration
     {
         self::createOroEmailMailboxTable($schema);
         self::createOroEmailMailboxProcessorTable($schema);
+
         self::addOwnerMailboxColumn($schema);
+
         self::addOroEmailMailboxForeignKeys($schema);
+
+        self::addEmailUserMailboxOwnerColumn($schema);
     }
 
     public static function createOroEmailMailboxTable(Schema $schema)
@@ -45,7 +48,7 @@ class OroEmailBundle implements Migration
         $table->setPrimaryKey(['id']);
     }
 
-    private static function addOwnerMailboxColumn(Schema $schema)
+    public static function addOwnerMailboxColumn(Schema $schema)
     {
         $table = $schema->getTable('oro_email_address');
 
@@ -65,7 +68,7 @@ class OroEmailBundle implements Migration
      *
      * @param Schema $schema
      */
-    protected function addOroEmailMailboxForeignKeys(Schema $schema)
+    public static function addOroEmailMailboxForeignKeys(Schema $schema)
     {
         $table = $schema->getTable('oro_email_mailbox');
         $table->addForeignKeyConstraint(
@@ -85,6 +88,18 @@ class OroEmailBundle implements Migration
             ['origin_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
+        );
+    }
+    public static function addEmailUserMailboxOwnerColumn(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_user');
+        $table->addColumn('mailbox_owner_id', 'integer', ['notnull' => false]);
+
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_mailbox'),
+            ['mailbox_owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 }
