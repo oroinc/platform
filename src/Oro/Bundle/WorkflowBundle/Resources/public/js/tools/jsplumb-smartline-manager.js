@@ -43,7 +43,7 @@ define(function(require){
                         return;
                     }
                     var rect = el.getBoundingClientRect(),
-                        clientRect = new Rectangle(rect.left - 16, rect.top - 16, rect.width + 32, rect.height+ 32);
+                        clientRect = new Rectangle(rect.left, rect.top, rect.width, rect.height);
                     rects[id] = clientRect;
                     clientRect.cid = id;
                     graph.rectangles.push(clientRect);
@@ -92,6 +92,8 @@ define(function(require){
             });
             _.each(cache, function(item) {
                 item.points = item.path.points.reverse();
+                item.points[0].y += 20;
+                item.points[item.points.length - 1].y -= 20;
             });
             _.extend(this.cache, cache);
             this.debouncedCalculateOverlays();

@@ -190,17 +190,16 @@ define(function(require) {
                 targetRect = params.targetEndpoint.element.getBoundingClientRect(),
                 sourcePoint = points.shift(),
                 targetPoint = points.pop(),
-                CONNECTION_WIDTH = 16,
                 correction;
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - sourceRect.left)/ sourceRect.width;
-            params.sourceEndpoint.anchor.y = (sourcePoint.y - CONNECTION_WIDTH - sourceRect.top)/ sourceRect.height;
+            params.sourceEndpoint.anchor.y = (sourcePoint.y - sourceRect.top)/ sourceRect.height;
             params.targetEndpoint.anchor.x = (targetPoint.x - targetRect.left)/ targetRect.width;
-            params.targetEndpoint.anchor.y = (targetPoint.y + CONNECTION_WIDTH - targetRect.top)/ targetRect.height;
+            params.targetEndpoint.anchor.y = (targetPoint.y - targetRect.top)/ targetRect.height;
             correction = {
                 x: Math.min(sourcePoint.x, targetPoint.x),
-                y: Math.min(sourcePoint.y - CONNECTION_WIDTH, targetPoint.y + CONNECTION_WIDTH)
+                y: Math.min(sourcePoint.y, targetPoint.y)
             }
             if (oldAnchorX !== params.sourceEndpoint.anchor.x) {
                 paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * sourceRect.width;
@@ -219,7 +218,7 @@ define(function(require) {
             // addSegment(segments, points[i].x - targetPoint.x, points[i].y - targetPoint.y, paintInfo);
 
             // end stub to end
-            addSegment(segments, targetPoint.x - correction.x, targetPoint.y + CONNECTION_WIDTH - correction.y, paintInfo);
+            addSegment(segments, targetPoint.x - correction.x, targetPoint.y - correction.y, paintInfo);
 
             writeSegments(this, segments, paintInfo);
         };

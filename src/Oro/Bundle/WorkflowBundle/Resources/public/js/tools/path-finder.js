@@ -1609,10 +1609,17 @@ var Path = (function () {
     });
     Object.defineProperty(Path.prototype, "points", {
         get: function () {
-            var nodes = this.allNodes, points = [];
-            for (var i = 0; i < nodes.length; i++) {
-                var point = nodes[i].recommendedPoint;
-                points.push(point);
+            var points = [], current = this, currentAxis = this.connection.axis, candidate;
+            points.push(this.toNode.recommendedPoint);
+            while (current) {
+                if (current.connection.axis !== currentAxis) {
+                    points.push(current.toNode.recommendedPoint);
+                    currentAxis = current.connection.axis;
+                }
+                if (!current.previous) {
+                    points.push(current.fromNode.recommendedPoint);
+                }
+                current = current.previous;
             }
             return points;
         },
