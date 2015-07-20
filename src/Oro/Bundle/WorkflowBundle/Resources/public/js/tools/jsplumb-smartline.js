@@ -186,26 +186,24 @@ define(function(require) {
                 return;
             }
             // set valid archors
-            var sourceRect = params.sourceEndpoint.element.getBoundingClientRect(),
-                targetRect = params.targetEndpoint.element.getBoundingClientRect(),
-                sourcePoint = points.shift(),
+            var sourcePoint = points.shift(),
                 targetPoint = points.pop(),
                 correction;
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
-            params.sourceEndpoint.anchor.x = (sourcePoint.x - sourceRect.left)/ sourceRect.width;
-            params.sourceEndpoint.anchor.y = (sourcePoint.y - sourceRect.top)/ sourceRect.height;
-            params.targetEndpoint.anchor.x = (targetPoint.x - targetRect.left)/ targetRect.width;
-            params.targetEndpoint.anchor.y = (targetPoint.y - targetRect.top)/ targetRect.height;
+            params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft)/ params.sourceEndpoint.element.offsetWidth;
+            params.sourceEndpoint.anchor.y = (sourcePoint.y - params.sourceEndpoint.element.offsetTop)/ params.sourceEndpoint.element.offsetHeight;
+            params.targetEndpoint.anchor.x = (targetPoint.x - params.targetEndpoint.element.offsetLeft)/ params.targetEndpoint.element.offsetWidth;
+            params.targetEndpoint.anchor.y = (targetPoint.y - params.targetEndpoint.element.offsetTop)/ params.targetEndpoint.element.offsetHeight;
             correction = {
                 x: Math.min(sourcePoint.x, targetPoint.x),
                 y: Math.min(sourcePoint.y, targetPoint.y)
             }
             if (oldAnchorX !== params.sourceEndpoint.anchor.x) {
-                paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * sourceRect.width;
+                paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * params.sourceEndpoint.element.offsetWidth;
             }
             if (oldAnchorY !== params.sourceEndpoint.anchor.y) {
-                paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * sourceRect.height;
+                paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * params.sourceEndpoint.element.offsetHeight;
             }
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {

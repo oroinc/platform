@@ -49,8 +49,7 @@ define(function(require){
                         this.cache = {};
                         return;
                     }
-                    var rect = el.getBoundingClientRect(),
-                        clientRect = new Rectangle(rect.left, rect.top, rect.width, rect.height);
+                    var clientRect = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
                     rects[id] = clientRect;
                     clientRect.cid = id;
                     graph.rectangles.push(clientRect);
@@ -77,13 +76,8 @@ define(function(require){
             _.each(connections, function (conn) {
                 var finder = new Finder(graph);
 
-                var fromRect = graph.getRectByCid(conn[0]);
-                var fromNode = graph.getNodeAt(new Point2d((fromRect.left + fromRect.right) / 2, (fromRect.top + fromRect.bottom) / 2));
-                var toRect = graph.getRectByCid(conn[1]);
-                var toNode = graph.getNodeAt(new Point2d((toRect.left + toRect.right) / 2, (toRect.top + toRect.bottom) / 2));
-
-                finder.addTo(new Path(toNode.connections[Direction2d.BOTTOM_TO_TOP.id], toNode, null));
-                finder.addFrom(new Path(fromNode.connections[Direction2d.TOP_TO_BOTTOM.id], fromNode, null));
+                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
+                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
 
                 var newCacheItem;
                 var path = finder.find();
