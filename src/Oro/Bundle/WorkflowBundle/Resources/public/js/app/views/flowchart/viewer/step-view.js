@@ -32,7 +32,7 @@ define(function(require) {
         sourceDefaults: {
             filter: '.jsplumb-source',
             anchor: 'Continuous',
-            connector: ['Smartline', {cornerRadius: 5, midpoint: 0.5}],
+            connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
             maxConnections: 100
         },
 
