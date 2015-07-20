@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\PathExpression;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -41,6 +42,12 @@ class OwnershipConditionDataBuilder
     const ACL_ENTRIES_SHARE_RECORD = 'recordId';
     const ACL_ENTRIES_CLASS_ID = 'class';
     const ACL_ENTRIES_SECURITY_ID = 'securityIdentity';
+
+    protected $shareAccessLevels = [
+        AccessLevel::BASIC_LEVEL,
+        AccessLevel::LOCAL_LEVEL,
+        AccessLevel::DEEP_LEVEL,
+    ];
 
     /** @var ServiceLink */
     protected $securityContextLink;
@@ -438,13 +445,7 @@ class OwnershipConditionDataBuilder
      */
     public function getAclShareData($entityName, $entityAlias, $permissions = BasicPermissionMap::PERMISSION_VIEW)
     {
-        $excludeAccessLevels = [
-            AccessLevel::BASIC_LEVEL,
-            AccessLevel::LOCAL_LEVEL,
-            AccessLevel::DEEP_LEVEL,
-        ];
-
-        $aclClass = $this->registry->getRepository('OroSecurityBundle:AclClass')
+        $aclClass = $this->getObjectManager()->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $entityName]);
         $aclSIds = $this->getSecurityIdentityIds();
 
@@ -463,7 +464,7 @@ class OwnershipConditionDataBuilder
             || $permissions !== BasicPermissionMap::PERMISSION_VIEW
             || !$shareConfig
             || !$isGranted
-            || !in_array($observer->getAccessLevel(), $excludeAccessLevels)
+            || !in_array($observer->getAccessLevel(), $this->shareAccessLevels)
         ) {
             return null;
         }
@@ -477,7 +478,7 @@ class OwnershipConditionDataBuilder
         );
         //Add query components for OutputSqlWalker
         $queryComponents[self::ACL_ENTRIES_ALIAS] = [
-            'metadata'     => $this->registry->getManagerForClass(self::ACL_ENTRIES_SCHEMA_NAME)->getClassMetadata(
+            'metadata'     => $this->getObjectManager()->getClassMetadata(
                 self::ACL_ENTRIES_SCHEMA_NAME
             ),
             'parent'       => null,
@@ -547,11 +548,19 @@ class OwnershipConditionDataBuilder
             );
         }
 
-        return $this->registry->getRepository('OroSecurityBundle:AclSecurityIdentity')
+        return $this->getObjectManager()->getRepository('OroSecurityBundle:AclSecurityIdentity')
             ->findOneBy([
                 'identifier' => $identifier,
                 'username' => $username,
             ]);
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    protected function getObjectManager()
+    {
+        return $this->registry->getManager();
     }
 
     /**
