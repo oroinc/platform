@@ -92,12 +92,19 @@ define([
         },
 
         onClickOpenEmail: function (e) {
+            var id  = $(e.currentTarget).data('id');
             mediator.execute(
                 'redirectTo',
                 {
-                    url: routing.generate('oro_email_view', {id: $(e.currentTarget).data('id')})
+                    url: routing.generate('oro_email_view', {id: id})
                 }
             );
+            var model = this.collection.find(function(item){
+                return Number(item.get('id')) === id;
+            });
+
+            this.$el.find('#'+model.cid).removeClass('new');
+            this.$el.find('#'+model.cid).find('.icon-envelope').removeClass('new');
         },
 
         onChangeAmount: function (count) {
