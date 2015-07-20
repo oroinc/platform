@@ -9,13 +9,13 @@ use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 {
     const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
-    const TEST_CONTACT_CLASS = 'Entity\TestContact';
+    const TEST_CONTACT_CLASS = 'Entity\TestContact';// @codingStandardsIgnoreStart
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
     const MAILBOX_CLASS = 'Oro\Bundle\EmailBundle\Entity\Mailbox';
 
-    const QB_SELECT = 'a.email,IDENTITY(a.userId) AS userId,' .
-        'IDENTITY(a.contactId) AS contactId,' .
-        'IDENTITY(a.mailboxId) AS mailboxId';
+    // @codingStandardsIgnoreStart
+    const QB_SELECT = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId,IDENTITY(a.mailboxId) AS mailboxId';
+    // @codingStandardsIgnoreStop
 
     /** @var KnownEmailAddressChecker */
     private $checker;
