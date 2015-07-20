@@ -104,7 +104,8 @@ define(function(require){
             })
 
             invalidateConnection = _.find(cache, function(item, cacheKey) {
-                return cacheKey in this.cache && !_.isEqual(this.cache[cacheKey].points, item.points);
+                return cacheKey in this.cache && item.connector !== connector &&
+                    !_.isEqual(this.cache[cacheKey].points, item.points);
             }, this);
 
             _.extend(this.cache, cache);
