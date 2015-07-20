@@ -332,6 +332,13 @@ var Rectangle = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Rectangle.prototype, "center", {
+        get: function () {
+            return new Point2d((this.left + this.right) / 2, (this.top + this.bottom) / 2);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Rectangle.prototype.clone = function () {
         return new Rectangle(this.left, this.top, this.width, this.height);
     };
@@ -504,15 +511,24 @@ var NodePoint = (function (_super) {
     __extends(NodePoint, _super);
     function NodePoint(x, y) {
         _super.call(this, x, y);
-        this.connections = [];
+        this._connections = [];
         this.stale = false;
         this.used = false;
     }
+    Object.defineProperty(NodePoint.prototype, "connections", {
+        get: function () {
+            return this._connections;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(NodePoint.prototype, "recommendedX", {
         get: function () {
-            var recommendation = this.vAxis.recommendedPosition;
-            if (recommendation !== undefined) {
-                return recommendation;
+            if (this.vAxis) {
+                var recommendation = this.vAxis.recommendedPosition;
+                if (recommendation !== undefined) {
+                    return recommendation;
+                }
             }
             return this.x;
         },
@@ -521,9 +537,11 @@ var NodePoint = (function (_super) {
     });
     Object.defineProperty(NodePoint.prototype, "recommendedY", {
         get: function () {
-            var recommendation = this.hAxis.recommendedPosition;
-            if (recommendation !== undefined) {
-                return recommendation;
+            if (this.hAxis) {
+                var recommendation = this.hAxis.recommendedPosition;
+                if (recommendation !== undefined) {
+                    return recommendation;
+                }
             }
             return this.y;
         },
@@ -776,6 +794,7 @@ var Axis = (function (_super) {
         this.clonesAtRight = [];
         this.used = false;
         this.nodes = [];
+        this.isVertical = this.a.x === this.b.x;
         this.uid = Axis.uidCounter++;
         this.costMultiplier = costMultiplier;
         this.graph = graph;
@@ -851,8 +870,32 @@ var Axis = (function (_super) {
         }
         this.nodes.push(node);
     };
+    Object.defineProperty(Axis.prototype, "nextNodeConnVector", {
+        get: function () {
+            if (this.isVertical) {
+                return Direction2d.TOP_TO_BOTTOM;
+            }
+            else {
+                return Direction2d.LEFT_TO_RIGHT;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Axis.prototype, "prevNodeConnVector", {
+        get: function () {
+            if (this.isVertical) {
+                return Direction2d.BOTTOM_TO_TOP;
+            }
+            else {
+                return Direction2d.RIGHT_TO_LEFT;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Axis.prototype.addFinalNode = function (node) {
-        var nextNodeConnVector = this.b.sub(this.a).unitVector.abs(), nextNodeConn, prevNodeConn;
+        var nextNodeConnVector = this.nextNodeConnVector, nextNodeConn, prevNodeConn;
         if (nextNodeConn = node.connections[nextNodeConnVector.id]) {
             var nextNode = nextNodeConn.second(node), nextIndex = this.nodes.indexOf(nextNode);
             if (nextIndex === -1)
@@ -865,7 +908,7 @@ var Axis = (function (_super) {
                 debugger;
             }
         }
-        else if (prevNodeConn = node.connections[nextNodeConnVector.rot180().id]) {
+        else if (prevNodeConn = node.connections[this.prevNodeConnVector.id]) {
             var prevNode = prevNodeConn.second(node), prevIndex = this.nodes.indexOf(prevNode);
             if (prevIndex === -1)
                 throw Error("Invalid add node call");
@@ -939,13 +982,6 @@ var Axis = (function (_super) {
             return a.x - b.x + a.y - b.y;
         });
     };
-    Object.defineProperty(Axis.prototype, "isVertical", {
-        get: function () {
-            return this.a.x === this.b.x;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Axis.prototype.merge = function (axis) {
         var middle = this.a.add(this.b).mul(0.5);
         this.a = this.a.simpleDistanceTo(middle) > axis.a.simpleDistanceTo(middle) ? this.a : axis.a;
@@ -1036,6 +1072,7 @@ var Graph = (function () {
         this.outerRect = this.rectangles.reduce(function (prev, current) { return current.union(prev); }, new Rectangle(this.rectangles[0].top, this.rectangles[0].left, 0, 0));
         this.baseAxises.push(BaseAxis.createFromInterval(this.outerRect.topSide, this, new EmptyConstraint(), new RightSimpleConstraint(this.outerRect.top), new StickRightLocationDirective()), BaseAxis.createFromInterval(this.outerRect.bottomSide, this, new LeftSimpleConstraint(this.outerRect.bottom), new EmptyConstraint(), new StickLeftLocationDirective()), BaseAxis.createFromInterval(this.outerRect.leftSide, this, new EmptyConstraint(), new RightSimpleConstraint(this.outerRect.left), new StickRightLocationDirective()), BaseAxis.createFromInterval(this.outerRect.rightSide, this, new LeftSimpleConstraint(this.outerRect.right), new EmptyConstraint(), new StickLeftLocationDirective()));
         this.buildCornerAxises();
+        this.buildCenterAxises();
         this.buildCenterLinesBetweenNodes();
         this.createAxises();
         this.buildMergeRequests();
@@ -1045,6 +1082,29 @@ var Graph = (function () {
         if (DEBUG_ENABLED) {
             this.draw();
         }
+    };
+    Graph.prototype.getPathFromCid = function (cid, direction) {
+        return this.getPathFrom(this.getRectByCid(cid), direction);
+    };
+    Graph.prototype.getPathFrom = function (rect, direction) {
+        var center = rect.center, node;
+        switch (direction.id) {
+            case Direction2d.BOTTOM_TO_TOP.id:
+                node = this.getNodeAt(new Point2d(center.x, center.y - 1));
+                break;
+            case Direction2d.TOP_TO_BOTTOM.id:
+                node = this.getNodeAt(new Point2d(center.x, center.y + 1));
+                break;
+            case Direction2d.LEFT_TO_RIGHT.id:
+                node = this.getNodeAt(new Point2d(center.x - 1, center.y));
+                break;
+            case Direction2d.RIGHT_TO_LEFT.id:
+                node = this.getNodeAt(new Point2d(center.x + 1, center.y));
+                break;
+            default:
+                throw new Error("Not supported direction");
+        }
+        return new Path(node.connections[direction.id], node, null);
     };
     Graph.prototype.getRectByCid = function (cid) {
         for (var i = 0; i < this.rectangles.length; i++) {
@@ -1166,13 +1226,6 @@ var Graph = (function () {
                     locationDirective: new StickRightLocationDirective()
                 },
                 {
-                    vectorA: new Vector2d((rect.left + rect.right) / 2, rect.top, Direction2d.TOP_TO_BOTTOM),
-                    vectorB: new Vector2d((rect.left + rect.right) / 2, rect.bottom, Direction2d.BOTTOM_TO_TOP),
-                    leftConstraint: new LeftSimpleConstraint(rect.left),
-                    rightConstraint: new RightSimpleConstraint(rect.right),
-                    locationDirective: new CenterLocationDirective()
-                },
-                {
                     vectorA: new Vector2d(rect.right, rect.top, Direction2d.TOP_TO_BOTTOM),
                     vectorB: new Vector2d(rect.right, rect.bottom, Direction2d.BOTTOM_TO_TOP),
                     leftConstraint: new LeftSimpleConstraint(rect.right),
@@ -1187,13 +1240,6 @@ var Graph = (function () {
                     locationDirective: new StickRightLocationDirective()
                 },
                 {
-                    vectorA: new Vector2d(rect.left, (rect.top + rect.bottom) / 2, Direction2d.RIGHT_TO_LEFT),
-                    vectorB: new Vector2d(rect.right, (rect.top + rect.bottom) / 2, Direction2d.LEFT_TO_RIGHT),
-                    leftConstraint: new LeftSimpleConstraint(rect.top),
-                    rightConstraint: new RightSimpleConstraint(rect.bottom),
-                    locationDirective: new CenterLocationDirective()
-                },
-                {
                     vectorA: new Vector2d(rect.left, rect.bottom, Direction2d.RIGHT_TO_LEFT),
                     vectorB: new Vector2d(rect.right, rect.bottom, Direction2d.LEFT_TO_RIGHT),
                     leftConstraint: new LeftSimpleConstraint(rect.bottom),
@@ -1205,6 +1251,43 @@ var Graph = (function () {
                 var def = defs[j];
                 var closestRectCrossPoint1 = this.findClosestRectCross(def.vectorA, rect), closestRectCrossPoint2 = this.findClosestRectCross(def.vectorB, rect);
                 this.baseAxises.push(BaseAxis.createFromInterval(new Interval2d(closestRectCrossPoint1, closestRectCrossPoint2), this, def.leftConstraint, def.rightConstraint, def.locationDirective));
+            }
+        }
+    };
+    Graph.prototype.buildCenterAxises = function () {
+        for (var i = this.rectangles.length - 1; i >= 0; i--) {
+            var rect = this.rectangles[i];
+            var center = rect.center;
+            var defs = [
+                {
+                    vector: new Vector2d(center.x, center.y + 1, Direction2d.TOP_TO_BOTTOM),
+                    leftConstraint: new LeftSimpleConstraint(rect.left),
+                    rightConstraint: new RightSimpleConstraint(rect.right),
+                    locationDirective: new CenterLocationDirective()
+                },
+                {
+                    vector: new Vector2d(center.x, center.y - 1, Direction2d.BOTTOM_TO_TOP),
+                    leftConstraint: new LeftSimpleConstraint(rect.left),
+                    rightConstraint: new RightSimpleConstraint(rect.right),
+                    locationDirective: new CenterLocationDirective()
+                },
+                {
+                    vector: new Vector2d(center.x + 1, center.y, Direction2d.RIGHT_TO_LEFT),
+                    leftConstraint: new LeftSimpleConstraint(rect.top),
+                    rightConstraint: new RightSimpleConstraint(rect.bottom),
+                    locationDirective: new CenterLocationDirective()
+                },
+                {
+                    vector: new Vector2d(center.x - 1, center.y, Direction2d.LEFT_TO_RIGHT),
+                    leftConstraint: new LeftSimpleConstraint(rect.top),
+                    rightConstraint: new RightSimpleConstraint(rect.bottom),
+                    locationDirective: new CenterLocationDirective()
+                }
+            ];
+            for (var j = defs.length - 1; j >= 0; j--) {
+                var def = defs[j];
+                var closestRectCrossPoint = this.findClosestRectCross(def.vector, rect);
+                this.baseAxises.push(BaseAxis.createFromInterval(new Interval2d(def.vector.start, closestRectCrossPoint), this, def.leftConstraint, def.rightConstraint, def.locationDirective));
             }
         }
     };
@@ -1258,19 +1341,66 @@ var Graph = (function () {
         this.baseAxises.push(new BaseAxis(closestRectCrossPoint1, closestRectCrossPoint2, this, GraphConstant.centerAxisCostMultiplier, new LeftSimpleConstraint(min), new RightSimpleConstraint(max), new CenterLocationDirective()));
     };
     Graph.prototype.buildNodes = function () {
+        var node, newAxis;
         for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
             var hAxis = this.horizontalAxises[i];
             for (var j = this.verticalAxises.length - 1; j >= 0; j--) {
                 var vAxis = this.verticalAxises[j];
                 var crossPoint = hAxis.getCrossPoint(vAxis);
                 if (crossPoint) {
-                    var node = this.getNodeAt(crossPoint);
+                    node = this.getNodeAt(crossPoint);
                     hAxis.addNode(node);
                     vAxis.addNode(node);
                     node.hAxis = hAxis;
                     node.vAxis = vAxis;
                     node.stale = true;
                 }
+            }
+        }
+        for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
+            var hAxis = this.horizontalAxises[i];
+            node = this.getNodeAt(hAxis.a);
+            if (!node.stale) {
+                newAxis = new BaseAxis(hAxis.a, hAxis.a, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
+                newAxis.isVertical = true;
+                this.verticalAxises.push(newAxis);
+                hAxis.addNode(node);
+                newAxis.addNode(node);
+                node.hAxis = hAxis;
+                node.vAxis = newAxis;
+            }
+            node = this.getNodeAt(hAxis.b);
+            if (!node.stale) {
+                newAxis = new BaseAxis(hAxis.b, hAxis.b, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
+                newAxis.isVertical = true;
+                this.verticalAxises.push(newAxis);
+                hAxis.addNode(node);
+                newAxis.addNode(node);
+                node.hAxis = hAxis;
+                node.vAxis = newAxis;
+            }
+        }
+        for (var j = this.verticalAxises.length - 1; j >= 0; j--) {
+            var vAxis = this.verticalAxises[j];
+            node = this.getNodeAt(vAxis.a);
+            if (!node.stale) {
+                newAxis = new BaseAxis(vAxis.a, vAxis.a, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
+                newAxis.isVertical = false;
+                this.horizontalAxises.push(newAxis);
+                vAxis.addNode(node);
+                newAxis.addNode(node);
+                node.hAxis = newAxis;
+                node.vAxis = vAxis;
+            }
+            node = this.getNodeAt(vAxis.b);
+            if (!node.stale) {
+                newAxis = new BaseAxis(vAxis.b, vAxis.b, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
+                newAxis.isVertical = false;
+                this.horizontalAxises.push(newAxis);
+                vAxis.addNode(node);
+                newAxis.addNode(node);
+                node.hAxis = newAxis;
+                node.vAxis = vAxis;
             }
         }
     };

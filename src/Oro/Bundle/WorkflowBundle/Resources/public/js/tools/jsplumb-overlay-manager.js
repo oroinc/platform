@@ -61,13 +61,12 @@ define(function(require) {
     TODO: move to separate file
      */
     function Block(el) {
-        var rect = el.getBoundingClientRect();
         this.name = $(el).find('.step-label').text();
         this.el = el;
-        this.x = (rect.left + rect.right) / 2;
-        this.y = (rect.top + rect.bottom) / 2;
-        this.w = rect.width;
-        this.h = rect.height;
+        this.x = el.offsetLeft + el.offsetWidth / 2;
+        this.y = el.offsetTop + el.offsetHeight / 2;
+        this.w = el.offsetWidth;
+        this.h = el.offsetHeight;
         // TODO: remove debug information
         if (debugVisualization) {
             var style = $(el).attr('style');
