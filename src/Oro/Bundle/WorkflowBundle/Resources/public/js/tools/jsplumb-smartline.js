@@ -5,11 +5,11 @@ define(function(require) {
     var _ = require('underscore');
     var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
 
-    function ensureSmartLineManager(jsPlumb) {
-        if (!jsPlumb.__smartLineManager) {
-            jsPlumb.__smartLineManager = new JsPlumbSmartlineManager(jsPlumb);
+    function ensureSmartLineManager(jsPlumbInstance) {
+        if (!jsPlumbInstance.__smartLineManager) {
+            jsPlumbInstance.__smartLineManager = new JsPlumbSmartlineManager(jsPlumbInstance);
         }
-        return jsPlumb.__smartLineManager;
+        return jsPlumbInstance.__smartLineManager;
     }
 
     function Smartline(params) {
