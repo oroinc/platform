@@ -258,69 +258,6 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function updateAcl(MutableAclInterface $acl)
-    {
-        $this->updatedAcl = $acl;
-        parent::updateAcl($acl);
-        $this->updatedAcl = null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getInsertAccessControlEntrySql(
-        $classId,
-        $objectIdentityId,
-        $field,
-        $aceOrder,
-        $securityIdentityId,
-        $strategy,
-        $mask,
-        $granting,
-        $auditSuccess,
-        $auditFailure
-    ) {
-        $recordId = $this->updatedAcl && $this->updatedAcl->getObjectIdentity()
-            ? $this->updatedAcl->getObjectIdentity()->getIdentifier()
-            : null;
-
-        $query = <<<QUERY
-            INSERT INTO %s (
-                class_id,
-                object_identity_id,
-                field_name,
-                ace_order,
-                security_identity_id,
-                mask,
-                granting,
-                granting_strategy,
-                audit_success,
-                audit_failure,
-                record_id
-            )
-            VALUES (%d, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s)
-QUERY;
-
-        return sprintf(
-            $query,
-            $this->options['entry_table_name'],
-            $classId,
-            null === $objectIdentityId ? 'NULL' : (int) $objectIdentityId,
-            null === $field ? 'NULL' : $this->connection->quote($field),
-            $aceOrder,
-            $securityIdentityId,
-            $mask,
-            $this->connection->getDatabasePlatform()->convertBooleans($granting),
-            $this->connection->quote($strategy),
-            $this->connection->getDatabasePlatform()->convertBooleans($auditSuccess),
-            $this->connection->getDatabasePlatform()->convertBooleans($auditFailure),
-            is_int($recordId) ? $recordId : 'NULL'
-        );
-    }
-
-    /**
      * Constructs the SQL for inserting a security identity.
      *
      * @param SecurityIdentityInterface $sid
@@ -387,6 +324,69 @@ QUERY;
             $this->options['sid_table_name'],
             $this->connection->quote($identifier),
             $this->connection->getDatabasePlatform()->convertBooleans($username)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateAcl(MutableAclInterface $acl)
+    {
+        $this->updatedAcl = $acl;
+        parent::updateAcl($acl);
+        $this->updatedAcl = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getInsertAccessControlEntrySql(
+        $classId,
+        $objectIdentityId,
+        $field,
+        $aceOrder,
+        $securityIdentityId,
+        $strategy,
+        $mask,
+        $granting,
+        $auditSuccess,
+        $auditFailure
+    ) {
+        $recordId = $this->updatedAcl && $this->updatedAcl->getObjectIdentity()
+            ? $this->updatedAcl->getObjectIdentity()->getIdentifier()
+            : null;
+
+        $query = <<<QUERY
+            INSERT INTO %s (
+                class_id,
+                object_identity_id,
+                field_name,
+                ace_order,
+                security_identity_id,
+                mask,
+                granting,
+                granting_strategy,
+                audit_success,
+                audit_failure,
+                record_id
+            )
+            VALUES (%d, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s)
+QUERY;
+
+        return sprintf(
+            $query,
+            $this->options['entry_table_name'],
+            $classId,
+            null === $objectIdentityId ? 'NULL' : (int) $objectIdentityId,
+            null === $field ? 'NULL' : $this->connection->quote($field),
+            $aceOrder,
+            $securityIdentityId,
+            $mask,
+            $this->connection->getDatabasePlatform()->convertBooleans($granting),
+            $this->connection->quote($strategy),
+            $this->connection->getDatabasePlatform()->convertBooleans($auditSuccess),
+            $this->connection->getDatabasePlatform()->convertBooleans($auditFailure),
+            null === $recordId ? 'NULL' : (int) $recordId
         );
     }
 }
