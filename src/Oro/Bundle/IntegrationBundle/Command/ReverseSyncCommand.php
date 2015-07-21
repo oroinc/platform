@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Command;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -64,7 +65,9 @@ class ReverseSyncCommand extends ContainerAwareCommand
             ->getRepository('OroIntegrationBundle:Channel');
 
         if (!is_array($convertedParams)) {
-            throw new \InvalidArgumentException('Parameters option must be serialized string.');
+            throw new \InvalidArgumentException(
+                sprintf('The "%s" option must be serialized string.', self::PARAMETERS_ARG_NAME)
+            );
         }
 
         $processor->getLoggerStrategy()->setLogger($logger);
@@ -139,13 +142,16 @@ class ReverseSyncCommand extends ContainerAwareCommand
             ->setParameter('commandName', $this->getName())
             ->setParameter('stateName', Job::STATE_RUNNING)
             ->andWhere(
-                $qb->expr()->eq('j.args', ':args')
+                $qb->expr()->eq('cast(j.args as text)', ':args')
             )
             ->setParameter(
                 'args',
-                '["--integration=' . $integrationId . '",' .
-                ' "--connector=' . $connectorTypeType . '",' .
-                ' "--params=\'' . $params . '\'"]'
+                [
+                    '--integration' => $integrationId,
+                    '--connector'   => $connectorTypeType,
+                    '--params'      => $params
+                ],
+                Type::JSON_ARRAY
             );
 
         return (int)$query->getQuery()->getSingleScalarResult() > 0;
