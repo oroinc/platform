@@ -13,7 +13,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * @var NumberFilterType
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
