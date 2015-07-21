@@ -3,7 +3,14 @@ define(function(require) {
 
     var jsPlumb = require('jsplumb');
     var _ = require('underscore');
-    var JsPlumbManager = require('./jsplumb-manager');
+    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
+
+    function ensureSmartLineManager(jsPlumb) {
+        if (!jsPlumb.__smartLineManager) {
+            jsPlumb.__smartLineManager = new JsPlumbSmartlineManager(jsPlumb);
+        }
+        return jsPlumb.__smartLineManager;
+    }
 
     function Smartline(params) {
         this.type = 'Smartline';
@@ -12,7 +19,7 @@ define(function(require) {
         params.stub = params.stub === null || params.stub === void 0 ? 30 : params.stub;
         var segments;
         var _super = jsPlumb.Connectors.AbstractConnector.apply(this, arguments);
-        this.smartlineManager = JsPlumbManager.getJsPlumbSmartlineManager(params._jsPlumb);
+        this.smartlineManager = ensureSmartLineManager(params._jsPlumb);
         var midpoint = params.midpoint === null || params.midpoint === void 0 ? 0.5 : params.midpoint;
         var alwaysRespectStubs = params.alwaysRespectStubs === true;
         var userSuppliedSegments = null;
@@ -53,7 +60,6 @@ define(function(require) {
             var current = null;
             var next;
             for (var i = 0; i < segments.length - 1; i++) {
-
                 current = current || _cloneArray(segments[i]);
                 next = _cloneArray(segments[i + 1]);
                 if (cornerRadius > 0 && current[4] !== next[4]) {
