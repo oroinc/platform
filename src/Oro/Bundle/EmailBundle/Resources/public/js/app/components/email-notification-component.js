@@ -54,6 +54,7 @@ define([
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);
                         self.view.onChangeAmount(r.count);
+                        self.view.showNotification();
                     }
                 })
             }

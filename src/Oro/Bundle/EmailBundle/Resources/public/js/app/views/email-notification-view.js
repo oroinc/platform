@@ -25,6 +25,11 @@ define([
             this.$containerContextTargets = $(options.el).find('.items');
             this.$el.show();
             this.initCollection().initEvents();
+
+            var self = this;
+            this.$el.click(function(){
+                self.initViewType()
+            });
         },
 
         initCollection: function () {
@@ -80,6 +85,7 @@ define([
         },
 
         initViewType: function () {
+            this.$el.find('.notification').hide();
             if (this.collection.models.length === 0) {
                 this.$el.find('.content').hide();
                 this.$el.find('.empty').show();
@@ -133,6 +139,15 @@ define([
                 self.$containerContextTargets.append($view);
                 self.initLayout();
             });
+        },
+
+        showNotification: function() {
+            if (!this.$el.hasClass('open')) {
+                this.$el.addClass('open');
+                this.$el.find('.content').hide();
+                this.$el.find('.empty').hide();
+                this.$el.find('.notification').show();
+            }
         }
     });
 
