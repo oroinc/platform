@@ -18,7 +18,14 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBu
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_15\OroEmailBundle as OroEmailBundle115;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\OroEmailBundle as OroEmailBundle116;
 
+/**
+ * Class OroEmailBundleInstaller
+ * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OroEmailBundleInstaller implements Installation
 {
     /**
@@ -75,10 +82,14 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle114::addEmbeddedContentIdField($schema);
 
-        OroEmailBundle115::createOroEmailMailboxProcessorTable($schema);
-        OroEmailBundle115::createOroEmailMailboxTable($schema);
-        OroEmailBundle115::addOwnerMailboxColumn($schema);
-        OroEmailBundle115::addOroEmailMailboxForeignKeys($schema);
-        OroEmailBundle115::addEmailUserMailboxOwnerColumn($schema);
+        OroEmailBundle115::addEmailFolderFields($schema);
+        OroEmailBundle115::addEmailOriginFields($schema);
+        OroEmailBundle115::updateEmailRecipientConstraint($schema);
+
+        OroEmailBundle116::createOroEmailMailboxProcessorTable($schema);
+        OroEmailBundle116::createOroEmailMailboxTable($schema);
+        OroEmailBundle116::addOwnerMailboxColumn($schema);
+        OroEmailBundle116::addOroEmailMailboxForeignKeys($schema);
+        OroEmailBundle116::addEmailUserMailboxOwnerColumn($schema);
     }
 }

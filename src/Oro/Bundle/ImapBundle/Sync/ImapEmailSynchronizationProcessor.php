@@ -19,6 +19,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
@@ -69,8 +70,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $this->initEnv($origin);
 
-        // iterate through all folders and do a synchronization of emails for each one
-        $imapFolders = $this->syncFolders($origin);
+        // iterate through all folders enabled for sync and do a synchronization of emails for each one
+        $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
 
@@ -119,16 +120,20 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
     {
-        $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
+        try {
+            $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
 
-        $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
-        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+            $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
+            $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-        $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
-        $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
+            $ids = $emailImapRepository->getEmailUserIdsByUIDs($uids, $imapFolder->getFolder());
+            $invertedIds = $emailUserRepository->getInvertedIdsFromFolder($ids, $imapFolder->getFolder());
 
-        $emailUserRepository->setEmailUsersSeen($ids, false);
-        $emailUserRepository->setEmailUsersSeen($invertedIds, true);
+            $emailUserRepository->setEmailUsersSeen($ids, false);
+            $emailUserRepository->setEmailUsersSeen($invertedIds, true);
+        } catch (UnsupportException $e) {
+            $this->logger->notice(sprintf('Seen update unsupport - "%s"', $imapFolder->getFolder()->getOrigin()));
+        }
     }
 
     /**
@@ -166,6 +171,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * TODO: remove in feature CRM-3260
+     *
      * Performs synchronization of folders
      *
      * @param EmailOrigin $origin
@@ -256,6 +263,27 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * Gets the list of IMAP folders enabled for sync
+     * The outdated folders are ignored
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return ImapEmailFolder[]
+     */
+    protected function getSyncEnabledImapFolders(EmailOrigin $origin)
+    {
+        $this->logger->notice('Get folders enabled for sync...');
+
+        /** @var ImapEmailFolderRepository $repo */
+        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
+
+        $this->logger->notice(sprintf('Got %d folder(s).', count($imapFolders)));
+
+        return $imapFolders;
+    }
+
+    /**
      * Gets all folders from IMAP server
      *
      * @return Folder[]
@@ -308,7 +336,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected function syncEmails(ImapEmailFolder $imapFolder, SearchQuery $searchQuery)
     {
         $folder             = $imapFolder->getFolder();
-        $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
 
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
@@ -352,15 +379,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail(
-                $email,
-                $folderType,
-                $this->currentUser,
-                $this->currentOrganization
-            )) {
-                continue;
-            }
-
             if ($email->getSentAt() > $lastSynchronizedAt) {
                 $lastSynchronizedAt = $email->getSentAt();
             }
@@ -381,9 +399,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($count > 0) {
             $this->saveEmails(
                 $batch,
-                $imapFolder,
-                $this->currentUser,
-                $this->currentOrganization
+                $imapFolder
             );
         }
 
@@ -497,7 +513,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 }
             }
         }
-
         $this->em->flush();
 
         $this->cleanUp();
@@ -683,7 +698,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if (!in_array($email->getId()->getUid(), $existingUids)) {
                 $result[] = $email->getMessageId();
             }
-
         }
 
         return $result;

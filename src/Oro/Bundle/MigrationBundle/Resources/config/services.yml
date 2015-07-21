@@ -82,3 +82,8 @@ services:
             - @doctrine
         tags:
             - { name: twig.extension }
+
+    oro_migration.listener.console_command_listener:
+        class: Oro\Bundle\MigrationBundle\EventListener\ConsoleCommandListener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }

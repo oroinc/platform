@@ -8,7 +8,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
@@ -16,6 +17,7 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPa
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessorPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFolderLoaderPass;
 
 class OroEmailBundle extends Bundle
 {

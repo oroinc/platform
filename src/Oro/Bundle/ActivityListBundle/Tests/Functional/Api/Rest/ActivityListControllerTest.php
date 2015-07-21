@@ -15,7 +15,9 @@ class ActivityListControllerTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData']);
+        $this->loadFixtures([
+            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData'
+        ]);
     }
 
     public function testGetList()

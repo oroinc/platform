@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Gaufrette\Stream;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -131,7 +133,7 @@ class AttachmentManager
                 $entity->setFileSize($file->getSize());
             }
 
-            $entity->setFilename(uniqid() . '.' . $entity->getExtension());
+            $entity->setFilename($this->generateFileName($entity->getExtension()));
 
             $fsAdapter = $this->filesystem->getAdapter();
             if ($fsAdapter instanceof MetadataSupporter) {
@@ -164,17 +166,8 @@ class AttachmentManager
      */
     public function copyLocalFileToStorage($localFilePath, $destinationFileName)
     {
-        $src = new LocalStream($localFilePath);
-        $dst = $this->filesystem->createStream($destinationFileName);
-
-        $src->open(new StreamMode('rb+'));
-        $dst->open(new StreamMode('wb+'));
-
-        while (!$src->eof()) {
-            $dst->write($src->read(self::READ_COUNT));
-        }
-        $dst->close();
-        $src->close();
+        $srcStream = new LocalStream($localFilePath);
+        $this->copyStreamToStorage($srcStream, $destinationFileName);
     }
 
     /**
@@ -441,5 +434,56 @@ class AttachmentManager
             $this->associationManager->getSingleOwnerFilter('attachment'),
             RelationType::MANY_TO_ONE
         );
+    }
+
+    /**
+     * Copy attachment file object
+     *
+     * @param File $file
+     *
+     * @return File
+     */
+    public function copyAttachmentFile(File $file)
+    {
+        $fileCopy = clone $file;
+        $fileCopy->setFilename($this->generateFileName($file->getExtension()));
+
+        $sourceStream =  $this->filesystem->createStream($file->getFilename());
+        $this->copyStreamToStorage($sourceStream, $fileCopy->getFilename());
+
+        return $fileCopy;
+    }
+
+    /**
+     * Copy stream to storage
+     *
+     * @param Stream $srcStream
+     * @param string $destinationFileName
+     */
+    protected function copyStreamToStorage(Stream $srcStream, $destinationFileName)
+    {
+        $dstStream = $this->filesystem->createStream($destinationFileName);
+
+        $srcStream->open(new StreamMode('rb+'));
+        $dstStream->open(new StreamMode('wb+'));
+
+        while (!$srcStream->eof()) {
+            $dstStream->write($srcStream->read(self::READ_COUNT));
+        }
+
+        $dstStream->close();
+        $srcStream->close();
+    }
+
+    /**
+     * Generate unique file name with specific extension
+     *
+     * @param string $extension
+     *
+     * @return string
+     */
+    protected function generateFileName($extension)
+    {
+        return sprintf('%s.%s', uniqid(), $extension);
     }
 }

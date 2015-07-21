@@ -290,9 +290,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
+     *
+     * @expectedException \Doctrine\ORM\EntityNotFoundException
+     */
     public function testExecuteWithoutTemplateEntity()
     {
-        $this->setExpectedException('\Doctrine\ORM\EntityNotFoundException', 'Entity was not found.');
         $options = [
             'from' => 'test@test.com',
             'to' => 'test@test.com',
