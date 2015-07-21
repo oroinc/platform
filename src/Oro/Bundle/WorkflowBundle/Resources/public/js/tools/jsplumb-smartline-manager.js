@@ -41,7 +41,6 @@ define(function(require){
             var connections = [];
             var rects = {};
             var graph = new Graph();
-            var endPoints = this.jsPlumbInstance.sourceEndpointDefinitions;
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);

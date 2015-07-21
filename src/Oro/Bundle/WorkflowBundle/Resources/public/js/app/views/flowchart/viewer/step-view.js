@@ -25,13 +25,13 @@ define(function(require) {
 
         targetDefaults: {
             dropOptions: {hoverClass: 'dragHover'},
-            anchor: 'Continuous',
+            anchor: ['Continuous', {faces: ['Top']}],
             allowLoopback: true
         },
 
         sourceDefaults: {
             filter: '.jsplumb-source',
-            anchor: 'Continuous',
+            anchor: ['Continuous', {faces: ['Bottom']}],
             connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
             maxConnections: 100
         },
