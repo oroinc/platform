@@ -34,6 +34,8 @@ services:
 
     oro_email.form.type.autoresponserule:
         class: %oro_email.form.type.autoresponserule.class%
+        arguments:
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
 
@@ -47,13 +49,14 @@ services:
         arguments:
             - @oro_config.user
             - @oro_locale.settings
+            - @doctrine
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template }
 
     oro_email.form.type.autoresponse_template_choice:
         class: %oro_email.form.type.autoresponse_template_choice.class%
         arguments:
-            - @oro_email.form.subscriber.emailtemplate
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
 

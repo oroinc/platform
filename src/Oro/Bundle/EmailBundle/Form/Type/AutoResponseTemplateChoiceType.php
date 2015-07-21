@@ -2,53 +2,54 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AutoResponseTemplateChoiceType extends AbstractType
 {
     const NAME = 'oro_email_autoresponse_template_choice';
 
-    /** @var EventSubscriberInterface */
-    protected $templateFormSubscriber;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /**
-     * @param EventSubscriberInterface $templateFormSubscriber
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(EventSubscriberInterface $templateFormSubscriber)
+    public function __construct(SecurityFacade $securityFacade)
     {
-        $this->templateFormSubscriber = $templateFormSubscriber;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
+     * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $builder
-            ->add('entityName', 'hidden', [
-                'mapped' => false,
-                'data' => Email::ENTITY_CLASS,
-                'constraints' => [
-                    new Assert\IdenticalTo([
-                        'value' => Email::ENTITY_CLASS
-                    ])
-                ]
-            ])
-            ->add('template', 'oro_email_template_list', [
-                'label' => false,
-                'configs' => [
-                    'allowClear'  => true,
-                    'placeholder' => 'oro.form.custom_value',
-                ]
-            ]);
+        $resolver->setDefaults([
+            'selectedEntity' => Email::ENTITY_CLASS,
+            'query_builder' => function (EmailTemplateRepository $repository) {
+                return $repository->getEntityTemplatesQueryBuilder(
+                    Email::ENTITY_CLASS,
+                    $this->securityFacade->getOrganization()
+                );
+            },
+            'configs' => [
+                'allowClear'  => true,
+                'placeholder' => 'oro.form.custom_value',
+            ]
+        ]);
+    }
 
-        $builder->addEventSubscriber($this->templateFormSubscriber);
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'oro_email_template_list';
     }
 
     /**

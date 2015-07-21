@@ -499,6 +499,7 @@
             modeSelector: '#' ~ form.mode.vars.id,
             newEntitySelector: '.new-entity',
             existingEntitySelector: '.existing-entity',
+            existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
          }|json_encode }}">
         <div class="existing-entity">
             {{ form_widget(form.existing_entity) }}

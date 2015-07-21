@@ -43,7 +43,7 @@ class AutoResponseRuleCondition
 
     /**
      * @var string
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $filterValue;
 

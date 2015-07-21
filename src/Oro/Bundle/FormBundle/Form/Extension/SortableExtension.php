@@ -20,6 +20,7 @@ class SortableExtension extends AbstractTypeExtension
 
         $builder->add('_position', 'hidden', [
             'property_path' => $options['sortable_property_path'],
+            'data' => '0',
             'attr' => [
                 'class' => 'position-input',
             ],

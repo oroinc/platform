@@ -2,30 +2,41 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class AutoResponseTemplateType extends AbstractType
 {
     /** @var ConfigManager */
-    private $userConfig;
+    protected $userConfig;
 
     /** @var LocaleSettings */
-    private $localeSettings;
+    protected $localeSettings;
+
+    /** @var Registry */
+    protected $registry;
 
     /**
      * @param ConfigManager $userConfig
-     * @param LocaleSettings    $localeSettings
+     * @param LocaleSettings $localeSettings
+     * @param Registry $registry
      */
-    public function __construct(ConfigManager $userConfig, LocaleSettings $localeSettings)
+    public function __construct(ConfigManager $userConfig, LocaleSettings $localeSettings, Registry $registry)
     {
         $this->userConfig     = $userConfig;
         $this->localeSettings = $localeSettings;
+        $this->registry       = $registry;
     }
 
     /**
@@ -34,6 +45,12 @@ class AutoResponseTemplateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('entityName', 'hidden', [
+                'data' => Email::ENTITY_CLASS,
+                'constraints' => [
+                    new Assert\IdenticalTo(['value' => Email::ENTITY_CLASS]),
+                ],
+            ])
             ->add('type', 'choice', [
                 'label'    => 'oro.email.emailtemplate.type.label',
                 'multiple' => false,
@@ -49,6 +66,16 @@ class AutoResponseTemplateType extends AbstractType
                 'label'    => 'oro.email.emailtemplate.translations.label',
                 'locales'  => $this->getLanguages(),
                 'labels'   => $this->getLocaleLabels(),
+                'content_options' => [
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                    ],
+                ],
+                'subject_options' => [
+                    'constraints' => [
+                        new Assert\NotBlank(),
+                    ],
+                ],
             ])
             ->add('visible', 'checkbox', [
                 'label' => 'oro.email.autoresponserule.form.template.visible.label',
@@ -59,6 +86,20 @@ class AutoResponseTemplateType extends AbstractType
             if ($form->has('owner')) {
                 $form->remove('owner');
             }
+        });
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $template = $event->getData();
+            if (!$template || $template->getName()) {
+                return;
+            }
+
+            $proposedName = $template->getSubject();
+            while ($this->templateExists($proposedName)) {
+                $proposedName .= rand(0, 10);
+            }
+
+            $template->setName($proposedName);
         });
     }
 
@@ -78,6 +119,34 @@ class AutoResponseTemplateType extends AbstractType
     public function getName()
     {
         return 'oro_email_autoresponse_template';
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    protected function templateExists($name)
+    {
+        return (bool) $this->getEmailTemplateRepository()
+            ->createQueryBuilder('et')
+            ->select('COUNT(et.id)')
+            ->where('et.name = :name')
+            ->andWhere('et.entityName = :entityName')
+            ->setParameters([
+                'name' => $name,
+                'entityName' => Email::ENTITY_CLASS,
+            ])
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return EmailTemplateRepository
+     */
+    protected function getEmailTemplateRepository()
+    {
+        return $this->registry->getRepository('OroEmailBundle:EmailTemplate');
     }
 
     /**

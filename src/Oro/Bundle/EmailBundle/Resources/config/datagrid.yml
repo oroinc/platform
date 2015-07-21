@@ -386,6 +386,9 @@ datagrid:
                     - t.isSystem
                 from:
                     - { table: %oro_email.emailtemplate.entity.class%, alias: t }
+                where:
+                    and:
+                        - t.visible = 1
 
         columns:
             entityName:

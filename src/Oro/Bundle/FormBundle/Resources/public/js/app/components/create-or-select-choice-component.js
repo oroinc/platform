@@ -14,6 +14,7 @@ define([
             'modeSelector',
             'newEntitySelector',
             'existingEntitySelector',
+            'existingEntityInputSelector',
             '_sourceElement',
         ],
 
@@ -38,7 +39,7 @@ define([
             this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
             this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
 
-            this._updateNewEntityVisibility();
+            this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
 
             var self = this;
             tinymce.EditorManager.once('AddEditor', function (e) {

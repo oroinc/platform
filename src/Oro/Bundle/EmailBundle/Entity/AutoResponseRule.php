@@ -42,17 +42,15 @@ class AutoResponseRule
      * @var AutoResponseRuleCondition[]|Collection
      * @ORM\OneToMany(targetEntity="AutoResponseRuleCondition", mappedBy="rule", cascade={"persist"})
      * @ORM\OrderBy({"position"="ASC"})
-     *
-     * @ Assert\NotBlank
      */
     protected $conditions;
 
     /**
      * @var EmailTemplate
      *
-     * @ORM\ManyToOne(targetEntity="EmailTemplate")
+     * @ORM\ManyToOne(targetEntity="EmailTemplate", cascade={"persist"})
      * @ORM\JoinColumn(name="template_id", referencedColumnName="id", onDelete="CASCADE")
-     * @ Assert\NotBlank
+     * @Assert\NotBlank
      */
     protected $template;
 
