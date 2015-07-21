@@ -41,8 +41,13 @@ class WebSocketSendProcessor
     public function send($usersWithNewEmails)
     {
         if ($usersWithNewEmails) {
-            foreach ($usersWithNewEmails as $user) {
-                $messageData = [['new_email' => true]];
+            foreach ($usersWithNewEmails as $item) {
+                $user = $item['owner'];
+                $messageData = [[
+                    'new_email' => true,
+                    'count_new' => isset($item['new']) && $item['new']>0 ? : 0
+                ]];
+
                 $this->publisher->send(self::getUserTopic($user), json_encode($messageData));
             }
         }

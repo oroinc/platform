@@ -10,6 +10,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 
 class EmailUserListener
 {
+    const ENTITY_STATUS_NEW = 'new';
+    const ENTITY_STATUS_UPDATE = 'update';
+
     /**
      * @var WebSocketSendProcessor
      */
@@ -51,16 +54,34 @@ class EmailUserListener
 
         /** @var EmailUser $entity */
         foreach ($this->processEmailUsersEntities as $entity) {
+            $status = $entity['status'];
+            $entity = $entity['entity'];
             if (!$entity->getOwner()) {
                 continue;
             }
-            $usersWithNewEmails[$entity->getOwner()->getId()] = $entity->getOwner();
+
+            $ownerId = $entity->getOwner()->getId();
+            if (isset($usersWithNewEmails[$ownerId])) {
+                $new = $usersWithNewEmails[$ownerId]['new'];
+                if ($status === self::ENTITY_STATUS_NEW) {
+                    $new = $new + 1;
+                }
+                $usersWithNewEmails[$ownerId]['new'] = $new;
+            } else {
+                $usersWithNewEmails[$ownerId] = [
+                    'owner' => $entity->getOwner(),
+                    'new' => $status === self::ENTITY_STATUS_NEW ? 1: 0
+                ];
+            }
         }
+
         if ($usersWithNewEmails) {
             $this->processor->send($usersWithNewEmails);
         }
         $this->processEmailUsersEntities = [];
     }
+
+
 
     /**
      * Collect new EmailUser entities
@@ -72,7 +93,10 @@ class EmailUserListener
         if ($entities) {
             foreach ($entities as $entity) {
                 if ($entity instanceof EmailUser && !$entity->isSeen()) {
-                    $this->processEmailUsersEntities[] = $entity;
+                    $this->processEmailUsersEntities[] = [
+                        'status' => self::ENTITY_STATUS_NEW,
+                        'entity' => $entity
+                    ];
                 }
             }
         }
@@ -90,7 +114,10 @@ class EmailUserListener
                 if ($entity instanceof EmailUser) {
                     $changes = $uow->getEntityChangeSet($entity);
                     if (array_key_exists('seen', $changes) === true) {
-                        $this->processEmailUsersEntities[] = $entity;
+                        $this->processEmailUsersEntities[] = [
+                            'status' => self::ENTITY_STATUS_UPDATE,
+                            'entity' => $entity
+                        ];
                     }
                 }
             }

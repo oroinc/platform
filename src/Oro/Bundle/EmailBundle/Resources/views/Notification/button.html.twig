@@ -45,7 +45,6 @@
         </div>
     </li>
 </script>
-
 {% if count > 0 %}
     {%  set classNew = 'new' %}
 {% else %}
@@ -70,7 +69,7 @@
         </i>
     </a>
     <div class="dropdown-menu pull-right" tabindex="0">
-        <div class="content hide" >
+        <div class="content" >
             <div class="header row-fluid">
                 <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
                     {{ "oro.email.menu.user_emails"|trans }}
@@ -80,12 +79,11 @@
             <ul class="items">
             </ul>
         </div>
-        <div class="empty hide">
+        <div class="empty">
             {{ "oro.email.notification.empty"|trans }}
         </div>
-        <div class="notification hide">
+        <div class="notification">
             {{ "oro.email.notification.new_email"|trans }}
-
         </div>
     </div>
 </li>

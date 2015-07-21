@@ -47,14 +47,18 @@ define([
         onNewEmail: function (r) {
             var self = this;
             r = JSON.parse(r);
+            var isNew = r[0].count_new;
             if (r) {
                 $.ajax({
                     url: routing.generate('oro_api_get_email_notification_data'),
                     success: function (r) {
+                        console.log(r);
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);
                         self.view.onChangeAmount(r.count);
-                        self.view.showNotification();
+                        if (isNew) {
+                            self.view.showNotification();
+                        }
                     }
                 })
             }

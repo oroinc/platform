@@ -624,7 +624,6 @@ a.sync-btn span.dots {
         font-size: 9px;
         width: 23px;
         display: inline-block;
-        text-align: center;
         background: #36424c;
         border-radius: 8px;
         position: absolute;
@@ -660,8 +659,43 @@ a.sync-btn span.dots {
   .icon-envelope.new {
     color: #fabb18;
   }
-  .empty, .notification {
-    padding: 5px 10px
+
+  .dropdown-menu {
+    .content {
+      display: none;
+    }
+    .empty {
+      display: none;
+    }
+    .notification {
+      display: none;
+    }
+  }
+
+  .dropdown-menu.content {
+    .content {
+      display: block;
+    }
+  }
+
+  .dropdown-menu.empty {
+    width: 200px !important;
+    .empty {
+      display: block;
+    }
+  }
+
+  .dropdown-menu.notification {
+    width: 160px !important;
+    .notification {
+      display: block;
+    }
+  }
+
+  .dropdown-menu {
+    .empty, .notification {
+      padding: 5px 10px
+    }
   }
   .items {
     .icon-envelope {

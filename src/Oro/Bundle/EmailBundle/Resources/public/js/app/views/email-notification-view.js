@@ -13,6 +13,7 @@ define([
 
     EmailAttachmentView = BaseView.extend({
         contextsView: null,
+        countNewEmail:null,
         inputName: '',
         events: {
             'click a.mark-as-read': 'onClickMarkAsRead',
@@ -23,12 +24,16 @@ define([
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
             this.$containerContextTargets = $(options.el).find('.items');
+            this.countNewEmail = this.getCount();
             this.$el.show();
             this.initCollection().initEvents();
 
             var self = this;
-            this.$el.click(function(){
-                self.initViewType()
+            this.$el.click(function() {
+                if ($(this).find('.dropdown-menu').hasClass('notification')) {
+                    self.$el.addClass('open');
+                }
+                self.initViewType();
             });
         },
 
@@ -84,17 +89,31 @@ define([
             return $(this.el).data('emails');
         },
 
+        getCount: function () {
+            return $(this.el).data('count');
+        },
+
+
         initViewType: function () {
-            this.$el.find('.notification').hide();
             if (this.collection.models.length === 0) {
-                this.$el.find('.content').hide();
-                this.$el.find('.empty').show();
+                this.setTypeDropDownMenu('empty');
                 this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
             } else {
-                this.$el.find('.content').show();
-                this.$el.find('.empty').hide();
-                this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
+                this.setTypeDropDownMenu('content');
+                if (this.countNewEmail > 0) {
+                    this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
+                }
             }
+        },
+
+        resetTypeDropDownMenu: function() {
+            this.$el.find('.dropdown-menu').removeClass('content empty notification');
+
+            return this;
+        },
+        setTypeDropDownMenu:function(type) {
+            this.resetTypeDropDownMenu();
+            this.$el.find('.dropdown-menu').addClass(type);
         },
 
         onClickOpenEmail: function (e) {
@@ -111,9 +130,11 @@ define([
 
             this.$el.find('#'+model.cid).removeClass('new');
             this.$el.find('#'+model.cid).find('.icon-envelope').removeClass('new');
+            this.initViewType();
         },
 
         onChangeAmount: function (count) {
+            this.countNewEmail = count;
             if (count > 10) {
                 count = '10+';
             }
@@ -121,7 +142,6 @@ define([
             if (count == 0) {
                 count = '';
             }
-
             this.$el.find('.icon-envelope span').html(count);
             this.initViewType();
         },
@@ -144,9 +164,7 @@ define([
         showNotification: function() {
             if (!this.$el.hasClass('open')) {
                 this.$el.addClass('open');
-                this.$el.find('.content').hide();
-                this.$el.find('.empty').hide();
-                this.$el.find('.notification').show();
+                this.setTypeDropDownMenu('notification');
             }
         }
     });

@@ -72,7 +72,11 @@ class EmailController extends Controller
     public function testAction()
     {
         $sender = $this->get('oro_email.email_websocket.processor');
-        $a = $sender->send([$this->getUser()]);
+        $item = [
+            'owner'=>$this->getUser(),
+            'new'=>0
+        ];
+        $a = $sender->send([$item]);
 
         return new JsonResponse([$a]);
     }
@@ -123,7 +127,7 @@ class EmailController extends Controller
         $emails = array_filter($emails, function ($email) {
             return $this->get('security.context')->isGranted('VIEW', $email);
         });
-        $this->loadEmailBody($emails);
+        $this->lfoadEmailBody($emails);
 
         return [
             'entity' => $entity,
