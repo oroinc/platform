@@ -42,24 +42,27 @@ define(function(require){
             var rects = {};
             var graph = new Graph();
             var endPoints = this.jsPlumbInstance.sourceEndpointDefinitions;
-            for (var id in endPoints) {
-                if (endPoints.hasOwnProperty(id)) {
-                    var el = document.getElementById(id);
-                    if (!el) {
-                        this.cache = {};
-                        return;
-                    }
-                    var clientRect = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
+            _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
+                var clientRect;
+                var el = document.getElementById(id);
+                if (el) {
+                    clientRect = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
                     rects[id] = clientRect;
                     clientRect.cid = id;
                     graph.rectangles.push(clientRect);
                 }
+            });
+            if (graph.rectangles.length < 1) {
+                this.cache = {};
+                return;
             }
-
+            console.log(this.jsPlumbInstance.sourceEndpointDefinitions)
             graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
-                connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
+                if (conn.sourceId in rects && conn.targetId in rects) {
+                    connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
+                }
             }, this);
 
             connections.sort(function (a, b) {
