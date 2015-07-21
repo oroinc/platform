@@ -62,6 +62,21 @@
         ]
     }] %}
 
+    {% set additionalData = [] %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set additionalData = additionalData|merge([form_row(child)]) %}
+    {% endfor %}
+    {% if additionalData is not empty %}
+        {% set dataBlocks = dataBlocks|merge([{
+        'title': 'Additional'|trans,
+        'subblocks': [{
+        'title': '',
+        'useSpan': false,
+        'data' : additionalData
+        }]
+        }] ) %}
+    {% endif %}
+
     {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
         {% set dataBlocks = dataBlocks|merge([{
             'title': privilegeConfig.label|trans,
@@ -76,21 +91,6 @@
             ]
         }]) %}
     {% endfor %}
-
-    {% set additionalData = [] %}
-    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-        {% set additionalData = additionalData|merge([form_row(child)]) %}
-    {% endfor %}
-    {% if additionalData is not empty %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional'|trans,
-            'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
-            }]
-        }] ) %}
-    {% endif %}
 
     {% set dataBlocks = dataBlocks|merge([{
         'title' : 'oro.user.entity_plural_label'|trans,
