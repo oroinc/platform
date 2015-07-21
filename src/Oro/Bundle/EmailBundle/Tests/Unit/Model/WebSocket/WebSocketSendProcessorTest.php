@@ -50,24 +50,20 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->emailUser->expects($this->exactly(2))
             ->method('getOwner')
-            ->willReturn($this->returnValue($user));
+            ->willReturn($user);
 
         $this->emailUser->expects($this->exactly(2))
             ->method('getOrganization')
-            ->willReturn($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->topicPublisher->expects($this->once())
             ->method('send')
             ->with(
-                sprintf(
-                    WebSocketSendProcessor::TOPIC,
-                    $this->emailUser->getOwner()->getId(),
-                    $this->emailUser->getOrganization()->getId()
-                ),
-                json_encode([['new_email' => true]])
+                WebSocketSendProcessor::getUserTopic($this->emailUser->getOwner(), $this->emailUser->getOrganization()),
+                json_encode([['count_new' => 0]])
             );
 
-        $this->processor->send(['entity' => $this->emailUser]);
+        $this->processor->send([['entity' => $this->emailUser]]);
     }
 
     public function testSendFailure()
