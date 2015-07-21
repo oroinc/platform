@@ -6,7 +6,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Criteria;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -109,7 +108,7 @@ class ActivityListAclCriteriaHelper
      */
     protected function applyCriteriaToQb(QueryBuilder $qb, Criteria $criteria)
     {
-        QueryBuilderHelper::addCriteria($qb, $criteria);
+        $qb->addCriteria($criteria);
     }
 
     /**

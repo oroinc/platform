@@ -8,7 +8,6 @@ use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class EmailActivityApiEntityManager extends ApiEntityManager
@@ -44,11 +43,7 @@ class EmailActivityApiEntityManager extends ApiEntityManager
             ->setMaxResults(2);
         $this->applyJoins($qb, $joins);
 
-        // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-        // http://www.doctrine-project.org/jira/browse/DDC-2798
-        // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-        QueryBuilderHelper::addCriteria($qb, $criteria);
-        // $qb->addCriteria($criteria);
+        $qb->addCriteria($criteria);
 
         /** @var Email[] $entity */
         $entity = $qb->getQuery()->getResult();

@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_11';
+        return 'v1_12';
     }
 
     /**

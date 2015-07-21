@@ -180,6 +180,8 @@ class Reminder extends ExtendReminder
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->setState(self::STATE_NOT_SENT);
     }
 
