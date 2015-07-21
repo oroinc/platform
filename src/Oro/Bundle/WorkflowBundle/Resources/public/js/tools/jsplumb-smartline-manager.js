@@ -13,14 +13,8 @@ define(function(require){
         this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
         this.cache = {};
         this.debouncedCalculateOverlays = _.debounce(
-                _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
-            50);
-        this.debouncedRepaintEverything = _.debounce(
-            _.bind(function () {
-                this.jsPlumbInstance.repaintEverything();
-            }, this),
-            0
-        );
+            _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
+        50);
     }
 
     window.getLastRequest = function () {
@@ -28,6 +22,18 @@ define(function(require){
     }
 
     JsPlumbSmartlineManager.prototype = {
+
+        isCacheValid: function () {
+            return _.isEqual(this.getState(), this.cache.state)
+        },
+
+        getConnectionPath: function (connector) {
+            if (!this.isCacheValid()) {
+                this.refreshCache();
+            }
+
+            return this.cache.connections[connector.getId()] || [];
+        },
 
         getNaivePathLength: function (fromRect, toRect) {
             if (fromRect == toRect) {
@@ -38,13 +44,35 @@ define(function(require){
                 + ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
         },
 
-        calculate: function (connector, paintInfo) {
-            var invalidateConnection;
+
+        getState: function () {
+            var state = {
+                rectangles: [],
+                connections: []
+            }
+            _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    state.rectangles.push([id, el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight]);
+                }
+            });
+
+            _.each(this.jsPlumbInstance.getConnections(), function (conn) {
+                if (conn.sourceId in rects && conn.targetId in rects) {
+                    state.connections.push([conn.sourceId, conn.targetId]);
+                }
+            }, this);
+
+            return state;
+        },
+
+        refreshCache: function () {
+            this.cache.state = this.getState();
             var cache = {};
             var connections = [];
             var rects = {};
             var graph = new Graph();
-            var endPoints = this.jsPlumbInstance.sourceEndpointDefinitions;
+
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);
@@ -55,10 +83,12 @@ define(function(require){
                     graph.rectangles.push(clientRect);
                 }
             });
+
             if (graph.rectangles.length < 1) {
-                this.cache = {};
+                this.cache.connections = {};
                 return;
             }
+
             graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
@@ -106,49 +136,10 @@ define(function(require){
             _.each(cache, function (item) {
                 var points =  item.path.points.reverse();
                 item.points = points;
-            })
+            });
 
-            invalidateConnection = _.find(cache, function(item, cacheKey) {
-                return cacheKey in this.cache && item.connector !== connector &&
-                    !_.isEqual(this.cache[cacheKey].points, item.points);
-            }, this);
-
-            _.extend(this.cache, cache);
-
-            if (invalidateConnection) {
-                this.debouncedRepaintEverything();
-            }
+            this.jsPlumbInstance.repaintEverything();
             this.debouncedCalculateOverlays();
-        },
-
-        getConnectionPath: function (connector, paintInfo) {
-            var connectorId = connector.getId();
-            var cached = this.retrieveCacheItem(connectorId, paintInfo);
-
-            if (cached === false) {
-                this.calculate(connector, paintInfo);
-                cached = this.retrieveCacheItem(connectorId, paintInfo);
-            }
-
-            if (cached !== false) {
-                return _.clone(cached.points);
-            }
-
-            console.warn("Path not found");
-            return [];
-        },
-
-        retrieveCacheItem: function (connectorId, paintInfo) {
-            var cached = connectorId in this.cache ? this.cache[connectorId] : undefined;
-            if (cached) {
-                if (cached.points.length && (_.isUndefined(cached.paintInfo) || matchEndpoints(cached.paintInfo, paintInfo))) {
-                    cached.paintInfo = paintInfo;
-                    return cached;
-                } else {
-                    delete this.cache[connectorId];
-                }
-            }
-            return false;
         }
     };
 
