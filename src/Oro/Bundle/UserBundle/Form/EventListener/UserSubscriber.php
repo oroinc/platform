@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class UserSubscriber implements EventSubscriberInterface
 {
@@ -31,8 +31,8 @@ class UserSubscriber implements EventSubscriberInterface
         FormFactoryInterface $factory,
         SecurityContextInterface $security
     ) {
-        $this->factory    = $factory;
-        $this->security   = $security;
+        $this->factory = $factory;
+        $this->security = $security;
     }
 
     /**
@@ -40,10 +40,10 @@ class UserSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::PRE_SUBMIT => 'preSubmit',
-        );
+        ];
     }
 
     /**
@@ -65,11 +65,14 @@ class UserSubscriber implements EventSubscriberInterface
         $event->setData($submittedData);
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function preSetData(FormEvent $event)
     {
-        /* @var $entity User */
+        /* @var AbstractUser $entity */
         $entity = $event->getData();
-        $form   = $event->getForm();
+        $form = $event->getForm();
 
         if (is_null($entity)) {
             return;
@@ -85,15 +88,15 @@ class UserSubscriber implements EventSubscriberInterface
                 'enabled',
                 'choice',
                 $entity->getId() ? $entity->isEnabled() : '',
-                array(
-                    'label'           => 'Status',
-                    'required'        => true,
-                    'disabled'        => $this->isCurrentUser($entity),
-                    'choices'         => array('Inactive', 'Active'),
-                    'empty_value'     => 'Please select',
-                    'empty_data'      => '',
+                [
+                    'label' => 'Status',
+                    'required' => true,
+                    'disabled' => $this->isCurrentUser($entity),
+                    'choices' => ['Inactive', 'Active'],
+                    'empty_value' => 'Please select',
+                    'empty_data' => '',
                     'auto_initialize' => false
-                )
+                ]
             )
         );
 
@@ -105,10 +108,10 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * Returns true if passed user is currently authenticated
      *
-     * @param  User $user
+     * @param  AbstractUser $user
      * @return bool
      */
-    protected function isCurrentUser(User $user)
+    protected function isCurrentUser(AbstractUser $user)
     {
         $token = $this->security->getToken();
         $currentUser = $token ? $token->getUser() : null;

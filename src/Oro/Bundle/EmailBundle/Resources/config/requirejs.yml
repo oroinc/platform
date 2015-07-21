@@ -22,5 +22,10 @@ config:
         'oroemail/js/app/components/email-context-activity-component': 'bundles/oroemail/js/app/components/email-context-activity-component.js'
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'
+        'oroemail/js/app/components/mark-unread-button': 'bundles/oroemail/js/app/components/mark-unread-button.js'
 
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
+
+        'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'
+
+        'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'

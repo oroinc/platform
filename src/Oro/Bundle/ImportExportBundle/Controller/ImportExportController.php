@@ -78,8 +78,9 @@ class ImportExportController extends Controller
         $existingAliases = $processorRegistry
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
+        $jobName = $this->getRequest()->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
         $result = $this->getImportHandler()->handleImportValidation(
-            JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV,
+            $jobName,
             $processorAlias,
             'csv',
             null,
@@ -99,8 +100,9 @@ class ImportExportController extends Controller
      */
     public function importProcessAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
         $result = $this->getImportHandler()->handleImport(
-            JobExecutor::JOB_IMPORT_FROM_CSV,
+            $jobName,
             $processorAlias,
             'csv',
             null,
@@ -119,8 +121,10 @@ class ImportExportController extends Controller
      */
     public function instantExportAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
+
         return $this->getExportHandler()->handleExport(
-            JobExecutor::JOB_EXPORT_TO_CSV,
+            $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT,
             'csv',
@@ -141,8 +145,9 @@ class ImportExportController extends Controller
      */
     public function templateExportAction($processorAlias)
     {
+        $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
         $result = $this->getExportHandler()->getExportResult(
-            JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
+            $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',

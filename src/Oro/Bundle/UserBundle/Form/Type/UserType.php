@@ -50,11 +50,7 @@ class UserType extends AbstractType
         $this->securityFacade    = $securityFacade;
         $this->userConfigManager = $userConfigManager;
 
-        if ($request->attributes->get('_route') == 'oro_user_profile_update') {
-            $this->isMyProfilePage = true;
-        } else {
-            $this->isMyProfilePage = false;
-        }
+        $this->isMyProfilePage = $request->attributes->get('_route') === 'oro_user_profile_update';
     }
 
     /**
@@ -79,7 +75,7 @@ class UserType extends AbstractType
             $builder->add(
                 'roles',
                 'entity',
-                array(
+                [
                     'property_path' => 'rolesCollection',
                     'label'         => 'oro.user.roles.label',
                     'class'         => 'OroUserBundle:Role',
@@ -96,7 +92,7 @@ class UserType extends AbstractType
                     'read_only'     => $this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
                     'translatable_options' => false
-                )
+                ]
             );
         }
 
@@ -104,7 +100,7 @@ class UserType extends AbstractType
             $builder->add(
                 'groups',
                 'entity',
-                array(
+                [
                     'label'     => 'oro.user.groups.label',
                     'class'     => 'OroUserBundle:Group',
                     'property'  => 'name',
@@ -114,7 +110,7 @@ class UserType extends AbstractType
                     'read_only' => $this->isMyProfilePage,
                     'disabled'  => $this->isMyProfilePage,
                     'translatable_options' => false
-                )
+                ]
             );
         }
 
@@ -124,10 +120,10 @@ class UserType extends AbstractType
             $builder->add(
                 'organizations',
                 'oro_organizations_select',
-                array(
+                [
                     'required' => false,
                     'label'    => 'oro.user.form.access_settings.label',
-                )
+                ]
             );
         }
 
@@ -135,18 +131,18 @@ class UserType extends AbstractType
             ->add(
                 'plainPassword',
                 'repeated',
-                array(
+                [
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options'  => array('label' => 'oro.user.password.label'),
-                    'second_options' => array('label' => 'oro.user.password_re.label'),
-                )
+                    'first_options'  => ['label' => 'oro.user.password.label'],
+                    'second_options' => ['label' => 'oro.user.password_re.label'],
+                ]
             )
             ->add(
                 'emails',
                 'collection',
-                array(
+                [
                     'label'          => 'oro.user.emails.label',
                     'type'           => 'oro_user_email',
                     'allow_add'      => true,
@@ -154,11 +150,11 @@ class UserType extends AbstractType
                     'by_reference'   => false,
                     'prototype'      => true,
                     'prototype_name' => 'tag__name__'
-                )
+                ]
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
-            ->add('change_password', 'oro_change_password')
+            ->add('change_password', ChangePasswordType::NAME)
             ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
@@ -170,7 +166,7 @@ class UserType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
                 'intention'            => 'user',
                 'validation_groups'    => function ($form) {
@@ -183,13 +179,13 @@ class UserType extends AbstractType
                     }
 
                     return $user && $user->getId()
-                        ? array('Roles', 'Default')
-                        : array('Registration', 'Roles', 'Default');
+                        ? ['Roles', 'Default']
+                        : ['Registration', 'Roles', 'Default'];
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'cascade_validation'   => true,
                 'ownership_disabled'   => $this->isMyProfilePage
-            )
+            ]
         );
     }
 
@@ -251,19 +247,18 @@ class UserType extends AbstractType
         $form = $event->getForm();
         $data = $form->getData();
         if ($data instanceof User) {
-            if ($token = $this->security->getToken()) {
-                if (is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
-                    $form->add(
-                        'signature',
-                        'oro_rich_text',
-                        [
-                            'label'    => 'oro.user.form.signature.label',
-                            'required' => false,
-                            'mapped'   => false,
-                            'data'     => $this->userConfigManager->getUserConfigSignature(),
-                        ]
-                    );
-                }
+            $token = $this->security->getToken();
+            if ($token && is_object($user = $token->getUser()) && $data->getId() == $user->getId()) {
+                $form->add(
+                    'signature',
+                    'oro_rich_text',
+                    [
+                        'label'    => 'oro.user.form.signature.label',
+                        'required' => false,
+                        'mapped'   => false,
+                        'data'     => $this->userConfigManager->getUserConfigSignature(),
+                    ]
+                );
             }
         }
     }

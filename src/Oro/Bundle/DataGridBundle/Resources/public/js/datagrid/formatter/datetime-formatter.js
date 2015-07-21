@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
-    ], function (_, Backgrid, DateTimeFormatter) {
+    ], function(_, Backgrid, DateTimeFormatter) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
      * @class   orodatagrid.datagrid.formatter.DateTimeFormatter
      * @extends Backgrid.CellFormatter
      */
-    var DatagridDateTimeFormatter = function (options) {
+    var DatagridDateTimeFormatter = function(options) {
         _.extend(this, options);
     };
 
@@ -26,7 +25,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
         /**
          * @inheritDoc
          */
-        fromRaw: function (rawData) {
+        fromRaw: function(rawData) {
             if (rawData === null || rawData === '') {
                 return '';
             }
@@ -37,7 +36,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
         /**
          * @inheritDoc
          */
-        toRaw: function (formattedData) {
+        toRaw: function(formattedData) {
             if (formattedData === null || formattedData === '') {
                 return null;
             }
@@ -52,7 +51,7 @@ define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
          * @returns {Function}
          * @private
          */
-        _getFormatterFunction: function (prefix, suffix) {
+        _getFormatterFunction: function(prefix, suffix) {
             suffix = suffix || '';
 
             function capitaliseFirstLetter(string) {

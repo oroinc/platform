@@ -36,6 +36,7 @@ class EmailGridTest extends AbstractDatagridTestCase
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['userId'] =
             $this->getReference('simple_user')->getId();
+        $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
 
         parent::testGrid($requestData);
     }
@@ -53,7 +54,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                     ],
                     'gridFilters' => [],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 9,
                 ],
             ],
             'Email grid filtered by from (admin)' => [
@@ -77,7 +78,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                         'user-email-grid[_filter][to][value]' => 'simple_user@example.com',
                     ],
                     'assert' => [],
-                    'expectedResultCount' => 10,
+                    'expectedResultCount' => 9,
                 ],
             ],
         ];

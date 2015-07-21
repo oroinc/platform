@@ -109,6 +109,35 @@ class Indexer
         return $this->mapper->getEntitiesListAliases();
     }
 
+
+    /**
+     * Gets search aliases for entities
+     *
+     * @param string[] $classNames The list of entity FQCN
+     *
+     * @return array [entity class name => entity search alias, ...]
+     *
+     * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
+     *                                   or has no the search alias
+     */
+    public function getEntityAliases(array $classNames = [])
+    {
+        return $this->mapper->getEntityAliases($classNames);
+    }
+
+    /**
+     * Gets the search alias of a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return string|null The search alias of the entity
+     *                     or NULL if the entity is not registered in a search index or has no the search alias
+     */
+    public function getEntityAlias($className)
+    {
+        return $this->mapper->getEntityAlias($className);
+    }
+
     /**
      * Get list of entities allowed to user
      *
@@ -125,9 +154,10 @@ class Indexer
      * @param  integer $maxResults
      * @param  string  $from
      * @param  integer $page
-     * @return Result
+     *
+     * @return Query
      */
-    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
+    public function getSimpleSearchQuery($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
     {
         $searchString = trim($searchString);
         $query = $this->select();
@@ -153,6 +183,21 @@ class Indexer
         } elseif ($offset > 0) {
             $query->setFirstResult($offset);
         }
+
+        return $query;
+    }
+
+    /**
+     * @param  string  $searchString
+     * @param  integer $offset
+     * @param  integer $maxResults
+     * @param  string  $from
+     * @param  integer $page
+     * @return Result
+     */
+    public function simpleSearch($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
+    {
+        $query = $this->getSimpleSearchQuery($searchString, $offset, $maxResults, $from, $page);
 
         return $this->query($query);
     }

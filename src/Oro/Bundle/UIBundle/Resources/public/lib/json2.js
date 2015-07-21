@@ -146,7 +146,6 @@
     redistribute.
 */
 
-/*jslint evil: true, regexp: true */
 
 /*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
     call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,

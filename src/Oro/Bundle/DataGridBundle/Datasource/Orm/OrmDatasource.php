@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
@@ -27,9 +28,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var QueryBuilder */
     protected $qb;
 
-    /**
-     * @var array
-     */
+    /** @var array|null */
     protected $queryHints;
 
     /** @var EntityManager */
@@ -44,14 +43,25 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var ParameterBinderInterface */
     protected $parameterBinder;
 
+    /** @var QueryHintResolver */
+    protected $queryHintResolver;
+
+    /**
+     * @param EntityManager            $em
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param ParameterBinderInterface $parameterBinder
+     * @param QueryHintResolver        $queryHintResolver
+     */
     public function __construct(
         EntityManager $em,
         EventDispatcherInterface $eventDispatcher,
-        ParameterBinderInterface $parameterBinder
+        ParameterBinderInterface $parameterBinder,
+        QueryHintResolver $queryHintResolver
     ) {
-        $this->em = $em;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->parameterBinder = $parameterBinder;
+        $this->em                = $em;
+        $this->eventDispatcher   = $eventDispatcher;
+        $this->parameterBinder   = $parameterBinder;
+        $this->queryHintResolver = $queryHintResolver;
     }
 
     /**
@@ -93,7 +103,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         }
 
         if (isset($config['hints'])) {
-            $this->processQueryHints($config['hints']);
+            $this->queryHints = $config['hints'];
         }
 
         $grid->setDatasource(clone $this);
@@ -106,7 +116,10 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     {
         $query = $this->qb->getQuery();
 
-        $this->setQueryHints($query);
+        $this->queryHintResolver->resolveHints(
+            $query,
+            null !== $this->queryHints ? $this->queryHints : []
+        );
 
         $event = new OrmResultBefore($this->datagrid, $query);
         $this->eventDispatcher->dispatch(OrmResultBefore::NAME, $event);
@@ -145,42 +158,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         $this->qb = $qb;
 
         return $this;
-    }
-
-    /**
-     * Parses 'hints' configuration and save it in $this->queryHints
-     *
-     * @param array $config
-     */
-    protected function processQueryHints(array $config)
-    {
-        if (!empty($config)) {
-            $this->queryHints = [];
-            foreach ($config as $hint) {
-                if (is_array($hint)) {
-                    $this->queryHints[$hint['name']] = isset($hint['value']) ? $hint['value'] : true;
-                } elseif (is_string($hint)) {
-                    $this->queryHints[$hint] = true;
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets hints for result query
-     *
-     * @param Query $query
-     */
-    protected function setQueryHints(Query $query)
-    {
-        if (!empty($this->queryHints)) {
-            foreach ($this->queryHints as $name => $value) {
-                if (defined("Doctrine\\ORM\\Query::$name")) {
-                    $name = constant("Doctrine\\ORM\\Query::$name");
-                }
-                $query->setHint($name, $value);
-            }
-        }
     }
 
     /**

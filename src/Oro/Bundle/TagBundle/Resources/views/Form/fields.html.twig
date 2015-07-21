@@ -58,32 +58,6 @@
     {% endif %}
 {% endblock %}
 
-{% block oro_combobox_dataconfig_multi_autocomplete %}
-    {{ block('oro_combobox_dataconfig_autocomplete') }}
-    select2Config.createSearchChoice = function(term, data) {
-        if (
-            $(data).filter(function() {
-                return this.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
-            }).length === 0
-        ) {
-            {% if not resource_granted('oro_tag_create') %}
-                return null;
-            {% else %}
-                return {
-                    id: term,
-                    name: term
-                };
-            {% endif %}
-        }
-    }
-
-    select2Config.maximumInputLength = 50;
-
-    {% if not resource_granted('oro_tag_create') %}
-        select2Config.placeholder = '{{ 'oro.tag.form.choose_tag'|trans }}';
-    {% endif %}
-{% endblock %}
-
 {% block oro_tag_autocomplete_row %}
     {{ form_widget(form) }}
     {{ form_javascript(form) }}

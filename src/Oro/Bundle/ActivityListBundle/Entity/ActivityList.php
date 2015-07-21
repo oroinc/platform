@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -160,6 +161,90 @@ class ActivityList extends ExtendActivityList
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="ActivityOwner", mappedBy="activity",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    protected $activityOwners;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->activityOwners = new ArrayCollection();
+    }
+
+    /**
+     * Set id
+     *
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @param ActivityOwner $activityOwner
+     *
+     * @return self
+     */
+    public function addActivityOwner(ActivityOwner $activityOwner)
+    {
+        if (!$this->hasActivityOwner($activityOwner)) {
+            $this->activityOwners->add($activityOwner);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ActivityOwner $activityOwner
+     *
+     * @return self
+     */
+    public function removeActivityOwner(ActivityOwner $activityOwner)
+    {
+        if ($this->hasActivityOwner($activityOwner)) {
+            $this->activityOwners->removeElement($activityOwner);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Whether activity list has specified owner
+     *
+     * @param ActivityOwner $activityOwner
+     *
+     * @return bool
+     */
+    public function hasActivityOwner(ActivityOwner $activityOwner)
+    {
+        /** @var $owner ActivityOwner */
+        foreach ($this->getActivityOwners() as $owner) {
+            if ($owner->getUser()->getId() === $activityOwner->getUser()->getId()
+                && $owner->getActivity()->getId() === $activityOwner->getActivity()->getId()
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getActivityOwners()
+    {
+        return $this->activityOwners;
+    }
 
     /**
      * Get id

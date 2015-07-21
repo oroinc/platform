@@ -1,7 +1,6 @@
-/*global define*/
 define([
     './datetime-cell'
-], function (DateTimeCell) {
+], function(DateTimeCell) {
     'use strict';
 
     var DateCell;

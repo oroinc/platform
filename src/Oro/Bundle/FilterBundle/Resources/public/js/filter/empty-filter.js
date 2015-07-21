@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'oroui/js/tools',
     './abstract-filter'
-], function ($, _, tools, AbstractFilter) {
+], function($, _, tools, AbstractFilter) {
     'use strict';
 
     var EmptyFilter;
@@ -56,12 +54,24 @@ define([
         updateSelectorEmptyClass: 'filter-update-empty',
 
         /**
+         * @property {String}
+         */
+        caret: '<span class="caret"></span>',
+
+        initialize: function(options) {
+            var opts = _.pick(options || {}, 'caret');
+            _.extend(this, opts);
+
+            EmptyFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
          * Set raw value to filter
          *
          * @param value
          * @return {*}
          */
-        setValue: function (value) {
+        setValue: function(value) {
             var oldValue = this.value;
             this.value = tools.deepClone(value);
             this._updateDOMValue();
@@ -76,8 +86,8 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickChoiceValue: function (e) {
-            $(e.currentTarget).parent().parent().find('li').each(function () {
+        _onClickChoiceValue: function(e) {
+            $(e.currentTarget).parent().parent().find('li').each(function() {
                 $(this).removeClass('active');
             });
             $(e.currentTarget).parent().addClass('active');
@@ -86,8 +96,10 @@ define([
             var type = $(e.currentTarget).attr('data-value');
             var choiceName = $(e.currentTarget).html();
 
-            this.$(this.criteriaValueSelectors.type).val(type).trigger('change');
-            choiceName += '<span class="caret"></span>';
+            var criteriaValues = this.$(this.criteriaValueSelectors.type).val(type);
+            this.fixSelects();
+            criteriaValues.trigger('change');
+            choiceName += this.caret;
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
             this._handleEmptyFilter(type);
@@ -96,12 +108,27 @@ define([
         },
 
         /**
+         * Without this $select.val() or select.selectedValue returns wrong value
+         * (tested with select.ui-datepicker-month)
+         */
+        fixSelects: function() {
+            this.$('select').each(function() {
+                var $select = $(this);
+                if ($select.val()) {
+                    return true;
+                }
+
+                $select.val($select.find('option[selected]').val());
+            });
+        },
+
+        /**
          * Handle click on criteria selector
          *
          * @param {Event} e
          * @protected
          */
-        _onClickCriteriaSelector: function (e) {
+        _onClickCriteriaSelector: function(e) {
             e.stopPropagation();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
@@ -118,7 +145,7 @@ define([
          *
          * @protected
          */
-        _handleEmptyFilter: function () {
+        _handleEmptyFilter: function() {
             var container = this.$(this.criteriaSelector);
             var item = container.find(this.criteriaValueSelectors.value);
             var type = container.find(this.criteriaValueSelectors.type).val();
@@ -151,7 +178,7 @@ define([
         /**
          * @inheritDoc
          */
-        isEmptyValue: function () {
+        isEmptyValue: function() {
             if (this.isEmptyType(this.value.type)) {
                 return false;
             }

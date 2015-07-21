@@ -65,6 +65,23 @@ abstract class RestController extends RestGetController implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        $handler = $this->getFormHandler();
+        if (!$handler instanceof FormAwareInterface) {
+            throw new \RuntimeException(
+                'The form cannot be retrieved. You have two choices to solve this: '
+                . 'implement "Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface" in your form handler '
+                . ' or implement "getForm" method in your controller.'
+            );
+        }
+
+        return $handler->getForm();
+    }
+
+    /**
      * Create new entity
      *
      * @param mixed $_ [optional] Arguments will be passed to createEntity method of manager (result of getManager)

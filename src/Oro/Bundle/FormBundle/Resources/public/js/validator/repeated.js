@@ -1,7 +1,5 @@
-/*global define*/
-/* jshint browser:true */
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-    ], function ($, _, __) {
+    ], function($, _, __) {
     'use strict';
 
     var defaultParam = {
@@ -14,13 +12,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
      */
     return [
         'Repeated',
-        function (value, element, params) {
+        function(value, element, params) {
             // validator should be added to repeated field (second one)
-            var id = element.id.slice(0, -(params.second_name || '').length) + (params.first_name || ''),
-                firstElement = document.getElementById(id);
-            return this.optional(firstElement) || value === this.elementValue(firstElement);
+            var attr = element.hasAttribute('data-ftid') ? 'data-ftid' : 'id';
+            var id = element.getAttribute(attr);
+            var secondName = params.second_name || '';
+            var firstId = id.slice(0, -secondName.length) + (params.first_name || '');
+            var firstElement = document.querySelector('[' + attr + '="' + firstId + '"]');
+            return firstElement && (this.optional(firstElement) || value === this.elementValue(firstElement));
         },
-        function (param) {
+        function(param) {
             param = _.extend({}, defaultParam, param);
             return __(param.invalid_message, param.invalid_message_parameters);
         }

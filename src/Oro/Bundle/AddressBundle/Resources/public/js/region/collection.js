@@ -1,6 +1,8 @@
-/*global define*/
-define(['backbone', 'routing', 'oroaddress/js/region/model'
-    ], function (Backbone, routing, RegionModel) {
+define([
+    'backbone',
+    'routing',
+    'oroaddress/js/region/model'
+], function(Backbone, routing, RegionModel) {
     'use strict';
 
     /**
@@ -16,7 +18,7 @@ define(['backbone', 'routing', 'oroaddress/js/region/model'
         /**
          * Constructor
          */
-        initialize: function () {
+        initialize: function() {
             this.url = routing.generate(this.route);
         },
 
@@ -25,7 +27,7 @@ define(['backbone', 'routing', 'oroaddress/js/region/model'
          *
          * @param id {string}
          */
-        setCountryId: function (id) {
+        setCountryId: function(id) {
             this.url = routing.generate(this.route, {country: id});
         }
     });

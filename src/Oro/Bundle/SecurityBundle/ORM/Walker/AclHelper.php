@@ -69,13 +69,22 @@ class AclHelper
      *
      * @return Criteria
      */
-    public function applyAclToCriteria($className, Criteria $criteria, $permission)
+    public function applyAclToCriteria($className, Criteria $criteria, $permission, $mapField = [])
     {
         $conditionData = $this->builder->getAclConditionData($className, $permission);
         if (!empty($conditionData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
                 = $conditionData;
+
+            if (isset($mapField[$organizationField])) {
+                $organizationField = $mapField[$organizationField];
+            }
+
+            if (isset($mapField[$entityField])) {
+                $entityField = $mapField[$entityField];
+            }
+
             if (!is_null($organizationField) && !is_null($organizationValue)) {
                 $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
             }
@@ -118,13 +127,14 @@ class AclHelper
 
             // We have access level check conditions. So mark query for acl walker.
             if (!$conditionStorage->isEmpty()) {
-                $query->setHint(
-                    Query::HINT_CUSTOM_TREE_WALKERS,
-                    array_merge(
-                        $query->getHints(),
-                        array(self::ORO_ACL_WALKER)
-                    )
-                );
+                $walkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
+                if (false === $walkers) {
+                    $walkers = [self::ORO_ACL_WALKER];
+                    $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
+                } elseif (!in_array(self::ORO_ACL_WALKER, $walkers, true)) {
+                    $walkers[] = self::ORO_ACL_WALKER;
+                    $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
+                }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
             }
         }
@@ -142,6 +152,10 @@ class AclHelper
     protected function processSubselects(SelectStatement $ast, AclConditionStorage $storage, $permission)
     {
         $conditionalExpression = $ast->whereClause->conditionalExpression;
+        if (isset($conditionalExpression->conditionalPrimary)) {
+            $conditionalExpression = $conditionalExpression->conditionalPrimary;
+        }
+
         if ($conditionalExpression instanceof ConditionalPrimary) {
             // we have request with only one where condition
             $expression = $conditionalExpression->simpleConditionalExpression;

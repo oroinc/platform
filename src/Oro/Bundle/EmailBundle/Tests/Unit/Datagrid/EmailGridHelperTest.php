@@ -123,11 +123,11 @@ class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
-        $datasource->expects($this->once())
+        $datasource->expects($this->any())
             ->method('getQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $this->activityManager->expects($this->once())
+        $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),
@@ -148,11 +148,11 @@ class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
-        $datasource->expects($this->once())
+        $datasource->expects($this->any())
             ->method('getQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $this->activityManager->expects($this->once())
+        $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),
@@ -171,11 +171,11 @@ class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
         $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
             ->disableOriginalConstructor()
             ->getMock();
-        $datasource->expects($this->once())
+        $datasource->expects($this->any())
             ->method('getQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $this->activityManager->expects($this->once())
+        $this->activityManager->expects($this->any())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),

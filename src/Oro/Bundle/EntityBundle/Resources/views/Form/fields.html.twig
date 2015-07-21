@@ -1,39 +1,3 @@
-{% block oro_combobox_dataconfig_entity_field_base %}
-    $field.data('entity-field-util', new EntityFieldUtil($field));
-
-    {% if configs.entities is defined %}
-    var entities = {{ configs.entities|json_encode|raw }};
-    $field.data('entity-field-util').findEntity = function (entity) {
-        return _.findWhere(entities, {name: entity});
-    };
-    {% endif %}
-
-    var formatContext = {
-        getFieldData: function (fieldId) {
-            return $field.data('entity-field-util').getFieldData(fieldId);
-        },
-        splitFieldId: function (fieldId) {
-            return $field.data('entity-field-util').splitFieldId(fieldId);
-        }
-    };
-    select2Config.formatContext = function () {
-        return formatContext;
-    };
-{% endblock %}
-
-{% block oro_combobox_dataconfig_entity_field_choice %}
-    {{ block('oro_combobox_dataconfig_entity_field_base') }}
-{% endblock %}
-
-{% block oro_combobox_dataconfig_entity_field_select %}
-    {{ block('oro_combobox_dataconfig_entity_field_base') }}
-
-    select2Config.collapsibleResults = true;
-    select2Config.data = function () {
-        return {more: false, results: $field.data('entity-field-util')._getData() };
-    }
-{% endblock %}
-
 {% block _oro_entity_config_type_view_priority_widget %}
     {{ form_widget(form) }}
 

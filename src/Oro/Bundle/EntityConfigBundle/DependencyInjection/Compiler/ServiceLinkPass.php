@@ -19,14 +19,13 @@ class ServiceLinkPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $tags = $container->findTaggedServiceIds(self::TAG_NAME);
-
         foreach ($tags as $id => $tag) {
             /** @var Definition $serviceLinkDef */
             $serviceLinkDef = $container->getDefinition($id);
 
             if (!isset($tag[0]['service'])) {
                 throw new RuntimeException(
-                    sprintf("Tag '%s' for service '%s' doesn't have required param 'service'", self::TAG_NAME, $id)
+                    sprintf('Tag "%s" for service "%s" does not have required param "service"', self::TAG_NAME, $id)
                 );
             }
 
@@ -38,10 +37,16 @@ class ServiceLinkPass implements CompilerPassInterface
             }
 
             if ($container->hasDefinition($serviceId)) {
-                // the service we are referred to must be public
+                // the service we are referring to must be public
                 $serviceDef = $container->getDefinition($serviceId);
                 if (!$serviceDef->isPublic()) {
                     $serviceDef->setPublic(true);
+                }
+            } elseif ($container->hasAlias($serviceId)) {
+                // the service alias we are referring to must be public
+                $serviceAlias = $container->getAlias($serviceId);
+                if (!$serviceAlias->isPublic()) {
+                    $serviceAlias->setPublic(true);
                 }
             } elseif (!$isOptional) {
                 throw new RuntimeException(
@@ -55,8 +60,10 @@ class ServiceLinkPass implements CompilerPassInterface
                 );
             }
 
-            $serviceLinkDef->setClass('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink');
-            $serviceLinkDef->setArguments(array(new Reference('service_container'), $serviceId, $isOptional));
+            $serviceLinkDef
+                ->setClass('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->setPublic(false)
+                ->setArguments([new Reference('service_container'), $serviceId, $isOptional]);
         }
     }
 }

@@ -1,11 +1,9 @@
-/*jslint nomen: true*/
-/*global define*/
 define([
     'jquery',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     'oroform/js/app/views/datepair-view'
-], function ($, mediator, BaseView, DatepairView) {
+], function($, mediator, BaseView, DatepairView) {
     'use strict';
 
     var CalendarEventFormView;
@@ -21,20 +19,21 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             this.render();
         },
 
-        render: function () {
+        render: function() {
             var self = this;
-            mediator.execute('layout:init', this.$el, this).done(function () {
+            this.initLayout().done(function() {
                 self.handleLayoutInit();
             });
         },
 
-        handleLayoutInit: function () {
-            var opts, datepair;
+        handleLayoutInit: function() {
+            var opts;
+            var datepair;
             opts = this.options;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);

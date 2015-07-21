@@ -36,6 +36,16 @@ oro_user_api_group:
     defaults:
         version:  latest
 
+oro_user_api_user_permission:
+    resource:     "@OroUserBundle/Controller/Api/Rest/UserPermissionController.php"
+    type:         rest
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
+
 # deprecated API routes
 oro_api_post_role_deprecated:
     path:            /api/rest/{version}/role.{_format}
