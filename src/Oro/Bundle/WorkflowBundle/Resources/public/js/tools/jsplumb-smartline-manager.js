@@ -15,9 +15,6 @@ define(function(require){
             state: {},
             connections: {}
         };
-        this.debouncedCalculateOverlays = _.debounce(
-            _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
-        50);
     }
 
     window.getLastRequest = function () {
@@ -35,14 +32,11 @@ define(function(require){
                 this.refreshCache();
             }
 
-            var points = _.clone(this.cache.connections[connector.getId()].points);
-
-            if (!points) {
-                points = [];
-                console.log("Cached value is not found")
+            var cacheRecord = this.cache.connections[connector.getId()];
+            if (!cacheRecord) {
+                return [];
             }
-
-            return points;
+            return _.clone(cacheRecord.points);
         },
 
         getNaivePathLength: function (fromRect, toRect) {
@@ -139,7 +133,7 @@ define(function(require){
             // console.log("Cache refresh: " + _.keys(this.cache.connections).join(', '));
 
             this.jsPlumbInstance.repaintEverything();
-            this.debouncedCalculateOverlays();
+            this.jsPlumbOverlayManager.calculate();
 
             // debug code
             JsPlumbSmartlineManager.lastRequest = {
