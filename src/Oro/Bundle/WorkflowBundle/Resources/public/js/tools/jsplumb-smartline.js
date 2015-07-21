@@ -163,16 +163,31 @@ define(function(require) {
             return userSuppliedSegments || segments;
         };
 
+        function getAdjustment(el, point) {
+            var style = window.getComputedStyle(el),
+                borderRadius = 0,
+                dx;
+            if (style.borderRadius) {
+                borderRadius = parseInt(style.borderRadius) || 0;
+            }
+            borderRadius = Math.min(borderRadius, el.offsetWidth / 2, el.offsetHeight / 2);
+
+            var realX = point.x - el.offsetLeft;
+            if (realX < 1 || realX > el.offsetWidth - 1) {
+                return 0;
+            }
+            if (realX < borderRadius) {
+                dx = borderRadius - realX;
+                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+            } else if (realX > el.offsetWidth - borderRadius) {
+                dx = realX - (el.offsetWidth - borderRadius);
+                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+            }
+
+            return el.offsetHeight / 2 - 1;
+        }
+
         this._compute = function(paintInfo, params) {
-            if (params.clearEdits) {
-                userSuppliedSegments = null;
-            }
-
-            if (userSuppliedSegments !== null) {
-                writeSegments(this, userSuppliedSegments, paintInfo);
-                return;
-            }
-
             lastx = null;
             lasty = null;
             lastOrientation = null;
@@ -186,15 +201,15 @@ define(function(require) {
                 return;
             }
 
-            // add space from center to line start
-            points[0].y += 18;
-            points[points.length - 1].y -= 18;
-
             // set valid archors
             var sourcePoint = points.shift(),
                 targetPoint = points.pop(),
                 correction,
                 ENDPOINT_SPACE_TO_LINE = 4;
+
+            sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint);
+            targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint);
+
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft)/ params.sourceEndpoint.element.offsetWidth;
@@ -214,12 +229,6 @@ define(function(require) {
 
             paintInfo.sx = sourcePoint.x - correction.x;
             paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
-
-            var style = window.getComputedStyle(params.sourceEndpoint.element),
-                sourceBorderRadius = 0;
-            if (style.borderRadius) {
-                sourceBorderRadius = parseInt(style.borderRadius);
-            }
 
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
