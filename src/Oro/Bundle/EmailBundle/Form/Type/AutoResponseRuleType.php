@@ -2,26 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+
+use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType;
 
 class AutoResponseRuleType extends AbstractType
 {
     const NAME = 'oro_email_autoresponserule';
-
-    /** @var EventSubscriberInterface */
-    protected $templateFormSubscriber;
-
-    /**
-     * @param EventSubscriberInterface $templateFormSubscriber
-     */
-    public function __construct(EventSubscriberInterface $templateFormSubscriber)
-    {
-        $this->templateFormSubscriber = $templateFormSubscriber;
-    }
 
     /**
      * {@inheritdoc}
@@ -29,15 +18,6 @@ class AutoResponseRuleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('entityName', 'hidden', [
-                'mapped' => false,
-                'data' => 'Oro\Bundle\EmailBundle\Entity\Email',
-                'constraints' => [
-                    new Assert\IdenticalTo([
-                        'value' => 'Oro\Bundle\EmailBundle\Entity\Email'
-                    ])
-                ]
-            ])
             ->add('active', 'checkbox', [
                 'label' => 'oro.email.autoresponserule.active.label',
             ])
@@ -50,11 +30,12 @@ class AutoResponseRuleType extends AbstractType
                 'handle_primary' => false,
                 'allow_add_after' => true,
             ])
-            ->add('template', 'oro_email_template_list', [
+            ->add('template', OroEntityCreateOrSelectChoiceType::NAME, [
                 'label' => 'oro.email.autoresponserule.template.label',
+                'class' => 'Oro\Bundle\EmailBundle\Entity\EmailTemplate',
+                'create_entity_form_type' => 'oro_email_autoresponse_template',
+                'select_entity_form_type' => 'oro_email_autoresponse_template_choice',
             ]);
-
-        $builder->addEventSubscriber($this->templateFormSubscriber);
     }
 
     /**

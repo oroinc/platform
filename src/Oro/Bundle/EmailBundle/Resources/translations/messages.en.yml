@@ -264,6 +264,9 @@ oro:
             status:
                 active:   Active
                 inactive: Inactive
+            form:
+                template:
+                    visible.label: Save Response as Email Template
 
         action:
             sync: Sync emails

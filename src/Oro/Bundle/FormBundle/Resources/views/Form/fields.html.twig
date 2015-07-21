@@ -492,6 +492,24 @@
     </script>
 {% endblock %}
 
+{% block oro_entity_create_or_select_choice_widget %}
+    <div class="create-select-entity-choice-container"
+         data-page-component-module="oroform/js/app/components/create-or-select-choice-component"
+         data-page-component-options="{{ {
+            modeSelector: '#' ~ form.mode.vars.id,
+            newEntitySelector: '.new-entity',
+            existingEntitySelector: '.existing-entity',
+         }|json_encode }}">
+        <div class="existing-entity">
+            {{ form_widget(form.existing_entity) }}
+        </div>
+        <div class="new-entity">
+            {{ form_widget(form.new_entity) }}
+        </div>
+        {{ form_widget(form.mode) }}
+    </div>
+{% endblock %}
+
 {% block oro_entity_create_or_select_inline_widget %}
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"

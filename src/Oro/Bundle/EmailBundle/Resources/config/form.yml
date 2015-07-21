@@ -2,6 +2,8 @@ parameters:
     oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
     oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
     oro_email.form.type.autoresponserule_condition.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType
+    oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
+    oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
     oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
@@ -32,8 +34,6 @@ services:
 
     oro_email.form.type.autoresponserule:
         class: %oro_email.form.type.autoresponserule.class%
-        arguments:
-            - @oro_email.form.subscriber.emailtemplate
         tags:
             - { name: form.type, alias: oro_email_autoresponserule }
 
@@ -41,6 +41,21 @@ services:
         class: %oro_email.form.type.autoresponserule_condition.class%
         tags:
             - { name: form.type, alias: oro_email_autoresponserule_condition }
+
+    oro_email.form.type.autoresponse_template:
+        class: %oro_email.form.type.autoresponse_template.class%
+        arguments:
+            - @oro_config.user
+            - @oro_locale.settings
+        tags:
+            - { name: form.type, alias: oro_email_autoresponse_template }
+
+    oro_email.form.type.autoresponse_template_choice:
+        class: %oro_email.form.type.autoresponse_template_choice.class%
+        arguments:
+            - @oro_email.form.subscriber.emailtemplate
+        tags:
+            - { name: form.type, alias: oro_email_autoresponse_template_choice }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
