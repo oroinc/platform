@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -69,11 +70,9 @@ class MailboxType extends AbstractType
         $builder->add('processorType', 'choice', [
             'label'       => 'oro.email.mailbox.processor.type.label',
             'choices'     => $this->processorProvider->getProcessorTypesChoiceList(),
-            'required'    => true,
+            'required'    => false,
             'mapped'      => false,
-            'constraints' => [
-                new NotNull(),
-            ],
+            'empty_value' => 'oro.email.mailbox_processor.default.label',
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
@@ -106,21 +105,13 @@ class MailboxType extends AbstractType
         $processorType = null;
         if ($processorEntity = $data->getProcessor()) {
             $processorType = $processorEntity->getType();
-        } else {
-            $choices = array_keys($form->get('processorType')->getConfig()->getOption('choices'));
-            $processorType = reset($choices);
         }
+
         FormUtils::replaceField($form, 'processorType', [
             'data' => $processorType,
         ]);
 
-        $form->add(
-            'processor',
-            $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
-            [
-                'required' => true,
-            ]
-        );
+        $this->addProcessorField($form, $processorType);
     }
 
     /**
@@ -137,15 +128,36 @@ class MailboxType extends AbstractType
         $originalProcessorType = $form->get('processorType')->getData();
 
         if ($processorType !== $originalProcessorType) {
-            $form->getViewData()->clearProcessor(null);
+            $form->getViewData()->clearProcessor();
         }
 
-        $form->add(
-            'processor',
-            $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
-            [
-                'required' => true,
-            ]
-        );
+        $this->addProcessorField($form, $processorType);
+    }
+
+    /**
+     * Adds mailbox processor form field of proper type
+     *
+     * @param FormInterface $form
+     * @param string|null   $processorType
+     */
+    protected function addProcessorField(FormInterface $form, $processorType)
+    {
+        if (!empty($processorType)) {
+            $form->add(
+                'processor',
+                $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
+                [
+                    'required' => true,
+                ]
+            );
+        } else {
+            $form->add(
+                'processor',
+                'hidden',
+                [
+                    'data' => null,
+                ]
+            );
+        }
     }
 }

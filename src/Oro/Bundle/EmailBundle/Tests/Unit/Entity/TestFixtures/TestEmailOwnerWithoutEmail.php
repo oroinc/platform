@@ -49,12 +49,11 @@ class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
         return $this->lastName;
     }
 
-    public function getName()
+    /**
+     * {@inheritdoc}
+     */
+    public function getEmailOwnerName()
     {
-        return sprintf(
-            '%s %s',
-            $this->getFirstName(),
-            $this->getLastName()
-        );
+        return $this->firstName . ' ' . $this->lastName;
     }
 }

@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        filter.inactive: inactive
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""
@@ -152,7 +153,16 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folder_type:
+            label:                Folder type
+            sent:                 Sent
+            inbox:                Inbox
+            other:                Other
+            spam:                 Spam
+            trash:                Trash
+            drafts:               Drafts
         contact.label:            Contact
+        mailbox.label:            Mailbox
         date.label:               Date
         date_time.label:          Date/Time
         from_email_address.label: From
@@ -226,12 +236,14 @@ oro:
             folder.label:             Folder
             id.label:                 Id
             organization.label:       Organization
-            owner.label:              Owner
+            owner.label:              User Owner
+            mailbox_owner.label:      Mailbox Owner
             received_at.label:        Received At
             seen.label:               Seen
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
+            id.label:                 Id
             label.label:              Mailbox Label
             general.label:            General
             email.label:              Email
@@ -241,15 +253,17 @@ oro:
             processor:
                 label:                Email Processing
                 type.label:           Action
+            smtp_settings.label:      SMTP Settings
             smtp_enabled.label:       Use SMTP
             smtp_host.label:          Host
             smtp_port.label:          Port
             smtp_encryption.label:    SSL
             smtp_username.label:      Username
             smtp_password.label:      Password
+            organization.label:       Organization
             action.create:            Add Mailbox
         mailbox_processor:
-            label:                    Do Nothing
+            default.label:            Do Nothing
         autoresponserule:
             entity_plural_label: Autoresponse Rules
             name.label:          Name
@@ -267,6 +281,7 @@ oro:
             form:
                 template:
                     visible.label: Save Response as Email Template
+
 
         action:
             sync: Sync emails

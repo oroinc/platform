@@ -66,6 +66,7 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
 
     public function getFullname($format = '')
     {
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     public function getRoles()
@@ -88,12 +89,11 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
     {
     }
 
-    public function getName()
+    /**
+     * {@inheritdoc}
+     */
+    public function getEmailOwnerName()
     {
-        return sprintf(
-            '%s %s',
-            $this->getFirstName(),
-            $this->getLastName()
-        );
+        return $this->getFullname();
     }
 }

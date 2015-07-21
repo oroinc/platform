@@ -9,68 +9,65 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEmailBundle implements Migration
 {
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::createOroEmailMailboxTable($schema);
-        self::createOroEmailMailboxProcessorTable($schema);
-        self::addOwnerMailboxColumn($schema);
-        self::addOroEmailMailboxForeignKeys($schema);
-    }
-
-    public static function createOroEmailMailboxTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_email_mailbox');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('processor_id', 'integer', ['notnull' => false]);
-        $table->addColumn('origin_id', 'integer', ['notnull' => false]);
-        $table->addColumn('email', 'string', ['length' => 255]);
-        $table->addColumn('label', 'string', ['length' => 255]);
-        $table->addColumn('smtp_settings', 'array', ['comment' => '(DC2Type:array)']);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['processor_id'], 'UNIQ_574C364F37BAC19A');
-        $table->addUniqueIndex(['origin_id'], 'UNIQ_574C364F56A273CC');
-    }
-
-    public static function createOroEmailMailboxProcessorTable(Schema $schema)
-    {
-        $table = $schema->createTable('oro_email_mailbox_processor');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('type', 'string', ['length' => 30]);
-        $table->setPrimaryKey(['id']);
-    }
-
-    private static function addOwnerMailboxColumn(Schema $schema)
-    {
-        $table = $schema->getTable('oro_email_address');
-
-        $table->addColumn('owner_mailbox_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['owner_mailbox_id'], 'IDX_FC9DBBC53486AC89');
-        $table->addForeignKeyConstraint($schema->getTable('oro_email_mailbox'),
-            ['owner_mailbox_id'],
-            ['id'],
-            ['onDelete' => null, 'onUpdate' => null],
-            'FK_FC9DBBC53486AC89');
+        self::addEmailFolderFields($schema);
+        self::addEmailOriginFields($schema);
+        self::updateEmailRecipientConstraint($schema);
     }
 
     /**
-     * Add oro_email_mailbox foreign keys.
-     *
      * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    protected function addOroEmailMailboxForeignKeys(Schema $schema)
+    public static function addEmailFolderFields(Schema $schema)
     {
-        $table = $schema->getTable('oro_email_mailbox');
-        $table->addForeignKeyConstraint($schema->getTable('oro_email_mailbox_processor'),
-            ['processor_id'],
+        $emailFolderTable = $schema->getTable('oro_email_folder');
+
+        $emailFolderTable->addColumn('sync_enabled', 'boolean', ['default' => false]);
+        $emailFolderTable->addColumn('parent_folder_id', 'integer', ['notnull' => false]);
+        $emailFolderTable->addForeignKeyConstraint(
+            $emailFolderTable,
+            ['parent_folder_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]);
-        $table->addForeignKeyConstraint($schema->getTable('oro_email_origin'),
-            ['origin_id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_EB940F1C421FFFC'
+        );
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function addEmailOriginFields(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_origin');
+
+        $table->addColumn('mailbox_name', 'string', ['length' => 64, 'notnull' => true, 'default' => '']);
+        $table->addIndex(['mailbox_name'], 'IDX_mailbox_name', []);
+    }
+
+    /**
+     * @param Schema $schema
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function updateEmailRecipientConstraint(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_recipient');
+
+        $table->removeForeignKey('FK_7DAF9656A832C1C9');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email'),
+            ['email_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]);
+            ['onDelete' => 'CASCADE', 'onUpdate' => null],
+            'FK_7DAF9656A832C1C9'
+        );
     }
 }

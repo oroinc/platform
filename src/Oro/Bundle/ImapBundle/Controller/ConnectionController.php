@@ -10,9 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ConnectionController extends Controller
 {
+    /**
+     * @var ImapEmailFolderManager
+     */
+    protected $manager;
+
     /**
      * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
      */
@@ -26,8 +34,17 @@ class ConnectionController extends Controller
             $data = $this->getDoctrine()->getRepository('OroImapBundle:ImapEmailOrigin')->find($id);
         }
 
-        $form = $this->createForm('oro_imap_configuration', $data, ['csrf_protection' => false]);
+        $form = $this->createForm(
+            'oro_imap_configuration',
+            null,
+            [
+                'csrf_protection' => false,
+                'validation_groups' => ['Check'],
+            ]
+        );
+        $form->setData($data);
         $form->submit($this->getRequest());
+        /** @var ImapEmailOrigin $origin */
         $origin = $form->getData();
 
         if ($form->isValid() && null !== $origin) {
@@ -41,9 +58,19 @@ class ConnectionController extends Controller
 
             try {
                 $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
-                $connector->getCapability();
+                $this->manager = new ImapEmailFolderManager($connector, $this->getDoctrine()->getManager(), $origin);
 
-                $responseCode = Codes::HTTP_NO_CONTENT;
+                $emailFolders = $this->manager->getFolders();
+                $origin->setFolders($emailFolders);
+
+                $user = new User();
+                $user->setImapConfiguration($origin);
+                $userForm = $this->get('oro_user.form.user');
+                $userForm->setData($user);
+
+                return $this->render('OroImapBundle:Connection:check.html.twig', [
+                    'form' => $userForm->createView(),
+                ]);
             } catch (\Exception $e) {
                 $this->get('logger')
                     ->critical('Unable to connect to IMAP server: ' . $e->getMessage(), ['exception' => $e]);

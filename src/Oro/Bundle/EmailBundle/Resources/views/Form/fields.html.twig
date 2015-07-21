@@ -208,6 +208,57 @@
     </script>
 {% endblock %}
 
+{% block oro_email_email_folder_row %}
+    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
+        <div>
+            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
+            {{ form_widget(form.fullName) }}
+            {{ form_widget(form.name) }}
+            {{ form_widget(form.type) }}
+            {% if form.vars.value.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {{ form_widget(form.subFolders) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_row %}
+    {% if form.vars.value is not null and form.vars.value|length > 0 %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_widget %}
+    <div class="folder-tree-widget">
+        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
+        <div id="folder-list">
+            {% for child in form.children %}
+                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery'], function($) {
+            var $folderList = $('#folder-list');
+            var $checkAll = $('#check-all');
+            $checkAll.click(function() {
+                var checked = this.checked;
+                $folderList.find(':checkbox').each(function() {
+                    this.checked = checked;
+                });
+            });
+
+            $folderList.find(':checkbox').each(function() {
+                $(this).css('margin', 0);
+            });
+        });
+    </script>
+{% endblock %}
 {% block oro_email_mailbox_grid_row %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
@@ -221,7 +272,9 @@
             </div>
         </div>
     </div>
-    {{ dataGrid.renderGrid('base-mailboxes-grid') }}
+    <div class="row" style="margin-right: -20px;">
+        {{ dataGrid.renderGrid('base-mailboxes-grid') }}
+    </div>
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}

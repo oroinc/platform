@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 class TestActivityProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
+    const ACL_CLASS = 'Test\Entity';
 
     protected $targets;
 
@@ -69,6 +70,14 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getActivityId($entity)
     {
     }
@@ -115,5 +124,10 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     public function hasComments(ConfigManager $configManager, $entity)
     {
         return true;
+    }
+
+    public function getActivityOwners($entity, ActivityList $activity)
+    {
+        return [];
     }
 }

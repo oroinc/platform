@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Entity\MailboxProcessor as ProcessorEntity;
+use Oro\Bundle\EmailBundle\Entity\MailboxProcessorSettings as ProcessorEntity;
 
 class MailboxProcessorProvider
 {
@@ -41,7 +41,10 @@ class MailboxProcessorProvider
         if (!isset($this->processors[$entity->getId()])) {
             if (!isset($this->processorTypes[$entity->getType()])) {
                 throw new \LogicException(
-                    "MailboxProcessor type {$entity->getType()} is not registered. Check if appropriate service exists."
+                    sprintf(
+                        'MailboxProcessor type %s is not registered. Check if appropriate service exists.',
+                        $entity->getType()
+                    )
                 );
             }
 
@@ -59,6 +62,19 @@ class MailboxProcessorProvider
     public function getProcessorTypes()
     {
         return $this->processorTypes;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return MailboxProcessorInterface
+     */
+    public function getProcessorType($type)
+    {
+        if (!isset($this->processorTypes[$type])) {
+            return null;
+        }
+        return $this->processorTypes[$type];
     }
 
     /**

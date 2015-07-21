@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
-use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
-
 /**
  * Represents an email owner
  */
@@ -34,9 +31,9 @@ interface EmailOwnerInterface
     public function getId();
 
     /**
-     * Returns email owner name.
+     * Get name of email owner.
      *
      * @return string
      */
-    public function getName();
+    public function getEmailOwnerName();
 }

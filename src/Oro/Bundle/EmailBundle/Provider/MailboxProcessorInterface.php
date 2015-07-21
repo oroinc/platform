@@ -3,7 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\MailboxProcessor;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\MailboxProcessorSettings;
 
 interface MailboxProcessorInterface
 {
@@ -11,16 +12,16 @@ interface MailboxProcessorInterface
     /**
      * Configures processor from processor entity.
      *
-     * @param MailboxProcessor $processor
+     * @param MailboxProcessorSettings $processor
      */
-    public function configureFromEntity(MailboxProcessor $processor);
+    public function configureFromEntity(MailboxProcessorSettings $processor);
 
     /**
      * Processes email and performs actions accordingly.
      *
-     * @param Email $email
+     * @param EmailUser $emailUser
      */
-    public function process(Email $email);
+    public function process(EmailUser $emailUser);
 
     /**
      * Returns processor type.

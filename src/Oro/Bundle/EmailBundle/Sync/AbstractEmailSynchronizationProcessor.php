@@ -95,7 +95,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             } else {
                 return $this->isKnownSender($email) && $this->isUserRecipient($user->getId(), $email);
             }
-        } elseif($user instanceof Mailbox ) {
+        } elseif ($user instanceof Mailbox) {
             if ($folderType === FolderType::SENT) {
                 return $this->isMailboxSender($user->getId(), $email);
             } else {

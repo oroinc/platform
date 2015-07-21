@@ -11,6 +11,11 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
     const TEST_CONTACT_CLASS = 'Entity\TestContact';
     const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    const MAILBOX_CLASS = 'Oro\Bundle\EmailBundle\Entity\Mailbox';
+
+    // @codingStandardsIgnoreStart
+    const QB_SELECT = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId,IDENTITY(a.mailboxId) AS mailboxId';
+    // @codingStandardsIgnoreStop
 
     /** @var KnownEmailAddressChecker */
     private $checker;
@@ -72,8 +77,8 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 
         $query        = $this->getLoadEmailAddressesQuery(
             [
-                ['email' => 'contact@test.com', 'userId' => null, 'contactId' => 10],
-                ['email' => 'user@test.com', 'userId' => 1, 'contactId' => null],
+                ['email' => 'contact@test.com', 'userId' => null, 'contactId' => 10, 'mailboxId' => null],
+                ['email' => 'user@test.com', 'userId' => 1, 'contactId' => null, 'mailboxId' => null],
             ]
         );
         $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
@@ -114,7 +119,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 
         $query        = $this->getLoadEmailAddressesQuery(
             [
-                ['email' => 'user@test.com', 'userId' => 1]
+                ['email' => 'user@test.com', 'userId' => 1, 'mailboxId' => null]
             ]
         );
         $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
@@ -122,7 +127,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             [
                 'user@test.com' => 'user@test.com'
             ],
-            'a.email,IDENTITY(a.userId) AS userId'
+            'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.mailboxId) AS mailboxId'
         );
         $queryBuilder->expects($this->once())
             ->method('andWhere')
@@ -144,8 +149,8 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     {
         $query1        = $this->getLoadEmailAddressesQuery(
             [
-                ['email' => '1@test.com', 'userId' => null, 'contactId' => 1],
-                ['email' => '3@test.com', 'userId' => null, 'contactId' => 2],
+                ['email' => '1@test.com', 'userId' => null, 'contactId' => 1, 'mailboxId' => null],
+                ['email' => '3@test.com', 'userId' => null, 'contactId' => 2, 'mailboxId' => null],
             ]
         );
         $queryBuilder1 = $this->getLoadEmailAddressesQueryBuilder(
@@ -162,7 +167,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 
         $query2        = $this->getLoadEmailAddressesQuery(
             [
-                ['email' => '11@test.com', 'userId' => null, 'contactId' => 3],
+                ['email' => '11@test.com', 'userId' => null, 'contactId' => 3, 'mailboxId' => null],
             ]
         );
         $queryBuilder2 = $this->getLoadEmailAddressesQueryBuilder(
@@ -239,7 +244,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
                 'emailAddress' => '1@test.com',
                 'emailsToLoad' => ['1@test.com' => '1@test.com'],
                 'queryResult'  => [
-                    ['email' => '1@test.com', 'userId' => null, 'contactId' => 1]
+                    ['email' => '1@test.com', 'userId' => null, 'contactId' => 1, 'mailboxId' => null]
                 ],
                 'expected'     => [
                     '1@test.com' => true
@@ -253,8 +258,8 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
                     '3@test.com' => '3@test.com'
                 ],
                 'queryResult'  => [
-                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null],
-                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10]
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null, 'mailboxId' => null],
+                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10, 'mailboxId' => null]
                 ],
                 'expected'     => [
                     '1@test.com' => true,
@@ -303,7 +308,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
                 'emailAddress' => '1@test.com',
                 'emailsToLoad' => ['1@test.com' => '1@test.com'],
                 'queryResult'  => [
-                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null]
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null, 'mailboxId' => null]
                 ],
                 'expected'     => [
                     '1@test.com' => true
@@ -317,8 +322,8 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
                     '3@test.com' => '3@test.com'
                 ],
                 'queryResult'  => [
-                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null],
-                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10]
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null, 'mailboxId' => null],
+                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10, 'mailboxId' => null]
                 ],
                 'expected'     => [
                     '1@test.com' => true,
@@ -344,20 +349,26 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             ->method('getEmailOwnerClass')
             ->will($this->returnValue(self::TEST_CONTACT_CLASS));
 
+        $mailboxProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $mailboxProvider->expects($this->any())
+            ->method('getEmailOwnerClass')
+            ->will($this->returnValue(self::MAILBOX_CLASS));
+
         $emailOwnerProviderStorage =
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage')
                 ->disableOriginalConstructor()
                 ->getMock();
         $emailOwnerProviderStorage->expects($this->any())
             ->method('getProviders')
-            ->will($this->returnValue([$userProvider, $contactProvider]));
+            ->will($this->returnValue([$userProvider, $contactProvider, $mailboxProvider]));
         $emailOwnerProviderStorage->expects($this->any())
             ->method('getEmailOwnerFieldName')
             ->will(
                 $this->returnValueMap(
                     [
                         [$userProvider, 'userId'],
-                        [$contactProvider, 'contactId']
+                        [$contactProvider, 'contactId'],
+                        [$mailboxProvider, 'mailboxId']
                     ]
                 )
             );
@@ -375,7 +386,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     protected function getLoadEmailAddressesQueryBuilder(
         $query,
         $emailsToLoad,
-        $select = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId'
+        $select = self::QB_SELECT
     ) {
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()

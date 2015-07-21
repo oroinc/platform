@@ -14,70 +14,92 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        static::oroEmailAutoResponseRuleTable($schema);
-        static::oroEmailAutoResponseRuleConditionTable($schema);
-        static::oroEmailTemplateTable($schema);
+        self::createOroEmailMailboxTable($schema);
+        self::createOroEmailMailboxProcessorTable($schema);
+
+        self::addOwnerMailboxColumn($schema);
+
+        self::addOroEmailMailboxForeignKeys($schema);
+
+        self::addEmailUserMailboxOwnerColumn($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
-    public static function oroEmailAutoResponseRuleTable(Schema $schema)
+    public static function createOroEmailMailboxTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_email_auto_response_rule');
+        $table = $schema->createTable('oro_email_mailbox');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('template_id', 'integer', ['notnull' => false]);
-        $table->addColumn('mailbox_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['length' => 255]);
-        $table->addColumn('active', 'boolean', []);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('processor_id', 'integer', ['notnull' => false]);
+        $table->addColumn('origin_id', 'integer', ['notnull' => false]);
+        $table->addColumn('email', 'string', ['length' => 255]);
+        $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('smtp_settings', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['template_id'], 'IDX_58CB592A5DA0FB8', []);
-        $table->addIndex(['mailbox_id'], 'IDX_58CB592A66EC35CC', []);
+        $table->addUniqueIndex(['processor_id'], 'UNIQ_574C364F37BAC19A');
+        $table->addUniqueIndex(['origin_id'], 'UNIQ_574C364F56A273CC');
+        $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE', []);
+    }
 
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_template'),
-            ['template_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
-        );
+    public static function createOroEmailMailboxProcessorTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_email_mailbox_processor');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('type', 'string', ['length' => 30]);
+        $table->setPrimaryKey(['id']);
+    }
+
+    public static function addOwnerMailboxColumn(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_address');
+
+        $table->addColumn('owner_mailbox_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['owner_mailbox_id'], 'IDX_FC9DBBC53486AC89');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_mailbox'),
-            ['mailbox_id'],
+            ['owner_mailbox_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => null, 'onUpdate' => null],
+            'FK_FC9DBBC53486AC89'
         );
     }
 
     /**
+     * Add oro_email_mailbox foreign keys.
+     *
      * @param Schema $schema
      */
-    public static function oroEmailAutoResponseRuleConditionTable(Schema $schema)
+    public static function addOroEmailMailboxForeignKeys(Schema $schema)
     {
-        $table = $schema->createTable('oro_email_auto_response_rule_condition');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('rule_id', 'integer', ['notnull' => false]);
-        $table->addColumn('operation', 'string', ['length' => 5]);
-        $table->addColumn('field', 'string', ['length' => 255]);
-        $table->addColumn('filterType', 'string', ['length' => 255]);
-        $table->addColumn('filterValue', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('position', 'integer', []);
-        $table->setPrimaryKey(['id']);
-        $table->addIndex(['rule_id'], 'IDX_4132B1DB744E0351', []);
+        $table = $schema->getTable('oro_email_mailbox');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_mailbox_processor'),
+            ['processor_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email_origin'),
+            ['origin_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+    }
+    public static function addEmailUserMailboxOwnerColumn(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_user');
+        $table->addColumn('mailbox_owner_id', 'integer', ['notnull' => false]);
 
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_auto_response_rule'),
-            ['rule_id'],
+            $schema->getTable('oro_email_mailbox'),
+            ['mailbox_owner_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
-    }
-
-    /**
-     * @param Schema $schema
-     */
-    public static function oroEmailTemplateTable(Schema $schema)
-    {
-       $table = $schema->getTable('oro_email_template');
-       $table->addColumn('visible', 'boolean', ['default' => '1']);
     }
 }

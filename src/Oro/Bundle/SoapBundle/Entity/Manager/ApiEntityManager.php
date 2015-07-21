@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
@@ -242,11 +241,7 @@ class ApiEntityManager
         $qb = $this->getRepository()->createQueryBuilder('e');
         $this->applyJoins($qb, $joins);
 
-        // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-        // http://www.doctrine-project.org/jira/browse/DDC-2798
-        // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-        QueryBuilderHelper::addCriteria($qb, $criteria);
-        // $qb->addCriteria($criteria);
+        $qb->addCriteria($criteria);
 
         return $qb;
     }

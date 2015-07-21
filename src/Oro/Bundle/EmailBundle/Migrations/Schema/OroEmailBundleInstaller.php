@@ -17,8 +17,16 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBundle112_2;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_15\OroEmailBundle as OroEmailBundle115;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\OroEmailBundle as OroEmailBundle116;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_17\OroEmailBundle as OroEmailBundle117;
 
+/**
+ * Class OroEmailBundleInstaller
+ * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OroEmailBundleInstaller implements Installation
 {
     /**
@@ -26,7 +34,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_17';
     }
 
     /**
@@ -75,8 +83,18 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle114::addEmbeddedContentIdField($schema);
 
-        OroEmailBundle116::oroEmailAutoResponseRuleTable($schema);
-        OroEmailBundle116::oroEmailAutoResponseRuleConditionTable($schema);
-        OroEmailBundle116::oroEmailTemplateTable($schema);
+        OroEmailBundle115::addEmailFolderFields($schema);
+        OroEmailBundle115::addEmailOriginFields($schema);
+        OroEmailBundle115::updateEmailRecipientConstraint($schema);
+
+        OroEmailBundle116::createOroEmailMailboxProcessorTable($schema);
+        OroEmailBundle116::createOroEmailMailboxTable($schema);
+        OroEmailBundle116::addOwnerMailboxColumn($schema);
+        OroEmailBundle116::addOroEmailMailboxForeignKeys($schema);
+        OroEmailBundle116::addEmailUserMailboxOwnerColumn($schema);
+
+        OroEmailBundle117::oroEmailAutoResponseRuleTable($schema);
+        OroEmailBundle117::oroEmailAutoResponseRuleConditionTable($schema);
+        OroEmailBundle117::oroEmailTemplateTable($schema);
     }
 }
