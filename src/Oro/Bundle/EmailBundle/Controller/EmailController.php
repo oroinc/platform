@@ -127,7 +127,7 @@ class EmailController extends Controller
         $emails = array_filter($emails, function ($email) {
             return $this->get('security.context')->isGranted('VIEW', $email);
         });
-        $this->lfoadEmailBody($emails);
+        $this->loadEmailBody($emails);
 
         return [
             'entity' => $entity,
