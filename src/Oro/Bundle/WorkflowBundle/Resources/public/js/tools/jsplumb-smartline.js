@@ -194,12 +194,6 @@ define(function(require) {
         }
 
         this._compute = function(paintInfo, params) {
-            lastx = null;
-            lasty = null;
-            lastOrientation = null;
-
-            segments = [];
-
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
             if (points.length == 0) {
@@ -207,25 +201,33 @@ define(function(require) {
                 return;
             }
 
-            // set valid archors
             var sourcePoint = points.shift().clone(),
                 targetPoint = points.pop().clone(),
                 correction,
                 ENDPOINT_SPACE_TO_LINE = 4;
 
+            // adjust source anf target points
             sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint);
             targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint);
 
+            // find required correction
+            correction = {
+                x: Math.min(sourcePoint.x, targetPoint.x),
+                y: Math.min(sourcePoint.y, targetPoint.y)
+            };
+
+            // that will be starting point of line
+            paintInfo.sx = sourcePoint.x - correction.x;
+            paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
+
+            // set valid archors
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft)/ params.sourceEndpoint.element.offsetWidth;
             params.sourceEndpoint.anchor.y = (sourcePoint.y - params.sourceEndpoint.element.offsetTop)/ params.sourceEndpoint.element.offsetHeight;
             params.targetEndpoint.anchor.x = (targetPoint.x - params.targetEndpoint.element.offsetLeft)/ params.targetEndpoint.element.offsetWidth;
             params.targetEndpoint.anchor.y = (targetPoint.y - params.targetEndpoint.element.offsetTop)/ params.targetEndpoint.element.offsetHeight;
-            correction = {
-                x: Math.min(sourcePoint.x, targetPoint.x),
-                y: Math.min(sourcePoint.y, targetPoint.y)
-            }
+
             if (oldAnchorX !== params.sourceEndpoint.anchor.x) {
                 paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * params.sourceEndpoint.element.offsetWidth;
             }
@@ -233,8 +235,11 @@ define(function(require) {
                 paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * params.sourceEndpoint.element.offsetHeight;
             }
 
-            paintInfo.sx = sourcePoint.x - correction.x;
-            paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
+            // build segments
+            lastx = null;
+            lasty = null;
+            lastOrientation = null;
+            segments = [];
 
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
