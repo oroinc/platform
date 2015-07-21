@@ -67,47 +67,49 @@ define(function(require) {
 
         connect: function() {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
-            this.$el.addClass(this.className);
-            var stepCollectionView;
-            var transitionOverlayView = this.transitionOverlayView;
-            var connectionOptions = _.extend({}, this.defaultConnectionOptions);
-            var StepView = this.stepView;
-            var TransitionView = this.transitionView;
-            var that = this;
-            var steps = this.model.get('steps');
-            this.stepCollectionView = stepCollectionView = new BaseCollectionView({
-                el: this.$el,
-                collection: steps,
-                animationDuration: 0,
-                // pass areaView to each model
-                itemView: function(options) {
-                    options = _.extend({
-                        areaView: that
-                    }, options);
-                    return new StepView(options);
-                },
-                autoRender: true
-            });
-            this.transitionCollectionView = new BaseCollectionView({
-                el: this.$el,
-                collection: this.model.get('transitions'),
-                animationDuration: 0,
-                // pass areaView to each model
-                itemView: function(options) {
-                    options = _.extend({
-                        areaView: that,
-                        stepCollection: steps,
-                        stepCollectionView: stepCollectionView,
-                        transitionOverlayView: transitionOverlayView,
-                        connectionOptions: connectionOptions
-                    }, options);
-                    return new TransitionView(options);
-                },
-                autoRender: true
-            });
+            this.jsPlumbInstance.batch(_.bind(function(){
+                this.$el.addClass(this.className);
+                var stepCollectionView;
+                var transitionOverlayView = this.transitionOverlayView;
+                var connectionOptions = _.extend({}, this.defaultConnectionOptions);
+                var StepView = this.stepView;
+                var TransitionView = this.transitionView;
+                var that = this;
+                var steps = this.model.get('steps');
+                this.stepCollectionView = stepCollectionView = new BaseCollectionView({
+                    el: this.$el,
+                    collection: steps,
+                    animationDuration: 0,
+                    // pass areaView to each model
+                    itemView: function(options) {
+                        options = _.extend({
+                            areaView: that
+                        }, options);
+                        return new StepView(options);
+                    },
+                    autoRender: true
+                });
+                this.transitionCollectionView = new BaseCollectionView({
+                    el: this.$el,
+                    collection: this.model.get('transitions'),
+                    animationDuration: 0,
+                    // pass areaView to each model
+                    itemView: function(options) {
+                        options = _.extend({
+                            areaView: that,
+                            stepCollection: steps,
+                            stepCollectionView: stepCollectionView,
+                            transitionOverlayView: transitionOverlayView,
+                            connectionOptions: connectionOptions
+                        }, options);
+                        return new TransitionView(options);
+                    },
+                    autoRender: true
+                });
 
-            this.subview('stepCollectionView', this.stepCollectionView);
-            this.subview('transitionCollectionView', this.transitionCollectionView);
+                this.subview('stepCollectionView', this.stepCollectionView);
+                this.subview('transitionCollectionView', this.transitionCollectionView);
+            }, this));
         }
     });
 

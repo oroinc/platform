@@ -30,9 +30,12 @@ define(function(require){
     JsPlumbSmartlineManager.prototype = {
 
         getNaivePathLength: function (fromRect, toRect) {
+            if (fromRect == toRect) {
+                return 0;
+            }
             return Math.abs(fromRect.bottom - toRect.top)
                 + Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right)
-                + ((fromRect.bottom - toRect.top > 0) ? 2400 : 0);
+                + ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
         },
 
         calculate: function (connector, paintInfo) {
