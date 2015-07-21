@@ -48,7 +48,6 @@ class WebSocketSendProcessor
                 /** @var EmailUser $emailUser */
                 $emailUser = $item['entity'];
                 $messageData = [[
-                    'new_email' => true,
                     'count_new' => isset($item['new']) && $item['new']>0 ? : 0
                 ]];
 

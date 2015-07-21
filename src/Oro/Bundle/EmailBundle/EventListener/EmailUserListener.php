@@ -64,9 +64,8 @@ class EmailUserListener
             if (isset($usersWithNewEmails[$ownerId])) {
                 $new = $usersWithNewEmails[$ownerId]['new'];
                 if ($status === self::ENTITY_STATUS_NEW) {
-                    $new = $new + 1;
+                    $usersWithNewEmails[$ownerId]['new'] = $new + 1;
                 }
-                $usersWithNewEmails[$ownerId]['new'] = $new;
             } else {
                 $usersWithNewEmails[$ownerId] = [
                     'entity' => $entity,

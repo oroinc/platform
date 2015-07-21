@@ -38,7 +38,7 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
         $emailUser2 = new EmailUser();
         $emailUser2->setOwner($user2);
 
-        $emailUserArray = [$emailUser1, $emailUser2];
+        $emailUserArray = [$emailUser1, $emailUser2, $emailUser1];
 
         $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->setMethods(
@@ -61,7 +61,7 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($onFlushEventArgs));
         $onFlushEventArgs
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('getEntityChangeSet')
             ->will($this->returnValue($changesetAnswer));
         $onFlushEventArgs
@@ -75,7 +75,12 @@ class EmailUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->processor
             ->expects($this->exactly(1))
             ->method('send')
-            ->with([$user1->getId() => $user1, $user2->getId() => $user2]);
+            ->with(
+                [
+                    $user1->getId() => ['entity' => $emailUser1, 'new' => 2],
+                    $user2->getId() => ['entity' => $emailUser2, 'new' => 1]
+                ]
+            );
         $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
