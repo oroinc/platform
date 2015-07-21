@@ -15,6 +15,8 @@ define(function(require){
             state: {},
             connections: {}
         };
+        this.debouncedCalculateOverlays = _.debounce(_.bind(this.jsPlumbOverlayManager.calculate,
+            this.jsPlumbOverlayManager), 50);
     }
 
     window.getLastRequest = function () {
@@ -133,7 +135,7 @@ define(function(require){
             // console.log("Cache refresh: " + _.keys(this.cache.connections).join(', '));
 
             this.jsPlumbInstance.repaintEverything();
-            this.jsPlumbOverlayManager.calculate();
+            this.debouncedCalculateOverlays();
 
             // debug code
             JsPlumbSmartlineManager.lastRequest = {
