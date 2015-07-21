@@ -63,35 +63,38 @@
                                 <div class="accordion-body in collapse" id="{{ accordionId }}" >
                                     <div class="accordion-inner">
                                         {{ form(form) }}
-                                        <fieldset class="form-horizontal form-horizontal-large">
-                                            <div class="auto-response-rule-header">
-                                                <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
-                                                {{ UI.clientLink({
-                                                    'dataUrl': path('oro_email_autoresponserule_create', {mailbox: form.vars.value.id}),
-                                                    'aCss': 'pull-right no-hash btn btn-primary',
-                                                    'label' : 'oro.email.autoresponserule.action.add.label'|trans,
-                                                    'widget' : {
-                                                        'type' : 'dialog',
-                                                        'multiple' : false,
-                                                        'reload-grid-name' : 'email-auto-response-rules',
-                                                        'options' : {
-                                                            'alias': 'auto-response-rules-dialog',
-                                                            'dialogOptions' : {
-                                                                'title' : 'oro.email.autoresponserule.action.add.title'|trans,
-                                                                'allowMaximize': true,
-                                                                'allowMinimize': true,
-                                                                'modal': true,
-                                                                'dblclick': 'maximize',
-                                                                'maximizedHeightDecreaseBy': 'minimize-bar',
-                                                                'width': 700,
+                                        {% set mailboxId = form.vars.value.id %}
+                                        {% if mailboxId %}
+                                            <fieldset class="form-horizontal form-horizontal-large">
+                                                <div class="auto-response-rule-header">
+                                                    <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
+                                                    {{ UI.clientLink({
+                                                        'dataUrl': path('oro_email_autoresponserule_create', {mailbox: mailboxId}),
+                                                        'aCss': 'pull-right no-hash btn btn-primary',
+                                                        'label' : 'oro.email.autoresponserule.action.add.label'|trans,
+                                                        'widget' : {
+                                                            'type' : 'dialog',
+                                                            'multiple' : false,
+                                                            'reload-grid-name' : 'email-auto-response-rules',
+                                                            'options' : {
+                                                                'alias': 'auto-response-rules-dialog',
+                                                                'dialogOptions' : {
+                                                                    'title' : 'oro.email.autoresponserule.action.add.title'|trans,
+                                                                    'allowMaximize': true,
+                                                                    'allowMinimize': true,
+                                                                    'modal': true,
+                                                                    'dblclick': 'maximize',
+                                                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                                                    'width': 700,
+                                                                }
                                                             }
-                                                        }
-                                                    },
-                                                }) }}
-                                            </div>
-                                            {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-                                            {{ dataGrid.renderGrid('email-auto-response-rules') }}
-                                        </fieldset>
+                                                        },
+                                                    }) }}
+                                                </div>
+                                                {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+                                                {{ dataGrid.renderGrid('email-auto-response-rules') }}
+                                            </fieldset>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

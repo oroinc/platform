@@ -53,7 +53,7 @@ class OroEmailBundle implements Migration
      */
     public static function oroEmailAutoResponseRuleConditionTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_email_auto_response_rule_condition');
+        $table = $schema->createTable('oro_email_response_rule_cond');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('rule_id', 'integer', ['notnull' => false]);
         $table->addColumn('operation', 'string', ['length' => 5]);

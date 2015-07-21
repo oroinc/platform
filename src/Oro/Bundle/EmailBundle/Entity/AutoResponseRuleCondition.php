@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_email_auto_response_rule_condition")
+ * @ORM\Table(name="oro_email_response_rule_cond")
  */
 class AutoResponseRuleCondition
 {
