@@ -9,7 +9,12 @@ define(function(require) {
      * @export  oroemail/js/app/models/email-template-collection
      */
     EmailNotificationCollection = BaseCollection.extend({
-        model: EmailNotificationModel
+        model: EmailNotificationModel,
+        markAllAsRead: function() {
+            for (var i in this.models) {
+                this.models[i].set({'seen':1});
+            }
+        }
     });
 
     return EmailNotificationCollection;

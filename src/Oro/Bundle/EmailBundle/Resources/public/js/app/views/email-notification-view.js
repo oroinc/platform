@@ -30,8 +30,9 @@ define([
 
             var self = this;
             this.$el.click(function() {
-                if ($(this).find('.dropdown-menu').hasClass('notification')) {
+                if (self.isActiveTypeDropDown('notification')) {
                     self.$el.addClass('open');
+                    self.setTypeDropDownMenu('content');
                 }
                 self.initViewType();
             });
@@ -75,7 +76,9 @@ define([
             $.ajax({
                 url: routing.generate('oro_email_mark_all_as_seen'),
                 success: function () {
-                    self.collection.reset();
+                    self.collection.markAllAsRead();
+                    self.render();
+                    self.onChangeAmount(0);
                     mediator.trigger('datagrid:doRefresh:user-email-grid');
                 }
             })
@@ -92,16 +95,18 @@ define([
         getCount: function () {
             return $(this.el).data('count');
         },
-
-
         initViewType: function () {
-            if (this.collection.models.length === 0) {
-                this.setTypeDropDownMenu('empty');
-                this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
-            } else {
-                this.setTypeDropDownMenu('content');
-                if (this.countNewEmail > 0) {
-                    this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
+            if (!this.isActiveTypeDropDown('notification')) {
+                if (this.collection.models.length === 0) {
+                    this.setTypeDropDownMenu('empty');
+                    this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
+                } else {
+                    this.setTypeDropDownMenu('content');
+                    if (this.countNewEmail > 0) {
+                        this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
+                    } else {
+                        this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
+                    }
                 }
             }
         },
@@ -114,6 +119,10 @@ define([
         setTypeDropDownMenu:function(type) {
             this.resetTypeDropDownMenu();
             this.$el.find('.dropdown-menu').addClass(type);
+        },
+
+        isActiveTypeDropDown: function(type) {
+            return this.$el.find('.dropdown-menu').hasClass(type);
         },
 
         onClickOpenEmail: function (e) {

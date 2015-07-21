@@ -52,7 +52,6 @@ define([
                 $.ajax({
                     url: routing.generate('oro_api_get_email_notification_data'),
                     success: function (r) {
-                        console.log(r);
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);
                         self.view.onChangeAmount(r.count);
