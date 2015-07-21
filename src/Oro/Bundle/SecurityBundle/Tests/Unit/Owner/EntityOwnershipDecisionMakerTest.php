@@ -106,11 +106,16 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
                 )
             );
 
+        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProvider,
             new ObjectIdAccessor(),
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $configProviderMock
         );
         $this->decisionMaker->setContainer($this->container);
     }

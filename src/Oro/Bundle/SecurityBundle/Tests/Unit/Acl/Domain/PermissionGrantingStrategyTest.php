@@ -111,11 +111,16 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             $objectIdAccessor,
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $configProviderMock
         );
         $decisionMaker->setContainer($this->container);
 
@@ -135,6 +140,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setContext($contextLink);
 
         $user = new User(1);
+        $user->setUsername('TestUser');
         $this->sid = new UserSecurityIdentity('TestUser', get_class($user));
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');

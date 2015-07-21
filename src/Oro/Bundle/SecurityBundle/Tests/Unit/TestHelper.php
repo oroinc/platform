@@ -100,6 +100,17 @@ class TestHelper
                 $metadataProvider
             );
         }
+        $configProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $decisionMaker = new EntityOwnershipDecisionMaker(
+            $treeProviderMock,
+            $idAccessor,
+            new EntityOwnerAccessor($metadataProvider),
+            $metadataProvider,
+            $configProviderMock
+        );
 
         $config = $this->testCase->getMockBuilder('\Doctrine\ORM\Configuration')
             ->disableOriginalConstructor()

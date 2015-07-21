@@ -222,6 +222,7 @@ services:
             - @oro_security.acl.object_id_accessor
             - @oro_security.owner.entity_owner_accessor
             - @oro_security.owner.ownership_metadata_provider
+            - @oro_entity_config.provider.security
         tags:
            - { name: oro_security.owner.ownership_decision_maker }
 

@@ -17,14 +17,14 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AceAwareAclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EntityAclExtension extends AbstractAclExtension implements AceAwareAclExtensionInterface
+class EntityAclExtension extends AbstractAclExtension implements AceAwareModelInterface
 {
     /**
      * @var ObjectIdAccessor
@@ -460,7 +460,7 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareAclExte
         }
 
         $result = false;
-        if ($this->decisionMaker instanceof AceAwareAclExtensionInterface) {
+        if ($this->decisionMaker instanceof AceAwareModelInterface && $this->ace) {
             $this->decisionMaker->setAce($this->ace);
         }
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
