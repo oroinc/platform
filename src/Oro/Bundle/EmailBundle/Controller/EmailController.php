@@ -66,21 +66,6 @@ class EmailController extends Controller
         ];
     }
 
-    /** todo: remove this method
-     * @Route("/testclank/email/testclank", name="oro_email_test_clank")
-     */
-    public function testAction()
-    {
-        $sender = $this->get('oro_email.email_websocket.processor');
-        $item = [
-            'owner'=>$this->getUser(),
-            'new'=>0
-        ];
-        $a = $sender->send([$item]);
-
-        return new JsonResponse([$a]);
-    }
-
     /**
      * Get new Unread Emails for email notification
      *
