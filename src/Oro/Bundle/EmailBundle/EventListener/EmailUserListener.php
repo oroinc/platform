@@ -69,7 +69,7 @@ class EmailUserListener
                 $usersWithNewEmails[$ownerId]['new'] = $new;
             } else {
                 $usersWithNewEmails[$ownerId] = [
-                    'owner' => $entity->getOwner(),
+                    'entity' => $entity,
                     'new' => $status === self::ENTITY_STATUS_NEW ? 1: 0
                 ];
             }

@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class WebSocketSendProcessor
 {
-    const TOPIC = 'oro/email_event/user_%s';
+    const TOPIC = 'oro/email_event/user_%s_org_%s';
 
     /**
      * @var TopicPublisher
@@ -26,11 +28,12 @@ class WebSocketSendProcessor
      * Get user topic
      *
      * @param User $user
+     * @param Organization $organization
      * @return string
      */
-    public static function getUserTopic(User $user)
+    public static function getUserTopic(User $user, Organization $organization)
     {
-        return sprintf(self::TOPIC, $user->getId());
+        return sprintf(self::TOPIC, $user->getId(), $organization->getId());
     }
 
     /**
@@ -42,13 +45,20 @@ class WebSocketSendProcessor
     {
         if ($usersWithNewEmails) {
             foreach ($usersWithNewEmails as $item) {
-                $user = $item['owner'];
+                /** @var EmailUser $emailUser */
+                $emailUser = $item['entity'];
                 $messageData = [[
                     'new_email' => true,
                     'count_new' => isset($item['new']) && $item['new']>0 ? : 0
                 ]];
 
-                $this->publisher->send(self::getUserTopic($user), json_encode($messageData));
+                $this->publisher->send(
+                    self::getUserTopic(
+                        $emailUser->getOwner(),
+                        $emailUser->getOrganization()
+                    ),
+                    json_encode($messageData)
+                );
             }
         }
     }

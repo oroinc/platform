@@ -89,6 +89,7 @@ class EmailController extends Controller
      */
     public function notificationDataAction()
     {
+        $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
 
@@ -96,7 +97,7 @@ class EmailController extends Controller
         $count = $emailNotificationManager->getCountNewEmails($this->getUser());
 
         return [
-            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser()),
+            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser(), $currentOrganization),
             'emails' => json_encode($emails),
             'count'=> $count
         ];
