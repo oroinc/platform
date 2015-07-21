@@ -61,6 +61,9 @@ var Point2d = (function () {
     Point2d.prototype.mul = function (n) {
         return new Point2d(this.x * n, this.y * n);
     };
+    Point2d.prototype.clone = function () {
+        return new Point2d(this.x, this.y);
+    };
     Object.defineProperty(Point2d.prototype, "length", {
         get: function () {
             return Math.sqrt(this.x * this.x + this.y * this.y);

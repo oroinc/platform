@@ -101,6 +101,12 @@ define(function(require) {
                 }
             }
             this.removeStaleConnections();
+
+            this.areaView.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            for (var i = 0; i < startSteps.length; i++) {
+                startStep = startSteps[i];
+                this.areaView.stepCollectionView.getItemView(startStep).updateStepMinWidth();
+            }
         },
 
         addStaleMark: function() {

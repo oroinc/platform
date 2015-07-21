@@ -3,7 +3,14 @@ define(function(require) {
 
     var jsPlumb = require('jsplumb');
     var _ = require('underscore');
-    var JsPlumbManager = require('./jsplumb-manager');
+    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
+
+    function ensureSmartLineManager(jsPlumbInstance) {
+        if (!jsPlumbInstance.__smartLineManager) {
+            jsPlumbInstance.__smartLineManager = new JsPlumbSmartlineManager(jsPlumbInstance);
+        }
+        return jsPlumbInstance.__smartLineManager;
+    }
 
     function Smartline(params) {
         this.type = 'Smartline';
@@ -12,7 +19,7 @@ define(function(require) {
         params.stub = params.stub === null || params.stub === void 0 ? 30 : params.stub;
         var segments;
         var _super = jsPlumb.Connectors.AbstractConnector.apply(this, arguments);
-        this.smartlineManager = JsPlumbManager.getJsPlumbSmartlineManager(params._jsPlumb);
+        this.smartlineManager = ensureSmartLineManager(params._jsPlumb);
         var midpoint = params.midpoint === null || params.midpoint === void 0 ? 0.5 : params.midpoint;
         var alwaysRespectStubs = params.alwaysRespectStubs === true;
         var userSuppliedSegments = null;
@@ -53,7 +60,6 @@ define(function(require) {
             var current = null;
             var next;
             for (var i = 0; i < segments.length - 1; i++) {
-
                 current = current || _cloneArray(segments[i]);
                 next = _cloneArray(segments[i + 1]);
                 if (cornerRadius > 0 && current[4] !== next[4]) {
@@ -163,28 +169,38 @@ define(function(require) {
             return userSuppliedSegments || segments;
         };
 
+        function getAdjustment(el, point) {
+            var style = window.getComputedStyle(el),
+                borderRadius = 0,
+                dx;
+            if (style.borderRadius) {
+                borderRadius = parseInt(style.borderRadius) || 0;
+            }
+            borderRadius = Math.min(borderRadius, el.offsetWidth / 2, el.offsetHeight / 2);
+
+            var realX = point.x - el.offsetLeft;
+            if (realX < 1 || realX > el.offsetWidth - 1) {
+                return 0;
+            }
+            if (realX < borderRadius) {
+                dx = borderRadius - realX;
+                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+            } else if (realX > el.offsetWidth - borderRadius) {
+                dx = realX - (el.offsetWidth - borderRadius);
+                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+            }
+
+            return el.offsetHeight / 2 - 1;
+        }
+
         this._compute = function(paintInfo, params) {
             var existingConnection = _.find(this._jsPlumb.instance.getConnections(), function (connection) {
                 return connection.connector === this;
             }, this);
             if (_.isUndefined(existingConnection)) {
-                return this._flowchartConnectionCompute.apply(this, arguments);
+                // if current connection is new one and hasn't a target yet using jsPlumb Flowchart connector behaviour
+                return this._flowchartConnectorCompute.apply(this, arguments);
             }
-            if (params.clearEdits) {
-                userSuppliedSegments = null;
-            }
-
-            if (userSuppliedSegments !== null) {
-                writeSegments(this, userSuppliedSegments, paintInfo);
-                return;
-            }
-
-            lastx = null;
-            lasty = null;
-            lastOrientation = null;
-
-            segments = [];
-
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
             if (points.length == 0) {
@@ -192,25 +208,33 @@ define(function(require) {
                 return;
             }
 
-            // add space from center to line start
-            points[0].y += 18;
-            points[points.length - 1].y -= 18;
-
-            // set valid archors
-            var sourcePoint = points.shift(),
-                targetPoint = points.pop(),
+            var sourcePoint = points.shift().clone(),
+                targetPoint = points.pop().clone(),
                 correction,
                 ENDPOINT_SPACE_TO_LINE = 4;
+
+            // adjust source anf target points
+            sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint);
+            targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint);
+
+            // find required correction
+            correction = {
+                x: Math.min(sourcePoint.x, targetPoint.x),
+                y: Math.min(sourcePoint.y, targetPoint.y)
+            };
+
+            // that will be starting point of line
+            paintInfo.sx = sourcePoint.x - correction.x;
+            paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
+
+            // set valid archors
             var oldAnchorX = params.sourceEndpoint.anchor.x,
                 oldAnchorY = params.sourceEndpoint.anchor.y;
             params.sourceEndpoint.anchor.x = (sourcePoint.x - params.sourceEndpoint.element.offsetLeft)/ params.sourceEndpoint.element.offsetWidth;
             params.sourceEndpoint.anchor.y = (sourcePoint.y - params.sourceEndpoint.element.offsetTop)/ params.sourceEndpoint.element.offsetHeight;
             params.targetEndpoint.anchor.x = (targetPoint.x - params.targetEndpoint.element.offsetLeft)/ params.targetEndpoint.element.offsetWidth;
             params.targetEndpoint.anchor.y = (targetPoint.y - params.targetEndpoint.element.offsetTop)/ params.targetEndpoint.element.offsetHeight;
-            correction = {
-                x: Math.min(sourcePoint.x, targetPoint.x),
-                y: Math.min(sourcePoint.y, targetPoint.y)
-            }
+
             if (oldAnchorX !== params.sourceEndpoint.anchor.x) {
                 paintInfo.points[0] += (params.sourceEndpoint.anchor.x - oldAnchorX) * params.sourceEndpoint.element.offsetWidth;
             }
@@ -218,14 +242,11 @@ define(function(require) {
                 paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * params.sourceEndpoint.element.offsetHeight;
             }
 
-            paintInfo.sx = sourcePoint.x - correction.x;
-            paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
-
-            var style = window.getComputedStyle(params.sourceEndpoint.element),
-                sourceBorderRadius = 0;
-            if (style.borderRadius) {
-                sourceBorderRadius = parseInt(style.borderRadius);
-            }
+            // build segments
+            lastx = null;
+            lasty = null;
+            lastOrientation = null;
+            segments = [];
 
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
@@ -285,7 +306,7 @@ define(function(require) {
         };
 
 
-        this._flowchartConnectionCompute = function (paintInfo, params) {
+        this._flowchartConnectorCompute = function (paintInfo, params) {
 
             if (params.clearEdits)
                 userSuppliedSegments = null;

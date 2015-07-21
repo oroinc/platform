@@ -18,6 +18,11 @@ define(function(require) {
         jsPlumbInstance: null,
 
         /**
+         * @type {number}
+         */
+        connectionWidth: 16,
+
+        /**
          * @type {function(): Object|Object}
          */
         defaultsChartOptions: function() {

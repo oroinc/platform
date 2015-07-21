@@ -100,6 +100,9 @@ class Point2d implements IPoint2d{
     abs() : Point2d {
         return new Point2d(Math.abs(this.x), Math.abs(this.y));
     }
+    clone() : Point2d {
+        return new Point2d(this.x, this.y);
+    }
 }
 
 var Direction2d = {

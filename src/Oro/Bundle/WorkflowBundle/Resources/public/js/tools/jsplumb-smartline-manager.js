@@ -11,16 +11,12 @@ define(function(require){
     function JsPlumbSmartlineManager(jsPlumbInstance) {
         this.jsPlumbInstance = jsPlumbInstance;
         this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
-        this.cache = {};
-        this.debouncedCalculateOverlays = _.debounce(
-                _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
-            50);
-        this.debouncedRepaintEverything = _.debounce(
-            _.bind(function () {
-                this.jsPlumbInstance.repaintEverything();
-            }, this),
-            0
-        );
+        this.cache = {
+            state: {},
+            connections: {}
+        };
+        this.debouncedCalculateOverlays = _.debounce(_.bind(this.jsPlumbOverlayManager.calculate,
+            this.jsPlumbOverlayManager), 50);
     }
 
     window.getLastRequest = function () {
@@ -29,18 +25,61 @@ define(function(require){
 
     JsPlumbSmartlineManager.prototype = {
 
-        getNaivePathLength: function (fromRect, toRect) {
-            return Math.abs(fromRect.bottom - toRect.top)
-                + Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right)
-                + ((fromRect.bottom - toRect.top > 0) ? 2400 : 0);
+        isCacheValid: function () {
+            return _.isEqual(this.getState(), this.cache.state)
         },
 
-        calculate: function (connector, paintInfo) {
-            var invalidateConnection;
-            var cache = {};
+        getConnectionPath: function (connector) {
+            if (!this.isCacheValid()) {
+                this.refreshCache();
+            }
+
+            var cacheRecord = this.cache.connections[connector.getId()];
+            if (!cacheRecord) {
+                return [];
+            }
+            return _.clone(cacheRecord.points);
+        },
+
+        getNaivePathLength: function (fromRect, toRect) {
+            if (fromRect == toRect) {
+                return 0;
+            }
+            return Math.abs(fromRect.bottom - toRect.top)
+                + Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right)
+                + ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
+        },
+
+
+        getState: function () {
+            var state = {
+                    rectangles: [],
+                    connections: []
+                },
+                hasRect = {}
+            _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
+                var el = document.getElementById(id);
+                if (el) {
+                    hasRect[id] = true;
+                    state.rectangles.push([id, el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight]);
+                }
+            });
+
+            _.each(this.jsPlumbInstance.getConnections(), function (conn) {
+                if (conn.sourceId in hasRect && conn.targetId in hasRect) {
+                    state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
+                }
+            }, this);
+
+            return state;
+        },
+
+        refreshCache: function () {
+            var _this = this;
             var connections = [];
             var rects = {};
             var graph = new Graph();
+            this.cache.state = this.getState();
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);
@@ -51,10 +90,12 @@ define(function(require){
                     graph.rectangles.push(clientRect);
                 }
             });
+
             if (graph.rectangles.length < 1) {
-                this.cache = {};
+                this.cache.connections = {};
                 return;
             }
+
             graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
@@ -67,6 +108,34 @@ define(function(require){
                 return a[2] - b[2];
             });
 
+            _.each(connections, function (conn) {
+                var finder = new Finder(graph);
+
+                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
+                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
+
+                var path = finder.find();
+                if (!path) {
+                    console.warn("Cannot find path");
+                } else {
+                    graph.updateWithPath(path);
+                    _this.cache.connections[conn[3].connector.getId()] = {
+                        connection: conn[3],
+                        path: path
+                    };
+                }
+            });
+
+            _.each(this.cache.connections, function (item) {
+                item.points = item.path.points.reverse();
+            });
+
+            // console.log("Cache refresh: " + _.keys(this.cache.connections).join(', '));
+
+            this.jsPlumbInstance.repaintEverything();
+            this.debouncedCalculateOverlays();
+
+            // debug code
             JsPlumbSmartlineManager.lastRequest = {
                 sources: graph.rectangles.map(function (item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
@@ -74,77 +143,6 @@ define(function(require){
                 connections: connections.map(function (item) {return item.slice(0,2);})
             };
 
-            _.each(connections, function (conn) {
-                var finder = new Finder(graph);
-
-                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
-                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
-
-                var newCacheItem;
-                var path = finder.find();
-                var cacheKey = conn[3].connector.getId();
-                if (!path) {
-                    console.warn("Cannot find path");
-                } else {
-                    graph.updateWithPath(path);
-                    newCacheItem = {
-                        connection: conn[3],
-                        path: path,
-                        paintInfo: conn[3].connector === connector ? paintInfo : undefined
-                    };
-                    if (conn[3].connector === connector) {
-                        newCacheItem.paintInfo = paintInfo;
-                    }
-                    cache[cacheKey] = newCacheItem;
-                }
-            });
-
-            _.each(cache, function (item) {
-                var points =  item.path.points.reverse();
-                item.points = points;
-            })
-
-            invalidateConnection = _.find(cache, function(item, cacheKey) {
-                return cacheKey in this.cache && item.connector !== connector &&
-                    !_.isEqual(this.cache[cacheKey].points, item.points);
-            }, this);
-
-            _.extend(this.cache, cache);
-
-            if (invalidateConnection) {
-                this.debouncedRepaintEverything();
-            }
-            this.debouncedCalculateOverlays();
-        },
-
-        getConnectionPath: function (connector, paintInfo) {
-            var connectorId = connector.getId();
-            var cached = this.retrieveCacheItem(connectorId, paintInfo);
-
-            if (cached === false) {
-                this.calculate(connector, paintInfo);
-                cached = this.retrieveCacheItem(connectorId, paintInfo);
-            }
-
-            if (cached !== false) {
-                return _.clone(cached.points);
-            }
-
-            console.warn("Path not found");
-            return [];
-        },
-
-        retrieveCacheItem: function (connectorId, paintInfo) {
-            var cached = connectorId in this.cache ? this.cache[connectorId] : undefined;
-            if (cached) {
-                if (cached.points.length && (_.isUndefined(cached.paintInfo) || matchEndpoints(cached.paintInfo, paintInfo))) {
-                    cached.paintInfo = paintInfo;
-                    return cached;
-                } else {
-                    delete this.cache[connectorId];
-                }
-            }
-            return false;
         }
     };
 

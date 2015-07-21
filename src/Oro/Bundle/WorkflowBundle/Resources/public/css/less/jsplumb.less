@@ -68,6 +68,7 @@
     height: 38px;
     color: #fff;
     border: 1px solid @step-border-color;
+    max-width: 180px;
     #gradient > .vertical(@step-gradient-start-color, @step-gradient-end-color);
     .box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.3));
     text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.3);
@@ -75,7 +76,10 @@
       text-align: center;
       font-size: 14px;
       font-weight: bold;
-      max-width: @step-label-max-width;
+      width: 100%;
+      > .dropdown-menu {
+        text-align: left;
+      }
     }
     .jsplumb-source {
       @source-radius: 8px;
@@ -119,7 +123,7 @@
     }
   }
   .workflow-step.start-step {
-    border-radius: 50%;
+    border-radius: 42.5px;
     height: 85px;
     width: 85px;
     border: 1px solid @start-step-border-color;
@@ -141,7 +145,7 @@
       left: 2px;
     }
     .step-label {
-      margin-top: 50%;
+      margin-top: 22.5px;
       width: 100%;
     }
   }
