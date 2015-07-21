@@ -63,13 +63,13 @@
 
             {% if pageReload %}
                 $('#{{ form.vars.id }}').submit(function() {
-                    mediator.once('page:update', function(){
+                    mediator.once('page:update', function() {
                         messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
                         // force reload without hash navigation
                         window.location.reload();
                     });
 
-                    mediator.once('page:afterChange', function(){
+                    mediator.once('page:afterChange', function() {
                         // Show loading until page is fully reloaded
                         mediator.execute('showLoading');
                     });
