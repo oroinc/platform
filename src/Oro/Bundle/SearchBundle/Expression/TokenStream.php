@@ -6,9 +6,13 @@ use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 
 class TokenStream
 {
+    /** @var Token */
     public $current;
 
+    /** @var Token[]  */
     private $tokens;
+
+    /** @var int */
     private $position = 0;
 
     /**
@@ -18,7 +22,7 @@ class TokenStream
      */
     public function __construct(array $tokens)
     {
-        $this->tokens = $tokens;
+        $this->tokens  = $tokens;
         $this->current = $tokens[0];
     }
 
@@ -56,7 +60,7 @@ class TokenStream
             throw new ExpressionSyntaxError(
                 sprintf(
                     '%sUnexpected token "%s" of value "%s" ("%s" expected%s)',
-                    $message ? $message.'. ' : '',
+                    $message ? $message . '. ' : '',
                     $token->type,
                     $token->value,
                     $type,

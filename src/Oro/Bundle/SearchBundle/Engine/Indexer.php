@@ -351,12 +351,6 @@ class Indexer
      */
     public function advancedSearch($expression)
     {
-//        /** @var Parser $parser */
-//        $parser = new Parser($this->mapper->getMappingConfig());
-
-//        /** @var Query $query */
-//        $query = $parser->getQueryFromString($expression);
-
         $lexer  = new Lexer();
         $parser = new ExpressionParser();
 

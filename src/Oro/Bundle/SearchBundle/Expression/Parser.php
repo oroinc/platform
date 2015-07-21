@@ -2,18 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Expression;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 
-use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Doctrine\Common\Collections\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-/**
- * Class Parser
- * @package Oro\Bundle\SearchBundle\Expression
- */
 class Parser
 {
     /** @var TokenStream */
@@ -52,11 +45,13 @@ class Parser
         $this->keywords = [
             Query::KEYWORD_FROM,
             Query::KEYWORD_WHERE,
+
             Query::KEYWORD_AND,
             Query::KEYWORD_OR,
-            Query::KEYWORD_ORDER_BY,
+
             Query::KEYWORD_OFFSET,
             Query::KEYWORD_MAX_RESULTS,
+            Query::KEYWORD_ORDER_BY
         ];
 
         $this->operators = [
@@ -85,8 +80,8 @@ class Parser
                 Query::OPERATOR_NOT_CONTAINS,
                 Query::OPERATOR_EQUALS,
                 Query::OPERATOR_NOT_EQUALS,
-                Query::OPERATOR_IN,
-                Query::OPERATOR_NOT_IN,
+                //Query::OPERATOR_IN,
+                //Query::OPERATOR_NOT_IN,
             ],
             QUERY::TYPE_INTEGER  => [
                 Query::OPERATOR_GREATER_THAN,
@@ -142,29 +137,23 @@ class Parser
                 case Query::KEYWORD_FROM:
                     $this->parseFromExpression();
                     break;
-
                 case Query::KEYWORD_WHERE:
                     $this->parseWhereExpression();
                     break;
-
-                case Query::KEYWORD_ORDER_BY:
-                    $this->parseOrderByExpression();
-                    break;
-
                 case Query::KEYWORD_OFFSET:
                     $this->parseOffsetExpression();
                     break;
-
                 case Query::KEYWORD_MAX_RESULTS:
                     $this->parseMaxResultsExpression();
                     break;
-
+                case Query::KEYWORD_ORDER_BY:
+                    $this->parseOrderByExpression();
+                    break;
                 default:
                     throw new ExpressionSyntaxError(
                         sprintf('Unexpected token "%s", value "%s"', $stream->current->type, $stream->current->value),
                         $stream->current->cursor
                     );
-                    break;
             }
         }
 
@@ -235,28 +224,17 @@ class Parser
                 case Token::PUNCTUATION_TYPE && $token->test(Token::PUNCTUATION_TYPE, '('):
                     $this->parseCompositeCondition();
                     break;
-
                 case Token::STRING_TYPE:
                     list ($type, $expr) = $this->parseSimpleCondition();
                     $this->query->getCriteria()->{$type}($expr);
                     break;
-
                 case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
                     list ($type, $expr) = $this->parseSimpleCondition($token->value);
-                    if ($type && $expr) {
-//                        if ($expr instanceof CompositeExpression) {
-//                            //$this->query->getCriteria()->andWhere($expr->)
-//                            $this->query->getCriteria()->andWhere($expr);
-//                        } else {
-                            $this->query->getCriteria()->{$type}($expr);
-//                        }
-                    }
+                    $this->query->getCriteria()->{$type}($expr);
                     break;
-
                 case Token::KEYWORD_TYPE:
                     $exit = true;
                     break;
-
                 default:
                     throw new ExpressionSyntaxError(
                         sprintf('Unexpected token "%s" in where statement', $this->stream->current->type),
@@ -268,7 +246,30 @@ class Parser
 
     protected function parseOrderByExpression()
     {
+        $this->stream->next();
+        /** @var Token $token */
+        $token = $this->stream->current;
 
+        if (count($this->query->getFrom()) > 1) {
+            throw new ExpressionSyntaxError(
+                sprintf(
+                    'Order By expression is allowed only for searching by single entity. Token "%s", value "%s"',
+                    $token->type,
+                    $token->value
+                ),
+                $token->cursor
+            );
+        }
+
+        if ($token->test(Token::STRING_TYPE)) {
+            $this->query->getCriteria()->setFirstResult($token->value);
+            $this->stream->next();
+        } else {
+            throw new ExpressionSyntaxError(
+                sprintf('Unexpected token "%s", value "%s" in order_by statements', $token->type, $token->value),
+                $token->cursor
+            );
+        }
     }
 
     protected function parseOffsetExpression()
@@ -418,9 +419,6 @@ class Parser
             }
 
             list($typeX, $expression) = $this->parseSimpleCondition($type);
-//            if (empty($expressions)) {
-//                $typeX = null;
-//            }
             $expressions[] = [
                 'type' => $typeX,
                 'expr' => $expression
@@ -430,10 +428,6 @@ class Parser
         $expr = Criteria::expr();
         if ($expressions) {
             $expressions = array_reverse($expressions);
-            //$expressions = reset($expressions);
-//            foreach ($expressions as $typeX => $expression) {
-//                $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $subExpressions);
-//            }
 
             $typeX = $expressions[0]['type'];
             $expressions = array_map(
@@ -452,44 +446,16 @@ class Parser
             );
 
             $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $expressions);
-
-
-
-//            $this->query->getCriteria()->andWhere(
-//                $expr->orX()
-//            )
-
         } else {
-            throw new ExpressionSyntaxError(sprintf('Syntax error in composite expression.'), $this->stream->current->cursor);
+            throw new ExpressionSyntaxError(
+                sprintf('Syntax error in composite expression.'),
+                $this->stream->current->cursor
+            );
         }
 
         $this->stream->next();
 
         return $expr;
-
-//        $this->query->getCriteria()->where(
-//            $expr->in('organization', [1,2,3])
-//        );
-//        $this->query->getCriteria()->andWhere(
-//            $expr->orX(
-//                $expr->contains('name', 'Price'),
-//                $expr->andX(
-//                    $expr->contains('name', 'Acuserv'),
-//                    $expr->contains('extend_description', 'test')
-//                )
-//            )
-//        );
-//
-//        $this->query->getCriteria()->andWhere(
-//            $expr->contains('a','a')
-//        );
-//        $this->query->getCriteria()->andWhere(
-//            $expr->orX(
-//                $expr->contains('b','b'),
-//                $expr->contains('c','c')
-//            )
-//        );
-
     }
 
     public function parseArguments()

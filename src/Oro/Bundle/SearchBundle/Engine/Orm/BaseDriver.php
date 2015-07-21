@@ -164,7 +164,7 @@ abstract class BaseDriver
         $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
+        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
             $searchString = $this->createContainsStringQuery($index, $useFieldName);
         } else {
             $searchString = $this->createNotContainsStringQuery($index, $useFieldName);

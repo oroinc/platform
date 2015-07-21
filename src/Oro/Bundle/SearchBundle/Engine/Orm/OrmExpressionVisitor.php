@@ -123,12 +123,12 @@ class OrmExpressionVisitor extends ExpressionVisitor
         switch ($operator) {
             case Comparison::CONTAINS:
                 return Query::OPERATOR_CONTAINS;
-                break;
             case Comparison::NEQ:
                 return Query::OPERATOR_NOT_EQUALS;
-                break;
+            case Comparison::NIN:
+                return Query::OPERATOR_NOT_IN;
         }
 
-        return $operator;
+        return strtolower($operator);
     }
 }

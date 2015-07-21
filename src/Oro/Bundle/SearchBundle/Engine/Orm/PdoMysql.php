@@ -66,7 +66,7 @@ class PdoMysql extends BaseDriver
         );
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
+        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
             $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
             $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
