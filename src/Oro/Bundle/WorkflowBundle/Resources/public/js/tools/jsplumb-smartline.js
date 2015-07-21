@@ -212,7 +212,14 @@ define(function(require) {
                 paintInfo.points[1] += (params.sourceEndpoint.anchor.y - oldAnchorY) * params.sourceEndpoint.element.offsetHeight;
             }
 
+            paintInfo.sx = sourcePoint.x - correction.x;
             paintInfo.sy += ENDPOINT_SPACE_TO_LINE + 1;
+
+            var style = window.getComputedStyle(params.sourceEndpoint.element),
+                sourceBorderRadius = 0;
+            if (style.borderRadius) {
+                sourceBorderRadius = parseInt(style.borderRadius);
+            }
 
             if (points.length) {
                 for (var i = 0; i < points.length; i++) {
