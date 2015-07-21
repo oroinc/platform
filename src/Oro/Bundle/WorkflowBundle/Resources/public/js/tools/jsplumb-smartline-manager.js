@@ -56,7 +56,6 @@ define(function(require){
                 this.cache = {};
                 return;
             }
-            console.log(this.jsPlumbInstance.sourceEndpointDefinitions)
             graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
