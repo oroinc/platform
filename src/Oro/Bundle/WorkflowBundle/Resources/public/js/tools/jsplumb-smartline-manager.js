@@ -11,7 +11,10 @@ define(function(require){
     function JsPlumbSmartlineManager(jsPlumbInstance) {
         this.jsPlumbInstance = jsPlumbInstance;
         this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
-        this.cache = {};
+        this.cache = {
+            state: {},
+            connections: {}
+        };
         this.debouncedCalculateOverlays = _.debounce(
             _.bind(this.jsPlumbOverlayManager.calculate, this.jsPlumbOverlayManager),
         50);
@@ -32,7 +35,14 @@ define(function(require){
                 this.refreshCache();
             }
 
-            return this.cache.connections[connector.getId()] || [];
+            var points = _.clone(this.cache.connections[connector.getId()].points);
+
+            if (!points) {
+                points = [];
+                console.log("Cached value is not found")
+            }
+
+            return points;
         },
 
         getNaivePathLength: function (fromRect, toRect) {
@@ -47,19 +57,21 @@ define(function(require){
 
         getState: function () {
             var state = {
-                rectangles: [],
-                connections: []
-            }
+                    rectangles: [],
+                    connections: []
+                },
+                hasRect = {}
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var el = document.getElementById(id);
                 if (el) {
+                    hasRect[id] = true;
                     state.rectangles.push([id, el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight]);
                 }
             });
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
-                if (conn.sourceId in rects && conn.targetId in rects) {
-                    state.connections.push([conn.sourceId, conn.targetId]);
+                if (conn.sourceId in hasRect && conn.targetId in hasRect) {
+                    state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
             }, this);
 
@@ -67,11 +79,12 @@ define(function(require){
         },
 
         refreshCache: function () {
-            this.cache.state = this.getState();
-            var cache = {};
+            var _this = this;
             var connections = [];
             var rects = {};
             var graph = new Graph();
+
+            this.cache.state = this.getState();
 
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
@@ -101,6 +114,34 @@ define(function(require){
                 return a[2] - b[2];
             });
 
+            _.each(connections, function (conn) {
+                var finder = new Finder(graph);
+
+                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
+                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
+
+                var path = finder.find();
+                if (!path) {
+                    console.warn("Cannot find path");
+                } else {
+                    graph.updateWithPath(path);
+                    _this.cache.connections[conn[3].connector.getId()] = {
+                        connection: conn[3],
+                        path: path
+                    };
+                }
+            });
+
+            _.each(this.cache.connections, function (item) {
+                item.points = item.path.points.reverse();
+            });
+
+            // console.log("Cache refresh: " + _.keys(this.cache.connections).join(', '));
+
+            this.jsPlumbInstance.repaintEverything();
+            this.debouncedCalculateOverlays();
+
+            // debug code
             JsPlumbSmartlineManager.lastRequest = {
                 sources: graph.rectangles.map(function (item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
@@ -108,38 +149,6 @@ define(function(require){
                 connections: connections.map(function (item) {return item.slice(0,2);})
             };
 
-            _.each(connections, function (conn) {
-                var finder = new Finder(graph);
-
-                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
-                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
-
-                var newCacheItem;
-                var path = finder.find();
-                var cacheKey = conn[3].connector.getId();
-                if (!path) {
-                    console.warn("Cannot find path");
-                } else {
-                    graph.updateWithPath(path);
-                    newCacheItem = {
-                        connection: conn[3],
-                        path: path,
-                        paintInfo: conn[3].connector === connector ? paintInfo : undefined
-                    };
-                    if (conn[3].connector === connector) {
-                        newCacheItem.paintInfo = paintInfo;
-                    }
-                    cache[cacheKey] = newCacheItem;
-                }
-            });
-
-            _.each(cache, function (item) {
-                var points =  item.path.points.reverse();
-                item.points = points;
-            });
-
-            this.jsPlumbInstance.repaintEverything();
-            this.debouncedCalculateOverlays();
         }
     };
 

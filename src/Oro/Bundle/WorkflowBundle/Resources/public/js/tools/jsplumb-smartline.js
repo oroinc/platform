@@ -202,8 +202,8 @@ define(function(require) {
             }
 
             // set valid archors
-            var sourcePoint = points.shift(),
-                targetPoint = points.pop(),
+            var sourcePoint = points.shift().clone(),
+                targetPoint = points.pop().clone(),
                 correction,
                 ENDPOINT_SPACE_TO_LINE = 4;
 
