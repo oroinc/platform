@@ -18,11 +18,12 @@ oro:
             access_denied: You don't have access to organization "%organization_name%"
         share_scopes:
             label: Share Scopes
-            system: System
+            global: Global
             organization: Organization
             division: Division
             business_unit: Business Unit
             user: User
+            widget.title: Sharing Entities
         action:
             share: Share record
             shared: Record shared

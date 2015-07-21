@@ -24,7 +24,7 @@ oro_entity_config:
                             expanded: true
                             label: 'oro.security.share_scopes.label'
                             choices:
-                                'system': 'oro.security.share_scopes.system'
+                                'global': 'oro.security.share_scopes.system'
                                 'organization': 'oro.security.share_scopes.organization'
                                 'division': 'oro.security.share_scopes.division'
                                 'business_unit': 'oro.security.share_scopes.business_unit'

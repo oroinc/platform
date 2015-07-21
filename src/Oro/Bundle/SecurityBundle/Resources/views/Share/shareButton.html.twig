@@ -1,3 +1,5 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 {{ UI.clientButton({
     'dataUrl': path(
     'oro_share_update', {
@@ -15,7 +17,7 @@
         'options': {
             'alias': 'note-dialog',
             'dialogOptions': {
-                'title': 'oro.security.action.share'|trans,
+                'title': 'oro.security.share_scopes.widget.title'|trans,
                 'allowMaximize': true,
                 'allowMinimize': true,
                 'dblclick': 'maximize',
