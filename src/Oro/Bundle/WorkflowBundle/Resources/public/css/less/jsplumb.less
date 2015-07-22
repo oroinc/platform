@@ -212,10 +212,6 @@
       opacity: 1;
       display: block !important;
     }
-    &:hover, &.open {
-      padding-left: 11px;
-      padding-right: 8px;
-    }
     &.dropdown .dropdown-toggle {
       margin: 0 -5px;
     }
@@ -258,5 +254,13 @@
   }
   .workflow-transition-endpoint-hover {
     opacity: 1;
+  }
+  &.workflow-flowchart-editor {
+    .workflow-transition-overlay {
+      &:hover, &.open {
+        padding-left: 11px;
+        padding-right: 8px;
+      }
+    }
   }
 }
