@@ -11,11 +11,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 
-use Oro\Bundle\SearchBundle\Expression\Lexer;
-use Oro\Bundle\SearchBundle\Expression\Parser as ExpressionParser;
+use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
+use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Expression;
+namespace Oro\Bundle\SearchBundle\Query\Expression;
 
 use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
 
@@ -37,7 +37,7 @@ class TokenStream
     }
 
     /**
-     * Sets the pointer to the next token and returns the old one.
+     * Sets the pointer to the next token.
      */
     public function next()
     {
@@ -51,29 +51,48 @@ class TokenStream
     }
 
     /**
-     * Test a token. If passed - returns it.
+     * Tests a token with value.
+     * If passed - returns token.
+     * If NOT passed throws Exception (in strict mode) or return FALSE otherwise
      *
-     * @param string $type
-     * @param null   $value
-     * @param null   $message
+     * @param string            $type
+     * @param string|array|null $value
+     * @param string|null       $message
+     * @param bool              $strict  If TRUE - Exception will be thrown
      *
-     * @return Token
+     * @return Token|bool
      */
-    public function expect($type, $value = null, $message = null)
+    public function expect($type, $value = null, $message = null, $strict = true)
     {
-        $token = $this->current;
-        if (!$token->test($type, $value)) {
-            throw new ExpressionSyntaxError(
-                sprintf(
-                    '%sUnexpected token "%s" of value "%s" ("%s" expected%s)',
-                    $message ? $message . '. ' : '',
-                    $token->type,
-                    $token->value,
-                    $type,
-                    $value ? sprintf(' with value "%s"', $value) : ''
-                ),
-                $token->cursor
-            );
+        $token  = $this->current;
+        $passed = false;
+
+        if (null === $value || is_string($value)) {
+            $value = [$value];
+        }
+
+        foreach ($value as $valueItem) {
+            if ($passed = $token->test($type, $valueItem)) {
+                break;
+            }
+        }
+
+        if (!$passed) {
+            if ($strict) {
+                throw new ExpressionSyntaxError(
+                    sprintf(
+                        '%sUnexpected token "%s" of value "%s" ("%s" expected%s)',
+                        $message ? $message . '. ' : '',
+                        $token->type,
+                        $token->value,
+                        $type,
+                        $value ? sprintf(' with value "%s"', implode(', ', $value)) : ''
+                    ),
+                    $token->cursor
+                );
+            } else {
+                return false;
+            }
         }
         $this->next();
 
@@ -91,7 +110,7 @@ class TokenStream
     }
 
     /**
-     * Sets the pointer to the previous token and returns the old one.
+     * Sets the pointer to the previous token.
      */
     public function prev()
     {

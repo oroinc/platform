@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Expression;
+namespace Oro\Bundle\SearchBundle\Query\Expression;
 
 use Doctrine\Common\Collections\Criteria;
 
@@ -259,11 +259,25 @@ class Parser
             );
         }
 
-        $orderFieldName = $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected.');
-        $orderDirection = $this->stream->expect(Token::STRING_TYPE, null, null);
+        $orderFieldName = null;
+        $orderFieldType = $this->stream->expect(Token::STRING_TYPE, $this->types, null, false);
+        if (!$orderFieldType) {
+            $orderFieldName =
+                Query::TYPE_TEXT . '.' .
+                $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected.')->value;
+        } else {
+            $orderFieldName =
+                $orderFieldType->value . '.' .
+                $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected.')->value;
+        }
+
+        $orderDirection = false;
+        if (!$this->stream->isEOF() && $this->stream->current->test(Token::STRING_TYPE)) {
+            $orderDirection = $this->stream->expect(Token::STRING_TYPE, $this->orderDirections, null, false);
+        }
 
         if ($orderFieldName) {
-            $this->query->getCriteria()->orderBy([$orderFieldName->value => $orderDirection ? : Criteria::ASC]);
+            $this->query->getCriteria()->orderBy([$orderFieldName => $orderDirection ? : Criteria::ASC]);
         } else {
             throw new ExpressionSyntaxError('Error in order_by statement', $this->stream->current->cursor);
         }

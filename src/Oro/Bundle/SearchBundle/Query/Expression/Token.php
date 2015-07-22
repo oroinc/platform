@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Expression;
+namespace Oro\Bundle\SearchBundle\Query\Expression;
 
 class Token
 {
