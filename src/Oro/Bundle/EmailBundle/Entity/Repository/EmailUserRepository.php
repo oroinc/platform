@@ -19,11 +19,12 @@ class EmailUserRepository extends EntityRepository
      *
      * @return null|EmailUser
      */
-    public function findByEmailAndOwner(Email $email, User $user)
+    public function findByEmailAndOwner(Email $email, User $user, Organization $organisation)
     {
-        return $this->findOneBy([
+        return $this->findBy([
             'email' => $email,
-            'owner' => $user
+            'owner' => $user,
+            'organization' => $organisation
         ]);
     }
 

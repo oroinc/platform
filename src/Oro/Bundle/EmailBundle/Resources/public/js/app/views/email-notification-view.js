@@ -1,12 +1,13 @@
 /*global define*/
 define([
     'jquery',
+    'underscore',
+    'oroui/js/mediator',
+    'routing',
     'oroemail/js/app/models/email-attachment-model',
     'oroui/js/app/views/base/view',
-    'oroemail/js/app/models/email-notification-collection',
-    'routing',
-    'oroui/js/mediator'
-], function ($, EmailAttachmentModel, BaseView, EmailNotificationCollection, routing, mediator) {
+    'oroemail/js/app/models/email-notification-collection'
+], function ($, _, mediator, routing, EmailAttachmentModel, BaseView, EmailNotificationCollection) {
     'use strict';
 
     var EmailAttachmentView;
@@ -24,35 +25,28 @@ define([
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
             this.$containerContextTargets = $(options.el).find('.items');
-            this.countNewEmail = this.getCount();
+            this.countNewEmail = this.getDefaultCount();
             this.$el.show();
             this.initCollection().initEvents();
-
-            var self = this;
-            this.$el.click(function() {
-                if (self.isActiveTypeDropDown('notification')) {
-                    self.$el.addClass('open');
-                    self.setTypeDropDownMenu('content');
-                }
-                self.initViewType();
-            });
         },
 
         initCollection: function () {
-            var emails = this.getInitData();
+            var emails = this.getDefaultData();
             this.collection = new EmailNotificationCollection(emails);
 
             return this;
         },
 
         render: function () {
-            var $view;
+            var $view, i;
             this.$containerContextTargets.empty();
             this.initViewType();
 
-            for (var i in this.collection.models) {
-                $view = this.getView(this.collection.models[i]);
-                this.$containerContextTargets.append($view);
+            for (i in this.collection.models) {
+                if (this.collection.models.hasOwnProperty(i)) {
+                    $view = this.getView(this.collection.models[i]);
+                    this.$containerContextTargets.append($view);
+                }
             }
         },
 
@@ -78,30 +72,31 @@ define([
                 success: function () {
                     self.collection.markAllAsRead();
                     self.render();
-                    self.onChangeAmount(0);
+                    self.setCount(0);
                     mediator.trigger('datagrid:doRefresh:user-email-grid');
                 }
-            })
+            });
         },
 
         getClankEvent: function () {
             return $(this.el).data('clank-event');
         },
 
-        getInitData: function () {
+        getDefaultData: function () {
             return $(this.el).data('emails');
         },
 
-        getCount: function () {
+        getDefaultCount: function () {
             return $(this.el).data('count');
         },
+
         initViewType: function () {
             if (!this.isActiveTypeDropDown('notification')) {
                 if (this.collection.models.length === 0) {
-                    this.setTypeDropDownMenu('empty');
+                    this.setModeDropDownMenu('empty');
                     this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
                 } else {
-                    this.setTypeDropDownMenu('content');
+                    this.setModeDropDownMenu('content');
                     if (this.countNewEmail > 0) {
                         this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
                     } else {
@@ -111,13 +106,13 @@ define([
             }
         },
 
-        resetTypeDropDownMenu: function() {
+        resetModeDropDownMenu: function() {
             this.$el.find('.dropdown-menu').removeClass('content empty notification');
 
             return this;
         },
-        setTypeDropDownMenu:function(type) {
-            this.resetTypeDropDownMenu();
+        setModeDropDownMenu:function(type) {
+            this.resetModeDropDownMenu();
             this.$el.find('.dropdown-menu').addClass(type);
         },
 
@@ -142,13 +137,13 @@ define([
             this.initViewType();
         },
 
-        onChangeAmount: function (count) {
+        setCount: function (count) {
             this.countNewEmail = count;
             if (count > 10) {
                 count = '10+';
             }
 
-            if (count == 0) {
+            if (count === 0) {
                 count = '';
             }
             this.$el.find('.icon-envelope span').html(count);
@@ -158,9 +153,17 @@ define([
         initEvents: function () {
             var self = this;
 
+            this.$el.click(function() {
+                if (self.isActiveTypeDropDown('notification')) {
+                    self.open();
+                    self.setModeDropDownMenu('content');
+                }
+                self.initViewType();
+            });
+
             this.collection.on('reset', function () {
                 self.$containerContextTargets.html('');
-                self.onChangeAmount(0);
+                self.setCount(0);
             });
 
             this.collection.on('add', function (model) {
@@ -171,10 +174,22 @@ define([
         },
 
         showNotification: function() {
-            if (!this.$el.hasClass('open')) {
-                this.$el.addClass('open');
-                this.setTypeDropDownMenu('notification');
+            if (!this.isOpen()) {
+                this.open();
+                this.setModeDropDownMenu('notification');
             }
+        },
+
+        isOpen: function() {
+            this.$el.hasClass('open');
+        },
+
+        close: function() {
+            this.$el.removeClass('open');
+        },
+
+        open: function () {
+            this.$el.addClass('open');
         }
     });
 

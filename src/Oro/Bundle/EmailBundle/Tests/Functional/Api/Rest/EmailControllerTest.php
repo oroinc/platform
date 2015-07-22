@@ -51,13 +51,13 @@ class EmailControllerTest extends WebTestCase
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
-        $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
         $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
-        $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
+        $this->assertCount(10, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 
     public function testGet()
@@ -206,5 +206,17 @@ class EmailControllerTest extends WebTestCase
             'The Head cannot be changed for already existing email.'
             . ' Existing value: "true". New value: "false".'
         );
+    }
+
+    public function testGetNotificationData()
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_email_notification_data')
+        );
+
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEquals(10, $response['count']);
+        $this->assertCount(4, $response['emails']);
     }
 }

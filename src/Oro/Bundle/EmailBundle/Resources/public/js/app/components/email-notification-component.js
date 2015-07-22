@@ -17,7 +17,7 @@ define([
         view: null,
         collection: null,
 
-        initialize: function (options) {
+        initialize: function () {
             this.initView()
                 .initSync()
                 .render();
@@ -32,8 +32,7 @@ define([
         },
 
         render: function () {
-            // todo: to fix double execution
-            this.view.render()
+            this.view.render();
         },
 
         initSync: function () {
@@ -54,12 +53,12 @@ define([
                     success: function (r) {
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);
-                        self.view.onChangeAmount(r.count);
+                        self.view.setCount(r.count);
                         if (isNew) {
                             self.view.showNotification();
                         }
                     }
-                })
+                });
             }
         }
     });

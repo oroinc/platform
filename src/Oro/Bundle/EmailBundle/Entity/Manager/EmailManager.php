@@ -83,9 +83,11 @@ class EmailManager
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
-            $emailUser = $this->getCurrentEmailUser($email);
-            if ($emailUser) {
-                $this->setEmailUserSeen($emailUser, true, true);
+            $emailUsers = $this->getCurrentEmailUser($email);
+            if ($emailUsers) {
+                foreach ($emailUsers as $emailUser) {
+                    $this->setEmailUserSeen($emailUser, true, true);
+                }
             }
         }
     }
@@ -184,9 +186,11 @@ class EmailManager
      */
     protected function getCurrentEmailUser(Email $entity)
     {
-        $user = $this->securityContext->getToken()->getUser();
+        $token = $this->securityContext->getToken();
+        $user = $token->getUser();
+        $currentOrganization = $token->getOrganizationContext();
         $emailUser = $this->em->getRepository('OroEmailBundle:EmailUser')
-            ->findByEmailAndOwner($entity, $user);
+            ->findByEmailAndOwner($entity, $user, $currentOrganization);
 
         return $emailUser;
     }
