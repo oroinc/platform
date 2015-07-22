@@ -18,7 +18,7 @@ class EmailUserRepository extends EntityRepository
      * @param User $user
      * @param Organization $organisation
      *
-     * @return null|EmailUser
+     * @return EmailUser[]
      */
     public function findByEmailAndOwner(Email $email, User $user, Organization $organisation)
     {

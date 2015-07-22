@@ -74,6 +74,7 @@ define([
                     self.render();
                     self.setCount(0);
                     mediator.trigger('datagrid:doRefresh:user-email-grid');
+                    self.initLayout();
                 }
             });
         },
