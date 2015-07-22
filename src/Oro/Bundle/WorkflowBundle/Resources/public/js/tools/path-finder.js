@@ -61,9 +61,6 @@ var Point2d = (function () {
     Point2d.prototype.mul = function (n) {
         return new Point2d(this.x * n, this.y * n);
     };
-    Point2d.prototype.clone = function () {
-        return new Point2d(this.x, this.y);
-    };
     Object.defineProperty(Point2d.prototype, "length", {
         get: function () {
             return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -100,6 +97,9 @@ var Point2d = (function () {
     };
     Point2d.prototype.abs = function () {
         return new Point2d(Math.abs(this.x), Math.abs(this.y));
+    };
+    Point2d.prototype.clone = function () {
+        return new Point2d(this.x, this.y);
     };
     Point2d.uidCounter = 0;
     return Point2d;
@@ -1531,14 +1531,12 @@ var Graph = (function () {
         var connections = path.allConnections, axises = [];
         for (var i = 0; i < connections.length; i++) {
             var conn = connections[i];
-            conn.axis.ensureTraversableSiblings();
             if (axises.indexOf(conn.axis) === -1) {
                 axises.push(conn.axis);
+                conn.axis.ensureTraversableSiblings();
+                conn.axis.used = true;
+                conn.axis.costMultiplier *= GraphConstant.usedAxisCostMultiplier;
             }
-        }
-        for (var i = 0; i < axises.length; i++) {
-            axises[i].used = true;
-            axises[i].costMultiplier *= GraphConstant.usedAxisCostMultiplier;
         }
         var nextNode;
         var current;
@@ -1549,6 +1547,8 @@ var Graph = (function () {
             current = connections[i];
             next = connections[i + 1];
             startNode = current.a === next.a || current.a === next.b ? current.b : current.a;
+            startNode.used = true;
+            // startNode.draw("yellow");
             midNode = current.a === next.a || current.a === next.b ? current.a : current.b;
             nextNode = startNode;
             // connection can be divided before, traverse all nodes
@@ -1572,6 +1572,8 @@ var Graph = (function () {
             nextNode = nextNode.nextNode(current.directionFrom(startNode));
             nextNode.used = true;
         } while (nextNode !== midNode);
+        path.toNode.used = true;
+        // path.toNode.draw("yellow");
         this.relocateAxises();
     };
     Graph.prototype.selfCheck = function () {
@@ -1742,7 +1744,7 @@ var Path = (function () {
     });
     Object.defineProperty(Path.prototype, "points", {
         get: function () {
-            var points = [], current = this, currentAxis = this.connection.axis, candidate;
+            var points = [], current = this, currentAxis = this.connection.axis;
             points.push(this.toNode.recommendedPoint);
             while (current) {
                 if (current.connection.axis !== currentAxis) {
