@@ -79,9 +79,7 @@ define(function(require){
             var connections = [];
             var rects = {};
             var graph = new Graph();
-
             this.cache.state = this.getState();
-
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);
