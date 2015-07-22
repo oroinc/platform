@@ -66,7 +66,7 @@ define(function(require){
             });
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
-                if (conn.sourceId in hasRect && conn.targetId in hasRect) {
+                if (conn.sourceId in hasRect && conn.targetId in hasRect && conn.source && conn.target) {
                     state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
             }, this);
@@ -80,6 +80,7 @@ define(function(require){
             var rects = {};
             var graph = new Graph();
             this.cache.state = this.getState();
+            this.cache.connections = {};
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);
@@ -92,14 +93,13 @@ define(function(require){
             });
 
             if (graph.rectangles.length < 1) {
-                this.cache.connections = {};
                 return;
             }
 
             graph.build();
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
-                if (conn.sourceId in rects && conn.targetId in rects) {
+                if (conn.sourceId in rects && conn.targetId in rects && conn.source && conn.target) {
                     connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
                 }
             }, this);

@@ -268,6 +268,9 @@ define(function(require) {
                 changed,
                 steps = [],
                 overlays = [];
+            if(!this.smartlineManager.isCacheValid()) {
+                this.smartlineManager.refreshCache();
+            }
             _.each(this.smartlineManager.cache.connections, function (cacheItem) {
                 var points = cacheItem.points;
                 _.each(cacheItem.connection.getOverlays(), function (overlay) {
