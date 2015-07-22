@@ -20,7 +20,7 @@ define(function(require) {
         /**
          * @type {number}
          */
-        connectionWidth: 16,
+        connectionWidth: 12,
 
         /**
          * @type {function(): Object|Object}

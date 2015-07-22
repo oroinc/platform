@@ -3,7 +3,6 @@ define(function(require) {
 
     var _ = require('underscore');
     var $ = require('jquery');
-    var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
     var Matrix = require('./jsplumb-manager/jpm-matrix');
     var HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule');
     var CascadeRule = require('./jsplumb-manager/jpm-cascade-rule');
@@ -67,9 +66,10 @@ define(function(require) {
 
             });
             matrix.align().forEachCell(_.bind(function(cell) {
+                var increment = cell.step.get('_is_start') ? -15 : 35;
                 cell.step.set('position', [
                     this.xIncrement * cell.x + this.xPadding,
-                    this.yIncrement * cell.y + this.yPadding
+                    this.yIncrement * cell.y + this.yPadding + increment
                 ]);
             }, this));
         },
