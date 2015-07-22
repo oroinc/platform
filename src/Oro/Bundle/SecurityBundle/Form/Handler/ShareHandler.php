@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Handler;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
@@ -89,7 +88,7 @@ class ShareHandler
                     /** @var $repo UserRepository */
                     $repo = $this->manager->getRepository('OroUserBundle:User');
                     $users = $repo->findUsersByUsernames($usernames);
-                    $model->setUsers(new ArrayCollection($users));
+                    $model->setUsers($users);
                     $this->form->setData($model);
                 }
             }
@@ -151,10 +150,10 @@ class ShareHandler
     protected function getUsers($model)
     {
         $users = [];
-        $users = array_merge($users, $model->getUsers()->toArray());
+        $users = array_merge($users, $model->getUsers());
         foreach ($model->getBusinessunits() as $businessUnit) {
             /** @var $businessUnit BusinessUnit */
-            $users = array_merge($users, $businessUnit->getUsers()->toArray());
+            $users = array_merge($users, $businessUnit->getUsers());
         }
 
         return $users;

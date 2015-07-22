@@ -35,24 +35,10 @@ class ShareTypeTest extends \PHPUnit_Framework_TestCase
         )->willReturn($builder);
         $builder->expects($this->at(2))->method('add')->with(
             'users',
-            'entity',
+            'oro_user_organization_acl_multiselect',
             [
-                'class'    => 'OroUserBundle:User',
-                'property' => 'username',
                 'label'    => 'oro.user.entity_plural_label',
                 'required' => false,
-                'multiple' => true,
-            ]
-        )->willReturn($builder);
-        $builder->expects($this->at(3))->method('add')->with(
-            'businessunits',
-            'entity',
-            [
-                'class'    => 'OroOrganizationBundle:BusinessUnit',
-                'property' => 'name',
-                'label'    => 'oro.organization.businessunit.entity_plural_label',
-                'required' => false,
-                'multiple' => true,
             ]
         )->willReturn($builder);
         $this->type->buildForm($builder, []);
@@ -68,7 +54,7 @@ class ShareTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 [
                     'data_class'         => 'Oro\Bundle\SecurityBundle\Form\Model\Share',
-                    'intention'          => 'email',
+                    'intention'          => 'users',
                     'csrf_protection'    => true,
                     'cascade_validation' => true,
                 ]

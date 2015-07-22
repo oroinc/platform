@@ -12,10 +12,10 @@ class Share
     /** @var mixed */
     protected $entityId;
 
-    /** @var ArrayCollection */
+    /** @var array */
     protected $businessunits;
 
-    /** @var ArrayCollection */
+    /** @var array */
     protected $users;
 
     /**
@@ -69,7 +69,7 @@ class Share
     /**
      * Returns collection of businessUnits
      *
-     * @return ArrayCollection
+     * @return array
      */
     public function getBusinessunits()
     {
@@ -79,11 +79,11 @@ class Share
     /**
      * Sets collection of businessUnits
      *
-     * @param ArrayCollection $businessunits
+     * @param array $businessunits
      *
      * @return self
      */
-    public function setBusinessunits(ArrayCollection $businessunits)
+    public function setBusinessunits(array $businessunits)
     {
         $this->businessunits = $businessunits;
 
@@ -93,7 +93,7 @@ class Share
     /**
      * Returns collection of users
      *
-     * @return ArrayCollection
+     * @return array
      */
     public function getUsers()
     {
@@ -103,11 +103,11 @@ class Share
     /**
      * Sets collection of users
      *
-     * @param ArrayCollection $users
+     * @param array $users
      *
      * @return self
      */
-    public function setUsers(ArrayCollection $users)
+    public function setUsers(array $users)
     {
         $this->users = $users;
 

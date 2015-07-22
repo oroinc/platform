@@ -34,7 +34,7 @@ class ShareType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\Bundle\SecurityBundle\Form\Model\Share',
-                'intention'          => 'email',
+                'intention'          => 'users',
                 'csrf_protection'    => true,
                 'cascade_validation' => true,
             ]
