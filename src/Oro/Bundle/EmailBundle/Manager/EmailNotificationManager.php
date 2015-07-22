@@ -82,7 +82,6 @@ class EmailNotificationManager
                 'route' => $this->router->generate('oro_email_email_reply', ['id' => $email->getId()]),
                 'id' => $email->getId(),
                 'seen' => $isSeen,
-                'isThread' => $email->getThread(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName(),

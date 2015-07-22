@@ -127,9 +127,6 @@ define([
                 url;
 
             url =  routing.generate('oro_email_thread_view', {id: id});
-            if (!isthread) {
-                url =  routing.generate('oro_email_view', {id: id});
-            }
             mediator.execute('redirectTo', {url: url});
             var model = this.collection.find(function(item){
                 return Number(item.get('id')) === id;

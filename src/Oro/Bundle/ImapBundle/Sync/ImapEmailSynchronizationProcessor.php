@@ -100,11 +100,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $startDate = clone $endDate;
             $startDate = $startDate->modify('-1 month');
 
-            // todo: verify how has to work this action. when I sync old emails and
-            // these emails have status "unseen" in origin then emails are saved with
-            // status "seen" in system
             // set seen flags from previously synchronized emails
-//            $this->checkFlags($imapFolder, $startDate, $endDate);
+            $this->checkFlags($imapFolder, $startDate, $endDate);
 
             $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
