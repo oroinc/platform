@@ -13,6 +13,8 @@ use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
@@ -79,18 +81,29 @@ class ShareHandler
 
             if ($acl) {
                 $usernames = [];
+                $buIds = [];
                 foreach ($acl->getObjectAces() as $ace) {
                     /** @var $ace Entry */
                     $securityIdentity = $ace->getSecurityIdentity();
-                    $usernames[] = $securityIdentity->getUsername();
+                    if ($securityIdentity instanceof UserSecurityIdentity) {
+                        $usernames[] = $securityIdentity->getUsername();
+                    } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
+                        $buIds = $securityIdentity->getId();
+                    }
                 }
                 if ($usernames) {
                     /** @var $repo UserRepository */
                     $repo = $this->manager->getRepository('OroUserBundle:User');
                     $users = $repo->findUsersByUsernames($usernames);
                     $model->setUsers($users);
-                    $this->form->setData($model);
                 }
+                if ($buIds) {
+                    /** @var $repo BusinessUnitRepository */
+                    $repo = $this->manager->getRepository('OroOrganizationBundle:BusinessUnit');
+                    $businessUnits = $repo->getBusinessUnits($buIds);
+                    $model->setBusinessunits($businessUnits);
+                }
+                $this->form->setData($model);
             }
         }
 
@@ -125,9 +138,13 @@ class ShareHandler
         $oldSidsCopy = $oldSids;
 
         $newSids = [];
-        $users = $this->getUsers($model);
+        $users = $model->getUsers();
         foreach ($users as $user) {
             $newSids[] = UserSecurityIdentity::fromAccount($user);
+        }
+        $businessUnits = $model->getBusinessunits();
+        foreach ($businessUnits as $businessUnit) {
+            $newSids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($businessUnit);
         }
         // $oldSids - $newSids: to delete
         foreach (array_diff($oldSids, $newSids) as $sid) {
@@ -141,21 +158,5 @@ class ShareHandler
         }
 
         $this->aclProvider->updateAcl($acl);
-    }
-
-    /**
-     * @param Share $model
-     * @return array
-     */
-    protected function getUsers($model)
-    {
-        $users = [];
-        $users = array_merge($users, $model->getUsers());
-        foreach ($model->getBusinessunits() as $businessUnit) {
-            /** @var $businessUnit BusinessUnit */
-            $users = array_merge($users, $businessUnit->getUsers());
-        }
-
-        return $users;
     }
 }

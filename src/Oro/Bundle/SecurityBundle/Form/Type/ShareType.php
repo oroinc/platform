@@ -20,8 +20,14 @@ class ShareType extends AbstractType
                 'users',
                 'oro_user_organization_acl_multiselect',
                 [
-                    'label'    => 'oro.user.entity_plural_label',
-                    'required' => false,
+                    'label' => 'oro.user.entity_plural_label',
+                ]
+            )
+            ->add(
+                'businessunits',
+                'oro_business_unit_multiselect',
+                [
+                    'label' => 'oro.organization.businessunit.entity_plural_label',
                 ]
             );
     }

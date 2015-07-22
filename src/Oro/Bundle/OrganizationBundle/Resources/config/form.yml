@@ -11,6 +11,7 @@ parameters:
     oro_organization.form.type.organizations_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
 
     oro_organization.form.type.ownership_type.class:                 Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType
+    oro_organization.form.type.business_unit_multiselect.class:      Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitAclMultiSelectType
 
     oro_organization.form.extension.owner.class:                     Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
     oro_organization.form.extension.organization.class:              Oro\Bundle\OrganizationBundle\Form\Extension\OrganizationFormExtension
@@ -115,6 +116,15 @@ services:
             - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_organizations_select }
+    #
+    # Business Unit
+    #
+    oro_organization.form.type.business_unit_multiselect:
+        class: %oro_organization.form.type.business_unit_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_business_unit_multiselect }
     #
     # Ownership
     #
