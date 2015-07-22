@@ -67,6 +67,24 @@ definitions:
                             - 'oro:email:flag-sync'
                             - ['--seen=true', $.arguments]
 
+    process_email_after_created:
+        label: Process Email after created
+        enabled: true
+        order:   150
+        entity:  Oro\Bundle\EmailBundle\Entity\EmailUser
+        actions_configuration:
+            - @tree:
+                conditions:
+                    @not_empty: [$mailboxOwner]
+                    @or:
+                        - @equal: [$folder.type, Oro\Bundle\EmailBundle\Model\FolderType::INBOX]
+                        - @equal: [$folder.type, Oro\Bundle\EmailBundle\Model\FolderType::OTHER]
+                actions:
+                    - @call_method:
+                        object: @oro_email.mailbox.mailbox_email_rocessor
+                        method: process
+                        method_parameters: [$]
+
 triggers:
     sync_email_body_after_email_synchronize:
         -
@@ -76,3 +94,7 @@ triggers:
         -
             event: update
             field: seen
+
+    process_email_after_created:
+        -
+            event: create

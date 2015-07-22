@@ -37,9 +37,6 @@ parameters:
     oro_email.email.folder.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailFolderManager
     oro_email.email_folder_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFolderLoaderSelector
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
-    oro_email.mailbox_email_owner_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
-    oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
-    oro_email.mailbox_choice_list.class:          Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
 
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -94,6 +91,12 @@ parameters:
 
     # Email DataGrid
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
+
+    # Mailboxes
+    oro.email.mailbox.mailbox_email_processor.class:     Oro\Bundle\EmailBundle\Mailbox\MailboxEmailProcessor
+    oro_email.mailbox_email_owner_provider.class:        Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
+    oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
+    oro_email.mailbox_choice_list.class:                 Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
 
 services:
     oro_email.entity.cache.warmer:
@@ -648,3 +651,8 @@ services:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
             - @doctrine
+
+    oro.email.mailbox.mailbox_email_processor:
+        class: %oro.email.mailbox.mailbox_email_processor.class%
+        arguments:
+            - @oro_email.provider.mailbox_processor_provider

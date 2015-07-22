@@ -11,6 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
+ * @ORM\HasLifecycleCallbacks()
  *
  * @Config(
  *      defaultValues={
@@ -64,10 +65,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var EmailOrigin
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
-     *     cascade={"all"}, orphanRemoval=true
+     * @ORM\OneToOne(
+     *     targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
+     *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
      * )
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
      */
     protected $origin;
 
@@ -89,6 +91,16 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function __construct()
     {
         $this->smtpSettings = [];
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+//        if ($this->origin !== null) {
+//            $this->origin->setOwner(null);
+//        }
     }
 
     /**
