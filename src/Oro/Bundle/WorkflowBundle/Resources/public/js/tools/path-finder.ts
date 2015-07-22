@@ -1013,12 +1013,20 @@ class Axis extends Interval2d {
         clone = this.closestLeftClone;
         if (!clone || clone.isUsed) {
             // console.log(this.a.sub(this.b).unitVector.rot90().abs().rot180());
-            this.clonesAtLeft.unshift(this.cloneAtDirection(this.prevNodeConnVector.rot90()));
+            this.clonesAtLeft.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs().rot180()));
         }
         clone = this.closestRightClone;
         if (!clone || clone.isUsed) {
             // console.log(this.a.sub(this.b).unitVector.rot90().abs());
-            this.clonesAtRight.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90()));
+            this.clonesAtRight.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs()));
+        }
+    }
+
+    draw(color: string = 'green') {
+        if (this.nodes.length) {
+            (new Interval2d(new Point2d(this.nodes[0].recommendedX, this.nodes[0].recommendedY), new Point2d(this.nodes[this.nodes.length - 1].recommendedX, this.nodes[this.nodes.length - 1].recommendedY))).draw(color);
+        } else {
+            Interval2d.prototype.draw.call(this, color);
         }
     }
 }
@@ -1141,11 +1149,11 @@ class Graph {
         var i;
         this.outerRect.draw('red');
         for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
-            this.horizontalAxises[i].draw("cyan");
+            this.horizontalAxises[i].allClones.forEach((clone)=>clone.draw("cyan"));
         }
 
         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-            this.verticalAxises[i].draw("cyan");
+            this.verticalAxises[i].allClones.forEach((clone)=>clone.draw("cyan"))
         }
 
         for (i = this.rectangles.length - 1; i >= 0; i--) {
