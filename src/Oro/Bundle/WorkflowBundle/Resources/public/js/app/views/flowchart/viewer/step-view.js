@@ -62,18 +62,6 @@ define(function(require) {
 
         connect: function() {
             FlowchartViewerStepView.__super__.connect.apply(this, arguments);
-            var instance = this.areaView.jsPlumbInstance;
-
-            // add element as source to jsPlumb
-            if (this.model.get('draggable') !== false) {
-                instance.draggable(this.$el, {
-                    containment: 'parent',
-                    stop: _.bind(function(e) {
-                        // update model position when dragging stops
-                        this.model.set({position: e.pos});
-                    }, this)
-                });
-            }
             this.makeTarget();
             this.makeSource();
         },
