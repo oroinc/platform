@@ -24,7 +24,7 @@ define([
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
-            this.$containerContextTargets = $(options.el).find('.items');
+            this.$containerEmails = $(options.el).find('.items');
             this.countNewEmail = this.getDefaultCount();
             this.$el.show();
             this.initCollection().initEvents();
@@ -39,13 +39,13 @@ define([
 
         render: function () {
             var $view, i;
-            this.$containerContextTargets.empty();
+            this.$containerEmails.empty();
             this.initViewType();
 
             for (i in this.collection.models) {
                 if (this.collection.models.hasOwnProperty(i)) {
                     $view = this.getView(this.collection.models[i]);
-                    this.$containerContextTargets.append($view);
+                    this.$containerEmails.append($view);
                 }
             }
         },
@@ -163,13 +163,13 @@ define([
             });
 
             this.collection.on('reset', function () {
-                self.$containerContextTargets.html('');
+                self.$containerEmails.empty();
                 self.setCount(0);
             });
 
             this.collection.on('add', function (model) {
                 var $view = self.getView(model);
-                self.$containerContextTargets.append($view);
+                self.$containerEmails.append($view);
                 self.initLayout();
             });
         },
