@@ -92,7 +92,7 @@
                                                     }) }}
                                                 </div>
                                                 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-                                                {{ dataGrid.renderGrid('email-auto-response-rules') }}
+                                                {{ dataGrid.renderGrid('email-auto-response-rules', {mailbox: mailboxId}) }}
                                             </fieldset>
                                         {% endif %}
                                     </div>

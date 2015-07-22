@@ -10,6 +10,11 @@ datagrid:
                     - r.active
                 from:
                     - { table: OroEmailBundle:AutoResponseRule, alias: r }
+                where:
+                    and:
+                        - r.mailbox = :mailbox
+            bind_parameters:
+                - mailbox
         columns:
             name:
                 label: oro.email.autoresponserule.name.label
