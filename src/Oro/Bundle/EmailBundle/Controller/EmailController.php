@@ -74,7 +74,7 @@ class EmailController extends Controller
      */
     public function notificationDataAction()
     {
-        $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
 
@@ -444,7 +444,7 @@ class EmailController extends Controller
     public function markAllEmailsAsSeenAction()
     {
         $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
-        $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $result = false;
 
         if ($loggedUser) {

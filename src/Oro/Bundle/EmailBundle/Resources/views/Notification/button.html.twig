@@ -2,7 +2,7 @@
 
 <script type="text/template" id="email-notification-item">
     <li class="new" id="<%= entity.cid %>">
-        <div class="info" data-id="<%= entity.get('id') %>">
+        <div class="info" data-id="<%= entity.get('id') %>" data-isthread="<%= entity.get('isThread') %>">
             <div class="body">
                 <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
                 <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>

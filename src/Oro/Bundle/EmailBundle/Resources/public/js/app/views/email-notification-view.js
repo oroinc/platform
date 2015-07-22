@@ -121,13 +121,15 @@ define([
         },
 
         onClickOpenEmail: function (e) {
-            var id  = $(e.currentTarget).data('id');
-            mediator.execute(
-                'redirectTo',
-                {
-                    url: routing.generate('oro_email_view', {id: id})
-                }
-            );
+            var id  = $(e.currentTarget).data('id'),
+                isthread  = $(e.currentTarget).data('isthread'),
+                url;
+
+            url =  routing.generate('oro_email_thread_view', {id: id});
+            if (!isthread) {
+                url =  routing.generate('oro_email_view', {id: id});
+            }
+            mediator.execute('redirectTo', {url: url});
             var model = this.collection.find(function(item){
                 return Number(item.get('id')) === id;
             });
@@ -138,6 +140,7 @@ define([
         },
 
         setCount: function (count) {
+            count = parseInt(count);
             this.countNewEmail = count;
             if (count > 10) {
                 count = '10+';

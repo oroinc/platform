@@ -15,7 +15,8 @@ class EmailUserRepository extends EntityRepository
 {
     /**
      * @param Email $email
-     * @param User  $user
+     * @param User $user
+     * @param Organization $organisation
      *
      * @return null|EmailUser
      */
@@ -116,7 +117,7 @@ class EmailUserRepository extends EntityRepository
 
         return $qb
             ->update()
-            ->set('eu.seen', 1)
+            ->set('eu.seen', true)
             ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('eu.seen', 0))

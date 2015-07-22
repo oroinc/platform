@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
-use Oro\Bundle\EmailBundle\Entity\Provider\EmailProvider;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class EmailNotificationManager
@@ -18,8 +19,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
  */
 class EmailNotificationManager
 {
-    /** @var EmailProvider */
-    protected $emailProvider;
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
     /** @var Router */
@@ -28,24 +27,39 @@ class EmailNotificationManager
     protected $emailCacheManager;
     /** @var ConfigManager */
     protected $configManager;
+    /** @var EntityManager */
+    protected $em;
 
+    /**
+     * @param EntityManager $entityManager
+     * @param HtmlTagHelper $htmlTagHelper
+     * @param Router $router
+     * @param EmailCacheManager $emailCacheManager
+     * @param ConfigManager $configManager
+     */
     public function __construct(
-        EmailProvider $emailProvider,
+        EntityManager $entityManager,
         HtmlTagHelper $htmlTagHelper,
         Router $router,
         EmailCacheManager $emailCacheManager,
         ConfigManager $configManager
     ) {
-        $this->emailProvider = $emailProvider;
+        $this->em = $entityManager;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->router = $router;
         $this->emailCacheManager = $emailCacheManager;
         $this->configManager = $configManager;
     }
 
+    /**
+     * @param User $user
+     * @param $maxEmailsDisplay
+     *
+     * @return array
+     */
     public function getEmails(User $user, $maxEmailsDisplay)
     {
-        $emails = $this->emailProvider->getNewEmails($user, $maxEmailsDisplay);
+        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails($user, $maxEmailsDisplay);
 
         $emailsData = [];
         /** @var $email Email */
@@ -63,10 +77,12 @@ class EmailNotificationManager
             } catch (LoadEmailBodyException $e) {
                 // no content
             }
+
             $emailsData[] = [
                 'route' => $this->router->generate('oro_email_email_reply', ['id' => $email->getId()]),
                 'id' => $email->getId(),
                 'seen' => $isSeen,
+                'isThread' => $email->getThread(),
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,
                 'fromName' => $email->getFromName(),
@@ -77,6 +93,11 @@ class EmailNotificationManager
         return $emailsData;
     }
 
+    /**
+     * @param Email $email
+     *
+     * @return bool|string
+     */
     protected function getFromNameLink(Email $email)
     {
         $path = false;
@@ -89,8 +110,15 @@ class EmailNotificationManager
         return $path;
     }
 
+    /**
+     * Get count new emails
+     *
+     * @param User $user
+     *
+     * @return integer
+     */
     public function getCountNewEmails(User $user)
     {
-        return $this->emailProvider->getCountNewEmails($user);
+        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user);
     }
 }

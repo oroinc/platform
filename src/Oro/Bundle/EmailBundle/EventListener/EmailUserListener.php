@@ -45,7 +45,7 @@ class EmailUserListener
      *
      * @param PostFlushEventArgs $args
      */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush()
     {
         $usersWithNewEmails = [];
         if (!$this->processEmailUsersEntities) {
@@ -104,7 +104,8 @@ class EmailUserListener
     /**
      * Collect updated EmailUser entities
      *
-     * @param array $entities
+     * @param $entities
+     * @param $uow - UnitOfWork
      */
     protected function collectUpdatedEmailUserEntities($entities, $uow)
     {

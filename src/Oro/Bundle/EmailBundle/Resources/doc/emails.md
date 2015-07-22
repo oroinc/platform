@@ -181,5 +181,5 @@ oro_email:
     flash_notification:
         max_emails_display: %email_flash_max_emails_display%
 
-You can take this parameter in backend via:
-$this->container->getParameter('oro_email.flash_notification.max_emails_display');
+You can retrieve this parameter as usual:
+    $this->container->getParameter('oro_email.flash_notification.max_emails_display');

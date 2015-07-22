@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class EmailManager
@@ -32,9 +33,9 @@ class EmailManager
     protected $em;
 
     /**
-     * @var SecurityContext
+     * @var SecurityFacade
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * Constructor
@@ -42,18 +43,18 @@ class EmailManager
      * @param EntityManager       $em                  - Entity Manager
      * @param EmailThreadManager  $emailThreadManager  - Email Thread Manager
      * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
-     * @param SecurityContext     $securityContext     - Security Context
+     * @param SecurityFacade      $securityFacade      - Security Facade
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
         EmailThreadProvider $emailThreadProvider,
-        SecurityContext $securityContext
+        SecurityFacade $securityFacade
     ) {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->securityContext = $securityContext;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -186,9 +187,8 @@ class EmailManager
      */
     protected function getCurrentEmailUser(Email $entity)
     {
-        $token = $this->securityContext->getToken();
-        $user = $token->getUser();
-        $currentOrganization = $token->getOrganizationContext();
+        $user = $this->securityFacade->getToken()->getUser();
+        $currentOrganization = $this->securityFacade->getOrganization();
         $emailUser = $this->em->getRepository('OroEmailBundle:EmailUser')
             ->findByEmailAndOwner($entity, $user, $currentOrganization);
 

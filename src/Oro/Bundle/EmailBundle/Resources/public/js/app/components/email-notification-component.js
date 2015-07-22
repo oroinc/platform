@@ -56,6 +56,7 @@ define([
                         self.view.setCount(r.count);
                         if (isNew) {
                             self.view.showNotification();
+                            mediator.trigger('datagrid:doRefresh:user-email-grid');
                         }
                     }
                 });
