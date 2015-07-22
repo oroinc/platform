@@ -246,29 +246,26 @@ class Parser
 
     protected function parseOrderByExpression()
     {
-        $this->stream->next();
-        /** @var Token $token */
-        $token = $this->stream->current;
+        $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_ORDER_BY, 'Order By statement is expected.');
 
         if (count($this->query->getFrom()) > 1) {
             throw new ExpressionSyntaxError(
                 sprintf(
                     'Order By expression is allowed only for searching by single entity. Token "%s", value "%s"',
-                    $token->type,
-                    $token->value
+                    $this->stream->current->type,
+                    $this->stream->current->value
                 ),
-                $token->cursor
+                $this->stream->current->cursor
             );
         }
 
-        if ($token->test(Token::STRING_TYPE)) {
-            $this->query->getCriteria()->setFirstResult($token->value);
-            $this->stream->next();
+        $orderFieldName = $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected.');
+        $orderDirection = $this->stream->expect(Token::STRING_TYPE, null, null);
+
+        if ($orderFieldName) {
+            $this->query->getCriteria()->orderBy([$orderFieldName->value => $orderDirection ? : Criteria::ASC]);
         } else {
-            throw new ExpressionSyntaxError(
-                sprintf('Unexpected token "%s", value "%s" in order_by statements', $token->type, $token->value),
-                $token->cursor
-            );
+            throw new ExpressionSyntaxError('Error in order_by statement', $this->stream->current->cursor);
         }
     }
 

@@ -9,7 +9,7 @@ class TokenStream
     /** @var Token */
     public $current;
 
-    /** @var Token[]  */
+    /** @var Token[] */
     private $tokens;
 
     /** @var int */
@@ -51,7 +51,13 @@ class TokenStream
     }
 
     /**
-     * Tests a token.
+     * Test a token. If passed - returns it.
+     *
+     * @param string $type
+     * @param null   $value
+     * @param null   $message
+     *
+     * @return Token
      */
     public function expect($type, $value = null, $message = null)
     {
@@ -70,6 +76,8 @@ class TokenStream
             );
         }
         $this->next();
+
+        return $token;
     }
 
     /**
