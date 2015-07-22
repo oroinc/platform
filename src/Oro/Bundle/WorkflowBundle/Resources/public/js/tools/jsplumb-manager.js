@@ -1,40 +1,6 @@
 define(function(require) {
     'use strict';
 
-    function getEdge(params) {
-        var x = params[0] - 0.5;
-        var y = params[1] - 0.5;
-        var edge = '';
-        if (Math.abs(y) > Math.abs(x)) {
-            edge = y > 0 ? 'bottom' : 'top';
-        } else {
-            edge = x > 0 ? 'right' : 'left';
-        }
-        return edge;
-    }
-
-    /*function between(a, b, c) {
-        return Math.min(a, c) < b && Math.max(a, c) > b;
-    }*/
-
-    /*function overlap(a, b) {
-        if (a[0] === a[2] && b[0] === b[2] && a[0] === b[0]) {
-            return between(a[1], b[1], a[3]) || between(a[1], b[3], a[3]);
-        } else if (a[1] === a[3] && b[1] === b[3] && a[1] === b[3]) {
-            return between(a[0], b[0], a[2]) || between(a[0], b[2], a[2]);
-        }
-        return false;
-    }*/
-
-    /*function intersect(a, b) {
-        var v1, v2, v3, v4;
-        v1 = (b[2] - b[0]) * (a[1] - b[1]) - (b[3] - b[1]) * (a[0] - b[0]);
-        v2 = (b[2] - b[0]) * (a[3] - b[1]) - (b[3] - b[1]) * (a[2] - b[0]);
-        v3 = (a[2] - a[0]) * (b[1] - a[1]) - (a[3] - a[1]) * (b[0] - a[0]);
-        v4 = (a[2] - a[0]) * (b[3] - a[1]) - (a[3] - a[1]) * (b[2] - a[0]);
-        return (v1 * v2 < 0) && (v3 * v4 < 0);
-    }*/
-
     var _ = require('underscore');
     var $ = require('jquery');
     var Matrix = require('./jsplumb-manager/jpm-matrix');
@@ -55,17 +21,16 @@ define(function(require) {
         this.workflow = workflow;
         this.loopback = {};
         this.loopbackAnchorPreset = [
-            [[1, 0.3, 1, 0], [0.8, 0, 0, -1]],
-            [[0.2, 1, 0, 1], [0, 0.7, -1, 0]],
-            [[1, 0.5, 1, 0], [0.5, 0, 0, -1]],
-            [[0.5, 1, 0, 1], [0, 0.5, -1, 0]]
+            [[1, 0.3, 1, 0],[0.8, 0, 0, -1]],
+            [[0.2, 1, 0, 1],[0, 0.7, -1, 0]],
+            [[1, 0.5, 1, 0],[0.5, 0, 0, -1]],
+            [[0.5, 1, 0, 1],[0, 0.5, -1, 0]]
         ];
-        this.xPadding = 20;
-        this.yPadding = 8;
-        this.xIncrement = 200;
-        this.yIncrement = 100;
+        this.xPadding = 80;
+        this.yPadding = 15;
+        this.xIncrement = 240;
+        this.yIncrement = 140;
         this.stepForNew = 10;
-        this._debounceRecalculateConnections = _.debounce(_.bind(this.recalculateConnections, this), 100);
     };
 
     _.extend(JsPlumbManager.prototype, {
@@ -101,9 +66,10 @@ define(function(require) {
 
             });
             matrix.align().forEachCell(_.bind(function(cell) {
+                var increment = cell.step.get('_is_start') ? -15 : 35;
                 cell.step.set('position', [
                     this.xIncrement * cell.x + this.xPadding,
-                    this.yIncrement * cell.y + this.yPadding
+                    this.yIncrement * cell.y + this.yPadding + increment
                 ]);
             }, this));
         },

@@ -21,12 +21,12 @@ define(function(require) {
             name: '',
             label: '',
             entity: '',
-            entity_attribute: 'entity',
-            start_step: null,
-            steps_display_ordered: false,
+            'entity_attribute': 'entity',
+            'start_step': null,
+            'steps_display_ordered': false,
             steps: null,
             transitions: null,
-            transition_definitions: null,
+            'transition_definitions': null,
             attributes: null
         },
 
@@ -92,14 +92,14 @@ define(function(require) {
             var cloned = this._getClonedItem(transition);
             if (transition.get('transition_definition')) {
                 var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
-                cloned.transition_definition = transitionDefinition.get('name');
+                cloned['transition_definition'] = transitionDefinition.get('name');
             }
 
-            cloned.frontend_options = helper.deepClone(cloned.frontend_options);
-            cloned.form_options = helper.deepClone(cloned.form_options);
+            cloned['frontend_options'] = helper.deepClone(cloned['frontend_options']);
+            cloned['form_options'] = helper.deepClone(cloned['form_options']);
             cloned.label = __('Copy of') + ' ' + cloned.label;
             if (doNotAddToCollection) {
-                cloned._is_clone = true;
+                cloned['_is_clone'] = true;
             }
 
             var clonedModel = new TransitionModel(cloned);

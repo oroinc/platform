@@ -24,8 +24,8 @@ define(function(require) {
                 paintStyle: {
                     strokeStyle: '#dcdcdc',
                     lineWidth: 2,
-                    outlineColor: 'transparent',
-                    outlineWidth: 7
+                    outlineColor: '#fafafa',
+                    outlineWidth: 2
                 }
             };
         },
@@ -101,7 +101,12 @@ define(function(require) {
                 }
             }
             this.removeStaleConnections();
-            this.areaView.jsPlumbManager.debounceRecalculateConnections();
+
+            this.areaView.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            for (var i = 0; i < startSteps.length; i++) {
+                startStep = startSteps[i];
+                this.areaView.stepCollectionView.getItemView(startStep).updateStepMinWidth();
+            }
         },
 
         addStaleMark: function() {
@@ -139,7 +144,7 @@ define(function(require) {
             var connectionOptions = _.defaults({
                 source: startEl,
                 target: endEl,
-                connector: ['Smartline', {cornerRadius: 5}],
+                connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
                 paintStyle: _.result(this, 'connectorStyle'),
                 hoverPaintStyle: _.result(this, 'connectorHoverStyle'),
                 anchors: anchors,
