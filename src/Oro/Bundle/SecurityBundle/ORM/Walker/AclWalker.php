@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\TreeWalkerAdapter;
-
+use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\ArithmeticExpression;
@@ -16,22 +16,15 @@ use Doctrine\ORM\Query\AST\WhereClause;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
-use Doctrine\ORM\Query\AST\NullComparisonExpression;
 use Doctrine\ORM\Query\AST\ConditionalExpression;
 
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclBiCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclNullCondition;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStorage;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinStatement;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
 
 /**
  * Class AclWalker
@@ -41,11 +34,11 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\Statement\AclJoinClause;
 class AclWalker extends TreeWalkerAdapter
 {
     const ORO_ACL_CONDITION = 'oro_acl.condition';
-    const ORO_ACL_JOIN = 'oro_acl.join';
+    const ORO_ACL_SHARE_CONDITION = 'oro_acl.share.condition';
 
     const EXPECTED_TYPE = 12;
 
-    /** @var AclConditionInterface */
+    /** @var Node */
     protected $whereShareCondition;
 
     /**
@@ -57,13 +50,8 @@ class AclWalker extends TreeWalkerAdapter
         $query = $this->_getQuery();
         $this->whereShareCondition = null;
 
-        if ($query->hasHint(self::ORO_ACL_JOIN)) {
-            /** @var AclJoinStorage $joinStorage */
-            $joinStorage = $query->getHint(self::ORO_ACL_JOIN);
-
-            if (!$joinStorage->isEmpty()) {
-                $this->addJoins($AST, $joinStorage);
-            }
+        if ($query->hasHint(self::ORO_ACL_SHARE_CONDITION)) {
+            $this->whereShareCondition = $query->getHint(self::ORO_ACL_SHARE_CONDITION);
         }
 
         if ($query->hasHint(self::ORO_ACL_CONDITION)) {
@@ -445,123 +433,14 @@ class AclWalker extends TreeWalkerAdapter
     }
 
     /**
-     * @param SelectStatement $AST
-     * @param AclJoinStorage $joinStorage
-     */
-    protected function addJoins($AST, $joinStorage)
-    {
-        $joinStatements = $joinStorage->getJoinStatements();
-        /** @var AclJoinStatement $joinStatement */
-        foreach ($joinStatements as $joinStatement) {
-            //Implement Join logic here
-            switch ($joinStatement->getMethod()) {
-                case AclJoinStatement::ACL_SHARE_STATEMENT:
-                    $this->addShareJoin($AST, $joinStatement);
-                    break;
-            }
-        }
-    }
-
-    protected function addShareJoin(SelectStatement $AST, AclJoinStatement $joinStatement)
-    {
-        /** @var AclJoinClause $joinClause */
-        $joinClause = $joinStatement->getJoinClause();
-
-        $conditionalFactors = [];
-        foreach ($joinStatement->getJoinConditions() as $condition) {
-            switch (true) {
-                case $condition instanceof AclBiCondition:
-                    $pathExpression = new PathExpression(
-                        self::EXPECTED_TYPE,
-                        $condition->getEntityAliasLeft(),
-                        $condition->getEntityFieldLeft()
-                    );
-                    $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
-                    $leftExpression = new ArithmeticExpression();
-                    $leftExpression->simpleArithmeticExpression = $pathExpression;
-                    $rightExpression = new ArithmeticExpression();
-                    $pathExpression = new PathExpression(
-                        self::EXPECTED_TYPE,
-                        $condition->getEntityAliasRight(),
-                        $condition->getEntityFieldRight()
-                    );
-                    $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
-                    $rightExpression->simpleArithmeticExpression = $pathExpression;
-                    $resultCondition      = new ConditionalPrimary();
-                    $resultCondition->simpleConditionalExpression =
-                        new ComparisonExpression($leftExpression, '=', $rightExpression);
-                    $conditionalFactors[] = $resultCondition;
-                    break;
-
-                case $condition instanceof AclCondition:
-                    $pathExpression       = new PathExpression(
-                        self::EXPECTED_TYPE,
-                        $condition->getEntityAlias(),
-                        $condition->getEntityField()
-                    );
-                    $pathExpression->type = PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
-                    $resultCondition      = new ConditionalPrimary();
-
-                    if (is_array($condition->getValue())) {
-                        $resultCondition->simpleConditionalExpression = $this->getInExpression(
-                            $condition,
-                            'value',
-                            'entityField'
-                        );
-                    } else {
-                        $leftExpression                              = new ArithmeticExpression();
-                        $leftExpression->simpleArithmeticExpression  = $pathExpression;
-                        $rightExpression                             = new ArithmeticExpression();
-                        $rightExpression->simpleArithmeticExpression =
-                            new Literal(Literal::NUMERIC, (int)$condition->getValue());
-
-                        $resultCondition->simpleConditionalExpression =
-                            new ComparisonExpression($leftExpression, '=', $rightExpression);
-                    }
-
-                    $conditionalFactors[] = $resultCondition;
-                    break;
-            }
-        }
-
-        $join = new Join(
-            Join::JOIN_TYPE_LEFT,
-            new Query\AST\RangeVariableDeclaration(
-                $joinClause->getAbstractSchemaName(),
-                $joinClause->getAliasIdentificationVariable(),
-                false
-            )
-        );
-        $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
-
-        if (!empty($AST->fromClause->identificationVariableDeclarations[0])) {
-            $AST->fromClause->identificationVariableDeclarations[0]->joins[] = $join;
-            foreach ($joinStatement->getWhereConditions() as $whereCondition) {
-                if ($whereCondition instanceof AclNullCondition) {
-                    $this->whereShareCondition = $whereCondition;
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
      * @param array $aclConditionalFactors
      *
      * @return array
      */
     protected function addShareFactor(array $aclConditionalFactors)
     {
-        $pathExpression = new PathExpression(
-            self::EXPECTED_TYPE,
-            $this->whereShareCondition->getEntityAlias(),
-            $this->whereShareCondition->getEntityField()
-        );
-        $pathExpression->type = PathExpression::TYPE_STATE_FIELD;
-        $shareCondition = new NullComparisonExpression($pathExpression);
-        $shareCondition->not = true;
         $prShareCondition = new ConditionalPrimary();
-        $prShareCondition->simpleConditionalExpression = $shareCondition;
+        $prShareCondition->simpleConditionalExpression = $this->whereShareCondition;
         $orgCondition = new ConditionalPrimary();
         $ownershipCondition = new ConditionalTerm($aclConditionalFactors);
         $orgCondition->conditionalExpression = new ConditionalExpression([$ownershipCondition, $prShareCondition]);
