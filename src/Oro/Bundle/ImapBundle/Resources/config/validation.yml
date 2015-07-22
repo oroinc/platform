@@ -1,4 +1,4 @@
-Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin:
+Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
     properties:
         host:
             - NotBlank:     { groups: [Check] }

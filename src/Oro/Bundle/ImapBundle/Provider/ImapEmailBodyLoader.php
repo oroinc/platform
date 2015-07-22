@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -44,7 +44,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
      */
     public function supports(EmailOrigin $origin)
     {
-        return $origin instanceof ImapEmailOrigin;
+        return $origin instanceof UserEmailOrigin;
     }
 
     /**
@@ -52,7 +52,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
      */
     public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em)
     {
-        /** @var ImapEmailOrigin $origin */
+        /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
 
         $config = new ImapConfig(

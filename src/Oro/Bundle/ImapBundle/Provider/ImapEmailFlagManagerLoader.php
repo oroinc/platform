@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
@@ -43,7 +43,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
      */
     public function supports(EmailOrigin $origin)
     {
-        return $origin instanceof ImapEmailOrigin;
+        return $origin instanceof UserEmailOrigin;
     }
 
     /**
@@ -51,7 +51,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
      */
     public function select(EmailFolder $folder, OroEntityManager $em)
     {
-        /** @var ImapEmailOrigin $origin */
+        /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
 
         $config = new ImapConfig(

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -31,7 +31,7 @@ class ConnectionController extends Controller
         $data = null;
         $id   = $this->getRequest()->get('id', false);
         if (false !== $id) {
-            $data = $this->getDoctrine()->getRepository('OroImapBundle:ImapEmailOrigin')->find($id);
+            $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
         $form = $this->createForm(
@@ -44,7 +44,7 @@ class ConnectionController extends Controller
         );
         $form->setData($data);
         $form->submit($this->getRequest());
-        /** @var ImapEmailOrigin $origin */
+        /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
         if ($form->isValid() && null !== $origin) {

@@ -9,7 +9,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -170,7 +170,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
         $entity->setPassword(self::TEST_PASSWORD);
 
         $form->setData($entity);
@@ -196,7 +196,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
@@ -212,7 +212,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->assertNotSame($entity, $form->getData());
 
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
+        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertTrue($form->getData()->isActive());
     }
 
@@ -225,7 +225,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
@@ -241,7 +241,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->assertNotSame($entity, $form->getData());
 
-        $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
+        $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
     }
 }

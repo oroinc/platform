@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -121,7 +121,7 @@ class ConfigurationType extends AbstractType
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
                 $data = $event->getData();
-                if ($data !== null && $data instanceof ImapEmailOrigin) {
+                if ($data !== null && $data instanceof UserEmailOrigin) {
                     foreach ($data->getFolders() as $folder) {
                         $folder->setOrigin($data);
                     }
@@ -144,7 +144,7 @@ class ConfigurationType extends AbstractType
                 $form = $event->getForm();
 
                 if (array_key_exists('folders', $data)) {
-                    /** @var ImapEmailOrigin $origin */
+                    /** @var UserEmailOrigin $origin */
                     $origin = $form->getData();
 
                     if ($origin !== null && $origin->getId() !== null) {
@@ -194,7 +194,7 @@ class ConfigurationType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
                 $data = (array) $event->getData();
-                /** @var ImapEmailOrigin|null $entity */
+                /** @var UserEmailOrigin|null $entity */
                 $entity = $event->getForm()->getData();
 
                 $filtered = array_filter(
@@ -215,14 +215,14 @@ class ConfigurationType extends AbstractType
 
                     $event->setData($data);
 
-                    if ($entity instanceof ImapEmailOrigin
+                    if ($entity instanceof UserEmailOrigin
                         && ($entity->getHost() !== $data['host'] || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
-                        $newConfiguration = new ImapEmailOrigin();
+                        $newConfiguration = new UserEmailOrigin();
                         $event->getForm()->setData($newConfiguration);
                     }
-                } elseif ($entity instanceof ImapEmailOrigin) {
+                } elseif ($entity instanceof UserEmailOrigin) {
                     $event->getForm()->setData(null);
                 }
             }
@@ -237,7 +237,7 @@ class ConfigurationType extends AbstractType
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
-                /** @var ImapEmailOrigin $data */
+                /** @var UserEmailOrigin $data */
                 $data = $event->getData();
                 if ($data !== null) {
                     if ($data->getOwner() === null) {
@@ -261,7 +261,7 @@ class ConfigurationType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\ImapEmailOrigin',
+            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'   => false,
         ]);
     }
