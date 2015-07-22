@@ -194,13 +194,13 @@ define(function(require) {
         }
 
         this._compute = function(paintInfo, params) {
-            var existingConnection = _.find(this._jsPlumb.instance.getConnections(), function (connection) {
-                return connection.connector === this;
-            }, this);
-            if (_.isUndefined(existingConnection)) {
-                // if current connection is new one and hasn't a target yet using jsPlumb Flowchart connector behaviour
+            if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
+                params.targetEndpoint.getAttachedElements().length === 0) {
+                // in case this connection is new one or is moving to another target or source
+                // use jsPlumb Flowchart connector behaviour
                 return this._flowchartConnectorCompute.apply(this, arguments);
             }
+
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
             if (points.length == 0) {
