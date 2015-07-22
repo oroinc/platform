@@ -3,7 +3,7 @@
 var DEBUG_ENABLED = false;
 
 class GraphConstant {
-    static recommendedConnectionWidth: number = 16;
+    static recommendedConnectionWidth: number = 12;
     static cornerCost: number = 200;
     static optimizationCornerCost: number = 190; // recomended > cornerCost - 1000 * usedAxisCostMultiplier;
     static crossPathCost: number = 300;  // recomended > cornerCost * 1.5
@@ -210,11 +210,20 @@ class Interval2d {
         return this.a.distanceTo(this.b);
     }
 
+    get simpleLength() {
+        return this.a.simpleDistanceTo(this.b);
+    }
+
     crosses(interval: Interval2d): boolean {
         return this.getCrossPoint(interval) !== null;
     }
 
     getCrossPoint(interval: Interval2d): Point2d {
+        if (interval.simpleLength == 0) {
+            return this.includesPoint(interval.a) ? interval.a : null;
+        } else if (this.simpleLength == 0) {
+            return interval.includesPoint(this.a) ? this.a : null;
+        }
         var point = this.line.intersection(interval.line);
         if (!isNaN(point.x)) {
             var v1: boolean, v2: boolean;
@@ -238,6 +247,11 @@ class Interval2d {
             }
         }
         return null;
+    }
+
+    includesPoint(point: Point2d) {
+        var line = this.line;
+        return line.slope == Infinity ? (point.x == this.a.x && util.between(point.y, this.a.y, this.b.y)) : (util.between(point.x, this.a.x, this.b.x) && point.y == line.intercept + point.x * line.slope);
     }
 
     crossesNonInclusive(interval: Interval2d): boolean {
@@ -513,10 +527,7 @@ class Line2d {
 }
 
 class NodePoint extends Point2d {
-    _connections: Connection[] = [];
-    get connections(): Connection[] {
-        return this._connections;
-    }
+    connections: Connection[] = [];
     stale: boolean = false;
     hAxis: Axis;
     vAxis: Axis;
@@ -594,6 +605,11 @@ class NodePoint extends Point2d {
     draw(color?: string, radius?: number) {
         this.recommendedPoint.draw(color, radius);
     }
+}
+
+
+class CenterNodePoint extends NodePoint {
+
 }
 
 class Connection extends Interval2d {
@@ -809,7 +825,12 @@ class Axis extends Interval2d {
 
     static createFromInterval(interval: Interval2d, graph: Graph) {
         var costMultiplier = (<Axis>interval).costMultiplier;
+        var isVertical = (<Axis>interval).isVertical;
         var clone = new Axis(interval.a, interval.b, graph, costMultiplier);
+        // this is fix for zero length axises
+        if (isVertical !== undefined) {
+            clone.isVertical = isVertical;
+        }
         return clone;
     }
 
@@ -927,9 +948,11 @@ class Axis extends Interval2d {
         // sort nodes and connect them
         var isVertical = this.isVertical;
         this.nodes.sort(function (a, b) {
-            if (a.x === b.x && a.y === b.y) {
-                // virtual node
-                debugger;
+            if (DEBUG_ENABLED) {
+                if (a.x === b.x && a.y === b.y) {
+                    // virtual node
+                    debugger;
+                }
             }
             return a.x - b.x + a.y - b.y;
         });
@@ -937,8 +960,13 @@ class Axis extends Interval2d {
 
     merge(axis: Axis) {
         var middle = this.a.add(this.b).mul(0.5);
-        this.a = this.a.simpleDistanceTo(middle) > axis.a.simpleDistanceTo(middle) ? this.a : axis.a;
-        this.b = this.b.simpleDistanceTo(middle) > axis.b.simpleDistanceTo(middle) ? this.b : axis.b;
+        var points = [this.a, this.b, axis.a, axis.b];
+        points.sort(function (a, b) {
+            return a.x + a.y - b.x - b.y;
+        });
+
+        this.a = points[0];
+        this.b = points[points.length - 1];
     }
 
     cloneAtDirection(direction: Point2d): Axis {
@@ -985,12 +1013,12 @@ class Axis extends Interval2d {
         clone = this.closestLeftClone;
         if (!clone || clone.isUsed) {
             // console.log(this.a.sub(this.b).unitVector.rot90().abs().rot180());
-            this.clonesAtLeft.unshift(this.cloneAtDirection(this.a.sub(this.b).unitVector.rot90().abs().rot180()));
+            this.clonesAtLeft.unshift(this.cloneAtDirection(this.prevNodeConnVector.rot90()));
         }
         clone = this.closestRightClone;
         if (!clone || clone.isUsed) {
             // console.log(this.a.sub(this.b).unitVector.rot90().abs());
-            this.clonesAtRight.unshift(this.cloneAtDirection(this.a.sub(this.b).unitVector.rot90().abs()));
+            this.clonesAtRight.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90()));
         }
     }
 }
@@ -1013,7 +1041,12 @@ class BaseAxis extends Axis {
 
     static createFromInterval(interval: Interval2d, graph: Graph, leftConstraint?: AbstractSimpleConstraint, rightConstraint?: AbstractSimpleConstraint, locationDirective?: AbstractLocationDirective) {
         var costMultiplier = (<Axis>interval).costMultiplier;
+        var isVertical = (<Axis>interval).isVertical;
         var clone = new BaseAxis(interval.a, interval.b, graph, costMultiplier, leftConstraint, rightConstraint, locationDirective);
+        // this is fix for zero length axises
+        if (isVertical !== undefined) {
+            clone.isVertical = isVertical;
+        }
         return clone;
     }
 }
@@ -1025,7 +1058,6 @@ interface ICornerAxisSpec {
     rightConstraint: AbstractSimpleConstraint;
     locationDirective: AbstractLocationDirective;
 }
-
 
 interface ICenterAxisSpec {
     vector: Vector2d;
@@ -1068,7 +1100,7 @@ class Graph {
         }
     }
 
-    getPathFromCid(cid: String, direction: Point2d) {
+    getPathFromCid(cid: string, direction: Point2d) {
         return this.getPathFrom(this.getRectByCid(cid), direction);
     }
 
@@ -1128,10 +1160,14 @@ class Graph {
     createAxises() {
         for (var i = 0; i < this.baseAxises.length; i++) {
             var axis = this.baseAxises[i];
-            if (axis.a.x === axis.b.x) {
-                this.verticalAxises.push(BaseAxis.createFromInterval(axis, this, axis.leftConstraint, axis.rightConstraint, axis.locationDirective));
+            if (axis.isVertical) {
+                var newAxis = new BaseAxis(axis.a, axis.b, this, axis.costMultiplier, axis.leftConstraint, axis.rightConstraint, axis.locationDirective);
+                newAxis.isVertical = axis.isVertical;
+                this.verticalAxises.push(newAxis);
             } else if (axis.a.y === axis.b.y) {
-                this.horizontalAxises.push(BaseAxis.createFromInterval(axis, this, axis.leftConstraint, axis.rightConstraint, axis.locationDirective));
+                var newAxis = new BaseAxis(axis.a, axis.b, this, axis.costMultiplier, axis.leftConstraint, axis.rightConstraint, axis.locationDirective);
+                newAxis.isVertical = axis.isVertical;
+                this.horizontalAxises.push(newAxis);
             } else {
                 throw Error("Not supported");
             }
@@ -1153,6 +1189,9 @@ class Graph {
         var i, j;
         for (i = 0; i < this.mergeAxisesQueue.length; i++) {
             var queue = this.mergeAxisesQueue[i];
+            if (DEBUG_ENABLED) {
+                console.log(queue.map((axis)=>{axis.draw(); return axis.uid}));
+            }
             for (j = queue.length - 1; j >= 1; j--) {
                 queue[j - 1].merge(queue[j]);
                 this.removeAxis(queue[j]);
@@ -1301,7 +1340,11 @@ class Graph {
             for (var j = defs.length - 1; j >= 0; j--) {
                 var def: ICenterAxisSpec = defs[j];
                 var closestRectCrossPoint = this.findClosestRectCross(def.vector, rect);
-                this.baseAxises.push(BaseAxis.createFromInterval(new Interval2d(def.vector.start, closestRectCrossPoint), this, def.leftConstraint, def.rightConstraint, def.locationDirective));
+                var axis = new BaseAxis(def.vector.start, closestRectCrossPoint, this, 1, def.leftConstraint, def.rightConstraint, def.locationDirective);
+                var secondaryAxis = new BaseAxis(def.vector.start, def.vector.start, this, 1, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
+                secondaryAxis.isVertical = !axis.isVertical;
+                // console.log(secondaryAxis.uid, axis.getCrossPoint(secondaryAxis), secondaryAxis.getCrossPoint(axis));
+                this.baseAxises.push(axis, secondaryAxis);
             }
         }
     }
@@ -1369,6 +1412,9 @@ class Graph {
     }
 
     buildNodes() {
+        /*
+         * add all nodes at axises cross points
+         */
         var node: NodePoint, newAxis: BaseAxis;
         for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
             var hAxis: Axis = this.horizontalAxises[i];
@@ -1385,13 +1431,19 @@ class Graph {
                 }
             }
         }
+
+        /*
+         * add all nodes at axises end points
+         */
+        var newVerticalAxises: BaseAxis[] = [];
+        var newHorizontalAxises: BaseAxis[] = [];
         for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
             var hAxis: Axis = this.horizontalAxises[i];
             node = this.getNodeAt(hAxis.a);
             if (!node.stale) {
                 newAxis = new BaseAxis(hAxis.a, hAxis.a, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
                 newAxis.isVertical = true;
-                this.verticalAxises.push(newAxis);
+                newVerticalAxises.push(newAxis);
                 hAxis.addNode(node);
                 newAxis.addNode(node);
                 node.hAxis = hAxis;
@@ -1414,7 +1466,7 @@ class Graph {
             if (!node.stale) {
                 newAxis = new BaseAxis(vAxis.a, vAxis.a, this, 0, new EmptyConstraint(), new EmptyConstraint(), new CenterLocationDirective());
                 newAxis.isVertical = false;
-                this.horizontalAxises.push(newAxis);
+                newHorizontalAxises.push(newAxis);
                 vAxis.addNode(node);
                 newAxis.addNode(node);
                 node.hAxis = newAxis;
@@ -1431,6 +1483,8 @@ class Graph {
                 node.vAxis = vAxis;
             }
         }
+        this.verticalAxises.push.apply(this.verticalAxises, newVerticalAxises);
+        this.horizontalAxises.push.apply(this.horizontalAxises, newHorizontalAxises);
     }
 
     buildMergeRequests() {
@@ -1562,26 +1616,26 @@ class Graph {
             axises: Axis[] = [];
         for (var i = 0; i < connections.length; i++) {
             var conn = connections[i];
-            conn.axis.ensureTraversableSiblings();
             if (axises.indexOf(conn.axis) === -1) {
                 axises.push(conn.axis);
+                conn.axis.ensureTraversableSiblings();
+                conn.axis.used = true;
+                conn.axis.costMultiplier *= GraphConstant.usedAxisCostMultiplier;
             }
-        }
-
-        for (var i = 0; i < axises.length; i++) {
-            axises[i].used = true;
-            axises[i].costMultiplier *= GraphConstant.usedAxisCostMultiplier;
         }
         var nextNode;
         var current;
         var midNode;
         var next;
         var startNode;
+        var markedNodes = [];
         for (var i = 0; i < connections.length - 2; i++) {
             current = connections[i];
             next = connections[i + 1];
             startNode = current.a === next.a || current.a === next.b ? current.b : current.a;
             midNode = current.a === next.a || current.a === next.b ? current.a : current.b;
+            midNode.used = true;
+            startNode.used = true;
             nextNode = startNode;
             // connection can be divided before, traverse all nodes
             do {
@@ -1589,7 +1643,6 @@ class Graph {
                 nextNode.used = true;
                 // console.log(midNode.uid);
             } while (nextNode !== midNode);
-            midNode.used = true;
             // console.log(midNode.uid);
             if (current.vector.id !== next.vector.id) {
                 // corner
@@ -1606,6 +1659,9 @@ class Graph {
             nextNode.used = true;
             // console.log(midNode.uid);
         } while (nextNode !== midNode);
+
+        path.toNode.used = true;
+        markedNodes.push(path.toNode);
 
         this.relocateAxises();
     }
@@ -1625,7 +1681,7 @@ class Graph {
         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
             var axis = this.verticalAxises[i],
                 clones = axis.allClones,
-                usage = clones.map((axis)=>axis.used);
+                usage = clones.map((axis) => axis.used);
             // console.log(clones.length);
             // console.log(usage);
             if (DEBUG_ENABLED) {
@@ -1784,8 +1840,7 @@ class Path {
     get points(): Point2d[] {
         var points: Point2d[] = [],
             current = this,
-            currentAxis = this.connection.axis,
-            candidate: Point2d;
+            currentAxis = this.connection.axis;
         points.push(this.toNode.recommendedPoint);
         while (current) {
             if (current.connection.axis !== currentAxis) {
@@ -1992,7 +2047,6 @@ class Finder {
 
             var newDirection = newPath.connection.directionFrom(newPath.fromNode);
             var toDirection = this.to[0].connection.directionFrom(to);
-            var nextVector;
 
             if (newDirection.id == toDirection.id) {
                 // 3 possible cases

@@ -3,12 +3,8 @@ define(function(require){
     require('./path-finder');
     var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
 
-    function matchEndpoints(paintInfo1, paintInfo2) {
-        var keys = ['sx', 'sy', 'tx', 'ty'];
-        return _.isEqual(_.pick(paintInfo1, keys), _.pick(paintInfo2, keys));
-    }
-
-    function JsPlumbSmartlineManager(jsPlumbInstance) {
+    function JsPlumbSmartlineManager(jsPlumbInstance, settings) {
+        this.settings = _.extend({}, this.settings, settings);
         this.jsPlumbInstance = jsPlumbInstance;
         this.jsPlumbOverlayManager = new JsPlumbOverlayManager(this);
         this.cache = {
@@ -24,6 +20,11 @@ define(function(require){
     }
 
     JsPlumbSmartlineManager.prototype = {
+        settings: {
+            connectionWidth: 12,
+            blockVMargin: 8,
+            blockHMargin: 4
+        },
 
         isCacheValid: function () {
             return _.isEqual(this.getState(), this.cache.state)
@@ -79,12 +80,13 @@ define(function(require){
             var connections = [];
             var rects = {};
             var graph = new Graph();
+            var settings = this.settings;
             this.cache.state = this.getState();
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var clientRect;
                 var el = document.getElementById(id);
                 if (el) {
-                    clientRect = new Rectangle(el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
+                    clientRect = new Rectangle(el.offsetLeft - settings.blockHMargin, el.offsetTop - settings.blockVMargin, el.offsetWidth + settings.blockHMargin * 2, el.offsetHeight + settings.blockVMargin * 2);
                     rects[id] = clientRect;
                     clientRect.cid = id;
                     graph.rectangles.push(clientRect);
@@ -97,6 +99,7 @@ define(function(require){
             }
 
             graph.build();
+            GraphConstant.recommendedConnectionWidth = settings.connectionWidth;
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
                 if (conn.sourceId in rects && conn.targetId in rects) {
@@ -130,8 +133,6 @@ define(function(require){
                 item.points = item.path.points.reverse();
             });
 
-            // console.log("Cache refresh: " + _.keys(this.cache.connections).join(', '));
-
             this.jsPlumbInstance.repaintEverything();
             this.debouncedCalculateOverlays();
 
@@ -142,7 +143,6 @@ define(function(require){
                 }),
                 connections: connections.map(function (item) {return item.slice(0,2);})
             };
-
         }
     };
 
