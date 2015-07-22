@@ -19,6 +19,7 @@ class CoreExtension extends AbstractExtension
             new Condition\Not(),
             new Condition\HasValue(),
             new Condition\NotHasValue(),
+            new Condition\Contains(),
             new Condition\EqualTo(),
             new Condition\NotEqualTo(),
             new Condition\GreaterThan(),

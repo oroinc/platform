@@ -65,7 +65,6 @@ class EmailModelBuilder
 
     /**
      * @param EmailModelBuilderHelper   $emailModelBuilderHelper
-     * @param Request                   $request
      * @param EntityManager             $entityManager
      * @param ConfigManager             $configManager
      * @param EmailActivityListProvider $activityListProvider
@@ -74,7 +73,6 @@ class EmailModelBuilder
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
-        Request $request,
         EntityManager $entityManager,
         ConfigManager $configManager,
         EmailActivityListProvider $activityListProvider,
@@ -82,7 +80,6 @@ class EmailModelBuilder
         Factory $factory
     ) {
         $this->helper               = $emailModelBuilderHelper;
-        $this->request              = $request;
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->activityListProvider = $activityListProvider;
@@ -102,7 +99,7 @@ class EmailModelBuilder
             $emailModel->setMailType(EmailModel::MAIL_TYPE_DIRECT);
         }
 
-        if ($this->request->getMethod() === 'GET') {
+        if ($this->request && $this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
             if (!$emailModel->getContexts()) {
                 $entityClass = $this->request->get('entityClass');
@@ -210,6 +207,14 @@ class EmailModelBuilder
         }
 
         return $this->createEmailModel($emailModel);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**

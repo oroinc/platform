@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -86,9 +88,17 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     protected $organization;
 
+    /**
+     * @var AutoResponseRule[]|Collection
+     *
+     * @ORM\OneToMany(targetEntity="AutoResponseRule", mappedBy="mailbox")
+     */
+    protected $autoResponseRules;
+
     public function __construct()
     {
         $this->smtpSettings = [];
+        $this->autoResponseRules = new ArrayCollection();
     }
 
     /**
@@ -283,5 +293,21 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getEmailOwnerName()
     {
         return $this->label;
+    }
+
+    /**
+     * @param AutoResponseRule[]|Collection $autoResponseRules
+     */
+    public function setAutoResponseRules(Collection $autoResponseRules)
+    {
+        $this->autoResponseRules = $autoResponseRules;
+    }
+
+    /**
+     * @return AutoResponseRule[]|Collection
+     */
+    public function getAutoResponseRules()
+    {
+        return $this->autoResponseRules;
     }
 }

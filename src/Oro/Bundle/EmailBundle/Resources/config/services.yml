@@ -19,6 +19,7 @@ parameters:
     oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
     oro_email.manager.autoresponserule.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
     oro_email.manager.email_origin.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailOriginApiEntityManager
     oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
@@ -187,16 +188,16 @@ services:
             - @oro_email.email.address.helper
 
     oro_email.email.model.builder:
-      class: %oro_email.email.model.builder.class%
-      scope: request
-      arguments:
-          - @oro_email.email.model.builder.helper
-          - @request
-          - @doctrine.orm.entity_manager
-          - @oro_config.user
-          - @oro_email.activity_list.provider
-          - @oro_email.provider.email_attachment_provider
-          - @oro_email.form.factory
+        class: %oro_email.email.model.builder.class%
+        arguments:
+            - @oro_email.email.model.builder.helper
+            - @doctrine.orm.entity_manager
+            - @oro_config.user
+            - @oro_email.activity_list.provider
+            - @oro_email.provider.email_attachment_provider
+            - @oro_email.form.factory
+        calls:
+            - [setRequest, [@?request=]]
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -224,6 +225,14 @@ services:
         arguments:
             - %oro_email.autoresponserule.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_email.autoresponserule_manager:
+        class: %oro_email.autoresponserule_manager.class%
+        arguments:
+            - @doctrine
+            - @oro_email.email.model.builder
+            - @oro_email.mailer.processor
+            - @logger
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
