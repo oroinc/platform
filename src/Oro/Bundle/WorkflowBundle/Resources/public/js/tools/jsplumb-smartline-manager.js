@@ -133,7 +133,8 @@ define(function(require){
                 item.points = item.path.points.reverse();
             });
 
-            this.jsPlumbInstance.repaintEverything();
+            _.defer(_.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance));
+
             this.debouncedCalculateOverlays();
 
             // debug code
