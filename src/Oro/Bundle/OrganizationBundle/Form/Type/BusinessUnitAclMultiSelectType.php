@@ -56,7 +56,6 @@ class BusinessUnitAclMultiSelectType extends AbstractType
             [
                 'autocomplete_alias' => 'user_business_units',
                 'configs' => [
-                    'extra_config' => 'user_business_unit_autocomplete',
                     'permission' => 'VIEW',
                     'entity_name' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
                     'multiple' => true,

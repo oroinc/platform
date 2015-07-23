@@ -71,6 +71,7 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
 
         /** @var User $user */
         $user = $this->getSecurityContext()->getToken()->getUser();
+        $hasMore = false;
         if ($user && $user->getId()) {
             $units = $user->getBusinessUnits()->map(
                 function (BusinessUnit $businessUnit) {
@@ -82,7 +83,7 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
                 $page        = (int) $page > 0 ? (int) $page : 1;
                 $perPage     = (int) $perPage > 0 ? (int) $perPage : 10;
                 $firstResult = ($page - 1) * $perPage;
-                $perPage += 1;
+                ++$perPage;
 
                 $queryBuilder = $this->entityManager->createQueryBuilder()
                     ->select('bu')
@@ -96,6 +97,7 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
                     ->setFirstResult($firstResult)
                     ->setMaxResults($perPage);
                 $results = $queryBuilder->getQuery()->getResult();
+                $hasMore = count($results) === $perPage;
                 foreach ($results as $user) {
                     $resultsData[] = $this->convertItem($user);
                 }
@@ -104,7 +106,7 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
 
         return [
             'results' => $resultsData,
-            'more' => false
+            'more' => $hasMore
         ];
     }
 

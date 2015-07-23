@@ -88,7 +88,7 @@ class ShareHandler
                     if ($securityIdentity instanceof UserSecurityIdentity) {
                         $usernames[] = $securityIdentity->getUsername();
                     } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
-                        $buIds = $securityIdentity->getId();
+                        $buIds[] = $securityIdentity->getId();
                     }
                 }
                 if ($usernames) {
@@ -123,7 +123,6 @@ class ShareHandler
             $acl = $this->aclProvider->createAcl($objectIdentity);
         }
 
-        // @todo add handling of OrganizationSecurityIdentity, BusinessUnitSecurityIdentity
         $fillOldSidsHandler = function($acl) {
             $oldSids = [];
             foreach ($acl->getObjectAces() as $ace) {
