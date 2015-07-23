@@ -52,8 +52,8 @@ datagrid:
                     options:
                         dialogOptions:
                             title:         @translator->trans(oro.email.autoresponserule.action.update.title)
-                            allowMaximize: true
-                            allowMinimize: true
+                            allowMaximize: false
+                            allowMinimize: false
                             modal:         true
                             dblclick:      maximize
                             maximizedHeightDecreaseBy: minimize-bar
