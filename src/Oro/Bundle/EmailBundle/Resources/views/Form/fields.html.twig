@@ -267,8 +267,8 @@
     {% set email_origin = form_row(form.children.originEnable) ~
         form_widget(form.children.origin) %}
     {% set smtp = form_widget(form.children.smtpSettings) %}
-    {% set processor = form_row(form.children.processorType) ~
-    form_widget(form.children.processor) %}
+    {% set process = form_row(form.children.processType) ~
+    form_widget(form.children.processSettings) %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
         {{ form_widget(form) }}
@@ -283,7 +283,7 @@
     </fieldset>
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.processor.label'|trans }}</h5>
-        {{ processor|raw }}
+        {{ process|raw }}
     </fieldset>
 
     <script type="text/javascript">
