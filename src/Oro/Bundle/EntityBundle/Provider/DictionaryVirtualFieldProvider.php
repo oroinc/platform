@@ -94,10 +94,6 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      */
     protected function ensureVirtualFieldsInitialized($className)
     {
-        if ($className === 'OroCRM\Bundle\SalesBundle\Entity\Lead') {
-            $w = 7;
-        }
-
         if (!isset($this->virtualFields[$className])) {
             $this->ensureDictionariesInitialized();
             $this->virtualFields[$className] = [];
@@ -109,33 +105,23 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 if ($metadata->isSingleValuedAssociation($associationName)
                     && isset($this->dictionaries[$targetClassName])
                 ) {
-                    $fields              = $this->dictionaries[$targetClassName];
-                    $isCombinedLabelName = count($fields) > 1;
-                    foreach ($fields as $fieldName => $fieldType) {
-                        $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
-                        $label = $isCombinedLabelName
-                            ? $virtualFieldName
-                            : Inflector::tableize($associationName);
-
-                            $this->virtualFields[$className][$virtualFieldName] = [
-                                'query' => [
-                                    'select' => [
-                                        'expr'        => sprintf('target.%s', $targetClassName),
-                                        'return_type' => GroupingScope::GROUP_DICTIONARY,
-                                        //'filter_by_id' => true,
-                                        'label'       => $label
-                                    ],
-                                    'join'   => [
-                                        'left' => [
-                                            [
-                                                'join'  => sprintf('entity.%s', $associationName),
-                                                'alias' => 'target'
-                                            ]
-                                        ]
+                    $this->virtualFields[$className][$associationName] = [
+                        'query' => [
+                            'select' => [
+                                'expr'        => sprintf('target.%s', $targetClassName),
+                                'return_type' => GroupingScope::GROUP_DICTIONARY,
+                                'filter_by_id' => true
+                            ],
+                            'join'   => [
+                                'left' => [
+                                    [
+                                        'join'  => sprintf('entity.%s', $associationName),
+                                        'alias' => 'target'
                                     ]
                                 ]
-                            ];
-                    }
+                            ]
+                        ]
+                    ];
                 }
             }
         }
