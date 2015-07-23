@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 /**
- * IMAP Email Origin
+ * User Email Origin
  *
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
@@ -27,6 +27,20 @@ class UserEmailOrigin extends EmailOrigin
      * @ORM\Column(name="imap_port", type="integer", length=10, nullable=true)
      */
     protected $port;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="smtp_host", type="string", length=255, nullable=true)
+     */
+    protected $smtpHost;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="smtp_port", type="integer", length=10, nullable=true)
+     */
+    protected $smtpPort;
 
     /**
      * The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
@@ -67,11 +81,60 @@ class UserEmailOrigin extends EmailOrigin
      * Sets the host name of IMAP server
      *
      * @param string $host
+     *
      * @return UserEmailOrigin
      */
     public function setHost($host)
     {
         $this->host = $host;
+
+        return $this;
+    }
+
+    /**
+     * Gets the host name of SMTP server
+     *
+     * @return string
+     */
+    public function getSmtpHost()
+    {
+        return $this->smtpHost;
+    }
+
+    /**
+     * Sets the host name of SMTP server
+     *
+     * @param string $smtpHost
+     *
+     * @return UserEmailOrigin
+     */
+    public function setSmtpHost($smtpHost)
+    {
+        $this->smtpHost = $smtpHost;
+
+        return $this;
+    }
+
+    /**
+     * Gets the port of SMTP server
+     *
+     * @return int
+     */
+    public function getSmtpPort()
+    {
+        return (int)$this->smtpPort;
+    }
+
+    /**
+     * Sets the port of SMTP server
+     *
+     * @param int $smtpPort
+     *
+     * @return UserEmailOrigin
+     */
+    public function setSmtpPort($smtpPort)
+    {
+        $this->smtpPort = (int)$smtpPort;
 
         return $this;
     }
@@ -175,7 +238,14 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function __toString()
     {
-        return sprintf('%s (%s)', $this->user, $this->host);
+        $host = '';
+        if ($this->host) {
+            $host = $this->host;
+        } elseif ($this->smtpHost) {
+            $host = $this->smtpHost;
+        }
+
+        return sprintf('%s (%s)', $this->user, $host);
     }
 
     /**
