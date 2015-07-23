@@ -8,6 +8,8 @@ use Symfony\Component\Form\AbstractType;
 
 class AddressCollectionType extends AbstractType
 {
+    const NAME = 'oro_address_collection';
+
     /**
      * {@inheritdoc}
      */
@@ -39,6 +41,6 @@ class AddressCollectionType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_address_collection';
+        return static::NAME;
     }
 }
