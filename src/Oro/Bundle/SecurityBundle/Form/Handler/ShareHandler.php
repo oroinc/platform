@@ -153,7 +153,7 @@ class ShareHandler
         }
         // $newSids - $oldSids: to insert
         foreach (array_diff($newSids, $oldSidsCopy) as $sid) {
-            $acl->insertObjectAce($sid, EntityMaskBuilder::MASK_VIEW_BASIC);
+            $acl->insertObjectAce($sid, EntityMaskBuilder::MASK_VIEW_SYSTEM);
         }
 
         $this->aclProvider->updateAcl($acl);

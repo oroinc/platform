@@ -226,6 +226,13 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
             return false;
         }
 
-        return true;
+        $sharedToScope = false;
+        if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
+            $sharedToScope = 'user';
+        } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
+            $sharedToScope = 'business_unit';
+        }
+
+        return in_array($sharedToScope, $shareScopes);
     }
 }
