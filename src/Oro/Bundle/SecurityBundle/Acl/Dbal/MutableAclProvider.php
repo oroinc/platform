@@ -186,6 +186,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL for updating a security identity.
+     * Clear Sids cache, that findAcls update Sids cache after Sid is updated
      *
      * @param SecurityIdentityInterface $sid
      * @param string $oldName
@@ -235,6 +236,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL to delete a security identity.
+     * Clear Sids cache, that findAcls update Sids cache after Sid is deleted
      *
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
@@ -244,6 +246,8 @@ class MutableAclProvider extends BaseMutableAclProvider
     {
         $select = $this->getSelectSecurityIdentityIdSql($sid);
         $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        $this->sids = null;
 
         return $delete;
     }
@@ -264,6 +268,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL for inserting a security identity.
+     * Clear Sids cache, that findAcls update Sids cache after new Sid is inserted
      *
      * @param SecurityIdentityInterface $sid
      *
