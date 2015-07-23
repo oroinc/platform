@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
@@ -63,7 +63,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
 
     public function testGetEmailsByMessageIdsQueryBuilder()
     {
-        $origin     = new ImapEmailOrigin();
+        $origin     = new UserEmailOrigin();
         $messageIds = ['msg1', 'msg2'];
 
         /** @var ImapEmailRepository $repo */

@@ -12,7 +12,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
-class ImapEmailOrigin extends EmailOrigin
+class UserEmailOrigin extends EmailOrigin
 {
     /**
      * @var string
@@ -67,7 +67,7 @@ class ImapEmailOrigin extends EmailOrigin
      * Sets the host name of IMAP server
      *
      * @param string $host
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function setHost($host)
     {
@@ -90,7 +90,7 @@ class ImapEmailOrigin extends EmailOrigin
      * Sets the port of IMAP server
      *
      * @param int $port
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function setPort($port)
     {
@@ -113,7 +113,7 @@ class ImapEmailOrigin extends EmailOrigin
      * Sets the SSL type to be used to connect to IMAP server
      *
      * @param string $ssl Can be empty string, 'ssl' or 'tls'
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function setSsl($ssl)
     {
@@ -136,7 +136,7 @@ class ImapEmailOrigin extends EmailOrigin
      * Sets the user name
      *
      * @param string $user
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function setUser($user)
     {
@@ -159,7 +159,7 @@ class ImapEmailOrigin extends EmailOrigin
      * Sets the password. The password must be encrypted.
      *
      * @param  string $password New encrypted password
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function setPassword($password)
     {
