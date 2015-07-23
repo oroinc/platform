@@ -11,7 +11,7 @@ define([
     /**
      * Mark email as read/unread
      *
-     * @export  oro/datagrid/action/mark-email-mass-action
+     * @export  oroemail/js/datagrid/action/mark-email-mass-action
      * @class   oro.datagrid.action.MarkAction
      * @extends oro.datagrid.action.MassAction
      */

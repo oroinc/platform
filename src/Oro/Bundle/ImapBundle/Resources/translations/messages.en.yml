@@ -5,3 +5,4 @@ oro.imap:
         ssl.label: SSL
         user.label: User
         password.label: Password
+        connect_and_retrieve_folders: Connect and retrieve folders

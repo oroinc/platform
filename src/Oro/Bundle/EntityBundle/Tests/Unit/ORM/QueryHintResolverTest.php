@@ -217,9 +217,22 @@ class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function getQuery()
     {
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->any())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $em->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
 
         return new Query($em);
     }

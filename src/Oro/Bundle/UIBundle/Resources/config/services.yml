@@ -51,7 +51,7 @@ services:
         arguments:
             - @service_container
         tags:
-            - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+            - { name: kernel.event_listener, event: kernel.view, method: onKernelView, priority: 10 }
 
     oro_ui.view.content_provider.listener:
         class: %oro_ui.view.content_provider.listener.class%

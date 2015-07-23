@@ -3,6 +3,10 @@ placeholders:
         items:
             dots_menu_email:
                 order: 100
+    scripts_before:
+        items:
+            email_filter_templates:
+                order: 5
 
 items:
     oro_send_email_button:
@@ -14,3 +18,5 @@ items:
     dots_menu_email:
         action: OroEmailBundle:Email:notificationData
         applicable: @oro_user.placeholder.filter->isUserApplicable()
+    email_filter_templates:
+        template: OroEmailBundle:Js:default_templates.js.twig

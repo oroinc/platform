@@ -37,6 +37,7 @@ parameters:
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
+    oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -94,6 +95,9 @@ parameters:
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
     oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
+
+    # Email DataGrid
+    oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
 
 services:
     oro_email.entity.cache.warmer:
@@ -226,6 +230,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: postRemove }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
@@ -647,3 +652,10 @@ services:
             - @router
             - @oro_email.email.cache.manager
             - @oro_entity_config.config_manager
+
+    oro_email.datagrid.origin_folder.provider:
+        class: %oro_email.datagrid.origin_folder.provider.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @security.context
+            - @translator
