@@ -19,7 +19,6 @@ parameters:
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
     oro_email.form.type.smtp.class:                       Oro\Bundle\EmailBundle\Form\Type\SmtpType
-    oro_email.form.type.mailbox_processor_manual.class:   Oro\Bundle\EmailBundle\Form\Type\ManualMailboxProcessorType
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
@@ -163,7 +162,7 @@ services:
 
     oro_email.form.type.mailbox:
         class: %oro_email.form.type.mailbox.class%
-        arguments: [@oro_email.provider.mailbox_processor_provider]
+        arguments: [@oro_email.mailbox.process_storage]
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 
@@ -171,12 +170,6 @@ services:
         class: %oro_email.form.type.smtp.class%
         tags:
             - { name: form.type, alias: oro_email_smtp }
-
-    oro_email.form.type.mailbox_processor_manual:
-        class: %oro_email.form.type.mailbox_processor_manual.class%
-        arguments: [@oro_email.provider.mailbox_processor_provider]
-        tags:
-            - { name: form.type, alias: oro_email_mailbox_processor_manual }
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%

@@ -93,9 +93,8 @@ parameters:
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
 
     # Mailboxes
-    oro.email.mailbox.mailbox_email_processor.class:     Oro\Bundle\EmailBundle\Mailbox\MailboxEmailProcessor
+    oro_email.mailbox.process_storage.class:            Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage
     oro_email.mailbox_email_owner_provider.class:        Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
-    oro_email.provider.mailbox_processor_provider.class: Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider
     oro_email.mailbox_choice_list.class:                 Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
 
 services:
@@ -639,8 +638,8 @@ services:
             - @security.context
             - @translator
 
-    oro_email.provider.mailbox_processor_provider:
-        class: %oro_email.provider.mailbox_processor_provider.class%
+    oro_email.mailbox.process_storage:
+        class: %oro_email.mailbox.process_storage.class%
 
     oro_email.mailbox_email_owner_provider:
         class: %oro_email.mailbox_email_owner_provider.class%
@@ -651,8 +650,3 @@ services:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
             - @doctrine
-
-    oro.email.mailbox.mailbox_email_processor:
-        class: %oro.email.mailbox.mailbox_email_processor.class%
-        arguments:
-            - @oro_email.provider.mailbox_processor_provider

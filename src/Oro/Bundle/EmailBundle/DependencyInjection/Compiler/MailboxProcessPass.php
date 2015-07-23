@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class MailboxProcessorPass implements CompilerPassInterface
+class MailboxProcessPass implements CompilerPassInterface
 {
 
     /**
@@ -14,23 +14,23 @@ class MailboxProcessorPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('oro_email.provider.mailbox_processor_provider')) {
+        if (!$container->has('oro_email.mailbox.process_storage')) {
             return;
         }
 
         $definition = $container->findDefinition(
-            'oro_email.provider.mailbox_processor_provider'
+            'oro_email.mailbox.process_storage'
         );
 
         $taggedServices = $container->findTaggedServiceIds(
-            'oro_email.mailbox_processor'
+            'oro_email.mailbox_process'
         );
 
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
                 $definition->addMethodCall(
-                    'addProcessorType',
-                    [new Reference($id), $attributes['type']]
+                    'addProcess',
+                    [$attributes['type'], new Reference($id)]
                 );
             }
         }
