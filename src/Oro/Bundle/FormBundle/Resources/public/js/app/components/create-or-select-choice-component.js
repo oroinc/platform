@@ -5,7 +5,7 @@ define([
 ], function (_, BaseComponent) {
     'use strict';
 
-    return BaseComponent.extend({
+    var CreateOrSelectChoiceComponent =  BaseComponent.extend({
 
         MODE_CREATE: 'create',
         MODE_VIEW: 'view',
@@ -24,11 +24,15 @@ define([
         $existingEntity: null,
         $dialog: null,
 
+        updateDialogPositionCb: null,
+
         initialize: function(options) {
             var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
             if (missingProperties.length) {
                 throw new Error('Following properties are required but weren\'t passed: ' + missingProperties.join(', ') + '.');
             }
+
+            this.updateDialogPositionCb = _.bind(this._updateDialogPosition, this);
 
             this.$el = options._sourceElement;
             this.$mode = this.$el.find(options.modeSelector);
@@ -38,13 +42,24 @@ define([
 
             this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
             this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
+            this.$mode.on('change', this.updateDialogPositionCb);
 
             this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
 
             var self = this;
             tinymce.EditorManager.once('AddEditor', function (e) {
-                e.editor.once('init', _.bind(self._updateDialogPosition, self));
+                e.editor.once('init', self.updateDialogPositionCb);
             });
+        },
+
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+
+            tinymce.EditorManager.off('init', this.updateDialogPositionCb);
+
+            CreateOrSelectChoiceComponent.__super__.dispose.apply(this, arguments);
         },
 
         _onEntityChange: function(e) {
@@ -85,4 +100,6 @@ define([
             return this.$mode.val() === this.MODE_CREATE;
         }
     });
+
+    return CreateOrSelectChoiceComponent;
 });
