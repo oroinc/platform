@@ -19,6 +19,9 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 class AutoResponseTemplateType extends AbstractType
 {
     /** @var ConfigManager */
+    protected $cm;
+
+    /** @var ConfigManager */
     protected $userConfig;
 
     /** @var LocaleSettings */
@@ -28,12 +31,18 @@ class AutoResponseTemplateType extends AbstractType
     protected $registry;
 
     /**
+     * @param ConfigManager $cm
      * @param ConfigManager $userConfig
      * @param LocaleSettings $localeSettings
      * @param Registry $registry
      */
-    public function __construct(ConfigManager $userConfig, LocaleSettings $localeSettings, Registry $registry)
-    {
+    public function __construct(
+        ConfigManager $cm,
+        ConfigManager $userConfig,
+        LocaleSettings $localeSettings,
+        Registry $registry
+    ) {
+        $this->cm             = $cm;
         $this->userConfig     = $userConfig;
         $this->localeSettings = $localeSettings;
         $this->registry       = $registry;
@@ -70,6 +79,7 @@ class AutoResponseTemplateType extends AbstractType
                     'constraints' => [
                         new Assert\NotBlank(),
                     ],
+                    'data' => $this->cm->get('oro_email.signature', ''),
                 ],
                 'subject_options' => [
                     'constraints' => [

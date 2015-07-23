@@ -50,6 +50,7 @@ services:
     oro_email.form.type.autoresponse_template:
         class: %oro_email.form.type.autoresponse_template.class%
         arguments:
+            - @oro_config.global
             - @oro_config.user
             - @oro_locale.settings
             - @doctrine
