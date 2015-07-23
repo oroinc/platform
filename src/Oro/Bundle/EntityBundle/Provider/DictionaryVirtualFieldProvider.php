@@ -105,21 +105,12 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 if ($metadata->isSingleValuedAssociation($associationName)
                     && isset($this->dictionaries[$targetClassName])
                 ) {
-                    $fields              = $this->dictionaries[$targetClassName];
-                    $isCombinedLabelName = count($fields) > 1;
-                    foreach ($fields as $fieldName => $fieldType) {
-                        $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
-                        $label            = $isCombinedLabelName
-                            ? $virtualFieldName
-                            : Inflector::tableize($associationName);
-                        $label            = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
-
-                        $this->virtualFields[$className][$virtualFieldName] = [
+                        $this->virtualFields[$className][$associationName] = [
                             'query' => [
                                 'select' => [
-                                    'expr'        => sprintf('target.%s', $fieldName),
-                                    'return_type' => $fieldType,
-                                    'label'       => $label
+                                    'expr'        => sprintf('target.%s', $targetClassName),
+                                    'return_type' => GroupingScope::GROUP_DICTIONARY,
+                                    'filter_by_id' => true
                                 ],
                                 'join'   => [
                                     'left' => [
@@ -131,7 +122,6 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                                 ]
                             ]
                         ];
-                    }
                 }
             }
         }
