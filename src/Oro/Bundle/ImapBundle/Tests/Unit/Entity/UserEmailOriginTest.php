@@ -53,4 +53,20 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $origin->setPassword('test');
         $this->assertEquals('test', $origin->getPassword());
     }
+
+    public function testSmtpHostGetterAndSetter()
+    {
+        $origin = new UserEmailOrigin();
+        $this->assertNull($origin->getSmtpHost());
+        $origin->setSmtpHost('test');
+        $this->assertEquals('test', $origin->getSmtpHost());
+    }
+
+    public function testSmtpPortGetterAndSetter()
+    {
+        $origin = new UserEmailOrigin();
+        $this->assertEquals(0, $origin->getSmtpPort());
+        $origin->setSmtpPort(123);
+        $this->assertEquals(123, $origin->getSmtpPort());
+    }
 }
