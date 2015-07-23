@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
@@ -49,12 +50,13 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
      */
     public function preSetData(FormEvent $event)
     {
-        $entityName = $this->getEntityName($event);
-        if (null === $event->getData() || null === $entityName) {
+        /** @var EmailNotification $eventObject */
+        $eventObject = $event->getData();
+        if (null === $eventObject || null === $eventObject->getEntityName()) {
             return;
         }
 
-        $this->initChoicesByEntityName($entityName, 'template', $event->getForm());
+        $this->initChoicesByEntityName($eventObject->getEntityName(), 'template', $event->getForm());
     }
 
     /**
@@ -64,36 +66,13 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
      */
     public function preSubmit(FormEvent $event)
     {
-        $entityName = $this->getEntityName($event);
-        if (empty($entityName)) {
+        /** @var EmailNotification $eventObject */
+        $data = $event->getData();
+        if (empty($data['entityName'])) {
             return;
         }
 
-        $this->initChoicesByEntityName($entityName, 'template', $event->getForm());
-    }
-
-    /**
-     * @param FormEvent $event
-     *
-     * @return string
-     */
-    protected function getEntityName(FormEvent $event)
-    {
-        $data = $event->getData();
-        if (is_array($data)) {
-            return $data['entityName'];
-        }
-
-        $callbacks = [
-            [$data, 'getEntityName'],
-            [$event->getForm()->get('entityName'), 'getData'],
-        ];
-
-        foreach ($callbacks as $callback) {
-            if (is_callable($callback)) {
-                return call_user_func($callback);
-            }
-        }
+        $this->initChoicesByEntityName($data['entityName'], 'template', $event->getForm());
     }
 
     /**
