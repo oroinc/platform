@@ -65,7 +65,7 @@
                                         {{ form(form) }}
                                         {% set mailboxId = form.vars.value.id %}
                                         {% if mailboxId %}
-                                            <fieldset class="form-horizontal form-horizontal-large">
+                                            <fieldset class="form-horizontal form-horizontal-large auto-response-rules">
                                                 <div class="auto-response-rule-header">
                                                     <h5>{{ 'oro.email.autoresponserule.entity_plural_label'|trans }}</h5>
                                                     {{ UI.clientLink({
