@@ -84,7 +84,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.name',
-                    'return_type' => 'string',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary1',
                     'label'       => 'acme.test.testentity.test_rel.label'
                 ],
                 'join'   => [
@@ -137,7 +138,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.id',
-                    'return_type' => 'integer',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2',
                     'label'       => 'acme.test.testentity.test_rel_id.label'
                 ],
                 'join'   => [
@@ -155,7 +157,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.name',
-                    'return_type' => 'string',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2',
                     'label'       => 'acme.test.testentity.test_rel_name.label'
                 ],
                 'join'   => [
@@ -204,7 +207,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.name',
-                    'return_type' => 'string',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary3',
                     'label'       => 'acme.test.testentity.test_rel.label'
                 ],
                 'join'   => [
@@ -261,7 +265,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.code',
-                    'return_type' => 'string',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4',
                     'label'       => 'acme.test.testentity.test_rel_code.label'
                 ],
                 'join'   => [
@@ -279,7 +284,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             [
                 'select' => [
                     'expr'        => 'target.label',
-                    'return_type' => 'string',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4',
                     'label'       => 'acme.test.testentity.test_rel_label.label'
                 ],
                 'join'   => [
