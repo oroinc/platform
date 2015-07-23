@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -295,7 +296,9 @@ class EntityFieldProvider
                 false,
                 $translate
             );
-            if (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
+            if (isset($query['select']['related_entity_name']) && $query['select']['related_entity_name']) {
+                $result[$fieldName]['related_entity_name'] = $query['select']['related_entity_name'];
+            } elseif (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
                 $result[$fieldName]['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
             }
         }
