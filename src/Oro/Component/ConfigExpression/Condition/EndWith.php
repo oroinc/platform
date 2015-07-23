@@ -2,14 +2,16 @@
 
 namespace Oro\Component\ConfigExpression\Condition;
 
-class Contains extends AbstractComparison
+class EndWith extends AbstractComparison
 {
     /**
      * {@inheritdoc}
      */
     protected function doCompare($left, $right)
     {
-        return stripos($left, $right) !== false;
+        $pattern = sprintf('/%s$/i', preg_quote($right));
+
+        return (bool) preg_match($pattern, $left);
     }
 
     /**
@@ -17,6 +19,6 @@ class Contains extends AbstractComparison
      */
     public function getName()
     {
-        return 'contains';
+        return 'end_with';
     }
 }

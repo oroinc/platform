@@ -19,6 +19,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
@@ -318,6 +319,8 @@ class Processor
                 if ($origin === null) {
                     $origin = $this->createUserInternalOrigin($emailOwner, $organization);
                 }
+            } elseif ($emailOwner instanceof Mailbox) {
+                $origin = $emailOwner->getOrigin();
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')

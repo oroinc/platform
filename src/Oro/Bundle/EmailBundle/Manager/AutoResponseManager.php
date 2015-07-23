@@ -35,6 +35,19 @@ class AutoResponseManager
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var array */
+    protected $filterToConditionMap = [
+        TextFilterType::TYPE_CONTAINS => 'contains',
+        TextFilterType::TYPE_ENDS_WITH => 'end_with',
+        TextFilterType::TYPE_EQUAL => 'eq',
+        TextFilterType::TYPE_IN => 'in',
+        TextFilterType::TYPE_NOT_CONTAINS => 'not_contains',
+        TextFilterType::TYPE_NOT_IN => 'not_in',
+        TextFilterType::TYPE_STARTS_WITH => 'start_with',
+        FilterUtility::TYPE_EMPTY => 'empty',
+        FilterUtility::TYPE_NOT_EMPTY => 'not_empty',
+    ];
+
     /**
      * @param Registry $registry
      * @param EmailModelBuilder $emailBuilder
@@ -53,26 +66,27 @@ class AutoResponseManager
         $this->logger = $logger;
     }
 
-    protected $filterToConditionMap = [
-        TextFilterType::TYPE_CONTAINS => 'contains',
-//        TextFilterType::TYPE_ENDS_WITH => '',
-        TextFilterType::TYPE_EQUAL => 'eq',
-//        TextFilterType::TYPE_IN => '',
-//        TextFilterType::TYPE_NOT_CONTAINS => '',
-//        TextFilterType::TYPE_NOT_IN => '',
-//        TextFilterType::TYPE_STARTS_WITH => '',
-        FilterUtility::TYPE_EMPTY => 'empty',
-        FilterUtility::TYPE_NOT_EMPTY => 'not_empty',
-    ];
-
     /**
      * @param Email $email
      */
     public function sendAutoResponses(Email $email)
     {
-        $emailUsers = $this->getEmailUserRepository()->findByEmail($email);
-        foreach ($emailUsers as $emailUser) {
-             $this->processMailbox($emailUser->getMailboxOwner(), $email);
+        $emailUsersDql = $this->getEmailUserRepository()->createQueryBuilder('ue')
+            ->select('ue.id')
+            ->where('ue.email = :email')
+            ->andWhere('ue.mailboxOwner = m.id')
+            ->setMaxResults(1)
+            ->getDQL();
+
+        $qb = $this->getMailboxRepository()->createQueryBuilder('m');
+        $mailboxes = $qb
+            ->select('m')
+            ->andWhere($qb->expr()->exists($emailUsersDql))
+            ->setParameter('email', $email)
+            ->getQuery()->getResult();
+
+        foreach ($mailboxes as $mailbox) {
+             $this->processMailbox($mailbox, $email);
         }
     }
 
@@ -108,7 +122,9 @@ class AutoResponseManager
     protected function createReplyEmailModels(Email $email, Collection $rules)
     {
         return $rules->map(function (AutoResponseRule $rule) use ($email) {
-            $emailModel = $this->emailBuilder->createReplyEmailModel($email);
+            $emailModel = $this->emailBuilder->createReplyEmailModel($email, true);
+            $emailModel->setFrom($rule->getMailbox()->getEmail());
+            $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
             $emailModel->setContexts([$email]);
             $this->applyTemplate($emailModel, $rule->getTemplate());
 
@@ -137,7 +153,7 @@ class AutoResponseManager
     public function getApplicableRules(Mailbox $mailbox, Email $email)
     {
         return $mailbox->getAutoResponseRules()->filter(function (AutoResponseRule $rule) use ($email) {
-            return $this->isExprApplicable($email, $this->createRuleExpr($rule));
+            return $rule->isActive() && $this->isExprApplicable($email, $this->createRuleExpr($rule));
         });
     }
 
@@ -168,7 +184,7 @@ class AutoResponseManager
                 sprintf('$%s', $condition->getField())
             ];
             if (!in_array($condition->getFilterType(), [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-                $args[] = $condition->getFilterValue();
+                $args[] = $this->parseValue($condition->getFilterValue());
             }
 
             $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
@@ -176,18 +192,14 @@ class AutoResponseManager
                 $configKey => $args,
             ];
 
-            if ($i >= 1) {
-                if ($condition->getOperation() === FilterUtility::CONDITION_OR) {
-                    $index = count($configs) - 1;
-                    $configs[$index] = [
-                        '@or' => [
-                            $configs[$index],
-                            $config,
-                        ],
-                    ];
-                } else {
-                    $configs[] = $config;
-                }
+            if ($i > 0 && $condition->getOperation() === FilterUtility::CONDITION_OR) {
+                $index = count($configs) - 1;
+                $configs[$index] = [
+                    '@or' => [
+                        $configs[$index],
+                        $config,
+                    ],
+                ];
             } else {
                 $configs[] = $config;
             }
@@ -197,6 +209,30 @@ class AutoResponseManager
         return [
             '@and' => $configs,
         ];
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return mixed
+     */
+    protected function parseValue($value)
+    {
+        $arrayTypes = [TextFilterType::TYPE_IN, TextFilterType::TYPE_NOT_IN];
+
+        if (in_array($value, $arrayTypes)) {
+            return array_map('trim', explode(',', $value));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @return EntityRepository
+     */
+    protected function getMailboxRepository()
+    {
+        return $this->registry->getRepository('OroEmailBundle:Mailbox');
     }
 
     /**

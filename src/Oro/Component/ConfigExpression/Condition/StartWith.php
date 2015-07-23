@@ -2,14 +2,14 @@
 
 namespace Oro\Component\ConfigExpression\Condition;
 
-class Contains extends AbstractComparison
+class StartWith extends AbstractComparison
 {
     /**
      * {@inheritdoc}
      */
     protected function doCompare($left, $right)
     {
-        return stripos($left, $right) !== false;
+        return stripos($left, $right) === 0;
     }
 
     /**
@@ -17,6 +17,6 @@ class Contains extends AbstractComparison
      */
     public function getName()
     {
-        return 'contains';
+        return 'start_with';
     }
 }
