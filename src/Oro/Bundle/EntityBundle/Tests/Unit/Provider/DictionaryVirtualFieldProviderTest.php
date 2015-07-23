@@ -73,19 +73,20 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->initialize([$entityClassName => $entityMetadata]);
 
         $this->assertEquals(
-            ['testRel'],
+            ['test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
         $this->assertEquals(
             true,
-            $this->provider->isVirtualField($entityClassName, 'testRel')
+            $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.Acme\TestBundle\Entity\Dictionary1',
+                    'expr'        => 'target.name',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => true
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary1',
+                    'label'       => 'acme.test.testentity.test_rel.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -96,7 +97,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
         );
     }
 
@@ -122,19 +123,24 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->initialize([$entityClassName => $entityMetadata]);
 
         $this->assertEquals(
-            ['testRel'],
+            ['test_rel_id', 'test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
         $this->assertEquals(
             true,
-            $this->provider->isVirtualField($entityClassName, 'testRel')
+            $this->provider->isVirtualField($entityClassName, 'test_rel_id')
+        );
+        $this->assertEquals(
+            true,
+            $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr' => 'target.Acme\TestBundle\Entity\Dictionary2',
+                    'expr'        => 'target.id',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => 1
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2',
+                    'label'       => 'acme.test.testentity.test_rel_id.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -145,14 +151,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr' => 'target.Acme\TestBundle\Entity\Dictionary2',
+                    'expr'        => 'target.name',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => 1
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2',
+                    'label'       => 'acme.test.testentity.test_rel_name.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -163,7 +170,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
         );
     }
 
@@ -189,19 +196,20 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->initialize([$entityClassName => $entityMetadata]);
 
         $this->assertEquals(
-            ['testRel'],
+            ['test_rel_name'],
             $this->provider->getVirtualFields($entityClassName)
         );
         $this->assertEquals(
             true,
-            $this->provider->isVirtualField($entityClassName, 'testRel')
+            $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr' => 'target.Acme\TestBundle\Entity\Dictionary3',
+                    'expr'        => 'target.name',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => 1
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary3',
+                    'label'       => 'acme.test.testentity.test_rel.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -212,7 +220,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_name')
         );
     }
 
@@ -238,7 +246,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->initialize([$entityClassName => $entityMetadata]);
 
         $this->assertEquals(
-            ['testRel'],
+            ['test_rel_code', 'test_rel_label'],
             $this->provider->getVirtualFields($entityClassName)
         );
         $this->assertEquals(
@@ -247,18 +255,19 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             true,
-            $this->provider->isVirtualField($entityClassName, 'testRel')
+            $this->provider->isVirtualField($entityClassName, 'test_rel_code')
         );
         $this->assertEquals(
             true,
-            $this->provider->isVirtualField($entityClassName, 'testRel')
+            $this->provider->isVirtualField($entityClassName, 'test_rel_label')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr' => 'target.Acme\TestBundle\Entity\Dictionary4',
+                    'expr'        => 'target.code',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => 1
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4',
+                    'label'       => 'acme.test.testentity.test_rel_code.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -269,14 +278,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_code')
         );
         $this->assertEquals(
             [
                 'select' => [
-                    'expr' => 'target.Acme\TestBundle\Entity\Dictionary4',
+                    'expr'        => 'target.label',
                     'return_type' => 'dictionary',
-                    'filter_by_id' => 1
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4',
+                    'label'       => 'acme.test.testentity.test_rel_label.label'
                 ],
                 'join'   => [
                     'left' => [
@@ -287,7 +297,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             ],
-            $this->provider->getVirtualFieldQuery($entityClassName, 'testRel')
+            $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_label')
         );
     }
 

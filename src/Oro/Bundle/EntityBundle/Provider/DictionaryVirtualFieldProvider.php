@@ -105,23 +105,34 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 if ($metadata->isSingleValuedAssociation($associationName)
                     && isset($this->dictionaries[$targetClassName])
                 ) {
-                    $this->virtualFields[$className][$associationName] = [
-                        'query' => [
-                            'select' => [
-                                'expr'        => sprintf('target.%s', $targetClassName),
-                                'return_type' => GroupingScope::GROUP_DICTIONARY,
-                                'filter_by_id' => true
-                            ],
-                            'join'   => [
-                                'left' => [
-                                    [
-                                        'join'  => sprintf('entity.%s', $associationName),
-                                        'alias' => 'target'
+                    $fields = $this->dictionaries[$targetClassName];
+                    $isCombinedLabelName = count($fields) > 1;
+                    foreach ($fields as $fieldName => $fieldType) {
+                        $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
+                        $fieldName = Inflector::tableize($fieldName);
+                        $label = $isCombinedLabelName
+                            ? $virtualFieldName
+                            : Inflector::tableize($associationName);
+                        $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
+                        $this->virtualFields[$className][$virtualFieldName] = [
+                            'query' => [
+                                'select' => [
+                                    'expr' => sprintf('target.%s', $fieldName),
+                                    'return_type' => GroupingScope::GROUP_DICTIONARY,
+                                    'related_entity_name' => $targetClassName,
+                                    'label' => $label
+                                ],
+                                'join' => [
+                                    'left' => [
+                                        [
+                                            'join' => sprintf('entity.%s', $associationName),
+                                            'alias' => 'target'
+                                        ]
                                     ]
                                 ]
                             ]
-                        ]
-                    ];
+                        ];
+                    }
                 }
             }
         }
