@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -28,11 +27,8 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
     /** @var array */
     protected $displayFields;
 
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
-
     /** @var ServiceLink */
-    protected $securityContextLink;
+    protected $serviceLink;
 
     /** @var PropertyAccessor */
     protected $accessor;
@@ -42,23 +38,20 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
      * @param string $className
      * @param array $fields
      * @param array $displayFields
-     * @param ManagerRegistry $managerRegistry
-     * @param ServiceLink $securityContextLink
+     * @param ServiceLink $serviceLink
      */
     public function __construct(
         EntityManager $entityManager,
         $className,
         $fields,
         $displayFields,
-        ManagerRegistry $managerRegistry,
-        ServiceLink $securityContextLink
+        ServiceLink $serviceLink
     ) {
         $this->entityManager = $entityManager;
         $this->className = $className;
         $this->fields = $fields;
         $this->displayFields = $displayFields;
-        $this->managerRegistry = $managerRegistry;
-        $this->securityContextLink = $securityContextLink;
+        $this->serviceLink = $serviceLink;
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -98,8 +91,8 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
                     ->setMaxResults($perPage);
                 $results = $queryBuilder->getQuery()->getResult();
                 $hasMore = count($results) === $perPage;
-                foreach ($results as $user) {
-                    $resultsData[] = $this->convertItem($user);
+                foreach ($results as $bu) {
+                    $resultsData[] = $this->convertItem($bu);
                 }
             }
         }
@@ -144,6 +137,6 @@ class BusinessUnitSearchHandler implements SearchHandlerInterface
      */
     protected function getSecurityContext()
     {
-        return $this->securityContextLink->getService();
+        return $this->serviceLink->getService();
     }
 }

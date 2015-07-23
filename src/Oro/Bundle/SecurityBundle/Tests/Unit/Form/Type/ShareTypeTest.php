@@ -38,7 +38,6 @@ class ShareTypeTest extends \PHPUnit_Framework_TestCase
             'oro_user_organization_acl_multiselect',
             [
                 'label'    => 'oro.user.entity_plural_label',
-                'required' => false,
             ]
         )->willReturn($builder);
         $this->type->buildForm($builder, []);
