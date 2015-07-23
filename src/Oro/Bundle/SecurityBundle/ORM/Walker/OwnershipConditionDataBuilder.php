@@ -482,7 +482,7 @@ class OwnershipConditionDataBuilder
             return null;
         }
 
-        $literal = new Literal(3, 1);
+        $literal = new Literal(Literal::NUMERIC, 1);
         $simpleSelectEx = new SimpleSelectExpression($literal);
         $simpleSelect = new SimpleSelectClause($simpleSelectEx, false);
 
