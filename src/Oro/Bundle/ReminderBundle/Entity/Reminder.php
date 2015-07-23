@@ -437,6 +437,7 @@ class Reminder extends ExtendReminder
      * Sets reminder data
      *
      * @param ReminderDataInterface $data
+     * @return Reminder
      */
     public function setReminderData(ReminderDataInterface $data)
     {
@@ -447,6 +448,8 @@ class Reminder extends ExtendReminder
         if ($data instanceof SenderAwareReminderDataInterface) {
             $this->setSender($data->getSender());
         }
+        
+        return $this;
     }
 
     /**
