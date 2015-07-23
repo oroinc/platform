@@ -23,7 +23,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
+    protected $securityFasade;
 
     protected function setUp()
     {
@@ -43,7 +43,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+        $this->securityFasade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,7 +51,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->emailThreadManager,
             $this->emailThreadProvider,
-            $this->securityContext
+            $this->securityFasade
         );
     }
 
