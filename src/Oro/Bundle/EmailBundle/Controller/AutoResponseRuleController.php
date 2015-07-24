@@ -29,10 +29,12 @@ class AutoResponseRuleController extends Controller
      * )
      * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
      */
-    public function createAction(Mailbox $mailbox)
+    public function createAction(Mailbox $mailbox = null)
     {
         $rule = new AutoResponseRule();
-        $rule->setMailbox($mailbox);
+        if ($mailbox) {
+            $rule->setMailbox($mailbox);
+        }
 
         return $this->update($rule);
     }

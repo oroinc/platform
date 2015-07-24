@@ -4,6 +4,7 @@ parameters:
     oro_email.form.type.autoresponserule_condition.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType
     oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
     oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
+    oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
     oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
@@ -63,6 +64,13 @@ services:
             - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_email_autoresponse_template_choice }
+
+    oro_email.form.extension.mailbox_unbound_rules:
+        class: %oro_email.form.extension.mailbox_unbound_rules.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: form.type_extension, alias: oro_email_mailbox }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form

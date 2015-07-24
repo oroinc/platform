@@ -300,6 +300,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function setAutoResponseRules(Collection $autoResponseRules)
     {
+        foreach ($autoResponseRules as $rule) {
+            $rule->setMailbox($this);
+        }
+
         $this->autoResponseRules = $autoResponseRules;
     }
 

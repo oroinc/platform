@@ -11,10 +11,12 @@ datagrid:
                 from:
                     - { table: OroEmailBundle:AutoResponseRule, alias: r }
                 where:
-                    and:
+                    or:
                         - r.mailbox = :mailbox
+                        - r.id IN (:ids)
             bind_parameters:
                 - mailbox
+                - ids
         columns:
             name:
                 label: oro.email.autoresponserule.name.label
@@ -75,6 +77,8 @@ datagrid:
         options:
             toolbarOptions:
                 hide: true
+            requireJSModules:
+                - oroemail/js/datagrid/auto-response-rules-extension
 
     base-email-grid:
         source:

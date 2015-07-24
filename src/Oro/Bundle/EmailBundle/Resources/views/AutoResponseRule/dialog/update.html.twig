@@ -4,6 +4,7 @@
             require(['oroui/js/widget-manager', 'oroui/js/mediator'],
             function(widgetManager, mediator) {
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    mediator.trigger('auto_response_rule:save', {{ form.vars.value.id }});
                     mediator.trigger('widget_success:' + widget.getWid());
                     mediator.trigger('widget_success:' + widget.getAlias());
                     widget.remove();

@@ -59,7 +59,6 @@ class AutoResponseRule
      * 
      * @ORM\ManyToOne(targetEntity="Mailbox", inversedBy="autoResponseRules")
      * @ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")
-     * @Assert\NotBlank
      */
     protected $mailbox;
 
