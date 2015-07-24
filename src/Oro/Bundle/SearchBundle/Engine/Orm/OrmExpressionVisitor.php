@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class OrmExpressionVisitor extends ExpressionVisitor
@@ -19,11 +20,13 @@ class OrmExpressionVisitor extends ExpressionVisitor
     /** @var QueryBuilder */
     protected $qb;
 
+    /** @var bool */
     protected $setOrderBy;
 
     /**
      * @param BaseDriver   $driver
      * @param QueryBuilder $qb
+     * @param bool         $setOrderBy
      */
     public function __construct(BaseDriver $driver, QueryBuilder $qb, $setOrderBy = false)
     {
@@ -33,16 +36,12 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * Converts a comparison expression into the target query language output.
-     *
-     * @param Comparison $comparison
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function walkComparison(Comparison $comparison)
     {
         $value = $comparison->getValue()->getValue();
-        list($type, $field) = $this->getFieldInfo($comparison->getField());
+        list($type, $field) = Criteria::explodeFieldTypeName($comparison->getField());
 
         $index = uniqid();
 
@@ -52,12 +51,12 @@ class OrmExpressionVisitor extends ExpressionVisitor
 
         $searchCondition = [
             'fieldName'  => $field,
-            'condition'  => $this->getSearchOperatorByComparisonOperator($comparison->getOperator()),
+            'condition'  => Criteria::getSearchOperatorByComparisonOperator($comparison->getOperator()),
             'fieldValue' => $value,
             'fieldType'  => $type
         ];
 
-        if ($type == Query::TYPE_TEXT) {
+        if ($type === Query::TYPE_TEXT) {
             if ($searchCondition['fieldValue'] === '') {
                 $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
 
@@ -71,24 +70,15 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * Converts a value expression into the target query language part.
-     *
-     * @param Value $value
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function walkValue(Value $value)
     {
-        $a = 1;
-        // TODO: Implement walkValue() method.
+        $value->getValue();
     }
 
     /**
-     * Converts a composite expression into the target query language output.
-     *
-     * @param CompositeExpression $expr
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function walkCompositeExpression(CompositeExpression $expr)
     {
@@ -106,33 +96,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
                 return '(' . implode(' OR ', $expressionList) . ')';
 
             default:
-                throw new \RuntimeException("Unknown composite " . $expr->getType());
+                throw new \RuntimeException('Unknown composite ' . $expr->getType());
         }
-    }
-
-    protected function getFieldInfo($field)
-    {
-        $fieldType = Query::TYPE_TEXT;
-        if (strpos($field, '.') !== false) {
-            list($fieldType, $field) = explode('.', $field);
-        }
-
-        return [$fieldType, $field];
-    }
-
-    protected function getSearchOperatorByComparisonOperator($operator)
-    {
-        switch ($operator) {
-            case Comparison::CONTAINS:
-                return Query::OPERATOR_CONTAINS;
-            case SearchComparison::NOT_CONTAINS:
-                return Query::OPERATOR_NOT_CONTAINS;
-            case Comparison::NEQ:
-                return Query::OPERATOR_NOT_EQUALS;
-            case Comparison::NIN:
-                return Query::OPERATOR_NOT_IN;
-        }
-
-        return strtolower($operator);
     }
 }
