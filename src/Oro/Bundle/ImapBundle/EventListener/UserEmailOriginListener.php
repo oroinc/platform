@@ -92,8 +92,8 @@ class UserEmailOriginListener
     protected function createManager(UserEmailOrigin $origin)
     {
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
             $origin->getSsl(),
             $origin->getUser(),
             $this->mcrypt->decryptData($origin->getPassword())

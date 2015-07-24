@@ -1,11 +1,11 @@
 Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
     properties:
-        host:
+        imapHost:
             - NotBlank:     { groups: [Check] }
             - Length:
                 min:        3
                 max:        255
-        port:
+        imapPort:
             - NotBlank:     { groups: [Check] }
             - Type:
                 type: integer

@@ -7,7 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -56,10 +58,19 @@ class ConfigurationType extends AbstractType
 
         $builder
             ->add(
-                'host',
+                'useImap',
+                'checkbox',
+                [
+                    'label'    => 'oro.imap.configuration.use_imap.label',
+                    'required' => false,
+                    'mapped'   => false
+                ]
+            )
+            ->add(
+                'imapHost',
                 'text',
                 [
-                    'label' => 'oro.imap.configuration.host.label',
+                    'label' => 'oro.imap.configuration.imap_host.label',
                     'required' => true,
                     'attr' => [
                         'class' => 'critical-field',
@@ -68,9 +79,35 @@ class ConfigurationType extends AbstractType
                 ]
             )
             ->add(
-                'port',
+                'imapPort',
                 'number',
-                ['label' => 'oro.imap.configuration.port.label', 'required' => true]
+                ['label' => 'oro.imap.configuration.imap_port.label', 'required' => true]
+            )
+            ->add(
+                'useSmtp',
+                'checkbox',
+                [
+                    'label'    => 'oro.imap.configuration.use_smtp.label',
+                    'required' => false,
+                    'mapped'   => false
+                ]
+            )
+            ->add(
+                'smtpHost',
+                'text',
+                [
+                    'label' => 'oro.imap.configuration.smtp_host.label',
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'critical-field',
+                    ],
+                    'tooltip' => 'oro.imap.configuration.tooltip',
+                ]
+            )
+            ->add(
+                'smtpPort',
+                'number',
+                ['label' => 'oro.imap.configuration.smtp_port.label', 'required' => true]
             )
             ->add(
                 'ssl',
@@ -110,6 +147,25 @@ class ConfigurationType extends AbstractType
                 ],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var UserEmailOrigin $data */
+        $data = $view->vars['value'];
+        if ($data->getImapHost()) {
+            $form->get('useImap')->setData(true);
+        } else {
+            $form->get('useImap')->setData(false);
+        }
+        if ($data->getSmtpHost()) {
+            $form->get('useSmtp')->setData(true);
+        } else {
+            $form->get('useSmtp')->setData(false);
+        }
     }
 
     /**
@@ -216,7 +272,7 @@ class ConfigurationType extends AbstractType
                     $event->setData($data);
 
                     if ($entity instanceof UserEmailOrigin
-                        && ($entity->getHost() !== $data['host'] || $entity->getUser() !== $data['user'])
+                        && ($entity->getImapHost() !== $data['imapHost'] || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new UserEmailOrigin();

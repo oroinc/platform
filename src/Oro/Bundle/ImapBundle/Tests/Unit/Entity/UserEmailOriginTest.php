@@ -14,20 +14,20 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(123, $origin->getId());
     }
 
-    public function testHostGetterAndSetter()
+    public function testImapHostGetterAndSetter()
     {
         $origin = new UserEmailOrigin();
-        $this->assertNull($origin->getHost());
-        $origin->setHost('test');
-        $this->assertEquals('test', $origin->getHost());
+        $this->assertNull($origin->getImapHost());
+        $origin->setImapHost('test');
+        $this->assertEquals('test', $origin->getImapHost());
     }
 
-    public function testPortGetterAndSetter()
+    public function testImapPortGetterAndSetter()
     {
         $origin = new UserEmailOrigin();
-        $this->assertEquals(0, $origin->getPort());
-        $origin->setPort(123);
-        $this->assertEquals(123, $origin->getPort());
+        $this->assertEquals(0, $origin->getImapPort());
+        $origin->setImapPort(123);
+        $this->assertEquals(123, $origin->getImapPort());
     }
 
     public function testSslGetterAndSetter()

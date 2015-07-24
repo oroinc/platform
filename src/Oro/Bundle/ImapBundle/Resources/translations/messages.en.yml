@@ -1,7 +1,11 @@
 oro.imap:
     configuration:
-        host.label: Host
-        port.label: Port
+        imap_host.label: IMAP Host
+        imap_port.label: IMAP Port
+        smtp_host.label: SMTP Host
+        smtp_port.label: SMTP Port
+        use_imap.label: Enable IMAP
+        use_smtp.label: Enable SMTP
         ssl.label: SSL
         user.label: User
         password.label: Password
