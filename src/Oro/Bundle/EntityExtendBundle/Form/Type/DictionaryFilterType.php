@@ -14,9 +14,9 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractMultiChoiceType;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
-class EnumFilterType extends AbstractMultiChoiceType
+class DictionaryFilterType extends AbstractMultiChoiceType
 {
-    const NAME = 'oro_enum_filter';
+    const NAME = 'oro_dictionary_filter';
 
     /**
      * @var EnumValueProvider
@@ -44,10 +44,10 @@ class EnumFilterType extends AbstractMultiChoiceType
 
         $resolver->setDefaults(
             [
-                // either enum_code or class must be specified
-                'enum_code'     => null,
-                'class'         => null,
-                'field_options' => $defaultFieldOptions
+                // either dictionary_code or class must be specified
+                'dictionary_code' => null,
+                'class'           => null,
+                'field_options'   => $defaultFieldOptions
             ]
         );
         $resolver->setNormalizers(
@@ -57,11 +57,13 @@ class EnumFilterType extends AbstractMultiChoiceType
                         return $value;
                     }
 
-                    if (empty($options['enum_code'])) {
-                        throw new InvalidOptionsException('Either "class" or "enum_code" must option must be set.');
+                    if (empty($options['dictionary_code'])) {
+                        throw new InvalidOptionsException(
+                            'Either "class" or "dictionary_code" must option must be set.'
+                        );
                     }
 
-                    $class = ExtendHelper::buildEnumValueClassName($options['enum_code']);
+                    $class = ExtendHelper::buildEnumValueClassName($options['dictionary_code']);
                     if (!is_a($class, 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue', true)) {
                         throw new InvalidOptionsException(
                             sprintf(
@@ -118,7 +120,7 @@ class EnumFilterType extends AbstractMultiChoiceType
     {
         $choices = [];
         if (!empty($nullValue)) {
-            $choices[$nullValue] = $this->translator->trans('oro.entity_extend.datagrid.enum.filter.empty');
+            $choices[$nullValue] = $this->translator->trans('oro.entity_extend.datagrid.dictionary.filter.empty');
         }
 
         if (!empty($enumValueClassName)) {

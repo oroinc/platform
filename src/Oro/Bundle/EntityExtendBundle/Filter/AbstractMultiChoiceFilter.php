@@ -8,7 +8,7 @@ use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
-class AbstractMultiChoiceFilter extends ChoiceFilter
+abstract class AbstractMultiChoiceFilter extends ChoiceFilter
 {
     /** @var ManyRelationBuilder */
     protected $manyRelationBuilder;

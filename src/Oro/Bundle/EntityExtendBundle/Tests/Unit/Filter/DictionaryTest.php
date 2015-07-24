@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\EntityExtendBundle\Filter\DictionaryFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -112,17 +112,17 @@ class DictionaryTest extends OrmTestCase
         );
     }
 
-    public function testInitWithEnumCode()
+    public function testInitWithDictionaryCode()
     {
         $params = [
-            'enum_code' => 'test_enum'
+            'dictionary_code' => 'test_dictionary'
         ];
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'choice',
                 'options'                        => [
-                    'enum_code' => 'test_enum'
+                    'dictionary_code' => 'test_dictionary'
                 ]
             ],
             'params',
@@ -136,7 +136,7 @@ class DictionaryTest extends OrmTestCase
 
         $this->formFactory->expects($this->once())
             ->method('create')
-            ->with(EnumFilterType::NAME)
+            ->with(DictionaryFilterType::NAME)
             ->will($this->returnValue($form));
 
         $this->assertSame(
