@@ -43,7 +43,7 @@
         "kriswallsmith/assetic": "1.1.2",
         "knplabs/knp-menu": "2.0.0-alpha2",
         "knplabs/knp-menu-bundle": "2.0.0-alpha2",
-        "friendsofsymfony/rest-bundle": "1.5.0-RC2",
+        "friendsofsymfony/rest-bundle": "1.7.1",
         "friendsofsymfony/jsrouting-bundle": "1.5.4",
         "nelmio/api-doc-bundle": "2.7.0",
         "ass/xmlsecurity": "1.0.0",
