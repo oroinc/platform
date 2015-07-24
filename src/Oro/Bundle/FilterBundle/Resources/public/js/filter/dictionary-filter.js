@@ -47,6 +47,7 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
+            console.log(5);
             console.log(this);
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
