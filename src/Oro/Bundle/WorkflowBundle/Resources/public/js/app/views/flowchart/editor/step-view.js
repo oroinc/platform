@@ -55,6 +55,11 @@ define(function(require) {
 
         triggerAddStep: function() {
             this.areaView.model.trigger('requestAddTransition', this.model);
+        },
+
+        render: function () {
+            FlowchartEditorStepView.__super__.render.call(this);
+            this.$el.toggleClass('final-step', !!this.model.get('is_final'));
         }
     });
 

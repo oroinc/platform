@@ -1,7 +1,8 @@
 define([
     'chaplin',
     'oroui/js/mediator',
-    './ready-state-tracker'
+    './ready-state-tracker',
+    'oroui/js/extend/polyfill'
 ], function(Chaplin, mediator, readyStateTracker) {
     'use strict';
 
