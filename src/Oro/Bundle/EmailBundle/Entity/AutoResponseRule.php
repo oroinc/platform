@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use DateTime;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="oro_email_auto_response_rule")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository")
  */
 class AutoResponseRule
 {
@@ -62,9 +64,17 @@ class AutoResponseRule
      */
     protected $mailbox;
 
+    /**
+     * @var Datetime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $createdAt;
+
     public function __construct()
     {
         $this->conditions = new ArrayCollection();
+        $this->createdAt = new DateTime();
     }
 
     /**
@@ -176,5 +186,13 @@ class AutoResponseRule
         $this->mailbox = $mailbox;
 
         return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
     }
 }

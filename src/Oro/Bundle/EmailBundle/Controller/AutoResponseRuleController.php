@@ -8,8 +8,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
+use Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -68,12 +70,41 @@ class AutoResponseRuleController extends Controller
             $em = $this->getAutoResponseRuleManager();
             $em->persist($rule);
             $em->flush();
+
+            $this->clearAutoResponses();
         }
 
         return [
             'form'  => $form->createView(),
             'saved' => $form->isValid(),
         ];
+    }
+
+    /**
+     * Cleans old unassigned auto response rules
+     */
+    private function clearAutoResponses()
+    {
+        $this->getEventDispatcher()->addListener(
+            'kernel.terminate',
+            [$this->getAutoResponseRuleRepository(), 'clearAutoResponses']
+        );
+    }
+
+    /**
+     * @return EventDispatcherInterface
+     */
+    protected function getEventDispatcher()
+    {
+        return $this->get('event_dispatcher');
+    }
+
+    /**
+     * @return AutoResponseRuleRepository
+     */
+    protected function getAutoResponseRuleRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroEmailBundle:AutoResponseRule');
     }
 
     /**

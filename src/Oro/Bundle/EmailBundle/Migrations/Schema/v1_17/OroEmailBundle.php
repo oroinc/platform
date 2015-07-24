@@ -30,6 +30,7 @@ class OroEmailBundle implements Migration
         $table->addColumn('mailbox_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('active', 'boolean', []);
+        $table->addColumn('createdAt', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['template_id'], 'IDX_58CB592A5DA0FB8', []);
         $table->addIndex(['mailbox_id'], 'IDX_58CB592A66EC35CC', []);
