@@ -41,8 +41,11 @@ class BaseUserManager implements UserProviderInterface
      * @param ManagerRegistry $registry
      * @param EncoderFactoryInterface $encoderFactory
      */
-    public function __construct($class, ManagerRegistry $registry, EncoderFactoryInterface $encoderFactory)
-    {
+    public function __construct(
+        $class,
+        ManagerRegistry $registry,
+        EncoderFactoryInterface $encoderFactory
+    ) {
         $this->class = $class;
         $this->registry = $registry;
         $this->encoderFactory = $encoderFactory;
@@ -70,6 +73,7 @@ class BaseUserManager implements UserProviderInterface
     {
         $this->assertRoles($user);
         $this->updatePassword($user);
+
         $this->getStorageManager()->persist($user);
 
         if ($flush) {

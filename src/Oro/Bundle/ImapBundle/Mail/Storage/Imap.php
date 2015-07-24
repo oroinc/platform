@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Zend\Mail\Storage\Exception as BaseException;
+
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 
 /**
  * Class Imap
@@ -79,12 +82,8 @@ class Imap extends \Zend\Mail\Storage\Imap
             $this->protocol = $params;
             try {
                 $this->selectFolder('INBOX');
-            } catch (\Zend\Mail\Storage\Exception\ExceptionInterface $e) {
-                throw new \Zend\Mail\Storage\Exception\RuntimeException(
-                    'cannot select INBOX, is this a valid transport?',
-                    0,
-                    $e
-                );
+            } catch (BaseException\ExceptionInterface $e) {
+                throw new BaseException\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
             }
             $this->postInit();
 
@@ -92,7 +91,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         if (!isset($params->user)) {
-            throw new Exception\InvalidArgumentException('need at least user in params');
+            throw new BaseException\InvalidArgumentException('need at least user in params');
         }
 
         $host     = isset($params->host)     ? $params->host     : 'localhost';
@@ -103,7 +102,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
         if (!$this->protocol->login($params->user, $password)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('cannot login, user or password wrong');
+            throw new BaseException\RuntimeException('cannot login, user or password wrong');
         }
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 
@@ -158,7 +157,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $folders = $this->protocol->listMailbox((string)$rootFolder);
         if (!$folders) {
-            throw new \Zend\Mail\Storage\Exception\InvalidArgumentException('folder not found');
+            throw new BaseException\InvalidArgumentException('folder not found');
         }
 
         $decodedFolders = array();
@@ -203,7 +202,7 @@ class Imap extends \Zend\Mail\Storage\Imap
                 }
             } while ($stack);
             if (!$stack) {
-                throw new \Zend\Mail\Storage\Exception\RuntimeException('error while constructing folder tree');
+                throw new BaseException\RuntimeException('error while constructing folder tree');
             }
         }
 
@@ -267,12 +266,12 @@ class Imap extends \Zend\Mail\Storage\Imap
     public function search(array $criteria)
     {
         if (empty($criteria)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
+            throw new BaseException\RuntimeException('The search criteria must not be empty.');
         }
 
         $response = $this->protocol->search($criteria);
         if (!is_array($response)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot search messages.');
+            throw new BaseException\RuntimeException('Cannot search messages.');
         }
 
         return $response;
@@ -287,8 +286,11 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     public function uidSearch(array $criteria)
     {
+        if (!$this->supportUidSearch()) {
+            throw new UnsupportException('The server do not support UID SEARCH.');
+        }
         if (empty($criteria)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
+            throw new BaseException\RuntimeException('The search criteria must not be empty.');
         }
 
         $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
@@ -301,7 +303,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         if (!is_array($response)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot search messages.');
+            throw new BaseException\RuntimeException('Cannot search messages.');
         }
 
         return $response;
@@ -323,7 +325,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         );
         if (!$selectResponse) {
             $this->currentFolder = '';
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('cannot change folder, maybe it does not exist');
+            throw new BaseException\RuntimeException('cannot change folder, maybe it does not exist');
         }
 
         $this->uidValidity = $selectResponse['uidvalidity'];
@@ -378,7 +380,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         if ($part !== null) {
             // TODO: implement
-            throw new Exception\RuntimeException('not implemented');
+            throw new BaseException\RuntimeException('not implemented');
         }
 
         return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
@@ -404,5 +406,13 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $headers->addHeaderLine(self::UID, $data[self::UID]);
         $headers->addHeaderLine('InternalDate', $data[self::INTERNALDATE]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function supportUidSearch()
+    {
+        return false;
     }
 }

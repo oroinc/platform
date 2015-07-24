@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
@@ -1192,7 +1191,10 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'val' => $domainObject,
-                'expected' => new ObjectIdentity(Stub\DomainObjectStub::IDENTIFIER, ClassUtils::getClass($domainObject))
+                'expected' => new ObjectIdentity(
+                    Stub\DomainObjectStub::IDENTIFIER,
+                    ClassUtils::getRealClass($domainObject)
+                ),
             ]
         ];
     }
