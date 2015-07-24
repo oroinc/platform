@@ -10,7 +10,7 @@ use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
-class MultiEnumFilter extends AbstractMultiChoiceFilter
+class DictionaryFilter extends AbstractMultiChoiceFilter
 {
     /**
      * Constructor
