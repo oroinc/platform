@@ -61,18 +61,6 @@ class OrganizationManager
 
     /**
      * @param User   $user
-     * @param string $name Organization name
-     * @param bool   $useLikeExpr Using expr()->like by default and expr()->eq otherwise
-     *
-     * @return Organization[]
-     */
-    public function getEnabledUserOrganizationsByName(User $user, $name, $useLikeExpr = true)
-    {
-        return $this->getOrganizationRepo()->getEnabledByUserAndName($user, $name, $useLikeExpr);
-    }
-
-    /**
-     * @param User   $user
      * @param string $name
      *
      * @return null|Organization

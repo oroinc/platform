@@ -607,6 +607,7 @@ services:
             - @request
             - @security.acl.provider
             - @doctrine.orm.entity_manager
+            - @oro_entity_config.provider.security
 
     oro_security.form.model.factory:
         class: %oro_security.form.model.factory.class%

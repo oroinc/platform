@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Form\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 class Share
 {
     /** @var string */
@@ -13,10 +11,10 @@ class Share
     protected $entityId;
 
     /** @var array */
-    protected $businessunits;
+    protected $businessunits = [];
 
     /** @var array */
-    protected $users;
+    protected $users = [];
 
     /**
      * Get class name of the target entity
@@ -67,7 +65,7 @@ class Share
     }
 
     /**
-     * Returns collection of businessUnits
+     * Returns array of businessUnits
      *
      * @return array
      */
@@ -77,7 +75,7 @@ class Share
     }
 
     /**
-     * Sets collection of businessUnits
+     * Sets array of businessUnits
      *
      * @param array $businessunits
      *
@@ -91,7 +89,7 @@ class Share
     }
 
     /**
-     * Returns collection of users
+     * Returns array of users
      *
      * @return array
      */
@@ -101,7 +99,7 @@ class Share
     }
 
     /**
-     * Sets collection of users
+     * Sets array of users
      *
      * @param array $users
      *
