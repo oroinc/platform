@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Collections\Criteria;
+//use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class Query
 {
@@ -88,6 +89,7 @@ class Query
 
         $this->options  = [];
         $this->criteria = Criteria::create();
+        //$this->сriteria = new Criteria();
 
         $this->criteria->setMaxResults(0);
     }

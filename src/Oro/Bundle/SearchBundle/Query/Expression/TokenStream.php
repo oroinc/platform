@@ -52,7 +52,7 @@ class TokenStream
 
     /**
      * Tests a token with value.
-     * If passed - returns token.
+     * If passed - returns token and sets the pointer to the text token.
      * If NOT passed throws Exception (in strict mode) or return FALSE otherwise
      *
      * @param string            $type
@@ -94,6 +94,7 @@ class TokenStream
                 return false;
             }
         }
+
         $this->next();
 
         return $token;

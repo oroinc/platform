@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison as SearchComparison;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class OrmExpressionVisitor extends ExpressionVisitor
@@ -26,9 +27,9 @@ class OrmExpressionVisitor extends ExpressionVisitor
      */
     public function __construct(BaseDriver $driver, QueryBuilder $qb, $setOrderBy = false)
     {
-        $this->driver = $driver;
-        $this->qb     = $qb;
-        $this->setOrderBy;
+        $this->driver     = $driver;
+        $this->qb         = $qb;
+        $this->setOrderBy = $setOrderBy;
     }
 
     /**
@@ -59,6 +60,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
         if ($type == Query::TYPE_TEXT) {
             if ($searchCondition['fieldValue'] === '') {
                 $this->qb->setParameter('field' . $index, $searchCondition['fieldName']);
+
                 return $joinAlias . '.field = :field' . $index;
             } else {
                 return $this->driver->addTextField($this->qb, $index, $searchCondition, $this->setOrderBy);
@@ -123,6 +125,8 @@ class OrmExpressionVisitor extends ExpressionVisitor
         switch ($operator) {
             case Comparison::CONTAINS:
                 return Query::OPERATOR_CONTAINS;
+            case SearchComparison::NOT_CONTAINS:
+                return Query::OPERATOR_NOT_CONTAINS;
             case Comparison::NEQ:
                 return Query::OPERATOR_NOT_EQUALS;
             case Comparison::NIN:
