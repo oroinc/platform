@@ -93,8 +93,8 @@ class OwnershipConditionDataBuilder
     /** @var SecurityIdentityRetrievalStrategyInterface */
     protected $sidStrategy;
 
-    /** @var array|int|null */
-    protected $sidIds = null;
+    /** @var array|null */
+    protected $sids = null;
 
     /**
      * @param ServiceLink                    $securityContextLink
@@ -460,13 +460,14 @@ class OwnershipConditionDataBuilder
     {
         $aclClass = $this->getObjectManager()->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $entityName]);
-        $aclSIds = $this->getSecurityIdentityIds();
 
         $shareConfig = null;
 
         if ($this->configProvider->hasConfig($entityName)) {
             $shareConfig = $this->configProvider->getConfig($entityName)->get('share_scopes');
         }
+
+        $aclSIds = $this->getSecurityIdentityIds((array) $shareConfig);
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
@@ -521,27 +522,60 @@ class OwnershipConditionDataBuilder
     /**
      * Get all Security Identity Ids
      *
+     * @param array $shareScope
+     *
      * @return array|int
      */
-    protected function getSecurityIdentityIds()
+    protected function getSecurityIdentityIds(array $shareScope)
     {
-        if ($this->sidIds !== null) {
-            return $this->sidIds;
+        if ($this->sids !== null) {
+            $sidIds = $this->getSecurityIdentityIdsByScope($this->sids, $shareScope);
+            return count($sidIds) === 1 ? $sidIds[0] : $sidIds;
         }
 
         $sids = $this->sidStrategy->getSecurityIdentities($this->getSecurityContext()->getToken());
-        $sidIds = [];
+        $sidByDb = [];
 
         foreach ($sids as $sid) {
             $entitySid = $this->getSecurityIdentityId($sid);
             if ($entitySid) {
-                $sidIds[] = $entitySid->getId();
+                $sidByDb[$entitySid->getId()] = $sid;
             }
         }
 
-        $this->sidIds = count($sidIds) === 1 ? $sidIds[0] : $sidIds;
+        $this->sids = $sidByDb;
+        $sidIds = $this->getSecurityIdentityIdsByScope($this->sids, $shareScope);
 
-        return $this->sidIds;
+        return count($sidIds) === 1 ? $sidIds[0] : $sidIds;
+    }
+
+    /**
+     * Get only Security Identity ids that can be shared by entity share scope
+     *
+     * @param array $sids
+     * @param array $shareScope
+     *
+     * @return array
+     */
+    protected function getSecurityIdentityIdsByScope(array $sids, array $shareScope)
+    {
+        $sidIds = [];
+
+        foreach ($sids as $key => $sid) {
+            $sharedToScope = false;
+
+            if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
+                $sharedToScope = 'user';
+            } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
+                $sharedToScope = 'business_unit';
+            }
+
+            if (in_array($sharedToScope, $shareScope)) {
+                $sidIds[] = $key;
+            }
+        }
+
+        return $sidIds;
     }
 
     /**
