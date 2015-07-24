@@ -11,7 +11,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             success: function(data) {
                 data = _.sortBy(data, 'order');
                 var choices = _.map(data, function(item) {
-                    return {value: item.id, label: item.name};
+                    return {value: item.name, label: item.name};
                 });
 
                 successCallback(choices);
@@ -54,6 +54,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
 
             filterOptions.filterParams = filterParams;
             filterOptions.choices = choices;
+
+            if (choices.length>2) {
+                filterOptions.type = 'select-row';
+            }
+            console.log(filterOptions.type);
 
             // mark promise as resolved
             promise.resolveWith(filterOptions);

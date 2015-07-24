@@ -66,6 +66,19 @@ class DictionaryFilter extends AbstractMultiChoiceFilter
     /**
      * {@inheritdoc}
      */
+    public function getMetadata()
+    {
+        $metadata = parent::getMetadata();
+
+        if ($metadata[FilterUtility::TYPE_KEY] === 'multichoice') {
+            $metadata[FilterUtility::TYPE_KEY] = 'dictionary';
+        }
+        return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function buildNullValueExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,
