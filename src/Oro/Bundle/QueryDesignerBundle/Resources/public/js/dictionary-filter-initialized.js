@@ -3,6 +3,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
     'use strict';
 
     function loadEnumChoices(className, successCallback, errorCallback) {
+        console.log(2);
         $.ajax({
             url: routing.generate(
                 'oro_api_get_dictionary_values',
@@ -11,7 +12,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             success: function(data) {
                 data = _.sortBy(data, 'order');
                 var choices = _.map(data, function(item) {
-                    return {value: item.id, label: item.name};
+                    return {value: item.name, label: item.name};
                 });
 
                 successCallback(choices);
@@ -38,6 +39,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
         var className = _.last(context).field.related_entity_name;
 
         loadEnumChoices(className, function(choices) {
+            console.log(3);
             var nullValue = null;
             var filterParams = {'class': className};
 
@@ -54,6 +56,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
 
             filterOptions.filterParams = filterParams;
             filterOptions.choices = choices;
+
+            if (choices.length>2) {
+                filterOptions.type = 'select-row';
+            }
+            console.log(4);
 
             // mark promise as resolved
             promise.resolveWith(filterOptions);
