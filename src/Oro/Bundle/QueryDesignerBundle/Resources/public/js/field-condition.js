@@ -16,7 +16,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _create: function() {
-            debugger;
             var data = this.element.data('value');
 
             // @TODO this 'none' filter probably in not in use any more, to delete
@@ -147,8 +146,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _createFilter: function(filterOptions, fieldId) {
-debugger;
-
             var moduleName = mapFilterModuleName(filterOptions.type);
             var requires = [moduleName];
 
