@@ -1,9 +1,11 @@
 define([
+    'jquery',
+    'routing',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
-    './select-filter'
-], function(_, __, tools, SelectFilter) {
+    './abstract-filter'
+], function($, routing, _, __, tools, AbstractFilter) {
     'use strict';
 
     // @const
@@ -18,7 +20,7 @@ define([
      * @class   oro.filter.MultiSelectFilter
      * @extends oro.filter.SelectFilter
      */
-    DictionaryFilter = SelectFilter.extend({
+    DictionaryFilter = AbstractFilter.extend({
         /**
          * Filter selector template
          *
@@ -49,12 +51,47 @@ define([
         initialize: function(options) {
             console.log(5);
             console.log(this);
-            if (_.isUndefined(this.emptyValue)) {
-                this.emptyValue = {
-                    value: [FILTER_EMPTY_VALUE]
-                };
-            }
-            DictionaryFilter.__super__.initialize.apply(this, arguments);
+
+            this.initFilter();
+            //if (_.isUndefined(this.emptyValue)) {
+            //    this.emptyValue = {
+            //        value: [FILTER_EMPTY_VALUE]
+            //    };
+            //}
+            //DictionaryFilter.__super__.initialize.apply(this, arguments);
+        },
+
+
+        initFilter: function() {
+            var className = this.constructor.prototype;
+            var self = this;
+            $.ajax({
+                url: routing.generate(
+                    'oro_api_get_dictionary_value_count',
+                    {dictionary: className.filterParams.class.replace(/\\/g, '_'), limit: -1}
+                ),
+                success: function(data) {
+                    self.count = data;
+                    DictionaryFilter.__super__.initialize.apply(self, arguments);
+                    if (data > 10) {
+                        //self.initSelect2();
+                        alert(1);
+                    } else {
+                        alert(2);
+                        self.initMultiselect();
+                    }
+                },
+                error: function(jqXHR) {
+                    //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                    //if (errorCallback) {
+                    //    errorCallback(jqXHR);
+                    //}
+                }
+            });
+        },
+
+        initMultiselect: function() {
+
         },
 
         /**

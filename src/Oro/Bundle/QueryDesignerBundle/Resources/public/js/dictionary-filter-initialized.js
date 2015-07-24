@@ -57,9 +57,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             filterOptions.filterParams = filterParams;
             filterOptions.choices = choices;
 
-            if (choices.length>2) {
-                filterOptions.type = 'select-row';
-            }
             console.log(4);
 
             // mark promise as resolved
