@@ -122,6 +122,20 @@ abstract class AbstractAuditField
     protected $oldArray;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="old_simplearray", type="simple_array", nullable=true)
+     */
+    protected $oldSimplearray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="old_jsonarray", type="json_array", nullable=true)
+     */
+    protected $oldJsonarray;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="new_integer", type="bigint", nullable=true)
@@ -190,6 +204,20 @@ abstract class AbstractAuditField
      * @ORM\Column(name="new_array", type="array", nullable=true)
      */
     protected $newArray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="new_simplearray", type="simple_array", nullable=true)
+     */
+    protected $newSimplearray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="new_jsonarray", type="json_array", nullable=true)
+     */
+    protected $newJsonarray;
 
     /**
      * @param AbstractAudit $audit

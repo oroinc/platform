@@ -169,7 +169,7 @@ abstract class AbstractAudit extends AbstractLogEntry
         foreach ($this->getVisibleFields() as $field) {
             $newValue = $field->getNewValue();
             $oldValue = $field->getOldValue();
-            if (in_array($field->getDataType(), ['date', 'datetime'], true)) {
+            if (in_array($field->getDataType(), ['date', 'datetime', 'array', 'jsonarray'], true)) {
                 $newValue = [
                     'value' => $newValue,
                     'type'  => $field->getDataType(),

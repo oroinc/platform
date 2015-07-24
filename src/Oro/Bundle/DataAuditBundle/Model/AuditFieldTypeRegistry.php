@@ -32,6 +32,8 @@ class AuditFieldTypeRegistry
         'datetimetz' => 'datetimetz',
         'object'     => 'object',
         'array'      => 'array',
+        'simple_array' => 'simplearray',
+        'json_array'   => 'jsonarray',
     ];
 
     /**
@@ -50,6 +52,8 @@ class AuditFieldTypeRegistry
     }
 
     /**
+     * Removing type will cause application to crash if type is in use and the field is auditable
+     *
      * @param string $doctrineType
      */
     public static function removeType($doctrineType)
@@ -58,6 +62,8 @@ class AuditFieldTypeRegistry
     }
 
     /**
+     * Replaces existing type. Make sure you move old data into new columns
+     *
      * @param string $doctrineType
      * @param string $auditType
      */
