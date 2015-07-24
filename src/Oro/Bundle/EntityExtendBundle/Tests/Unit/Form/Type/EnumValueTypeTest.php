@@ -85,9 +85,7 @@ class EnumValueTypeTest extends TypeTestCase
             'Symfony\Component\Validator\Constraints\Callback',
             $nameConstraints[2]
         );
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())->method('addViolation')->with(EnumValueType::INVALID_NAME_MESSAGE);
         call_user_func($nameConstraints[2]->methods[0], '!@#$', $context);
     }
