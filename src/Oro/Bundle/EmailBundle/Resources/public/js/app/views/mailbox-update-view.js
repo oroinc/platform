@@ -19,7 +19,7 @@ define([
         RELOAD_MARKER: '_reloadForm',
 
         events: {
-            'change [name*="processorType"]': 'changeHandler'
+            'change [name*="processType"]': 'changeHandler'
         },
 
         /**

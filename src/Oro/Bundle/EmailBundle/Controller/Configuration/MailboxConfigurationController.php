@@ -13,11 +13,11 @@ use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 class MailboxConfigurationController extends Controller
 {
     const ACTIVE_GROUP = 'platform';
-    const ACTIVE_SUBGROUP = 'mailbox';
+    const ACTIVE_SUBGROUP = 'email_configuration';
 
     /**
      * @Route(
-     *      "/system/platform/mailbox/update/{mailbox}",
+     *      "/system/platform/email_configuration/mailbox/update/{mailbox}",
      *      name="oro_email_mailbox_update"
      * )
      * @Template
@@ -58,16 +58,16 @@ class MailboxConfigurationController extends Controller
 
         if ($form->isSubmitted()) {
             if ($this->getRequest()->get(MailboxType::RELOAD_MARKER, false)) {
-                $processorProvider = $this->get('oro_email.provider.mailbox_processor_provider');
+                $storage = $this->get('oro_email.mailbox.process_storage');
 
-                $type = $form->get('processorType')->getViewData();
+                $type = $form->get('processType')->getViewData();
                 $data = $form->getData();
 
                 if (!empty($type)) {
-                    $processorEntity = $processorProvider->createConfigurationEntity($type);
-                    $data->setProcessor($processorEntity);
+                    $processorEntity = $storage->getNewSettingsEntity($type);
+                    $data->setProcessSettings($processorEntity);
                 } else {
-                    $data->clearProcessor();
+                    $data->setProcessSettings(null);
                 }
 
                 $newForm = $this->createForm('oro_email_mailbox', $data, [
@@ -105,7 +105,7 @@ class MailboxConfigurationController extends Controller
 
     /**
      * @Route(
-     *      "/system/platform/mailbox/create",
+     *      "/system/platform/email_configuration/mailbox/create",
      *      name="oro_email_mailbox_create"
      * )
      * @Template("OroEmailBundle:Configuration/MailboxConfiguration:edit.html.twig")

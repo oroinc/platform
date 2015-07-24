@@ -52,7 +52,7 @@ oro:
                 default_button.label: Default Reply Button
 
             mailbox_configuration:
-                label: Mailboxes
+                label: System Mailboxes
                 add_mailbox.label: Add Mailbox
 
         emailtemplate:
@@ -248,22 +248,23 @@ oro:
             general.label:            General
             email.label:              Email
             name.label:               Name
-            imap_origin.label:        IMAP Synchronization
-            imap_enable.label:        Use IMAP Synchronization
-            processor:
-                label:                Email Processing
-                type.label:           Action
-            smtp_settings.label:      SMTP Settings
-            smtp_enabled.label:       Use SMTP
-            smtp_host.label:          Host
-            smtp_port.label:          Port
-            smtp_encryption.label:    SSL
-            smtp_username.label:      Username
-            smtp_password.label:      Password
+            origin:
+                label:                IMAP Synchronization
+                enable.label:         Use IMAP Synchronization
             organization.label:       Organization
             action.create:            Add Mailbox
-        mailbox_processor:
-            default.label:            Do Nothing
+            process:
+                label:                Email Processing
+                type.label:           Action
+                default.label:        Do Nothing
+            smtp_settings:
+                label:      SMTP Settings
+                enabled.label:       Use SMTP
+                host.label:          Host
+                port.label:          Port
+                encryption.label:    SSL
+                username.label:      Username
+                password.label:      Password
 
         action:
             sync: Sync emails

@@ -11,7 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- *
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      defaultValues={
  *          "entity"={

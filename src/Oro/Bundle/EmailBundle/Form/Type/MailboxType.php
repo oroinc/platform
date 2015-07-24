@@ -61,8 +61,7 @@ class MailboxType extends AbstractType
         ]);
         $builder->add('originEnable', 'checkbox', [
             'required' => false,
-            'label'    => 'oro.email.mailbox.imap_enable.label',
-            'data'     => true,
+            'label'    => 'oro.email.mailbox.origin.enable.label',
             'mapped'   => false,
         ]);
         $builder->add('origin', 'oro_imap_configuration');
@@ -72,7 +71,7 @@ class MailboxType extends AbstractType
             'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
             'mapped'      => false,
-            'empty_value' => 'oro.email.mailbox_process.default.label',
+            'empty_value' => 'oro.email.mailbox.process.default.label',
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
@@ -102,6 +101,14 @@ class MailboxType extends AbstractType
             return;
         }
 
+        FormUtils::replaceField(
+            $form,
+            'originEnable',
+            [
+                'data' => ($data->getOrigin() !== null)
+            ]
+        );
+
         $processType = null;
         if ($processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
@@ -126,6 +133,12 @@ class MailboxType extends AbstractType
 
         $processType = $data['processType'];
         $originalProcessType = $form->get('processType')->getData();
+
+        $originEnable = $data['originEnable'];
+        if (!$originEnable) {
+            $form->getViewData()->setOrigin(null);
+            $data['origin'] = null;
+        }
 
         if ($processType !== $originalProcessType) {
             $form->getViewData()->setProcessSettings(null);

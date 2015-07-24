@@ -248,7 +248,7 @@
 {% block oro_email_mailbox_grid_row %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div class="row">
+    <div class="row" style="margin-top: -42px;">
         <div class="pull-right">
             <div class="btn-group">
                 {{ UI.addButton({
@@ -274,7 +274,7 @@
         {{ form_widget(form) }}
     </fieldset>
     <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.imap_origin.label'|trans }}</h5>
+        <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
         {{ email_origin|raw }}
     </fieldset>
     <fieldset class="form-horizontal form-horizontal-large">
@@ -282,7 +282,7 @@
         {{ smtp|raw }}
     </fieldset>
     <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.processor.label'|trans }}</h5>
+        <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
         {{ process|raw }}
     </fieldset>
 
