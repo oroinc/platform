@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -38,9 +38,9 @@ class DictionaryFilter extends AbstractMultiChoiceFilter
             $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
             unset($params['class']);
         }
-        if (isset($params['enum_code'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['enum_code'] = $params['enum_code'];
-            unset($params['enum_code']);
+        if (isset($params['dictionary_code'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['dictionary_code'] = $params['dictionary_code'];
+            unset($params['dictionary_code']);
         }
         parent::init($name, $params);
     }
@@ -84,6 +84,6 @@ class DictionaryFilter extends AbstractMultiChoiceFilter
      */
     protected function getFormType()
     {
-        return EnumFilterType::NAME;
+        return DictionaryFilterType::NAME;
     }
 }
