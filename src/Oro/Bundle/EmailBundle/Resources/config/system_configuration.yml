@@ -20,12 +20,9 @@ oro_system_configuration:
             title: oro.email.system_configuration.reply_configuration.label
             priority: 80
 
-        mailbox:
-            icon:  icon-envelope
-            title: oro.email.system_configuration.mailbox_configuration.label
-
         mailboxes:
             title: oro.email.system_configuration.mailbox_configuration.label
+            priority: -10
 
     fields:
         oro_email.signature:
@@ -68,11 +65,6 @@ oro_system_configuration:
                 children:
                     general_setup:
                         children:
-                            mailbox:
-                                children:
-                                    mailboxes:
-                                        children:
-                                            - oro_email.mailbox_grid
                             email_configuration:
                                 children:
                                     signature_configuration:
@@ -82,6 +74,9 @@ oro_system_configuration:
                                     reply_configuration:
                                         children:
                                             - oro_email.default_button_reply
+                                    mailboxes:
+                                        children:
+                                            - oro_email.mailbox_grid
 
     api_tree:
         signature_configuration:

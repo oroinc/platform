@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -11,22 +12,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\EmailBundle\Provider\MailboxProcessorProvider;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class MailboxType extends AbstractType
 {
     const RELOAD_MARKER = '_reloadForm';
 
-    /** @var MailboxProcessorProvider */
-    private $processorProvider;
+    /** @var MailboxProcessStorage */
+    private $storage;
 
     /**
-     * @param MailboxProcessorProvider $processorProvider
+     * @param MailboxProcessStorage $storage
      */
-    public function __construct(MailboxProcessorProvider $processorProvider)
+    public function __construct(MailboxProcessStorage $storage)
     {
-        $this->processorProvider = $processorProvider;
+        $this->storage = $storage;
     }
 
     /**
@@ -61,18 +61,17 @@ class MailboxType extends AbstractType
         ]);
         $builder->add('originEnable', 'checkbox', [
             'required' => false,
-            'label'    => 'oro.email.mailbox.imap_enable.label',
-            'data'     => true,
+            'label'    => 'oro.email.mailbox.origin.enable.label',
             'mapped'   => false,
         ]);
         $builder->add('origin', 'oro_imap_configuration');
         $builder->add('smtpSettings', 'oro_email_smtp');
-        $builder->add('processorType', 'choice', [
-            'label'       => 'oro.email.mailbox.processor.type.label',
-            'choices'     => $this->processorProvider->getProcessorTypesChoiceList(),
+        $builder->add('processType', 'choice', [
+            'label'       => 'oro.email.mailbox.process.type.label',
+            'choices'     => $this->storage->getProcessTypeChoiceList(),
             'required'    => false,
             'mapped'      => false,
-            'empty_value' => 'oro.email.mailbox_processor.default.label',
+            'empty_value' => 'oro.email.mailbox.process.default.label',
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
@@ -102,16 +101,24 @@ class MailboxType extends AbstractType
             return;
         }
 
-        $processorType = null;
-        if ($processorEntity = $data->getProcessor()) {
-            $processorType = $processorEntity->getType();
+        FormUtils::replaceField(
+            $form,
+            'originEnable',
+            [
+                'data' => ($data->getOrigin() !== null)
+            ]
+        );
+
+        $processType = null;
+        if ($processEntity = $data->getProcessSettings()) {
+            $processType = $processEntity->getType();
         }
 
-        FormUtils::replaceField($form, 'processorType', [
-            'data' => $processorType,
+        FormUtils::replaceField($form, 'processType', [
+            'data' => $processType,
         ]);
 
-        $this->addProcessorField($form, $processorType);
+        $this->addProcessField($form, $processType);
     }
 
     /**
@@ -124,35 +131,41 @@ class MailboxType extends AbstractType
         $form = $event->getForm();
         $data = $event->getData();
 
-        $processorType = $data['processorType'];
-        $originalProcessorType = $form->get('processorType')->getData();
+        $processType = $data['processType'];
+        $originalProcessType = $form->get('processType')->getData();
 
-        if ($processorType !== $originalProcessorType) {
-            $form->getViewData()->clearProcessor();
+        $originEnable = $data['originEnable'];
+        if (!$originEnable) {
+            $form->getViewData()->setOrigin(null);
+            $data['origin'] = null;
         }
 
-        $this->addProcessorField($form, $processorType);
+        if ($processType !== $originalProcessType) {
+            $form->getViewData()->setProcessSettings(null);
+        }
+
+        $this->addProcessField($form, $processType);
     }
 
     /**
-     * Adds mailbox processor form field of proper type
+     * Adds mailbox process form field of proper type
      *
      * @param FormInterface $form
-     * @param string|null   $processorType
+     * @param string|null   $processType
      */
-    protected function addProcessorField(FormInterface $form, $processorType)
+    protected function addProcessField(FormInterface $form, $processType)
     {
-        if (!empty($processorType)) {
+        if (!empty($processType)) {
             $form->add(
-                'processor',
-                $this->processorProvider->getProcessorTypes()[$processorType]->getSettingsFormType(),
+                'processSettings',
+                $this->storage->getProcess($processType)->getSettingsFormType(),
                 [
                     'required' => true,
                 ]
             );
         } else {
             $form->add(
-                'processor',
+                'processSettings',
                 'hidden',
                 [
                     'data' => null,

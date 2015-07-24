@@ -13,7 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- *
+ * @ORM\HasLifecycleCallbacks
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -54,22 +54,23 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $label;
 
     /**
-     * @var MailboxProcessorSettings
+     * @var MailboxProcessSettings
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\MailboxProcessorSettings",
+     * @ORM\OneToOne(targetEntity="MailboxProcessSettings",
      *     cascade={"all"}, orphanRemoval=true
      * )
-     * @ORM\JoinColumn(name="processor_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="process_settings_id", referencedColumnName="id", nullable=true)
      */
-    protected $processor;
+    protected $processSettings;
 
     /**
      * @var EmailOrigin
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
-     *     cascade={"all"}, orphanRemoval=true
+     * @ORM\OneToOne(
+     *     targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
+     *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
      * )
-     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
      */
     protected $origin;
 
@@ -99,6 +100,16 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     {
         $this->smtpSettings = [];
         $this->autoResponseRules = new ArrayCollection();
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        if ($this->origin !== null) {
+            $this->origin->setOwner(null);
+        }
     }
 
     /**
@@ -150,31 +161,21 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return MailboxProcessorSettings
+     * @return MailboxProcessSettings
      */
-    public function getProcessor()
+    public function getProcessSettings()
     {
-        return $this->processor;
+        return $this->processSettings;
     }
 
     /**
-     * @param MailboxProcessorSettings $processor
+     * @param MailboxProcessSettings $processSettings
      *
      * @return $this
      */
-    public function setProcessor($processor)
+    public function setProcessSettings($processSettings)
     {
-        $this->processor = $processor;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearProcessor()
-    {
-        $this->processor = null;
+        $this->processSettings = $processSettings;
 
         return $this;
     }

@@ -87,7 +87,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle115::addEmailOriginFields($schema);
         OroEmailBundle115::updateEmailRecipientConstraint($schema);
 
-        OroEmailBundle116::createOroEmailMailboxProcessorTable($schema);
+        OroEmailBundle116::createOroEmailMailboxProcessSettingsTable($schema);
         OroEmailBundle116::createOroEmailMailboxTable($schema);
         OroEmailBundle116::addOwnerMailboxColumn($schema);
         OroEmailBundle116::addOroEmailMailboxForeignKeys($schema);

@@ -525,7 +525,7 @@ datagrid:
                     - { table: OroEmailBundle:Mailbox, alias: m }
                 join:
                     left:
-                        - { join: m.processor, alias: processor }
+                        - { join: m.processSettings, alias: process }
         columns:
             email:
                 label: oro.email.mailbox.email.label
