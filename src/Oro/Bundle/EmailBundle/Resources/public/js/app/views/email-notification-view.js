@@ -17,7 +17,7 @@ define([
         countNewEmail:null,
         inputName: '',
         events: {
-            'click a.mark-as-read': 'onClickMarkAsRead',
+            'click button.mark-as-read': 'onClickMarkAsRead',
             'click .info': 'onClickOpenEmail'
         },
 

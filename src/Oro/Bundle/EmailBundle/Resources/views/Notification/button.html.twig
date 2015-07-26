@@ -74,7 +74,10 @@
                 <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
                     {{ "oro.email.menu.user_emails"|trans }}
                 </a>
-                <a class="mark-as-read pull-right">{{ "oro.email.notification.mark_read.label"|trans }}</a>
+                <button class="mark-as-read pull-right btn btn-primary">
+                    <i class="icon-check"></i>
+                    {{ "oro.email.notification.mark_read.label"|trans }}
+                </button>
             </div>
             <ul class="items">
             </ul>
