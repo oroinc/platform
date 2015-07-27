@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\DataAuditBundle\Model;
 
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
-use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
 
-class ExtendAuditField extends AbstractAuditField
+class ExtendAuditField
 {
     /**
      * Constructor
@@ -14,13 +13,13 @@ class ExtendAuditField extends AbstractAuditField
      *
      * IMPORTANT: If the derived class has own constructor it must call parent constructor.
      *
-     * @param AbstractAudit $audit
+     * @param Audit $audit
      * @param string $field
      * @param string $dataType
      * @param mixed $newValue
      * @param mixed $oldValue
      */
-    public function __construct(AbstractAudit $audit, $field, $dataType, $newValue, $oldValue)
+    public function __construct(Audit $audit, $field, $dataType, $newValue, $oldValue)
     {
         parent::__construct($audit, $field, $dataType, $newValue, $oldValue);
     }
