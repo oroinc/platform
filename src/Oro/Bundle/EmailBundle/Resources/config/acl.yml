@@ -22,8 +22,8 @@ oro_email_email_user_edit:
     permission: EDIT
     group_name: ""
 
-oro_email_autoresponserule_view:
-    type: entity
-    class: OroEmailBundle:AutoResponseRule
-    permission: VIEW
-    group_name: ""
+#oro_email_mailbox_view:
+#    type: entity
+#    class: OroEmailBundle:Mailbox
+#    permission: VIEW
+#    group_name: ""

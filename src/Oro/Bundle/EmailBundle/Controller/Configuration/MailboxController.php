@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -10,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 
-class MailboxConfigurationController extends Controller
+class MailboxController extends Controller
 {
     const ACTIVE_GROUP = 'platform';
     const ACTIVE_SUBGROUP = 'email_configuration';
@@ -21,6 +22,7 @@ class MailboxConfigurationController extends Controller
      *      name="oro_email_mailbox_update"
      * )
      * @Template
+     * @AclAncestor("oro_email_mailbox_edit")
      *
      * @param $mailbox
      *
@@ -108,7 +110,8 @@ class MailboxConfigurationController extends Controller
      *      "/system/platform/email_configuration/mailbox/create",
      *      name="oro_email_mailbox_create"
      * )
-     * @Template("OroEmailBundle:Configuration/MailboxConfiguration:edit.html.twig")
+     * @Template("OroEmailBundle:Configuration/Mailbox:edit.html.twig")
+     * @AclAncestor("oro_email_mailbox_create")
      *
      * @return array
      */

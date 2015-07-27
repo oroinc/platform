@@ -198,7 +198,7 @@ class EmailActivityListProvider implements
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
-        if ($activityEntity->getFromEmailAddress()->hasOwner() &&
+        if ($activityEntity->getFromEmailAddress()->getHasOwner() &&
             $activityEntity->getFromEmailAddress()->getOwner()->getOrganization()
         ) {
             return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
@@ -249,7 +249,7 @@ class EmailActivityListProvider implements
             }
         }
 
-        if ($email->getFromEmailAddress()->hasOwner()) {
+        if ($email->getFromEmailAddress()->getHasOwner()) {
             $owner = $email->getFromEmailAddress()->getOwner();
             $data['headOwnerName'] = $data['ownerName'] = $this->entityNameResolver->getName($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))

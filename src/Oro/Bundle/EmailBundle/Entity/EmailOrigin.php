@@ -232,7 +232,7 @@ abstract class EmailOrigin
      *
      * @return EmailOrigin
      */
-    public function setIsActive($isActive)
+    public function setActive($isActive)
     {
         $this->isActive = $isActive;
 

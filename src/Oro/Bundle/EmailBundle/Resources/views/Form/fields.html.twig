@@ -278,7 +278,7 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_row(form.children.originEnable) ~
+    {% set email_origin = form_row(form.children.activeOrigin) ~
         form_widget(form.children.origin) %}
     {% set smtp = form_widget(form.children.smtpSettings) %}
     {% set process = form_row(form.children.processType) ~

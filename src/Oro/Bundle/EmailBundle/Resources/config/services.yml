@@ -97,9 +97,11 @@ parameters:
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
 
     # Mailboxes
+    oro_email.mailbox.entity.class:                     Oro\Bundle\EmailBundle\Entity\Mailbox
     oro_email.mailbox.process_storage.class:            Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage
-    oro_email.mailbox_email_owner_provider.class:        Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
-    oro_email.mailbox_choice_list.class:                 Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
+    oro_email.mailbox_email_owner_provider.class:       Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
+    oro_email.mailbox_choice_list.class:                Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
+    oro_email.mailbox.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
 services:
     oro_email.entity.cache.warmer:
@@ -669,3 +671,10 @@ services:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
             - @doctrine
+
+    oro_email.mailbox.manager.api:
+        class: %oro_email.mailbox.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.mailbox.entity.class%
+            - @doctrine.orm.entity_manager
