@@ -653,8 +653,9 @@ class ConfigManager
         } else {
             $entityModel = $this->modelManager->findEntityModel($className);
             if (null === $entityModel) {
-                $metadata    = $this->getEntityMetadata($className);
-                $entityModel = $this->modelManager->createEntityModel($className, $metadata->mode);
+                $metadata      = $this->getEntityMetadata($className);
+                $newEntityMode = $metadata ? $metadata->mode : $mode;
+                $entityModel   = $this->modelManager->createEntityModel($className, $newEntityMode);
                 foreach ($this->getProviders() as $provider) {
                     $configId = new EntityConfigId($provider->getScope(), $className);
                     $config   = $this->createConfig(
