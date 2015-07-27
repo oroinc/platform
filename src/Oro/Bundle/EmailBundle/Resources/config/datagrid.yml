@@ -433,6 +433,7 @@ datagrid:
 
     base-mailboxes-grid:
         source:
+            acl_resource: oro_email_mailbox_view
             type: orm
             query:
                 select:
@@ -466,14 +467,14 @@ datagrid:
         actions:
             update:
                 type:         navigate
-                #acl_resource: oro_email_mailbox_update
+                acl_resource: oro_email_mailbox_edit
                 label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit
                 rowAction:    true
             delete:
                 type:         delete
-                #acl_resource: oro_email_mailbox_delete
+                acl_resource: oro_email_mailbox_delete
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link
