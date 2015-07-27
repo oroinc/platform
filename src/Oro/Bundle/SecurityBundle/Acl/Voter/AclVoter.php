@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -17,6 +16,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterf
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -69,6 +69,11 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $configProvider;
 
     /**
+     * @var AclGroupProviderInterface
+     */
+    protected $groupProvider;
+
+    /**
      * @param ConfigProvider $configProvider
      */
     public function setConfigProvider(ConfigProvider $configProvider)
@@ -84,6 +89,14 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclExtensionSelector(AclExtensionSelector $selector)
     {
         $this->extensionSelector = $selector;
+    }
+
+    /**
+     * @param AclGroupProviderInterface $provider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $provider)
+    {
+        $this->groupProvider = $provider;
     }
 
     /**
@@ -113,8 +126,10 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             ? $object->getDomainObject()
             : $object;
 
+        list($this->object, $group) = $this->separateAclGroupFromObject($this->object);
+
         try {
-            $this->extension = $this->extensionSelector->select($object);
+            $this->extension = $this->extensionSelector->select($this->object);
         } catch (InvalidDomainObjectException $e) {
             return self::ACCESS_ABSTAIN;
         }
@@ -127,10 +142,15 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             }
         }
 
-        $result = parent::vote($token, $object, $attributes);
+        //check acl group
+        $result = $this->checkAclGroup($group);
 
-        //check organization context
-        $result = $this->checkOrganizationContext($result);
+        if ($result !== self::ACCESS_DENIED) {
+            $result = parent::vote($token, $this->object, $attributes);
+
+            //check organization context
+            $result = $this->checkOrganizationContext($result);
+        }
 
         $this->extension = null;
         $this->object = null;
@@ -205,7 +225,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
             if ($this->configProvider->hasConfig($className)) {
                 $config = $this->configProvider->getConfig($className);
                 $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
@@ -234,5 +254,41 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         return $result;
+    }
+
+    /**
+     * @param mixed $object
+     * @return array
+     */
+    protected function separateAclGroupFromObject($object)
+    {
+        $group = null;
+
+        if ($object instanceof ObjectIdentity) {
+            $type = $object->getType();
+
+            $delim = strpos($type, '@');
+            if ($delim) {
+                $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
+                $group = ltrim(substr($type, 0, $delim), ' ');
+            } else {
+                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+            }
+        }
+
+        return [$object, $group];
+    }
+
+    /**
+     * @param string $group
+     * @return int
+     */
+    protected function checkAclGroup($group)
+    {
+        if ($group=== null || !$this->groupProvider || !$this->object) {
+            return self::ACCESS_ABSTAIN;
+        }
+
+        return $group === $this->groupProvider->getGroup() ? self::ACCESS_ABSTAIN : self::ACCESS_DENIED;
     }
 }

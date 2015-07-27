@@ -59,7 +59,7 @@ class EmailRecipient
      * @var Email
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="recipients")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $email;

@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
  * IMAP Email Origin
  *
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class ImapEmailOrigin extends EmailOrigin
 {
@@ -175,5 +176,15 @@ class ImapEmailOrigin extends EmailOrigin
     public function __toString()
     {
         return sprintf('%s (%s)', $this->user, $this->host);
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        if ($this->mailboxName === null) {
+            $this->mailboxName = $this->user;
+        }
     }
 }

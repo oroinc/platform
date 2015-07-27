@@ -21,6 +21,10 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
+    const SYNC_ENABLED_TRUE = 1;
+    const SYNC_ENABLED_FALSE = 0;
+    const SYNC_ENABLED_IGNORE = -1;
+
     /**
      * @var integer
      *
@@ -59,6 +63,37 @@ class EmailFolder
     protected $type;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $syncEnabled = false;
+
+    /**
+     * @var EmailFolder $folder
+     *
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="subFolders")
+     * @ORM\JoinColumn(
+     *  name="parent_folder_id", referencedColumnName="id",
+     *  nullable=true, onDelete="CASCADE")
+     * @JMS\Exclude
+     */
+    protected $parentFolder;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="EmailFolder",
+     *  mappedBy="parentFolder",
+     *  cascade={"persist", "remove"},
+     *  orphanRemoval=true)
+     */
+    protected $subFolders;
+
+    /**
      * @var EmailOrigin
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
@@ -88,6 +123,11 @@ class EmailFolder
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $emailUsers;
+
+    public function __construct()
+    {
+        $this->subFolders = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -172,6 +212,125 @@ class EmailFolder
     }
 
     /**
+     * Is folder checked for sync
+     *
+     * @return bool
+     */
+    public function isSyncEnabled()
+    {
+        return $this->syncEnabled;
+    }
+
+    /**
+     * Set folder checked for sync
+     *
+     * @param boolean $syncEnabled
+     *
+     * @return $this
+     */
+    public function setSyncEnabled($syncEnabled)
+    {
+        $this->syncEnabled = (bool)$syncEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Get sub folders
+     *
+     * @return EmailFolder[]|ArrayCollection
+     */
+    public function getSubFolders()
+    {
+        return $this->subFolders;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSubFolders()
+    {
+        return !$this->subFolders->isEmpty();
+    }
+
+    /**
+     * @param ArrayCollection|array $folders
+     *
+     * @return $this
+     */
+    public function setSubFolders($folders)
+    {
+        $this->subFolders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addSubFolder($folder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add sub folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function addSubFolder(EmailFolder $folder)
+    {
+        $this->subFolders->add($folder);
+
+        $exParentFolder = $folder->getParentFolder();
+        if ($exParentFolder !== null && $exParentFolder !== $this) {
+            if ($exParentFolder->getSubFolders()->contains($folder)) {
+                $exParentFolder->getSubFolders()->removeElement($folder);
+            }
+        }
+
+        $folder->setParentFolder($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeSubFolder(EmailFolder $folder)
+    {
+        if ($this->subFolders->contains($folder)) {
+            $this->subFolders->removeElement($folder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get parent folder
+     *
+     * @return EmailFolder
+     */
+    public function getParentFolder()
+    {
+        return $this->parentFolder;
+    }
+
+    /**
+     * Set parent folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function setParentFolder(EmailFolder $folder)
+    {
+        $this->parentFolder = $folder;
+
+        return $this;
+    }
+
+    /**
      * Get email folder origin
      *
      * @return EmailOrigin
@@ -191,6 +350,12 @@ class EmailFolder
     public function setOrigin(EmailOrigin $origin)
     {
         $this->origin = $origin;
+
+        if (!$this->subFolders->isEmpty()) {
+            foreach ($this->subFolders as $subFolder) {
+                $subFolder->setOrigin($origin);
+            }
+        }
 
         return $this;
     }

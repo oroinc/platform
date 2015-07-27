@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -21,22 +21,22 @@ class NavigationListener
     /** @var ConfigManager $configManager */
     protected $configManager;
 
-    /** @var  Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param ConfigManager  $configManager
-     * @param Translator     $translator
+     * @param SecurityFacade      $securityFacade
+     * @param ConfigManager       $configManager
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
         ConfigManager $configManager,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
-        $this->securityFacade       = $securityFacade;
-        $this->configManager        = $configManager;
-        $this->translator           = $translator;
+        $this->securityFacade = $securityFacade;
+        $this->configManager  = $configManager;
+        $this->translator     = $translator;
     }
 
     /**

@@ -25,6 +25,7 @@ use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailModelBuilder
 {
@@ -134,7 +135,7 @@ class EmailModelBuilder
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
-        if ($fromAddress->getOwner() == $this->helper->getUser()) {
+        if ($fromAddress->getOwner() === $this->helper->getUser()) {
             $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
             $emailModel->setFrom($fromAddress->getEmail());
         } else {
@@ -152,26 +153,41 @@ class EmailModelBuilder
     }
 
     /**
-     * @param EmailModel  $emailModel
      * @param EmailEntity $parentEmailEntity
+     *
+     * @return EmailModel
      */
-    protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
+    public function createReplyAllEmailModel(EmailEntity $parentEmailEntity)
     {
-        $userEmails = $this->helper->getUser()->getEmails();
-        $toEmails = [];
-        $emailRecipients = $parentEmailEntity->getTo();
-        /** @var EmailRecipient $emailRecipient */
-        foreach ($emailRecipients as $emailRecipient) {
-            $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
-        }
+        $emailModel = $this->factory->getEmail();
+        $emailModel->setMailType(EmailModel::MAIL_TYPE_REPLY);
+        $emailModel->setParentEmailId($parentEmailEntity->getId());
 
-        foreach ($userEmails as $userEmail) {
-            if (in_array($userEmail->getEmail(), $toEmails)) {
-                $emailModel->setFrom($userEmail->getEmail());
-
-                break;
+        $fromAddress = $parentEmailEntity->getFromEmailAddress();
+        if ($fromAddress->getOwner() === $this->helper->getUser()) {
+            $toList = [];
+            foreach ($parentEmailEntity->getTo() as $toRecipient) {
+                $toList[] = $toRecipient->getEmailAddress()->getEmail();
             }
+            $ccList = [];
+            foreach ($parentEmailEntity->getCc() as $ccRecipient) {
+                $ccList[] = $ccRecipient->getEmailAddress()->getEmail();
+            }
+            $emailModel->setTo($toList);
+            $emailModel->setCc($ccList);
+            $emailModel->setFrom($fromAddress->getEmail());
+        } else {
+            $emailModel->setTo([$fromAddress->getEmail()]);
+            $this->initReplyAllFrom($emailModel, $parentEmailEntity);
         }
+
+        $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
+
+        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
+        $emailModel->setBodyFooter($body);
+        $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
+
+        return $this->createEmailModel($emailModel);
     }
 
     /**
@@ -194,6 +210,58 @@ class EmailModelBuilder
         }
 
         return $this->createEmailModel($emailModel);
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $parentEmailEntity
+     */
+    protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
+    {
+        $userEmails = $this->helper->getUser()->getEmails();
+        $toEmails = [];
+        $emailRecipients = $parentEmailEntity->getTo();
+        /** @var EmailRecipient $emailRecipient */
+        foreach ($emailRecipients as $emailRecipient) {
+            $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
+        }
+
+        foreach ($userEmails as $userEmail) {
+            if (in_array($userEmail->getEmail(), $toEmails, true)) {
+                $emailModel->setFrom($userEmail->getEmail());
+                break;
+            }
+        }
+    }
+
+    /**
+     * @param EmailModel  $emailModel
+     * @param EmailEntity $parentEmailEntity
+     */
+    protected function initReplyAllFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
+    {
+        $userEmails = $this->helper->getUser()->getEmails();
+        $toEmails = [];
+        $ccEmails = [];
+        $emailRecipients = $parentEmailEntity->getTo();
+        $emailCcRecipients = $parentEmailEntity->getCc();
+        /** @var EmailRecipient $emailRecipient */
+        foreach ($emailRecipients as $emailRecipient) {
+            $toEmails[] = $emailRecipient->getEmailAddress()->getEmail();
+        }
+
+        /** @var EmailRecipient $emailCcRecipient */
+        foreach ($emailCcRecipients as $emailCcRecipient) {
+            $ccEmails[] = $emailCcRecipient->getEmailAddress()->getEmail();
+        }
+        $emailModel->setCc($ccEmails);
+
+        foreach ($userEmails as $userEmail) {
+            if (in_array($userEmail->getEmail(), $toEmails, true)) {
+                $emailModel->setFrom($userEmail->getEmail());
+                break;
+            }
+        }
     }
 
     /**

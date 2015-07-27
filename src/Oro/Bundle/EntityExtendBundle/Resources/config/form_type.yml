@@ -237,7 +237,7 @@ services:
         class: %oro_entity_extend.type.enum_filter.class%
         arguments:
             - @translator
-            - @doctrine
+            - @oro_entity_extend.enum_value_provider
         tags:
             - { name: form.type, alias: oro_enum_filter }
 

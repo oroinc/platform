@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
@@ -41,7 +41,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var FlashBagInterface */
     protected $flashBag;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var LoggerInterface */
@@ -60,39 +60,39 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected $securityFacade;
 
     /**
-     * @param FormInterface     $form
-     * @param Request           $request
-     * @param UserManager       $manager
+     * @param FormInterface $form
+     * @param Request $request
+     * @param UserManager $manager
      * @param UserConfigManager $userConfigManager
-     * @param ConfigManager     $cm
-     * @param DelegatingEngine  $templating
-     * @param \Swift_Mailer     $mailer
+     * @param ConfigManager $cm
+     * @param DelegatingEngine $templating
+     * @param \Swift_Mailer $mailer
      * @param FlashBagInterface $flashBag
-     * @param Translator        $translator
-     * @param LoggerInterface   $logger
-     * @param ServiceLink       $serviceLink
+     * @param TranslatorInterface $translator
+     * @param LoggerInterface $logger
+     * @param ServiceLink $serviceLink
      */
     public function __construct(
-        FormInterface     $form,
-        Request           $request,
-        UserManager       $manager,
+        FormInterface $form,
+        Request $request,
+        UserManager $manager,
         UserConfigManager $userConfigManager = null,
-        ConfigManager     $cm = null,
-        DelegatingEngine  $templating = null,
-        \Swift_Mailer     $mailer = null,
+        ConfigManager $cm = null,
+        DelegatingEngine $templating = null,
+        \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
-        Translator        $translator = null,
-        LoggerInterface   $logger = null,
-        ServiceLink       $serviceLink = null
+        TranslatorInterface $translator = null,
+        LoggerInterface $logger = null,
+        ServiceLink $serviceLink = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
-        $this->templating        = $templating;
-        $this->cm                = $cm;
-        $this->mailer            = $mailer;
-        $this->flashBag          = $flashBag;
-        $this->translator        = $translator;
-        $this->logger            = $logger;
+        $this->templating = $templating;
+        $this->cm = $cm;
+        $this->mailer = $mailer;
+        $this->flashBag = $flashBag;
+        $this->translator = $translator;
+        $this->logger = $logger;
         if ($serviceLink !== null) {
             $this->securityFacade = $serviceLink->getService();
         }
@@ -173,7 +173,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /**
      * Send invite email to new user
      *
-     * @param User   $user
+     * @param User $user
      * @param string $plainPassword
      *
      * @throws \RuntimeException
@@ -184,7 +184,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
         $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
+        $senderName = $this->cm->get('oro_notification.email_notification_sender_name');
 
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')

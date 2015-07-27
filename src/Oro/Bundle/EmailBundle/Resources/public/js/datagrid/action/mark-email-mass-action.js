@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/messenger',
     'orotranslation/js/translator',
     'oro/datagrid/action/mass-action'
-], function (_, messenger, __, MassAction) {
+], function(_, messenger, __, MassAction) {
     'use strict';
 
     var MarkAction;
@@ -13,7 +11,7 @@ define([
     /**
      * Mark email as read/unread
      *
-     * @export  oro/datagrid/action/mark-email-mass-action
+     * @export  oroemail/js/datagrid/action/mark-email-mass-action
      * @class   oro.datagrid.action.MarkAction
      * @extends oro.datagrid.action.MassAction
      */

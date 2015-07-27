@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
 
+use FOS\RestBundle\Util\Codes;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +37,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailController extends Controller
 {
@@ -95,7 +98,8 @@ class EmailController extends Controller
             'target' => $this->getTargetEntity(),
             'hasGrantReattach' => $this->isAttachmentCreationGranted(),
             'routeParameters' => $this->getTargetEntityConfig(),
-            'renderContexts' => $this->getRequest()->get('renderContexts', true)
+            'renderContexts' => $this->getRequest()->get('renderContexts', true),
+            'defaultReplyButton' => $this->get('oro_config.user')->get('oro_email.default_button_reply')
         ];
     }
 
@@ -181,10 +185,27 @@ class EmailController extends Controller
      * @Route("/reply/{id}", name="oro_email_email_reply", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
+     *
+     * @param Email $email
+     * @return array
      */
     public function replyAction(Email $email)
     {
         $emailModel = $this->get('oro_email.email.model.builder')->createReplyEmailModel($email);
+        return $this->process($emailModel);
+    }
+
+    /**
+     * @Route("/replyall/{id}", name="oro_email_email_reply_all", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_create")
+     * @Template("OroEmailBundle:Email:update.html.twig")
+     *
+     * @param Email $email
+     * @return array
+     */
+    public function replyAllAction(Email $email)
+    {
+        $emailModel = $this->get('oro_email.email.model.builder')->createReplyAllEmailModel($email);
         return $this->process($emailModel);
     }
 
@@ -291,6 +312,21 @@ class EmailController extends Controller
     public function userEmailsAction()
     {
         return [];
+    }
+
+    /**
+     * @Route("/user-sync-emails", name="oro_email_user_sync_emails")
+     * @AclAncestor("oro_email_email_view")
+     */
+    public function userEmailsSyncAction()
+    {
+        $this->get('oro_email.email_synchronization_manager')->syncOrigins(
+            $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                $this->get('oro_security.security_facade')->getLoggedUserId()
+            )
+        );
+
+        return new JsonResponse([], Codes::HTTP_OK);
     }
 
     /**

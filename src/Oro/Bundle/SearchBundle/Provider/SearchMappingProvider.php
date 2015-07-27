@@ -73,6 +73,58 @@ class SearchMappingProvider
     }
 
     /**
+     * Gets search aliases for entities
+     *
+     * @param string[] $classNames The list of entity FQCN
+     *
+     * @return array [entity class name => entity search alias, ...]
+     *
+     * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
+     *                                   or has no the search alias
+     */
+    public function getEntityAliases(array $classNames = [])
+    {
+        $result = [];
+
+        $mappingConfig = $this->getMappingConfig();
+        if (empty($classNames)) {
+            foreach ($mappingConfig as $className => $mapping) {
+                if (!empty($mapping['alias'])) {
+                    $result[$className] = $mapping['alias'];
+                }
+            }
+        } else {
+            foreach ($classNames as $className) {
+                if (empty($mappingConfig[$className]['alias'])) {
+                    throw new \InvalidArgumentException(
+                        sprintf('The search alias for the entity "%s" not found.', $className)
+                    );
+                }
+                $result[$className] = $mappingConfig[$className]['alias'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets the search alias of a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return string|null The search alias of the entity
+     *                     or NULL if the entity is not registered in a search index or has no the search alias
+     */
+    public function getEntityAlias($className)
+    {
+        $mappingConfig = $this->getMappingConfig();
+
+        return !empty($mappingConfig[$className]['alias'])
+            ? $mappingConfig[$className]['alias']
+            : null;
+    }
+
+    /**
      * Get list of available entity classes
      *
      * @return array
