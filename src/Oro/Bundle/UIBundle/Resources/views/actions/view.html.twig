@@ -90,6 +90,8 @@
                                 {% block pageActions %}
                                     {% placeholder view_pageActions_before with {entity: entity} %}
 
+                                    {% placeholder share_block with {'entity': entity} %}
+
                                     {% block ownerLink %}
                                         {% if isDesktopVersion() %}
                                             {% set ownerLink = UI.entityOwnerLink(entity) %}

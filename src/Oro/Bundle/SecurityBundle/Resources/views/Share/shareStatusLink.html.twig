@@ -1,0 +1,29 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+<li>
+{{ UI.clientLink({
+    'dataUrl': path(
+    'oro_share_update', {
+        entityClass: oro_class_name(entity, true),
+        entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'dataId': entity.id,
+    'label': 'oro.security.status.shared'|trans,
+    'widget': {
+        'type': 'dialog',
+        'multiple': false,
+        'options': {
+            'alias': 'note-dialog',
+            'dialogOptions': {
+                'title': 'oro.security.action.share'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 500
+            }
+        }
+    }
+}) }}
+</li>

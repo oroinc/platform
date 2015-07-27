@@ -27,3 +27,5 @@ oro:
         action:
             share: Share record
             shared: Record shared
+        status:
+            shared: Shared
