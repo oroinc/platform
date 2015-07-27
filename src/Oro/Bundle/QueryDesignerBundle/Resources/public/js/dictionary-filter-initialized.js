@@ -3,7 +3,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
     'use strict';
 
     function loadEnumChoices(className, successCallback, errorCallback) {
-        console.log(2);
+        console.log(2, 'request to oro_api_get_dictionary_values');
         $.ajax({
             url: routing.generate(
                 'oro_api_get_dictionary_values',
@@ -39,7 +39,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
         var className = _.last(context).field.related_entity_name;
 
         loadEnumChoices(className, function(choices) {
-            console.log(3);
+            console.log(3, 'loadEnumChoices dictionary-filter-initializer');
             var nullValue = null;
             var filterParams = {'class': className};
 
@@ -57,7 +57,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             filterOptions.filterParams = filterParams;
             filterOptions.choices = choices;
 
-            console.log(4);
+            console.log(4, 'done prepare filter options');
 
             // mark promise as resolved
             promise.resolveWith(filterOptions);

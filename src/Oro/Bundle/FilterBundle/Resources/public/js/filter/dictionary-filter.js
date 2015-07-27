@@ -21,12 +21,13 @@ define([
      * @extends oro.filter.SelectFilter
      */
     DictionaryFilter = AbstractFilter.extend({
+        renderMode: 'select2',
         /**
          * Filter selector template
          *
          * @property
          */
-        templateSelector: '#multiselect-filter-template',
+        templateSelector: '#dictionary-filter-template',
 
         /**
          * Select widget options
@@ -49,20 +50,11 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            console.log(5);
-            console.log(this);
-
+            console.log(5, 'initialization filter');
             this.initFilter();
-            //if (_.isUndefined(this.emptyValue)) {
-            //    this.emptyValue = {
-            //        value: [FILTER_EMPTY_VALUE]
-            //    };
-            //}
-            //DictionaryFilter.__super__.initialize.apply(this, arguments);
+            DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
-
-
-        initFilter: function() {
+        render: function() {
             var className = this.constructor.prototype;
             var self = this;
             $.ajax({
@@ -72,14 +64,14 @@ define([
                 ),
                 success: function(data) {
                     self.count = data;
-                    DictionaryFilter.__super__.initialize.apply(self, arguments);
+                    console.log(data);
                     if (data > 10) {
-                        //self.initSelect2();
-                        alert(1);
+                        self.componentMode = 'select2autocomplate';
                     } else {
-                        alert(2);
-                        self.initMultiselect();
+                        self.componentMode = 'select2';
                     }
+
+                    self.renderSelect2();
                 },
                 error: function(jqXHR) {
                     //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
@@ -89,83 +81,87 @@ define([
                 }
             });
         },
+        renderSelect2: function() {
+            debugger;
+            var className = this.constructor.prototype;
+            var tt = _.template($(this.templateSelector).html());
+            this.$el.append(tt);
 
-        initMultiselect: function() {
-
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _onSelectChange: function() {
-            DictionaryFilter.__super__._onSelectChange.apply(this, arguments);
-            this._setDropdownWidth();
-        },
-
-        /**
-         * Set design for select dropdown
-         *
-         * @protected
-         */
-        _setDropdownWidth: function() {
-            if (!this.cachedMinimumWidth) {
-                this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth,
-                    this.selectWidget.getMinimumDropdownWidth()) + 24;
+            if (this.componentMode === 'select2autocomplate') {
+                this.$el.find('.select-values-autocomplete').removeClass('hide');
+                this.$el.find('.select-values-autocomplete').attr('multiple','multiple').select2({
+                    multiple: true,
+                    ajax: {
+                        url: routing.generate(
+                            'oro_dictionary_filter',
+                            {
+                                dictionary: className.filterParams.class.replace(/\\/g, '_')
+                            }
+                        ),
+                        dataType: 'json',
+                        delay: 250,
+                        type: 'POST',
+                        data: function (params) {
+                            console.log('params', params);
+                            return {
+                                q: params // search term
+                            };
+                        },
+                        results: function (data, page) {
+                            // parse the results into the format expected by Select2.
+                            // since we are using custom formatting functions we do not need to
+                            // alter the remote JSON data
+                            return {
+                                results: data.results
+                            };
+                        },
+                        cache: true
+                    },
+                    dropdownAutoWidth : true,
+                    escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+                    minimumInputLength: 1
+                });
             }
-            var widget = this.selectWidget.getWidget();
-            var requiredWidth = this.cachedMinimumWidth;
-            // fix width
-            widget.width(requiredWidth).css({
-                minWidth: requiredWidth,
-                maxWidth: requiredWidth
-            });
-            widget.find('input[type="search"]').width(requiredWidth - 30);
-        },
 
-        /**
-         * Set raw value to filter
-         *
-         * @param value
-         * @return {*}
-         */
-        setValue: function(value) {
-            var normValue;
-            normValue = this._normalizeValue(tools.deepClone(value));
-            // prevent uncheck 'Any' value
-            if ((value.value === null || value.value === undefined) && tools.isEqualsLoosely(this.value, normValue)) {
-                this._updateDOMValue();
-                this._onValueUpdated(normValue, this.value);
-            }
-            DictionaryFilter.__super__.setValue.call(this, normValue);
-        },
+            if (this.componentMode === 'select2') {
+                var self = this;
+                var proto = this.__proto__;
+                console.log(proto);
 
-        /**
-         * Updates checkboxes when user clicks on element corresponding empty value
-         */
-        _normalizeValue: function(value) {
-            // means that all checkboxes are unchecked
-            if (value.value === null || value.value === undefined) {
-                value.value = [FILTER_EMPTY_VALUE];
-                return value;
+                this.$el.find('.select-values').removeClass('hide');
+                $.each(proto.choices, function(index, value) {
+                    self.$el.find('.select-values').append('<option value="'+ value.value +'">'+value.label+ '</option>');
+                });
+                //this.$el.find('.select-values')
+                this.$el.find('.select-values').attr('multiple','multiple').select2({
+                    //multiple: true
+                    dropdownAutoWidth : true
+                }).on('change', function (e) {
+                    console.log('this.value', this.value);
+                    self.applyValue();
+                });
             }
-            // if we have old value
-            // need to check if it has selected "EMPTY" option
-            if (this.isEmpty()) {
-                // need to uncheck it in new value
-                if (value.value.length > 1) {
-                    var indexOfEmptyOption = value.value.indexOf(FILTER_EMPTY_VALUE);
-                    if (indexOfEmptyOption !== -1) {
-                        value.value.splice(indexOfEmptyOption, 1);
-                    }
-                }
-            } else {
-                // if we just selected "EMPTY" option
-                if (!value.value || value.value.indexOf(FILTER_EMPTY_VALUE) !== -1) {
-                    // clear other choices
-                    value.value = [FILTER_EMPTY_VALUE];
-                }
+        },
+        isEmptyValue: function() {
+            return false;
+        },
+        getValue:function() {
+            var value;
+            if (this.componentMode === 'select2autocomplate') {
+                value =  this.$el.find('.select-values-autocomplete').select2("val");
+            }
+
+            if (this.componentMode === 'select2') {
+                value =  this.$el.find('.select-values').select2("val");
             }
             return value;
+        },
+        _writeDOMValue: function(value) {
+            this._setInputValue(this.inputSelector, value);
+            return this;
+        },
+        _readDOMValue: function() {
+            return this.getValue();
         }
     });
 
