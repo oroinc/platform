@@ -13,24 +13,16 @@ use Oro\Bundle\SearchBundle\Entity\Item;
 
 class Orm extends AbstractEngine
 {
-    /**
-     * @var SearchIndexRepository
-     */
+    /** @var SearchIndexRepository */
     protected $indexRepository;
 
-    /**
-     * @var ObjectMapper
-     */
+    /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $drivers = array();
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $needFlush = true;
 
     /**
@@ -199,7 +191,8 @@ class Orm extends AbstractEngine
     {
         $results = array();
         $searchResults = $this->getIndexRepository()->search($query);
-        if (($query->getMaxResults() > 0 || $query->getFirstResult() > 0)) {
+        //if (($query->getMaxResults() > 0 || $query->getFirstResult() > 0)) {
+        if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
         } else {
             $recordsCount = count($searchResults);
