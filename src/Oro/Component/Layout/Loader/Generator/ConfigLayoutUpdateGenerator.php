@@ -83,7 +83,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         foreach ($actions as $nodeNo => $actionDefinition) {
             if (isset($actionDefinition[self::PATH_ATTR])) {
                 $path = $actionDefinition[self::PATH_ATTR];
-                unset ($actionDefinition[self::PATH_ATTR]);
+                unset($actionDefinition[self::PATH_ATTR]);
             } else {
                 $path = self::NODE_ACTIONS . '.' . $nodeNo;
             }
