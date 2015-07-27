@@ -41,6 +41,6 @@ class AddressCollectionType extends AbstractType
      */
     public function getName()
     {
-        return static::NAME;
+        return self::NAME;
     }
 }
