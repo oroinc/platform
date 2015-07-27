@@ -617,3 +617,4 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_entity_config.provider.security
+            - @doctrine

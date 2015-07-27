@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Entity\Repository;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityRepository;
 
 class AclEntryRepository extends EntityRepository
 {
@@ -26,8 +26,8 @@ class AclEntryRepository extends EntityRepository
             ->setParameter('entityId', $entity->getId())
             ->setMaxResults(1);
 
-        $item = $queryBuilder->getQuery()->getResult();
+        $item = $queryBuilder->getQuery()->getOneOrNullResult();
 
-        return !empty($item)?:false;
+        return $item ? true : false;
     }
 }

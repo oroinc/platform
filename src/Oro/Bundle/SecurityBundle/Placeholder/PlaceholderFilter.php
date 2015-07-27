@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -16,22 +16,22 @@ class PlaceholderFilter
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var ManagerRegistry */
-    protected $registry;
+    /** @var ObjectManager */
+    protected $manager;
 
     /**
      * @param SecurityFacade  $securityFacade
      * @param ConfigProvider  $configProvider
-     * @param ManagerRegistry $registry
+     * @param ObjectManager $manager
      */
     public function __construct(
         SecurityFacade $securityFacade,
         ConfigProvider $configProvider,
-        ManagerRegistry $registry
+        ObjectManager $manager
     ) {
         $this->securityFacade = $securityFacade;
         $this->configProvider = $configProvider;
-        $this->registry       = $registry;
+        $this->manager        = $manager;
     }
 
     /**
@@ -51,15 +51,15 @@ class PlaceholderFilter
             $this->configProvider->getConfig($className)->get('share_scopes');
     }
 
+    /**
+     * Check if the entity is shared
+     *
+     * @param object $entity
+     * @return bool
+     */
     public function isShared($entity)
     {
-        if (null === $entity || !is_object($entity)) {
-            return false;
-        }
-
-        $className = ClassUtils::getClass($entity);
-        return $this->securityFacade->isGranted('SHARE', $entity) && $this->configProvider->hasConfig($className) &&
-            $this->configProvider->getConfig($className)->get('share_scopes') &&
-            $this->registry->getManager()->getRepository('OroSecurityBundle:AclEntry')->isEntityShared($entity);
+        return $this->isShareEnabled($entity) &&
+            $this->manager->getRepository('OroSecurityBundle:AclEntry')->isEntityShared($entity);
     }
 }
