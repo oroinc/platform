@@ -8,13 +8,13 @@ use LogicException;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 class AuditFilter extends EntityFilter
 {
@@ -156,7 +156,7 @@ class AuditFilter extends EntityFilter
             $type = 'text';
         }
 
-        $newValueField = sprintf('new%s', ucfirst(AuditField::normalizeDataTypeName($type)));
+        $newValueField = sprintf('new%s', ucfirst(AuditFieldTypeRegistry::getAuditType($type)));
 
         $this->applyFilter(
             $ds,
