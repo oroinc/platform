@@ -2,39 +2,21 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
+use LogicException;
+
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\DataAuditBundle\Exception\UnsupportedDataTypeException;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
+use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_audit_field")
+ * @Config(mode=Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN)
  */
-class AuditField
+class AuditField extends ExtendAuditField
 {
-    /** @var string[] */
-    protected static $typeMap = [
-        'boolean'   => 'boolean',
-        'text'      => 'text',
-        'string'    => 'text',
-        'guid'      => 'text',
-        'manyToOne' => 'text',
-        'enum'      => 'text',
-        'multiEnum' => 'text',
-        'ref-many'  => 'text',
-        'ref-one'   => 'text',
-        'smallint'  => 'integer',
-        'integer'   => 'integer',
-        'bigint'    => 'integer',
-        'decimal'   => 'float',
-        'float'     => 'float',
-        'money'     => 'float',
-        'percent'   => 'float',
-        'date'      =>  'date',
-        'time'      => 'time',
-        'datetime'  => 'datetime',
-    ];
-
     /**
      * @var int
      *
@@ -58,6 +40,13 @@ class AuditField
      * @ORM\Column(type="string", nullable=false)
      */
     protected $field;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", options={"default"=true})
+     */
+    protected $visible = true;
 
     /**
      * @var string
@@ -116,6 +105,41 @@ class AuditField
     protected $oldDatetime;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="old_datetimetz", type="datetimetz", nullable=true)
+     */
+    protected $oldDatetimetz;
+
+    /**
+     * @var object
+     *
+     * @ORM\Column(name="old_object", type="object", nullable=true)
+     */
+    protected $oldObject;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="old_array", type="array", nullable=true)
+     */
+    protected $oldArray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="old_simplearray", type="simple_array", nullable=true)
+     */
+    protected $oldSimplearray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="old_jsonarray", type="json_array", nullable=true)
+     */
+    protected $oldJsonarray;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="new_integer", type="bigint", nullable=true)
@@ -165,6 +189,41 @@ class AuditField
     protected $newDatetime;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="new_datetimetz", type="datetimetz", nullable=true)
+     */
+    protected $newDatetimetz;
+
+    /**
+     * @var object
+     *
+     * @ORM\Column(name="new_object", type="object", nullable=true)
+     */
+    protected $newObject;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="new_array", type="array", nullable=true)
+     */
+    protected $newArray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="new_simplearray", type="simple_array", nullable=true)
+     */
+    protected $newSimplearray;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="new_jsonarray", type="json_array", nullable=true)
+     */
+    protected $newJsonarray;
+
+    /**
      * @param Audit $audit
      * @param string $field
      * @param string $dataType
@@ -176,10 +235,7 @@ class AuditField
         $this->audit = $audit;
         $this->field = $field;
 
-        $this->dataType = static::normalizeDataTypeName($dataType);
-        if (is_null($this->dataType)) {
-            throw new UnsupportedDataTypeException($dataType);
-        }
+        $this->dataType = AuditFieldTypeRegistry::getAuditType($dataType);
 
         $this->setOldValue($oldValue);
         $this->setNewValue($newValue);
@@ -191,6 +247,14 @@ class AuditField
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
     }
 
     /**
@@ -238,20 +302,6 @@ class AuditField
     }
 
     /**
-     * @param string $dataType
-     *
-     * @return string|null
-     */
-    public static function normalizeDataTypeName($dataType)
-    {
-        if (isset(static::$typeMap[$dataType])) {
-            return static::$typeMap[$dataType];
-        }
-
-        return null;
-    }
-
-    /**
      * @param mixed $value
      *
      * @return this
@@ -284,6 +334,20 @@ class AuditField
      */
     protected function getPropertyName($type)
     {
-        return sprintf('%s%s', $type, ucfirst($this->dataType));
+        $name = sprintf('%s%s', $type, ucfirst($this->dataType));
+        if (property_exists(get_class($this), $name)) {
+            return $name;
+        }
+
+        $customName = sprintf('%s_%s', $type, $this->dataType);
+        if (property_exists(get_class($this), $customName)) {
+            return $customName;
+        }
+
+        throw new LogicException(sprintf(
+            'Neither property "%s" nor "%s" was found. Maybe you forget to add migration?',
+            $name,
+            $customName
+        ));
     }
 }
