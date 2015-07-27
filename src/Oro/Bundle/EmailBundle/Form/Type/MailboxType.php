@@ -151,7 +151,7 @@ class MailboxType extends AbstractType
         /** @var Mailbox $data */
         $data = $event->getData();
 
-        if ($data !== null) {
+        if (($data !== null) && ($data->getOrigin() !== null)) {
             $data->getOrigin()->setOwner(null);
         }
     }
