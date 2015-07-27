@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -57,6 +58,7 @@ class MailboxType extends AbstractType
             'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
                 new NotNull(),
+                new Email(),
             ],
         ]);
         $builder->add('origin', 'oro_imap_configuration');
@@ -73,6 +75,7 @@ class MailboxType extends AbstractType
             'required'    => false,
             'mapped'      => false,
             'empty_value' => 'oro.email.mailbox.process.default.label',
+            'empty_data'  => null,
         ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);

@@ -7,6 +7,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -25,6 +26,7 @@ class MailboxController extends RestController
      *      description="Delete Mailbox",
      *      resource=true
      * )
+     * @AclAncestor("oro_email_mailbox_delete")
      * @return Response
      */
     public function deleteAction($id)

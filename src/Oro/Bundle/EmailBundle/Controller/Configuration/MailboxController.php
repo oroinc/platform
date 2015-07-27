@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -21,6 +22,7 @@ class MailboxController extends Controller
      *      name="oro_email_mailbox_update"
      * )
      * @Template
+     * @AclAncestor("oro_email_mailbox_edit")
      *
      * @param $mailbox
      *
@@ -109,6 +111,7 @@ class MailboxController extends Controller
      *      name="oro_email_mailbox_create"
      * )
      * @Template("OroEmailBundle:Configuration/Mailbox:edit.html.twig")
+     * @AclAncestor("oro_email_mailbox_create")
      *
      * @return array
      */

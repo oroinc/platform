@@ -150,7 +150,20 @@ class RequestEntity extends AbstractAction
             if ($this->isCaseInsensitive()) {
                 $field = "LOWER($field)";
             }
-            $queryBuilder->andWhere("$field = :$parameter")->setParameter($parameter, $value);
+            if (is_array($value)) {
+                if (count($value) == 1) {
+                    $operator = $value[0];
+                    $queryBuilder->andWhere("$field $operator");
+                } elseif (count($value) == 2) {
+                    $operator = $value[0];
+                    $value = $value[1];
+                    $queryBuilder->andWhere("$field $operator :$parameter")
+                        ->setParameter($parameter, $value);
+                }
+            } else {
+                $queryBuilder->andWhere("$field = :$parameter")
+                    ->setParameter($parameter, $value);
+            }
             $counter++;
         }
 
