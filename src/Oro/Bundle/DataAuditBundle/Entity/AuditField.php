@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_audit_field")
- * @Config
+ * @Config(mode=Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN)
  */
 class AuditField extends ExtendAuditField
 {
