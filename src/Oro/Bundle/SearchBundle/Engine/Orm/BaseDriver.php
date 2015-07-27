@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 abstract class BaseDriver
@@ -169,7 +170,6 @@ abstract class BaseDriver
         } else {
             $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
         }
-        //$whereExpr = $searchCondition['type'] . ' (' . $searchString . ')';
 
         $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
 
@@ -319,36 +319,12 @@ abstract class BaseDriver
         $this->setFrom($query, $qb);
 
         $criteria        = $query->getCriteria();
+
         $whereExpression = $criteria->getWhereExpression();
-
-        $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
-
-        $qb->andWhere($visitor->dispatch($whereExpression));
-
-//        $whereExpr = array();
-//        if (count($query->getOptions())) {
-//            foreach ($query->getOptions() as $index => $searchCondition) {
-//                $joinField = sprintf('search.%sFields', $searchCondition['fieldType']);
-//                $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
-//                $qb->leftJoin($joinField, $joinAlias);
-//
-//                if ($searchCondition['fieldType'] == Query::TYPE_TEXT) {
-//                    if ($searchCondition['fieldValue'] === '') {
-//                        $whereExpr[] = $joinAlias . '.field = :field' . $index;
-//                        $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-//                    } else {
-//                        $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
-//                    }
-//                } else {
-//                    $whereExpr[] = $this->addNonTextField($qb, $index, $searchCondition);
-//                }
-//            }
-//            if (substr($whereExpr[0], 0, 3) == 'and') {
-//                $whereExpr[0] = substr($whereExpr[0], 3, strlen($whereExpr[0]));
-//            }
-//
-//            $qb->andWhere(implode(' ', $whereExpr));
-//        }
+        if ($whereExpression) {
+            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+            $qb->andWhere($visitor->dispatch($whereExpression));
+        }
 
         if ($setOrderBy) {
             $this->addOrderBy($query, $qb);
@@ -398,13 +374,12 @@ abstract class BaseDriver
         $orderBy = $query->getCriteria()->getOrderings();
 
         if ($orderBy) {
-            /**
-             * TODO: ordering from criteria
-             */
-//            $orderRelation = $query->getOrderType() . 'Fields';
-//            $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
-//                ->orderBy('orderTable.value', $query->getOrderDirection())
-//                ->setParameter('orderField', $orderBy);
+            $direction = reset($orderBy);
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            $orderRelation = $fieldType . 'Fields';
+            $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
+                ->orderBy('orderTable.value', $direction)
+                ->setParameter('orderField', $fieldName);
         }
     }
 

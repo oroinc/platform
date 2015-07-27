@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use FOS\RestBundle\Util\Codes;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -83,7 +85,7 @@ class NoteController extends Controller
         $entityRoutingHelper = $this->getEntityRoutingHelper();
 
         $entity      = $entityRoutingHelper->getEntity($entityClass, $entityId);
-        $entityClass = get_class($entity);
+        $entityClass = ClassUtils::getRealClass($entity);
 
         $noteEntity = new Note();
         $noteEntity->setTarget($entity);

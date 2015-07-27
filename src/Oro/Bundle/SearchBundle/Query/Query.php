@@ -407,9 +407,10 @@ class Query
      */
     public function getOrderBy()
     {
-        $fieldName = array_pop(array_keys($this->criteria->getOrderings()));
+        $orders = array_keys($this->criteria->getOrderings());
+        $fieldName = array_pop($orders);
 
-        return explode('.', $fieldName)[1];
+        return Criteria::explodeFieldTypeName($fieldName)[1];
     }
 
     /**
@@ -421,9 +422,10 @@ class Query
      */
     public function getOrderType()
     {
-        $fieldName = array_pop(array_keys($this->criteria->getOrderings()));
+        $orders = array_keys($this->criteria->getOrderings());
+        $fieldName = array_pop($orders);
 
-        return explode('.', $fieldName)[0];
+        return Criteria::explodeFieldTypeName($fieldName)[0];
     }
 
     /**
@@ -435,7 +437,9 @@ class Query
      */
     public function getOrderDirection()
     {
-        return array_pop($this->criteria->getOrderings());
+        $orders = $this->criteria->getOrderings();
+
+        return array_pop($orders);
     }
 
     /**
@@ -461,6 +465,47 @@ class Query
         }
 
         return $string;
+    }
+
+    /**
+     * Returns string representation of the query
+     *
+     * @return string
+     */
+    public function getStringQuery()
+    {
+        $selectString = $this->getQuery();
+
+        $fromString = '';
+        if ($this->getFrom()) {
+            $fromString .=  ' from ' . implode(', ', $this->getFrom());
+        }
+
+        $visitor = new QueryStringExpressionVisitor();
+        $whereString = ' where ' . $this->criteria->getWhereExpression()->visit($visitor);
+
+        $orderByString = '';
+        if ($this->getOrderBy()) {
+            $orderByString .= ' ' . $this->getOrderBy();
+        }
+        if ($this->getOrderDirection()) {
+            $orderByString .= ' ' . $this->getOrderDirection();
+        }
+        if ($orderByString) {
+            $orderByString = ' order by' . $orderByString;
+        }
+
+        $limitString = '';
+        if ($this->getMaxResults() && $this->getMaxResults() != Query::INFINITY) {
+            $limitString = ' limit ' . $this->getMaxResults();
+        }
+
+        $offsetString = '';
+        if ($this->getFirstResult()) {
+            $offsetString .= ' offset ' . $this->getFirstResult();
+        }
+
+        return $selectString . $fromString. $whereString . $orderByString . $limitString . $offsetString;
     }
 
     /**
