@@ -7,7 +7,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
@@ -764,7 +764,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    public function isRegionValid(ExecutionContext $context)
+    public function isRegionValid(ExecutionContextInterface $context)
     {
         if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->region && !$this->regionText) {
             // do not allow saving text region in case when region was checked from list

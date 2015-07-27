@@ -8,12 +8,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Asset\Packages as AssetHelper;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\IntegrationBundle\Form\Choice\Loader;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -30,15 +29,15 @@ class IntegrationSelectType extends AbstractType
     protected $typesRegistry;
 
     /**
-     * @param EntityManager    $em
-     * @param TypesRegistry    $typesRegistry
-     * @param CoreAssetsHelper $assetHelper
-     * @param AclHelper        $aclHelper
+     * @param EntityManager $em
+     * @param TypesRegistry $typesRegistry
+     * @param AssetHelper   $assetHelper
+     * @param AclHelper     $aclHelper
      */
     public function __construct(
         EntityManager $em,
         TypesRegistry $typesRegistry,
-        CoreAssetsHelper $assetHelper,
+        AssetHelper $assetHelper,
         AclHelper $aclHelper
     ) {
         $this->em            = $em;
@@ -100,7 +99,7 @@ class IntegrationSelectType extends AbstractType
                 $attributes['data-icon'] = $this->assetHelper->getUrl($typeData[$integration->getType()]['icon']);
             }
 
-            $choiceView->label = new ChoiceListItem($choiceView->label, $attributes);
+            $choiceView->attr = $attributes;
         }
     }
 

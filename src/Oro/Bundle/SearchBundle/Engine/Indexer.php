@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -15,7 +17,6 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -68,18 +69,18 @@ class Indexer
     protected $entityProvider;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @param ObjectManager     $em
-     * @param EngineInterface   $engine
-     * @param ObjectMapper      $mapper
-     * @param SecurityProvider  $securityProvider
-     * @param ConfigManager     $configManager
-     * @param EntityProvider    $entityProvider
-     * @param Translator        $translator
+     * @param ObjectManager       $em
+     * @param EngineInterface     $engine
+     * @param ObjectMapper        $mapper
+     * @param SecurityProvider    $securityProvider
+     * @param ConfigManager       $configManager
+     * @param EntityProvider      $entityProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ObjectManager       $em,
@@ -88,7 +89,7 @@ class Indexer
         SecurityProvider    $securityProvider,
         ConfigManager       $configManager,
         EntityProvider      $entityProvider,
-        Translator          $translator
+        TranslatorInterface $translator
     ) {
         $this->em               = $em;
         $this->engine           = $engine;
