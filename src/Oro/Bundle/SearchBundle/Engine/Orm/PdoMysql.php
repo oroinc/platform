@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoMysql extends BaseDriver
@@ -78,8 +79,6 @@ class PdoMysql extends BaseDriver
         } else {
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
-
-        //$whereExpr = $searchCondition['type'] . '(' . $whereExpr . ')';
 
         return $whereExpr;
     }
@@ -187,13 +186,8 @@ class PdoMysql extends BaseDriver
         }
 
         if ($setOrderBy) {
-            $rawValueParameter = "raw_$valueParameter";
-            $qb->select(
-                [
-                    'search as item',
-                    "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
-                ]
-            )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
+            $qb->addSelect(sprintf('MATCH_AGAINST(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+                ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
         }
 
         return (string)$result;
