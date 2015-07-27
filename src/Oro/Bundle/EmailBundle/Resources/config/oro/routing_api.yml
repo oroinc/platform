@@ -17,3 +17,7 @@ oro_email_activity_api:
 oro_email_activity_search_api:
     resource: Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySearchController
     type:     rest
+
+oro_email_mailbox_api:
+    resource: Oro\Bundle\EmailBundle\Controller\Api\Rest\MailboxController
+    type:     rest

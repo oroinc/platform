@@ -93,16 +93,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @ORM\PrePersist
-     */
-    public function beforeSave()
-    {
-        if ($this->origin !== null) {
-            $this->origin->setOwner(null);
-        }
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getId()

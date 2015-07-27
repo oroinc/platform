@@ -59,12 +59,13 @@ class MailboxType extends AbstractType
                 new NotNull(),
             ],
         ]);
-        $builder->add('originEnable', 'checkbox', [
+        $builder->add('origin', 'oro_imap_configuration');
+        $builder->add('activeOrigin', 'checkbox', [
             'required' => false,
             'label'    => 'oro.email.mailbox.origin.enable.label',
             'mapped'   => false,
+            'data'     => true,
         ]);
-        $builder->add('origin', 'oro_imap_configuration');
         $builder->add('smtpSettings', 'oro_email_smtp');
         $builder->add('processType', 'choice', [
             'label'       => 'oro.email.mailbox.process.type.label',
@@ -76,6 +77,7 @@ class MailboxType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -101,22 +103,17 @@ class MailboxType extends AbstractType
             return;
         }
 
-        FormUtils::replaceField(
-            $form,
-            'originEnable',
-            [
-                'data' => ($data->getOrigin() !== null)
-            ]
-        );
-
         $processType = null;
         if ($processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
         }
 
-        FormUtils::replaceField($form, 'processType', [
-            'data' => $processType,
-        ]);
+        FormUtils::replaceField($form, 'processType', ['data' => $processType]);
+
+        if ($data->getOrigin() !== null) {
+            $originActive = $data->getOrigin()->isActive();
+            FormUtils::replaceField($form, 'activeOrigin', ['data' => $originActive]);
+        }
 
         $this->addProcessField($form, $processType);
     }
@@ -134,17 +131,26 @@ class MailboxType extends AbstractType
         $processType = $data['processType'];
         $originalProcessType = $form->get('processType')->getData();
 
-        $originEnable = $data['originEnable'];
-        if (!$originEnable) {
-            $form->getViewData()->setOrigin(null);
-            $data['origin'] = null;
-        }
-
         if ($processType !== $originalProcessType) {
             $form->getViewData()->setProcessSettings(null);
         }
 
+        $originActive = isset($data['activeOrigin']) && $data['activeOrigin'];
+        if ($form->getViewData()->getOrigin() !== null) {
+            $form->getViewData()->getOrigin()->setActive($originActive);
+        }
+
         $this->addProcessField($form, $processType);
+    }
+
+    public function postSubmit(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+
+        if ($data !== null) {
+            $data->getOrigin()->setOwner(null);
+        }
     }
 
     /**
