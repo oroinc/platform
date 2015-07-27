@@ -735,7 +735,7 @@ class ConfigManager
         }
 
         $metadata = $this->getEntityMetadata($className);
-        $entityModel = $this->modelManager->findEntityModel($className);
+        $entityModel = $this->createConfigEntityModel($className, $metadata->mode);
         $entityModel->setMode($metadata->mode);
         foreach ($this->getProviders() as $provider) {
             $config        = $provider->getConfig($className);
