@@ -448,7 +448,24 @@ datagrid:
                 label: oro.email.mailbox.email.label
             label:
                 label: oro.email.mailbox.label.label
-
+            imap:
+                label: oro.email.mailbox.origin.label
+                type: twig
+                frontend_type: html
+                data_name: origin
+                template: OroEmailBundle:Mailbox:Datagrid/Property/origin.html.twig
+            smtp:
+                label: oro.email.mailbox.smtp_settings.enabled.label
+                type: twig
+                frontend_type: html
+                data_name: smtpSettings
+                template: OroEmailBundle:Mailbox:Datagrid/Property/smtpSettings.html.twig
+            processing:
+                data_name: processSettings
+                type: twig
+                label: oro.email.mailbox.process.label
+                frontend_type: html
+                template: OroEmailBundle:Mailbox:Datagrid/Property/processSettings.html.twig
         properties:
             id: ~
             update_link:

@@ -24,6 +24,7 @@ class SmtpType extends AbstractType
         $builder->add('enabled', 'checkbox', [
             'label'    => 'oro.email.mailbox.smtp_settings.enabled.label',
             'required' => false,
+            'data'     => false,
         ]);
         $builder->add('host', 'text', [
             'label'    => 'oro.email.mailbox.smtp_settings.host.label',

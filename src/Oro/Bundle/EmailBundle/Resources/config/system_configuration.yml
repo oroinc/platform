@@ -75,6 +75,7 @@ oro_system_configuration:
                                         children:
                                             - oro_email.default_button_reply
                                     mailboxes:
+                                        acl: oro_email_mailbox_view
                                         children:
                                             - oro_email.mailbox_grid
 
