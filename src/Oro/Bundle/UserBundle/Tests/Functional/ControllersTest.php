@@ -28,8 +28,6 @@ class ControllersTest extends WebTestCase
 
     public function testCreate()
     {
-        $this->markTestIncomplete('Temporary inactivate');
-
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = 1;
@@ -59,8 +57,6 @@ class ControllersTest extends WebTestCase
 
     public function testUpdate()
     {
-        $this->markTestIncomplete('Temporary inactivate');
-
         $response = $this->client->requestGrid(
             'users-grid',
             array('users-grid[_filter][username][value]' => 'testUser1')
@@ -126,8 +122,6 @@ class ControllersTest extends WebTestCase
 
     public function testViewProfile()
     {
-        $this->markTestIncomplete('Temporary inactivate');
-
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
@@ -136,8 +130,6 @@ class ControllersTest extends WebTestCase
 
     public function testUpdateProfile()
     {
-        $this->markTestIncomplete('Temporary inactivate');
-
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertContains(
