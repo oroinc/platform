@@ -353,6 +353,7 @@ class Indexer
         $lexer  = new Lexer();
         $parser = new ExpressionParser();
 
+        /** @var Query $query */
         $query = $parser->parse($lexer->tokenize($expression));
 
         $query->setMappingConfig($this->mapper->getMappingConfig());
