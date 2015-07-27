@@ -45,7 +45,7 @@
   }
 }
 .workflow-flowchart-wrapper {
-  overflow: auto;
+  overflow: hidden;
   height: 700px;
 }
 .workflow-flowchart {
@@ -76,6 +76,7 @@
       font-size: 14px;
       font-weight: bold;
       width: 100%;
+      cursor: default;
       > .dropdown-menu {
         text-align: left;
       }
@@ -168,6 +169,7 @@
     .transition-label {
       max-width: @transition-label-max-width;
       margin-top: 1px;
+      cursor: default;
     }
   }
 
@@ -256,6 +258,9 @@
   }
   &.workflow-flowchart-editor {
     .workflow-step {
+      cursor: move;
+    }
+    .step-label{
       cursor: move;
     }
     .workflow-transition-overlay {

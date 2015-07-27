@@ -69,7 +69,18 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
+            this.onZoomChange = _.bind(this.onZoomChange, this);
+            $(document).on('zoomchange', this.onZoomChange);
+
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+        },
+
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $(document).off('zoomchange', this.onZoomChange);
+            FlowchartJsPlumbAreaView.__super__.dispose.apply(this, arguments);
         },
 
         render: function() {
@@ -95,6 +106,10 @@ define(function(require) {
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
             }
+        },
+
+        onZoomChange: function (event, options) {
+            this.jsPlumbInstance.setZoom(options.zoom);
         }
     });
 
