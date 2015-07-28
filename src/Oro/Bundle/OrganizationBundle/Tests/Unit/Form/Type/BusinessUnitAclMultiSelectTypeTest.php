@@ -38,8 +38,6 @@ class BusinessUnitAclMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $builder->expects($this->once())
-            ->method('addEventListener');
-        $builder->expects($this->once())
             ->method('addModelTransformer');
         $this->formType->buildForm($builder, ['entity_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit']);
     }
