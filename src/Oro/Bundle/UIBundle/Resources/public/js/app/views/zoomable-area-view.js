@@ -2,9 +2,10 @@ define(function(require) {
     'use strict';
 
     var ZoomAreaView;
-    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
     var ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
+    var ZoomControlsView = require('./zoom-controls-view');
 
     require('jquery.mousewheel');
 
@@ -26,9 +27,11 @@ define(function(require) {
          */
         initialize: function(options) {
             ZoomAreaView.__super__.initialize.apply(this, arguments);
+            this.$zoomedElement = this.$el.find('>*:first');
             if (!this.model) {
                 this.model = new ZoomStateModel({
-                    el: this.el,
+                    wrapper: this.el,
+                    inner: this.$zoomedElement[0],
                     zoomLevel: 1,
                     dx: 0,
                     dy: 0
@@ -81,12 +84,17 @@ define(function(require) {
         },
 
         render: function () {
-            if (this.controls && !this.subview("controls")) {
-                console.log("create controls");
+            if (this.controls !== false && !this.subview('controls')) {
+                var el = $('<div class="zoom-controls"></div>');
+                this.subview('controls', new ZoomControlsView({
+                    el: el,
+                    model: this.model
+                }));
+                this.$el.prepend(el);
             }
-            this.$el.find('>:first').css({
-                transform: 'translate(' + this.model.get('dx') + 'px, ' + this.model.get('dy') + 'px)'
-                    + ' scale(' + this.model.get('zoom') + ', ' + this.model.get('zoom') + ')'
+            this.$zoomedElement.css({
+                transform: 'translate(' + this.model.get('dx') + 'px, ' + this.model.get('dy') + 'px)' +
+                    ' scale(' + this.model.get('zoom') + ', ' + this.model.get('zoom') + ')'
             });
         }
     });
