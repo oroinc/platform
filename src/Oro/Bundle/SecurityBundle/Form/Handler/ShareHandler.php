@@ -141,11 +141,11 @@ class ShareHandler
             throw new \LogicException('Sharing scopes are disabled');
         }
 
-        if (!in_array('user', $this->shareScopes, true)) {
+        if (!in_array(Share::SHARE_SCOPE_USER, $this->shareScopes, true)) {
             $this->form->remove('users');
         }
 
-        if (!in_array('business_unit', $this->shareScopes, true)) {
+        if (!in_array(Share::SHARE_SCOPE_BUSINESS_UNIT, $this->shareScopes, true)) {
             $this->form->remove('businessunits');
         }
     }
@@ -222,13 +222,13 @@ class ShareHandler
         return (
             $this->form->has('users') &&
             $sid instanceof UserSecurityIdentity &&
-            in_array('user', $this->shareScopes, true)
+            in_array(Share::SHARE_SCOPE_USER, $this->shareScopes, true)
         )
         ||
         (
             $this->form->has('businessunits') &&
             $sid instanceof BusinessUnitSecurityIdentity &&
-            in_array('business_unit', $this->shareScopes, true)
+            in_array(Share::SHARE_SCOPE_BUSINESS_UNIT, $this->shareScopes, true)
         );
     }
 

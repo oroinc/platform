@@ -39,6 +39,7 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Entity\AclClass;
+use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
@@ -564,10 +565,10 @@ class OwnershipConditionDataBuilder
         foreach ($sids as $key => $sid) {
             $sharedToScope = false;
 
-            if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
-                $sharedToScope = 'user';
-            } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
-                $sharedToScope = 'business_unit';
+            if ($sid instanceof UserSecurityIdentity) {
+                $sharedToScope = Share::SHARE_SCOPE_USER;
+            } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+                $sharedToScope = Share::SHARE_SCOPE_BUSINESS_UNIT;
             }
 
             if (in_array($sharedToScope, $shareScope)) {

@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Form\Model;
 
 class Share
 {
+    const SHARE_SCOPE_USER = 'user';
+    const SHARE_SCOPE_BUSINESS_UNIT = 'business_unit';
+
     /** @var string */
     protected $entityClass;
 

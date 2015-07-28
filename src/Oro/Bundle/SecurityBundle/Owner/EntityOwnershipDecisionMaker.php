@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
+use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -228,11 +229,11 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
 
         $sharedToScope = false;
         if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
-            $sharedToScope = 'user';
+            $sharedToScope = Share::SHARE_SCOPE_USER;
         } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
-            $sharedToScope = 'business_unit';
+            $sharedToScope = Share::SHARE_SCOPE_BUSINESS_UNIT;
         }
 
-        return in_array($sharedToScope, $shareScopes);
+        return in_array($sharedToScope, $shareScopes, true);
     }
 }

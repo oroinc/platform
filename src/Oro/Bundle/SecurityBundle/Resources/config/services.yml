@@ -71,6 +71,7 @@ parameters:
     oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
+    oro_security.form.type.share_scope.class:                  Oro\Bundle\SecurityBundle\Form\Type\ShareScopeType
     oro_security.form.type.share.class:                        Oro\Bundle\SecurityBundle\Form\Type\ShareType
     oro_security.form.handler.share.class:                     Oro\Bundle\SecurityBundle\Form\Handler\ShareHandler
     oro_security.form.model.factory.class:                     Oro\Bundle\SecurityBundle\Form\Model\Factory
@@ -590,6 +591,11 @@ services:
         class: %oro_security.form.type.share.class%
         tags:
             - { name: form.type, alias: oro_share }
+
+    oro_security.form.type.share_scope:
+        class: %oro_security.form.type.share_scope.class%
+        tags:
+            - { name: form.type, alias: oro_share_scope }
 
     oro_security.form.share:
         class: Symfony\Component\Form\Form

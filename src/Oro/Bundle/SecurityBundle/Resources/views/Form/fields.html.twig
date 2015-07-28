@@ -90,3 +90,43 @@
         </td>
     {% endfor %}
 {% endblock %}
+
+{% block oro_share_scope_widget %}
+    {{ form_widget(form, {'attr': {'class': 'share-scopes'}}) }}
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'], function ($, _, __, Modal) {
+            $(function () {
+                var anyElementChanged = false;
+                $('.share-scopes :checked').each(function (index, el) {
+                    $(el).on('change', function (e) {
+                        if (!anyElementChanged) {
+                            var confirmModal = new Modal({
+                                title: __("oro.security.share_scopes.confirmModal.title"),
+                                okText: __("oro.security.share_scopes.confirmModal.okText"),
+                                cancelText: __("oro.security.share_scopes.confirmModal.cancelText"),
+                                content: __("oro.security.share_scopes.confirmModal.content", {
+                                    scope_name: $(el).parent().find('label').text().trim(),
+                                    entity_name_plural: $('#oro_entity_config_type_entity_plural_label').val().trim(),
+                                    entity_name: $('#oro_entity_config_type_entity_label').val().trim()
+                                }),
+                                className: 'modal modal-primary',
+                                okButtonClass: 'btn-primary btn-large',
+                                handleClose: true
+                            });
+                            confirmModal.on('ok', function(){
+                                anyElementChanged = true;
+                            });
+                            confirmModal.on('cancel', function(){
+                                $(el).prop('checked', true);
+                            });
+                            confirmModal.on('close', function(){
+                                $(el).prop('checked', true);
+                            });
+                            confirmModal.open();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
