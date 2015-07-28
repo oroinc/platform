@@ -96,9 +96,36 @@ define([
             var type = $(e.currentTarget).attr('data-value');
             var choiceName = $(e.currentTarget).html();
 
-            var criteriaValues = this.$(this.criteriaValueSelectors.type).val(type);
+            var $typeInput = this.$(this.criteriaValueSelectors.type);
+            $typeInput.each(function () {
+                var $input = $(this);
+
+                if ($input.is(':not(select)')) {
+                    $input.val(type);
+
+                    return true;
+                }
+
+                /**
+                 * prevent setting of non existing value on select
+                 * leading to selecting default value in "fixSelect"
+                 * without showing this change in gui which causes huge amount
+                 * of issues due to having more inputs in "this.criteriaValueSelectors.type"
+                 *
+                 * how to reproduce one of them:
+                 * - create datetime field condition in reports/segments
+                 * - select "less than", then change other dropdown to "week"
+                 *   and check value of select in dropdown "less than"
+                 *   which should be 1 despite "less than" having value "4"
+                 */
+                if ($input.is(':has(option[value=' + type + '])')) {
+                    $input.val(type);
+
+                    return true;
+                }
+            });
             this.fixSelects();
-            criteriaValues.trigger('change');
+            $typeInput.trigger('change');
             choiceName += this.caret;
             parentDiv.find('.dropdown-toggle').html(choiceName);
 
