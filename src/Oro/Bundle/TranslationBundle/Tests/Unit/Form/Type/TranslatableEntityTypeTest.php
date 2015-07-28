@@ -138,7 +138,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('choice', $this->type->getParent());
+        $this->assertEquals('entity', $this->type->getParent());
     }
 
     /**
