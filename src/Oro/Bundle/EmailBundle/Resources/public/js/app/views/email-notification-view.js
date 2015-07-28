@@ -70,11 +70,13 @@ define([
             var self = this;
             $.ajax({
                 url: routing.generate('oro_email_mark_all_as_seen'),
-                success: function() {
+                success: function(r) {
                     self.collection.markAllAsRead();
                     self.render();
                     self.setCount(0);
-                    mediator.trigger('datagrid:doRefresh:user-email-grid');
+                    if (r.successful) {
+                        mediator.trigger('datagrid:doRefresh:user-email-grid');
+                    }
                     self.initLayout();
                 }
             });

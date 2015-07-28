@@ -69,10 +69,10 @@ class EmailController extends Controller
     /**
      * Get new Unread Emails for email notification
      *
-     * @Route("/notification/data", name="oro_email_new_natification_data")
+     * @Route("/last", name="oro_email_last")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
-    public function notificationDataAction()
+    public function lastAction()
     {
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');

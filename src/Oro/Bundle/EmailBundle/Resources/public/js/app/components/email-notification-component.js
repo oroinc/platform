@@ -49,7 +49,7 @@ define([
             var isNew = r[0].count_new;
             if (r) {
                 $.ajax({
-                    url: routing.generate('oro_api_get_email_notification_data'),
+                    url: routing.generate('oro_api_get_email_last'),
                     success: function(r) {
                         self.view.collection.reset();
                         self.view.collection.add(r.emails);

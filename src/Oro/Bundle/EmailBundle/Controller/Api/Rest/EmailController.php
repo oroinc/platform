@@ -150,21 +150,17 @@ class EmailController extends RestController
     }
 
     /**
-     * Get email.
+     * Get last N user emails.
      *
-     * @Get(
-     *      "/emails/notification/data",
-     *      name="",
-     * )
      * @ApiDoc(
-     *      description="Get email",
+     *      description="Get last N user emails (N - can be configured)",
      *      resource=true
      * )
      * @AclAncestor("oro_email_email_view")
      *
      * @return Response
      */
-    public function getNotificationDataAction()
+    public function getLastAction()
     {
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->getEmailNotificationManager();
