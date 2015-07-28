@@ -6,6 +6,8 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var ZoomStateModel = require('oroui/js/app/models/zoom-state-model');
 
+    require('jquery.mousewheel');
+
     ZoomAreaView = BaseView.extend({
         autoRender: true,
 
@@ -35,13 +37,13 @@ define(function(require) {
             this.$el.addClass('zoomable-area');
         },
 
-        onMouseWheel: function (event) {
+        onMouseWheel: function (event, delta, deltaX, deltaY) {
             var clientRect = this.el.getBoundingClientRect();
-            if (event.originalEvent.deltaY > 0) {
-                this.model.zoomIn(event.clientX - clientRect.left, event.clientY - clientRect.top);
+            if (deltaY > 0) {
+                this.model.zoomOut(event.clientX - clientRect.left, event.clientY - clientRect.top);
                 event.preventDefault();
             } else {
-                this.model.zoomOut(event.clientX - clientRect.left, event.clientY - clientRect.top);
+                this.model.zoomIn(event.clientX - clientRect.left, event.clientY - clientRect.top);
                 event.preventDefault();
             }
         },
