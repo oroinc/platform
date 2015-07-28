@@ -62,6 +62,7 @@ class ConfigurationType extends AbstractType
                 'checkbox',
                 [
                     'label'    => 'oro.imap.configuration.use_imap.label',
+                    'attr'     => ['class' => 'imap-config'],
                     'required' => false,
                     'mapped'   => false
                 ]
@@ -70,24 +71,27 @@ class ConfigurationType extends AbstractType
                 'imapHost',
                 'text',
                 [
-                    'label' => 'oro.imap.configuration.imap_host.label',
+                    'label'    => 'oro.imap.configuration.imap_host.label',
                     'required' => true,
-                    'attr' => [
-                        'class' => 'critical-field',
-                    ],
-                    'tooltip' => 'oro.imap.configuration.tooltip',
+                    'attr'     => ['class' => 'critical-field imap-config'],
+                    'tooltip'  => 'oro.imap.configuration.tooltip',
                 ]
             )
             ->add(
                 'imapPort',
                 'number',
-                ['label' => 'oro.imap.configuration.imap_port.label', 'required' => true]
+                [
+                    'label'    => 'oro.imap.configuration.imap_port.label',
+                    'attr'     => ['class' => 'imap-config'],
+                    'required' => true
+                ]
             )
             ->add(
                 'useSmtp',
                 'checkbox',
                 [
                     'label'    => 'oro.imap.configuration.use_smtp.label',
+                    'attr'     => ['class' => 'smtp-config'],
                     'required' => false,
                     'mapped'   => false
                 ]
@@ -96,18 +100,20 @@ class ConfigurationType extends AbstractType
                 'smtpHost',
                 'text',
                 [
-                    'label' => 'oro.imap.configuration.smtp_host.label',
+                    'label'    => 'oro.imap.configuration.smtp_host.label',
+                    'attr'     => ['class' => 'critical-field smtp-config'],
                     'required' => true,
-                    'attr' => [
-                        'class' => 'critical-field',
-                    ],
-                    'tooltip' => 'oro.imap.configuration.tooltip',
+                    'tooltip'  => 'oro.imap.configuration.tooltip',
                 ]
             )
             ->add(
                 'smtpPort',
                 'number',
-                ['label' => 'oro.imap.configuration.smtp_port.label', 'required' => true]
+                [
+                    'label'    => 'oro.imap.configuration.smtp_port.label',
+                    'attr'     => ['class' => 'smtp-config'],
+                    'required' => true
+                ]
             )
             ->add(
                 'ssl',
@@ -124,12 +130,10 @@ class ConfigurationType extends AbstractType
                 'user',
                 'text',
                 [
-                    'label' => 'oro.imap.configuration.user.label',
+                    'label'    => 'oro.imap.configuration.user.label',
                     'required' => true,
-                    'attr' => [
-                        'class' => 'critical-field',
-                    ],
-                    'tooltip' => 'oro.imap.configuration.tooltip',
+                    'attr'     => ['class' => 'critical-field'],
+                    'tooltip'  => 'oro.imap.configuration.tooltip',
                 ]
             )
             ->add(
@@ -141,10 +145,8 @@ class ConfigurationType extends AbstractType
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
             ])
             ->add('folders', 'oro_email_email_folder_tree', [
-                'label' => $this->translator->trans('oro.email.folders.label'),
-                'attr' => [
-                    'class' => 'folder-tree',
-                ],
+                'label'   => $this->translator->trans('oro.email.folders.label'),
+                'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
     }
@@ -181,7 +183,6 @@ class ConfigurationType extends AbstractType
                     foreach ($data->getFolders() as $folder) {
                         $folder->setOrigin($data);
                     }
-
                     $event->setData($data);
                 }
             }

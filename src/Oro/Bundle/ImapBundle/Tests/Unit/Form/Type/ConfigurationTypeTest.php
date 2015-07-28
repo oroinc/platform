@@ -128,33 +128,27 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         return array(
             'should bind correct data except password' => array(
                 array(
-                    'useImap'  => true,
                     'imapHost' => 'someHost',
                     'imapPort' => '123',
-                    'useSmtp'  => true,
-                    'smtpHost' => 'someHost2',
-                    'smtpPort' => '456',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD,
                 ),
                 array(
-                    'useImap'  => true,
                     'imapHost' => 'someHost',
                     'imapPort' => '123',
-                    'useSmtp'  => true,
-                    'smtpHost' => 'someHost2',
-                    'smtpPort' => '456',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                 ),
                 array(
-                    'useImap'  => true,
                     'imapHost' => 'someHost',
                     'imapPort' => '123',
-                    'useSmtp'  => true,
-                    'smtpHost' => 'someHost2',
-                    'smtpPort' => '456',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD
@@ -162,10 +156,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ),
             'should not create empty entity' => array(
                 array(
-                    'useImap'  => false,
                     'imapHost' => '',
                     'imapPort' => '',
-                    'useSmtp'  => false,
                     'smtpHost' => '',
                     'smtpPort' => '',
                     'ssl'      => '',
@@ -192,12 +184,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'useImap'  => true,
                 'imapHost' => 'someHost',
                 'imapPort' => '123',
-                'useSmtp'  => true,
-                'smtpHost' => 'someHost2',
-                'smtpPort' => '456',
+                'smtpHost' => '',
+                'smtpPort' => '',
                 'ssl'      => 'ssl',
                 'user'     => 'someUser',
                 'password' => ''
@@ -222,12 +212,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'useImap'  => true,
                 'imapHost' => 'someHost',
                 'imapPort' => '123',
-                'useSmtp'  => true,
-                'smtpHost' => 'someHost2',
-                'smtpPort' => '456',
+                'smtpHost' => '',
+                'smtpPort' => '',
                 'ssl'      => 'ssl',
                 'user'     => 'someUser',
                 'password' => 'somPassword'
@@ -255,10 +243,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'useImap'  => '',
                 'imapHost' => '',
                 'imapPort' => '',
-                'useSmtp'  => '',
                 'smtpHost' => '',
                 'smtpPort' => '',
                 'ssl'      => '',
