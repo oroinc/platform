@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
-use Symfony\Component\Validator\ConstraintValidatorFactory;
-use Symfony\Component\Validator\DefaultTranslator;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
-use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Constraints\File as FileConstraint;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
@@ -16,7 +12,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigFileValidator */
     protected $configValidator;
 
-    /** @var Validator */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -27,11 +23,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->validator = new Validator(
-            new ClassMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory(),
-            new DefaultTranslator()
-        );
+        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $this->config = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -48,11 +40,18 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
         $this->configValidator = new ConfigFileValidator($this->validator, $configManager, $this->config);
     }
 
-    /**
-     * @dataProvider validationData
-     */
-    public function testValidate($dataClass, $entity, $fieldName, $mimeTypes, $isValid)
+    public function testValidate()
     {
+        $dataClass = 'testClass';
+        $entity = new File();
+        $file = new \Symfony\Component\HttpFoundation\File\File(
+            realpath(__DIR__ . '/../Fixtures/testFile/test.txt')
+        );
+        $entity->setFile($file);
+        $fieldName = 'testField';
+        $mimeTypes = "image/*\ntext/plain";
+        $maxsize = 1; // 1Mb
+
         $entityAttachmentConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
@@ -76,36 +75,27 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
         $entityAttachmentConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
-            ->will($this->returnValue(1));
+            ->will($this->returnValue($maxsize));
+
+        $violationList = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with(
+                $this->identicalTo($entity->getFile()),
+                [
+                    new FileConstraint(
+                        [
+                            'maxSize'   => $maxsize * 1024 * 1024,
+                            'mimeTypes' => explode("\n", $mimeTypes)
+                        ]
+                    )
+                ]
+            )
+            ->willReturn($violationList);
 
         $result = $this->configValidator->validate($dataClass, $entity, $fieldName);
-        if ($isValid) {
-            $this->assertEquals(0, $result->count());
-        } else {
-            $this->assertNotEquals(0, $result->count());
-        }
-    }
-
-    public function validationData()
-    {
-        $fileEntity = new File();
-        $file = new \Symfony\Component\HttpFoundation\File\File(realpath(__DIR__ . '/../Fixtures/testFile/test.txt'));
-        $fileEntity->setFile($file);
-        return [
-            'valid' => [
-                'testClass',
-                $fileEntity,
-                'testField',
-                "image/*\ntext/plain",
-                true
-            ],
-            'bad_mime' => [
-                'testClass',
-                $fileEntity,
-                'testField',
-                "image/*",
-                false
-            ],
-        ];
+        $this->assertSame($violationList, $result);
     }
 }

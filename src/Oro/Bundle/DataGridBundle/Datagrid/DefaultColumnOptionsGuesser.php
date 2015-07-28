@@ -40,6 +40,13 @@ class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
             case 'percent':
                 $frontendType = Property::TYPE_PERCENT;
                 break;
+            case 'simple_array':
+                $frontendType = Property::TYPE_SIMPLE_ARRAY;
+                break;
+            case 'array':
+            case 'json_array':
+                $frontendType = Property::TYPE_ARRAY;
+                break;
             default:
                 $frontendType = Property::TYPE_STRING;
                 break;
