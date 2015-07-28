@@ -355,25 +355,22 @@ class Parser
             return [$whereType, $this->parseCompositeCondition()];
         }
 
-        /** @var Token $token */
-        $fieldNameToken = $this->stream->current;
+        /**
+         * We expecting that both field type and field name will be specified
+         */
+        $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, null, null, false);
+        $fieldNameToken = $this->stream->expect(Token::STRING_TYPE, null, null, false);
 
-        $this->stream->next();
-
-        if ($this->stream->current->test(Token::STRING_TYPE)) {
-            $fieldType      = $fieldNameToken->value;
-            $fieldNameToken = $this->stream->current;
-            $this->stream->next();
-        } elseif ($this->stream->current->test(Token::OPERATOR_TYPE)) {
-            $fieldType = Query::TYPE_TEXT;
+        $fieldType = Query::TYPE_TEXT;
+        if (!$fieldNameToken) {
+            /**
+             * If field type is not specified we got field name in first expect ($fieldTypeToken)
+             */
+            $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldTypeToken->value);
         } else {
-            throw new ExpressionSyntaxError(
-                sprintf('Unexpected token "%s" in comparison statement', $this->stream->current->type),
-                $this->stream->current->cursor
-            );
+            $fieldType = $fieldTypeToken->value;
+            $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldNameToken->value);
         }
-
-        $fieldName = $this->query->getCriteria()->implodeFieldTypeName($fieldType, $fieldNameToken->value);
 
         /** @var Token $operatorToken */
         $operatorToken = $this->stream->expect(

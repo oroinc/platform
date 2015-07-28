@@ -22,6 +22,9 @@ class Lexer
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function tokenize($expression)
     {
@@ -49,29 +52,26 @@ class Lexer
                 $cursor += strlen($match[0]);
             } elseif (preg_match('/[0-9]+(?:\.[0-9]+)?/A', $expression, $match, null, $cursor)) {
                 // numbers
-                $number = (float)$match[0];  // floats
+                $number = (float) $match[0];  // floats
                 if (ctype_digit($match[0]) && $number <= PHP_INT_MAX) {
-                    $number = (int)$match[0]; // integers lower than the maximum
+                    $number = (int) $match[0]; // integers lower than the maximum
                 }
                 $tokens[] = new Token(Token::NUMBER_TYPE, $number, $cursor + 1);
                 $cursor += strlen($match[0]);
             } elseif (false !== strpos('([{', $expression[$cursor])) {
                 // opening bracket
                 $brackets[] = [$expression[$cursor], $cursor];
-
-                $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
+                $tokens[]   = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
             } elseif (false !== strpos(')]}', $expression[$cursor])) {
                 // closing bracket
                 if (empty($brackets)) {
                     throw new ExpressionSyntaxError(sprintf('Unexpected "%s"', $expression[$cursor]), $cursor);
                 }
-
                 list($expect, $cur) = array_pop($brackets);
                 if ($expression[$cursor] != strtr($expect, '([{', ')]}')) {
                     throw new ExpressionSyntaxError(sprintf('Unclosed "%s"', $expect), $cur);
                 }
-
                 $tokens[] = new Token(Token::PUNCTUATION_TYPE, $expression[$cursor], $cursor + 1);
                 ++$cursor;
             } elseif (preg_match(
@@ -110,7 +110,6 @@ class Lexer
                 } else {
                     $tokens[] = new Token(Token::STRING_TYPE, $match[0], $cursor + 1);
                 }
-
                 $cursor += strlen($match[0]);
             } else {
                 // unlexable

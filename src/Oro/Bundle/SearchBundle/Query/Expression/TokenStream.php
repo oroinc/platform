@@ -67,12 +67,13 @@ class TokenStream
         $token  = $this->current;
         $passed = false;
 
-        if (null === $value || is_string($value)) {
+        if (!is_array($value)) {
             $value = [$value];
         }
 
         foreach ($value as $valueItem) {
-            if ($passed = $token->test($type, $valueItem)) {
+            $passed = $token->test($type, $valueItem);
+            if (true === $passed) {
                 break;
             }
         }
