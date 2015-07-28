@@ -150,12 +150,13 @@ class EmailController extends RestController
     }
 
     /**
-     * Get last N user emails.
+     * Get last N user emails (N - can be configured by application config)
      *
      * @ApiDoc(
-     *      description="Get last N user emails (N - can be configured)",
+     *      description="Get last user emails",
      *      resource=true
      * )
+     * @Get("/emails/last")
      * @AclAncestor("oro_email_email_view")
      *
      * @return Response
