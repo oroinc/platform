@@ -198,11 +198,11 @@ class ShareHandler
     protected function extractSids(AclInterface $acl)
     {
         $sids = [];
-        foreach ($acl->getObjectAces() as $ace) {
+        foreach ($acl->getObjectAces() as $key => $ace) {
             /** @var Entry $ace */
             $sid = $ace->getSecurityIdentity();
             if ($this->isSidApplicable($sid)) {
-                $sids[] = $sid;
+                $sids[$key] = $sid;
             }
         }
 
