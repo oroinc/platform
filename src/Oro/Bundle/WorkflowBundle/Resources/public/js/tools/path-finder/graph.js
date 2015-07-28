@@ -95,15 +95,14 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
         Graph.prototype.draw = function() {
             var i;
             this.outerRect.draw('red');
+            function drawFn(item) {
+                return item.draw('cyan');
+            }
             for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
-                this.horizontalAxises[i].allClones.forEach(function(clone) {
-                    return clone.draw('cyan');
-                });
+                this.horizontalAxises[i].allClones.forEach(drawFn);
             }
             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-                this.verticalAxises[i].allClones.forEach(function(clone) {
-                    return clone.draw('cyan');
-                });
+                this.verticalAxises[i].allClones.forEach(drawFn);
             }
             for (i = this.rectangles.length - 1; i >= 0; i--) {
                 this.rectangles[i].draw('black');
@@ -156,14 +155,6 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
         };
         Graph.prototype.finalizeAxises = function() {
             var i;
-            var j;
-            var node;
-            var connectionToLeft;
-            var nodeAtLeft;
-            var connectionToRight;
-            var nodeAtRight;
-            var axis;
-
             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
                 this.verticalAxises[i].sortNodes();
                 this.verticalAxises[i].finalize();
@@ -178,7 +169,18 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
             this.horizontalAxises.sort(function(a, b) {
                 return a.a.y - b.a.y;
             });
-            // find connections between axises
+            this.buildAxisConnectionInfo();
+        };
+        Graph.prototype.buildAxisConnectionInfo = function() {
+            var i;
+            var j;
+            var node;
+            var connectionToLeft;
+            var nodeAtLeft;
+            var connectionToRight;
+            var nodeAtRight;
+            var axis;
+
             for (i = 0; i < this.horizontalAxises.length; i++) {
                 axis = this.horizontalAxises[i];
                 for (j = axis.nodes.length - 1; j >= 0; j--) {
@@ -368,7 +370,6 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
              * add all nodes at axises cross points
              */
             var node;
-            var newAxis;
             var i;
             var j;
             var hAxis;
@@ -389,11 +390,20 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
                     }
                 }
             }
-            /*
-             * add all nodes at axises end points
-             */
+            this.buildNodesAtEndPoints();
+        };
+        Graph.prototype.buildNodesAtEndPoints = function() {
+            var newVerticalAxises = this.buildNodesAtEndPointsVertical();
+            var newHorizontalAxises = this.buildNodesAtEndPointsHorizontal();
+            this.verticalAxises.push.apply(this.verticalAxises, newVerticalAxises);
+            this.horizontalAxises.push.apply(this.horizontalAxises, newHorizontalAxises);
+        };
+        Graph.prototype.buildNodesAtEndPointsHorizontal = function() {
+            var node;
+            var newAxis;
+            var i;
+            var hAxis;
             var newVerticalAxises = [];
-            var newHorizontalAxises = [];
             for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
                 hAxis = this.horizontalAxises[i];
                 node = this.getNodeAt(hAxis.a);
@@ -412,15 +422,23 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
                     newAxis = new BaseAxis(hAxis.b, hAxis.b, this, 0, new EmptyConstraint(), new EmptyConstraint(),
                         new CenterLocationDirective());
                     newAxis.isVertical = true;
-                    this.verticalAxises.push(newAxis);
+                    newVerticalAxises.push(newAxis);
                     hAxis.addNode(node);
                     newAxis.addNode(node);
                     node.hAxis = hAxis;
                     node.vAxis = newAxis;
                 }
             }
-            for (j = this.verticalAxises.length - 1; j >= 0; j--) {
-                vAxis = this.verticalAxises[j];
+            return newVerticalAxises;
+        };
+        Graph.prototype.buildNodesAtEndPointsVertical = function() {
+            var node;
+            var newAxis;
+            var i;
+            var vAxis;
+            var newHorizontalAxises = [];
+            for (i = this.verticalAxises.length - 1; i >= 0; i--) {
+                vAxis = this.verticalAxises[i];
                 node = this.getNodeAt(vAxis.a);
                 if (!node.stale) {
                     newAxis = new BaseAxis(vAxis.a, vAxis.a, this, 0, new EmptyConstraint(), new EmptyConstraint(),
@@ -437,15 +455,14 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
                     newAxis = new BaseAxis(vAxis.b, vAxis.b, this, 0, new EmptyConstraint(), new EmptyConstraint(),
                         new CenterLocationDirective());
                     newAxis.isVertical = false;
-                    this.horizontalAxises.push(newAxis);
+                    newHorizontalAxises.push(newAxis);
                     vAxis.addNode(node);
                     newAxis.addNode(node);
                     node.hAxis = newAxis;
                     node.vAxis = vAxis;
                 }
             }
-            this.verticalAxises.push.apply(this.verticalAxises, newVerticalAxises);
-            this.horizontalAxises.push.apply(this.horizontalAxises, newHorizontalAxises);
+            return newHorizontalAxises;
         };
         Graph.prototype.buildMergeRequests = function() {
             for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
@@ -572,8 +589,10 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
             var connections = path.allConnections;
             var axises = [];
             var i;
+            var conn;
+            var prev;
             for (i = 0; i < connections.length; i++) {
-                var conn = connections[i];
+                conn = connections[i];
                 if (axises.indexOf(conn.axis) === -1) {
                     axises.push(conn.axis);
                     conn.axis.ensureTraversableSiblings();
@@ -581,44 +600,24 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
                     conn.axis.costMultiplier *= settings.usedAxisCostMultiplier;
                 }
             }
-            var nextNode;
-            var current;
-            var midNode;
-            var next;
-            var startNode;
-            var markedNodes = [];
-            for (i = 0; i < connections.length - 2; i++) {
-                current = connections[i];
-                next = connections[i + 1];
-                startNode = current.a === next.a || current.a === next.b ? current.b : current.a;
-                midNode = current.a === next.a || current.a === next.b ? current.a : current.b;
-                midNode.used = true;
-                startNode.used = true;
-                nextNode = startNode;
-                // connection can be divided before, traverse all nodes
-                do {
-                    nextNode = nextNode.nextNode(current.directionFrom(startNode));
-                    nextNode.used = true;
-                } while (nextNode !== midNode);
-                // console.log(midNode.uid);
-                if (current.vector.id !== next.vector.id) {
+            connections = path.allConnections;
+            for (i = 0; i < connections.length; i++) {
+                conn = connections[i];
+                conn.traversable = false;
+                conn.a.used = true;
+                conn.b.used = true;
+
+                if (prev && conn.vector.id !== prev.vector.id) {
                     // corner
                     // all connections are used on corner
                     // this will avoid double corner use
+                    var midNode = conn.a === prev.a || conn.a === prev.b ? conn.a : conn.b;
                     midNode.eachConnection(function(conn) {
                         conn.traversable = false;
                     });
                 }
+                prev = conn;
             }
-            nextNode = startNode = midNode;
-            current = next;
-            midNode = current.a === nextNode ? current.b : current.a;
-            do {
-                nextNode = nextNode.nextNode(current.directionFrom(startNode));
-                nextNode.used = true;
-            } while (nextNode !== midNode);
-            path.toNode.used = true;
-            markedNodes.push(path.toNode);
             this.relocateAxises();
         };
         Graph.prototype.selfCheck = function() {
@@ -639,15 +638,11 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
             var j;
             var axis;
             var clones;
-            var usage;
             var current;
             var clone;
             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
                 axis = this.verticalAxises[i];
                 clones = axis.allClones;
-                usage = clones.map(function(axis) {
-                    return axis.used;
-                });
                 axis.linesIncluded = Math.floor(clones.length / 2);
                 if (axis.linesIncluded > 0) {
                     current = 0;
@@ -661,9 +656,6 @@ define(['./settings', './directions', './Vector2d', './constraint/simple/empty-c
             for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
                 axis = this.horizontalAxises[i];
                 clones = axis.allClones;
-                usage = clones.map(function(axis) {
-                    return axis.used;
-                });
                 axis.linesIncluded = Math.floor(clones.length / 2);
                 if (axis.linesIncluded > 0) {
                     current = 0;

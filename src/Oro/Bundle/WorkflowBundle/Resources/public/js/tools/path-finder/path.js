@@ -63,10 +63,33 @@ define(['./directions', './settings'], function(directions, settings) {
         get: function() {
             if (this.previous) {
                 var result = this.previous.allConnections;
-                result.push(this.connection);
+                result.push.apply(result, this.includedConnections);
                 return result;
             }
-            return [this.connection];
+            return this.includedConnections;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Path.prototype, 'includedConnections', {
+        get: function() {
+            var node = this.fromNode;
+            var needle = this.toNode;
+            var directionId = this.connection.directionFrom(node).id;
+            var connection = node.connections[directionId];
+            if (connection !== this.connection) {
+                var result = [];
+                result.push(connection);
+                node = connection.second(node);
+                while (node !== needle) {
+                    connection = node.connections[directionId];
+                    result.push(connection);
+                    node = connection.second(node);
+                }
+                return result;
+            } else {
+                return [this.connection];
+            }
         },
         enumerable: true,
         configurable: true

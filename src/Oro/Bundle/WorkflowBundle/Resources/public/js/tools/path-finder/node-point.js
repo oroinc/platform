@@ -53,9 +53,11 @@ define(['./extends', './point2d', './directions', './connection'],
         if (this.connections[direction.id]) {
             this.connections[direction.id].remove();
         }
+        /* jshint ignore:start */
         if (node) {
             new Connection(this, node, direction);
         }
+        /* jshint ignore:end */
     };
     NodePoint.prototype.removeConnection = function(conn) {
         for (var key in this.connections) {
