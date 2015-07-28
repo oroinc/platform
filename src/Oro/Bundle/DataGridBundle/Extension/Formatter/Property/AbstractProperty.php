@@ -93,6 +93,12 @@ abstract class AbstractProperty implements PropertyInterface
             case self::TYPE_BOOLEAN:
                 $result = (bool)$value;
                 break;
+            case self::TYPE_SIMPLE_ARRAY:
+                $result = $value ? implode(', ', $value) : '';
+                break;
+            case self::TYPE_ARRAY:
+                $result = $value !== null ? json_encode($value, JSON_FORCE_OBJECT) : '';
+                break;
             default:
                 $result = $value;
         }

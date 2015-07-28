@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -21,14 +21,14 @@ class EmailNotificationEntityProvider extends EntityProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param Translator          $translator
+     * @param TranslatorInterface $translator
      * @param EntityManager       $em
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
-        Translator $translator,
+        TranslatorInterface $translator,
         EntityManager $em
     ) {
         parent::__construct(

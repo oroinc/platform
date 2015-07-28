@@ -281,7 +281,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'route_name' => 'foo'
                     ]
                 ],
-                'expectedCalls'            => [],
+                'expectedCalls'            => [
+                    'formType' => [
+                        ['createDefaultTransformer', ['\stdClass'], 'getMockEntityToIdTransformer']
+                    ],
+                ],
                 'expectedException'        => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
                 'expectedExceptionMessage' => 'The option "converter" must be set.'
             ],
@@ -293,7 +297,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'route_name' => 'foo'
                     ]
                 ],
-                'expectedCalls'            => [],
+                'expectedCalls'            => [
+                    'formType' => [
+                        ['createDefaultTransformer', ['\stdClass'], 'getMockEntityToIdTransformer']
+                    ],
+                ],
                 'expectedException'        => 'Symfony\Component\Form\Exception\UnexpectedTypeException',
                 'expectedExceptionMessage' =>
                     'Expected argument of type "Oro\Bundle\FormBundle\Autocomplete\ConverterInterface", "string" given'

@@ -240,10 +240,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
     public function testIsRegionValidNoCountry()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->never())
             ->method('addViolationAt');
 
@@ -261,10 +258,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('hasRegions')
             ->will($this->returnValue(false));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->never())
             ->method('addViolationAt');
 
@@ -286,10 +280,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('Country'));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext $context */
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $context->expects($this->once())
             ->method('getPropertyPath')
             ->will($this->returnValue('test'));

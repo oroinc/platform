@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Config;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
@@ -21,16 +21,16 @@ class ConfigManager
     /** @var string */
     protected $scopeName;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
      * @param ConfigDefinitionImmutableBag $configDefinition
-     * @param EventDispatcher              $eventDispatcher
+     * @param EventDispatcherInterface     $eventDispatcher
      */
     public function __construct(
         ConfigDefinitionImmutableBag $configDefinition,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->settings = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
