@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SidebarBundle\EventListener\RequestHandler;
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Templating\Asset\PackageInterface;
 
 class RequestHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +20,7 @@ class RequestHandlerTest extends \PHPUnit_Framework_TestCase
     protected $widgetDefinitionsRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $assetHelper;
 
@@ -33,7 +32,9 @@ class RequestHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Asset\PackageInterface')->getMock();
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->handler = new RequestHandler($this->widgetDefinitionsRegistry, $this->assetHelper);
     }

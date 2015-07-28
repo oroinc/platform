@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
@@ -130,16 +130,16 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     protected $formatMatch = array();
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     private $translator;
 
     /**
-     * @param DateTimeFormatter $formatter
-     * @param Translator $translator
+     * @param DateTimeFormatter   $formatter
+     * @param TranslatorInterface $translator
      */
-    public function __construct(DateTimeFormatter $formatter, Translator $translator)
+    public function __construct(DateTimeFormatter $formatter, TranslatorInterface $translator)
     {
-        $this->formatter = $formatter;
+        $this->formatter  = $formatter;
         $this->translator = $translator;
     }
 

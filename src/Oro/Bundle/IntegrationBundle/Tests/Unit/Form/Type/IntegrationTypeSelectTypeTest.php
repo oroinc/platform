@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType;
@@ -16,14 +15,14 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
     /** @var TypesRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var  CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
     protected function setUp()
     {
         $this->registry    = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
             ->disableOriginalConstructor()->getMock();
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()->getMock();
         $this->type        = new IntegrationTypeSelectType($this->registry, $this->assetHelper);
     }
@@ -35,17 +34,13 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        /** @var OptionsResolverInterface|\PHPUnit_Framework_MockObject_MockObject $resolver */
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with($this->isType('array'));
+        $resolver = new OptionsResolver();
         $this->registry->expects($this->once())->method('getAvailableIntegrationTypesDetailedData')
             ->will(
                 $this->returnValue(
                     [
-                        'testType1' => ["label" => "oro.type1.label", "icon" => "bundles/acmedemo/img/logo.png"],
-                        'testType2' => ["label" => "oro.type2.label"],
+                        'testType1' => ['label' => 'oro.type1.label', 'icon' => 'bundles/acmedemo/img/logo.png'],
+                        'testType2' => ['label' => 'oro.type2.label'],
                     ]
                 )
             );
@@ -55,6 +50,34 @@ class IntegrationTypeSelectTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnArgument(0));
 
         $this->type->setDefaultOptions($resolver);
+        $result = $resolver->resolve([]);
+        $choiceAttr = [];
+        foreach ($result['choices'] as $choice => $label) {
+            $choiceAttr[$choice] = call_user_func($result['choice_attr'], $choice);
+        }
+        unset($result['choice_attr']);
+        $this->assertEquals(
+            [
+                'empty_value' => '',
+                'choices'     => [
+                    'testType1' => 'oro.type1.label',
+                    'testType2' => 'oro.type2.label'
+                ],
+                'configs'     => [
+                    'placeholder'             => 'oro.form.choose_value',
+                    'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:type/result.html.twig',
+                    'selection_template_twig' => 'OroIntegrationBundle:Autocomplete:type/selection.html.twig',
+                ]
+            ],
+            $result
+        );
+        $this->assertEquals(
+            [
+                'testType1' => ['data-icon' => 'bundles/acmedemo/img/logo.png'],
+                'testType2' => []
+            ],
+            $choiceAttr
+        );
     }
 
     public function testBuildView()

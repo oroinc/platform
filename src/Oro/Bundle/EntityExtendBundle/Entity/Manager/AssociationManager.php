@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
@@ -23,7 +23,7 @@ class AssociationManager
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DoctrineHelper */
@@ -33,14 +33,14 @@ class AssociationManager
     protected $entityNameResolver;
 
     /**
-     * @param ConfigManager      $configManager
-     * @param EventDispatcher    $eventDispatcher
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager            $configManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param EntityNameResolver       $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver
     ) {

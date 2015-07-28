@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -11,7 +10,10 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
+
 use Gedmo\Translatable\Query\TreeWalker\TranslationWalker;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type\Stub\TestEntity;
@@ -53,6 +55,11 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
     protected $queryBuilder;
 
     /**
+     * @var Query
+     */
+    protected $query;
+
+    /**
      * @var TranslatableEntityType
      */
     protected $type;
@@ -71,6 +78,15 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
         $this->classMetadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue(self::TEST_IDENTIFIER));
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array(self::TEST_IDENTIFIER)));
+        $this->classMetadata->expects($this->any())
+            ->method('getTypeOfField')
+            ->will($this->returnValue('integer'));
+        $this->classMetadata->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(self::TEST_CLASS));
 
         $this->ormConfiguration = $this->getMockBuilder('Doctrine\ORM\Configuration')
             ->disableOriginalConstructor()
@@ -133,21 +149,27 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
         $testChoiceEntities = $this->getTestChoiceEntities($this->testChoices);
 
         if (!$this->queryBuilder) {
-            $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
                 ->disableOriginalConstructor()
-                ->setMethods(array('execute', 'setHint'))
+                ->setMethods(array('execute', 'setHint', 'getSQL'))
                 ->getMockForAbstractClass();
-            $query->expects($this->any())
+            $this->query->expects($this->any())
                 ->method('execute')
                 ->will($this->returnValue($testChoiceEntities));
+            $this->query->expects($this->any())
+                ->method('getSQL')
+                ->will($this->returnValue('SQL QUERY'));
 
             $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
                 ->disableOriginalConstructor()
-                ->setMethods(array('getQuery'))
+                ->setMethods(array('getQuery', 'getParameters'))
                 ->getMock();
             $this->queryBuilder->expects($this->any())
                 ->method('getQuery')
-                ->will($this->returnValue($query));
+                ->will($this->returnValue($this->query));
+            $this->queryBuilder->expects($this->any())
+                ->method('getParameters')
+                ->will($this->returnValue(new ArrayCollection()));
         }
 
         return $this->queryBuilder;
@@ -258,41 +280,9 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDefaultOptions(array $choiceListOptions, array $expectedChoices, $expectTranslation = false)
     {
-        $test = $this;
-
         // prepare query builder option
         if (isset($choiceListOptions['query_builder'])) {
             $choiceListOptions['query_builder'] = $this->getQueryBuilderOption($choiceListOptions);
-        }
-
-        // expectations for option resolver
-        $expectedRequiredOptions = array('class');
-
-        $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('setRequired', 'setDefaults'))
-            ->getMockForAbstractClass();
-        $optionsResolver->expects($this->once())
-            ->method('setRequired')
-            ->with($expectedRequiredOptions);
-        $optionsResolver->expects($this->once())
-            ->method('setDefaults')
-            ->will(
-                $this->returnCallback(
-                    function ($options) use ($test, $choiceListOptions, $expectedChoices) {
-                        $test->assertNull($options['property']);
-                        $test->assertNull($options['query_builder']);
-                        $test->assertNull($options['choices']);
-                        $test->assertInstanceOf('\Closure', $options['choice_list']);
-
-                        $test->assertChoiceList($options['choice_list'], $choiceListOptions, $expectedChoices);
-                    }
-                )
-            );
-
-        // expectation for translation hydrator and hint
-        if ($expectTranslation) {
-            /** @var $configuration \PHPUnit_Framework_MockObject_MockObject */
             $configuration = $this->ormConfiguration;
             $configuration->expects($this->once())
                 ->method('addCustomHydrationMode')
@@ -302,8 +292,7 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
                 );
 
             /** @var $query \PHPUnit_Framework_MockObject_MockObject */
-            $query = $this->getQueryBuilder()->getQuery();
-            $query->expects($this->once())
+            $this->query->expects($this->once())
                 ->method('setHint')
                 ->with(
                     Query::HINT_CUSTOM_OUTPUT_WALKER,
@@ -311,8 +300,15 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
                 );
         }
 
-        // test
-        $this->type->setDefaultOptions($optionsResolver);
+        $resolver = new OptionsResolver();
+        $this->type->setDefaultOptions($resolver);
+        $result = $resolver->resolve($choiceListOptions);
+
+        $this->assertInstanceOf(
+            'Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList',
+            $result['choice_list']
+        );
+        $this->assertEquals($expectedChoices, $result['choice_list']->getChoices());
     }
 
     /**
@@ -386,33 +382,5 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
                 'expectTranslation' => true,
             ),
         );
-    }
-
-    /**
-     * @param callback $choiceList
-     * @param array    $options
-     * @param array    $expectedChoices
-     */
-    public function assertChoiceList($choiceList, $options, $expectedChoices)
-    {
-        /** @var $objectChoiceList ObjectChoiceList */
-        $objectChoiceList = $choiceList($this->getResolverOptions($options));
-
-        $this->assertInstanceOf('Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList', $objectChoiceList);
-        $this->assertEquals($expectedChoices, $objectChoiceList->getChoices());
-    }
-
-    /**
-     * @param  array   $options
-     * @return Options
-     */
-    protected function getResolverOptions($options)
-    {
-        $resolverOptions = new Options();
-        foreach ($options as $key => $value) {
-            $resolverOptions->set($key, $value);
-        }
-
-        return $resolverOptions;
     }
 }

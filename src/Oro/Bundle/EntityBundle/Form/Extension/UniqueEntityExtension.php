@@ -6,15 +6,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Validator;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 class UniqueEntityExtension extends AbstractTypeExtension
 {
     /**
-     * @var Validator
+     * @var ValidatorInterface
      */
     protected $validator;
 
