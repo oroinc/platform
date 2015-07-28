@@ -7,9 +7,7 @@ define(function() {
             }
         }
         function C() {
-            /* jshint ignore:start */
             this.constructor = child;
-            /* jshint ignore:end */
         }
         child.prototype = _super === null ? Object.create(_super) : (C.prototype = _super.prototype, new C());
     };
