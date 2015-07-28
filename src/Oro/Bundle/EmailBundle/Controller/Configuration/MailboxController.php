@@ -81,17 +81,18 @@ class MailboxController extends Controller
                 if ($form->isValid()) {
                     $em = $this->getDoctrine()
                         ->getManager();
-                    $em->persist($form->getData());
+                    $em->persist($mailbox = $form->getData());
                     $em->flush();
 
-                    return $this->redirect(
-                        $this->get('router')->generate(
-                            'oro_config_configuration_system',
-                            [
+                    return $this->get('oro_ui.router')->redirectAfterSave(
+                        ['route' => 'oro_email_mailbox_update', 'parameters' => ['mailbox' => $mailbox->getId()]],
+                        [
+                            'route' => 'oro_config_configuration_system',
+                            'parameters' => [
                                 'activeGroup' => self::ACTIVE_GROUP,
                                 'activeSubGroup' => self::ACTIVE_SUBGROUP,
                             ]
-                        )
+                        ]
                     );
                 }
             }

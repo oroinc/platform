@@ -35,7 +35,7 @@ abstract class AbstractParseEmailAddressAction extends AbstractAction
             throw new InvalidParameterException('Email address must be defined.');
         }
 
-        $this->address = $options['email_address'];
-        $this->attribute = $options['attribute'];
+        $this->attribute = isset($options['attribute']) ? $options['attribute'] : $options[0];
+        $this->address = isset($options['email_address']) ? $options['email_address'] : $options[1];
     }
 }

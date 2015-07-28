@@ -99,10 +99,15 @@ parameters:
     oro_email.mailbox_choice_list.class:                Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
     oro_email.mailbox.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
-    #Workflow conditions
+    # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
+    oro_email.workflow.condition.has_count.class:       Oro\Bundle\EmailBundle\Model\Condition\HasCount
+
+    # Workflow actions
     oro_email.workflow.action.parse_first_name.class:   Oro\Bundle\EmailBundle\Model\Action\ParseFirstNameFromEmailAddress
     oro_email.workflow.action.parse_last_name.class:    Oro\Bundle\EmailBundle\Model\Action\ParseLastNameFromEmailAddress
+    oro_email.workflow.action.request_mailboxes.class:  Oro\Bundle\EmailBundle\Model\Action\RequestMailboxes
+    oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
 
 services:
     oro_email.entity.cache.warmer:
@@ -670,6 +675,11 @@ services:
         tags:
             - { name: oro_workflow.condition, alias: instanceof }
 
+    oro_email.workflow.condition.has_count:
+        class: %oro_email.workflow.condition.has_count.class%
+        tags:
+            - { name: oro_workflow.condition, alias: has_count }
+
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%
         arguments:
@@ -685,3 +695,18 @@ services:
             - @oro_email.email.address.helper
         tags:
             - { name: oro_workflow.action, alias: parse_last_name_from_email_address }
+
+    oro_email.workflow.action.request_mailboxes:
+        class: %oro_email.workflow.action.request_mailboxes.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: request_mailboxes|find_mailboxes }
+
+    oro_email.workflow.action.strip_html_tags:
+        class: %oro_email.workflow.action.strip_html_tags.class%
+        arguments:
+            - @oro_workflow.context_accessor
+        tags:
+            - { name: oro_workflow.action, alias: strip_html_tags }

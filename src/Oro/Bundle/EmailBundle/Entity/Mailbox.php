@@ -80,6 +80,13 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $smtpSettings;
 
     /**
+     * @var EmailUser[]
+     *
+     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailUser", mappedBy="mailboxOwner")
+     */
+    protected $emailUsers;
+
+    /**
      * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
@@ -274,5 +281,25 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getEmailOwnerName()
     {
         return $this->label;
+    }
+
+    /**
+     * @return EmailUser[]
+     */
+    public function getEmailUsers()
+    {
+        return $this->emailUsers;
+    }
+
+    /**
+     * @param EmailUser[] $emailUsers
+     *
+     * @return $this
+     */
+    public function setEmailUsers($emailUsers)
+    {
+        $this->emailUsers = $emailUsers;
+
+        return $this;
     }
 }
