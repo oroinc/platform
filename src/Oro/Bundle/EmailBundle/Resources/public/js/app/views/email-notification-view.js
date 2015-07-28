@@ -4,24 +4,23 @@ define([
     'underscore',
     'oroui/js/mediator',
     'routing',
-    'oroemail/js/app/models/email-attachment-model',
     'oroui/js/app/views/base/view',
     'oroemail/js/app/models/email-notification-collection'
-], function ($, _, mediator, routing, EmailAttachmentModel, BaseView, EmailNotificationCollection) {
+], function($, _, mediator, routing, BaseView, EmailNotificationCollection) {
     'use strict';
 
     var EmailAttachmentView;
 
     EmailAttachmentView = BaseView.extend({
         contextsView: null,
-        countNewEmail:null,
+        countNewEmail: null,
         inputName: '',
         events: {
             'click a.mark-as-read': 'onClickMarkAsRead',
             'click .info': 'onClickOpenEmail'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
             this.$containerEmails = $(options.el).find('.items');
@@ -30,15 +29,17 @@ define([
             this.initCollection().initEvents();
         },
 
-        initCollection: function () {
+        initCollection: function() {
             var emails = this.getDefaultData();
             this.collection = new EmailNotificationCollection(emails);
 
             return this;
         },
 
-        render: function () {
-            var $view, i;
+        render: function() {
+            var $view;
+            var i;
+
             this.$containerEmails.empty();
             this.initViewType();
 
@@ -50,7 +51,7 @@ define([
             }
         },
 
-        getView: function (model) {
+        getView: function(model) {
             var view = this.template({
                 entity: model
             });
@@ -65,11 +66,11 @@ define([
             return $view;
         },
 
-        onClickMarkAsRead: function () {
+        onClickMarkAsRead: function() {
             var self = this;
             $.ajax({
                 url: routing.generate('oro_email_mark_all_as_seen'),
-                success: function () {
+                success: function() {
                     self.collection.markAllAsRead();
                     self.render();
                     self.setCount(0);
@@ -79,19 +80,19 @@ define([
             });
         },
 
-        getClankEvent: function () {
+        getClankEvent: function() {
             return $(this.el).data('clank-event');
         },
 
-        getDefaultData: function () {
+        getDefaultData: function() {
             return $(this.el).data('emails');
         },
 
-        getDefaultCount: function () {
+        getDefaultCount: function() {
             return $(this.el).data('count');
         },
 
-        initViewType: function () {
+        initViewType: function() {
             if (!this.isActiveTypeDropDown('notification')) {
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
@@ -112,7 +113,7 @@ define([
 
             return this;
         },
-        setModeDropDownMenu:function(type) {
+        setModeDropDownMenu: function(type) {
             this.resetModeDropDownMenu();
             this.$el.find('.dropdown-menu').addClass(type);
         },
@@ -121,23 +122,24 @@ define([
             return this.$el.find('.dropdown-menu').hasClass(type);
         },
 
-        onClickOpenEmail: function (e) {
-            var id  = $(e.currentTarget).data('id'),
-                isthread  = $(e.currentTarget).data('isthread'),
-                url;
+        onClickOpenEmail: function(e) {
+            var id  = $(e.currentTarget).data('id');
+            var isthread  = $(e.currentTarget).data('isthread');
+            var url;
+            var model;
 
             url =  routing.generate('oro_email_thread_view', {id: id});
             mediator.execute('redirectTo', {url: url});
-            var model = this.collection.find(function(item){
+            model = this.collection.find(function(item) {
                 return Number(item.get('id')) === id;
             });
 
-            this.$el.find('#'+model.cid).removeClass('new');
-            this.$el.find('#'+model.cid).find('.icon-envelope').removeClass('new');
+            this.$el.find('#' + model.cid).removeClass('new');
+            this.$el.find('#' + model.cid).find('.icon-envelope').removeClass('new');
             this.initViewType();
         },
 
-        setCount: function (count) {
+        setCount: function(count) {
             count = parseInt(count);
             this.countNewEmail = count;
             if (count > 10) {
@@ -151,7 +153,7 @@ define([
             this.initViewType();
         },
 
-        initEvents: function () {
+        initEvents: function() {
             var self = this;
 
             this.$el.click(function() {
@@ -162,12 +164,12 @@ define([
                 self.initViewType();
             });
 
-            this.collection.on('reset', function () {
+            this.collection.on('reset', function() {
                 self.$containerEmails.empty();
                 self.setCount(0);
             });
 
-            this.collection.on('add', function (model) {
+            this.collection.on('add', function(model) {
                 var $view = self.getView(model);
                 self.$containerEmails.append($view);
                 self.initLayout();
@@ -189,7 +191,7 @@ define([
             this.$el.removeClass('open');
         },
 
-        open: function () {
+        open: function() {
             this.$el.addClass('open');
         }
     });
