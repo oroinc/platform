@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Form\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
