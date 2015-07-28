@@ -282,8 +282,8 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt')
             ->with(
                 'test.region',
-                'Region is required for country %country%',
-                array('%country%' => 'Country')
+                'State is required for country {{ country }}',
+                ['{{ country }}' => 'Country']
             );
 
         $address = $this->createAddress();
