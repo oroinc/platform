@@ -21,12 +21,16 @@ class EmailNotificationManager
 {
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
+
     /** @var Router */
     protected $router;
+
     /** @var EmailCacheManager */
     protected $emailCacheManager;
+
     /** @var ConfigManager */
     protected $configManager;
+
     /** @var EntityManager */
     protected $em;
 
