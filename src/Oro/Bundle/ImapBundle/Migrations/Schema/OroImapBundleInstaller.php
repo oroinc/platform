@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ImapBundle\Migrations\Schema\v1_3\OroImapBundle as v13;
 
 class OroImapBundleInstaller implements Installation
 {
@@ -26,6 +27,7 @@ class OroImapBundleInstaller implements Installation
         $this->addImapFieldsToOroEmailOriginTable($schema);
         $this->createOroEmailFolderImapTable($schema);
         $this->createOroEmailImapTable($schema);
+        v13::addSmtpFieldsToOroEmailOriginTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroEmailFolderImapForeignKeys($schema);
