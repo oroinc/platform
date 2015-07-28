@@ -51,7 +51,6 @@ define([
          */
         initialize: function(options) {
             console.log(5, 'initialization filter');
-            this.initFilter();
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
         render: function() {

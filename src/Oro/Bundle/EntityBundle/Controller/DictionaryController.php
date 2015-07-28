@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 /**
  * Entities controller.
  * @Route("/dictionary")
- * todo: Discuss ACL permissions for controller
  */
 class DictionaryController extends Controller
 {
