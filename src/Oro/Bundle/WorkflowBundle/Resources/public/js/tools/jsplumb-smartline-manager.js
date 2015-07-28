@@ -1,7 +1,12 @@
 define(function(require){
     'use strict';
-    require('./path-finder');
     var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
+    var _ = require('underscore');
+    var Graph = require('./path-finder/graph');
+    var Rectangle = require('./path-finder/rectangle');
+    var finderSettings = require('./path-finder/settings');
+    var Finder = require('./path-finder/finder');
+    var directions = require('./path-finder/directions');
 
     function JsPlumbSmartlineManager(jsPlumbInstance, settings) {
         this.settings = _.extend({}, this.settings, settings);
@@ -17,7 +22,7 @@ define(function(require){
 
     window.getLastRequest = function () {
         return JSON.stringify(JsPlumbSmartlineManager.lastRequest);
-    }
+    };
 
     JsPlumbSmartlineManager.prototype = {
         settings: {
@@ -27,7 +32,7 @@ define(function(require){
         },
 
         isCacheValid: function () {
-            return _.isEqual(this.getState(), this.cache.state)
+            return _.isEqual(this.getState(), this.cache.state);
         },
 
         getConnectionPath: function (connector) {
@@ -43,12 +48,12 @@ define(function(require){
         },
 
         getNaivePathLength: function (fromRect, toRect) {
-            if (fromRect == toRect) {
+            if (fromRect === toRect) {
                 return 0;
             }
-            return Math.abs(fromRect.bottom - toRect.top)
-                + Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right)
-                + ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
+            return Math.abs(fromRect.bottom - toRect.top) +
+                Math.max(0, fromRect.left - toRect.right, toRect.left - fromRect.right) +
+                ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
         },
 
 
@@ -57,7 +62,7 @@ define(function(require){
                     rectangles: [],
                     connections: []
                 },
-                hasRect = {}
+                hasRect = {};
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var el = document.getElementById(id);
                 if (el) {
@@ -87,7 +92,11 @@ define(function(require){
                 var clientRect;
                 var el = document.getElementById(id);
                 if (el) {
-                    clientRect = new Rectangle(el.offsetLeft - settings.blockHMargin, el.offsetTop - settings.blockVMargin, el.offsetWidth + settings.blockHMargin * 2, el.offsetHeight + settings.blockVMargin * 2);
+                    clientRect = new Rectangle(
+                        el.offsetLeft - settings.blockHMargin,
+                        el.offsetTop - settings.blockVMargin,
+                        el.offsetWidth + settings.blockHMargin * 2,
+                        el.offsetHeight + settings.blockVMargin * 2);
                     rects[id] = clientRect;
                     clientRect.cid = id;
                     graph.rectangles.push(clientRect);
@@ -99,11 +108,12 @@ define(function(require){
             }
 
             graph.build();
-            GraphConstant.recommendedConnectionWidth = settings.connectionWidth;
+            finderSettings.recommendedConnectionWidth = settings.connectionWidth;
 
             _.each(this.jsPlumbInstance.getConnections(), function (conn) {
                 if (conn.sourceId in rects && conn.targetId in rects && conn.source && conn.target) {
-                    connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId], rects[conn.targetId]), conn]);
+                    connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId],
+                        rects[conn.targetId]), conn]);
                 }
             }, this);
 
@@ -114,12 +124,12 @@ define(function(require){
             _.each(connections, function (conn) {
                 var finder = new Finder(graph);
 
-                finder.addTo(graph.getPathFromCid(conn[1], Direction2d.BOTTOM_TO_TOP));
-                finder.addFrom(graph.getPathFromCid(conn[0], Direction2d.TOP_TO_BOTTOM));
+                finder.addTo(graph.getPathFromCid(conn[1], directions.BOTTOM_TO_TOP));
+                finder.addFrom(graph.getPathFromCid(conn[0], directions.TOP_TO_BOTTOM));
 
                 var path = finder.find();
                 if (!path) {
-                    console.warn("Cannot find path");
+                    console.warn('Cannot find path');
                 } else {
                     graph.updateWithPath(path);
                     _this.cache.connections[conn[3].connector.getId()] = {
