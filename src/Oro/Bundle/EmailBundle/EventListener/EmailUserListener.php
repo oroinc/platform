@@ -42,8 +42,6 @@ class EmailUserListener
 
     /**
      * Send notification to clank that user have new emails
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush()
     {
@@ -61,7 +59,7 @@ class EmailUserListener
             }
 
             $ownerId = $entity->getOwner()->getId();
-            if (isset($usersWithNewEmails[$ownerId])) {
+            if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
                 $new = $usersWithNewEmails[$ownerId]['new'];
                 if ($status === self::ENTITY_STATUS_NEW) {
                     $usersWithNewEmails[$ownerId]['new'] = $new + 1;
@@ -69,7 +67,7 @@ class EmailUserListener
             } else {
                 $usersWithNewEmails[$ownerId] = [
                     'entity' => $entity,
-                    'new' => $status === self::ENTITY_STATUS_NEW ? 1: 0
+                    'new' => $status === self::ENTITY_STATUS_NEW ? 1 : 0
                 ];
             }
         }

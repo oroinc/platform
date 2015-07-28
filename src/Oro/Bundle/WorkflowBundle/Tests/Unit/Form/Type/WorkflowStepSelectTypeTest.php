@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
@@ -51,6 +54,15 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $classMetadata = $this->getMockBuilder('\Doctrine\Common\Persistence\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
+        $classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array('id')));
+        $classMetadata->expects($this->any())
+            ->method('getTypeOfField')
+            ->will($this->returnValue('integer'));
+        $classMetadata->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep'));
 
         $mockEntityManager->expects($this->any())
             ->method('getClassMetadata')
@@ -164,6 +176,9 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->method('setParameter')
             ->with('workflowDefinition', $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
             ->will($this->returnSelf());
+        $qb->expects($this->any())
+            ->method('getParameters')
+            ->will($this->returnValue(new ArrayCollection()));
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
@@ -172,6 +187,9 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $query->expects($this->any())
             ->method('execute')
             ->will($this->returnValue(array()));
+        $query->expects($this->any())
+            ->method('getSQL')
+            ->will($this->returnValue('SQL QUERY'));
         $qb->expects($this->any())
             ->method('getQuery')
             ->will($this->returnValue($query));

@@ -8,8 +8,9 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
@@ -52,7 +53,7 @@ class ConfigManager
     protected $metadataFactory;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -106,15 +107,15 @@ class ConfigManager
     protected $configChangeSets;
 
     /**
-     * @param MetadataFactory    $metadataFactory
-     * @param EventDispatcher    $eventDispatcher
-     * @param ServiceLink        $providerBagLink
-     * @param ConfigModelManager $modelManager
-     * @param AuditManager       $auditManager
+     * @param MetadataFactory          $metadataFactory
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param ServiceLink              $providerBagLink
+     * @param ConfigModelManager       $modelManager
+     * @param AuditManager             $auditManager
      */
     public function __construct(
         MetadataFactory $metadataFactory,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
         AuditManager $auditManager
@@ -174,7 +175,7 @@ class ConfigManager
     }
 
     /**
-     * @return EventDispatcher
+     * @return EventDispatcherInterface
      */
     public function getEventDispatcher()
     {
@@ -653,8 +654,9 @@ class ConfigManager
         } else {
             $entityModel = $this->modelManager->findEntityModel($className);
             if (null === $entityModel) {
-                $entityModel = $this->modelManager->createEntityModel($className, $mode);
-                $metadata    = $this->getEntityMetadata($className);
+                $metadata      = $this->getEntityMetadata($className);
+                $newEntityMode = $metadata ? $metadata->mode : $mode;
+                $entityModel   = $this->modelManager->createEntityModel($className, $newEntityMode);
                 foreach ($this->getProviders() as $provider) {
                     $configId = new EntityConfigId($provider->getScope(), $className);
                     $config   = $this->createConfig(
@@ -735,6 +737,8 @@ class ConfigManager
         }
 
         $metadata = $this->getEntityMetadata($className);
+        $entityModel = $this->createConfigEntityModel($className, $metadata->mode);
+        $entityModel->setMode($metadata->mode);
         foreach ($this->getProviders() as $provider) {
             $config        = $provider->getConfig($className);
             $defaultValues = $this->getEntityDefaultValues($provider, $className, $metadata);

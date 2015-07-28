@@ -123,11 +123,14 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Subject cannot be changed for already existing email.'
-            . ' Existing value: "New email". New value: "New subject".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Subject cannot be changed for already existing email.'
+                . ' Existing value: "New email". New value: "New subject".'
+            );
+        }
     }
 
     public function testCreateEmailWithoutSubjectAndBody()
@@ -201,11 +204,14 @@ class EmailControllerTest extends WebTestCase
         );
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Head cannot be changed for already existing email.'
-            . ' Existing value: "true". New value: "false".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Head cannot be changed for already existing email.'
+                . ' Existing value: "true". New value: "false".'
+            );
+        }
     }
 
     public function testGetNotificationData()
