@@ -435,7 +435,7 @@ class MigrationsLoader
                 if ($loadedVersion) {
                     foreach (array_keys($bundleMigrationDirectories) as $migrationVersion) {
                         if (empty($migrationVersion) || version_compare($migrationVersion, $loadedVersion) < 1) {
-                            unset ($migrationDirectories[$bundleName][$migrationVersion]);
+                            unset($migrationDirectories[$bundleName][$migrationVersion]);
                         }
                     }
                 }

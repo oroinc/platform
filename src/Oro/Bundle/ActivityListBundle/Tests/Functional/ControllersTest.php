@@ -19,8 +19,6 @@ class ControllersTest extends WebTestCase
 
     public function testWidget()
     {
-        $this->markTestIncomplete('Temporary inactivate');
-
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(
