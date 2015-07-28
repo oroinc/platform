@@ -6,6 +6,8 @@ class TestClassMagicGet
 {
     private $magicProperty;
 
+    public $publicProperty;
+
     public function __construct($value)
     {
         $this->magicProperty = $value;

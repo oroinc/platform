@@ -95,7 +95,7 @@ abstract class AbstractEnumType extends AbstractType
                     return $class;
                 },
                 'multiple' => function (Options $options, $value) {
-                    if ($value === null) {
+                    if ($value === null && !empty($options['class'])) {
                         $value = $this->configManager
                             ->getProvider('enum')
                             ->getConfig($options['class'])

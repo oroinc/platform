@@ -27,7 +27,7 @@ services:
         calls:
             - [setEntityName, ["OroWorkflowBundle:WorkflowDefinition"]]
 
-    oro_workflow.datagrid.listener.workflow_step_column.class:
+    oro_workflow.datagrid.listener.workflow_step_column:
         class: %oro_workflow.datagrid.listener.workflow_step_column.class%
         arguments:
             - @oro_entity.doctrine_helper
