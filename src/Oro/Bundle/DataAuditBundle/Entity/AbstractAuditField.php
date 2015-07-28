@@ -10,6 +10,7 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 /**
  * @ORM\MappedSuperclass
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 abstract class AbstractAuditField
 {
