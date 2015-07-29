@@ -43,24 +43,30 @@ define([
             return this;
         },
 
-        onNewEmail: function(r) {
+        onNewEmail: function(response) {
             var self = this;
-            r = JSON.parse(r);
-            var isNew = r[0].count_new;
-            if (r) {
-                $.ajax({
-                    url: routing.generate('oro_api_get_email_last'),
-                    success: function(r) {
-                        self.view.collection.reset();
-                        self.view.collection.add(r.emails);
-                        self.view.setCount(r.count);
-                        if (isNew) {
-                            self.view.showNotification();
-                            mediator.trigger('datagrid:doRefresh:user-email-grid');
-                        }
-                    }
-                });
+            console.log(response);
+            response = JSON.parse(response);
+            console.log(response);
+            var isNew = response[0].count_new;
+            if (response) {
+                self.loadLastEmail(isNew);
             }
+        },
+
+        loadLastEmail: function(isNew) {
+            var self = this;
+            $.ajax({
+                url: routing.generate('oro_api_get_email_last'),
+                success: function(response) {
+                    self.view.collection.reset(response.emails);
+                    self.view.setCount(response.count);
+                    if (isNew) {
+                        self.view.showNotification();
+                        mediator.trigger('datagrid:doRefresh:user-email-grid');
+                    }
+                }
+            });
         }
     });
 

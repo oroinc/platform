@@ -5,8 +5,9 @@ define([
     'oroui/js/mediator',
     'routing',
     'oroui/js/app/views/base/view',
-    'oroemail/js/app/models/email-notification-collection'
-], function($, _, mediator, routing, BaseView, EmailNotificationCollection) {
+    'oroemail/js/app/models/email-notification-collection',
+    'oroui/js/messenger'
+], function($, _, mediator, routing, BaseView, EmailNotificationCollection, messenger) {
     'use strict';
 
     var EmailNotificationView;
@@ -70,14 +71,17 @@ define([
             var self = this;
             $.ajax({
                 url: routing.generate('oro_email_mark_all_as_seen'),
-                success: function(r) {
+                success: function(response) {
                     self.collection.markAllAsRead();
                     self.render();
                     self.setCount(0);
-                    if (r.successful) {
+                    if (response.successful) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
                     self.initLayout();
+                },
+                error: function(model, response) {
+                    messenger.showErrorMessage(__('oro.ui.item_delete_error'), response.responseJSON || {});
                 }
             });
         },
