@@ -773,8 +773,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
             $propertyPath = $context->getPropertyPath() . '.region';
             $context->addViolationAt(
                 $propertyPath,
-                'Region is required for country %country%',
-                array('%country%' => $this->getCountry()->getName())
+                'State is required for country {{ country }}',
+                ['{{ country }}' => $this->getCountry()->getName()]
             );
         }
     }
