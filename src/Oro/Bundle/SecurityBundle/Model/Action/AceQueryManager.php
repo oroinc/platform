@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Expr\Composite;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Entity\AclClass;
+use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\SecurityBundle\Exception\UnknownShareScopeException;
 
 class AceQueryManager implements AceQueryInterface
@@ -17,7 +18,8 @@ class AceQueryManager implements AceQueryInterface
     /**
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper) {
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -55,9 +57,9 @@ class AceQueryManager implements AceQueryInterface
      */
     protected function addExprByShareScope(QueryBuilder $qb, Composite $expr, $scope)
     {
-        if ($scope == 'user') {
+        if ($scope === Share::SHARE_SCOPE_USER) {
             $expr->add($qb->expr()->eq('asid.username', 'true'));
-        } elseif ($scope == 'business_unit') {
+        } elseif ($scope === Share::SHARE_SCOPE_BUSINESS_UNIT) {
             $expr->add(
                 $qb->expr()->like(
                     'asid.identifier',

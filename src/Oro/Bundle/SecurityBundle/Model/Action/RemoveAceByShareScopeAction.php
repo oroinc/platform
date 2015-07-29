@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Model\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
+
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
@@ -15,20 +17,26 @@ class RemoveAceByShareScopeAction extends AbstractAction
     /** @var ObjectManager */
     protected $manager;
 
+    /** @var AclCacheInterface */
+    protected $aclCache;
+
     /**
      * @param ContextAccessor   $contextAccessor
      * @param AceQueryInterface $qbManager
      * @param ObjectManager     $manager
+     * @param AclCacheInterface $aclCache
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         AceQueryInterface $qbManager,
-        ObjectManager $manager
+        ObjectManager $manager,
+        AclCacheInterface $aclCache
     ) {
         parent::__construct($contextAccessor);
 
-        $this->qbManager      = $qbManager;
-        $this->manager = $manager;
+        $this->qbManager = $qbManager;
+        $this->manager   = $manager;
+        $this->aclCache  = $aclCache;
     }
 
     /**
@@ -63,6 +71,7 @@ class RemoveAceByShareScopeAction extends AbstractAction
 
         $qb = $this->qbManager->getRemoveAceQueryBuilder($aclClass, $removeScopes);
         $qb->getQuery()->execute();
+        $this->aclCache->clearCache();
     }
 
     /**

@@ -639,5 +639,6 @@ services:
             - @oro_workflow.context_accessor
             - @oro_security.ace.query.manager
             - @doctrine.orm.entity_manager
+            - @security.acl.cache.doctrine
         tags:
             - { name: oro_workflow.action, alias: remove_ace_share_scope }
