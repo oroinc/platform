@@ -14,8 +14,18 @@ class MailboxRepository extends EntityRepository
      *
      * @return null|Mailbox
      */
-    public function findByOrigin(EmailOrigin $origin)
+    public function findOneByOrigin(EmailOrigin $origin)
     {
         return $this->findOneBy(['origin' => $origin]);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return null|Mailbox
+     */
+    public function findOneByEmail($email)
+    {
+        return $this->findOneBy(['email' => $email]);
     }
 }

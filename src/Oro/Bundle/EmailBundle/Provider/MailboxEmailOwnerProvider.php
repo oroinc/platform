@@ -22,6 +22,6 @@ class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
      */
     public function findEmailOwner(EntityManager $em, $email)
     {
-        return $em->getRepository('OroEmailBundle:Mailbox')->findOneBy(compact('email'));
+        return $em->getRepository('OroEmailBundle:Mailbox')->findOneByEmail($email);
     }
 }
