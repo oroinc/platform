@@ -46,6 +46,8 @@ parameters:
 
     oro_integration.workflow.action.populate_integration_owner.class:     Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
 
+    oro_integration.twig.integration.class:                                Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
+
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -283,3 +285,10 @@ services:
             - @oro_integration.helper.default_owner_helper
         tags:
             - { name: oro_workflow.action, alias: populate_integration_owner }
+
+    oro_integration.twig.integration:
+        class: %oro_integration.twig.integration.class%
+        arguments:
+            - @event_dispatcher
+        tags:
+            - { name: twig.extension }
