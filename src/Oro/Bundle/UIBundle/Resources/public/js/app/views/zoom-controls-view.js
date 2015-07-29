@@ -3,6 +3,7 @@ define(function(require) {
 
     var ZoomControlsView;
     var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
 
     ZoomControlsView = BaseView.extend({
         autoRender: true,
@@ -11,23 +12,32 @@ define(function(require) {
         events: {
             'click .btn-zoom-in': 'onZoomInClick',
             'click .btn-zoom-out': 'onZoomOutClick',
-            'click .btn-auto-zoom': 'onAutoZoomClick'
+            'click .btn-auto-zoom': 'onAutoZoomClick',
+            'click .btn-set-zoom': 'onSetZoomClick'
         },
 
         listen: {
             'change model': 'render'
         },
 
-        onZoomInClick: function () {
+        onZoomInClick: function (e) {
+            e.preventDefault();
             this.model.zoomIn();
         },
 
-        onZoomOutClick: function () {
+        onZoomOutClick: function (e) {
+            e.preventDefault();
             this.model.zoomOut();
         },
 
-        onAutoZoomClick: function () {
+        onAutoZoomClick: function (e) {
+            e.preventDefault();
             this.model.autoZoom();
+        },
+
+        onSetZoomClick: function (e) {
+            e.preventDefault();
+            this.model.setZoom(parseFloat($(e.currentTarget).attr('data-size')) / 100);
         }
     });
 

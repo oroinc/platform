@@ -71,37 +71,11 @@ define(function(require) {
         },
 
         zoomIn: function (dx, dy) {
-            if (dx === undefined) {
-                dx = this.getCenter().x;
-            }
-            if (dy === undefined) {
-                dy = this.getCenter().y;
-            }
-            var zoom = this.get('zoom');
-            var center = this.getCenter();
-            //console.log(center, dx, dy);
-            this.set({
-                dx: this.get('dx') - (center.x - dx) * (1 - this.get('zoomSpeed')),
-                dy: this.get('dy') - (center.y - dy) * (1 - this.get('zoomSpeed')),
-                zoom: zoom * this.get('zoomSpeed')
-            });
+            this.setZoom(this.get('zoom') * this.get('zoomSpeed'), dx, dy);
         },
 
         zoomOut: function (dx, dy) {
-            if (dx === undefined) {
-                dx = this.getCenter().x;
-            }
-            if (dy === undefined) {
-                dy = this.getCenter().y;
-            }
-            var zoom = this.get('zoom');
-            var center = this.getCenter();
-            //console.log(center, dx, dy);
-            this.set({
-                dx: this.get('dx') - (center.x - dx) * (1 - 1/this.get('zoomSpeed')),
-                dy: this.get('dy') - (center.y - dy) * (1 - 1/this.get('zoomSpeed')),
-                zoom: zoom / this.get('zoomSpeed')
-            });
+            this.setZoom(this.get('zoom') / this.get('zoomSpeed'), dx, dy);
         },
 
         getPosition: function (el) {
@@ -193,6 +167,24 @@ define(function(require) {
                 zoom: zoomLevel,
                 dx: - currentCenter.x, //zeroPoint.x + currentCenter.x,
                 dy: - currentCenter.y + this.get('autoZoomPadding') * (1 - zoomLevel) //zeroPoint.y + currentCenter.y
+            });
+        },
+
+        setZoom: function (zoom, dx, dy) {
+            if (dx === undefined) {
+                dx = this.getCenter().x;
+            }
+            if (dy === undefined) {
+                dy = this.getCenter().y;
+            }
+            var currentZoom = this.get('zoom');
+            var zoomSpeed = zoom / currentZoom;
+            var center = this.getCenter();
+            //console.log(center, dx, dy);
+            this.set({
+                dx: this.get('dx') - (center.x - dx) * (1 - zoomSpeed),
+                dy: this.get('dy') - (center.y - dy) * (1 - zoomSpeed),
+                zoom: zoom
             });
         },
 
