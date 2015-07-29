@@ -9,8 +9,18 @@ define([
     'orosync/js/sync',
     'oroui/js/app/components/base/component',
     'oroemail/js/app/views/email-notification-view',
+    'oroemail/js/app/models/email-notification-collection',
     'oroui/js/messenger'
-], function($, __, _, routing, mediator, sync, BaseComponent, EmailNotificationView, messenger) {
+], function($,
+            __,
+            _,
+            routing,
+            mediator,
+            sync,
+            BaseComponent,
+            EmailNotificationView,
+            EmailNotificationCollection,
+            messenger) {
     'use strict';
 
     var EmailNotification;
@@ -19,15 +29,26 @@ define([
         view: null,
         collection: null,
 
-        initialize: function() {
-            this.initView()
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
+
+            this.initCollection()
+                .initView()
                 .initSync()
                 .render();
         },
 
+        initCollection: function() {
+            this.collection = new EmailNotificationCollection(JSON.parse(this.options.emails));
+
+            return this;
+        },
+
         initView: function() {
             this.view = new EmailNotificationView({
-                el: '.email-notification-menu'
+                el: this.options._sourceElement,
+                collection: this.collection,
+                count: this.options.count
             });
 
             return this;
@@ -38,7 +59,7 @@ define([
         },
 
         initSync: function() {
-            var clankEvent = this.view.getClankEvent();
+            var clankEvent = this.options.clank_event;
             var handlerNotification = _.bind(this.handlerNotification, this);
             sync.subscribe(clankEvent, handlerNotification);
 
@@ -59,7 +80,8 @@ define([
             $.ajax({
                 url: routing.generate('oro_api_get_email_last'),
                 success: function(response) {
-                    self.view.collection.reset(response.emails);
+                    self.view.collection.reset();
+                    self.view.collection.add(response.emails);
                     self.view.setCount(response.count);
                     if (hasNewEmail) {
                         self.view.showNotification();

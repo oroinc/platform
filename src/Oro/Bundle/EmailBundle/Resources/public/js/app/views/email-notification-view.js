@@ -6,9 +6,8 @@ define([
     'oroui/js/mediator',
     'routing',
     'oroui/js/app/views/base/view',
-    'oroemail/js/app/models/email-notification-collection',
     'oroui/js/messenger'
-], function($, __, _, mediator, routing, BaseView, EmailNotificationCollection, messenger) {
+], function($, __, _, mediator, routing, BaseView, messenger) {
     'use strict';
 
     var EmailNotificationView;
@@ -26,16 +25,10 @@ define([
             this.options = _.defaults(options || {}, this.options);
             this.template = _.template($('#email-notification-item').html());
             this.$containerEmails = $(options.el).find('.items');
-            this.countNewEmail = this.getDefaultCount();
+            this.countNewEmail = parseInt(options.count);
             this.$el.show();
-            this.initCollection().initEvents();
-        },
-
-        initCollection: function() {
-            var emails = this.getDefaultData();
-            this.collection = new EmailNotificationCollection(emails);
-
-            return this;
+            this.collection = options.collection;
+            this.initEvents();
         },
 
         render: function() {
@@ -43,7 +36,7 @@ define([
             var i;
 
             this.$containerEmails.empty();
-            this.initViewMode();
+            this.updateViewMode();
 
             for (i in this.collection.models) {
                 if (this.collection.models.hasOwnProperty(i)) {
@@ -87,19 +80,7 @@ define([
             });
         },
 
-        getClankEvent: function() {
-            return $(this.el).data('clank-event');
-        },
-
-        getDefaultData: function() {
-            return $(this.el).data('emails');
-        },
-
-        getDefaultCount: function() {
-            return $(this.el).data('count');
-        },
-
-        initViewMode: function() {
+        updateViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
@@ -141,7 +122,7 @@ define([
 
             this.$el.find('#' + model.cid).removeClass('new');
             this.$el.find('#' + model.cid).find('.icon-envelope').removeClass('new');
-            this.initViewMode();
+            this.updateViewMode();
         },
 
         setCount: function(count) {
@@ -155,7 +136,7 @@ define([
                 count = '';
             }
             this.$el.find('.icon-envelope span').html(count);
-            this.initViewMode();
+            this.updateViewMode();
         },
 
         initEvents: function() {
@@ -166,7 +147,7 @@ define([
                     self.open();
                     self.setModeDropDownMenu('content');
                 }
-                self.initViewMode();
+                self.updateViewMode();
             });
 
             this.collection.on('reset', function() {

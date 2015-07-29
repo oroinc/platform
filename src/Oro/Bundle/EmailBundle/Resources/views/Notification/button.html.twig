@@ -51,10 +51,15 @@
     {%  set classNew = '' %}
 {% endif %}
 
+{% set options = {
+    'clank_event': clank_event,
+    'emails': emails,
+    'count': count
+} %}
+
 <li class="email-notification-menu dropdown"
-    data-clank-event="{{ clank_event }}"
-    data-emails="{{ emails }}"
-    data-count = "{{ count }}" style="display: none;">
+    data-page-component-options="{{ options|json_encode }}"
+    style="display: none;">
     <a href="#" class="oro-dropdown-toggle">
         <i class="icon-envelope {{ classNew }}">
             <span>

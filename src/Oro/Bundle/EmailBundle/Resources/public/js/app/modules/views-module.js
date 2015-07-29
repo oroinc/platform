@@ -13,8 +13,15 @@ require([
      * Init ShortcutsView
      */
     BaseController.loadBeforeAction([
+        'jquery',
         'oroemail/js/app/components/email-notification-component'
-    ], function(EmailNotificationComponent) {
-        BaseController.addToReuse('email-notification', EmailNotificationComponent, {});
+    ], function(jquery, EmailNotificationComponent) {
+        BaseController.addToReuse('emailNotification', {
+            compose: function() {
+                var options = jquery('.email-notification-menu').data('page-component-options');
+                options._sourceElement = '.email-notification-menu';
+                this.cComponent = new EmailNotificationComponent(options);
+            }
+        });
     });
 });
