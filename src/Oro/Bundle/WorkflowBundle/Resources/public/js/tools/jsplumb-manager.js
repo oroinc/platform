@@ -2,14 +2,12 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore');
-    var $ = require('jquery');
     var Matrix = require('./jsplumb-manager/jpm-matrix');
     var HideStartRule = require('./jsplumb-manager/jpm-hide-start-rule');
     var CascadeRule = require('./jsplumb-manager/jpm-cascade-rule');
     var PyramidRule = require('./jsplumb-manager/jpm-pyramid-rule');
     var TriadaRule = require('./jsplumb-manager/jpm-triada-rule');
     var CherryRule = require('./jsplumb-manager/jpm-cherry-rule');
-    var positions = [0.5, 0.8, 0.2, 0.65, 0.35, 0.6, 0.3, 0.7, 0.4];
     var mids = {
         top: [0.5, 0, 0, -1],
         bottom: [0.5, 1, 0, 1],
@@ -121,72 +119,6 @@ define(function(require) {
             }
 
             return [sa, ta];
-        },
-
-        debounceRecalculateConnections: function() {
-            return this._debounceRecalculateConnections();
-        },
-
-        recalculateConnections: function() {
-            function process (ep, anchor) {
-                // don't manage Perimeter type anchors
-                var i;
-                var adjusted;
-                var coords = _.clone(anchor);
-                var round = $('#' + ep.elementId).hasClass('start-step');
-                var edge = getEdge(coords);
-                var key = ep.element.id + '_' + edge;
-                if (key in that.anchors === false) {
-                    that.anchors[key] = [];
-                }
-                i = that.anchors[key].length % positions.length;
-                if (edge === 'top' || edge === 'bottom') {
-                    coords[0] = positions[i];
-                } else {
-                    coords[1] = positions[i];
-                }
-                if (round) {
-                    adjusted = roundAdjust(edge, coords[0], coords[1]);
-                    coords[0] = adjusted[0];
-                    coords[1] = adjusted[1];
-                }
-                that.anchors[key].push(coords);
-                ep.setAnchor(coords);
-            }
-            function roundAdjust(edge, x, y) {
-                if (x * 2 % 1 === 0 && y * 2 % 1 === 0) {
-                    return [x, y];
-                }
-                var a;
-                var b;
-                var c = 0.5;
-                if (edge === 'top' || edge === 'bottom') {
-                    b = x - 0.5;
-                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
-                    y = 0.5 + a * (edge === 'bottom' ? 1 : -1);
-                } else {
-                    b = y - 0.5;
-                    a = Math.floor(Math.sqrt(c * c - b * b) * 1000) / 1000;
-                    x = 0.5 + a * (edge === 'right' ? 1 : -1);
-                }
-                return [x, y];
-            }
-            var that = this;
-            that.loopback = {};
-            that.anchors = {};
-            _.each(that.jsPlumbInstance.getConnections(), function(conn) {
-                var anchors;
-                var se;
-                var te;
-                if (_.isArray(conn.endpoints) && conn.endpoints.length === 2) {
-                    se = conn.endpoints[0];
-                    te = conn.endpoints[1];
-
-                    anchors = that.getAnchors(se.element, te.element);
-                    process(se, anchors[0]);
-                    process(te, anchors[1]);
-                }
-            });
         }
     });
 

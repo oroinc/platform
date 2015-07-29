@@ -1,65 +1,10 @@
 define(function(require) {
     'use strict';
-    var JsPlumbOverlayManager,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BLOCK_MOVE_ITERATIONS = 16,
-    // TODO: remove debug information
-        debugVisualization = false;
+    var JsPlumbOverlayManager;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BLOCK_MOVE_ITERATIONS = 16;
 
-    // TODO: remove debug information
-    function setBorderColor (block) {
-        var color = '';
-        if ('range' in block === false) {
-            color = 'yellow';
-        } else if ('x' in block.range) {
-            color = 'blue';
-        } else if ('y' in block.range) {
-            color = 'red';
-        }
-        $(block.el).css('border-color', color);
-    }
-
-    // TODO: remove debug information
-    function drawSegment(segment) {
-        var x1, x2, y1, y2;
-        if (segment.orientation === 'v') {
-            x1 = x2 = segment.x;
-            y1 = segment.y1;
-            y2 = segment.y2;
-        } else {
-            y1 = y2 = segment.y;
-            x1 = segment.x1;
-            x2 = segment.x2;
-        }
-        $('body').append($('<div/>', {'class': 'myrange'}).css({
-                'border': '1px solid skyblue',
-                'position': 'absolute',
-                'left': Math.min(x1, x2) + 'px',
-                'width': Math.abs(x1 - x2) + 'px',
-                'top': Math.min(y1, y2) + 'px',
-                'height': Math.abs(y1 - y2) + 'px'
-            })
-        );
-    }
-    // TODO: remove debug information
-    function drawBlock(block) {
-        $('body').append($('<div/>', {'class': 'myblock'}).css({
-                'border': '1px solid red',
-                'position': 'absolute',
-                'left': block.x + 'px',
-                'width': block.w + 'px',
-                'top': block.y + 'px',
-                'height': block.h + 'px',
-                'margin': -block.h / 2 + 'px ' + -block.w / 2 + 'px',
-                'z-index': 9999
-            }).attr('title', block.name)
-        );
-    }
-
-    /* class Block
-    TODO: move to separate file
-     */
     function Block(el) {
         this.name = $(el).find('.step-label').text();
         this.el = el;
@@ -67,15 +12,10 @@ define(function(require) {
         this.y = el.offsetTop + el.offsetHeight / 2;
         this.w = el.offsetWidth;
         this.h = el.offsetHeight;
-        // TODO: remove debug information
-        if (debugVisualization) {
-            var style = $(el).attr('style');
-            $(el).attr('style', style.replace(/border-color\:\s?(blue|red|yellow)/, ''));
-        }
     }
 
     _.extend(Block.prototype, {
-        isOverlapped: function (block) {
+        isOverlapped: function(block) {
             if (this === block) {
                 throw new Error('Incorrect overlap checking with itself.');
             }
@@ -89,9 +29,6 @@ define(function(require) {
         }
     });
 
-    /* class OverlayBlock
-     TODO: move to separate file
-     */
     function OverlayBlock(el, overlay, points) {
         this.super.apply(this, arguments);
         this.jsPlumbOverlayInstance = overlay;
@@ -109,8 +46,12 @@ define(function(require) {
     _.extend(OverlayBlock.prototype, {
         super: Block,
 
-        _fillSegments: function (points) {
-            var i, segment, p1, p2, totalLength = 0;
+        _fillSegments: function(points) {
+            var i;
+            var segment;
+            var p1;
+            var p2;
+            var totalLength = 0;
             for (i = 1; i < points.length; i++) {
                 segment = {};
                 p1 = points[i - 1];
@@ -134,14 +75,11 @@ define(function(require) {
             this.pathLength = totalLength;
         },
 
-        setNearestLocation: function (dx, dy) {
+        setNearestLocation: function(dx, dy) {
             var location, x = this.x + dx, y = this.y + dy, locations = [],  passed = 0;
-            _.each(this.segments, function (segment) {
-                var min, max;
-                // TODO: remove debug information
-                if (debugVisualization) {
-                    drawSegment(segment);
-                }
+            _.each(this.segments, function(segment) {
+                var min;
+                var max;
                 if (segment.orientation === 'v') { // vertical segment
                     min = Math.min(segment.y1, segment.y2);
                     max = Math.max(segment.y1, segment.y2);
@@ -152,7 +90,7 @@ define(function(require) {
                             x : segment.x,
                             y : y,
                             segment: segment
-                        })
+                        });
                     }
                     passed += max - min;
                 } else { // horizontal segment
@@ -165,12 +103,12 @@ define(function(require) {
                             x: x,
                             y: segment.y,
                             segment: segment
-                        })
+                        });
                     }
                     passed += max - min;
                 }
             }, this);
-            location = _.min(locations, function (location) {
+            location = _.min(locations, function(location) {
                 return location.distance;
             });
             this.moveX = 0;
@@ -178,7 +116,7 @@ define(function(require) {
             if (_.isObject(location)) {
                 if (Math.abs(dx) > 0 || Math.abs(dy) > 0) {
                     // to prevent situation when vector is perpendicular to path segment we move it a bit
-                    if (this.x == location.x && location.segment.orientation === 'h') {
+                    if (this.x === location.x && location.segment.orientation === 'h') {
                         if (Math.min(location.segment.x1, location.segment.x1) <= location.x - 1) {
                             location.x -= 1;
                             location.passed -= 1;
@@ -187,7 +125,7 @@ define(function(require) {
                             location.passed += 1;
                         }
                     }
-                    if (this.y == location.y && location.segment.orientation === 'v') {
+                    if (this.y === location.y && location.segment.orientation === 'v') {
                         if (Math.min(location.segment.y1, location.segment.y1) <= location.y - 1) {
                             location.y -= 1;
                             location.passed -= 1;
@@ -206,9 +144,9 @@ define(function(require) {
             }
         },
 
-        setLocation: function (location) {
+        setLocation: function(location) {
             var segment, passed = 0;
-            segment = _.find(this.segments, function (segment) {
+            segment = _.find(this.segments, function(segment) {
                 var min, max, diff;
                 if (segment.orientation === 'v') {
                     min = Math.min(segment.y1, segment.y2);
@@ -238,7 +176,7 @@ define(function(require) {
             return typeof segment !== 'undefined';
         },
 
-        resetOriginalLocation: function () {
+        resetOriginalLocation: function() {
             return this.setLocation(this._originalLocation);
         },
 
@@ -254,26 +192,21 @@ define(function(require) {
         }
     });
 
-    JsPlumbOverlayManager = function (smartlineManager) {
+    JsPlumbOverlayManager = function(smartlineManager) {
         this.smartlineManager = smartlineManager;
-    }
+    };
     _.extend(JsPlumbOverlayManager.prototype, {
-        calculate: function () {
-            // TODO: remove debug information
-            if (debugVisualization) {
-                $('.myrange, .myblock').remove();
-            }
-            var i,
-                blocks,
-                changed,
-                steps = [],
-                overlays = [];
+        calculate: function() {
+            var i;
+            var blocks;
+            var steps = [];
+            var overlays = [];
             if(!this.smartlineManager.isCacheValid()) {
                 this.smartlineManager.refreshCache();
             }
-            _.each(this.smartlineManager.cache.connections, function (cacheItem) {
+            _.each(this.smartlineManager.cache.connections, function(cacheItem) {
                 var points = cacheItem.points;
-                _.each(cacheItem.connection.getOverlays(), function (overlay) {
+                _.each(cacheItem.connection.getOverlays(), function(overlay) {
                     var block;
                     if (overlay.type === 'Custom') {
                         block = new OverlayBlock(overlay.canvas, overlay, _.clone(points));
@@ -282,7 +215,7 @@ define(function(require) {
                     }
                 }, this);
             });
-            _.each(_.keys(this.smartlineManager.jsPlumbInstance.sourceEndpointDefinitions), function (id) {
+            _.each(_.keys(this.smartlineManager.jsPlumbInstance.sourceEndpointDefinitions), function(id) {
                 var el = document.getElementById(id);
                 if (el) {
                     steps.push(new Block(el));
@@ -290,41 +223,14 @@ define(function(require) {
             });
             blocks = steps.concat(overlays);
             for (i = 0; i < BLOCK_MOVE_ITERATIONS; i++) {
-                _.each(blocks, function (block) {
-                    _.each(overlays, function (overlay) {
-                        var deltaX, deltaY, multiplier;
-                        if (block !== overlay && block.isOverlapped(overlay)) {
-                            deltaX = overlay.x - block.x;
-                            deltaY = overlay.y - block.y;
-                            multiplier = 5 / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                            deltaX *= multiplier;
-                            deltaY *= multiplier;
-                            overlay.moveX += deltaX;
-                            overlay.moveY += deltaY;
-
-                            // TODO: remove debug information
-                            if (debugVisualization) {
-                                setBorderColor(overlay);
-                            }
-                        }
-                    })
-                });
-                changed = false;
-                _.each(overlays, function (overlay) {
-                    if (Math.abs(overlay.moveX) >= 1 || Math.abs(overlay.moveY) >= 1) {
-                        changed = true;
-                        overlay.setNearestLocation(overlay.moveX, overlay.moveY);
-                    }
-                });
-                if (!changed) {
+                if (!this._moveBlocks(blocks, overlays)) {
                     break;
                 }
             }
-
-            _.each(overlays, function (overlay) {
+            _.each(overlays, function(overlay) {
                 var overlapped;
                 if (overlay.isChanged() ) {
-                    overlapped = _.find(blocks, function (block) {
+                    overlapped = _.find(blocks, function(block) {
                         var deny = block !== overlay && overlay.isOverlapped(block);
                         return deny;
                     });
@@ -335,6 +241,31 @@ define(function(require) {
                     }
                 }
             });
+        },
+
+        _moveBlocks: function(blocks, overlays) {
+            var changed = false;
+            _.each(blocks, function(block) {
+                _.each(overlays, function(overlay) {
+                    var deltaX, deltaY, multiplier;
+                    if (block !== overlay && block.isOverlapped(overlay)) {
+                        deltaX = overlay.x - block.x;
+                        deltaY = overlay.y - block.y;
+                        multiplier = 5 / Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                        deltaX *= multiplier;
+                        deltaY *= multiplier;
+                        overlay.moveX += deltaX;
+                        overlay.moveY += deltaY;
+                    }
+                });
+            });
+            _.each(overlays, function(overlay) {
+                if (Math.abs(overlay.moveX) >= 1 || Math.abs(overlay.moveY) >= 1) {
+                    changed = true;
+                    overlay.setNearestLocation(overlay.moveX, overlay.moveY);
+                }
+            });
+            return changed;
         }
     });
 

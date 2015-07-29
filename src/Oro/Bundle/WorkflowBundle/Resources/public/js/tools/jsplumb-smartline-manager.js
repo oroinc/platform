@@ -20,7 +20,7 @@ define(function(require){
             this.jsPlumbOverlayManager), 50);
     }
 
-    window.getLastRequest = function () {
+    window.getLastRequest = function() {
         return JSON.stringify(JsPlumbSmartlineManager.lastRequest);
     };
 
@@ -31,11 +31,11 @@ define(function(require){
             blockHMargin: 4
         },
 
-        isCacheValid: function () {
+        isCacheValid: function() {
             return _.isEqual(this.getState(), this.cache.state);
         },
 
-        getConnectionPath: function (connector) {
+        getConnectionPath: function(connector) {
             if (!this.isCacheValid()) {
                 this.refreshCache();
             }
@@ -47,7 +47,7 @@ define(function(require){
             return _.clone(cacheRecord.points);
         },
 
-        getNaivePathLength: function (fromRect, toRect) {
+        getNaivePathLength: function(fromRect, toRect) {
             if (fromRect === toRect) {
                 return 0;
             }
@@ -57,7 +57,7 @@ define(function(require){
         },
 
 
-        getState: function () {
+        getState: function() {
             var state = {
                     rectangles: [],
                     connections: []
@@ -71,7 +71,7 @@ define(function(require){
                 }
             });
 
-            _.each(this.jsPlumbInstance.getConnections(), function (conn) {
+            _.each(this.jsPlumbInstance.getConnections(), function(conn) {
                 if (conn.sourceId in hasRect && conn.targetId in hasRect && conn.source && conn.target) {
                     state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
@@ -80,7 +80,7 @@ define(function(require){
             return state;
         },
 
-        refreshCache: function () {
+        refreshCache: function() {
             var _this = this;
             var connections = [];
             var rects = {};
@@ -110,27 +110,25 @@ define(function(require){
             graph.build();
             finderSettings.recommendedConnectionWidth = settings.connectionWidth;
 
-            _.each(this.jsPlumbInstance.getConnections(), function (conn) {
+            _.each(this.jsPlumbInstance.getConnections(), function(conn) {
                 if (conn.sourceId in rects && conn.targetId in rects && conn.source && conn.target) {
                     connections.push([conn.sourceId, conn.targetId, this.getNaivePathLength(rects[conn.sourceId],
                         rects[conn.targetId]), conn]);
                 }
             }, this);
 
-            connections.sort(function (a, b) {
+            connections.sort(function(a, b) {
                 return a[2] - b[2];
             });
 
-            _.each(connections, function (conn) {
+            _.each(connections, function(conn) {
                 var finder = new Finder(graph);
 
                 finder.addTo(graph.getPathFromCid(conn[1], directions.BOTTOM_TO_TOP));
                 finder.addFrom(graph.getPathFromCid(conn[0], directions.TOP_TO_BOTTOM));
 
                 var path = finder.find();
-                if (!path) {
-                    console.warn('Cannot find path');
-                } else {
+                if (path) {
                     graph.updateWithPath(path);
                     _this.cache.connections[conn[3].connector.getId()] = {
                         connection: conn[3],
@@ -139,7 +137,7 @@ define(function(require){
                 }
             });
 
-            _.each(this.cache.connections, function (item) {
+            _.each(this.cache.connections, function(item) {
                 item.points = item.path.points.reverse();
             });
 
@@ -149,10 +147,10 @@ define(function(require){
 
             // debug code
             JsPlumbSmartlineManager.lastRequest = {
-                sources: graph.rectangles.map(function (item) {
+                sources: graph.rectangles.map(function(item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
                 }),
-                connections: connections.map(function (item) {return item.slice(0,2);})
+                connections: connections.map(function(item) {return item.slice(0,2);})
             };
         }
     };
