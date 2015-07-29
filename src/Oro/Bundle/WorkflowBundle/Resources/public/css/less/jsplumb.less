@@ -25,7 +25,6 @@
   border-top: 1px solid #f1f1f1;
   .workflow-table-container {
     padding-top: 20px;
-    margin-right: -10px;
   }
   .workflow-flowchart-container {
     background-color: #fafafa;
@@ -194,8 +193,16 @@
       #workflow > .hover-block();
       color: #fff;
     }
-    &.dropdown .dropdown-toggle {
-      margin-left: 2px;
+    &.dropdown {
+      .dropdown-toggle {
+        margin-left: 2px;
+      }
+      &:hover {
+        .dropdown-toggle {
+          position: absolute;
+          right: 4px;
+        }
+      }
     }
   }
   .workflow-transition-overlay {
