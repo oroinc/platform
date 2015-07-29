@@ -13,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class TargetType extends AbstractType
 {
@@ -61,6 +60,9 @@ class TargetType extends AbstractType
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
                 ),
+                'choice_attr' => function ($choice) {
+                    return $this->getChoiceAttributes($choice);
+                },
                 'configs' => array(
                     'allowClear'              => true,
                     'placeholder'             => 'oro.entity.form.choose_entity',
@@ -103,18 +105,29 @@ class TargetType extends AbstractType
 
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
-            if ($className != $entityClassName) {
+            if ($className !== $entityClassName) {
                 $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
-                $choices[$className] = new ChoiceListItem(
-                    $entityConfig->get('label'),
-                    array(
-                        'data-icon' => $entityConfig->get('icon')
-                    )
-                );
+                $choices[$className] = $entityConfig->get('label');
             }
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns a list of choice attributes for the given entity
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    protected function getChoiceAttributes($entityClass)
+    {
+        $entityConfig = $this->configManager->getProvider('entity')->getConfig($entityClass);
+
+        return array(
+            'data-icon' => $entityConfig->get('icon')
+        );
     }
 
     /**

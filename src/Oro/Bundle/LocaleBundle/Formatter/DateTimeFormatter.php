@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -14,17 +14,17 @@ class DateTimeFormatter
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     private $translator;
 
     /**
-     * @param LocaleSettings $localeSettings
-     * @param Translator $translator
+     * @param LocaleSettings      $localeSettings
+     * @param TranslatorInterface $translator
      */
-    public function __construct(LocaleSettings $localeSettings, Translator $translator)
+    public function __construct(LocaleSettings $localeSettings, TranslatorInterface $translator)
     {
         $this->localeSettings = $localeSettings;
-        $this->translator = $translator;
+        $this->translator     = $translator;
     }
 
     /**

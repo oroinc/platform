@@ -4,11 +4,15 @@ namespace Oro\Bundle\DataAuditBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\DataAuditBundle\Model\ExtendAuditField;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_audit_field")
+ * @Config(mode=Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN)
  */
-class AuditField extends AbstractAuditField
+class AuditField extends ExtendAuditField
 {
     /**
      * @var Audit
