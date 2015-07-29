@@ -13,6 +13,13 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
  */
 abstract class AbstractAuditField
 {
+    use BitFieldTypeTrait;
+    use NumericFieldTypeTrait;
+    use StringFieldTypeTrait;
+    use DateTimeFieldType;
+    use ArrayFieldTypeTrait;
+    use ObjectFieldTypeTrait;
+
     /**
      * @var int
      *
@@ -50,174 +57,6 @@ abstract class AbstractAuditField
      * @ORM\Column(name="data_type", type="string", nullable=false)
      */
     protected $dataType;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="old_integer", type="bigint", nullable=true)
-     */
-    protected $oldInteger;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="old_float", type="float", nullable=true)
-     */
-    protected $oldFloat;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="old_boolean", type="boolean", nullable=true)
-     */
-    protected $oldBoolean;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="old_text", type="text", nullable=true)
-     */
-    protected $oldText;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_date", type="date", nullable=true)
-     */
-    protected $oldDate;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_time", type="time", nullable=true)
-     */
-    protected $oldTime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_datetime", type="datetime", nullable=true)
-     */
-    protected $oldDatetime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="old_datetimetz", type="datetimetz", nullable=true)
-     */
-    protected $oldDatetimetz;
-
-    /**
-     * @var object
-     *
-     * @ORM\Column(name="old_object", type="object", nullable=true)
-     */
-    protected $oldObject;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="old_array", type="array", nullable=true)
-     */
-    protected $oldArray;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="old_simplearray", type="simple_array", nullable=true)
-     */
-    protected $oldSimplearray;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="old_jsonarray", type="json_array", nullable=true)
-     */
-    protected $oldJsonarray;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="new_integer", type="bigint", nullable=true)
-     */
-    protected $newInteger;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="new_float", type="float", nullable=true)
-     */
-    protected $newFloat;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="new_boolean", type="boolean", nullable=true)
-     */
-    protected $newBoolean;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="new_text", type="text", nullable=true)
-     */
-    protected $newText;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_date", type="date", nullable=true)
-     */
-    protected $newDate;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_time", type="time", nullable=true)
-     */
-    protected $newTime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_datetime", type="datetime", nullable=true)
-     */
-    protected $newDatetime;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="new_datetimetz", type="datetimetz", nullable=true)
-     */
-    protected $newDatetimetz;
-
-    /**
-     * @var object
-     *
-     * @ORM\Column(name="new_object", type="object", nullable=true)
-     */
-    protected $newObject;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="new_array", type="array", nullable=true)
-     */
-    protected $newArray;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="new_simplearray", type="simple_array", nullable=true)
-     */
-    protected $newSimplearray;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="new_jsonarray", type="json_array", nullable=true)
-     */
-    protected $newJsonarray;
 
     /**
      * @param AbstractAudit $audit
