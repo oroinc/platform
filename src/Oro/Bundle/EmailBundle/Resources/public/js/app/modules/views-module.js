@@ -2,7 +2,7 @@
 require([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/tools'
-], function (BaseController, tools) {
+], function(BaseController, tools) {
     'use strict';
 
     if (tools.isMobile()) {
@@ -14,7 +14,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroemail/js/app/components/email-notification-component'
-    ], function (EmailNotificationComponent) {
+    ], function(EmailNotificationComponent) {
         BaseController.addToReuse('email-notification', EmailNotificationComponent, {});
     });
 });

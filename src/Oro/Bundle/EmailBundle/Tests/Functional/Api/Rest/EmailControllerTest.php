@@ -16,45 +16,45 @@ class EmailControllerTest extends WebTestCase
     protected $emails =
         [
             [
-                'folders'    => [
+                'folders' => [
                     ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
                 ],
-                'subject'    => 'New email',
-                'messageId'  => 'test@email-bundle.func-test',
-                'from'       => '"Address 1" <1@example.com>',
-                'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
-                'cc'         => '2@example.com; "Address 3" <3@example.com>',
+                'subject' => 'New email',
+                'messageId' => 'test@email-bundle.func-test',
+                'from' => '"Address 1" <1@example.com>',
+                'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+                'cc' => '2@example.com; "Address 3" <3@example.com>',
                 'importance' => 'low',
-                'body'       => 'Test body',
-                'bodyType'   => 'text',
+                'body' => 'Test body',
+                'bodyType' => 'text',
                 'receivedAt' => '2015-06-19 12:17:51'
             ],
             [
-                'folders'    => [
+                'folders' => [
                     ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
                 ],
-                'subject'    => 'New email',
-                'messageId'  => 'test@email-bundle.func-tesl1',
-                'from'       => '"Address 1" <1@example.com>',
-                'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
-                'cc'         => '2@example.com; "Address 3" <3@example.com>',
+                'subject' => 'New email',
+                'messageId' => 'test@email-bundle.func-tesl1',
+                'from' => '"Address 1" <1@example.com>',
+                'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+                'cc' => '2@example.com; "Address 3" <3@example.com>',
                 'importance' => 'low',
-                'body'       => 'Test body',
-                'bodyType'   => 'text',
+                'body' => 'Test body',
+                'bodyType' => 'text',
                 'receivedAt' => '2015-06-19 12:17:51'
             ],
             [
-                'folders'    => [
+                'folders' => [
                     ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
                 ],
-                'subject'    => 'New email',
-                'messageId'  => 'test@email-bundle.func-tesl2',
-                'from'       => '"Address 1" <1@example.com>',
-                'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
-                'cc'         => '2@example.com; "Address 3" <3@example.com>',
+                'subject' => 'New email',
+                'messageId' => 'test@email-bundle.func-tesl2',
+                'from' => '"Address 1" <1@example.com>',
+                'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+                'cc' => '2@example.com; "Address 3" <3@example.com>',
                 'importance' => 'low',
-                'body'       => 'Test body',
-                'bodyType'   => 'text',
+                'body' => 'Test body',
+                'bodyType' => 'text',
                 'receivedAt' => '2015-06-19 12:17:51'
             ]
         ];
