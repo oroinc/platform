@@ -249,8 +249,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'label' => 'oro.workflow.workflowstep.grid.label'
                         ),
                     ),
-                    'filters' => array(),
-                    'sorters' => array(),
                 ),
             ),
             'full configuration' => array(

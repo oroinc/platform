@@ -5,11 +5,8 @@ namespace Oro\Bundle\InstallerBundle\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\InstallerBundle\CommandExecutor;
-
-class PlatformUpdateCommand extends ContainerAwareCommand
+class PlatformUpdateCommand extends AbstractCommand
 {
     /**
      * @inheritdoc
@@ -24,14 +21,9 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Forces operation to be executed.'
             )
-            ->addOption(
-                'timeout',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Timeout for child command execution',
-                CommandExecutor::DEFAULT_TIMEOUT
-            )
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it') ;
+            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it');
+
+        parent::configure();
     }
 
     /**
@@ -49,15 +41,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                 $assetsOptions['--symlink'] = true;
             }
 
-            $commandExecutor = new CommandExecutor(
-                $input->hasOption('env') ? $input->getOption('env') : null,
-                $output,
-                $this->getApplication(),
-                $this->getContainer()->get('oro_cache.oro_data_cache_manager')
-            );
-
-            $timeout = $input->getOption('timeout');
-            $commandExecutor->setDefaultTimeout($timeout);
+            $commandExecutor = $this->getCommandExecutor($input, $output);
 
             $commandExecutor
                 ->runCommand(
@@ -65,7 +49,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
                     array(
                         '--process-isolation' => true,
                         '--force'             => true,
-                        '--timeout'           => $timeout
+                        '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                     )
                 )
                 ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
