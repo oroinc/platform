@@ -65,6 +65,8 @@ class EntityProxyGenerator
             }
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfigs        = $extendConfigProvider->getConfigs(null, true);
+            $metadataFactory      = $em->getMetadataFactory();
+            $proxyFactory         = $em->getProxyFactory();
             foreach ($extendConfigs as $extendConfig) {
                 if (!$extendConfig->is('is_extend')) {
                     continue;
@@ -76,13 +78,10 @@ class EntityProxyGenerator
                 $entityClass   = $extendConfig->getId()->getClassName();
                 $proxyFileName = $proxyDir . DIRECTORY_SEPARATOR . '__CG__'
                     . str_replace('\\', '', $entityClass) . '.php';
-                if (!file_exists($proxyFileName)) {
-                    $proxyFactory = $em->getProxyFactory();
-                    $metadata     = $em->getClassMetadata($entityClass);
+                $metadata      = $metadataFactory->getMetadataFor($entityClass);
 
-                    $proxyFactory->generateProxyClasses([$metadata], $proxyDir);
-                    clearstatcache(true, $proxyFileName);
-                }
+                $proxyFactory->generateProxyClasses([$metadata], $proxyDir);
+                clearstatcache(true, $proxyFileName);
             }
         }
     }
