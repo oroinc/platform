@@ -34,8 +34,7 @@ define([
 
             this.initCollection()
                 .initView()
-                .initSync()
-                .render();
+                .initSync();
         },
 
         initCollection: function() {
@@ -52,10 +51,6 @@ define([
             });
 
             return this;
-        },
-
-        render: function() {
-            this.view.render();
         },
 
         initSync: function() {

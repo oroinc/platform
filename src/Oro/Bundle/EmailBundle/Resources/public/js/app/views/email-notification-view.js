@@ -29,6 +29,7 @@ define([
             this.$el.show();
             this.collection = options.collection;
             this.initEvents();
+            this.render();
         },
 
         render: function() {
