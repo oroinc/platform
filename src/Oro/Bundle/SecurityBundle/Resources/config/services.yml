@@ -78,6 +78,9 @@ parameters:
 
     oro_security.placeholder.filter.class:                     Oro\Bundle\SecurityBundle\Placeholder\PlaceholderFilter
 
+    oro_security.workflow.action.remove_ace_share_scope.class: Oro\Bundle\SecurityBundle\Model\Action\RemoveAceByShareScopeAction
+    oro_security.ace.query.manager.class:                            Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
+
 services:
     oro_security.security_facade:
         class: %oro_security.security_facade.class%
@@ -623,4 +626,18 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_entity_config.provider.security
-            - @doctrine
+            - @doctrine.orm.entity_manager
+
+    oro_security.ace.query.manager:
+        class: %oro_security.ace.query.manager.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+
+    oro_security.workflow.action.remove_ace_share_scope:
+        class: %oro_security.workflow.action.remove_ace_share_scope.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_security.ace.query.manager
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_workflow.action, alias: remove_ace_share_scope }
