@@ -269,7 +269,9 @@
     {% set smtp = form_widget(form.children.smtpSettings) %}
     {% set process = form_row(form.children.processType) ~
     form_widget(form.children.processSettings) %}
-    {% set access= form_row(form.children.allowedUsers) %}
+    {% set access = form_row(form.children.allowedUsers) ~
+        form_row(form.children.allowedRoles)
+    %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
         {{ form_widget(form) }}

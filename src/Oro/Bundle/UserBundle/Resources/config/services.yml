@@ -20,6 +20,7 @@ parameters:
     oro_user.autocomplete.user.search_without_current_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.autocomplete.user.organization_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
+    oro_user.autocomplete.role.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
     oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.change_password.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
@@ -170,6 +171,16 @@ services:
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
+
+    # Autocomplete role search handler
+    oro_user.autocomplete.role.search_handler:
+        class: %oro_user.autocomplete.role.search_handler.class%
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_user.role.entity.class%
+            - ["label"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
 
     oro_user.gender_provider:
         class: %oro_user.gender_provider.class%

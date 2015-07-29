@@ -85,6 +85,22 @@ class MailboxType extends AbstractType
                 'mapped' => false
             ]
         );
+        $builder->add(
+            'allowedUsers',
+            'oro_user_multiselect',
+            [
+                'label' => 'oro.user.entity_plural_label',
+                'mapped' => false
+            ]
+        );
+        $builder->add(
+            'allowedRoles',
+            'oro_role_multiselect',
+            [
+                'label' => 'oro.user.role.entity_plural_label',
+                'mapped' => false
+            ]
+        );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
