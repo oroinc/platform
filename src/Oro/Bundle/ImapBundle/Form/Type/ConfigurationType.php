@@ -55,92 +55,59 @@ class ConfigurationType extends AbstractType
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
+        $this->addEnableSMTPImapListener($builder);
 
         $builder
-            ->add(
-                'useImap',
-                'checkbox',
-                [
-                    'label'    => 'oro.imap.configuration.use_imap.label',
-                    'attr'     => ['class' => 'imap-config'],
-                    'required' => false,
-                    'mapped'   => false
-                ]
-            )
-            ->add(
-                'imapHost',
-                'text',
-                [
-                    'label'    => 'oro.imap.configuration.imap_host.label',
-                    'required' => true,
-                    'attr'     => ['class' => 'critical-field imap-config'],
-                    'tooltip'  => 'oro.imap.configuration.tooltip',
-                ]
-            )
-            ->add(
-                'imapPort',
-                'number',
-                [
-                    'label'    => 'oro.imap.configuration.imap_port.label',
-                    'attr'     => ['class' => 'imap-config'],
-                    'required' => true
-                ]
-            )
-            ->add(
-                'useSmtp',
-                'checkbox',
-                [
-                    'label'    => 'oro.imap.configuration.use_smtp.label',
-                    'attr'     => ['class' => 'smtp-config'],
-                    'required' => false,
-                    'mapped'   => false
-                ]
-            )
-            ->add(
-                'smtpHost',
-                'text',
-                [
-                    'label'    => 'oro.imap.configuration.smtp_host.label',
-                    'attr'     => ['class' => 'critical-field smtp-config'],
-                    'required' => true,
-                    'tooltip'  => 'oro.imap.configuration.tooltip',
-                ]
-            )
-            ->add(
-                'smtpPort',
-                'number',
-                [
-                    'label'    => 'oro.imap.configuration.smtp_port.label',
-                    'attr'     => ['class' => 'smtp-config'],
-                    'required' => true
-                ]
-            )
-            ->add(
-                'ssl',
-                'choice',
-                [
-                    'label'       => 'oro.imap.configuration.ssl.label',
-                    'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                    'empty_data'  => null,
-                    'empty_value' => '',
-                    'required'    => false
-                ]
-            )
-            ->add(
-                'user',
-                'text',
-                [
-                    'label'    => 'oro.imap.configuration.user.label',
-                    'required' => true,
-                    'attr'     => ['class' => 'critical-field'],
-                    'tooltip'  => 'oro.imap.configuration.tooltip',
-                ]
-            )
-            ->add(
-                'password',
-                'password',
-                ['label' => 'oro.imap.configuration.password.label', 'required' => true]
-            )
+            ->add('useImap', 'checkbox', [
+                'label'    => 'oro.imap.configuration.use_imap.label',
+                'attr'     => ['class' => 'imap-config'],
+                'required' => false,
+                'mapped'   => false
+            ])
+            ->add('imapHost', 'text', [
+                'label'    => 'oro.imap.configuration.imap_host.label',
+                'required' => false,
+                'attr'     => ['class' => 'critical-field imap-config'],
+                'tooltip'  => 'oro.imap.configuration.tooltip',
+            ])
+            ->add('imapPort', 'number', [
+                'label'    => 'oro.imap.configuration.imap_port.label',
+                'attr'     => ['class' => 'imap-config'],
+                'required' => false
+            ])
+            ->add('useSmtp', 'checkbox', [
+                'label'    => 'oro.imap.configuration.use_smtp.label',
+                'attr'     => ['class' => 'smtp-config'],
+                'required' => false,
+                'mapped'   => false
+            ])
+            ->add('smtpHost', 'text', [
+                'label'    => 'oro.imap.configuration.smtp_host.label',
+                'attr'     => ['class' => 'critical-field smtp-config'],
+                'required' => false,
+                'tooltip'  => 'oro.imap.configuration.tooltip',
+            ])
+            ->add('smtpPort', 'number', [
+                'label'    => 'oro.imap.configuration.smtp_port.label',
+                'attr'     => ['class' => 'smtp-config'],
+                'required' => false
+            ])
+            ->add('ssl', 'choice', [
+                'label'       => 'oro.imap.configuration.ssl.label',
+                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'empty_data'  => null,
+                'empty_value' => '',
+                'required'    => false
+            ])
+            ->add('user', 'text', [
+                'label'    => 'oro.imap.configuration.user.label',
+                'required' => true,
+                'attr'     => ['class' => 'critical-field'],
+                'tooltip'  => 'oro.imap.configuration.tooltip',
+            ])
+            ->add('password', 'password', [
+                'label' => 'oro.imap.configuration.password.label', 'required' => true
+            ])
             ->add('check_connection', new CheckButtonType(), [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
             ])
@@ -149,25 +116,6 @@ class ConfigurationType extends AbstractType
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        /** @var UserEmailOrigin $data */
-        $data = $view->vars['value'];
-        if ($data->getImapHost()) {
-            $form->get('useImap')->setData(true);
-        } else {
-            $form->get('useImap')->setData(false);
-        }
-        if ($data->getSmtpHost()) {
-            $form->get('useSmtp')->setData(true);
-        } else {
-            $form->get('useSmtp')->setData(false);
-        }
     }
 
     /**
@@ -307,6 +255,29 @@ class ConfigurationType extends AbstractType
                         $data->setOrganization($organization);
                     }
                     $event->setData($data);
+                }
+            }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    public function addEnableSMTPImapListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $formEvent) {
+                /** @var UserEmailOrigin $data */
+                $data = $formEvent->getData();
+                if ($data !== null) {
+                    $form = $formEvent->getForm();
+                    if ($data->getImapHost() !== null) {
+                        $form->get('useImap')->setData(true);
+                    }
+                    if ($data->getSmtpHost() !== null) {
+                        $form->get('useSmtp')->setData(true);
+                    }
                 }
             }
         );
