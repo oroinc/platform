@@ -3,12 +3,26 @@
 namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SecurityBundle\Form\Model\Share;
 
 class ShareScopeType extends AbstractType
 {
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -19,6 +33,13 @@ class ShareScopeType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $this->getChoices(),
+            ]
+        );
+        $resolver->setNormalizers(
+            [
+                'disabled' => function (Options $options, $value) {
+                    return $this->isReadOnly($options) ? true : $value;
+                },
             ]
         );
     }
@@ -48,5 +69,28 @@ class ShareScopeType extends AbstractType
             Share::SHARE_SCOPE_USER => 'oro.security.share_scopes.user',
             Share::SHARE_SCOPE_BUSINESS_UNIT => 'oro.security.share_scopes.business_unit',
         ];
+    }
+
+    /**
+     * Checks if the form type should be read-only or not
+     *
+     * @param $options
+     *
+     * @return bool
+     */
+    protected function isReadOnly($options)
+    {
+        /** @var EntityConfigId $configId */
+        $configId = $options['config_id'];
+        $className = $configId->getClassName();
+
+        if (!empty($className)) {
+            $applicable = $this->configManager->getProvider('security')->getConfig($className)->get('share_scopes');
+            if ($applicable) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

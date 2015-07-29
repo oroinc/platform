@@ -15,7 +15,10 @@ class ShareScopeTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->type = new ShareScopeType();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->type = new ShareScopeType($configManager);
     }
 
     public function testGetName()
@@ -45,6 +48,8 @@ class ShareScopeTypeTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             );
+        $resolver->expects($this->once())
+            ->method('setNormalizers');
         $this->type->setDefaultOptions($resolver);
     }
 }
