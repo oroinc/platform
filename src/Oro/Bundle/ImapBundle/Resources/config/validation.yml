@@ -10,12 +10,12 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - Type:
                 type: integer
         smtpHost:
-            - NotBlank: ~
+            - NotBlank:      { groups: [Check] }
             - Length:
                 min:        3
                 max:        255
         smtpPort:
-            - NotBlank: ~
+            - NotBlank:      { groups: [Check] }
             - Type:
                 type: integer
         ssl:

@@ -55,6 +55,7 @@ class ConfigurationType extends AbstractType
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
+        $this->modifySettingsFields($builder);
 
         $builder
             ->add(
@@ -305,6 +306,34 @@ class ConfigurationType extends AbstractType
                             ? $this->securityFacade->getOrganization()
                             : $this->securityFacade->getLoggedUser()->getOrganization();
                         $data->setOrganization($organization);
+                    }
+                    $event->setData($data);
+                }
+            }
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function modifySettingsFields(FormBuilderInterface $builder)
+    {
+        $encryptor = $this->encryptor;
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($encryptor) {
+                $data = (array)$event->getData();
+                $entity = $event->getForm()->getData();
+
+                if ($entity instanceof UserEmailOrigin) {
+                    if (array_key_exists('useImap', $data) === false || $data['useImap'] === 0) {
+                        $data['imapHost'] = '';
+                        $data['imapPort'] = 0;
+                    }
+                    if (array_key_exists('useSmtp', $data) === false || $data['useSmtp'] === 0) {
+                        $data['smtpHost'] = '';
+                        $data['smtpPort'] = 0;
                     }
                     $event->setData($data);
                 }
