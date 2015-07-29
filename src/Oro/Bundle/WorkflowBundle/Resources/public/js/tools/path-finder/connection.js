@@ -1,4 +1,4 @@
-define(['./extends', './interval2d', './Point2d', './settings'], function(__extends, Interval2d, Point2d, settings) {
+define(['./extends', './interval2d', './point2d', './settings'], function(__extends, Interval2d, Point2d, settings) {
     'use strict';
     __extends(Connection, Interval2d);
     function Connection(a, b, vector) {
