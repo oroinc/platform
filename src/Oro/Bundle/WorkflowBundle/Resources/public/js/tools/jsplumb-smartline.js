@@ -169,25 +169,34 @@ define(function(require) {
             return userSuppliedSegments || segments;
         };
 
-        function getAdjustment(el, point) {
-            var style = window.getComputedStyle(el),
-                borderRadius = 0,
-                dx;
-            if (style.borderRadius) {
-                borderRadius = parseInt(style.borderRadius) || 0;
-            }
-            borderRadius = Math.min(borderRadius, el.offsetWidth / 2, el.offsetHeight / 2);
-
+        function getAdjustment(el, point, direction) {
             var realX = point.x - el.offsetLeft;
             if (realX < 1 || realX > el.offsetWidth - 1) {
                 return 0;
             }
-            if (realX < borderRadius) {
-                dx = borderRadius - realX;
-                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
-            } else if (realX > el.offsetWidth - borderRadius) {
-                dx = realX - (el.offsetWidth - borderRadius);
-                return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+            var dx;
+            var radiusPropName;
+            var borderRadius;
+            var maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
+            var style = window.getComputedStyle(el);
+            if (realX < el.offsetWidth / 2) {
+                radiusPropName = 'border-'+ direction +'-left-radius';
+                if (style[radiusPropName] && style[radiusPropName] !== 'none') {
+                    borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
+                    dx = borderRadius - realX;
+                    if (dx > 0) {
+                        return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+                    }
+                }
+            } else {
+                radiusPropName = 'border-'+ direction +'-right-radius';
+                if (style[radiusPropName] && style[radiusPropName] !== 'none') {
+                    borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
+                    dx = realX - (el.offsetWidth - borderRadius);
+                    if (dx > 0) {
+                        return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
+                    }
+                }
             }
 
             return el.offsetHeight / 2 - 1;
@@ -203,7 +212,7 @@ define(function(require) {
 
             // compute the rest of the line
             var points = this.smartlineManager.getConnectionPath(this, paintInfo);
-            if (points.length == 0) {
+            if (points.length === 0) {
                 // leave everything as is
                 return;
             }
@@ -214,8 +223,8 @@ define(function(require) {
                 ENDPOINT_SPACE_TO_LINE = 4;
 
             // adjust source anf target points
-            sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint);
-            targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint);
+            sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint, 'bottom');
+            targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint, 'top');
 
             // find required correction
             correction = {
