@@ -9,7 +9,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -289,8 +288,18 @@ class ConfigurationType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
-            'required'   => false,
+            'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
+            'required'          => false,
+            'validation_groups' => function (FormInterface $form) {
+                $groups = ['Check'];
+                if ($form->get('useImap')->getData() == true) {
+                    $groups[] = 'Imap';
+                }
+                if ($form->get('useSmtp')->getData() == true) {
+                    $groups[] = 'Smtp';
+                }
+                return $groups;
+            },
         ]);
     }
 
