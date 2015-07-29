@@ -19,7 +19,10 @@ define(function(require) {
 
         events: {
             'mousewheel': 'onMouseWheel',
-            'mousedown': 'onMouseDown'
+            'mousedown': 'onMouseDown',
+            'zoomin': 'onZoomIn',
+            'zoomout': 'onZoomOut',
+            'autozoom': 'onZoomAuto'
         },
 
         /**
@@ -38,6 +41,9 @@ define(function(require) {
                 });
             }
             this.$el.addClass('zoomable-area');
+            if (options.autozoom) {
+                this.model.autoZoom();
+            }
         },
 
         onMouseWheel: function (event, delta, deltaX, deltaY) {
@@ -81,6 +87,18 @@ define(function(require) {
                 el: this.el,
                 zoom: this.model.get('zoom')
             });
+        },
+
+        onZoomIn: function () {
+            this.model.zoomIn();
+        },
+
+        onZoomOut: function () {
+            this.model.zoomOut();
+        },
+
+        onZoomAuto: function () {
+            this.model.autoZoom();
         },
 
         render: function () {

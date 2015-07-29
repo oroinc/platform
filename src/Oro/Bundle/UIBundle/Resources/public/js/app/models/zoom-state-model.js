@@ -11,6 +11,7 @@ define(function(require) {
      */
     var ZoomStateModel;
     var BaseModel = require('./base/model');
+    var $ = require('jquery');
 
     ZoomStateModel = BaseModel.extend(/** @exports RouteModel.prototype */{
         /**
@@ -47,7 +48,18 @@ define(function(require) {
                  * Auto zoom padding
                  * @type {number}
                  */
-                autoZoomPadding: 50
+                autoZoomPadding: 50,
+
+                /**
+                 * Interceptors
+                 */
+                getPositionInterceptors: {
+                    // that is centered using transform
+                    '.jsplumb-overlay' : function (el, pos) {
+                        pos.left -= pos.width / 2;
+                        pos.top -= pos.height / 2;
+                    }
+                }
             };
         },
 
@@ -92,6 +104,28 @@ define(function(require) {
             });
         },
 
+        getPosition: function (el) {
+            var positionInterceptors = this.get('getPositionInterceptors');
+            var $el = $(el);
+            var pos = {
+                left: el.offsetLeft,
+                top: el.offsetTop,
+                width: el.offsetWidth,
+                height: el.offsetHeight
+            };
+
+            // another variant use
+            // getComputedStyle(el).transform (returns matrix) and
+            // getComputedStyle(el).transformOrigin
+            // to calculate valid border rect
+            for (var query in positionInterceptors) {
+                if ($el.is(query)) {
+                    positionInterceptors[query](el, pos);
+                }
+            }
+            return pos;
+        },
+
         autoZoom: function () {
             var inner = this.get('inner');
             var left = Infinity;
@@ -103,19 +137,22 @@ define(function(require) {
                 if (el.offsetHeight === 0 || el.offsetWidth === 0) {
                     continue;
                 }
-                if (left > el.offsetLeft) {
-                    left = el.offsetLeft;
+                var pos = this.getPosition(el);
+
+                if (left > pos.left) {
+                    left = pos.left;
                 }
-                if (right < el.offsetLeft + el.offsetWidth) {
-                    right = el.offsetLeft + el.offsetWidth;
+                if (right < pos.left + pos.width) {
+                    right = pos.left + pos.width;
                 }
-                if (top > el.offsetTop) {
-                    top = el.offsetTop;
+                if (top > pos.top) {
+                    top = pos.top;
                 }
-                if (bottom < el.offsetTop + el.offsetHeight) {
-                    bottom = el.offsetTop + el.offsetHeight;
+                if (bottom < pos.top + pos.height) {
+                    bottom = pos.top + pos.height;
                 }
             }
+
             /*
             var $shower = $("<div>&nbsp;</div>").css({
                 position: 'absolute',
