@@ -18,7 +18,7 @@ define([
         'bodyContent': '',
         'fromName': '',
         'linkFromName': ''
-    }   );
+    });
 
     return EmailNotificationModel;
 });

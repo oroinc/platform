@@ -48,7 +48,7 @@ class WebSocketSendProcessor
                 /** @var EmailUser $emailUser */
                 $emailUser = $item['entity'];
                 $messageData = [
-                    'count_new' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : 0
+                    'hasNewEmail' => array_key_exists('new', $item) === true && $item['new'] > 0 ? : false
                 ];
 
                 $this->publisher->send(

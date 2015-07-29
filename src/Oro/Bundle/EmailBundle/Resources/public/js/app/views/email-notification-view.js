@@ -1,13 +1,14 @@
 /*global define*/
 define([
     'jquery',
+    'orotranslation/js/translator',
     'underscore',
     'oroui/js/mediator',
     'routing',
     'oroui/js/app/views/base/view',
     'oroemail/js/app/models/email-notification-collection',
     'oroui/js/messenger'
-], function($, _, mediator, routing, BaseView, EmailNotificationCollection, messenger) {
+], function($, __, _, mediator, routing, BaseView, EmailNotificationCollection, messenger) {
     'use strict';
 
     var EmailNotificationView;
@@ -81,7 +82,7 @@ define([
                     self.initLayout();
                 },
                 error: function(model, response) {
-                    messenger.showErrorMessage(__('oro.ui.item_delete_error'), response.responseJSON || {});
+                    messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
                 }
             });
         },
