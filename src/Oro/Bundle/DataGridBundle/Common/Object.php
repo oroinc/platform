@@ -3,9 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Common;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
@@ -13,7 +15,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $accessor;
 
     /** @var array */
@@ -21,7 +23,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
 
     protected function __construct(array $params)
     {
-        $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->accessor = new PropertyAccessor();
         $this->params   = $params;
     }
 
@@ -140,7 +142,12 @@ class Object implements \ArrayAccess, \IteratorAggregate
      */
     public function offsetGetByPath($path, $default = null)
     {
-        $value = $this->accessor->getValue($this, $path);
+        try {
+            $value = $this->accessor->getValue($this, $path);
+        } catch (NoSuchPropertyException $e) {
+            return $default;
+        }
+
         if ($default === null && $value !== null) {
             return $value;
         }
@@ -218,7 +225,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
      */
     protected function explodeArrayPath($path)
     {
-        return explode('.', strtr($path, array('][' => '.', '[' => '', ']' => '')));
+        return explode('.', strtr($path, ['][' => '.', '[' => '', ']' => '']));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -13,8 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
-
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FieldType extends AbstractType
 {
@@ -62,7 +61,7 @@ class FieldType extends AbstractType
     protected $configManager;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -73,12 +72,12 @@ class FieldType extends AbstractType
 
     /**
      * @param ConfigManager                   $configManager
-     * @param Translator                      $translator
+     * @param TranslatorInterface             $translator
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
         ConfigManager $configManager,
-        Translator $translator,
+        TranslatorInterface $translator,
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
         $this->configManager = $configManager;
