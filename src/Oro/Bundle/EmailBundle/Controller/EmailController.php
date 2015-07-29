@@ -69,10 +69,10 @@ class EmailController extends Controller
     /**
      * Get new Unread Emails for email notification
      *
-     * @Route("/notification/data", name="oro_email_new_natification_data")
+     * @Route("/last", name="oro_email_last")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
-    public function notificationDataAction()
+    public function lastAction()
     {
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
@@ -398,6 +398,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Togle user emails seen status
+     *
      * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
@@ -415,6 +417,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Mark email as seen for user
+     *
      * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
@@ -437,6 +441,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Mark all user emails as seen
+     *
      * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen")
      * @AclAncestor("oro_email_email_user_edit")
      * @return JsonResponse

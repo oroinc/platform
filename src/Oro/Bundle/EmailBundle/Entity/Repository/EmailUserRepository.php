@@ -105,25 +105,22 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
-     * Mark all email as seen
+     * Get all unseen user email
      *
      * @param User $user
      * @param Organization $organization
      * @return mixed
      */
-    public function markAllEmailsAsSeen(User $user, Organization $organization)
+    public function findUnseenUserEmail(User $user, Organization $organization)
     {
         $qb = $this->createQueryBuilder('eu');
 
         return $qb
-            ->update()
-            ->set('eu.seen', true)
             ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('eu.seen', 0))
             ->setParameter('owner', $user)
-            ->setParameter('organization', $organization)
-            ->getQuery()->execute();
+            ->setParameter('organization', $organization);
     }
 
     /**
