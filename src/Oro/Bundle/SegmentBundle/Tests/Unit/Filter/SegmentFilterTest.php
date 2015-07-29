@@ -95,25 +95,9 @@ class SegmentFilterTest extends OrmTestCase
             )
             ->getFormFactory();
 
-        $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetaData->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('OroSegment:Segment'));
-        $classMetaData->expects($this->any())
-            ->method('getIdentifier')
-            ->will($this->returnValue(['id']));
-        $classMetaData->expects($this->any())
-            ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array('id')));
-        $classMetaData->expects($this->any())
-            ->method('getTypeOfField')
-            ->will($this->returnValue('integer'));
-
         $this->em->expects($this->any())
             ->method('getClassMetadata')
-            ->will($this->returnValue($classMetaData));
+            ->will($this->returnValue($this->getClassMetadata()));
 
         $this->dynamicSegmentQueryBuilder = $this
             ->getMockBuilder('Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder')
@@ -163,6 +147,27 @@ class SegmentFilterTest extends OrmTestCase
             $this->extendConfigProvider
         );
         $this->filter->init('segment', ['entity' => '']);
+    }
+
+    protected function getClassMetadata()
+    {
+        $classMetaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $classMetaData->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('OroSegment:Segment'));
+        $classMetaData->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue(['id']));
+        $classMetaData->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array('id')));
+        $classMetaData->expects($this->any())
+            ->method('getTypeOfField')
+            ->will($this->returnValue('integer'));
+
+        return $classMetaData;
     }
 
     protected function tearDown()
