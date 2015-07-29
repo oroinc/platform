@@ -94,8 +94,13 @@
 
 {% block choice_widget_option_attributes %}
 {% spaceless %}
+    {# @deprecated since 1.8. Remove together with Oro\Bundle\FormBundle\Form\Type\ChoiceListItem #}
     {% if choice.label.attr is defined and choice.label.attr|length > 0 %}
         {% for attrname, attrvalue in choice.label.attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
+    {% endif %}
+
+    {% if choice.attr is defined and choice.attr|length > 0 %}
+        {% for attrname, attrvalue in choice.attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
     {% endif %}
 {% endspaceless %}
 {% endblock choice_widget_option_attributes %}
