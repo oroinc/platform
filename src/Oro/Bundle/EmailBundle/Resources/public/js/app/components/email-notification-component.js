@@ -45,11 +45,9 @@ define([
 
         onNewEmail: function(response) {
             var self = this;
-            console.log(response);
             response = JSON.parse(response);
-            console.log(response);
-            var isNew = response[0].count_new;
             if (response) {
+                var isNew = response.count_new;
                 self.loadLastEmail(isNew);
             }
         },
