@@ -50,7 +50,8 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            console.log(5, 'initialization filter');
+            //this.constructor.prototype
+
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
         render: function() {
@@ -63,7 +64,6 @@ define([
                 ),
                 success: function(data) {
                     self.count = data;
-                    console.log(data);
                     if (data > 10) {
                         self.componentMode = 'select2autocomplate';
                     } else {
@@ -81,7 +81,6 @@ define([
             });
         },
         renderSelect2: function() {
-            debugger;
             var className = this.constructor.prototype;
             var tt = _.template($(this.templateSelector).html());
             this.$el.append(tt);
@@ -101,7 +100,6 @@ define([
                         delay: 250,
                         type: 'POST',
                         data: function (params) {
-                            console.log('params', params);
                             return {
                                 q: params // search term
                             };
@@ -120,12 +118,13 @@ define([
                     escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
                     minimumInputLength: 1
                 });
+
+                this.$el.find('.select-values-autocomplete').select2('val', this.value.value);
             }
 
             if (this.componentMode === 'select2') {
                 var self = this;
                 var proto = this.__proto__;
-                console.log(proto);
 
                 this.$el.find('.select-values').removeClass('hide');
                 $.each(proto.choices, function(index, value) {
@@ -134,24 +133,25 @@ define([
                 //this.$el.find('.select-values')
                 this.$el.find('.select-values').attr('multiple','multiple').select2({
                     //multiple: true
-                    dropdownAutoWidth : true
+                    dropdownAutoWidth: true
                 }).on('change', function (e) {
-                    console.log('this.value', this.value);
                     self.applyValue();
                 });
+
+                this.$el.find('.select-values').select2('val', this.value.value);
             }
         },
         isEmptyValue: function() {
             return false;
         },
-        getValue:function() {
-            var value;
+        getValue: function() {
+            var value = {};
             if (this.componentMode === 'select2autocomplate') {
-                value =  this.$el.find('.select-values-autocomplete').select2("val");
-            }
-
-            if (this.componentMode === 'select2') {
-                value =  this.$el.find('.select-values').select2("val");
+                value.value =  this.$el.find('.select-values-autocomplete').select2("val");
+            } else if (this.componentMode === 'select2') {
+                value.value =  this.$el.find('.select-values').select2("val");
+            } else {
+                value.value = this.value.value;
             }
             return value;
         },
