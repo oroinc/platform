@@ -79,7 +79,7 @@ parameters:
     oro_security.placeholder.filter.class:                     Oro\Bundle\SecurityBundle\Placeholder\PlaceholderFilter
 
     oro_security.workflow.action.remove_ace_share_scope.class: Oro\Bundle\SecurityBundle\Model\Action\RemoveAceByShareScopeAction
-    oro_security.ace.query.manager.class:                            Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
+    oro_security.ace.query.manager.class:                      Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
 
 services:
     oro_security.security_facade:
