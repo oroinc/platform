@@ -72,7 +72,7 @@ class NavigationListener
                     $config = $this->entityConfigProvider->getConfig($report->getEntity());
                     if ($this->checkAvailability($config)) {
                         $entityLabel = $config->get('plural_label');
-                        if (!isset ($reportMenuData[$entityLabel])) {
+                        if (!isset($reportMenuData[$entityLabel])) {
                             $reportMenuData[$entityLabel] = [];
                         }
                         $reportMenuData[$entityLabel][$report->getId()] = $report->getName();

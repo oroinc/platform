@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
@@ -41,7 +41,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var FlashBagInterface */
     protected $flashBag;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var LoggerInterface */
@@ -68,7 +68,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
      * @param DelegatingEngine $templating
      * @param \Swift_Mailer $mailer
      * @param FlashBagInterface $flashBag
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      * @param LoggerInterface $logger
      * @param ServiceLink $serviceLink
      */
@@ -81,7 +81,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         DelegatingEngine $templating = null,
         \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
-        Translator $translator = null,
+        TranslatorInterface $translator = null,
         LoggerInterface $logger = null,
         ServiceLink $serviceLink = null
     ) {

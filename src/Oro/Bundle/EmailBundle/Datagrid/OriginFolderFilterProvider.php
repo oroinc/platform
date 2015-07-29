@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -23,19 +23,19 @@ class OriginFolderFilterProvider
     protected $em;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @param OroEntityManager $em
-     * @param SecurityContext $securityContext
-     * @param Translator $translator
+     * @param OroEntityManager    $em
+     * @param SecurityContext     $securityContext
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         OroEntityManager $em,
         SecurityContext $securityContext,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->em = $em;
         $this->securityContext = $securityContext;

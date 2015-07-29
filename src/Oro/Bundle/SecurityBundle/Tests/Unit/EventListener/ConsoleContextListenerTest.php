@@ -11,6 +11,8 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
@@ -53,10 +55,10 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
+        $this->securityContext = new SecurityContext(
+            new TokenStorage(),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
+        );
 
         $this->userRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $this->organizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');

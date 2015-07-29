@@ -5,10 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class IntegrationTypeSelectType extends AbstractType
@@ -16,14 +15,17 @@ class IntegrationTypeSelectType extends AbstractType
     /** @var TypesRegistry */
     protected $registry;
 
-    /** @var CoreAssetsHelper */
+    /** @var AssetHelper */
     protected $assetHelper;
 
+    /** @var array */
+    protected $itemsCache;
+
     /**
-     * @param TypesRegistry    $registry
-     * @param CoreAssetsHelper $assetHelper
+     * @param TypesRegistry $registry
+     * @param AssetHelper   $assetHelper
      */
-    public function __construct(TypesRegistry $registry, CoreAssetsHelper $assetHelper)
+    public function __construct(TypesRegistry $registry, AssetHelper $assetHelper)
     {
         $this->registry    = $registry;
         $this->assetHelper = $assetHelper;
@@ -34,7 +36,7 @@ class IntegrationTypeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $choices = $options['choice_list']->getRemainingViews();
+        $choices = $options['choice_list']->getChoices();
 
         if (empty($choices)) {
             $options['configs']['placeholder'] = 'oro.integration.form.no_available_integrations';
@@ -52,6 +54,9 @@ class IntegrationTypeSelectType extends AbstractType
             [
                 'empty_value' => '',
                 'choices'     => $this->getChoices(),
+                'choice_attr' => function ($choice) {
+                    return $this->getChoiceAttributes($choice);
+                },
                 'configs'     => [
                     'placeholder'             => 'oro.form.choose_value',
                     'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:type/result.html.twig',
@@ -78,22 +83,47 @@ class IntegrationTypeSelectType extends AbstractType
     }
 
     /**
+     * Returns a list of available integration types
+     *
+     * @return array [{integration type} => [{attr1} => {val1}, ...], ...]
+     */
+    protected function getAvailableIntegrationTypes()
+    {
+        if (null === $this->itemsCache) {
+            $this->itemsCache = $this->registry->getAvailableIntegrationTypesDetailedData();
+        }
+
+        return $this->itemsCache;
+    }
+
+    /**
      * @return array
      */
     protected function getChoices()
     {
-        $choices     = [];
-        $choicesData = $this->registry->getAvailableIntegrationTypesDetailedData();
-
-        foreach ($choicesData as $typeName => $data) {
-            $attributes = [];
-            if (!empty($data['icon'])) {
-                $attributes['data-icon'] = $this->assetHelper->getUrl($data['icon']);
-            }
-
-            $choices[$typeName] = new ChoiceListItem($data['label'], $attributes);
+        $choices = [];
+        foreach ($this->getAvailableIntegrationTypes() as $typeName => $data) {
+            $choices[$typeName] = $data['label'];
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns a list of choice attributes for the given integration type
+     *
+     * @param string $typeName
+     *
+     * @return array
+     */
+    protected function getChoiceAttributes($typeName)
+    {
+        $attributes = [];
+        $data       = $this->itemsCache[$typeName];
+        if (!empty($data['icon'])) {
+            $attributes['data-icon'] = $this->assetHelper->getUrl($data['icon']);
+        }
+
+        return $attributes;
     }
 }

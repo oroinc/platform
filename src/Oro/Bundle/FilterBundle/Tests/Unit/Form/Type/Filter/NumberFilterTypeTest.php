@@ -13,7 +13,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     /**
      * @var NumberFilterType
      */
-    private $type;
+    protected $type;
 
     /**
      * @var string
@@ -77,7 +77,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         return array(
             'not formatted number' => array(
                 'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
-                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789),
+                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68),
                 'viewData'      => array(
                     'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'),
                 ),
@@ -150,7 +150,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
                 'formData'      => array(
                     'type'  => NumberFilterType::TYPE_EQUAL,
-                    'value' => 12345.6789
+                    'value' => 12345.68
                 ),
                 'viewData'      => array(
                     'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'),

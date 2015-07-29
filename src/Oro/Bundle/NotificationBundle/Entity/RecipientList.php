@@ -5,7 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Group;
@@ -239,9 +239,9 @@ class RecipientList
      * Custom validation constraint
      * Not valid if no one recipient specified
      *
-     * @param ExecutionContext $context
+     * @param ExecutionContextInterface $context
      */
-    public function isValid(ExecutionContext $context)
+    public function isValid(ExecutionContextInterface $context)
     {
         $notValid =
             $this->getGroups()->isEmpty()
