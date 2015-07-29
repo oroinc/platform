@@ -9,9 +9,9 @@ define([
 ], function($, _, mediator, routing, BaseView, EmailNotificationCollection) {
     'use strict';
 
-    var EmailAttachmentView;
+    var EmailNotificationView;
 
-    EmailAttachmentView = BaseView.extend({
+    EmailNotificationView = BaseView.extend({
         contextsView: null,
         countNewEmail: null,
         inputName: '',
@@ -41,7 +41,7 @@ define([
             var i;
 
             this.$containerEmails.empty();
-            this.initViewType();
+            this.initViewMode();
 
             for (i in this.collection.models) {
                 if (this.collection.models.hasOwnProperty(i)) {
@@ -92,7 +92,7 @@ define([
             return $(this.el).data('count');
         },
 
-        initViewType: function() {
+        initViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
@@ -130,13 +130,11 @@ define([
 
             url =  routing.generate('oro_email_thread_view', {id: id});
             mediator.execute('redirectTo', {url: url});
-            model = this.collection.find(function(item) {
-                return Number(item.get('id')) === id;
-            });
+            model = this.collection.indWhere({id: id});
 
             this.$el.find('#' + model.cid).removeClass('new');
             this.$el.find('#' + model.cid).find('.icon-envelope').removeClass('new');
-            this.initViewType();
+            this.initViewMode();
         },
 
         setCount: function(count) {
@@ -150,7 +148,7 @@ define([
                 count = '';
             }
             this.$el.find('.icon-envelope span').html(count);
-            this.initViewType();
+            this.initViewMode();
         },
 
         initEvents: function() {
@@ -161,7 +159,7 @@ define([
                     self.open();
                     self.setModeDropDownMenu('content');
                 }
-                self.initViewType();
+                self.initViewMode();
             });
 
             this.collection.on('reset', function() {
@@ -196,5 +194,5 @@ define([
         }
     });
 
-    return EmailAttachmentView;
+    return EmailNotificationView;
 });
