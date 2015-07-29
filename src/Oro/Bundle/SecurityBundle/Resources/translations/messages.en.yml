@@ -19,8 +19,12 @@ oro:
         share_scopes:
             not_available: N/A
             label: Share Scopes
-            business_unit: Business Unit
-            user: User
+            business_unit:
+                label: Business Unit
+                short_label: BU
+            user:
+                label: User
+                short_label: User
             widget.title: Sharing Entities
         action:
             share: Share record
