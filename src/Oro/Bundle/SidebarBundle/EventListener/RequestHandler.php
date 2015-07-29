@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\EventListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\Asset\Packages as AssetHelper;
 
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
@@ -15,15 +15,15 @@ class RequestHandler
     protected $widgetDefinitionsRegistry;
 
     /**
-     * @var PackageInterface
+     * @var AssetHelper
      */
     protected $assetHelper;
 
     /**
      * @param WidgetDefinitionRegistry $widgetDefinitionsRegistry
-     * @param PackageInterface $assetHelper
+     * @param AssetHelper $assetHelper
      */
-    public function __construct(WidgetDefinitionRegistry $widgetDefinitionsRegistry, PackageInterface $assetHelper)
+    public function __construct(WidgetDefinitionRegistry $widgetDefinitionsRegistry, AssetHelper $assetHelper)
     {
         $this->widgetDefinitionsRegistry = $widgetDefinitionsRegistry;
         $this->assetHelper = $assetHelper;

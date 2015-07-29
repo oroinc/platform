@@ -1,3 +1,4 @@
+/*global xdescribe*/
 define(function(require) {
     'use strict';
 
@@ -6,7 +7,10 @@ define(function(require) {
     var data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
     require('oroquerydesigner/js/field-condition');
 
-    describe('oroquerydesigner/js/field-condition', function() {
+    /**
+     * Will be refactored in BAP-8667
+     */
+    xdescribe('oroquerydesigner/js/field-condition', function() {
         var $el = null;
 
         beforeEach(function() {

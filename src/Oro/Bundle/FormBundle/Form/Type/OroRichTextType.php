@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\Asset\Packages as AssetHelper;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
@@ -20,7 +20,7 @@ class OroRichTextType extends AbstractType
     const TOOLBAR_LARGE   = 'large';
 
     /**
-     * @var PackageInterface
+     * @var AssetHelper
      */
     protected $assetHelper;
 
@@ -66,9 +66,9 @@ class OroRichTextType extends AbstractType
     }
 
     /**
-     * @param PackageInterface $assetHelper
+     * @param AssetHelper $assetHelper
      */
-    public function setAssetHelper(PackageInterface $assetHelper)
+    public function setAssetHelper(AssetHelper $assetHelper)
     {
         $this->assetHelper = $assetHelper;
     }

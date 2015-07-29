@@ -6,20 +6,20 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
+use Symfony\Component\Asset\Packages as AssetHelper;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DownloadLinksType extends AbstractType
 {
-    /** @var CoreAssetsHelper */
+    /** @var AssetHelper */
     protected $assetHelper;
 
     /**
-     * @param CoreAssetsHelper $assetHelper
+     * @param AssetHelper $assetHelper
      */
-    public function __construct(CoreAssetsHelper $assetHelper)
+    public function __construct(AssetHelper $assetHelper)
     {
-        $this->assetHelper   = $assetHelper;
+        $this->assetHelper = $assetHelper;
     }
 
     /**
