@@ -40,7 +40,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
     public function walkComparison(Comparison $comparison)
     {
         $value = $comparison->getValue()->getValue();
-        list($type, $field) = Criteria::explodeFieldTypeName($comparison->getField());
+        list($type, $field) = $this->explodeCombinedFieldString($comparison->getField());
 
         $index = uniqid();
 
@@ -81,9 +81,44 @@ class OrmExpressionVisitor extends ExpressionVisitor
      */
     public function walkCompositeExpression(CompositeExpression $expr)
     {
-        $expressionList = [];
+        $expressionList       = [];
+        $expressionObjectList = [];
 
-        foreach ($expr->getExpressionList() as $child) {
+        $expressions    = $expr->getExpressionList();
+        $lineExpression = true;
+        foreach ($expressions as $child) {
+            if ($child instanceof CompositeExpression) {
+                $lineExpression       = false;
+                $expressionObjectList = $expressions;
+                break;
+            }
+        }
+
+        // optimize search query.
+        if ($lineExpression) {
+            /** @var Comparison $child */
+            foreach ($expressions as $child) {
+                $fieldName = $child->getField();
+                $operator  = $child->getOperator();
+                $value     = $child->getValue()->getValue();
+
+                $key                = $this->getExpressionKey($fieldName, $operator, $value);
+                $combinedExpression = $child;
+                if (in_array($key, array_keys($expressionObjectList))) {
+                    $combinedExpression = $expressionObjectList[$key];
+
+                    $combinedExpression = new Comparison(
+                        $this->combineFieldNames($combinedExpression->getField(), $fieldName),
+                        $operator,
+                        $value
+                    );
+
+                }
+                $expressionObjectList[$key] = $combinedExpression;
+            }
+        }
+
+        foreach ($expressionObjectList as $child) {
             $expressionList[] = $this->dispatch($child);
         }
 
@@ -97,5 +132,52 @@ class OrmExpressionVisitor extends ExpressionVisitor
             default:
                 throw new \RuntimeException('Unknown composite ' . $expr->getType());
         }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $operator
+     * @param mixed  $value
+     *
+     * @return string
+     */
+    protected function getExpressionKey($fieldName, $operator, $value)
+    {
+        $fieldType = Criteria::explodeFieldTypeName($fieldName)[0];
+        $value     = is_array($value) ? serialize($value) : (string)$value;
+        return md5($fieldType . $operator . $value);
+    }
+
+    /**
+     * @param string $arrayFields
+     * @param string $additionalField
+     *
+     * @return string
+     */
+    protected function combineFieldNames($arrayFields, $additionalField)
+    {
+        list($type, $field) = Criteria::explodeFieldTypeName($additionalField);
+        $fieldsString = implode(
+            '|',
+            array_merge(explode('|', Criteria::explodeFieldTypeName($arrayFields)[1]), [$field])
+        );
+
+        return Criteria::implodeFieldTypeName($type, $fieldsString);
+
+    }
+
+    /**
+     * @param string $fieldString
+     *
+     * @return array
+     */
+    protected function explodeCombinedFieldString($fieldString)
+    {
+        list($type, $field) = Criteria::explodeFieldTypeName($fieldString);
+        if (strpos($field, '|') !== false) {
+            $field = explode('|', $field);
+        }
+
+        return [$type, $field];
     }
 }

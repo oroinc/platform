@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -14,6 +14,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 class SearchListener
 {
     const EMPTY_ORGANIZATION_ID = 0;
+    const EMPTY_OWNER_ID        = 0;
 
     /**
      * @var OwnershipMetadataProvider
@@ -32,7 +33,7 @@ class SearchListener
     public function __construct(OwnershipMetadataProvider $metadataProvider, SecurityFacade $securityFacade)
     {
         $this->metadataProvider = $metadataProvider;
-        $this->securityFacade = $securityFacade;
+        $this->securityFacade   = $securityFacade;
     }
 
     /**
@@ -41,12 +42,27 @@ class SearchListener
     public function collectEntityMapEvent(SearchMappingCollectEvent $event)
     {
         $mapConfig = $event->getMappingConfig();
-        foreach (array_keys($mapConfig) as $className) {
+        foreach ($mapConfig as $className => $mapping) {
             $mapConfig[$className]['fields'][] = [
-                'name' => 'organization',
-                'target_type' => 'integer',
+                'name'          => 'organization',
+                'target_type'   => 'integer',
                 'target_fields' => ['organization']
             ];
+
+            $metadata = $this->metadataProvider->getMetadata($className);
+            if ($metadata
+                && in_array(
+                    $metadata->getOwnerType(),
+                    [OwnershipMetadata::OWNER_TYPE_USER, OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT]
+                )
+            ) {
+                $ownerField                        = sprintf('%s_owner', $mapping['alias']);
+                $mapConfig[$className]['fields'][] = [
+                    'name'          => $metadata->getOwnerFieldName(),
+                    'target_type'   => 'integer',
+                    'target_fields' => [$ownerField]
+                ];
+            }
         }
 
         $event->setMappingConfig($mapConfig);
@@ -59,10 +75,11 @@ class SearchListener
      */
     public function prepareEntityMapEvent(PrepareEntityMapEvent $event)
     {
-        $data = $event->getData();
-        $className = $event->getClassName();
-        $entity = $event->getEntity();
+        $data           = $event->getData();
+        $className      = $event->getClassName();
+        $entity         = $event->getEntity();
         $organizationId = self::EMPTY_ORGANIZATION_ID;
+        $ownerId        = self::EMPTY_OWNER_ID;
 
         $metadata = $this->metadataProvider->getMetadata($className);
         if ($metadata) {
@@ -75,33 +92,33 @@ class SearchListener
                 $organizationField = $metadata->getOwnerFieldName();
             }
 
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
             if ($organizationField) {
-                $propertyAccessor = PropertyAccess::createPropertyAccessor();
                 /** @var Organization $organization */
                 $organization = $propertyAccessor->getValue($entity, $organizationField);
                 if ($organization && null !== $organization->getId()) {
                     $organizationId = $organization->getId();
                 }
             }
+
+            if (in_array(
+                $metadata->getOwnerType(),
+                [OwnershipMetadata::OWNER_TYPE_USER, OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT]
+            )) {
+                $ownerField = sprintf('%s_owner', $event->getEntityMapping()['alias']);
+
+                $owner = $propertyAccessor->getValue($entity, $metadata->getOwnerFieldName());
+                if ($owner && $owner->getId()) {
+                    $ownerId = $owner->getId();
+                }
+
+                $data['integer'][$ownerField] = $ownerId;
+            }
         }
 
         $data['integer']['organization'] = $organizationId;
 
         $event->setData($data);
-    }
-
-    /**
-     * Add Organization limitation for search data
-     *
-     * @param BeforeSearchEvent $event
-     */
-    public function beforeSearchEvent(BeforeSearchEvent $event)
-    {
-        $query = $event->getQuery();
-        $organizationId = $this->securityFacade->getOrganizationId();
-        if ($organizationId) {
-            $query->andWhere('organization', 'in', [$organizationId, self::EMPTY_ORGANIZATION_ID], 'integer');
-        }
-        $event->setQuery($query);
     }
 }

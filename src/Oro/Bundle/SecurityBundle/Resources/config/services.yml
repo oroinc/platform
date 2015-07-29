@@ -371,6 +371,13 @@ services:
              - @oro_security.orm.ownership_sql_walker_builder
              - @event_dispatcher
 
+    oro_security.search.acl_helper:
+        class: Oro\Bundle\SecurityBundle\Search\AclHelper
+        arguments:
+            - @oro_search.provider.search_mapping
+            - @oro_security.security_facade
+            - @oro_security.orm.ownership_sql_walker_builder
+
     oro_security.orm.ownership_sql_walker_builder:
         public: false
         class: %oro_security.orm.ownership_sql_walker_builder.class%
@@ -526,7 +533,6 @@ services:
               - @oro_security.security_facade
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
-              - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }
               - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }
 
     oro_security.layout_expression.acl_granted:

@@ -20,6 +20,8 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 
+use Oro\Bundle\SecurityBundle\Search\AclHelper;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -63,6 +65,9 @@ class Indexer
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var AclHelper */
+    protected $searchAclHelper;
+
     /**
      * @param ObjectManager       $em
      * @param EngineInterface     $engine
@@ -79,7 +84,8 @@ class Indexer
         SecurityProvider    $securityProvider,
         ConfigManager       $configManager,
         EntityProvider      $entityProvider,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        AclHelper           $searchAclHelper
     ) {
         $this->em               = $em;
         $this->engine           = $engine;
@@ -88,6 +94,7 @@ class Indexer
         $this->configManager    = $configManager;
         $this->entityProvider   = $entityProvider;
         $this->translator       = $translator;
+        $this->searchAclHelper = $searchAclHelper;
     }
 
     /**
@@ -373,32 +380,7 @@ class Indexer
     protected function prepareQuery(Query $query)
     {
         $this->applyModesBehavior($query);
-        $this->applyAclToQuery($query);
-    }
-
-    /**
-     * Apply ACL to search Query.
-     * Removes all entities of the request to which the user has no access
-     *
-     * @param Query $query
-     */
-    protected function applyAclToQuery(Query $query)
-    {
-        $allowedEntities   = $this->getAllowedEntitiesListAliases();
-        $queryFromEntities = $query->getFrom();
-        $entitiesList      = array_values($allowedEntities);
-
-        // in query, from record !== '*'
-        if (!empty($queryFromEntities) && $queryFromEntities[0] !== '*') {
-            foreach ($queryFromEntities as $key => $fromEntityAlias) {
-                if (!in_array($fromEntityAlias, $entitiesList)) {
-                    unset($queryFromEntities[$key]);
-                }
-            }
-            $query->from($queryFromEntities);
-        } elseif ($allowedEntities != $this->mapper->getEntitiesListAliases()) {
-            $query->from($allowedEntities);
-        }
+        $this->searchAclHelper->apply($query);
     }
 
     /**
