@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\Role\Role as BaseRole;
-
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\UserBundle\Model\ExtendRole;
 
 /**
  * Role Entity
@@ -37,7 +35,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
-class Role extends BaseRole
+class Role extends ExtendRole
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -77,6 +75,8 @@ class Role extends BaseRole
      */
     public function __construct($role = '')
     {
+        parent::__construct($role);
+
         $this->role  =
         $this->label = $role;
     }

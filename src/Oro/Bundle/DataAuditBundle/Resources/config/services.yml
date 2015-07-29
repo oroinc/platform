@@ -21,6 +21,7 @@ parameters:
     oro_dataaudit.audit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_dataaudit.filter.audit.class:               Oro\Bundle\DataAuditBundle\Filter\AuditFilter
+    oro_dataaudit.migration.extension.audit_field.class: Oro\Bundle\DataAuditBundle\Migration\Extension\AuditFieldExtension
 
 services:
     oro_dataaudit.filter.audit:
@@ -110,3 +111,8 @@ services:
         arguments:
             - %oro_dataaudit.loggable.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_dataaudit.migration.extension.audit_field:
+        class: %oro_dataaudit.migration.extension.audit_field.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: audit_field }

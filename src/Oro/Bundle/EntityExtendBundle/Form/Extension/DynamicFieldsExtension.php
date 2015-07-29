@@ -260,21 +260,27 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 $title[] = FieldAccessor::getValue($entity, $fieldName);
             }
 
-            $result[] = [
-                'id'        => $entity->getId(),
-                'label'     => implode(' ', $title),
-                'link'      => $this->router->generate(
-                    'oro_entity_detailed',
-                    [
-                        'id'         => $entity->getId(),
-                        'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
-                        'fieldName'  => $extendConfig->getId()->getFieldName()
-                    ]
-                ),
-                'extraData' => $extraData,
-                'isDefault' => ($defaultEntity != null && $defaultEntity->getId() == $entity->getId())
-
-            ];
+            /**
+             * If using ExtendExtension with a form that only updates part of
+             * of the entity, we need to make sure an ID is present. An ID
+             * isn't present when a PHP-based Validation Constraint is fired.
+             */
+            if (null !== $entity->getId()) {
+                $result[] = [
+                    'id'        => $entity->getId(),
+                    'label'     => implode(' ', $title),
+                    'link'      => $this->router->generate(
+                        'oro_entity_detailed',
+                        [
+                            'id'         => $entity->getId(),
+                            'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
+                            'fieldName'  => $extendConfig->getId()->getFieldName()
+                        ]
+                    ),
+                    'extraData' => $extraData,
+                    'isDefault' => ($defaultEntity != null && $defaultEntity->getId() == $entity->getId())
+                ];
+            }
         }
 
         return $result;
