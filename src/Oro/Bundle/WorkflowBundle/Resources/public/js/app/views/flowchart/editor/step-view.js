@@ -59,7 +59,7 @@ define(function(require) {
 
         render: function () {
             FlowchartEditorStepView.__super__.render.call(this);
-            this.$el.toggleClass('final-step', !!this.model.get('is_final'));
+            this.$el.toggleClass('final-step', Boolean(this.model.get('is_final')));
         }
     });
 
