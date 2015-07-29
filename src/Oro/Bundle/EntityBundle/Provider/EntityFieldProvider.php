@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use Doctrine\ORM\EntityManager;
@@ -52,7 +52,7 @@ class EntityFieldProvider
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var ManagerRegistry */
@@ -69,7 +69,7 @@ class EntityFieldProvider
      * @param EntityClassResolver $entityClassResolver
      * @param FieldTypeHelper     $fieldTypeHelper
      * @param ManagerRegistry     $doctrine
-     * @param Translator          $translator
+     * @param TranslatorInterface $translator
      * @param array               $hiddenFields
      */
     public function __construct(
@@ -78,7 +78,7 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         FieldTypeHelper $fieldTypeHelper,
         ManagerRegistry $doctrine,
-        Translator $translator,
+        TranslatorInterface $translator,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;

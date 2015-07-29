@@ -47,6 +47,29 @@ class OroDataAuditBundle implements Migration
         $oroAuditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
         $oroAuditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('old_datetimetz', 'datetimetz', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $oroAuditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
+        $oroAuditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $oroAuditFieldTable->addColumn('visible', 'boolean', ['default' => '1']);
+        $oroAuditFieldTable->addColumn('old_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $oroAuditFieldTable->addColumn('new_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $oroAuditFieldTable->addColumn('old_simplearray', 'simple_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:simple_array)'
+        ]);
+        $oroAuditFieldTable->addColumn('new_simplearray', 'simple_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:simple_array)'
+        ]);
+        $oroAuditFieldTable->addColumn('old_jsonarray', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
+        $oroAuditFieldTable->addColumn('new_jsonarray', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
         $oroAuditFieldTable->setPrimaryKey(['id']);
         $oroAuditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 
