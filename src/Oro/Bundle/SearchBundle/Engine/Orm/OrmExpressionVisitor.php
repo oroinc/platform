@@ -98,13 +98,13 @@ class OrmExpressionVisitor extends ExpressionVisitor
         if ($lineExpression) {
             /** @var Comparison $child */
             foreach ($expressions as $child) {
-                $fieldName = $child->getField();
-                $operator  = $child->getOperator();
-                $value     = $child->getValue()->getValue();
-
-                $key                = $this->getExpressionKey($fieldName, $operator, $value);
+                $fieldName          = $child->getField();
+                $operator           = $child->getOperator();
+                $value              = $child->getValue()->getValue();
+                $fieldType          = Criteria::explodeFieldTypeName($fieldName)[0];
+                $key                = $this->getExpressionKey($fieldType, $operator, $value);
                 $combinedExpression = $child;
-                if (in_array($key, array_keys($expressionObjectList))) {
+                if ($fieldType !== Query::TYPE_TEXT && in_array($key, array_keys($expressionObjectList))) {
                     $combinedExpression = $expressionObjectList[$key];
 
                     $combinedExpression = new Comparison(
@@ -135,16 +135,15 @@ class OrmExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * @param string $fieldName
+     * @param string $fieldType
      * @param string $operator
      * @param mixed  $value
      *
      * @return string
      */
-    protected function getExpressionKey($fieldName, $operator, $value)
+    protected function getExpressionKey($fieldType, $operator, $value)
     {
-        $fieldType = Criteria::explodeFieldTypeName($fieldName)[0];
-        $value     = is_array($value) ? serialize($value) : (string)$value;
+        $value = is_array($value) ? serialize($value) : (string)$value;
         return md5($fieldType . $operator . $value);
     }
 

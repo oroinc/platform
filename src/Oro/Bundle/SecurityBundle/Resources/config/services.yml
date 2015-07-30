@@ -50,6 +50,7 @@ parameters:
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
     oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
+    oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
     oro_security.abstract_ownership_tree_provider.class:       Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider
@@ -372,7 +373,7 @@ services:
              - @event_dispatcher
 
     oro_security.search.acl_helper:
-        class: Oro\Bundle\SecurityBundle\Search\AclHelper
+        class: %oro_security.search.acl_helper.class%
         arguments:
             - @oro_search.provider.search_mapping
             - @oro_security.security_facade

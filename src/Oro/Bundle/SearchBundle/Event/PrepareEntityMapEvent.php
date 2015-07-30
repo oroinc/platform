@@ -34,6 +34,9 @@ class PrepareEntityMapEvent extends Event
         $this->entityMapping = $entityMapping;
     }
 
+    /**
+     * @return array
+     */
     public function getEntityMapping()
     {
         return $this->entityMapping;

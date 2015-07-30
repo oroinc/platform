@@ -61,7 +61,7 @@ class Indexer
 
     /** @var EntityProvider */
     protected $entityProvider;
-    
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -76,6 +76,7 @@ class Indexer
      * @param ConfigManager       $configManager
      * @param EntityProvider      $entityProvider
      * @param TranslatorInterface $translator
+     * @param AclHelper           $searchAclHelper
      */
     public function __construct(
         ObjectManager       $em,
