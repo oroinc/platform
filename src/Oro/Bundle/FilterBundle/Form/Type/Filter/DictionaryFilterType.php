@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
 
-class FilterType extends AbstractType
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\FormBuilderInterface;
+
+class DictionaryFilterType extends AbstractType
 {
-    const NAME = 'oro_type_filter';
+    const NAME = 'oro_type_dictionary_filter';
 
     /**
      * @var TranslatorInterface
@@ -29,23 +35,8 @@ class FilterType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-//        if ($options['field_type'] === 'choice') {
-//            if (!isset($options['field_options'])) {
-//                $options['field_options'] = [];
-//            }
-//            $options['field_options']['choices'] = ['low' => 'Low'];
-//        }
-
         $builder->add('type', $options['operator_type'], $this->createOperatorOptions($options));
         $builder->add('value', $options['field_type'], $this->createFieldOptions($options));
     }
@@ -76,6 +67,23 @@ class FilterType extends AbstractType
         return array_merge(array('required' => false), $options['field_options']);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
+    }
+
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public function getParent()
+//    {
+//        return ChoiceFilterType::NAME;
+//    }
+
     /**
      * {@inheritDoc}
      */
@@ -100,6 +108,11 @@ class FilterType extends AbstractType
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
+
+                'populate_default' => false,
+                'default_value'    => null,
+                'null_value'       => null,
+                'class'            => null
             )
         )->setRequired(
             array(

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
@@ -44,7 +46,7 @@ class DictionaryFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return ChoiceFilterType::NAME;
+        return DictionaryFilterType::NAME;
     }
 
     /**
@@ -83,43 +85,7 @@ class DictionaryFilter extends AbstractFilter
         $fieldName,
         $parameterName
     ) {
-        switch ($comparisonType) {
-            case TextFilterType::TYPE_EQUAL:
-                return $ds->expr()->eq($fieldName, $parameterName, true);
-            case TextFilterType::TYPE_NOT_CONTAINS:
-                return $ds->expr()->notLike($fieldName, $parameterName, true);
-            case TextFilterType::TYPE_IN:
-                return $ds->expr()->in($fieldName, $parameterName, true);
-            case TextFilterType::TYPE_NOT_IN:
-                return $ds->expr()->notIn($fieldName, $parameterName, true);
-            case FilterUtility::TYPE_EMPTY:
-                $emptyString = $ds->expr()->literal('');
-
-                if ($this->isCompositeField($ds, $fieldName)) {
-                    $fieldName = $ds->expr()->trim($fieldName);
-                }
-
-                return $ds->expr()->andX(
-                    $ds->expr()->orX(
-                        $ds->expr()->isNull($fieldName),
-                        $ds->expr()->eq($fieldName, $emptyString)
-                    ),
-                    $ds->expr()->eq(true, true)
-                );
-            case FilterUtility::TYPE_NOT_EMPTY:
-                $emptyString = $ds->expr()->literal('');
-
-                if ($this->isCompositeField($ds, $fieldName)) {
-                    $fieldName = $ds->expr()->trim($fieldName);
-                }
-
-                return $ds->expr()->andX(
-                    $ds->expr()->isNotNull($fieldName),
-                    $ds->expr()->neq($fieldName, $emptyString)
-                );
-            default:
-                return $ds->expr()->like($fieldName, $parameterName, true);
-        }
+        return $ds->expr()->in($fieldName, $parameterName, true);
     }
 
     /**

@@ -7,6 +7,14 @@ use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
+
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+
 class EntityFilterType extends AbstractChoiceType
 {
     const NAME = 'oro_type_entity_filter';
@@ -37,6 +45,7 @@ class EntityFilterType extends AbstractChoiceType
                 'field_type'    => 'entity',
                 'field_options' => array(),
                 'translatable'  => false,
+//                'class'            => null
             )
         );
 
@@ -52,4 +61,23 @@ class EntityFilterType extends AbstractChoiceType
             )
         );
     }
+
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public function finishView(FormView $view, FormInterface $form, array $options)
+//    {
+//        parent::finishView($view, $form, $options);
+//        if (isset($options['populate_default'])) {
+//            $view->vars['populate_default'] = $options['populate_default'];
+//            $view->vars['default_value']    = $options['default_value'];
+//        }
+//        if (!empty($options['null_value'])) {
+//            $view->vars['null_value'] = $options['null_value'];
+//        }
+//
+//        if (!empty($options['class'])) {
+//            $view->vars['class'] = $options['class'];
+//        }
+//    }
 }
