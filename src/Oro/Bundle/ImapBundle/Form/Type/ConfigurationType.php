@@ -50,11 +50,11 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
-        $this->modifySettingsFields($builder);
         $this->addEnableSMTPImapListener($builder);
 
         $builder
@@ -221,6 +221,9 @@ class ConfigurationType extends AbstractType
                     $event->setData($data);
 
                     if ($entity instanceof UserEmailOrigin
+                        && $entity->getImapHost() !== null
+                        && $data['imapHost'] !== null
+                        && array_key_exists('user', $data)
                         && ($entity->getImapHost() !== $data['imapHost'] || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
@@ -273,12 +276,12 @@ class ConfigurationType extends AbstractType
 
                 if ($entity instanceof UserEmailOrigin) {
                     if (array_key_exists('useImap', $data) === false || $data['useImap'] === 0) {
-                        $data['imapHost'] = '';
-                        $data['imapPort'] = 0;
+                        unset($data['imapHost']);
+                        unset($data['imapPort']);
                     }
                     if (array_key_exists('useSmtp', $data) === false || $data['useSmtp'] === 0) {
-                        $data['smtpHost'] = '';
-                        $data['smtpPort'] = 0;
+                        unset($data['smtpHost']);
+                        unset($data['smtpPort']);
                     }
                     $event->setData($data);
                 }
@@ -318,13 +321,14 @@ class ConfigurationType extends AbstractType
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
             'validation_groups' => function (FormInterface $form) {
-                $groups = ['Check'];
+                $groups = [];
                 if ($form->get('useImap')->getData() === true) {
                     $groups[] = 'Imap';
                 }
                 if ($form->get('useSmtp')->getData() === true) {
                     $groups[] = 'Smtp';
                 }
+
                 return $groups;
             },
         ]);
