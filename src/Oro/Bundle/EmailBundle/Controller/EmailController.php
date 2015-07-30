@@ -69,7 +69,6 @@ class EmailController extends Controller
     /**
      * Get new Unread Emails for email notification
      *
-     * @ R o u te("/last", name="oro_email_last")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
     public function placeholderLastAction()
@@ -105,7 +104,6 @@ class EmailController extends Controller
             'emails' => $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)
         ];
 
-//        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
         return new JsonResponse($result);
     }
 
