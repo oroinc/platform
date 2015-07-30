@@ -2,7 +2,7 @@ datagrid:
     email-auto-response-rules:
         source:
             type: orm
-            acl_resource: oro_email_autoresponserule_view
+#            acl_resource: oro_email_autoresponserule_view
             query:
                 select:
                     - r.id
@@ -15,8 +15,10 @@ datagrid:
                         - r.mailbox = :mailbox
                         - r.id IN (:ids)
             bind_parameters:
-                - mailbox
-                - ids
+                mailbox:
+                    default: null
+                ids:
+                    default: []
         columns:
             name:
                 label: oro.email.autoresponserule.name.label

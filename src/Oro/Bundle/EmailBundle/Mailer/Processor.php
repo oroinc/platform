@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 

@@ -267,7 +267,7 @@ oro:
                 password.label:       Password
             access:
                 label:                Access Management
-	autoresponserule:
+        autoresponserule:
             entity_plural_label: Autoresponse Rules
             name.label:          Name
             active.label:        Active
