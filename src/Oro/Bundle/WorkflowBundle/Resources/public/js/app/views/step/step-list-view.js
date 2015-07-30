@@ -27,6 +27,10 @@ define(function(require) {
             this.listenTo(this.getCollection(), 'change', this.render);
             this.listenTo(this.getCollection(), 'add', this.render);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
+
+            this.listenTo(this.getTransitionCollection(), 'change', this.updateDataFields);
+            this.listenTo(this.getTransitionCollection(), 'add', this.updateDataFields);
+            this.listenTo(this.getTransitionCollection(), 'reset', this.updateDataFields);
         },
 
         addItem: function(item) {
@@ -47,6 +51,10 @@ define(function(require) {
             return this.options.workflow.get('steps');
         },
 
+        getTransitionCollection: function() {
+            return this.options.workflow.get('transitions');
+        },
+
         remove: function() {
             this.resetView();
             StepsListView.__super__.remove.call(this);
@@ -59,9 +67,15 @@ define(function(require) {
             this.rowViews = [];
         },
 
+        updateDataFields: function() {
+            this.$listEl.find('[name="oro_workflow_definition_form[steps]"]').val(JSON.stringify(this.getCollection()));
+            this.$listEl.find('[name="oro_workflow_definition_form[transitions]"]').val(JSON.stringify(this.getTransitionCollection()));
+        },
+
         render: function() {
             this.getCollection().sort();
             this.addAllItems(this.getCollection());
+            this.updateDataFields();
             return this;
         }
     });

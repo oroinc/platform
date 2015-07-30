@@ -271,7 +271,7 @@ define(function(require) {
                     mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
-                    mediator.execute('redirectTo', {url: redirectUrl});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),
                 'error': function(model, response) {
                     mediator.execute('hideLoading');
