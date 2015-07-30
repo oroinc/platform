@@ -231,13 +231,11 @@ class EmailControllerTest extends WebTestCase
 
     public function testGetLastEmail()
     {
-        $this->markTestIncomplete('Need to check');
-
         $url = $this->getUrl('oro_email_last');
         $this->client->request('GET', $url);
 
         $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertEquals(5, $response['count']);
-        $this->assertCount(4, $response['emails']);
+        $this->assertEquals(1, $response['count']);
+        $this->assertCount(1, $response['emails']);
     }
 }
