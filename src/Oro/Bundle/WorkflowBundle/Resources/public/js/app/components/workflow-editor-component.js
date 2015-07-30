@@ -45,7 +45,9 @@ define(function(require) {
                 _sourceElement: $el.find('.workflow-history-container')
             });
             this.workflowManagementView.render();
-            this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            if (this.flowchartEnabled) {
+                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            }
             WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
         },
 
@@ -67,7 +69,9 @@ define(function(require) {
         },
 
         refreshChart: function() {
-            this.flowchartView.jsPlumbManager.organizeBlocks();
+            if (this.flowchartEnabled) {
+                this.flowchartView.jsPlumbManager.organizeBlocks();
+            }
         },
 
         /**
