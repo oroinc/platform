@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 /**
  * User Email Origin
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class UserEmailOrigin extends EmailOrigin

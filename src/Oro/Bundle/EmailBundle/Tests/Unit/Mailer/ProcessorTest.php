@@ -55,6 +55,15 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $userEmailOriginRepository;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $userEmailOrigin;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $mailerTransport;
+
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -66,6 +75,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer = $this->getMockBuilder('\Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->mailerTransport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->mailer->expects($this->any())
+            ->method('getTransport')
+            ->will($this->returnValue($this->mailerTransport));
         $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,6 +100,33 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->will($this->returnValue(new User));
+
+        $this->userEmailOrigin =
+            $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getSmtpHost')
+            ->will($this->returnValue('abc'));
+
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getSmtpPort')
+            ->will($this->returnValue(25));
+
+        $this->userEmailOriginRepository =
+            $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository')
+                ->setMethods(['findUserEmailOrigin'])
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->userEmailOriginRepository->expects($this->any())
+            ->method('findUserEmailOrigin')
+            ->will($this->returnValue($this->userEmailOrigin));
+
         $this->securityFacadeLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->setMethods(['getService'])
@@ -103,6 +145,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityManager')
             ->with('OroEmailBundle:Email')
             ->will($this->returnValue($this->em));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->will($this->returnValue($this->userEmailOriginRepository));
 
         $this->emailProcessor = new Processor(
             $this->doctrineHelper,
@@ -288,6 +334,16 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $email->expects($this->any())
             ->method('getEmailBody')
             ->willReturn($body);
+
+        $this->mailerTransport
+            ->expects($this->exactly(1))
+            ->method('setHost')
+            ->with($this->userEmailOrigin->getSmtpHost());
+
+        $this->mailerTransport
+            ->expects($this->exactly(1))
+            ->method('setPort')
+            ->with($this->userEmailOrigin->getSmtpPort());
 
         if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
             $targetEntity = new TestUser();

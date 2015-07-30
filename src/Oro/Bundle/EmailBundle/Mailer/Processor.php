@@ -28,6 +28,7 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
  * Class Processor
@@ -131,10 +132,7 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if (!$this->mailer->send($message)) {
-            throw new \Swift_SwiftException('An email was not delivered.');
-        }
-
+        $this->processSend($message);
         $origin = $this->getEmailOrigin($model->getFrom());
 
         $emailUser = $this->emailEntityBuilder->emailUser(
@@ -178,6 +176,51 @@ class Processor
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $emailUser;
+    }
+
+    /**
+     * Process send email message. In case exist custom smtp host/port use it
+     *
+     * @param object $message
+     * @throws \Swift_SwiftException
+     */
+    public function processSend($message)
+    {
+        $user = $this->securityFacade->getLoggedUser();
+        $organization = $this->securityFacade->getOrganization();
+
+        $userEmailOrigin = $this
+            ->doctrineHelper
+            ->getEntityRepository('OroImapBundle:UserEmailOrigin')
+            ->findUserEmailOrigin($user, $organization);
+
+        if ($userEmailOrigin) {
+            $this->modifySmtpSettings($userEmailOrigin);
+        }
+
+        if (!$this->mailer->send($message)) {
+            throw new \Swift_SwiftException('An email was not delivered.');
+        }
+    }
+
+    /**
+     * Modify transport smtp settings
+     *
+     * @param UserEmailOrigin $userEmailOrigin
+     */
+    protected function modifySmtpSettings(UserEmailOrigin $userEmailOrigin)
+    {
+        $transport = $this->mailer->getTransport();
+
+        if ($userEmailOrigin && $transport instanceof \Swift_Transport_EsmtpTransport) {
+            $smtpHost = $userEmailOrigin->getSmtpHost();
+            $smtpPort = $userEmailOrigin->getSmtpPort();
+
+            if (!empty($smtpHost) && ((int) $smtpPort) > 0) {
+                $transport->setHost($smtpHost);
+                $transport->setPort($smtpPort);
+            }
+        }
     }
 
     /**
