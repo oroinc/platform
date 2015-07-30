@@ -17,6 +17,7 @@ class OroEmailBundle implements Migration
         static::oroEmailAutoResponseRuleTable($schema);
         static::oroEmailAutoResponseRuleConditionTable($schema);
         static::oroEmailTemplateTable($schema);
+        static::oroEmailTable($schema);
     }
 
     /**
@@ -79,5 +80,14 @@ class OroEmailBundle implements Migration
     {
        $table = $schema->getTable('oro_email_template');
        $table->addColumn('visible', 'boolean', ['default' => '1']);
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    public static function oroEmailTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_email');
+        $table->addColumn('acceptLanguageHeader', 'text', ['notnull' => false]);
     }
 }

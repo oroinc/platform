@@ -248,6 +248,7 @@ services:
             - @oro_email.email.model.builder
             - @oro_email.mailer.processor
             - @logger
+            - %locale%
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%

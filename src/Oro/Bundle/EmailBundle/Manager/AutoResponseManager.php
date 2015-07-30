@@ -23,6 +23,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class AutoResponseManager
 {
@@ -45,6 +46,9 @@ class AutoResponseManager
 
     /** @var PropertyAccessorInterface */
     protected $accessor;
+
+    /** @var string */
+    protected $defaultLocale;
 
     /** @var array */
     protected $filterToConditionMap = [
@@ -69,12 +73,14 @@ class AutoResponseManager
         Registry $registry,
         EmailModelBuilder $emailBuilder,
         Processor $emailProcessor,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        $defaultLocale
     ) {
         $this->registry = $registry;
         $this->emailBuilder = $emailBuilder;
         $this->emailProcessor = $emailProcessor;
         $this->logger = $logger;
+        $this->defaultLocale = $defaultLocale;
         $this->configExpressions = new ConfigExpressions();
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
@@ -126,22 +132,49 @@ class AutoResponseManager
             $emailModel->setFrom($rule->getMailbox()->getEmail());
             $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
             $emailModel->setContexts([$email]);
-            $this->applyTemplate($emailModel, $rule->getTemplate());
+            $this->applyTemplate($emailModel, $rule->getTemplate(), $email);
 
             return $emailModel;
         });
     }
 
     /**
-     * @param EmailModel $email
+     * @param EmailModel $emailModel
      * @param EmailTemplate $template
+     * @param Eamil $email
      */
-    protected function applyTemplate(EmailModel $email, EmailTemplate $template)
+    protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
-        $email
-            ->setType($template->getType())
-            ->setSubject($template->getSubject())
-            ->setBody($template->getContent());
+        $locales = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
+        $flippedLocales = array_flip($locales);
+
+        $translatedSubjects = [];
+        $translatedContents = [];
+        foreach ($template->getTranslations() as $translation) {
+            switch ($translation->getField()) {
+                case 'content':
+                    $translatedContents[$translation->getLocale()] = $translation->getContent();
+                    break;
+                case 'subject':
+                    $translatedSubjects[$translation->getLocale()] = $translation->getContent();
+                    break;
+            }
+        }
+
+        $comparator =  ArrayUtil::createOrderedComparator($flippedLocales);
+        uksort($translatedSubjects, $comparator);
+        uksort($translatedContents, $comparator);
+
+        $validContents = array_intersect_key($translatedContents, $flippedLocales);
+        $validsubjects = array_intersect_key($translatedSubjects, $flippedLocales);
+
+        $content = reset($validContents);
+        $subject = reset($validsubjects);
+
+        $emailModel
+            ->setSubject($subject === false ? $template->getSubject() : $subject)
+            ->setBody($content === false ? $template->getContent() : $content)
+            ->setType($template->getType());
     }
 
     /**

@@ -96,5 +96,6 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle117::oroEmailAutoResponseRuleTable($schema);
         OroEmailBundle117::oroEmailAutoResponseRuleConditionTable($schema);
         OroEmailBundle117::oroEmailTemplateTable($schema);
+        OroEmailBundle117::oroEmailTable($schema);
     }
 }
