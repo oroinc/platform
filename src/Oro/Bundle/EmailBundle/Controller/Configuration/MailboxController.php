@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\TagBundle\Entity\Taggable;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -83,6 +84,10 @@ class MailboxController extends Controller
                         ->getManager();
                     $em->persist($mailbox = $form->getData());
                     $em->flush();
+
+                    if ($mailbox->getProcessSettings() instanceof Taggable) {
+                        $this->get('oro_tag.tag.manager')->saveTagging($mailbox->getProcessSettings());
+                    }
 
                     return $this->get('oro_ui.router')->redirectAfterSave(
                         ['route' => 'oro_email_mailbox_update', 'parameters' => ['mailbox' => $mailbox->getId()]],

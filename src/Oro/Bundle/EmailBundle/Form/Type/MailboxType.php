@@ -53,7 +53,7 @@ class MailboxType extends AbstractType
                 new NotNull(),
             ],
         ]);
-        $builder->add('email', 'email', [
+        $builder->add('email', 'oro_email_email_address', [
             'required'    => true,
             'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
@@ -66,7 +66,7 @@ class MailboxType extends AbstractType
             'required' => false,
             'label'    => 'oro.email.mailbox.origin.enable.label',
             'mapped'   => false,
-            'data'     => true,
+            'data'     => false,
         ]);
         $builder->add('smtpSettings', 'oro_email_smtp');
         $builder->add('processType', 'choice', [
@@ -131,18 +131,18 @@ class MailboxType extends AbstractType
         }
 
         $processType = null;
-        if ($processEntity = $data->getProcessSettings()) {
+        if (null !== $processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
         }
 
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
 
+        $this->addProcessField($form, $processType);
+
         if ($data->getOrigin() !== null) {
             $originActive = $data->getOrigin()->isActive();
             FormUtils::replaceField($form, 'activeOrigin', ['data' => $originActive]);
         }
-
-        $this->addProcessField($form, $processType);
     }
 
     /**

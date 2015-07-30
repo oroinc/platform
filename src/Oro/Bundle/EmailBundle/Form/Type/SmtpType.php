@@ -16,8 +16,7 @@ class SmtpType extends AbstractType
         'host',
         'port',
         'encryption',
-        'username',
-        'password'
+        'username'
     ];
 
     /**
@@ -64,6 +63,11 @@ class SmtpType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
+
+            if (empty($data['password'])) {
+                $data['password'] = $form->get('password')->getData();
+                $event->setData($data);
+            }
 
             if (isset($data['enabled']) && $data['enabled']) {
                 foreach ($this->requiredFields as $field) {

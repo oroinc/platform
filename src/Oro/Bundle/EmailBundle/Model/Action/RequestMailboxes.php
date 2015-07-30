@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
@@ -22,15 +23,22 @@ class RequestMailboxes extends AbstractAction
     protected $email;
     /** @var Registry */
     private $doctrine;
+    /** @var MailboxProcessStorage */
+    private $processStorage;
 
     /**
-     * @param ContextAccessor $contextAccessor
-     * @param Registry        $doctrine
+     * @param ContextAccessor       $contextAccessor
+     * @param Registry              $doctrine
+     * @param MailboxProcessStorage $processStorage
      */
-    public function __construct(ContextAccessor $contextAccessor, Registry $doctrine)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        Registry $doctrine,
+        MailboxProcessStorage $processStorage
+    ) {
         parent::__construct($contextAccessor);
         $this->doctrine = $doctrine;
+        $this->processStorage = $processStorage;
     }
 
     /**
@@ -42,6 +50,8 @@ class RequestMailboxes extends AbstractAction
         $manager = $this->doctrine->getManager();
 
         $type = $this->contextAccessor->getValue($context, $this->processType);
+
+        $type = $this->processStorage->getProcess($type)->getSettingsEntityFQCN();
 
         $qb = $manager->createQueryBuilder();
         $qb->select('mb')

@@ -18,6 +18,7 @@ parameters:
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
+    oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
     oro_email.form.type.smtp.class:                       Oro\Bundle\EmailBundle\Form\Type\SmtpType
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
@@ -165,6 +166,26 @@ services:
         arguments: [@oro_email.mailbox.process_storage]
         tags:
             - { name: form.type, alias: oro_email_mailbox }
+
+    oro_email.form.handler.mailbox:
+        class: %oro_email.form.handler.mailbox.class%
+        scope: request
+        arguments:
+            - @oro_email.form.mailbox
+            - @request
+            - @doctrine
+            - @oro_security.acl.manager
+            - @oro_email.mailbox.process_storage
+
+    oro_email.form.mailbox:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - ~
+            - 'oro_email_mailbox'
+            - ~
+            - {csrf_protection: true, csrf_field_name: _token}
 
     oro_email.form.type.smtp:
         class: %oro_email.form.type.smtp.class%
