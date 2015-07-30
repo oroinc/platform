@@ -13,49 +13,19 @@ class EmailControllerTest extends WebTestCase
     const INCORRECT_ID = -1;
 
     /** @var array */
-    protected $emails = [
-        [
-            'folders' => [
-                ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
-            ],
-            'subject' => 'New email',
-            'messageId' => 'test@email-bundle.func-test',
-            'from' => '"Address 1" <1@example.com>',
-            'to' => ['"Address 2" <2@example.com>', '3@example.com'],
-            'cc' => '2@example.com; "Address 3" <3@example.com>',
-            'importance' => 'low',
-            'body' => 'Test body',
-            'bodyType' => 'text',
-            'receivedAt' => '2015-06-19 12:17:51'
+    protected $email = [
+        'folders' => [
+            ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
         ],
-        [
-            'folders' => [
-                ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
-            ],
-            'subject' => 'New email',
-            'messageId' => 'test@email-bundle.func-tesl1',
-            'from' => '"Address 1" <1@example.com>',
-            'to' => ['"Address 2" <2@example.com>', '3@example.com'],
-            'cc' => '2@example.com; "Address 3" <3@example.com>',
-            'importance' => 'low',
-            'body' => 'Test body',
-            'bodyType' => 'text',
-            'receivedAt' => '2015-06-19 12:17:51'
-        ],
-        [
-            'folders' => [
-                ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
-            ],
-            'subject' => 'New email',
-            'messageId' => 'test@email-bundle.func-tesl2',
-            'from' => '"Address 1" <1@example.com>',
-            'to' => ['"Address 2" <2@example.com>', '3@example.com'],
-            'cc' => '2@example.com; "Address 3" <3@example.com>',
-            'importance' => 'low',
-            'body' => 'Test body',
-            'bodyType' => 'text',
-            'receivedAt' => '2015-06-19 12:17:51'
-        ]
+        'subject' => 'New email',
+        'messageId' => 'test@email-bundle.func-test',
+        'from' => '"Address 1" <1@example.com>',
+        'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+        'cc' => '2@example.com; "Address 3" <3@example.com>',
+        'importance' => 'low',
+        'body' => 'Test body',
+        'bodyType' => 'text',
+        'receivedAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -121,7 +91,7 @@ class EmailControllerTest extends WebTestCase
 
     public function testCreateEmail()
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->emails[0]);
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
@@ -138,7 +108,7 @@ class EmailControllerTest extends WebTestCase
      */
     public function testCreateForExistingEmail($id)
     {
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->emails[0]);
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->assertEquals($response['id'], $id, 'Existing email should be updated');
@@ -149,7 +119,7 @@ class EmailControllerTest extends WebTestCase
      */
     public function testCreateForExistingEmailButWithChangedProtectedProperty()
     {
-        $newEmail = array_merge($this->emails[0], ['subject' => 'New subject']);
+        $newEmail = array_merge($this->email, ['subject' => 'New subject']);
         $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
@@ -165,7 +135,7 @@ class EmailControllerTest extends WebTestCase
 
     public function testCreateEmailWithoutSubjectAndBody()
     {
-        $email = $this->emails[0];
+        $email = $this->email;
         $email['messageId'] = 'new.test@email-bundle.func-test';
         unset($email['subject'], $email['body'], $email['bodyType']);
 
