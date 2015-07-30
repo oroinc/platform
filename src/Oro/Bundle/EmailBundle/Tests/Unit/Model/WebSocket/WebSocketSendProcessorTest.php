@@ -60,10 +60,35 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with(
                 WebSocketSendProcessor::getUserTopic($this->emailUser->getOwner(), $this->emailUser->getOrganization()),
-                json_encode([['count_new' => 0]])
+                json_encode(['hasNewEmail' => true])
             );
 
-        $this->processor->send([['entity' => $this->emailUser]]);
+        $this->processor->send([['entity' => $this->emailUser, 'new' => 1]]);
+    }
+
+    public function testSendNotNewEntity()
+    {
+        $organization = new Organization();
+        $organization->setId(1);
+        $user = new User();
+        $user->setId(1);
+
+        $this->emailUser->expects($this->exactly(2))
+            ->method('getOwner')
+            ->willReturn($user);
+
+        $this->emailUser->expects($this->exactly(2))
+            ->method('getOrganization')
+            ->willReturn($organization);
+
+        $this->topicPublisher->expects($this->once())
+            ->method('send')
+            ->with(
+                WebSocketSendProcessor::getUserTopic($this->emailUser->getOwner(), $this->emailUser->getOrganization()),
+                json_encode(['hasNewEmail' => false])
+            );
+
+        $this->processor->send([['entity' => $this->emailUser, 'new' => 0]]);
     }
 
     public function testSendFailure()
