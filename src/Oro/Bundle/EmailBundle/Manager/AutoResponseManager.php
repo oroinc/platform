@@ -6,9 +6,11 @@ use Exception;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityRepository;
 
 use Psr\Log\LoggerInterface;
+
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -24,6 +26,8 @@ use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 
 class AutoResponseManager
 {
+    const INDEX_PLACEHOLDER = '__index__';
+
     /** @var Registry */
     protected $registry;
 
@@ -35,6 +39,12 @@ class AutoResponseManager
 
     /** @var LoggerInterface */
     protected $logger;
+
+    /** @var ConfigExpressions */
+    protected $configExpressions;
+
+    /** @var PropertyAccessorInterface */
+    protected $accessor;
 
     /** @var array */
     protected $filterToConditionMap = [
@@ -65,6 +75,8 @@ class AutoResponseManager
         $this->emailBuilder = $emailBuilder;
         $this->emailProcessor = $emailProcessor;
         $this->logger = $logger;
+        $this->configExpressions = new ConfigExpressions();
+        $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -141,7 +153,7 @@ class AutoResponseManager
     public function getApplicableRules(Mailbox $mailbox, Email $email)
     {
         return $mailbox->getAutoResponseRules()->filter(function (AutoResponseRule $rule) use ($email) {
-            return $rule->isActive() && $this->isExprApplicable($email, $this->createRuleExpr($rule));
+            return $rule->isActive() && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email));
         });
     }
 
@@ -153,36 +165,65 @@ class AutoResponseManager
      */
     protected function isExprApplicable(Email $email, array $expr)
     {
-        $language = new ConfigExpressions();
-
-        return (bool) $language->evaluate($expr, $email);
+        return (bool) $this->configExpressions->evaluate($expr, $email);
     }
 
     /**
      * @param AutoResponseRule $rule
+     * @param Email $email
      *
      * @return array
      */
-    public function createRuleExpr(AutoResponseRule $rule)
+    public function createRuleExpr(AutoResponseRule $rule, Email $email)
     {
         $configs = [];
         foreach ($rule->getConditions() as $condition) {
-            $args = [
-                sprintf('$%s', $condition->getField())
-            ];
+            $paths = $this->getFieldPaths($condition->getField(), $email);
+
+            $args = [null];
             if (!in_array($condition->getFilterType(), [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
                 $args[] = $this->parseValue($condition->getFilterValue(), $condition->getFilterType());
             }
 
-            $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
-            $configs[] = [
-                $configKey => $args,
-            ];
+            foreach ($paths as $path) {
+                $args[0] = $path;
+                $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
+                $configs[] = [
+                    $configKey => $args,
+                ];
+            }
         }
 
-        return [
-            '@and' => $configs,
-        ];
+        return $configs ? ['@and' => $configs] : [];
+    }
+
+    /**
+     * @param string $field
+     * @param object $context
+     *
+     * @return string[]
+     */
+    protected function getFieldPaths($field, $context)
+    {
+        $delimiter = sprintf('.%s.', static::INDEX_PLACEHOLDER);
+        if (strpos($field, $delimiter) !== false) {
+            list($leftPart) = explode($delimiter, $field);
+            $collection = $this->accessor->getValue($context, $leftPart);
+            if (!$collection) {
+                return [];
+            }
+
+            $keys = $collection->getKeys();
+            if (!$keys) {
+                return [];
+            }
+
+            return array_map(function ($key) use ($field) {
+                return sprintf('$%s', str_replace(static::INDEX_PLACEHOLDER, $key, $field));
+            }, $keys);
+        }
+
+        return [sprintf('$%s', $field)];
     }
 
     /**

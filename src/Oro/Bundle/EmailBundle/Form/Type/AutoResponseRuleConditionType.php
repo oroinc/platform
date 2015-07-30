@@ -6,7 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
 class AutoResponseRuleConditionType extends AbstractType
@@ -23,6 +22,9 @@ class AutoResponseRuleConditionType extends AbstractType
                 'choices' => [
                     'subject'   => 'oro.email.subject.label',
                     'emailBody' => 'oro.email.email_body.label',
+                    'fromName'  => 'From',
+                    'cc.__index__.name'  => 'Cc',
+                    'bcc.__index__.name' => 'Bcc',
                 ],
             ])
             ->add('filter', TextFilterType::NAME, [
