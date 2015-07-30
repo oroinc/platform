@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(
  *      name="acl_security_identities",
+ *      indexes={
+ *          @ORM\Index(name="acl_sids_username_idx", columns={"username"})
+ *      },
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(name="UNIQ_8835EE78772E836AF85E0677", columns={"identifier", "username"})
  *      }

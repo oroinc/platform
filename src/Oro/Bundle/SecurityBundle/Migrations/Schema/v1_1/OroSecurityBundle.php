@@ -71,5 +71,8 @@ class OroSecurityBundle implements Migration
             ['onDelete' => 'CASCADE'],
             'FK_825DE2993D9AB4A6'
         );
+
+        $aclSecurityIdentityTable = $schema->getTable('acl_security_identities');
+        $aclSecurityIdentityTable->addIndex(['username'], 'acl_sids_username_idx');
     }
 }
