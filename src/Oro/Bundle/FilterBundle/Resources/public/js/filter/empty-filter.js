@@ -97,7 +97,7 @@ define([
             var choiceName = $(e.currentTarget).html();
 
             var $typeInput = this.$(this.criteriaValueSelectors.type);
-            $typeInput.each(function () {
+            $typeInput.each(function() {
                 var $input = $(this);
 
                 if ($input.is(':not(select)')) {
