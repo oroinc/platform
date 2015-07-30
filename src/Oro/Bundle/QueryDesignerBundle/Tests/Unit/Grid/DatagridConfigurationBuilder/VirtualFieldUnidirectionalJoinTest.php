@@ -3,11 +3,10 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
 use Doctrine\ORM\Query;
 
-class VirtualFieldUnidirectionalJoinTest extends OrmQueryConverterTest
+class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
