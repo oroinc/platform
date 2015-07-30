@@ -36,7 +36,7 @@ define([
          */
         widgetOptions: {
             multiple: true,
-            classes: 'select-filter-widget multiselect-filter-widget'
+            classes: ''
         },
 
         /**
@@ -89,6 +89,7 @@ define([
                 this.$el.find('.select-values-autocomplete').removeClass('hide');
                 this.$el.find('.select-values-autocomplete').attr('multiple','multiple').select2({
                     multiple: true,
+                    containerCssClass: "dictionary-filter",
                     ajax: {
                         url: routing.generate(
                             'oro_dictionary_filter',
@@ -118,8 +119,14 @@ define([
                     escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
                     minimumInputLength: 1
                 });
-
-                this.$el.find('.select-values-autocomplete').select2('val', this.value.value);
+                var value1 = [];
+                $.each(this.value.value, function(index, value) {
+                    value1.push({
+                        "id": value,
+                        "text": value
+                    });
+                });
+                this.$el.find('.select-values-autocomplete').select2('data',  value1);
             }
 
             if (this.componentMode === 'select2') {
@@ -132,6 +139,7 @@ define([
                 });
                 //this.$el.find('.select-values')
                 this.$el.find('.select-values').attr('multiple','multiple').select2({
+                    containerCssClass: "dictionary-filter",
                     //multiple: true
                     dropdownAutoWidth: true
                 }).on('change', function (e) {
