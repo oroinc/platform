@@ -128,30 +128,38 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         return array(
             'should bind correct data except password' => array(
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
+                    'imapHost' => 'someHost',
+                    'imapPort' => '123',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD,
                 ),
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
+                    'imapHost' => 'someHost',
+                    'imapPort' => '123',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                 ),
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
+                    'imapHost' => 'someHost',
+                    'imapPort' => '123',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD
                 ),
             ),
-            'should not create empty entity'           => array(
+            'should not create empty entity' => array(
                 array(
-                    'host'     => '',
-                    'port'     => '',
+                    'imapHost' => '',
+                    'imapPort' => '',
+                    'smtpHost' => '',
+                    'smtpPort' => '',
                     'ssl'      => '',
                     'user'     => '',
                     'password' => ''
@@ -176,8 +184,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => 'someHost',
-                'port'     => '123',
+                'imapHost' => 'someHost',
+                'imapPort' => '123',
+                'smtpHost' => '',
+                'smtpPort' => '',
                 'ssl'      => 'ssl',
                 'user'     => 'someUser',
                 'password' => ''
@@ -202,8 +212,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => 'someHost',
-                'port'     => '123',
+                'imapHost' => 'someHost',
+                'imapPort' => '123',
+                'smtpHost' => '',
+                'smtpPort' => '',
                 'ssl'      => 'ssl',
                 'user'     => 'someUser',
                 'password' => 'somPassword'
@@ -231,8 +243,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => '',
-                'port'     => '',
+                'imapHost' => '',
+                'imapPort' => '',
+                'smtpHost' => '',
+                'smtpPort' => '',
                 'ssl'      => '',
                 'user'     => '',
                 'password' => ''
@@ -240,7 +254,6 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         );
 
         $this->assertNotSame($entity, $form->getData());
-
         $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
     }

@@ -72,8 +72,8 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     protected function createSynchronizationProcessor($origin)
     {
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
             $origin->getSsl(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword())

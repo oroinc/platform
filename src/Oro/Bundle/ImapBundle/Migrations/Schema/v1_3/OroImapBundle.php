@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Migrations\Schema\v3_0;
+namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_3;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -18,7 +18,7 @@ class OroImapBundle implements Migration
         $queries->addPreQuery("UPDATE oro_email_origin SET name='useremailorigin' WHERE name='imapemailorigin';");
 
         /** Tables generation **/
-        $this->addSmtpFieldsToOroEmailOriginTable($schema);
+        self::addSmtpFieldsToOroEmailOriginTable($schema);
     }
 
     /**
@@ -26,7 +26,7 @@ class OroImapBundle implements Migration
      *
      * @param Schema $schema
      */
-    protected function addSmtpFieldsToOroEmailOriginTable(Schema $schema)
+    public static function addSmtpFieldsToOroEmailOriginTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('smtp_host', 'string', ['notnull' => false, 'length' => 255]);

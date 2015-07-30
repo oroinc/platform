@@ -56,8 +56,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
         $origin = $folder->getOrigin();
 
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
             $origin->getSsl(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword())

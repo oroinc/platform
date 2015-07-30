@@ -49,8 +49,8 @@ class ConnectionController extends Controller
 
         if ($form->isValid() && null !== $origin) {
             $config = new ImapConfig(
-                $origin->getHost(),
-                $origin->getPort(),
+                $origin->getImapHost(),
+                $origin->getImapPort(),
                 $origin->getSsl(),
                 $origin->getUser(),
                 $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword())

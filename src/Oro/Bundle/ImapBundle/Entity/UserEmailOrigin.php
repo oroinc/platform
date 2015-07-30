@@ -19,14 +19,14 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @ORM\Column(name="imap_host", type="string", length=255, nullable=true)
      */
-    protected $host;
+    protected $imapHost;
 
     /**
      * @var string
      *
      * @ORM\Column(name="imap_port", type="integer", length=10, nullable=true)
      */
-    protected $port;
+    protected $imapPort;
 
     /**
      * @var string
@@ -72,21 +72,21 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @return string
      */
-    public function getHost()
+    public function getImapHost()
     {
-        return $this->host;
+        return $this->imapHost;
     }
 
     /**
      * Sets the host name of IMAP server
      *
-     * @param string $host
+     * @param string $imapHost
      *
      * @return UserEmailOrigin
      */
-    public function setHost($host)
+    public function setImapHost($imapHost)
     {
-        $this->host = $host;
+        $this->imapHost = $imapHost;
 
         return $this;
     }
@@ -144,20 +144,21 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @return int
      */
-    public function getPort()
+    public function getImapPort()
     {
-        return (int)$this->port;
+        return (int)$this->imapPort;
     }
 
     /**
      * Sets the port of IMAP server
      *
-     * @param int $port
+     * @param int $imapPort
+     *
      * @return UserEmailOrigin
      */
-    public function setPort($port)
+    public function setImapPort($imapPort)
     {
-        $this->port = (int)$port;
+        $this->imapPort = (int)$imapPort;
 
         return $this;
     }
@@ -239,8 +240,8 @@ class UserEmailOrigin extends EmailOrigin
     public function __toString()
     {
         $host = '';
-        if ($this->host) {
-            $host = $this->host;
+        if ($this->imapHost) {
+            $host = $this->imapHost;
         } elseif ($this->smtpHost) {
             $host = $this->smtpHost;
         }
