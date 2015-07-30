@@ -67,7 +67,7 @@ define(function(require) {
 
         connect: function() {
             FlowchartViewerWorkflowView.__super__.connect.apply(this, arguments);
-            this.jsPlumbInstance.batch(_.bind(function(){
+            this.jsPlumbInstance.batch(_.bind(function() {
                 this.$el.addClass(this.className);
                 var stepCollectionView;
                 var transitionOverlayView = this.transitionOverlayView;
