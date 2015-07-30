@@ -291,9 +291,4 @@ class FieldType extends AbstractType
 
         return true;
     }
-
-    protected function isManyToOneRelationAvailable()
-    {
-
-    }
 }
