@@ -244,22 +244,4 @@ class EmailControllerTest extends WebTestCase
             );
         }
     }
-
-    /**
-     * @depends testUpdateEmailProtectedProperty
-     */
-    public function testGetLastEmail()
-    {
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->emails[1]);
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $this->emails[2]);
-
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_email_last')
-        );
-
-        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertEquals(5, $response['count']);
-        $this->assertCount(4, $response['emails']);
-    }
 }

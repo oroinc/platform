@@ -150,30 +150,6 @@ class EmailController extends RestController
     }
 
     /**
-     * Get last N user emails (N - can be configured by application config)
-     *
-     * @ApiDoc(
-     *      description="Get last user emails",
-     *      resource=true
-     * )
-     * @Get("/emails/last")
-     * @AclAncestor("oro_email_email_view")
-     *
-     * @return Response
-     */
-    public function getLastAction()
-    {
-        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
-        $emailNotificationManager = $this->getEmailNotificationManager();
-        $result = [
-            'count' => $emailNotificationManager->getCountNewEmails($this->getUser()),
-            'emails' => $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)
-        ];
-
-        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
-    }
-
-    /**
      * Get email cache manager
      *
      * @return EmailCacheManager
@@ -191,14 +167,6 @@ class EmailController extends RestController
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email.api');
-    }
-
-    /**
-     * @return \Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
-     */
-    public function getEmailNotificationManager()
-    {
-        return $this->container->get('oro_email.manager.notification');
     }
 
     /**

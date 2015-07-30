@@ -228,4 +228,16 @@ class EmailControllerTest extends WebTestCase
             $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
         );
     }
+
+    public function testGetLastEmail()
+    {
+        $this->markTestIncomplete('Need to check');
+
+        $url = $this->getUrl('oro_email_last');
+        $this->client->request('GET', $url);
+
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEquals(5, $response['count']);
+        $this->assertCount(4, $response['emails']);
+    }
 }

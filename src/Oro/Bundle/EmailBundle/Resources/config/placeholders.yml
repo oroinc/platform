@@ -16,7 +16,7 @@ items:
         template: OroEmailBundle:Email:activityLink.html.twig
         acl: oro_email_email_create
     dots_menu_email:
-        action: OroEmailBundle:Email:last
+        action: OroEmailBundle:Email:placeholderLast
         applicable: @oro_user.placeholder.filter->isUserApplicable()
     email_filter_templates:
         template: OroEmailBundle:Js:default_templates.js.twig

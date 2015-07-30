@@ -69,10 +69,10 @@ class EmailController extends Controller
     /**
      * Get new Unread Emails for email notification
      *
-     * @Route("/last", name="oro_email_last")
+     * @ R o u te("/last", name="oro_email_last")
      * @Template("OroEmailBundle:Notification:button.html.twig")
      */
-    public function lastAction()
+    public function placeholderLastAction()
     {
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
@@ -86,6 +86,27 @@ class EmailController extends Controller
             'emails' => json_encode($emails),
             'count'=> $count
         ];
+    }
+
+    /**
+     * Get last N user emails (N - can be configured by application config)
+     *
+     * @Route("/last", name="oro_email_last")
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @return JsonResponse
+     */
+    public function lastAction()
+    {
+        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        $emailNotificationManager = $this->get('oro_email.manager.notification');
+        $result = [
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser()),
+            'emails' => $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)
+        ];
+
+//        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result]);
+        return new JsonResponse($result);
     }
 
     /**

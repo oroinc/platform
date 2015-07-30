@@ -73,7 +73,7 @@ define([
         loadLastEmail: function(hasNewEmail) {
             var self = this;
             $.ajax({
-                url: routing.generate('oro_api_get_email_last'),
+                url: routing.generate('oro_email_last'),
                 success: function(response) {
                     self.view.collection.reset();
                     self.view.collection.add(response.emails);
