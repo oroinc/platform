@@ -132,8 +132,8 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        $this->processSend($message);
         $origin = $this->getEmailOrigin($model->getFrom());
+        $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(
             $model->getSubject(),
@@ -182,20 +182,13 @@ class Processor
      * Process send email message. In case exist custom smtp host/port use it
      *
      * @param object $message
+     * @param object $emailOrigin
      * @throws \Swift_SwiftException
      */
-    public function processSend($message)
+    public function processSend($message, $emailOrigin)
     {
-        $user = $this->securityFacade->getLoggedUser();
-        $organization = $this->securityFacade->getOrganization();
-
-        $userEmailOrigin = $this
-            ->doctrineHelper
-            ->getEntityRepository('OroImapBundle:UserEmailOrigin')
-            ->findUserEmailOrigin($user, $organization);
-
-        if ($userEmailOrigin) {
-            $this->modifySmtpSettings($userEmailOrigin);
+        if ($emailOrigin instanceof UserEmailOrigin) {
+            $this->modifySmtpSettings($emailOrigin);
         }
 
         if (!$this->mailer->send($message)) {
@@ -212,14 +205,9 @@ class Processor
     {
         $transport = $this->mailer->getTransport();
 
-        if ($userEmailOrigin && $transport instanceof \Swift_Transport_EsmtpTransport) {
-            $smtpHost = $userEmailOrigin->getSmtpHost();
-            $smtpPort = $userEmailOrigin->getSmtpPort();
-
-            if (!empty($smtpHost) && ((int) $smtpPort) > 0) {
-                $transport->setHost($smtpHost);
-                $transport->setPort($smtpPort);
-            }
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $transport->setHost($userEmailOrigin->getSmtpHost());
+            $transport->setPort($userEmailOrigin->getSmtpPort());
         }
     }
 
@@ -352,10 +340,20 @@ class Processor
                 $origins = $emailOwner->getEmailOrigins()->filter(
                     function ($item) use ($organization) {
                         return
-                            $item instanceof InternalEmailOrigin
+                            $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
                             && (!$organization || $item->getOrganization() === $organization);
                     }
                 );
+
+                if ($origins->isEmpty()) {
+                    $origins = $emailOwner->getEmailOrigins()->filter(
+                        function ($item) use ($organization) {
+                            return
+                                $item instanceof InternalEmailOrigin
+                                && (!$organization || $item->getOrganization() === $organization);
+                        }
+                    );
+                }
 
                 $origin = $origins->isEmpty() ? null : $origins->first();
                 if ($origin === null) {

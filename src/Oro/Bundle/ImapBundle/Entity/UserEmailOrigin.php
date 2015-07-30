@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 /**
  * User Email Origin
  *
- * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository")
+ * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
  */
 class UserEmailOrigin extends EmailOrigin
@@ -230,6 +230,25 @@ class UserEmailOrigin extends EmailOrigin
         $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * Check is configured smtp.
+     *
+     * @return bool
+     */
+    public function isSmtpConfigured()
+    {
+        $smtpHost = $this->getSmtpHost();
+        $smtpPort = $this->getSmtpPort();
+        $user = $this->getUser();
+        $password = $this->getPassword();
+
+        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && !empty($password)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

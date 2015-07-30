@@ -69,4 +69,27 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $origin->setSmtpPort(123);
         $this->assertEquals(123, $origin->getSmtpPort());
     }
+
+    public function testIsSmtpConfiguredSuccess()
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setSmtpHost('host');
+        $origin->setSmtpPort(25);
+        $origin->setUser('test');
+        $origin->setPassword('password');
+
+        $this->assertTrue($origin->isSmtpConfigured());
+    }
+
+    public function testIsSmtpConfiguredFailure()
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setSmtpHost('');
+        $origin->setSmtpPort(0);
+        $origin->setUser('');
+        $origin->setPassword('');
+
+        $this->assertFalse($origin->isSmtpConfigured());
+    }
+
 }

@@ -56,9 +56,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $userEmailOriginRepository;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $userEmailOrigin;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -100,10 +97,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade->expects($this->any())
-            ->method('getLoggedUser')
-            ->will($this->returnValue(new User));
-
         $this->userEmailOrigin =
             $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
                 ->disableOriginalConstructor()
@@ -116,16 +109,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->userEmailOrigin->expects($this->any())
             ->method('getSmtpPort')
             ->will($this->returnValue(25));
-
-        $this->userEmailOriginRepository =
-            $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository')
-                ->setMethods(['findUserEmailOrigin'])
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->userEmailOriginRepository->expects($this->any())
-            ->method('findUserEmailOrigin')
-            ->will($this->returnValue($this->userEmailOrigin));
 
         $this->securityFacadeLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
@@ -146,9 +129,25 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:Email')
             ->will($this->returnValue($this->em));
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
-            ->will($this->returnValue($this->userEmailOriginRepository));
+        $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getFolder')
+            ->with(FolderType::SENT)
+            ->will($this->returnValue($folder));
+
+        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailOriginRepo->expects($this->any())
+            ->method('findOneBy')
+            ->with(['internalName' => InternalEmailOrigin::BAP])
+            ->will($this->returnValue($this->userEmailOrigin));
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with('OroEmailBundle:InternalEmailOrigin')
+            ->will($this->returnValue($emailOriginRepo));
 
         $this->emailProcessor = new Processor(
             $this->doctrineHelper,
@@ -265,29 +264,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with($message)
             ->will($this->returnValue(true));
-
-        $origin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $origin->expects($this->any())
-            ->method('getFolder')
-            ->with(FolderType::SENT)
-            ->will($this->returnValue($folder));
-
-        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailOriginRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(['internalName' => InternalEmailOrigin::BAP])
-            ->will($this->returnValue($origin));
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:InternalEmailOrigin')
-            ->will($this->returnValue($emailOriginRepo));
 
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->setMethods(['setFolder', 'getEmail'])
