@@ -145,7 +145,7 @@ services:
             - @oro_form.provider.html_tag_provider
             - %kernel.cache_dir%
         calls:
-            - [setAssetHelper, ["@?templating.helper.assets="]]
+            - [setAssetHelper, [@assets.packages]]
         tags:
             - { name: form.type, alias: oro_rich_text }
 
@@ -241,7 +241,7 @@ services:
     oro_form.type.download_links:
         class: %oro_form.type.download_links.class%
         arguments:
-            - @templating.helper.assets
+            - @assets.packages
         scope: request
         tags:
             - { name: form.type, alias: oro_download_links_type }

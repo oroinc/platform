@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid;
+namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
-class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
+class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
 {
     public function testGrouping()
     {

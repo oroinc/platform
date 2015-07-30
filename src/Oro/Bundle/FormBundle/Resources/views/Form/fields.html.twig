@@ -142,6 +142,7 @@
 
 {% block form_label %}
     {% spaceless %}
+    {% if label is not sameas(false) %}
         {% if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {% endif %}
@@ -152,7 +153,11 @@
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
         {% endif %}
         {% if label is empty %}
-            {% set label = name|humanize %}
+            {% if label_format is not empty -%}
+                {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
+            {% else %}
+                {% set label = name|humanize %}
+            {% endif %}
         {% endif %}
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
@@ -177,6 +182,7 @@
             {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
+    {%- endif -%}
     {% endspaceless %}
 {% endblock form_label %}
 
