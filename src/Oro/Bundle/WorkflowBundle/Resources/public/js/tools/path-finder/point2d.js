@@ -7,7 +7,10 @@ define(function() {
     }
     Object.defineProperty(Point2d.prototype, 'id', {
         get: function() {
-            return this.x * 200000 + this.y;
+            if (this._id === void 0) {
+                this._id = this.x * 200000 + this.y;
+            }
+            return this._id;
         },
         enumerable: true,
         configurable: true
@@ -36,7 +39,10 @@ define(function() {
     };
     Object.defineProperty(Point2d.prototype, 'length', {
         get: function() {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
+            if (this._length === void 0) {
+                this._length = Math.sqrt(this.x * this.x + this.y * this.y);
+            }
+            return this._length;
         },
         enumerable: true,
         configurable: true

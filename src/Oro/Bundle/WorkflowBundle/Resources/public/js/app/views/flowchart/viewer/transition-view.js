@@ -83,6 +83,7 @@ define(function(require) {
         },
 
         updateStepTransitions: function() {
+            var i;
             var startStep;
             var connection;
             var name = this.model.get('name');
@@ -91,7 +92,7 @@ define(function(require) {
                 });
             var endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
             this.addStaleMark();
-            for (var i = 0; i < startSteps.length; i++) {
+            for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
                 connection = this.findConnectionByStartStep(startStep);
                 if (connection && connection.endStep === endStep) {
@@ -103,7 +104,7 @@ define(function(require) {
             this.removeStaleConnections();
 
             this.areaView.stepCollectionView.getItemView(endStep).updateStepMinWidth();
-            for (var i = 0; i < startSteps.length; i++) {
+            for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
                 this.areaView.stepCollectionView.getItemView(startStep).updateStepMinWidth();
             }
