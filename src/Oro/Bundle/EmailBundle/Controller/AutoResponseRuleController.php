@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\PersistentCollection;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -69,6 +70,12 @@ class AutoResponseRuleController extends Controller
         if ($form->isValid()) {
             $em = $this->getAutoResponseRuleManager();
             $em->persist($rule);
+
+            $conditions = $rule->getConditions();
+            if ($conditions instanceof PersistentCollection) {
+                array_map([$em, 'remove'], $conditions->getDeleteDiff());
+            }
+
             $em->flush();
 
             $this->clearAutoResponses();

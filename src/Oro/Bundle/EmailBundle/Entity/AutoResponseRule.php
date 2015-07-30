@@ -150,16 +150,38 @@ class AutoResponseRule
     }
 
     /**
-     * @param AutoResponseRuleCondition[]|Collection $conditions
+     * @param AutoResponseRuleCondition[] $conditions
      *
      * @return $this
      */
-    public function setConditions(Collection $conditions)
+    public function addConditions(array $conditions)
     {
-        foreach ($conditions as $condition) {
-            $condition->setRule($this);
-        }
-        $this->conditions = $conditions;
+        array_map([$this, 'addCondition'], $conditions);
+
+        return $this;
+    }
+
+    /**
+     * @param AutoResponseRuleCondition $condition
+     *
+     * @return $this
+     */
+    public function addCondition(AutoResponseRuleCondition $condition)
+    {
+        $this->conditions->add($condition);
+        $condition->setRule($this);
+
+        return $this;
+    }
+
+    /**
+     * @param AutoResponseRuleCondition $condition
+     *
+     * @return $this
+     */
+    public function removeCondition(AutoResponseRuleCondition $condition)
+    {
+        $this->conditions->removeElement($condition);
 
         return $this;
     }
