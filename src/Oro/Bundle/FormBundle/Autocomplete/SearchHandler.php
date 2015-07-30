@@ -64,7 +64,7 @@ class SearchHandler implements SearchHandlerInterface
     /**
      * @var PropertyAccessor
      */
-    protected $propertyAccessor = 0;
+    protected $propertyAccessor;
 
     /**
      * @param string $entityName
