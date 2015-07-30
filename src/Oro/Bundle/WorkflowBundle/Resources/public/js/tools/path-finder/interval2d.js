@@ -6,14 +6,20 @@ define(['./util', './line2d'], function(util, Line2d) {
     }
     Object.defineProperty(Interval2d.prototype, 'length', {
         get: function() {
-            return this.a.distanceTo(this.b);
+            if (this._length === void 0) {
+                this._length = this.a.distanceTo(this.b);
+            }
+            return this._length;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Interval2d.prototype, 'simpleLength', {
         get: function() {
-            return this.a.simpleDistanceTo(this.b);
+            if (this._simpleLength === void 0) {
+                this._simpleLength = this.a.simpleDistanceTo(this.b);
+            }
+            return this._simpleLength;
         },
         enumerable: true,
         configurable: true
@@ -78,19 +84,27 @@ define(['./util', './line2d'], function(util, Line2d) {
     };
     Object.defineProperty(Interval2d.prototype, 'line', {
         get: function() {
+            if (this._line) {
+                return this._line;
+            }
             var direction = this.a.sub(this.b).unitVector;
             var slope = direction.y / direction.x;
             if (slope === Infinity || slope === -Infinity) {
-                return new Line2d(Infinity, this.a.x);
+                this._line = new Line2d(Infinity, this.a.x);
+            } else {
+                this._line = new Line2d(slope, this.a.y + this.a.x * slope);
             }
-            return new Line2d(slope, this.a.y + this.a.x * slope);
+            return this._line;
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Interval2d.prototype, 'center', {
         get: function() {
-            return this.a.add(this.b).mul(0.5);
+            if (this._center === void 0) {
+                this._center = this.a.add(this.b).mul(0.5);
+            }
+            return this._center;
         },
         enumerable: true,
         configurable: true

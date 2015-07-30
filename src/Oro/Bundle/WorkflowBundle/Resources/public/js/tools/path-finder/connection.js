@@ -63,20 +63,6 @@ define(['./extends', './interval2d', './point2d', './settings'], function(__exte
     Connection.prototype.directionFrom = function(first) {
         return this.b === first ? this.vector.rot180() : this.vector;
     };
-    Connection.prototype.replaceNode = function(original, replacement) {
-        var vector;
-        if (this.a === original) {
-            vector = this.vector;
-            replacement.connections[vector.id] = this;
-            original.connections[vector.id] = null;
-            this.a = replacement;
-        } else {
-            vector = this.vector.rot180();
-            replacement.connections[vector.id] = this;
-            original.connections[vector.id] = null;
-            this.b = replacement;
-        }
-    };
     Connection.prototype.draw = function(color) {
         if (color === void 0) {
             color = 'green';
