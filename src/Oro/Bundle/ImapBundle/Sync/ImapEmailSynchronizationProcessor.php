@@ -132,7 +132,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emailUserRepository->setEmailUsersSeen($ids, false);
             $emailUserRepository->setEmailUsersSeen($invertedIds, true);
         } catch (UnsupportException $e) {
-            $this->logger->notice(sprintf('Seen update unsupport - "%s"', $imapFolder->getFolder()->getOrigin()));
+            $this->logger->notice(sprintf('Seen update unsupported - "%s"', $imapFolder->getFolder()->getOrigin()));
         }
     }
 

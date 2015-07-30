@@ -2,11 +2,23 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class SmtpType extends AbstractType
 {
+    protected $requiredFields = [
+        'host',
+        'port',
+        'encryption',
+        'username',
+        'password'
+    ];
 
     /**
      * {@inheritdoc}
@@ -48,5 +60,21 @@ class SmtpType extends AbstractType
             'label'    => 'oro.email.mailbox.smtp_settings.password.label',
             'required' => false,
         ]);
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            if (isset($data['enabled']) && $data['enabled']) {
+                foreach ($this->requiredFields as $field) {
+                    FormUtils::replaceField($form, $field, [
+                        //'required' => true,
+                        'constraints' => [
+                            new NotNull()
+                        ]
+                    ]);
+                }
+            }
+        });
     }
 }

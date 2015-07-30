@@ -258,14 +258,16 @@ oro:
                 type.label:           Action
                 default.label:        Do Nothing
             smtp_settings:
-                label:      SMTP Settings
-                enabled.label:       Use SMTP
-                host.label:          Host
-                port.label:          Port
-                encryption.label:    SSL
-                username.label:      Username
-                password.label:      Password
-        autoresponserule:
+                label:                SMTP Settings
+                enabled.label:        Use SMTP
+                host.label:           Host
+                port.label:           Port
+                encryption.label:     SSL
+                username.label:       Username
+                password.label:       Password
+            access:
+                label:                Access Management
+	autoresponserule:
             entity_plural_label: Autoresponse Rules
             name.label:          Name
             active.label:        Active

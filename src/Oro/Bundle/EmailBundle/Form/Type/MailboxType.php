@@ -77,6 +77,30 @@ class MailboxType extends AbstractType
             'empty_value' => 'oro.email.mailbox.process.default.label',
             'empty_data'  => null,
         ]);
+        $builder->add(
+            'allowedUsers',
+            'oro_user_multiselect',
+            [
+                'label' => 'oro.user.entity_plural_label',
+                'mapped' => false
+            ]
+        );
+        $builder->add(
+            'allowedUsers',
+            'oro_user_multiselect',
+            [
+                'label' => 'oro.user.entity_plural_label',
+                'mapped' => false
+            ]
+        );
+        $builder->add(
+            'allowedRoles',
+            'oro_role_multiselect',
+            [
+                'label' => 'oro.user.role.entity_plural_label',
+                'mapped' => false
+            ]
+        );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
@@ -151,7 +175,7 @@ class MailboxType extends AbstractType
         /** @var Mailbox $data */
         $data = $event->getData();
 
-        if ($data !== null) {
+        if (($data !== null) && ($data->getOrigin() !== null)) {
             $data->getOrigin()->setOwner(null);
         }
     }

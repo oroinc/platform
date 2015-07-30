@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Twig;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -28,23 +29,28 @@ class EmailExtension extends \Twig_Extension
 
     /** @var EntityManager */
     protected $em;
+    /**  @var MailboxProcessStorage */
+    private $mailboxProcessStorage;
 
     /**
-     * @param EmailHolderHelper $emailHolderHelper
-     * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailHolderHelper      $emailHolderHelper
+     * @param EmailAddressHelper     $emailAddressHelper
      * @param EmailAttachmentManager $emailAttachmentManager
-     * @param EntityManager $em
+     * @param EntityManager          $em
+     * @param MailboxProcessStorage  $mailboxProcessStorage
      */
     public function __construct(
         EmailHolderHelper $emailHolderHelper,
         EmailAddressHelper $emailAddressHelper,
         EmailAttachmentManager $emailAttachmentManager,
-        EntityManager $em
+        EntityManager $em,
+        MailboxProcessStorage $mailboxProcessStorage
     ) {
         $this->emailHolderHelper = $emailHolderHelper;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->emailAttachmentManager = $emailAttachmentManager;
         $this->em = $em;
+        $this->mailboxProcessStorage = $mailboxProcessStorage;
     }
 
     /**
@@ -58,7 +64,8 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_get_email_address', [$this, 'getEmailAddress']),
             new \Twig_SimpleFunction('oro_get_email_thread_recipients', [$this, 'getEmailThreadRecipients']),
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
-            new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach'])
+            new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
+            new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel'])
         ];
     }
 
@@ -154,6 +161,16 @@ class EmailExtension extends \Twig_Extension
         } else {
             return true;
         }
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    public function getMailboxProcessLabel($type)
+    {
+        return $this->mailboxProcessStorage->getProcess($type)->getLabel();
     }
 
     /**

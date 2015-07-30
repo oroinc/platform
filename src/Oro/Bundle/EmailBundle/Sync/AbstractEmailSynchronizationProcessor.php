@@ -315,7 +315,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function initEnv(EmailOrigin $emailOrigin)
     {
-        $this->currentUser = $this->em->getRepository('OroEmailBundle:Mailbox')->findByOrigin($emailOrigin);
+        $this->currentUser = $this->em->getRepository('OroEmailBundle:Mailbox')->findOneByOrigin($emailOrigin);
         if ($this->currentUser === null) {
             $this->currentUser = $emailOrigin->getOwner() ? $this->em->getReference(
                 'Oro\Bundle\UserBundle\Entity\User',

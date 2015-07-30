@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
@@ -68,6 +69,8 @@ class Processor
 
     /** @var array */
     protected $origins = [];
+    /** @var MailboxMailerManager */
+    private $mailboxMailerManager;
 
     /**
      * @param DoctrineHelper           $doctrineHelper
@@ -78,6 +81,7 @@ class Processor
      * @param EmailActivityManager     $emailActivityManager
      * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
+     * @param MailboxMailerManager     $mailboxMailerManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -87,7 +91,8 @@ class Processor
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        MailboxMailerManager $mailboxMailerManager
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
@@ -97,6 +102,7 @@ class Processor
         $this->emailActivityManager = $emailActivityManager;
         $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
+        $this->mailboxMailerManager = $mailboxMailerManager;
     }
 
     /**
@@ -132,7 +138,14 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if (!$this->mailer->send($message)) {
+        $mailer = $this->mailer;
+        $fromAddress = $this->emailAddressHelper->extractPureEmailAddress($model->getFrom());
+
+        if (null !== $mailboxMailer = $this->mailboxMailerManager->getMailerForAddress($fromAddress)) {
+            $mailer = $mailboxMailer;
+        }
+
+        if (!$mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
@@ -152,7 +165,16 @@ class Processor
             $origin->getOrganization()
         );
 
-        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $folder = $origin->getFolder(FolderType::SENT);
+        if ($folder === false) {
+            $folder = $this->emailEntityBuilder->folder(
+                FolderType::SENT,
+                'sent',
+                'sent'
+            );
+            $folder->setOrigin($origin);
+        }
+        $emailUser->setFolder($folder);
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );

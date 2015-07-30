@@ -1,0 +1,6 @@
+{% set settings = record.getValue('smtpSettings') %}
+{% if settings.enabled is not defined or not settings.enabled %}
+    {{ 'No'|trans }}
+{% else %}
+    {{ 'Yes'|trans }}
+{% endif %}
