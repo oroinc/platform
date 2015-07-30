@@ -89,6 +89,14 @@ class MailboxController extends Controller
                         $this->get('oro_tag.tag.manager')->saveTagging($mailbox->getProcessSettings());
                     }
 
+                    $this->get('session')->getFlashBag()->add(
+                        'success',
+                        $this->get('translator')->trans(
+                            'oro.email.mailbox.action.saved',
+                            ['%mailbox%' => $mailbox->getLabel()]
+                        )
+                    );
+
                     return $this->get('oro_ui.router')->redirectAfterSave(
                         ['route' => 'oro_email_mailbox_update', 'parameters' => ['mailbox' => $mailbox->getId()]],
                         [

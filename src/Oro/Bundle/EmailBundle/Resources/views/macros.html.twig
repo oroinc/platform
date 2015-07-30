@@ -617,3 +617,44 @@
         </div>
     </div>
 {% endmacro %}
+
+{#
+    Render title and buttons for Mailbox configuration
+#}
+{% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
+    <div class="container-fluid configuration-header clearfix">
+        {% if pageTitle is iterable %}
+            <div class="customer-info customer-simple pull-left">
+                {% for title in pageTitle%}
+                    {% if not loop.last %}
+                        <div class="sub-title">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </div>
+                        <span class="separator">/</span>
+                    {% else %}
+                        <h1 class="user-name">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </h1>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>
+                {{ pageTitle }}
+            </h1>
+        {% endif %}
+
+        <div class="pull-right title-buttons-container">
+            {{ buttons|raw }}
+        </div>
+    </div>
+{% endmacro %}
+

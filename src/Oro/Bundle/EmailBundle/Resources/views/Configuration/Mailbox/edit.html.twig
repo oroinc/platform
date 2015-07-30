@@ -1,6 +1,28 @@
 {% extends 'OroConfigBundle::configPage.html.twig' %}
 
-{% set pageTitle = 'oro.config.menu.system_configuration.label'|trans %}
+{% import 'OroEmailBundle::macros.html.twig' as emailUI %}
+
+{% if form.vars.data.label is defined and form.vars.data.label is not empty %}
+    {% set mailboxTitle = form.vars.data.label %}
+{% else %}
+    {% set mailboxTitle = 'oro.email.mailbox.action.new'|trans %}
+{% endif %}
+
+{% set pageTitle = [
+    {
+        link: path('oro_config_configuration_system'),
+        label: 'oro.config.menu.system_configuration.label'|trans,
+    },
+    {
+        link: path('oro_config_configuration_system', {
+                activeGroup: 'platform',
+                activeSubGroup: 'email_configuration'
+            }),
+        label: 'oro.email.system_configuration.email_configuration'|trans,
+    },
+    mailboxTitle
+] %}
+
 {% if form.vars.data.id is not null %}
     {% set formAction = path(
         'oro_email_mailbox_update',
@@ -20,8 +42,25 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
 
 {% block content %}
-    {% set saveButton    = UI.saveAndCloseButton() %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
+    {% set buttons = '' %}
+    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
+        {% set buttons = buttons ~ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_mailbox', {'id': form.vars.value.id}),
+            'dataRedirect': path('oro_config_configuration_system', {
+                activeGroup: 'platform',
+                activeSubGroup: 'email_configuration'
+            }),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-mailbox',
+            'dataId':  form.vars.value.id,
+            'entity_label': 'oro.email.mailbox.entity_label'|trans
+        }) %}
+        {% set buttons = buttons ~ UI.buttonSeparator() %}
+    {% endif %}
+
+    {% set html = UI.saveAndCloseButton() %}
+    {% set html = html ~ UI.saveAndStayButton() %}
+    {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     <form
             id="{{ form.vars.id }}"
@@ -31,7 +70,7 @@
             method="post"
             data-collect="true"
             >
-        {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
+        {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
         <div class="system-configuration-container left-panel-container">
             <div class="placeholder">
                 <div class="scrollable-container">

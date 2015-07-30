@@ -252,7 +252,10 @@ oro:
                 label:                IMAP Synchronization
                 enable.label:         Use IMAP Synchronization
             organization.label:       Organization
-            action.create:            Add Mailbox
+            action:
+                create:               Add Mailbox
+                new:                  New Mailbox
+                saved:                "%mailbox% has been saved."
             process:
                 label:                Email Processing
                 type.label:           Action
