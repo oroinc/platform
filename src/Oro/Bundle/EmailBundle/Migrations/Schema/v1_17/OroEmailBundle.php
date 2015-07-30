@@ -57,7 +57,6 @@ class OroEmailBundle implements Migration
         $table = $schema->createTable('oro_email_response_rule_cond');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('rule_id', 'integer', ['notnull' => false]);
-        $table->addColumn('operation', 'string', ['length' => 5]);
         $table->addColumn('field', 'string', ['length' => 255]);
         $table->addColumn('filterType', 'string', ['length' => 255]);
         $table->addColumn('filterValue', 'string', ['notnull' => false, 'length' => 255]);

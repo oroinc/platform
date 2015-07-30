@@ -22,13 +22,6 @@ class AutoResponseRuleCondition
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=5)
-     * @Assert\NotBlank
-     */
-    protected $operation;
-
-    /**
-     * @var string
      * @ORM\Column(type="string")
      * @Assert\NotBlank
      */
@@ -72,14 +65,6 @@ class AutoResponseRuleCondition
     /**
      * @return string
      */
-    public function getOperation()
-    {
-        return $this->operation;
-    }
-
-    /**
-     * @return string
-     */
     public function getField()
     {
         return $this->field;
@@ -115,18 +100,6 @@ class AutoResponseRuleCondition
     public function getRule()
     {
         return $this->rule;
-    }
-
-    /**
-     * @param string $operation
-     *
-     * @return $this
-     */
-    public function setOperation($operation)
-    {
-        $this->operation = $operation;
-
-        return $this;
     }
 
     /**

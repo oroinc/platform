@@ -19,11 +19,6 @@ class AutoResponseRuleConditionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('operation', 'choice', [
-                'choices' => [
-                    FilterUtility::CONDITION_AND => FilterUtility::CONDITION_AND,
-                ],
-            ])
             ->add('field', 'choice', [
                 'choices' => [
                     'subject'   => 'oro.email.subject.label',

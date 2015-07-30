@@ -20,6 +20,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 
 class AutoResponseManager
 {
@@ -71,20 +72,7 @@ class AutoResponseManager
      */
     public function sendAutoResponses(Email $email)
     {
-        $emailUsersDql = $this->getEmailUserRepository()->createQueryBuilder('ue')
-            ->select('ue.id')
-            ->where('ue.email = :email')
-            ->andWhere('ue.mailboxOwner = m.id')
-            ->setMaxResults(1)
-            ->getDQL();
-
-        $qb = $this->getMailboxRepository()->createQueryBuilder('m');
-        $mailboxes = $qb
-            ->select('m')
-            ->andWhere($qb->expr()->exists($emailUsersDql))
-            ->setParameter('email', $email)
-            ->getQuery()->getResult();
-
+        $mailboxes = $this->getMailboxRepository()->findForEmail($email);
         foreach ($mailboxes as $mailbox) {
              $this->processMailbox($mailbox, $email);
         }
@@ -178,7 +166,6 @@ class AutoResponseManager
     public function createRuleExpr(AutoResponseRule $rule)
     {
         $configs = [];
-        $i = 0;
         foreach ($rule->getConditions() as $condition) {
             $args = [
                 sprintf('$%s', $condition->getField())
@@ -188,22 +175,9 @@ class AutoResponseManager
             }
 
             $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
-            $config = [
+            $configs[] = [
                 $configKey => $args,
             ];
-
-            if ($i > 0 && $condition->getOperation() === FilterUtility::CONDITION_OR) {
-                $index = count($configs) - 1;
-                $configs[$index] = [
-                    '@or' => [
-                        $configs[$index],
-                        $config,
-                    ],
-                ];
-            } else {
-                $configs[] = $config;
-            }
-            $i++;
         }
 
         return [
@@ -229,18 +203,10 @@ class AutoResponseManager
     }
 
     /**
-     * @return EntityRepository
+     * @return MailboxRepository
      */
     protected function getMailboxRepository()
     {
         return $this->registry->getRepository('OroEmailBundle:Mailbox');
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    protected function getEmailUserRepository()
-    {
-        return $this->registry->getRepository('OroEmailBundle:EmailUser');
     }
 }

@@ -272,7 +272,7 @@ oro:
             name.label:          Name
             active.label:        Active
             status.label:        Status
-            conditions.label:    Satisfy
+            conditions.label:    Conditions
             template.label:      Response Template
             action:
                 add.label:    Add Rule
