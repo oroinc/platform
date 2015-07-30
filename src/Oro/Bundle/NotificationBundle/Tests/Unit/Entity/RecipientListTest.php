@@ -126,9 +126,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
 
     public function testNotValidData()
     {
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $context->expects($this->once())
             ->method('getPropertyPath')
@@ -144,9 +142,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $group = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
-        $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $context->expects($this->never())
             ->method('getPropertyPath');

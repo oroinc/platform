@@ -230,8 +230,10 @@ class RestApiTest extends WebTestCase
 
             $responseJson = json_decode($response->getContent(), true);
 
-            $this->assertArrayHasKey('message', $responseJson);
-            $this->assertEquals('Wrong JSON inside POST body', $responseJson['message']);
+            // The original exception message is returned only if functional tests are running in debug mode
+            if ($this->client->getKernel()->isDebug()) {
+                $this->assertEquals('Wrong JSON inside POST body', $responseJson['message']);
+            }
 
             $this->client->restart();
         }

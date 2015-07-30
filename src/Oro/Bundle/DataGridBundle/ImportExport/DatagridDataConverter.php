@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
@@ -22,7 +22,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $gridManagerLink;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -43,14 +43,14 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
 
     /**
      *
-     * @param ServiceLink       $gridManagerLink
-     * @param Translator        $translator
-     * @param NumberFormatter   $numberFormatter
-     * @param DateTimeFormatter $dateTimeFormatter
+     * @param ServiceLink         $gridManagerLink
+     * @param TranslatorInterface $translator
+     * @param NumberFormatter     $numberFormatter
+     * @param DateTimeFormatter   $dateTimeFormatter
      */
     public function __construct(
         ServiceLink $gridManagerLink,
-        Translator $translator,
+        TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
         DateTimeFormatter $dateTimeFormatter
     ) {
