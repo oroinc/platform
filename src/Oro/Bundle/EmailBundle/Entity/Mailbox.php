@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -12,6 +14,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
  * @ORM\HasLifecycleCallbacks
+ * @UniqueEntity(fields={"email"})
  * @Config(
  *      defaultValues={
  *          "entity"={

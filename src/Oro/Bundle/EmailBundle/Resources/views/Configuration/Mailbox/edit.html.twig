@@ -2,7 +2,7 @@
 
 {% import 'OroEmailBundle::macros.html.twig' as emailUI %}
 
-{% if form.vars.data.label is defined and form.vars.data.label is not empty %}
+{% if form.vars.data.id %}
     {% set mailboxTitle = form.vars.data.label %}
 {% else %}
     {% set mailboxTitle = 'oro.email.mailbox.action.new'|trans %}
@@ -40,6 +40,10 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
+
+{% if form.vars.value.id %}
+    {% oro_title_set({params : {"%label%": form.vars.value.label} }) %}
+{% endif %}
 
 {% block content %}
     {% set buttons = '' %}
