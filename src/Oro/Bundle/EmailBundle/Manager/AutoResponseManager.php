@@ -184,7 +184,7 @@ class AutoResponseManager
                 sprintf('$%s', $condition->getField())
             ];
             if (!in_array($condition->getFilterType(), [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-                $args[] = $this->parseValue($condition->getFilterValue());
+                $args[] = $this->parseValue($condition->getFilterValue(), $condition->getFilterType());
             }
 
             $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
@@ -213,14 +213,15 @@ class AutoResponseManager
 
     /**
      * @param string $value
+     * @param string $type
      *
      * @return mixed
      */
-    protected function parseValue($value)
+    protected function parseValue($value, $type)
     {
         $arrayTypes = [TextFilterType::TYPE_IN, TextFilterType::TYPE_NOT_IN];
 
-        if (in_array($value, $arrayTypes)) {
+        if (in_array($type, $arrayTypes)) {
             return array_map('trim', explode(',', $value));
         }
 

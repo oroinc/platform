@@ -21,7 +21,6 @@ class AutoResponseRuleConditionType extends AbstractType
             ->add('operation', 'choice', [
                 'choices' => [
                     FilterUtility::CONDITION_AND => FilterUtility::CONDITION_AND,
-                    FilterUtility::CONDITION_OR  => FilterUtility::CONDITION_OR,
                 ],
             ])
             ->add('field', 'choice', [
