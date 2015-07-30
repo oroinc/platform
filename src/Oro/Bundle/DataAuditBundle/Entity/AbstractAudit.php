@@ -133,11 +133,11 @@ abstract class AbstractAudit extends AbstractLogEntry
     /**
      * Get visible fields
      *
-     * @return AuditField[]|Collection
+     * @return AbstractAuditField[]|Collection
      */
     protected function getVisibleFields()
     {
-        return $this->getFields()->filter(function (AuditField $field) {
+        return $this->getFields()->filter(function (AbstractAuditField $field) {
             return $field->isVisible();
         });
     }

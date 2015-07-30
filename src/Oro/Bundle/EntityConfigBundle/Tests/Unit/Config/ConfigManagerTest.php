@@ -883,11 +883,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($config));
-
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(Events::UPDATE_ENTITY_CONFIG);
-
         $extendConfig = new Config(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -922,7 +920,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($extendPropertyConfigContainer));
         $extendConfigProvider->expects($this->never())
             ->method('persist');
-
         $expectedConfig = new Config($configId);
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');

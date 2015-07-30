@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,7 +14,7 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
-class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
+class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     /** @var InputOptionProvider */
     protected $inputOptionProvider;
@@ -36,13 +35,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
-            ->addOption(
-                'timeout',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Timeout for child command execution',
-                CommandExecutor::DEFAULT_TIMEOUT
-            )
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption(
                 'sample-data',
@@ -56,6 +48,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 InputOption::VALUE_NONE,
                 'Database will be dropped and all data will be deleted.'
             );
+
+        parent::configure();
     }
 
     /**
@@ -70,13 +64,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         $forceInstall = $input->getOption('force');
 
-        $commandExecutor = new CommandExecutor(
-            $input->hasOption('env') ? $input->getOption('env') : null,
-            $output,
-            $this->getApplication(),
-            $this->getContainer()->get('oro_cache.oro_data_cache_manager')
-        );
-        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
+        $commandExecutor = $this->getCommandExecutor($input, $output);
 
         // if there is application is not installed or no --force option
         $isInstalled = $this->getContainer()->hasParameter('installed')
@@ -217,10 +205,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         }
 
         $commandExecutor
-            ->runCommand(
-                'doctrine:schema:drop',
-                $schemaDropOptions
-            )
+            ->runCommand('doctrine:schema:drop', $schemaDropOptions)
             ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
             ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
 
@@ -425,7 +410,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout'           => $commandExecutor->getDefaultTimeout()
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
             ->runCommand(
@@ -539,13 +524,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         $this->updateInstalledFlag(date('c'));
 
-        // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand(
-            'cache:clear',
-            array(
-                '--process-isolation' => true,
-            )
-        );
+        // clear the cache and set installed flag in DI container
+        $cacheClearOptions = ['--process-isolation' => true];
+        if ($commandExecutor->getDefaultOption('no-debug')) {
+            $cacheClearOptions['--no-debug'] = false;
+        }
+        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         $output->writeln('');
 
