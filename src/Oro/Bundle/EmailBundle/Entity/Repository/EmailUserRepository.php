@@ -118,9 +118,10 @@ class EmailUserRepository extends EntityRepository
         return $qb
             ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
-            ->andWhere($qb->expr()->eq('eu.seen', 0))
+            ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
             ->setParameter('owner', $user)
-            ->setParameter('organization', $organization);
+            ->setParameter('organization', $organization)
+            ->setParameter('seen', false);
     }
 
     /**
@@ -136,7 +137,7 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->join('eu.email', 'e');
 
         $this->applyOwnerFilter($queryBuilder, $user);
-        $this->applyHeadFilter($queryBuilder, 1);
+        $this->applyHeadFilter($queryBuilder, true);
 
         if ($folderType) {
             $this->applyFolderFilter($queryBuilder, $folderType);

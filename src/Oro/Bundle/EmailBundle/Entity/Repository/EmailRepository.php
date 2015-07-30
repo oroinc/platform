@@ -60,7 +60,7 @@ class EmailRepository extends EntityRepository
             ->leftJoin('e.emailUsers', 'eu')
             ->where('eu.organization = :organizationId')
             ->andWhere('eu.owner = :ownerId')
-            ->groupBy('e')
+            ->groupBy('e, eu.seen')
             ->orderBy('e.sentAt', 'DESC')
             ->setParameter('organizationId', $user->getOrganization()->getId())
             ->setParameter('ownerId', $user->getId())
@@ -83,9 +83,10 @@ class EmailRepository extends EntityRepository
             ->leftJoin('e.emailUsers', 'eu')
             ->where('eu.organization = :organizationId')
             ->andWhere('eu.owner = :ownerId')
-            ->andWhere('eu.seen = 0')
+            ->andWhere('eu.seen = :seen')
             ->setParameter('organizationId', $user->getOrganization()->getId())
             ->setParameter('ownerId', $user->getId())
+            ->setParameter('seen', false)
             ->getQuery()
             ->getSingleScalarResult();
     }
