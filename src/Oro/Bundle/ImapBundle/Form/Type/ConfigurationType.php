@@ -266,11 +266,9 @@ class ConfigurationType extends AbstractType
      */
     protected function modifySettingsFields(FormBuilderInterface $builder)
     {
-        $encryptor = $this->encryptor;
-
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) use ($encryptor) {
+            function (FormEvent $event) {
                 $data = (array)$event->getData();
                 $entity = $event->getForm()->getData();
 
