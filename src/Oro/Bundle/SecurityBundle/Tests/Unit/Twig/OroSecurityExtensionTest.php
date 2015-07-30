@@ -16,13 +16,21 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $securityFacade;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
+
     protected function setUp()
     {
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->twigExtension = new OroSecurityExtension($this->securityFacade);
+        $this->twigExtension = new OroSecurityExtension($this->securityFacade, $this->translator);
     }
 
     protected function tearDown()
@@ -40,6 +48,7 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $expectedFunctions = array(
             'resource_granted' => 'checkResourceIsGranted',
+            'format_share_scopes' => 'formatShareScopes',
         );
 
         $actualFunctions = $this->twigExtension->getFunctions();
@@ -60,5 +69,58 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $this->assertTrue($this->twigExtension->checkResourceIsGranted('test_acl'));
+    }
+
+    public function testFormatShareScopesWithEmptyValue()
+    {
+        $this->translator->expects($this->at(0))
+            ->method('trans')
+            ->with('oro.security.share_scopes.not_available')
+            ->willReturn('N/A');
+        $this->assertEquals('N/A', $this->twigExtension->formatShareScopes(null));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testFormatShareScopesWithLoginException()
+    {
+        $this->twigExtension->formatShareScopes(new \stdClass());
+    }
+
+    public function testFormatShareScopesWithString()
+    {
+        $this->translator->expects($this->at(0))
+            ->method('trans')
+            ->with('oro.security.share_scopes.business_unit.short_label')
+            ->willReturn('business_unit_short_label_translated');
+
+        $this->translator->expects($this->at(1))
+            ->method('trans')
+            ->with('oro.security.share_scopes.user.short_label')
+            ->willReturn('user_short_label_translated');
+
+        $this->assertEquals(
+            'business_unit_short_label_translated, user_short_label_translated',
+            $this->twigExtension->formatShareScopes(json_encode(['business_unit', 'user']), 'short_label')
+        );
+    }
+
+    public function testFormatShareScopesWithArray()
+    {
+        $this->translator->expects($this->at(0))
+            ->method('trans')
+            ->with('oro.security.share_scopes.business_unit.label')
+            ->willReturn('business_unit_label_translated');
+
+        $this->translator->expects($this->at(1))
+            ->method('trans')
+            ->with('oro.security.share_scopes.user.label')
+            ->willReturn('user_label_translated');
+
+        $this->assertEquals(
+            'business_unit_label_translated, user_label_translated',
+            $this->twigExtension->formatShareScopes(['business_unit', 'user'])
+        );
     }
 }

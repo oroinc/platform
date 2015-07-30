@@ -17,6 +17,7 @@ oro:
         organization:
             access_denied: You don't have access to organization "%organization_name%"
         share_scopes:
+            not_available: N/A
             label: Share Scopes
             business_unit: Business Unit
             user: User

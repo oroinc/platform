@@ -3,20 +3,23 @@
 namespace Oro\Bundle\SecurityBundle\Twig;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class OroSecurityExtension extends \Twig_Extension
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var Translator */
+    protected $translator;
 
     /**
      * @param SecurityFacade $securityFacade
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, Translator $translator)
     {
         $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
     }
 
     /**
@@ -28,6 +31,7 @@ class OroSecurityExtension extends \Twig_Extension
     {
         return array(
             'resource_granted' => new \Twig_Function_Method($this, 'checkResourceIsGranted'),
+            'format_share_scopes' => new \Twig_Function_Method($this, 'formatShareScopes'),
         );
     }
 
@@ -43,6 +47,35 @@ class OroSecurityExtension extends \Twig_Extension
     public function checkResourceIsGranted($attributes, $object = null)
     {
         return $this->securityFacade->isGranted($attributes, $object);
+    }
+
+    /**
+     * Formats json encoded string of share scopes entity config attribute
+     *
+     * @param string|array|null $value
+     * @param string $labelType
+     *
+     * @return string
+     */
+    public function formatShareScopes($value, $labelType = 'label')
+    {
+        if (!$value) {
+            return $this->translator->trans('oro.security.share_scopes.not_available');
+        }
+        $result = [];
+        if (is_string($value)) {
+            $shareScopes = json_decode($value);
+        } elseif (is_array($value)) {
+            $shareScopes = $value;
+        } else {
+            throw new \LogicException('$value must be string or array');
+        }
+
+        foreach ($shareScopes as $shareScope) {
+            $result[] = $this->translator->trans('oro.security.share_scopes.' . $shareScope . '.' . $labelType);
+        }
+
+        return implode(', ', $result);
     }
 
     /**
