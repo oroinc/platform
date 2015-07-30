@@ -5,9 +5,8 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBu
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
-class SameEntityVirtualColumnsTest extends OrmQueryConverterTest
+class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

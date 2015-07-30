@@ -7,7 +7,8 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
@@ -152,7 +153,7 @@ class ParameterBinder implements ParameterBinderInterface
      */
     protected function getParameterValue($source, array $config)
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = new PropertyAccessor();
         try {
             $path = '';
             foreach (explode('.', $config['path']) as $part) {

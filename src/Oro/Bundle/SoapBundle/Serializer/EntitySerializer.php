@@ -200,9 +200,9 @@ class EntitySerializer
 
         $result = [];
         if ($useIdAsKey) {
-            $getIdMethodName = $this->getEntityIdGetter($entityClass);
+            $idFieldName = $this->getEntityIdFieldName($entityClass);
             foreach ($entities as $entity) {
-                $id          = $entity->$getIdMethodName();
+                $id          = $this->dataAccessor->getValue($entity, $idFieldName);
                 $result[$id] = $this->serializeItem($entity, $entityClass, $config);
             }
         } else {
@@ -352,7 +352,7 @@ class EntitySerializer
                 }
             );
             // make sure identifier fields are added
-            foreach ($this->getEntityIdFieldNames($entityClass) as $field) {
+            foreach ($entityMetadata->getIdentifierFieldNames() as $field) {
                 if (!in_array($field, $fields, true)) {
                     $fields[] = $field;
                 }
@@ -740,10 +740,10 @@ class EntitySerializer
      */
     protected function getEntityIds($entities, $entityClass)
     {
-        $ids             = [];
-        $getIdMethodName = $this->getEntityIdGetter($entityClass);
+        $ids         = [];
+        $idFieldName = $this->getEntityIdFieldName($entityClass);
         foreach ($entities as $entity) {
-            $id = $entity->$getIdMethodName();
+            $id = $this->dataAccessor->getValue($entity, $idFieldName);
             if (!isset($ids[$id])) {
                 $ids[$id] = $id;
             }
@@ -756,6 +756,8 @@ class EntitySerializer
      * @param string $entityClass
      *
      * @return string[]
+     *
+     * @deprecated since 1.8
      */
     protected function getEntityIdFieldNames($entityClass)
     {
@@ -776,6 +778,8 @@ class EntitySerializer
      * @param string $entityClass
      *
      * @return string
+     *
+     * @deprecated since 1.8
      */
     protected function getEntityIdGetter($entityClass)
     {

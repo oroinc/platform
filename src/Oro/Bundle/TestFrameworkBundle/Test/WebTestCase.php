@@ -88,18 +88,6 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
-
-        /**
-         * Need reset security context for next test case:
-         * 1. Create new user.
-         * 2. Create security context for this user.
-         * 3. Rollback(user already removed, security context still exists).
-         * 4. When Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener tries to refresh
-         * this entity and merge in Doctrine\ORM\UnitOfWork it falls with Doctrine\ORM\EntityNotFoundException.
-         */
-        if (self::$clientInstance) {
-            self::getContainer()->get('security.context')->setToken(null);
-        }
     }
 
     public static function tearDownAfterClass()
@@ -130,6 +118,13 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
+            // Fix for: The "native_profiler" extension is not enabled in "*.html.twig".
+            // If you still getting this exception please run "php app/console cache:clear --env=test --no-debug".
+            // The cache will be cleared and warmed up without the twig profiler.
+            if (!isset($options['debug'])) {
+                $options['debug'] = false;
+            }
+
             /** @var Client $client */
             $client = self::$clientInstance = static::createClient($options, $server);
 

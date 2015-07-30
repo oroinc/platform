@@ -6,7 +6,9 @@ define(function() {
             integer:   'number',
             decimal:   'number',
             percent:   'number',
-            currency:  'number'
+            currency:  'number',
+            array:     'string',
+            simple_array: 'string',
         };
 
     return function(type) {
