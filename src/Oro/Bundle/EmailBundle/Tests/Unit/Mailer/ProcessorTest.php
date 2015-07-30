@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * Class ProcessorTest
@@ -157,7 +158,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailOwnerProvider,
             $this->emailActivityManager,
             $this->securityFacadeLink,
-            $this->dispatcher
+            $this->dispatcher,
+            new Mcrypt()
         );
     }
 
@@ -528,7 +530,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                         $this->emailOwnerProvider,
                         $this->emailActivityManager,
                         $this->securityFacadeLink,
-                        $this->dispatcher
+                        $this->dispatcher,
+                        new Mcrypt()
                     ]
                 )
                 ->setMethods(['createUserInternalOrigin'])

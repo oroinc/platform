@@ -29,6 +29,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * Class Processor
@@ -69,6 +70,9 @@ class Processor
     /** @var array */
     protected $origins = [];
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param \Swift_Mailer            $mailer
@@ -87,7 +91,8 @@ class Processor
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Mcrypt $encryptor
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
@@ -97,6 +102,7 @@ class Processor
         $this->emailActivityManager = $emailActivityManager;
         $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
+        $this->encryptor            = $encryptor;
     }
 
     /**
@@ -208,6 +214,9 @@ class Processor
         if ($transport instanceof \Swift_Transport_EsmtpTransport) {
             $transport->setHost($userEmailOrigin->getSmtpHost());
             $transport->setPort($userEmailOrigin->getSmtpPort());
+            $transport->setUsername($userEmailOrigin->getUser());
+            $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
+            $transport->setEncryption($userEmailOrigin->getSsl());
         }
     }
 
