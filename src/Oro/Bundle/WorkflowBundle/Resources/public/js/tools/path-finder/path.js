@@ -25,10 +25,13 @@ define(['./directions', './settings'], function(directions, settings) {
     }
     Object.defineProperty(Path.prototype, 'uid', {
         get: function() {
-            var vectorId = this.connection.a === this.fromNode ?
-                this.connection.vector.id :
-                this.connection.vector.rot180().id;
-            return this.fromNode.uid * 10 + shortDirectionUid[vectorId];
+            if (this._uid === void 0) {
+                var vectorId = this.connection.a === this.fromNode ?
+                    this.connection.vector.id :
+                    this.connection.vector.rot180().id;
+                this._uid = this.fromNode.uid * 10 + shortDirectionUid[vectorId];
+            }
+            return this._uid;
         },
         enumerable: true,
         configurable: true
