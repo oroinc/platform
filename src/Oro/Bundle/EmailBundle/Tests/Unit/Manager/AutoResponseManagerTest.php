@@ -43,7 +43,8 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->emailBuilder,
             $this->emailProcessor,
-            $this->logger
+            $this->logger,
+            'en'
         );
     }
 
@@ -52,17 +53,13 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
         $expectedExpr = [
             '@and' => [
                 ['@empty' => ['$subject']],
-                [
-                    '@or' => [
-                        ['@contains' => ['$emailBody.bodyContent', 'offer']],
-                        ['@contains' => ['$emailBody.bodyContent', 'sale']],
-                    ],
-                ],
+                ['@contains' => ['$emailBody.bodyContent', 'offer']],
+                ['@contains' => ['$emailBody.bodyContent', 'sale']],
                 ['@contains' => ['$emailBody.bodyContent', 'won']],
             ],
         ];
 
-        $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule());
+        $expr = $this->autoResponseManager->createRuleExpr($this->getAutoResponseRule(), new Email());
         $this->assertEquals($expectedExpr, $expr);
     }
 
@@ -139,37 +136,33 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
         $subjectCondition = new AutoResponseRuleCondition();
         $subjectCondition
             ->setField('subject')
-            ->setFilterType(FilterUtility::TYPE_EMPTY)
-            ->setOperation(FilterUtility::CONDITION_AND);
+            ->setFilterType(FilterUtility::TYPE_EMPTY);
 
         $offerCondition = new AutoResponseRuleCondition();
         $offerCondition
             ->setField('emailBody.bodyContent')
             ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('offer')
-            ->setOperation(FilterUtility::CONDITION_AND);
+            ->setFilterValue('offer');
         
         $saleCondition = new AutoResponseRuleCondition();
         $saleCondition
             ->setField('emailBody.bodyContent')
             ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('sale')
-            ->setOperation(FilterUtility::CONDITION_OR);
+            ->setFilterValue('sale');
 
         $wonCondition = new AutoResponseRuleCondition();
         $wonCondition
             ->setField('emailBody.bodyContent')
             ->setFilterType(TextFilterType::TYPE_CONTAINS)
-            ->setFilterValue('won')
-            ->setOperation(FilterUtility::CONDITION_AND);
+            ->setFilterValue('won');
 
         $autoResponseRule = new AutoResponseRule();
-        $autoResponseRule->setConditions(new ArrayCollection([
+        $autoResponseRule->addConditions([
             $subjectCondition,
             $offerCondition,
             $saleCondition,
             $wonCondition,
-        ]));
+        ]);
 
         return $autoResponseRule;
     }
