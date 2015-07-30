@@ -113,13 +113,12 @@ define([
 
         onClickOpenEmail: function(e) {
             var id  = $(e.currentTarget).data('id');
-            var isthread  = $(e.currentTarget).data('isthread');
             var url;
             var model;
 
             url =  routing.generate('oro_email_thread_view', {id: id});
             mediator.execute('redirectTo', {url: url});
-            model = this.collection.indWhere({id: id});
+            model = this.collection.findWhere({id: id});
 
             this.$el.find('#' + model.cid).removeClass('new');
             this.$el.find('#' + model.cid).find('.icon-envelope').removeClass('new');

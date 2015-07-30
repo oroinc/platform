@@ -54,6 +54,7 @@ define([
         },
 
         initSync: function() {
+            debugger;
             var clankEvent = this.options.clank_event;
             var handlerNotification = _.bind(this.handlerNotification, this);
             sync.subscribe(clankEvent, handlerNotification);
@@ -63,6 +64,7 @@ define([
 
         handlerNotification: function(response) {
             var self = this;
+            debugger;
             response = JSON.parse(response);
             if (response) {
                 var hasNewEmail = response.hasNewEmail;
