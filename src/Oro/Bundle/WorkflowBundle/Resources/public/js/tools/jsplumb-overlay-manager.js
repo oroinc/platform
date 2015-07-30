@@ -76,7 +76,11 @@ define(function(require) {
         },
 
         setNearestLocation: function(dx, dy) {
-            var location, x = this.x + dx, y = this.y + dy, locations = [],  passed = 0;
+            var location;
+            var x = this.x + dx;
+            var y = this.y + dy;
+            var locations = [];
+            var passed = 0;
             _.each(this.segments, function(segment) {
                 var min;
                 var max;
@@ -87,8 +91,8 @@ define(function(require) {
                         locations.push({
                             distance: Math.abs(segment.x - x),
                             passed: segment.y1 < segment.y2 ? passed + y - min : passed + max - y,
-                            x : segment.x,
-                            y : y,
+                            x: segment.x,
+                            y: y,
                             segment: segment
                         });
                     }
@@ -145,9 +149,12 @@ define(function(require) {
         },
 
         setLocation: function(location) {
-            var segment, passed = 0;
+            var segment;
+            var passed = 0;
             segment = _.find(this.segments, function(segment) {
-                var min, max, diff;
+                var min;
+                var max;
+                var diff;
                 if (segment.orientation === 'v') {
                     min = Math.min(segment.y1, segment.y2);
                     max = Math.max(segment.y1, segment.y2);
@@ -201,7 +208,7 @@ define(function(require) {
             var blocks;
             var steps = [];
             var overlays = [];
-            if(!this.smartlineManager.isCacheValid()) {
+            if (!this.smartlineManager.isCacheValid()) {
                 this.smartlineManager.refreshCache();
             }
             _.each(this.smartlineManager.cache.connections, function(cacheItem) {
@@ -229,7 +236,7 @@ define(function(require) {
             }
             _.each(overlays, function(overlay) {
                 var overlapped;
-                if (overlay.isChanged() ) {
+                if (overlay.isChanged()) {
                     overlapped = _.find(blocks, function(block) {
                         var deny = block !== overlay && overlay.isOverlapped(block);
                         return deny;
@@ -247,7 +254,9 @@ define(function(require) {
             var changed = false;
             _.each(blocks, function(block) {
                 _.each(overlays, function(overlay) {
-                    var deltaX, deltaY, multiplier;
+                    var deltaX;
+                    var deltaY;
+                    var multiplier;
                     if (block !== overlay && block.isOverlapped(overlay)) {
                         deltaX = overlay.x - block.x;
                         deltaY = overlay.y - block.y;
@@ -271,5 +280,4 @@ define(function(require) {
 
     return JsPlumbOverlayManager;
 });
-
 

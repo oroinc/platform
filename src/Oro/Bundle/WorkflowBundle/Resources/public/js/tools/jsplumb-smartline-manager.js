@@ -1,4 +1,4 @@
-define(function(require){
+define(function(require) {
     'use strict';
     var JsPlumbOverlayManager = require('./jsplumb-overlay-manager');
     var _ = require('underscore');
@@ -56,13 +56,12 @@ define(function(require){
                 ((fromRect.bottom - toRect.top > 0) ? 1200 : 0);
         },
 
-
         getState: function() {
             var state = {
                     rectangles: [],
                     connections: []
-                },
-                hasRect = {};
+                };
+            var hasRect = {};
             _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
                 var el = document.getElementById(id);
                 if (el) {
@@ -150,7 +149,7 @@ define(function(require){
                 sources: graph.rectangles.map(function(item) {
                     return [item.cid, item.left, item.top, item.width, item.height];
                 }),
-                connections: connections.map(function(item) {return item.slice(0,2);})
+                connections: connections.map(function(item) {return item.slice(0, 2);})
             };
         }
     };

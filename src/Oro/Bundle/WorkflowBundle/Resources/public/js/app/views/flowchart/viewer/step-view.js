@@ -40,6 +40,7 @@ define(function(require) {
         },
 
         updateStepMinWidth: function() {
+            var STEP_MAX_WIDTH = 180; //that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
             var currentId = this.el.id;
             var connections = this.jsPlumbSource.getConnections();
             var count = _.countBy(connections, function(connection) {
@@ -50,7 +51,7 @@ define(function(require) {
             this.$el.css({
                 minWidth: newWidth
             });
-            if (newWidth > 180/* that taken from css .workflow-flowchart .workflow-step 'max-width' definition*/ ) {
+            if (newWidth > STEP_MAX_WIDTH) {
                 this.$el.css({
                     maxWidth: newWidth
                 });
