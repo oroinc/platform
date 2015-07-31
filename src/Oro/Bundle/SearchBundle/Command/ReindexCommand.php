@@ -31,7 +31,7 @@ class ReindexCommand extends ContainerAwareCommand
                 'Full or compact class name of entity which should be reindexed' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
-             ->setDescription('Rebuild search index');
+            ->setDescription('Rebuild search index');
     }
 
     /**
@@ -46,7 +46,7 @@ class ReindexCommand extends ContainerAwareCommand
                 ->getManagerForClass($class)->getClassMetadata($class)->getName();
         }
 
-        $placeholder = $class ? '"' . $class .'" entity' : 'all mapped entities';
+        $placeholder = $class ? '"' . $class . '" entity' : 'all mapped entities';
 
         $output->writeln('Starting reindex task for ' . $placeholder);
 

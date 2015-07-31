@@ -11,12 +11,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
+use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Command\IndexCommand;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 /**
  * Connector abstract class
@@ -25,29 +27,19 @@ abstract class AbstractEngine implements EngineInterface
 {
     const BATCH_SIZE = 1000;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var ObjectMapper
-     */
+    /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $logQueries = false;
 
     /**
@@ -102,7 +94,7 @@ abstract class AbstractEngine implements EngineInterface
         // search must be performed as fast as possible and it might return lots of entities (10M and more)
         // it's important to not trigger any additional or processing for all entities here
         $searchResult = $this->doSearch($query);
-        $result = new Result($query, $searchResult['results'], $searchResult['records_count']);
+        $result       = new Result($query, $searchResult['results'], $searchResult['records_count']);
 
         if ($this->logQueries) {
             $this->logQuery($result);
@@ -139,16 +131,16 @@ abstract class AbstractEngine implements EngineInterface
     {
         $entities = $this->getEntitiesArray($entity);
 
-        $entityIdentifiers = array();
+        $entityIdentifiers = [];
         foreach ($entities as $entity) {
-            $class = $this->doctrineHelper->getEntityClass($entity);
-            $identifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $class                       = $this->doctrineHelper->getEntityClass($entity);
+            $identifier                  = $this->doctrineHelper->getSingleEntityIdentifier($entity);
             $entityIdentifiers[$class][] = $identifier;
         }
 
-        $jobs = array();
+        $jobs = [];
         foreach ($entityIdentifiers as $class => $identifiers) {
-            $jobs[] = new Job(IndexCommand::NAME, array_merge(array($class), $identifiers));
+            $jobs[] = new Job(IndexCommand::NAME, array_merge([$class], $identifiers));
         }
 
         return $jobs;
@@ -182,21 +174,27 @@ abstract class AbstractEngine implements EngineInterface
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityName);
+        $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+
         $queryBuilder = $entityManager->getRepository($entityName)->createQueryBuilder('entity');
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
+
+        //$queryBuilder->setFirstResult(100101);
+
+        $iterator     = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
         $itemsCount = 0;
-        $entities = array();
+        $entities   = [];
 
         foreach ($iterator as $entity) {
-            $entities[] = $entity;
+             $entities[] = $entity;
             $itemsCount++;
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $this->save($entities, true);
                 $entityManager->clear();
-                $entities = array();
+                gc_collect_cycles();
+                $entities = [];
             }
         }
 
@@ -218,14 +216,14 @@ abstract class AbstractEngine implements EngineInterface
     protected function getEntityTitle($entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        $fields = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
+        $fields      = $this->mapper->getEntityMapParameter($entityClass, 'title_fields');
         if ($fields) {
-            $title = array();
+            $title = [];
             foreach ($fields as $field) {
                 $title[] = $this->mapper->getFieldValue($entity, $field);
             }
         } else {
-            $title = array((string) $entity);
+            $title = [(string) $entity];
         }
 
         return implode(' ', $title);
@@ -238,9 +236,9 @@ abstract class AbstractEngine implements EngineInterface
     protected function getEntitiesArray($entity)
     {
         if (!$entity) {
-            return array();
+            return [];
         }
 
-        return is_array($entity) ? $entity : array($entity);
+        return is_array($entity) ? $entity : [$entity];
     }
 }

@@ -5,11 +5,12 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+
+use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
-use Oro\Bundle\SearchBundle\Entity\Item;
 
 class Orm extends AbstractEngine
 {
@@ -20,7 +21,7 @@ class Orm extends AbstractEngine
     protected $mapper;
 
     /** @var array */
-    protected $drivers = array();
+    protected $drivers = [];
 
     /** @var bool */
     protected $needFlush = true;
@@ -51,7 +52,7 @@ class Orm extends AbstractEngine
             }
 
             foreach ($entityNames as $class) {
-                $this->clearSearchIndexForEntity($class);
+                //$this->clearSearchIndexForEntity($class);
             }
         }
 
@@ -78,11 +79,12 @@ class Orm extends AbstractEngine
 
         if (!$realTime) {
             $this->scheduleIndexation($entities);
+
             return true;
         }
 
         $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
+        $existingItems     = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasDeletedEntities = !empty($existingItems);
         foreach ($existingItems as $items) {
@@ -110,6 +112,7 @@ class Orm extends AbstractEngine
 
         if (!$realTime) {
             $this->scheduleIndexation($entities);
+
             return true;
         }
 
@@ -129,7 +132,7 @@ class Orm extends AbstractEngine
     protected function saveItemData(array $entities)
     {
         $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
+        $existingItems     = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasSavedEntities = false;
         foreach ($entities as $entity) {
@@ -139,7 +142,7 @@ class Orm extends AbstractEngine
             }
 
             $class = $this->doctrineHelper->getEntityClass($entity);
-            $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $id    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
             $item = null;
             if ($id && !empty($existingItems[$class][$id])) {
@@ -189,7 +192,7 @@ class Orm extends AbstractEngine
      */
     protected function doSearch(Query $query)
     {
-        $results = array();
+        $results       = [];
         $searchResults = $this->getIndexRepository()->search($query);
         if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
@@ -223,10 +226,10 @@ class Orm extends AbstractEngine
             }
         }
 
-        return array(
-            'results' => $results,
+        return [
+            'results'       => $results,
             'records_count' => $recordsCount
-        );
+        ];
     }
 
     /**
