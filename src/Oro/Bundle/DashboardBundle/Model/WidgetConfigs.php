@@ -262,7 +262,7 @@ class WidgetConfigs
                     $applicable = reset($resolved);
                 }
 
-                unset ($item['acl'], $item['applicable'], $item['enabled']);
+                unset($item['acl'], $item['applicable'], $item['enabled']);
 
                 return $visible && $enabled && $accessGranted && $applicable;
             }
