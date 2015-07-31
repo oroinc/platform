@@ -25,6 +25,11 @@ class EmailAttachment
     protected $content;
 
     /**
+     * @var string|null
+     */
+    protected $contentId;
+
+    /**
      * Get attachment file name
      *
      * @return string
@@ -114,5 +119,21 @@ class EmailAttachment
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getContentId()
+    {
+        return $this->contentId;
+    }
+
+    /**
+     * @param null|string $contentId
+     */
+    public function setContentId($contentId)
+    {
+        $this->contentId = $contentId;
     }
 }

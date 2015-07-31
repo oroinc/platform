@@ -1,11 +1,10 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var TransitionsShortRowView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var TransitionsShortRowView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     TransitionsShortRowView = BaseView.extend({
         tagName: 'li',
@@ -27,7 +26,7 @@ define(function (require) {
             'change model': 'render'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
@@ -38,7 +37,7 @@ define(function (require) {
             this.options.workflow.trigger('requestRemoveTransition', this.model);
         },
 
-        triggerEditTransition: function (e) {
+        triggerEditTransition: function(e) {
             e.preventDefault();
             this.options.workflow.trigger('requestEditTransition', this.model, this.options.stepFrom);
         },

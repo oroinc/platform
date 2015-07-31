@@ -9,6 +9,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_datagrid.event.dispatcher
             - @oro_datagrid.datasource.orm.parameter_binder
+            - @oro_entity.query_hint_resolver
         tags:
             - { name: oro_datagrid.datasource, type: orm }
 

@@ -5,6 +5,8 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -15,7 +17,6 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -68,18 +69,18 @@ class Indexer
     protected $entityProvider;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @param ObjectManager     $em
-     * @param EngineInterface   $engine
-     * @param ObjectMapper      $mapper
-     * @param SecurityProvider  $securityProvider
-     * @param ConfigManager     $configManager
-     * @param EntityProvider    $entityProvider
-     * @param Translator        $translator
+     * @param ObjectManager       $em
+     * @param EngineInterface     $engine
+     * @param ObjectMapper        $mapper
+     * @param SecurityProvider    $securityProvider
+     * @param ConfigManager       $configManager
+     * @param EntityProvider      $entityProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ObjectManager       $em,
@@ -88,7 +89,7 @@ class Indexer
         SecurityProvider    $securityProvider,
         ConfigManager       $configManager,
         EntityProvider      $entityProvider,
-        Translator          $translator
+        TranslatorInterface $translator
     ) {
         $this->em               = $em;
         $this->engine           = $engine;
@@ -107,6 +108,35 @@ class Indexer
     public function getEntitiesListAliases()
     {
         return $this->mapper->getEntitiesListAliases();
+    }
+
+
+    /**
+     * Gets search aliases for entities
+     *
+     * @param string[] $classNames The list of entity FQCN
+     *
+     * @return array [entity class name => entity search alias, ...]
+     *
+     * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
+     *                                   or has no the search alias
+     */
+    public function getEntityAliases(array $classNames = [])
+    {
+        return $this->mapper->getEntityAliases($classNames);
+    }
+
+    /**
+     * Gets the search alias of a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return string|null The search alias of the entity
+     *                     or NULL if the entity is not registered in a search index or has no the search alias
+     */
+    public function getEntityAlias($className)
+    {
+        return $this->mapper->getEntityAlias($className);
     }
 
     /**
@@ -437,7 +467,7 @@ class Indexer
             if ($this->securityProvider->isProtectedEntity($entityClass)
                 && !$this->securityProvider->isGranted($attribute, $objectString)
             ) {
-                unset ($entities[$entityClass]);
+                unset($entities[$entityClass]);
             }
         }
 

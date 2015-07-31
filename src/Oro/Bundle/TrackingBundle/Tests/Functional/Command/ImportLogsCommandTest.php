@@ -38,6 +38,7 @@ class ImportLogsCommandTest extends WebTestCase
     protected function tearDown()
     {
         $this->fs->remove($this->directory);
+        parent::tearDown();
     }
 
     public function testDirectoryEmpty()

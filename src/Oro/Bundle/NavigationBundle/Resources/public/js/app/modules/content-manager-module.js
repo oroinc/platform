@@ -1,8 +1,7 @@
-/*global require*/
 require([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
-], function (mediator, BaseController) {
+], function(mediator, BaseController) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oronavigation/js/content-manager'
-    ], function (contentManager) {
+    ], function(contentManager) {
         mediator.setHandler('pageCache:init', contentManager.init, contentManager);
         mediator.setHandler('pageCache:add', contentManager.add, contentManager);
         mediator.setHandler('pageCache:get', contentManager.get, contentManager);

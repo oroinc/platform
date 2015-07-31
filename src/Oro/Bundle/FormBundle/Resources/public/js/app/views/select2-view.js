@@ -1,12 +1,11 @@
-/*jslint nomen: true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var Select2View,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var Select2View;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery.select2');
+
     Select2View = BaseView.extend({
 
         /**
@@ -21,18 +20,18 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.select2Config = _.result(options, 'select2Config') || _.extend({}, this.select2Config);
         },
 
-        render: function () {
+        render: function() {
             this.undelegateEvents();
             this.$el.select2(this.select2Config).trigger('select2-init');
             this.$el.select2('readonly', this.$el.is('[readonly]'));
             this.delegateEvents();
         },
 
-        dispose: function () {
+        dispose: function() {
             this.$el.select2('close').select2('destroy');
         }
     });

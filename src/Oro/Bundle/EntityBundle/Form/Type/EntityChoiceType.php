@@ -7,20 +7,18 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class EntityChoiceType extends AbstractType
 {
     const NAME = 'oro_entity_choice';
 
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $provider;
 
+    /** @var array */
+    protected $itemsCache;
+
     /**
-     * Constructor
-     *
      * @param EntityProvider $provider
      */
     public function __construct(EntityProvider $provider)
@@ -33,36 +31,56 @@ class EntityChoiceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $that    = $this;
-        $choices = function (Options $options) use ($that) {
-            return $that->getChoices($options['show_plural']);
-        };
-
-        $defaultConfigs = array(
+        $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
-        );
-
-        // this normalizer allows to add/override config options outside.
-        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
-            return array_merge($defaultConfigs, $configs);
-        };
+        ];
 
         $resolver->setDefaults(
-            array(
-                'choices'     => $choices,
-                'empty_value' => '',
-                'show_plural' => false,
-                'configs'     => $defaultConfigs,
+            [
+                'choices'              => function (Options $options) {
+                    return $this->getChoices($options['show_plural']);
+                },
+                'choice_attr'          => function ($choice) {
+                    return $this->getChoiceAttributes($choice);
+                },
+                'empty_value'          => '',
+                'show_plural'          => false,
+                'configs'              => $defaultConfigs,
                 'translatable_options' => false
-            )
+            ]
         );
         $resolver->setNormalizers(
-            array(
-                'configs' => $configsNormalizer
-            )
+            [
+                // this normalizer allows to add/override config options outside
+                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
+                    return array_merge($defaultConfigs, $configs);
+                }
+            ]
         );
+    }
+
+    /**
+     * Returns a list of entities
+     *
+     * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
+     *
+     * @return array [{full class name} => [{attr1} => {val1}, ...], ...]
+     */
+    protected function getEntities($showPlural)
+    {
+        if (null === $this->itemsCache) {
+            $this->itemsCache = [];
+
+            foreach ($this->provider->getEntities($showPlural) as $entity) {
+                $entityClass = $entity['name'];
+                unset($entity['name']);
+                $this->itemsCache[$entityClass] = $entity;
+            }
+        }
+
+        return $this->itemsCache;
     }
 
     /**
@@ -70,28 +88,33 @@ class EntityChoiceType extends AbstractType
      *
      * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
      *
-     * @return array of entities
-     *               key = full class name, value = ChoiceListItem
+     * @return array
      */
     protected function getChoices($showPlural)
     {
-        $choices = array();
-
-        $entities = $this->provider->getEntities($showPlural);
-        foreach ($entities as $entity) {
-            $attributes = [];
-            foreach ($entity as $key => $val) {
-                if (!in_array($key, ['name'])) {
-                    $attributes['data-' . $key] = $val;
-                }
-            }
-            $choices[$entity['name']] = new ChoiceListItem(
-                $showPlural ? $entity['plural_label'] : $entity['label'],
-                $attributes
-            );
+        $choices = [];
+        foreach ($this->getEntities($showPlural) as $entityClass => $entity) {
+            $choices[$entityClass] = $showPlural ? $entity['plural_label'] : $entity['label'];
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns a list of choice attributes for the given entity
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    protected function getChoiceAttributes($entityClass)
+    {
+        $attributes = [];
+        foreach ($this->itemsCache[$entityClass] as $key => $val) {
+            $attributes['data-' . $key] = $val;
+        }
+
+        return $attributes;
     }
 
     /**

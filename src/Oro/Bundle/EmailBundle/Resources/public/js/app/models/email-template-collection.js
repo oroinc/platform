@@ -1,11 +1,10 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailTemplateCollection,
-        routing = require('routing'),
-        EmailTemplateModel = require('./email-template-model'),
-        BaseCollection = require('oroui/js/app/models/base/collection');
+    var EmailTemplateCollection;
+    var routing = require('routing');
+    var EmailTemplateModel = require('./email-template-model');
+    var BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @export  oroemail/js/app/models/email-template-collection
@@ -26,7 +25,7 @@ define(function (require) {
          * @param includeNonEntity {bool}
          * @param includeSystemTemplates {bool}
          */
-        initialize: function (route, routeId, includeNonEntity, includeSystemTemplates) {
+        initialize: function(route, routeId, includeNonEntity, includeSystemTemplates) {
             this.route = route;
             this.routeId = routeId;
             this.includeNonEntity = includeNonEntity;
@@ -41,11 +40,11 @@ define(function (require) {
          *
          * @param id {String}
          */
-        setEntityId: function (id) {
+        setEntityId: function(id) {
             var routeParams = {};
             routeParams[this.routeId] = id;
-            routeParams['includeNonEntity'] = this.includeNonEntity ? '1' : '0';
-            routeParams['includeSystemTemplates'] = this.includeSystemTemplates ? '1' : '0';
+            routeParams.includeNonEntity = this.includeNonEntity ? '1' : '0';
+            routeParams.includeSystemTemplates = this.includeSystemTemplates ? '1' : '0';
             this.url = routing.generate(this.route, routeParams);
         }
     });

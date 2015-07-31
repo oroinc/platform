@@ -20,6 +20,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.attachment_configuration.label
             priority: 110
 
+        reply_configuration:
+            title: oro.email.system_configuration.reply_configuration.label
+            priority: 80
+
     fields:
         oro_email.minimum_input_length:
             data_type: integer
@@ -46,6 +50,16 @@ oro_system_configuration:
                     1: oro.email.system_configuration.signature_configuration.append_signature.choices.auto.label
                     0: oro.email.system_configuration.signature_configuration.append_signature.choices.manual.label
 
+        oro_email.default_button_reply:
+            data_type: integer
+            type: choice
+            options:
+                label: oro.email.system_configuration.reply_configuration.default_button.label
+                choices:
+                    1: oro.email.reply
+                    2: oro.email.reply_all
+                required: false
+
     tree:
         system_configuration:
             platform:
@@ -61,8 +75,13 @@ oro_system_configuration:
                                         children:
                                             - oro_email.signature
                                             - oro_email.append_signature
+                                    reply_configuration:
+                                        children:
+                                            - oro_email.default_button_reply
 
     api_tree:
         signature_configuration:
             oro_email.signature: ~
             oro_email.append_signature: ~
+        reply_configuration:
+            oro_email.default_button_reply: ~

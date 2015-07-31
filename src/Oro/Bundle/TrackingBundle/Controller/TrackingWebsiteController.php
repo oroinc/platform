@@ -7,12 +7,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TrackingBundle\Entity\TrackingWebsite;
 use Oro\Bundle\TrackingBundle\Form\Type\TrackingWebsiteType;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * @Route("/tracking/website")
@@ -97,16 +97,16 @@ class TrackingWebsiteController extends Controller
             $trackingWebsite,
             $this->createForm($this->getFormType(), $trackingWebsite),
             function (TrackingWebsite $entity) {
-                return array(
+                return [
                     'route' => 'oro_tracking_website_update',
-                    'parameters' => array('id' => $entity->getId())
-                );
+                    'parameters' => ['id' => $entity->getId()]
+                ];
             },
             function (TrackingWebsite $entity) {
-                return array(
+                return [
                     'route' => 'oro_tracking_website_view',
-                    'parameters' => array('id' => $entity->getId())
-                );
+                    'parameters' => ['id' => $entity->getId()]
+                ];
             },
             $this->getTranslator()->trans('oro.tracking.trackingwebsite.saved_message')
         );
@@ -121,7 +121,7 @@ class TrackingWebsiteController extends Controller
     }
 
     /**
-     * @return Translator
+     * @return TranslatorInterface
      */
     protected function getTranslator()
     {

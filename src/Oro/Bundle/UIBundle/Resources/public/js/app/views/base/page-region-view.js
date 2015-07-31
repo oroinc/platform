@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     './view',
     'oroui/js/mediator'
-], function (_, BaseView, mediator) {
+], function(_, BaseView, mediator) {
     'use strict';
 
     var PageRegionView;
@@ -34,7 +32,7 @@ define([
          * @param {Object} jqXHR
          * @param {Array.<Object>} promises collection
          */
-        onPageUpdate: function (pageData, actionArgs, jqXHR, promises) {
+        onPageUpdate: function(pageData, actionArgs, jqXHR, promises) {
             this.data = _.pick(pageData, this.pageItems);
             this.actionArgs = actionArgs;
             this.disposePageComponents();
@@ -55,7 +53,7 @@ define([
          *
          * @override
          */
-        render: function () {
+        render: function() {
             var data;
             data = this.getTemplateData();
 
@@ -85,29 +83,8 @@ define([
          * @returns {Object}
          * @override
          */
-        getTemplateData: function () {
+        getTemplateData: function() {
             return this.data;
-        },
-
-        /**
-         * Create flag of deferred initialization
-         *
-         * @protected
-         */
-        _deferredRender: function () {
-            this.deferredRender = $.Deferred();
-        },
-
-        /**
-         * Resolves deferred initialization
-         *
-         * @protected
-         */
-        _resolveDeferredRender: function () {
-            if (this.deferredRender) {
-                this.deferredRender.resolve(this);
-                delete this.deferredRender;
-            }
         }
     });
 

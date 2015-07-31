@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\File as FileConstraint;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -17,7 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ConfigFileValidator
 {
-    /** @var Validator */
+    /** @var ValidatorInterface */
     protected $validator;
 
     /** @var Configuration */
@@ -27,11 +27,11 @@ class ConfigFileValidator
     protected $attachmentConfigProvider;
 
     /**
-     * @param Validator         $validator
-     * @param ConfigManager     $configManager
-     * @param Configuration     $config
+     * @param ValidatorInterface $validator
+     * @param ConfigManager      $configManager
+     * @param Configuration      $config
      */
-    public function __construct(Validator $validator, ConfigManager $configManager, Configuration $config)
+    public function __construct(ValidatorInterface $validator, ConfigManager $configManager, Configuration $config)
     {
         $this->validator                = $validator;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
@@ -75,7 +75,7 @@ class ConfigFileValidator
             $mimeTypes[$id] = trim($value);
         }
 
-        return $this->validator->validateValue(
+        return $this->validator->validate(
             $entity->getFile(),
             [
                 new FileConstraint(

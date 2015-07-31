@@ -1,9 +1,9 @@
 parameters:
     # entity
-    oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
+    oro_activity_list.entity.class: Oro\Bundle\ActivityListBundle\Entity\ActivityList
 
     # managers
-    oro_activity_list.manager.class:     Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
+    oro_activity_list.manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
     oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
@@ -27,6 +27,8 @@ parameters:
 
     oro_activity_list.listener.email_recipients_load.listener.class: Oro\Bundle\ActivityListBundle\EventListener\EmailRecipientsLoadListener
 
+    # helper
+    oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%
@@ -40,6 +42,7 @@ services:
             - @oro_activity_list.filter.helper
             - @oro_comment.comment.api_manager
             - @oro_entity.doctrine_helper
+            - @oro_activity_list.helper.acl_criteria
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
@@ -81,11 +84,11 @@ services:
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%
         arguments:
-           - @oro_entity.doctrine_helper
-           - @oro_entity_config.config_manager
-           - @translator
-           - @oro_entity.routing_helper
-           - @oro_ui.html_tag_helper
+            - @oro_entity.doctrine_helper
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_entity.routing_helper
+            - @oro_ui.html_tag_helper
 
     oro_activity_list.event_listener.segment_widget_options_listener:
         class: %oro_activity_list.event_listener.segment_widget_options_listener.class%
@@ -170,3 +173,9 @@ services:
             - @oro_email.provider.email_recipients.helper
         tags:
             - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: onLoad }
+
+    oro_activity_list.helper.acl_criteria:
+        class: %oro_activity_list.helper.acl_criteria.class%
+        arguments:
+            - @oro_security.acl_helper
+            - @oro_entity_config.link.security_context

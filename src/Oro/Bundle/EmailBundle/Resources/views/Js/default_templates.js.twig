@@ -1,0 +1,24 @@
+<script type="text/template" id="multiselect-origin-folder-template">
+    <div class="filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <strong class="select-filter-placeholder multiselect-filter-placeholder"><%= placeholder %></strong>
+            <select multiple>
+                <% _.each(options, function (item, key) { %>
+                    <optgroup label="<%- key %>">
+                        <% _.each(item['folder'], function (option) { %>
+                            <option value="<%= option.value %>" title="<%- option.label %>"
+                            <% if (_.isArray(selected.value)) { %>
+                            <% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
+                            <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
+                            <%- option.label %>
+                            </option>
+                        <% }); %>
+                    </optgroup>
+                <% }); %>
+            </select>
+            <span class="reset-filter" title="<%- _.__("oro.filter.wrapper.reset.tooltip") %>"
+            ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
+        </div>
+    </div>
+</script>
