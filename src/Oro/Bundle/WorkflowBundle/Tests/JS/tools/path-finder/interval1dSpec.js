@@ -13,6 +13,8 @@ define(function(require) {
         it('check width calculation', function() {
             var a = new Interval1d(5, 7);
             expect(a.width).toEqual(2);
+            a.width = 10;
+            expect(a.max).toEqual(15);
         });
 
         it('check validation', function() {
@@ -35,7 +37,6 @@ define(function(require) {
         it('check union', function() {
             var a = new Interval1d(5, 15);
             var b = new Interval1d(2, 8);
-            var c = new Interval1d(30, 40);
             var union = a.union(b);
             expect(union.min).toEqual(2);
             expect(union.max).toEqual(15);
