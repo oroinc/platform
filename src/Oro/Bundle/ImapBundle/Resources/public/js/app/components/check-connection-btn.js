@@ -21,6 +21,11 @@ function($, _, routing, __, mediator, messenger) {
             var isNestedForm = options.elementNamePrototype.indexOf('[') !== -1;
             var elementNamePrototype = isNestedForm ? options.elementNamePrototype.replace(/(.+)\[\w+]$/, '$1') : '';
 
+            var $criticalFields = $('.critical-field :input');
+            $criticalFields.change(function() {
+                $('.folder-tree').remove();
+            });
+
             $el.click(function() {
                 var data = $form.serializeArray();
 
@@ -35,6 +40,8 @@ function($, _, routing, __, mediator, messenger) {
 
                         return field;
                     });
+                    // clear folders data
+                    data = data.splice(0, 6);
                 }
 
                 url = routing.generate(routeName);
@@ -46,11 +53,10 @@ function($, _, routing, __, mediator, messenger) {
                 }
 
                 mediator.execute('showLoading');
+                $('.folder-tree').remove();
                 $.post(url, data)
-                    .done(function() {
-                        messenger.notificationFlashMessage('success', __('oro.imap.connection.success'), {
-                            container: $el.parent()
-                        });
+                    .done(function(response) {
+                        $el.parent().parent().parent().append(response);
                     })
                     .error(function() {
                         messenger.notificationFlashMessage('error', __('oro.imap.connection.error'), {

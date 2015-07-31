@@ -20,7 +20,7 @@ class ProcessControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroWorkflowBundle:ProcessDefinition');
     }
@@ -36,14 +36,14 @@ class ProcessControllerTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_workflow_api_rest_process_deactivate',
-                array('processDefinition' => $definitionName)
+                ['processDefinition' => $definitionName]
             )
         );
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
 
         // assert that process definition item was deactivated
-        $this->entityManager->refresh($definition);
+        $definition = $this->refreshEntity($definition);
         $this->assertFalse($definition->isEnabled());
 
         // activate process
@@ -51,15 +51,33 @@ class ProcessControllerTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_workflow_api_rest_process_activate',
-                array('processDefinition' => $definitionName)
+                ['processDefinition' => $definitionName]
             )
         );
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
 
         // assert that process definition item was activated
-        $this->entityManager->refresh($definition);
+        $definition = $this->refreshEntity($definition);
         $this->assertTrue($definition->isEnabled());
+    }
+
+    /**
+     * Refresh entity
+     *
+     * @param ProcessDefinition $definition
+     *
+     * @return ProcessDefinition
+     */
+    protected function refreshEntity(ProcessDefinition $definition)
+    {
+        $definition = $this->client
+            ->getContainer()
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroWorkflowBundle:ProcessDefinition')
+            ->findOneBy(['name' => $definition->getName()]);
+
+        return $definition;
     }
 
     /**

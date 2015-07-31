@@ -38,7 +38,7 @@
         /* jshint browser:true, devel:true */
         /* global require */
         require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, Mediator, Messenger, FormDefault, Modal) {
+        function ($, __, mediator, messenger, FormDefault, Modal) {
             'use strict';
 
             $('#{{ form.vars.id }} :input[type=reset]').click(function (e) {
@@ -63,10 +63,15 @@
 
             {% if pageReload %}
                 $('#{{ form.vars.id }}').submit(function() {
-                    Mediator.once('page:update', function() {
-                        Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
+                    mediator.once('page:update', function() {
+                        messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
                         // force reload without hash navigation
                         window.location.reload();
+                    });
+
+                    mediator.once('page:afterChange', function() {
+                        // Show loading until page is fully reloaded
+                        mediator.execute('showLoading');
                     });
                 });
             {% endif %}

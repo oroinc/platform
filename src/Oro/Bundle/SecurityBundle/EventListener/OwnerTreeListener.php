@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -89,7 +89,7 @@ class OwnerTreeListener implements ContainerAwareInterface
     protected function checkEntities(array $entities)
     {
         foreach ($entities as $entity) {
-            if (in_array(ClassUtils::getClass($entity), $this->securityClasses, true)) {
+            if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
                 return true;
             }
         }

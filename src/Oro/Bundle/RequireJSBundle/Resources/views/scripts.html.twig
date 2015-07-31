@@ -1,7 +1,7 @@
 {% set compressed = compressed is defined ? compressed : true %}
 {% set config_extend %}
     require({
-        baseUrl: {{ asset('bundles')|json_encode|raw }}
+        baseUrl: {{ asset('bundles')|split('?', 2)[0]|json_encode|raw }}
     });
     {{ config_extend|default('') }}
 {% endset %}

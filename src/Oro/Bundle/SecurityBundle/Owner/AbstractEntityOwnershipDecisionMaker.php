@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -431,11 +430,7 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      */
     protected function getObjectClass($domainObjectOrClassName)
     {
-        if (is_object($domainObjectOrClassName)) {
-            return ClassUtils::getClass($domainObjectOrClassName);
-        } else {
-            return ClassUtils::getRealClass($domainObjectOrClassName);
-        }
+        return ClassUtils::getRealClass($domainObjectOrClassName);
     }
 
     /**

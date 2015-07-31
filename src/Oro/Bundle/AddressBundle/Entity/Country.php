@@ -96,6 +96,8 @@ class Country extends ExtendCountry implements Translatable
      */
     public function __construct($iso2Code)
     {
+        parent::__construct();
+
         $this->iso2Code = $iso2Code;
         $this->regions  = new ArrayCollection();
     }
