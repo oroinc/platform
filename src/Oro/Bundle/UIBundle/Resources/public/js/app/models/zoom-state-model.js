@@ -157,21 +157,6 @@ define(function(require) {
                 }
             }
 
-            /*
-            var $shower = $("<div>&nbsp;</div>").css({
-                position: 'absolute',
-                top: top,
-                left: left,
-                width: right - left,
-                height: bottom - top,
-                border: 'dashed 1px red'
-            });
-            $(inner).append($shower);
-            setTimeout(function (){
-                $shower.remove();
-            }, 2000);
-            */
-
             // calculate zoom level
             var zoomLevel = Math.min(
                 1,
