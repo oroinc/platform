@@ -179,7 +179,7 @@ define(function(require) {
             var maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
             var style = window.getComputedStyle(el);
             if (realX < el.offsetWidth / 2) {
-                radiusPropName = 'border-'+ direction +'-left-radius';
+                radiusPropName = 'border-' + direction + '-left-radius';
                 if (style[radiusPropName] && style[radiusPropName] !== 'none') {
                     borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
                     dx = borderRadius - realX;
@@ -188,7 +188,7 @@ define(function(require) {
                     }
                 }
             } else {
-                radiusPropName = 'border-'+ direction +'-right-radius';
+                radiusPropName = 'border-' + direction + '-right-radius';
                 if (style[radiusPropName] && style[radiusPropName] !== 'none') {
                     borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
                     dx = realX - (el.offsetWidth - borderRadius);
