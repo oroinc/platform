@@ -54,7 +54,6 @@ function($, _, routing, __, mediator, messenger) {
                 $('.folder-tree').remove();
                 $.post(url, data)
                     .done(function(response) {
-                        debugger;
                         if (response.imap) {
                             if (response.imap.error) {
                                 messenger.notificationFlashMessage('error', __('oro.imap.connection.imap.error'), {
