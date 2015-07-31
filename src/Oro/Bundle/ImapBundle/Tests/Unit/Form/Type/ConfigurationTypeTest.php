@@ -212,12 +212,14 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($type);
 
         $entity = new UserEmailOrigin();
+        $entity->setImapHost('someHost');
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
             array(
-                'imapHost' => 'someHost',
+                'useImap'  => 1,
+                'imapHost' => 'someHostChanged',
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
