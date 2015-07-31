@@ -257,7 +257,7 @@ class ConfigurationType extends AbstractType
                     if ($entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
                         && array_key_exists('imapHost', $data) && $data['imapHost'] !== null
-                        && array_key_exists('user', $data) && $data['user' !== null]
+                        && array_key_exists('user', $data) && $data['user'] !== null
                         && ($entity->getImapHost() !== $data['imapHost']
                             || $entity->getUser() !== $data['user'])
                     ) {
