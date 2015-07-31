@@ -863,6 +863,31 @@ class ConfigManager
     }
 
     /**
+     * Changes a mode of a field
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeFieldMode($className, $fieldName, $mode)
+    {
+        return $this->modelManager->changeFieldMode($className, $fieldName, $mode);
+    }
+
+    /**
+     * Changes a mode of an entity
+     *
+     * @param string $className
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeEntityMode($className, $mode)
+    {
+        return $this->modelManager->changeEntityMode($className, $mode);
+    }
+
+    /**
      * Gets config id for the given model
      *
      * @param EntityConfigModel|FieldConfigModel $model
