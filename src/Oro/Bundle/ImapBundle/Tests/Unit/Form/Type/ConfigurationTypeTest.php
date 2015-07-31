@@ -132,6 +132,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort'       => '123',
                     'smtpHost'       => '',
                     'smtpPort'       => '',
+                    'imapEncryption' => 'ssl',
                     'smtpEncryption' => 'ssl',
                     'user'           => 'someUser',
                     'password'       => self::TEST_PASSWORD,
@@ -141,6 +142,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort'       => '123',
                     'smtpHost'       => '',
                     'smtpPort'       => '',
+                    'imapEncryption' => 'ssl',
                     'smtpEncryption' => 'ssl',
                     'user'           => 'someUser',
                 ),
@@ -149,6 +151,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort'        => '123',
                     'smtpHost'        => '',
                     'smtpPort'        => '',
+                    'imapEncryption'  => 'ssl',
                     'smtpEncryption'  => 'ssl',
                     'user'            => 'someUser',
                     'password'        => self::TEST_PASSWORD
@@ -160,6 +163,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort'       => '',
                     'smtpHost'       => '',
                     'smtpPort'       => '',
+                    'imapEncryption' => '',
                     'smtpEncryption' => '',
                     'user'           => '',
                     'password'       => ''
@@ -188,6 +192,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort'       => '123',
                 'smtpHost'       => '',
                 'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user'           => 'someUser',
                 'password'       => ''
@@ -207,6 +212,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form = $this->factory->create($type);
 
         $entity = new UserEmailOrigin();
+        $entity->setImapHost('someHost');
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
@@ -216,6 +222,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort'       => '123',
                 'smtpHost'       => '',
                 'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user'           => 'someUser',
                 'password'       => 'somPassword'
@@ -247,6 +254,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort'       => '',
                 'smtpHost'       => '',
                 'smtpPort'       => '',
+                'imapEncryption' => '',
                 'smtpEncryption' => '',
                 'user'           => '',
                 'password'       => ''

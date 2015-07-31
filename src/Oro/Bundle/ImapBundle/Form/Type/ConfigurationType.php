@@ -61,50 +61,50 @@ class ConfigurationType extends AbstractType
         $builder
             ->add('useImap', 'checkbox', [
                 'label'    => 'oro.imap.configuration.use_imap.label',
-                'attr'     => ['class' => 'imap-config'],
+                'attr'     => ['class' => 'imap-config check-connection'],
                 'required' => false,
                 'mapped'   => false
             ])
             ->add('imapHost', 'text', [
                 'label'    => 'oro.imap.configuration.imap_host.label',
                 'required' => false,
-                'attr'     => ['class' => 'critical-field imap-config'],
+                'attr'     => ['class' => 'critical-field imap-config check-connection'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('imapPort', 'number', [
                 'label'    => 'oro.imap.configuration.imap_port.label',
-                'attr'     => ['class' => 'imap-config'],
+                'attr'     => ['class' => 'imap-config check-connection'],
                 'required' => false
             ])
             ->add('imapEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.imap_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'imap-config'],
+                'attr'        => ['class' => 'imap-config check-connection'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
             ])
             ->add('useSmtp', 'checkbox', [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
-                'attr'     => ['class' => 'smtp-config'],
+                'attr'     => ['class' => 'smtp-config check-connection'],
                 'required' => false,
                 'mapped'   => false
             ])
             ->add('smtpHost', 'text', [
                 'label'    => 'oro.imap.configuration.smtp_host.label',
-                'attr'     => ['class' => 'critical-field smtp-config'],
+                'attr'     => ['class' => 'critical-field smtp-config check-connection'],
                 'required' => false,
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('smtpPort', 'number', [
                 'label'    => 'oro.imap.configuration.smtp_port.label',
-                'attr'     => ['class' => 'smtp-config'],
+                'attr'     => ['class' => 'smtp-config check-connection'],
                 'required' => false
             ])
             ->add('smtpEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.smtp_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'smtp-config'],
+                'attr'        => ['class' => 'smtp-config check-connection'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -112,11 +112,12 @@ class ConfigurationType extends AbstractType
             ->add('user', 'text', [
                 'label'    => 'oro.imap.configuration.user.label',
                 'required' => true,
-                'attr'     => ['class' => 'critical-field'],
+                'attr'     => ['class' => 'critical-field check-connection'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('password', 'password', [
-                'label' => 'oro.imap.configuration.password.label', 'required' => true
+                'label' => 'oro.imap.configuration.password.label', 'required' => true,
+                'attr' => ['class' => 'check-connection']
             ])
             ->add('check_connection', new CheckButtonType(), [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
@@ -252,6 +253,7 @@ class ConfigurationType extends AbstractType
                 if (count($filtered) > 0) {
                     if ($entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
+                        && array_key_exists('imapHost', $data)
                         && $data['imapHost'] !== null
                         && array_key_exists('user', $data)
                         && ($entity->getImapHost() !== $data['imapHost']
