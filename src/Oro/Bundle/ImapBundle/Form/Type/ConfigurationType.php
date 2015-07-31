@@ -52,6 +52,7 @@ class ConfigurationType extends AbstractType
     {
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
+        $this->addNewOriginCreateEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
@@ -203,22 +204,19 @@ class ConfigurationType extends AbstractType
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
     {
         $encryptor = $this->encryptor;
-
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
                 $data = (array) $event->getData();
                 /** @var UserEmailOrigin|null $entity */
                 $entity = $event->getForm()->getData();
-
                 $filtered = array_filter(
                     $data,
                     function ($item) {
                         return !empty($item);
                     }
                 );
-
-                if (!empty($filtered)) {
+                if (count($filtered) > 0) {
                     $oldPassword = $event->getForm()->get('password')->getData();
                     if (empty($data['password']) && $oldPassword) {
                         // populate old password
@@ -226,14 +224,38 @@ class ConfigurationType extends AbstractType
                     } else {
                         $data['password'] = $encryptor->encryptData($data['password']);
                     }
-
                     $event->setData($data);
+                } elseif ($entity instanceof UserEmailOrigin) {
+                    $event->getForm()->setData(null);
+                }
+            }
+        );
+    }
 
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = (array) $event->getData();
+                /** @var UserEmailOrigin|null $entity */
+                $entity = $event->getForm()->getData();
+                $filtered = array_filter(
+                    $data,
+                    function ($item) {
+                        return !empty($item);
+                    }
+                );
+                if (count($filtered) > 0) {
                     if ($entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
                         && $data['imapHost'] !== null
                         && array_key_exists('user', $data)
-                        && ($entity->getImapHost() !== $data['imapHost'] || $entity->getUser() !== $data['user'])
+                        && ($entity->getImapHost() !== $data['imapHost']
+                            || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new UserEmailOrigin();
