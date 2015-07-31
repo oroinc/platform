@@ -45,11 +45,15 @@ class AuditEntityMapper
     }
 
     /**
-     * @param AbstractUser $user
+     * @param AbstractUser|null $user
      * @return string
      */
-    public function getAuditEntryClass(AbstractUser $user)
+    public function getAuditEntryClass(AbstractUser $user = null)
     {
+        if ($user === null) {
+            return $this->entryMap->first();
+        }
+
         $userClass = ClassUtils::getRealClass($user);
 
         if (!$this->entryMap->containsKey($userClass)) {
@@ -60,11 +64,15 @@ class AuditEntityMapper
     }
 
     /**
-     * @param AbstractUser $user
+     * @param AbstractUser|null $user
      * @return string
      */
-    public function getAuditEntryFieldClass(AbstractUser $user)
+    public function getAuditEntryFieldClass(AbstractUser $user = null)
     {
+        if ($user === null) {
+            return $this->entryFieldMap->first();
+        }
+
         $userClass = ClassUtils::getRealClass($user);
 
         if (!$this->entryFieldMap->containsKey($userClass)) {

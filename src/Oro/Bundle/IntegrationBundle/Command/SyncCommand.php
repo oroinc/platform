@@ -8,12 +8,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
+use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Component\Log\OutputLogger;
 
 /**
@@ -123,11 +125,12 @@ class SyncCommand extends AbstractSyncCronCommand
             $integrations = $repository->getConfiguredChannelsForSync(null, true);
         }
 
-        /** @var Integration $integration */
+        /* @var $integration Integration */
         foreach ($integrations as $integration) {
             try {
                 $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
 
+                $this->updateToken($integration);
                 if ($batchSize) {
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
@@ -173,6 +176,35 @@ class SyncCommand extends AbstractSyncCronCommand
         }
 
         return $result;
+    }
+
+    /**
+     * @param Integration $integration
+     */
+    protected function updateToken(Integration $integration)
+    {
+        if (!$integration->getOrganization()) {
+            $token = new ConsoleToken();
+            $this->getSecurityContext()->setToken($token);
+            return;
+        }
+
+        $securityContext = $this->getSecurityContext();
+        $token = $securityContext->getToken();
+        if (!$token) {
+            $token = new ConsoleToken();
+            $this->getSecurityContext()->setToken($token);
+        }
+
+        $token->setOrganizationContext($integration->getOrganization());
+    }
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurityContext()
+    {
+        return $this->getService('security.context');
     }
 
     /**
