@@ -126,7 +126,10 @@ class OroRichTextType extends AbstractType
             [
                 'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
                     if (!empty($wysiwygOptions['toolbar'])) {
-                        return array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                        $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                        unset($wysiwygOptions['toolbar_type']);
+
+                        return $wysiwygOptions;
                     }
 
                     if (empty($wysiwygOptions['toolbar_type'])
