@@ -106,7 +106,10 @@ oro:
             shortcut_compose_email.description: Compose email
             mark_read.label: Mark read
             mark_unread.label: Mark unread
-
+        notification:
+            mark_read.label: Mark all as Read
+            empty: You don't have any emails yet
+            new_email: You have a new email
         datagrid:
             emailtemplate:
                 action:
