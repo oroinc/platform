@@ -24,29 +24,56 @@ There are two approaches to customize the dictionary API basing on your needs
 
 ***Creating a custom controller***
 
-In case if you need to customize API for just one dictionary entity, the easiesy way will be to create a new controller that will override the automatically generated path. For example:
+In case if you need to customize API for just one dictionary entity, the easiest way will be to create a new controller that will override the automatically generated path. For example:
+
 ```php
+/**
+ * @RouteResource("casestatus")
+ * @NamePrefix("oro_api_")
+ */
+class CaseStatusesController extends RestGetController
+{
     /**
-     * @Get("/casestatuses", name="")
+     * Get case statuses
      *
-     * Necessary QueryParams here...
-     *
+     * @QueryParam(
+     *      name="page",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Page number, starting from 1. Defaults to 1."
+     * )
+     * @QueryParam(
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of items per page. Defaults to 10. Set -1 to get all items."
+     * )
+     * @QueryParam(
+     *      name="locale",
+     *      requirements=".+",
+     *      nullable=true,
+     *      description="The preferred locale for dictionary values. Falls back to the default locale."
+     * )
+     * @ApiDoc(
+     *      description="Get case statuses",
+     *      resource=true
+     * )
      * @return Response
      */
     public function cgetAction()
     {
-        return $this->handleGetListRequest();
+        ...
     }
+}
 ```
 
 ***Creating a custom dictionary type***
 
-If you have a custom dictionary type and you want to have its entities added to the REST API,
-you need to do two things.
+If you have some group of entities which can be classified as a dictionary, but by some reason they are not included in the `dictionary` group in entity configuration, and you want to have its entities added to the dictionary REST API, you need to do two things.
 
 First, you should create a dictionary value list provider implementing the [DictionaryValueListProviderInterface](./../../Provider/DictionaryValueListProviderInterface.php) interface.
 
-And second, you should register your provider service in the DI container by the `oro_entity.dictionary_value_list_provider` tag:
+And second, you should register your provider service in the DI container by the tag `oro_entity.dictionary_value_list_provider`:
 
 ```yml
     oro_entity.dictionary_value_list_provider.default:
