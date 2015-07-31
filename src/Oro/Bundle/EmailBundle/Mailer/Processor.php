@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
@@ -154,8 +155,7 @@ class Processor
             $origin->getOwner(),
             $origin->getOrganization()
         );
-
-        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $emailUser->setFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );
@@ -182,6 +182,30 @@ class Processor
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $emailUser;
+    }
+
+    /**
+     * Get origin's folder
+     *
+     * @param string $email
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($email, EmailOrigin $origin)
+    {
+        $folder = $origin->getFolder(FolderType::SENT);
+
+        //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
+        if (!$folder && $origin instanceof UserEmailOrigin) {
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, InternalEmailOrigin::BAP, false);
+            return $origin->getFolder(FolderType::SENT);
+        }
+
+        return $folder;
     }
 
     /**
@@ -330,10 +354,11 @@ class Processor
      *
      * @param string $email
      * @param string $originName
+     * @param boolean $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $enableUseUserEmailOrigin = true)
     {
         $originKey    = $originName . $email;
         $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
@@ -346,13 +371,17 @@ class Processor
             );
 
             if ($emailOwner instanceof User) {
-                $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) use ($organization) {
-                        return
-                            $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
-                            && (!$organization || $item->getOrganization() === $organization);
-                    }
-                );
+                $origins = new ArrayCollection();
+
+                if ($enableUseUserEmailOrigin) {
+                    $origins = $emailOwner->getEmailOrigins()->filter(
+                        function ($item) use ($organization) {
+                            return
+                                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
+                                && (!$organization || $item->getOrganization() === $organization);
+                        }
+                    );
+                }
 
                 if ($origins->isEmpty()) {
                     $origins = $emailOwner->getEmailOrigins()->filter(
