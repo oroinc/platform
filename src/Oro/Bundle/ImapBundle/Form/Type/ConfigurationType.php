@@ -57,6 +57,7 @@ class ConfigurationType extends AbstractType
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
         $this->addEnableSMTPImapListener($builder);
+        $this->finalDataCleaner($builder);
 
         $builder
             ->add('useImap', 'checkbox', [
@@ -173,7 +174,8 @@ class ConfigurationType extends AbstractType
                     $form->remove('folders');
                 }
                 $event->setData($data);
-            }
+            },
+            5
         );
     }
 
@@ -210,6 +212,7 @@ class ConfigurationType extends AbstractType
             function (FormEvent $event) use ($encryptor) {
                 $data = (array) $event->getData();
                 /** @var UserEmailOrigin|null $entity */
+                $entity = $event->getForm()->getData();
                 $filtered = array_filter(
                     $data,
                     function ($item) {
@@ -225,11 +228,11 @@ class ConfigurationType extends AbstractType
                         $data['password'] = $encryptor->encryptData($data['password']);
                     }
                     $event->setData($data);
-                } else {
+                } elseif ($entity instanceof UserEmailOrigin) {
                     $event->getForm()->setData(null);
-                    $event->setData([]);
                 }
-            }
+            },
+            4
         );
     }
 
@@ -262,10 +265,11 @@ class ConfigurationType extends AbstractType
                         $newConfiguration = new UserEmailOrigin();
                         $event->getForm()->setData($newConfiguration);
                     }
-                } else {
+                } elseif ($entity instanceof UserEmailOrigin) {
                     $event->getForm()->setData(null);
                 }
-            }
+            },
+            3
         );
     }
 
@@ -316,7 +320,34 @@ class ConfigurationType extends AbstractType
                     }
                     $event->setData($data);
                 }
-            }
+            },
+            2
+        );
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function finalDataCleaner(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = (array)$event->getData();
+                $filtered = array_filter(
+                    $data,
+                    function ($item) {
+                        return !empty($item);
+                    }
+                );
+
+                if (!count($filtered)) {
+                    $event->getForm()->remove('useImap');
+                    $event->getForm()->remove('useSmtp');
+                    $event->getForm()->setData(null);
+                }
+            },
+            1
         );
     }
 
@@ -353,10 +384,11 @@ class ConfigurationType extends AbstractType
             'required'          => false,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
-                if ($form->get('useImap')->getData() === true) {
+
+                if ($form->has('useImap') && $form->get('useImap')->getData() === true) {
                     $groups[] = 'Imap';
                 }
-                if ($form->get('useSmtp')->getData() === true) {
+                if ($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) {
                     $groups[] = 'Smtp';
                 }
 
