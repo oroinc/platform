@@ -6,6 +6,8 @@ use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -24,12 +26,12 @@ class ConnectionController extends Controller
     /**
      * @Route("/connection/check", name="oro_imap_connection_check", methods={"POST"})
      */
-    public function checkAction()
+    public function checkAction(Request $request)
     {
         $responseCode = Codes::HTTP_BAD_REQUEST;
 
         $data = null;
-        $id   = $this->getRequest()->get('id', false);
+        $id   = $request->get('id', false);
         if (false !== $id) {
             $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
@@ -43,18 +45,36 @@ class ConnectionController extends Controller
             ]
         );
         $form->setData($data);
-        $form->submit($this->getRequest());
+        $form->submit($request);
         /** @var UserEmailOrigin $origin */
         $origin = $form->getData();
 
         if ($form->isValid() && null !== $origin) {
+            $response = [];
+            $response['smtp'] = [];
+            $response['imap'] = [];
+
+            $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
             $config = new ImapConfig(
                 $origin->getImapHost(),
                 $origin->getImapPort(),
                 $origin->getImapEncryption(),
                 $origin->getUser(),
-                $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword())
+                $password
             );
+
+            try {
+                $mailer = $this->get('oro_email.direct_mailer');
+                $transport = $mailer->getTransport();
+                $transport->setHost($origin->getSmtpHost());
+                $transport->setPort($origin->getSmtpPort());
+                $transport->setEncryption($origin->getSmtpEncryption());
+                $transport->setUsername($origin->getUser());
+                $transport->setPassword($password);
+                $transport->start();
+            } catch (\Exception $e) {
+                $response['smtp']['error'] = $e->getMessage();
+            }
 
             try {
                 $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
@@ -68,13 +88,14 @@ class ConnectionController extends Controller
                 $userForm = $this->get('oro_user.form.user');
                 $userForm->setData($user);
 
-                return $this->render('OroImapBundle:Connection:check.html.twig', [
+                $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
                     'form' => $userForm->createView(),
                 ]);
             } catch (\Exception $e) {
-                $this->get('logger')
-                    ->critical('Unable to connect to IMAP server: ' . $e->getMessage(), ['exception' => $e]);
+                $response['imap']['error'] = $e->getMessage();
             }
+
+            return new JsonResponse($response);
         }
 
         return new Response('', $responseCode);

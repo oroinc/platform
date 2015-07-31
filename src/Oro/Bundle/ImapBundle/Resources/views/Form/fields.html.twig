@@ -11,48 +11,14 @@
 
     <div class="control-group" id="{{ wrapperId }}">
         <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
-        <script type="text/javascript">
-            require(['jquery'], function ($) {
-                $(function () {
-                    var useImap = $('.imap-config:checkbox');
-                    var useSmtp = $('.smtp-config:checkbox');
-                    var imapFields = $('.imap-config input:not([type=checkbox])');
-                    var smtpFields = $('.smtp-config input:not([type=checkbox])');
-
-                    if (useImap.prop('checked') == false) {
-                        imapFields.each(function() {
-                            $(this).parent().parent().hide();
-                        });
-                    }
-                    if (useSmtp.prop('checked') == false) {
-                        smtpFields.each(function() {
-                            $(this).parent().parent().hide();
-                        });
-                    }
-
-                    $(useImap).on('change', function() {
-                        configShowHide(useImap, imapFields);
-                    });
-                    $(useSmtp).on('change', function() {
-                        configShowHide(useSmtp, smtpFields);
-                    });
-
-                    var configShowHide = function(controlCheckbox, configValues) {
-                        if (controlCheckbox.is(':checked')) {
-                            configValues.each(function() {
-                                $(this).parent().parent().show();
-                            });
-                        } else {
-                            configValues.each(function() {
-                                $(this).parent().parent().hide();
-                            });
-                        }
-                    }
-                });
-            })
-        </script>
     </div>
-
+    {% set optionsConfig = {
+        elementContainer: form.parent
+    } %}
+    <div class="container-config-group"
+         data-page-component-module="oroimap/js/app/components/check-config-settings"
+         data-page-component-options="{{ optionsConfig|json_encode|raw }}">
+    </div>
     <style type="text/css">
         {{ '#' ~ wrapperId }} {
             max-width: 465px;
