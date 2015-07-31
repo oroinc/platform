@@ -371,32 +371,7 @@ class Processor
             );
 
             if ($emailOwner instanceof User) {
-                $origins = new ArrayCollection();
-
-                if ($enableUseUserEmailOrigin) {
-                    $origins = $emailOwner->getEmailOrigins()->filter(
-                        function ($item) use ($organization) {
-                            return
-                                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
-                                && (!$organization || $item->getOrganization() === $organization);
-                        }
-                    );
-                }
-
-                if ($origins->isEmpty()) {
-                    $origins = $emailOwner->getEmailOrigins()->filter(
-                        function ($item) use ($organization) {
-                            return
-                                $item instanceof InternalEmailOrigin
-                                && (!$organization || $item->getOrganization() === $organization);
-                        }
-                    );
-                }
-
-                $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin === null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
-                }
+                $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')
@@ -519,5 +494,63 @@ class Processor
         }
 
         return $this->em;
+    }
+
+    /**
+     * Get imap origin if exists.
+     *
+     * @param $enableUseUserEmailOrigin
+     * @param $emailOwner
+     * @param $organization
+     * @return mixed|null|InternalEmailOrigin
+     */
+    protected function getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization)
+    {
+        $origins = new ArrayCollection();
+
+        if ($enableUseUserEmailOrigin) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getImapEnabledFilter($organization)
+            );
+        }
+        if ($origins->isEmpty()) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getInternalFilter($organization)
+            );
+        }
+        $origin = $origins->isEmpty() ? null : $origins->first();
+        if ($origin === null) {
+            $origin = $this->createUserInternalOrigin($emailOwner, $organization);
+
+            return $origin;
+        }
+
+        return $origin;
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getImapEnabledFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
+                && (!$organization || $item->getOrganization() === $organization);
+        };
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getInternalFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof InternalEmailOrigin
+                && (!$organization || $item->getOrganization() === $organization);
+        };
     }
 }

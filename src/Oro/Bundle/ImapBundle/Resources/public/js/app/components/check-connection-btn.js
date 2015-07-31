@@ -41,7 +41,7 @@ function($, _, routing, __, mediator, messenger) {
                         return field;
                     });
                     // clear folders data
-                    data = data.splice(0, 9);
+                    data = data.splice(0, 10);
                 }
 
                 url = routing.generate(routeName);
