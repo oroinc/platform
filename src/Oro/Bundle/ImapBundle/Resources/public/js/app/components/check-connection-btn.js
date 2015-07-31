@@ -27,7 +27,7 @@ function($, _, routing, __, mediator, messenger) {
             });
 
             $el.click(function() {
-                var data = $form.serializeArray();
+                var data = $form.find('.check-connection').serializeArray();
 
                 if (isNestedForm) {
                     // pick only values from needed nested form
@@ -41,7 +41,7 @@ function($, _, routing, __, mediator, messenger) {
                         return field;
                     });
                     // clear folders data
-                    data = data.splice(0, 10);
+                    //data = data.splice(0, 10);
                 }
 
                 url = routing.generate(routeName);

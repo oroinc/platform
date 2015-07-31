@@ -10,4 +10,4 @@ oro.imap:
         use_smtp.label: Enable SMTP
         user.label: User
         password.label: Password
-        connect_and_retrieve_folders: Connect and retrieve folders
+        connect_and_retrieve_folders: Check connection/Retrieve folders

@@ -68,7 +68,7 @@ class ConnectionController extends Controller
                 $transport = $mailer->getTransport();
                 $transport->setHost($origin->getSmtpHost());
                 $transport->setPort($origin->getSmtpPort());
-                $transport->setEncryption($origin->getSsl());
+                $transport->setEncryption($origin->getSmtpEncryption());
                 $transport->setUsername($origin->getUser());
                 $transport->setPassword($password);
                 $transport->start();
