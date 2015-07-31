@@ -12,74 +12,74 @@ define(function(require) {
 
         it('point initialization', function() {
             var a = new Point2d(5, 7);
-            expect(a.x).toEqual(5);
-            expect(a.y).toEqual(7);
-            expect(a.id).toEqual(1000007);
+            expect(a.x).toBe(5);
+            expect(a.y).toBe(7);
+            expect(a.id).toBe(1000007);
             expect(a.uid).toBeDefined();
         });
 
         it('check distance calculation', function() {
             var a = new Point2d(1, -3);
             var b = new Point2d(-2, 1);
-            expect(a.simpleDistanceTo(b)).toEqual(7);
-            expect(a.distanceTo(b)).toEqual(5);
+            expect(a.simpleDistanceTo(b)).toBe(7);
+            expect(a.distanceTo(b)).toBe(5);
         });
 
         it('check point inversion', function() {
             var a = new Point2d(1, -3);
             var b = a.opposite();
-            expect(b.x).toEqual(-1);
-            expect(b.y).toEqual(3);
+            expect(b.x).toBe(-1);
+            expect(b.y).toBe(3);
         });
 
         it('check point addition', function() {
             var a = new Point2d(1, -3);
             var b = new Point2d(-2, 1);
             var c = a.add(b);
-            expect(c.x).toEqual(-1);
-            expect(c.y).toEqual(-2);
+            expect(c.x).toBe(-1);
+            expect(c.y).toBe(-2);
         });
 
         it('check point subtraction', function() {
             var a = new Point2d(1, -3);
             var b = new Point2d(-2, 1);
             var c = a.sub(b);
-            expect(c.x).toEqual(3);
-            expect(c.y).toEqual(-4);
+            expect(c.x).toBe(3);
+            expect(c.y).toBe(-4);
         });
 
         it('check point multiplication', function() {
             var a = new Point2d(1, -3);
             var c = a.mul(2);
-            expect(c.x).toEqual(2);
-            expect(c.y).toEqual(-6);
+            expect(c.x).toBe(2);
+            expect(c.y).toBe(-6);
         });
 
         it('check point length', function() {
             var a = new Point2d(3, -4);
-            expect(a.length).toEqual(5);
+            expect(a.length).toBe(5);
         });
 
         it('check point unitVector', function() {
             var a = new Point2d(3, -4);
             var b = a.unitVector;
-            expect(b.x).toEqual(0.6);
-            expect(b.y).toEqual(-0.8);
+            expect(b.x).toBe(0.6);
+            expect(b.y).toBe(-0.8);
         });
 
         it('check point rotation', function() {
             var a = new Point2d(3, -4);
             var b = a.rot90();
-            expect(b.x).toEqual(-4);
-            expect(b.y).toEqual(-3);
+            expect(b.x).toBe(-4);
+            expect(b.y).toBe(-3);
 
             b = a.rot180();
-            expect(b.x).toEqual(-3);
-            expect(b.y).toEqual(4);
+            expect(b.x).toBe(-3);
+            expect(b.y).toBe(4);
 
             b = a.rot270();
-            expect(b.x).toEqual(4);
-            expect(b.y).toEqual(3);
+            expect(b.x).toBe(4);
+            expect(b.y).toBe(3);
         });
 
         it('check point draw', function() {
@@ -102,17 +102,17 @@ define(function(require) {
         it('check point abs', function() {
             var a = new Point2d(3, -4);
             var b = a.abs();
-            expect(b.x).toEqual(3);
-            expect(b.y).toEqual(4);
+            expect(b.x).toBe(3);
+            expect(b.y).toBe(4);
         });
 
         it('check point clone', function() {
             var a = new Point2d(3, -4);
             var b = a.clone();
             expect(b).not.toBe(a);
-            expect(b.x).toEqual(a.x);
-            expect(b.y).toEqual(a.y);
-            expect(b.uid).not.toEqual(a.uid);
+            expect(b.x).toBe(a.x);
+            expect(b.y).toBe(a.y);
+            expect(b.uid).not.toBe(a.uid);
         });
     });
 });

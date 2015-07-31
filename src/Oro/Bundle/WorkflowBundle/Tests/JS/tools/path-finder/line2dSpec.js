@@ -7,8 +7,8 @@ define(function(require) {
     describe('oroworkflow/js/tools/path-finder/line2d', function() {
         it('check line creation', function() {
             var a = new Line2d(3, 8);
-            expect(a.slope).toEqual(3);
-            expect(a.intercept).toEqual(8);
+            expect(a.slope).toBe(3);
+            expect(a.intercept).toBe(8);
         });
 
         describe('check line intersection', function() {
@@ -17,8 +17,8 @@ define(function(require) {
                 var b = new Line2d(9, 4);
                 var point = a.intersection(b);
                 expect(point instanceof Point2d).toBe(true);
-                expect(point.x).toEqual(0.8);
-                expect(point.y).toEqual(11.2);
+                expect(point.x).toBe(0.8);
+                expect(point.y).toBe(11.2);
             });
 
             it('with infinite slope', function() {
@@ -31,14 +31,14 @@ define(function(require) {
                 a = new Line2d(Infinity, 8);
                 b = new Line2d(5, 4);
                 point = a.intersection(b);
-                expect(point.x).toEqual(8);
-                expect(point.y).toEqual(44);
+                expect(point.x).toBe(8);
+                expect(point.y).toBe(44);
 
                 a = new Line2d(2, 8);
                 b = new Line2d(Infinity, 4);
                 point = a.intersection(b);
-                expect(point.x).toEqual(4);
-                expect(point.y).toEqual(16);
+                expect(point.x).toBe(4);
+                expect(point.y).toBe(16);
             });
         });
     });
