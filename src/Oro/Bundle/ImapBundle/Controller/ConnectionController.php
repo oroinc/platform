@@ -58,7 +58,7 @@ class ConnectionController extends Controller
             $config = new ImapConfig(
                 $origin->getImapHost(),
                 $origin->getImapPort(),
-                $origin->getSsl(),
+                $origin->getImapEncryption(),
                 $origin->getUser(),
                 $password
             );

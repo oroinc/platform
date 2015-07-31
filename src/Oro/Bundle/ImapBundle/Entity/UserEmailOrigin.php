@@ -49,7 +49,16 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @ORM\Column(name="imap_ssl", type="string", length=3, nullable=true)
      */
-    protected $ssl;
+    protected $imapEncryption;
+
+    /**
+     * The SSL type to be used to connect to SMTP server. Can be empty string, 'ssl' or 'tls'
+     *
+     * @var string
+     *
+     * @ORM\Column(name="smtp_encryption", type="string", length=3, nullable=true)
+     */
+    protected $smtpEncryption;
 
     /**
      * @var string
@@ -122,7 +131,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function getSmtpPort()
     {
-        return (int)$this->smtpPort;
+        return $this->smtpPort;
     }
 
     /**
@@ -134,7 +143,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setSmtpPort($smtpPort)
     {
-        $this->smtpPort = (int)$smtpPort;
+        $this->smtpPort = $smtpPort;
 
         return $this;
     }
@@ -146,7 +155,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function getImapPort()
     {
-        return (int)$this->imapPort;
+        return $this->imapPort;
     }
 
     /**
@@ -158,7 +167,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setImapPort($imapPort)
     {
-        $this->imapPort = (int)$imapPort;
+        $this->imapPort = $imapPort;
 
         return $this;
     }
@@ -168,20 +177,43 @@ class UserEmailOrigin extends EmailOrigin
      *
      * @return string
      */
-    public function getSsl()
+    public function getImapEncryption()
     {
-        return $this->ssl;
+        return $this->imapEncryption;
     }
 
     /**
      * Sets the SSL type to be used to connect to IMAP server
      *
-     * @param string $ssl Can be empty string, 'ssl' or 'tls'
+     * @param string $imapEncryption Can be empty string, 'ssl' or 'tls'
      * @return UserEmailOrigin
      */
-    public function setSsl($ssl)
+    public function setImapEncryption($imapEncryption)
     {
-        $this->ssl = $ssl;
+        $this->imapEncryption = $imapEncryption;
+
+        return $this;
+    }
+
+    /**
+     * Gets the SSL type to be used to connect to SMTP server
+     *
+     * @return string
+     */
+    public function getSmtpEncryption()
+    {
+        return $this->smtpEncryption;
+    }
+
+    /**
+     * Sets the SSL type to be used to connect to SMTP server
+     *
+     * @param string $smtpEncryption Can be empty string, 'ssl' or 'tls'
+     * @return UserEmailOrigin
+     */
+    public function setSmtpEncryption($smtpEncryption)
+    {
+        $this->smtpEncryption = $smtpEncryption;
 
         return $this;
     }
@@ -243,8 +275,9 @@ class UserEmailOrigin extends EmailOrigin
         $smtpPort = $this->getSmtpPort();
         $user = $this->getUser();
         $password = $this->getPassword();
+        $encryption = $this->getSsl();
 
-        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && !empty($password)) {
+        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && !empty($password) && !empty($encryption)) {
             return true;
         }
 

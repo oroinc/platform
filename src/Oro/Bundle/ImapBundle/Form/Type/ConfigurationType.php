@@ -52,6 +52,7 @@ class ConfigurationType extends AbstractType
     {
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
+        $this->addNewOriginCreateEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
@@ -75,6 +76,14 @@ class ConfigurationType extends AbstractType
                 'attr'     => ['class' => 'imap-config'],
                 'required' => false
             ])
+            ->add('imapEncryption', 'choice', [
+                'label'       => 'oro.imap.configuration.imap_encryption.label',
+                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'attr'        => ['class' => 'imap-config'],
+                'empty_data'  => null,
+                'empty_value' => '',
+                'required'    => false
+            ])
             ->add('useSmtp', 'checkbox', [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config'],
@@ -92,9 +101,10 @@ class ConfigurationType extends AbstractType
                 'attr'     => ['class' => 'smtp-config'],
                 'required' => false
             ])
-            ->add('ssl', 'choice', [
-                'label'       => 'oro.imap.configuration.ssl.label',
+            ->add('smtpEncryption', 'choice', [
+                'label'       => 'oro.imap.configuration.smtp_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'attr'        => ['class' => 'smtp-config'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -194,22 +204,19 @@ class ConfigurationType extends AbstractType
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
     {
         $encryptor = $this->encryptor;
-
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($encryptor) {
                 $data = (array) $event->getData();
                 /** @var UserEmailOrigin|null $entity */
                 $entity = $event->getForm()->getData();
-
                 $filtered = array_filter(
                     $data,
                     function ($item) {
                         return !empty($item);
                     }
                 );
-
-                if (!empty($filtered)) {
+                if (count($filtered) > 0) {
                     $oldPassword = $event->getForm()->get('password')->getData();
                     if (empty($data['password']) && $oldPassword) {
                         // populate old password
@@ -217,14 +224,38 @@ class ConfigurationType extends AbstractType
                     } else {
                         $data['password'] = $encryptor->encryptData($data['password']);
                     }
-
                     $event->setData($data);
+                } elseif ($entity instanceof UserEmailOrigin) {
+                    $event->getForm()->setData(null);
+                }
+            }
+        );
+    }
 
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = (array) $event->getData();
+                /** @var UserEmailOrigin|null $entity */
+                $entity = $event->getForm()->getData();
+                $filtered = array_filter(
+                    $data,
+                    function ($item) {
+                        return !empty($item);
+                    }
+                );
+                if (count($filtered) > 0) {
                     if ($entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
                         && $data['imapHost'] !== null
                         && array_key_exists('user', $data)
-                        && ($entity->getImapHost() !== $data['imapHost'] || $entity->getUser() !== $data['user'])
+                        && ($entity->getImapHost() !== $data['imapHost']
+                            || $entity->getUser() !== $data['user'])
                     ) {
                         // in case when critical fields were changed new entity should be created
                         $newConfiguration = new UserEmailOrigin();
@@ -257,6 +288,7 @@ class ConfigurationType extends AbstractType
                             : $this->securityFacade->getLoggedUser()->getOrganization();
                         $data->setOrganization($organization);
                     }
+
                     $event->setData($data);
                 }
             }
@@ -275,13 +307,11 @@ class ConfigurationType extends AbstractType
                 $entity = $event->getForm()->getData();
 
                 if ($entity instanceof UserEmailOrigin) {
-                    if (array_key_exists('useImap', $data) === false || $data['useImap'] === 0) {
-                        unset($data['imapHost']);
-                        unset($data['imapPort']);
+                    if (!array_key_exists('useImap', $data) || $data['useImap'] === 0) {
+                        unset($data['imapHost'], $data['imapPort'], $data['imapEncryption']);
                     }
-                    if (array_key_exists('useSmtp', $data) === false || $data['useSmtp'] === 0) {
-                        unset($data['smtpHost']);
-                        unset($data['smtpPort']);
+                    if (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0) {
+                        unset($data['smtpHost'], $data['smtpPort'], $data['smtpEncryption']);
                     }
                     $event->setData($data);
                 }

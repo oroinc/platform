@@ -33,9 +33,9 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
     public function testSslGetterAndSetter()
     {
         $origin = new UserEmailOrigin();
-        $this->assertNull($origin->getSsl());
-        $origin->setSsl('test');
-        $this->assertEquals('test', $origin->getSsl());
+        $this->assertNull($origin->getImapEncryption());
+        $origin->setImapEncryption('test');
+        $this->assertEquals('test', $origin->getImapEncryption());
     }
 
     public function testUserGetterAndSetter()
@@ -77,6 +77,7 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $origin->setSmtpPort(25);
         $origin->setUser('test');
         $origin->setPassword('password');
+        $origin->setSsl('ssl');
 
         $this->assertTrue($origin->isSmtpConfigured());
     }
@@ -88,6 +89,7 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $origin->setSmtpPort(0);
         $origin->setUser('');
         $origin->setPassword('');
+        $origin->setSsl('');
 
         $this->assertFalse($origin->isSmtpConfigured());
     }

@@ -18,7 +18,10 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - NotBlank: { groups: [Smtp] }
             - Type:
                 type: integer
-        ssl:
+        imapEncryption:
+            - Choice:
+                choices:  [ssl, tls]
+        smtpEncryption:
             - Choice:
                 choices:  [ssl, tls]
         user:
