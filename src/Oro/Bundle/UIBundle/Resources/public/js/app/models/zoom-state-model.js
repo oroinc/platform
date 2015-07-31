@@ -62,7 +62,7 @@ define(function(require) {
         initialize: function(attributes, options) {
             ZoomStateModel.__super__.initialize.apply(this, arguments);
             if (!options.wrapper || !options.inner) {
-                throw new Error("ZoomStateModel requires wrapper and inner options to be passed");
+                throw new Error('ZoomStateModel requires wrapper and inner options to be passed');
             }
             this.wrapper = options.wrapper;
             this.inner = options.inner;
