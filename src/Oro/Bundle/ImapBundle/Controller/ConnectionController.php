@@ -36,14 +36,7 @@ class ConnectionController extends Controller
             $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 
-        $form = $this->createForm(
-            'oro_imap_configuration',
-            null,
-            [
-                'csrf_protection' => false,
-                'validation_groups' => ['Check'],
-            ]
-        );
+        $form = $this->createForm('oro_imap_configuration', null, ['csrf_protection' => false,]);
         $form->setData($data);
         $form->submit($request);
         /** @var UserEmailOrigin $origin */
@@ -51,48 +44,59 @@ class ConnectionController extends Controller
 
         if ($form->isValid() && null !== $origin) {
             $response = [];
-            $response['smtp'] = [];
-            $response['imap'] = [];
-
             $password = $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword());
-            $config = new ImapConfig(
-                $origin->getImapHost(),
-                $origin->getImapPort(),
-                $origin->getImapEncryption(),
-                $origin->getUser(),
-                $password
-            );
 
-            try {
-                $mailer = $this->get('oro_email.direct_mailer');
-                $transport = $mailer->getTransport();
-                $transport->setHost($origin->getSmtpHost());
-                $transport->setPort($origin->getSmtpPort());
-                $transport->setEncryption($origin->getSmtpEncryption());
-                $transport->setUsername($origin->getUser());
-                $transport->setPassword($password);
-                $transport->start();
-            } catch (\Exception $e) {
-                $response['smtp']['error'] = $e->getMessage();
+            if ($origin->getImapHost() !== null) {
+                $response['imap'] = [];
+
+                $config = new ImapConfig(
+                    $origin->getImapHost(),
+                    $origin->getImapPort(),
+                    $origin->getImapEncryption(),
+                    $origin->getUser(),
+                    $password
+                );
+
+                try {
+                    $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
+                    $this->manager = new ImapEmailFolderManager(
+                        $connector,
+                        $this->getDoctrine()->getManager(),
+                        $origin
+                    );
+
+                    $emailFolders = $this->manager->getFolders();
+                    $origin->setFolders($emailFolders);
+
+                    $user = new User();
+                    $user->setImapConfiguration($origin);
+                    $userForm = $this->get('oro_user.form.user');
+                    $userForm->setData($user);
+
+                    $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
+                        'form' => $userForm->createView(),
+                    ]);
+                } catch (\Exception $e) {
+                    $response['imap']['error'] = $e->getMessage();
+                }
             }
 
-            try {
-                $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
-                $this->manager = new ImapEmailFolderManager($connector, $this->getDoctrine()->getManager(), $origin);
+            if ($origin->getSmtpHost() !== null) {
+                $response['smtp'] = [];
 
-                $emailFolders = $this->manager->getFolders();
-                $origin->setFolders($emailFolders);
+                try {
+                    $mailer = $this->get('oro_email.direct_mailer');
+                    $transport = $mailer->getTransport();
+                    $transport->setHost($origin->getSmtpHost());
+                    $transport->setPort($origin->getSmtpPort());
+                    $transport->setEncryption($origin->getSmtpEncryption());
+                    $transport->setUsername($origin->getUser());
+                    $transport->setPassword($password);
 
-                $user = new User();
-                $user->setImapConfiguration($origin);
-                $userForm = $this->get('oro_user.form.user');
-                $userForm->setData($user);
-
-                $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
-                    'form' => $userForm->createView(),
-                ]);
-            } catch (\Exception $e) {
-                $response['imap']['error'] = $e->getMessage();
+                    $transport->start();
+                } catch (\Exception $e) {
+                    $response['smtp']['error'] = $e->getMessage();
+                }
             }
 
             return new JsonResponse($response);

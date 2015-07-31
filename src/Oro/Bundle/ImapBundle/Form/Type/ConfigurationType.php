@@ -210,7 +210,6 @@ class ConfigurationType extends AbstractType
             function (FormEvent $event) use ($encryptor) {
                 $data = (array) $event->getData();
                 /** @var UserEmailOrigin|null $entity */
-                $entity = $event->getForm()->getData();
                 $filtered = array_filter(
                     $data,
                     function ($item) {
@@ -226,8 +225,9 @@ class ConfigurationType extends AbstractType
                         $data['password'] = $encryptor->encryptData($data['password']);
                     }
                     $event->setData($data);
-                } elseif ($entity instanceof UserEmailOrigin) {
+                } else {
                     $event->getForm()->setData(null);
+                    $event->setData([]);
                 }
             }
         );
@@ -253,8 +253,8 @@ class ConfigurationType extends AbstractType
                 if (count($filtered) > 0) {
                     if ($entity instanceof UserEmailOrigin
                         && $entity->getImapHost() !== null
-                        && $data['imapHost'] !== null
-                        && array_key_exists('user', $data)
+                        && array_key_exists('imapHost', $data) && $data['imapHost'] !== null
+                        && array_key_exists('user', $data) && $data['user' !== null]
                         && ($entity->getImapHost() !== $data['imapHost']
                             || $entity->getUser() !== $data['user'])
                     ) {
@@ -262,7 +262,7 @@ class ConfigurationType extends AbstractType
                         $newConfiguration = new UserEmailOrigin();
                         $event->getForm()->setData($newConfiguration);
                     }
-                } elseif ($entity instanceof UserEmailOrigin) {
+                } else {
                     $event->getForm()->setData(null);
                 }
             }
