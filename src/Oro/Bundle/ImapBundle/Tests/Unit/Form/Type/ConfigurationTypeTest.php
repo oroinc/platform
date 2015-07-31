@@ -224,7 +224,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user'     => 'someUser',
-                'password' => 'somPassword2'
+                'password' => 'somPassword'
             )
         );
 
