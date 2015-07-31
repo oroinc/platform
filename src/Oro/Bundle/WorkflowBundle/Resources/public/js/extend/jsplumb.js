@@ -35,6 +35,66 @@ define(function(require) {
     /* jshint ignore:end */
     /* original jsPlumb methods:end */
 
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time, also it execution wil be postponed till repaint cycle.
+    // Normally, the throttled function will run
+    // as much as it can, without ever going more than once per `wait` duration;
+    // but if you'd like to disable the execution on the leading edge, pass
+    // `{leading: false}`. To disable execution on the trailing edge, ditto.
+    var throttleAndWaitRepaint = !_.isFunction(window.requestAnimationFrame) ?
+        _.throttle :
+        function(func, wait, options) {
+            var context;
+            var args;
+            var result;
+            var timeout = null;
+            var previous = 0;
+            var locked = false;
+            var animationLockId;
+            if (!options) {
+                options = {};
+            }
+            var later = function() {
+                if (locked) {
+                    timeout = setTimeout(later, 0);
+                    return;
+                }
+                previous = options.leading === false ? 0 : _.now();
+                timeout = null;
+                result = func.apply(context, args);
+                if (!timeout) {
+                    context = args = null;
+                }
+            };
+            var unlock = function() {
+                locked = false;
+            };
+            return function() {
+                var now = _.now();
+                if (!previous && options.leading === false) {
+                    previous = now;
+                }
+                var remaining = wait - (now - previous);
+                context = this;
+                args = arguments;
+                if (remaining <= 0 || remaining > wait) {
+                    if (locked) {
+                        return;
+                    }
+                    clearTimeout(timeout);
+                    previous = now;
+                    timeout = setTimeout(later, 0);
+                    locked = true;
+                    animationLockId = requestAnimationFrame(unlock);
+                } else if (!timeout && options.trailing !== false) {
+                    timeout = setTimeout(later, remaining);
+                    locked = true;
+                    animationLockId = requestAnimationFrame(unlock);
+                }
+                return result;
+            };
+        };
+
     /**
      * Override for initDraggable method to make the listener handler debounced
      */
@@ -43,7 +103,7 @@ define(function(require) {
         _each(el, function(el) {
             el = _gel(el);
             if (el) {
-                el._katavorioDrag.moveListener = _.debounce(el._katavorioDrag.moveListener, 30);
+                el._katavorioDrag.moveListener = throttleAndWaitRepaint(el._katavorioDrag.moveListener, 10);
             }
         });
     });

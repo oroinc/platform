@@ -110,6 +110,9 @@ define(function(require) {
                 this.subview('stepCollectionView', this.stepCollectionView);
                 this.subview('transitionCollectionView', this.transitionCollectionView);
             }, this));
+
+            // tell zoomable-area to update zoom level
+            this.$el.trigger('autozoom');
         }
     });
 

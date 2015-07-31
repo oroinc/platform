@@ -69,7 +69,8 @@ define(function(require) {
 
         updateDataFields: function() {
             this.$listEl.find('[name="oro_workflow_definition_form[steps]"]').val(JSON.stringify(this.getCollection()));
-            this.$listEl.find('[name="oro_workflow_definition_form[transitions]"]').val(JSON.stringify(this.getTransitionCollection()));
+            this.$listEl.find('[name="oro_workflow_definition_form[transitions]"]').val(
+                JSON.stringify(this.getTransitionCollection()));
         },
 
         render: function() {
