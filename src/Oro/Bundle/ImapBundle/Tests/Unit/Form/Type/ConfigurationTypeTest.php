@@ -132,7 +132,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort' => '123',
                     'smtpHost' => '',
                     'smtpPort' => '',
-                    'ssl'      => 'ssl',
+                    'imapEncryption' => 'ssl',
+                    'smtpEncryption' => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD,
                 ),
@@ -141,7 +142,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort' => '123',
                     'smtpHost' => '',
                     'smtpPort' => '',
-                    'ssl'      => 'ssl',
+                    'imapEncryption' => 'ssl',
+                    'smtpEncryption' => 'ssl',
                     'user'     => 'someUser',
                 ),
                 array(
@@ -149,7 +151,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort' => '123',
                     'smtpHost' => '',
                     'smtpPort' => '',
-                    'ssl'      => 'ssl',
+                    'imapEncryption' => 'ssl',
+                    'smtpEncryption' => 'ssl',
                     'user'     => 'someUser',
                     'password' => self::TEST_PASSWORD
                 ),
@@ -160,7 +163,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                     'imapPort' => '',
                     'smtpHost' => '',
                     'smtpPort' => '',
-                    'ssl'      => '',
+                    'imapEncryption' => '',
+                    'smtpEncryption' => '',
                     'user'     => '',
                     'password' => ''
                 ),
@@ -188,7 +192,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
-                'ssl'      => 'ssl',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
                 'user'     => 'someUser',
                 'password' => ''
             )
@@ -216,9 +221,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
-                'ssl'      => 'ssl',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
                 'user'     => 'someUser',
-                'password' => 'somPassword'
+                'password' => 'somPassword2'
             )
         );
 
@@ -247,7 +253,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '',
                 'smtpHost' => '',
                 'smtpPort' => '',
-                'ssl'      => '',
+                'imapEncryption' => '',
+                'smtpEncryption' => '',
                 'user'     => '',
                 'password' => ''
             )

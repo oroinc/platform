@@ -240,7 +240,9 @@ class Processor
             $transport->setPort($userEmailOrigin->getSmtpPort());
             $transport->setUsername($userEmailOrigin->getUser());
             $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
-            $transport->setEncryption($userEmailOrigin->getSsl());
+            if ($userEmailOrigin->getSmtpEncryption()) {
+                $transport->setEncryption($userEmailOrigin->getSmtpEncryption());
+            }
         }
     }
 
