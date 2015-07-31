@@ -3,6 +3,7 @@ define(function(require) {
 
     var FlowchartJsPlumbAreaView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var jsPlumb = require('jsplumb');
     var JPManager = require('../../../../tools/jsplumb-manager');
     var FlowchartJsPlumbBaseView = require('./base-view');
@@ -69,10 +70,20 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
-            this.onZoomChange = _.bind(this.onZoomChange, this);
-            $(document).on('zoomchange', this.onZoomChange);
 
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+        },
+
+        delegateEvents: function() {
+            FlowchartJsPlumbAreaView.__super__.delegateEvents.apply(this, arguments);
+            $(document).on('zoomchange' + this.eventNamespace(), _.bind(this.onZoomChange, this));
+            return this;
+        },
+
+        undelegateEvents: function() {
+            FlowchartJsPlumbAreaView.__super__.undelegateEvents.apply(this, arguments);
+            $(document).off(this.eventNamespace());
+            return this;
         },
 
         dispose: function () {

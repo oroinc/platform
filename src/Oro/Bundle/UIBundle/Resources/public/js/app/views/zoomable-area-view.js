@@ -33,11 +33,12 @@ define(function(require) {
             this.$zoomedElement = this.$el.find('>*:first');
             if (!this.model) {
                 this.model = new ZoomStateModel({
-                    wrapper: this.el,
-                    inner: this.$zoomedElement[0],
                     zoomLevel: 1,
                     dx: 0,
                     dy: 0
+                }, {
+                    wrapper: this.el,
+                    inner: this.$zoomedElement[0]
                 });
             }
             this.$el.addClass('zoomable-area');
@@ -48,12 +49,11 @@ define(function(require) {
 
         onMouseWheel: function (event, delta, deltaX, deltaY) {
             var clientRect = this.el.getBoundingClientRect();
+            event.preventDefault();
             if (deltaY > 0) {
-                this.model.zoomOut(event.clientX - clientRect.left, event.clientY - clientRect.top);
-                event.preventDefault();
-            } else {
                 this.model.zoomIn(event.clientX - clientRect.left, event.clientY - clientRect.top);
-                event.preventDefault();
+            } else {
+                this.model.zoomOut(event.clientX - clientRect.left, event.clientY - clientRect.top);
             }
         },
 

@@ -11,7 +11,14 @@ define(function(require) {
      */
     var ZoomStateModel;
     var BaseModel = require('./base/model');
-    var $ = require('jquery');
+
+    // homogeneous matrix
+    function applyMatrix(point, matrix) {
+        return [
+            point[0] * matrix[0] + point[1] * matrix[2] + matrix[4],
+            point[0] * matrix[1] + point[1] * matrix[3] + matrix[5]
+        ];
+    }
 
     ZoomStateModel = BaseModel.extend(/** @exports RouteModel.prototype */{
         /**
@@ -27,7 +34,7 @@ define(function(require) {
                 zoom: 1,
 
                 /**
-                 * Current zoom level
+                 * Zoom level change speed
                  * @type {number}
                  */
                 zoomSpeed: 1.1,
@@ -48,25 +55,23 @@ define(function(require) {
                  * Auto zoom padding
                  * @type {number}
                  */
-                autoZoomPadding: 50,
-
-                /**
-                 * Interceptors
-                 */
-                getPositionInterceptors: {
-                    // that is centered using transform
-                    '.jsplumb-overlay' : function (el, pos) {
-                        pos.left -= pos.width / 2;
-                        pos.top -= pos.height / 2;
-                    }
-                }
+                autoZoomPadding: 50
             };
+        },
+        
+        initialize: function(attributes, options) {
+            ZoomStateModel.__super__.initialize.apply(this, arguments);
+            if (!options.wrapper || !options.inner) {
+                throw new Error("ZoomStateModel requires wrapper and inner options to be passed");
+            }
+            this.wrapper = options.wrapper;
+            this.inner = options.inner;
         },
 
         getCenter: function () {
             return {
-                x: this.get('wrapper').clientWidth / 2 + this.get('dx'),
-                y: this.get('wrapper').clientHeight / 2 + this.get('dy')
+                x: this.wrapper.clientWidth / 2 + this.get('dx'),
+                y: this.wrapper.clientHeight / 2 + this.get('dy')
             };
         },
 
@@ -79,8 +84,6 @@ define(function(require) {
         },
 
         getPosition: function (el) {
-            var positionInterceptors = this.get('getPositionInterceptors');
-            var $el = $(el);
             var pos = {
                 left: el.offsetLeft,
                 top: el.offsetTop,
@@ -88,20 +91,47 @@ define(function(require) {
                 height: el.offsetHeight
             };
 
-            // another variant use
-            // getComputedStyle(el).transform (returns matrix) and
-            // getComputedStyle(el).transformOrigin
-            // to calculate valid border rect
-            for (var query in positionInterceptors) {
-                if ($el.is(query)) {
-                    positionInterceptors[query](el, pos);
+            var style = getComputedStyle(el);
+            try {
+                if (style.transform && style.transform !== 'none') {
+                    var matrix = style.transform
+                        .replace('matrix(', '')
+                        .replace(')', '')
+                        .split(' ')
+                        .map(function(str) {return str.trim();})
+                        .map(parseFloat);
+                    var transformOrigin = style.transformOrigin
+                        .split(' ')
+                        .map(parseFloat);
+                    var transformCenter = [pos.left + transformOrigin[0], pos.top + transformOrigin[1]];
+                    var leftTop = applyMatrix([transformCenter[0] - pos.left,
+                        transformCenter[1] - pos.top], matrix);
+                    var leftBottom = applyMatrix([transformCenter[0] - pos.left,
+                        transformCenter[1] - pos.top - pos.height], matrix);
+                    var rightTop = applyMatrix([transformCenter[0] - pos.left - pos.width,
+                        transformCenter[1] - pos.top], matrix);
+                    var rightBottom = applyMatrix([transformCenter[0] - pos.left - pos.width,
+                        transformCenter[1] - pos.top - pos.height], matrix);
+
+                    var left = Math.min(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
+                    var right = Math.max(leftTop[0], leftBottom[0], rightTop[0], rightBottom[0]);
+                    var top = Math.min(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
+                    var bottom = Math.max(leftTop[1], leftBottom[1], rightTop[1], rightBottom[1]);
+                    pos = {
+                        left: left + transformCenter[0],
+                        top: top + transformCenter[1],
+                        width: right - left,
+                        height: bottom - top
+                    };
                 }
+            } catch (e) {
+                // ignore
             }
             return pos;
         },
 
         autoZoom: function () {
-            var inner = this.get('inner');
+            var inner = this.inner;
             var left = Infinity;
             var right = -Infinity;
             var top = Infinity;
@@ -145,12 +175,12 @@ define(function(require) {
             // calculate zoom level
             var zoomLevel = Math.min(
                 1,
-                (this.get('wrapper').clientWidth - this.get('autoZoomPadding') * 2) / (right - left),
-                (this.get('wrapper').clientHeight - this.get('autoZoomPadding') * 2) / (bottom - top)
+                (this.wrapper.clientWidth - this.get('autoZoomPadding') * 2) / (right - left),
+                (this.wrapper.clientHeight - this.get('autoZoomPadding') * 2) / (bottom - top)
             );
             var clientCenter = {
-                x: this.get('wrapper').clientWidth / 2,
-                y: this.get('wrapper').clientHeight / 2
+                x: this.wrapper.clientWidth / 2,
+                y: this.wrapper.clientHeight / 2
             };
 
             left = zoomLevel * (left - clientCenter.x);
@@ -171,10 +201,10 @@ define(function(require) {
         },
 
         setZoom: function (zoom, dx, dy) {
-            if (dx === undefined) {
+            if (dx === void 0) {
                 dx = this.getCenter().x;
             }
-            if (dy === undefined) {
+            if (dy === void 0) {
                 dy = this.getCenter().y;
             }
             var currentZoom = this.get('zoom');
