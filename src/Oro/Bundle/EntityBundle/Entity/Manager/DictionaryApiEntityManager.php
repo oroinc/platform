@@ -7,20 +7,29 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
 
+    /** @var DictionaryHelper */
+    protected $dictionaryHelper;
+
     /**
      * @param ObjectManager                    $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      */
-    public function __construct(ObjectManager $om, ChainDictionaryValueListProvider $dictionaryProvider)
+    public function __construct(
+        ObjectManager $om,
+        ChainDictionaryValueListProvider $dictionaryProvider,
+        DictionaryHelper $dictionaryHelper
+    )
     {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
+        $this->dictionaryHelper = $dictionaryHelper;
     }
 
     /**
@@ -55,5 +64,73 @@ class DictionaryApiEntityManager extends ApiEntityManager
         }
 
         return $qb;
+    }
+
+    /**
+     * Search entities by search string
+     *
+     * @param $searchQuery
+     *
+     * @return array
+     */
+    public function findValueBySearchQuery($searchQuery)
+    {
+        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        if (!empty($searchQuery)) {
+            $qb->andWhere('e.' . $keyField . ' LIKE :like')
+                ->setParameter('like', '%' . $searchQuery . '%');
+        }
+        $results = $qb->getQuery()->getResult();
+
+        return $this->prepareData($results, $keyField, $labelField);
+    }
+
+    /**
+     * Search entities by primary key
+     *
+     * @param $keys[]
+     *
+     * @return array
+     */
+    public function findValueByPrimaryKey($keys)
+    {
+        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb->andWhere('e.' . $keyField . ' in (:keys)')
+            ->setParameter('keys', $keys);
+
+        $results = $qb->getQuery()->getResult();
+
+        return $this->prepareData($results, $keyField, $labelField);
+    }
+
+    /**
+     * Transform Entity data to array for dictionary filter
+     *
+     * @param $results
+     * @param $keyField
+     * @param $labelField
+     *
+     * @return array
+     */
+    protected function prepareData($results, $keyField, $labelField)
+    {
+        $resultD = [];
+        $methodGetPK = 'get' . ucfirst($keyField);
+        $methodGetLabel = 'get' . ucfirst($labelField);
+        foreach ($results as $result) {
+            $resultD[] = [
+                'id' => $result->$methodGetPK(),
+                'value' => $result->$methodGetPK(),
+                'text' => $result->$methodGetLabel()
+            ];
+        }
+
+        return $resultD;
     }
 }

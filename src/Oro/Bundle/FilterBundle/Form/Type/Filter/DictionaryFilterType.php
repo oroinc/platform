@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
@@ -104,7 +105,6 @@ class DictionaryFilterType extends AbstractType
             array(
                 'field_type'       => 'text',
                 'field_options'    => array(),
-                'operator_choices' => array(),
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
@@ -112,7 +112,11 @@ class DictionaryFilterType extends AbstractType
                 'populate_default' => false,
                 'default_value'    => null,
                 'null_value'       => null,
-                'class'            => null
+                'class'            => null,
+                'operator_choices' => [
+                    FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
+                    FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
+                ],
             )
         )->setRequired(
             array(

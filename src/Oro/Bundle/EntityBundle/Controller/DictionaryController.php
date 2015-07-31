@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
+use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -31,26 +32,43 @@ class DictionaryController extends Controller
      */
     public function filterAction($dictionary)
     {
-        $value = $this->getRequest()->get('q');
-
-        $manager = $this->container->get('oro_entity.manager.dictionary.api');
-        $manager->setClass($manager->resolveEntityClass($dictionary, true));
-
-        $qb         = $manager->getListQueryBuilder(-1, 1, [], null, []);
-        $qb->andWhere('e.name LIKE :like')
-            ->setParameter('like', '%'.$value.'%');
-        $results = $qb->getQuery()->getResult();
-
-        $resultD= [];
-        foreach($results as $result) {
-            $resultD[] = [
-                'id'=> $result->getName(),
-                'value'=> $result->getName(),
-                'text'=> $result->getName()
-            ];
+        try {
+            $searchQuery = $this->get('request_stack')->getCurrentRequest()->get('q');
+            $manager = $this->container->get('oro_entity.manager.dictionary.api');
+            $manager->setClass($manager->resolveEntityClass($dictionary, true));
+            $results = $manager->findValueBySearchQuery($searchQuery);
+            $responseContext = ['results' => $results];
+        } catch (Exception $e) {
+            $responseContext = ['error' => $e->getMessage()];
         }
 
-        $responseContext = ['results' => $resultD, 'query' => $qb];
+        return new JsonResponse($responseContext);
+    }
+
+    /**
+     * Grid of Custom/Extend entity.
+     *
+     * @param string $entityName
+     *
+     * @return array
+     *
+     * @Route(
+     *      "values/{dictionary}",
+     *      name="oro_dictionary_value"
+     * )
+     * @Template()
+     */
+    public function loadValuesAction($dictionary)
+    {
+        try {
+            $keys = $this->get('request_stack')->getCurrentRequest()->get('keys');
+            $manager = $this->container->get('oro_entity.manager.dictionary.api');
+            $manager->setClass($manager->resolveEntityClass($dictionary, true));
+            $result = $manager->findValueByPrimaryKey($keys);
+            $responseContext = ['results' => $result];
+        } catch (Exception $e) {
+            $responseContext = ['error' => $e->getMessage()];
+        }
 
         return new JsonResponse($responseContext);
     }
