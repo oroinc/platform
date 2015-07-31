@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery')
+    var $ = require('jquery');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
 
     describe('oroworkflow/js/tools/path-finder/point2d', function() {
@@ -86,11 +86,14 @@ define(function(require) {
             var a = new Point2d(2, 7);
             a.draw();
             expect(document.body).toContainElement('circle[fill=red][r=2][cx=2][cy=7]');
+
             a.draw('blue', 7);
             expect(document.body).toContainElement('circle[fill=blue][r=7][cx=2][cy=7]');
+
             a.drawText('test');
             expect(document.body).toContainElement('text[x=7][y=2][fill=black]');
             expect($('text[x=7][y=2][fill=black]')).toContainText('test');
+
             a.drawText('test1', 'green');
             expect(document.body).toContainElement('text[x=7][y=2][fill=green]');
             expect($('text[x=7][y=2][fill=green]')).toContainText('test1');
