@@ -14,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_3';
+        return 'v1_4';
     }
 
     /**
@@ -86,6 +86,29 @@ class OroDataAuditBundleInstaller implements Installation
         $auditFieldTable->addColumn('new_date', 'date', ['notnull' => false]);
         $auditFieldTable->addColumn('new_time', 'time', ['notnull' => false]);
         $auditFieldTable->addColumn('new_datetime', 'datetime', ['notnull' => false]);
+        $auditFieldTable->addColumn('old_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('old_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $auditFieldTable->addColumn('new_datetimetz', 'datetimetz', ['notnull' => false]);
+        $auditFieldTable->addColumn('new_object', 'object', ['notnull' => false, 'comment' => '(DC2Type:object)']);
+        $auditFieldTable->addColumn('visible', 'boolean', ['default' => '1']);
+        $auditFieldTable->addColumn('old_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $auditFieldTable->addColumn('new_array', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $auditFieldTable->addColumn('old_simplearray', 'simple_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:simple_array)'
+        ]);
+        $auditFieldTable->addColumn('new_simplearray', 'simple_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:simple_array)'
+        ]);
+        $auditFieldTable->addColumn('old_jsonarray', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
+        $auditFieldTable->addColumn('new_jsonarray', 'json_array', [
+            'notnull' => false,
+            'comment' => '(DC2Type:json_array)',
+        ]);
         $auditFieldTable->setPrimaryKey(['id']);
         $auditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 

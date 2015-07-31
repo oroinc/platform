@@ -9,7 +9,9 @@
 
     {%- if fieldValue.timestamp is defined -%}
         {{ type == 'date' ? fieldValue|oro_format_date : fieldValue|oro_format_datetime }}
-    {%- else -%}
+    {%- elseif type == 'array' or type == 'jsonarray' -%}
+        {{ fieldValue is not null ? fieldValue|json_encode(constant('JSON_FORCE_OBJECT')) }}
+    {% else %}
         {% if fieldValue is iterable %}{{ fieldValue|join(', ') }}{% else %}{{ fieldValue|default('') }}{% endif %}
     {%- endif -%}
 {% endmacro %}

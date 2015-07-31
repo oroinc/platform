@@ -7,7 +7,6 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
@@ -235,6 +234,17 @@ class WorkflowAttributesType extends AbstractType
     {
         $resolver->setRequired(array('workflow_item'));
 
+        $resolver->setDefaults(
+            array(
+                'workflow' => function (Options $options, $workflow) {
+                    if (!$workflow) {
+                        $workflowName = $options['workflow_item']->getWorkflowName();
+                        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
+                    }
+                    return $workflow;
+                }
+            )
+        );
         $resolver->setOptional(
             array(
                 'attribute_fields',
@@ -260,20 +270,6 @@ class WorkflowAttributesType extends AbstractType
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
                 'init_actions' => 'Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface',
-            )
-        );
-
-        $workflowRegistry = $this->workflowRegistry;
-
-        $resolver->setNormalizers(
-            array(
-                'workflow' => function (Options $options, $workflow) use ($workflowRegistry) {
-                    if (!$workflow) {
-                        $workflowName = $options['workflow_item']->getWorkflowName();
-                        $workflow = $this->workflowRegistry->getWorkflow($workflowName);
-                    }
-                    return $workflow;
-                },
             )
         );
     }

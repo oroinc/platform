@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -66,10 +67,13 @@ class RefreshContextListener
             $user = $this->refreshEntity($user);
             if ($user) {
                 $token->setUser($user);
+            } else {
+                $securityContext->setToken(null);
+                $token = null;
             }
         }
 
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token && $token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
             if (is_object($organization) && (!$className || $className == ClassUtils::getRealClass($organization))) {
                 /** @var Organization $organization */
@@ -102,6 +106,10 @@ class RefreshContextListener
             return $entityManager->find($entityClass, $entityId);
         }
 
-        return $entityManager->merge($entity);
+        try {
+            return $entityManager->merge($entity);
+        } catch (EntityNotFoundException $e) {
+            return null;
+        }
     }
 }

@@ -1,4 +1,4 @@
-define(['./settings', './directions', './Vector2d', './constraint/simple/empty-constraint',
+define(['./settings', './directions', './vector2d', './constraint/simple/empty-constraint',
     './constraint/simple/left-simple-constraint', './constraint/simple/right-simple-constraint',
     './location-directive/stick-left-location-directive', './location-directive/stick-right-location-directive',
     './location-directive/center-location-directive', './rectangle', './base-axis', './point2d', './path',

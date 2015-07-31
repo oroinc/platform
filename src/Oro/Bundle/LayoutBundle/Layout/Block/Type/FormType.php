@@ -58,9 +58,15 @@ class FormType extends AbstractFormType
                 //   ]
                 // ]
                 'groups'            => [],
-                'form_prefix'       => null,
-                'form_field_prefix' => null,
-                'form_group_prefix' => null
+                'form_prefix'       => function (Options $options, $value) {
+                    return null === $value ? $options['form_name'] : $value;
+                },
+                'form_field_prefix' => function (Options $options, $value) {
+                    return null === $value ? $options['form_prefix'] . '_' : $value;
+                },
+                'form_group_prefix' => function (Options $options, $value) {
+                    return null === $value ? $options['form_prefix'] . ':group_' : $value;
+                }
             ]
         );
         $resolver->setAllowedTypes(
@@ -70,25 +76,6 @@ class FormType extends AbstractFormType
                 'form_prefix'       => 'string',
                 'form_field_prefix' => 'string',
                 'form_group_prefix' => 'string'
-            ]
-        );
-        $resolver->setNormalizers(
-            [
-                'form_prefix'       => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_name']
-                        : $value;
-                },
-                'form_field_prefix' => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_prefix'] . '_'
-                        : $value;
-                },
-                'form_group_prefix' => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_prefix'] . ':group_'
-                        : $value;
-                }
             ]
         );
     }

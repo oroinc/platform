@@ -50,7 +50,7 @@ class CleanupCommandTest extends WebTestCase
     {
         return [
             'should show help'                             => [
-                '$expectedContent' => "Usage:\n oro:cron:batch:cleanup [-i|--interval[=\"...\"]]",
+                '$expectedContent' => "Usage:\n  oro:cron:batch:cleanup [options]",
                 '$params'          => ['--help']
             ],
             'should show no records found'                 => [

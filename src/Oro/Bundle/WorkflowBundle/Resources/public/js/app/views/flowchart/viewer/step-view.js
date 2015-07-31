@@ -39,17 +39,19 @@ define(function(require) {
             maxConnections: 100
         },
 
-        updateStepMinWidth: function () {
+        updateStepMinWidth: function() {
+            var STEP_MAX_WIDTH = 180; //that's taken from css .workflow-flowchart .workflow-step 'max-width' definition
             var currentId = this.el.id;
             var connections = this.jsPlumbSource.getConnections();
-            var count = _.countBy(connections, function (connection) {
+            var count = _.countBy(connections, function(connection) {
                 return connection.sourceId === currentId ? 'out' : (connection.targetId === currentId ? 'in' : 'other');
             });
-            var newWidth = (Math.max(count.in ? count.in : 0, count.out ? count.out : 0) + 1) * this.areaView.connectionWidth;
+            var newWidth = (Math.max(count.in ? count.in : 0, count.out ? count.out : 0) + 1) *
+                this.areaView.connectionWidth;
             this.$el.css({
                 minWidth: newWidth
             });
-            if (newWidth > 180/* that taken from css .workflow-flowchart .workflow-step 'max-width' definition*/ ) {
+            if (newWidth > STEP_MAX_WIDTH) {
                 this.$el.css({
                     maxWidth: newWidth
                 });
