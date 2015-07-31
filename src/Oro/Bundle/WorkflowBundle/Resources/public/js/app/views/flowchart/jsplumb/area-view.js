@@ -111,7 +111,7 @@ define(function(require) {
             }
         },
 
-        onZoomChange: function (event, options) {
+        onZoomChange: function(event, options) {
             this.jsPlumbInstance.setZoom(options.zoom);
         }
     });
