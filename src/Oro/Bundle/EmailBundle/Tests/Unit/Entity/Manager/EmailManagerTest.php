@@ -214,7 +214,7 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
         $repository->expects($this->once())->method('createQueryBuilder')->will($this->returnValue($repository));
         $repository->expects($this->exactly(3))->method('andWhere')->will($this->returnValue($repository));
-        $repository->expects($this->exactly(2))->method('setParameter')->will($this->returnValue($repository));
+        $repository->expects($this->exactly(3))->method('setParameter')->will($this->returnValue($repository));
         $repository->expects($this->once())->method('getQuery')->will($this->returnValue($repository));
         $repository->expects($this->exactly(3))->method('expr')->will($this->returnValue($repository));
         $repository->expects($this->exactly(3))->method('eq')->will($this->returnValue($repository));
