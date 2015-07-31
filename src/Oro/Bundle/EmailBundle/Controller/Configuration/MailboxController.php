@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -82,12 +83,18 @@ class MailboxController extends Controller
                 if ($form->isValid()) {
                     $em = $this->getDoctrine()
                         ->getManager();
-                    $em->persist($mailbox = $form->getData());
-                    $em->flush();
 
-                    if ($mailbox->getProcessSettings() instanceof Taggable) {
-                        $this->get('oro_tag.tag.manager')->saveTagging($mailbox->getProcessSettings());
+                    /** @var Mailbox $mailbox */
+                    $mailbox = $form->getData();
+
+                    $em->persist($mailbox);
+
+                    $processSettings = $mailbox->getProcessSettings();
+                    if ($processSettings instanceof Taggable) {
+                        $this->get('oro_tag.tag.manager')->saveTagging($processSettings);
                     }
+
+                    $em->flush();
 
                     $this->get('session')->getFlashBag()->add(
                         'success',

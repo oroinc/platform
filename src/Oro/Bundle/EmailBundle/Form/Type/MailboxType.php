@@ -78,27 +78,17 @@ class MailboxType extends AbstractType
             'empty_data'  => null,
         ]);
         $builder->add(
-            'allowedUsers',
+            'authorizedUsers',
             'oro_user_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
-                'mapped' => false
             ]
         );
         $builder->add(
-            'allowedUsers',
-            'oro_user_multiselect',
-            [
-                'label' => 'oro.user.entity_plural_label',
-                'mapped' => false
-            ]
-        );
-        $builder->add(
-            'allowedRoles',
+            'authorizedRoles',
             'oro_role_multiselect',
             [
                 'label' => 'oro.user.role.entity_plural_label',
-                'mapped' => false
             ]
         );
 
