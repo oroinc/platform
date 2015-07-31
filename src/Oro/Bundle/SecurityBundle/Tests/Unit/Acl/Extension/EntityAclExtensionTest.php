@@ -137,12 +137,15 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
+        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor(),
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider
+            $this->metadataProvider,
+            $configProviderMock
         );
         $this->decisionMaker->setContainer($container);
 

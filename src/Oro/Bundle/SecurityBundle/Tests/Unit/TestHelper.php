@@ -92,17 +92,18 @@ class TestHelper
             ->method('getTree')
             ->will($this->testCase->returnValue($ownerTree));
 
+        $configProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
                 $treeProviderMock,
                 $idAccessor,
                 new EntityOwnerAccessor($metadataProvider),
-                $metadataProvider
+                $metadataProvider,
+                $configProviderMock
             );
         }
-        $configProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,

@@ -179,6 +179,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testObjIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
     {
+
         $obj = new TestEntity(1);
         $this->context->setObject($obj);
         $masks = $this->getMasks('VIEW', $obj);

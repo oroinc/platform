@@ -119,14 +119,21 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithOrganization($user, $domainObject, $organization = null)
     {
-        $this->validateUserObject($user);
-        $this->validateObject($domainObject);
-
-        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
-            return true;
-        }
-        
         return $this->isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
+    {
+        $result = parent::isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization);
+
+        if (!$result) {
+            $result = $this->isSharedWithUser($user, $domainObject, $organization);
+        }
+
+        return $result;
     }
 
     /**
@@ -135,15 +142,21 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
-        $tree = $this->treeProvider->getTree();
-        $this->validateUserObject($user);
-        $this->validateObject($domainObject);
-
-        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
-            return true;
-        }
-        
         return $this->isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
+    {
+        $result = parent::isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
+
+        if (!$result) {
+            $result = $this->isSharedWithUser($user, $domainObject, $organization);
+        }
+
+        return $result;
     }
 
     /**
@@ -152,15 +165,21 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      */
     public function isAssociatedWithUser($user, $domainObject, $organization = null)
     {
-        $userId = $this->getObjectId($user);
-        $this->validateUserObject($user);
-        $this->validateObject($domainObject);
-
-        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
-            return true;
-        }
-        
         return $this->isAssociatedWithBasicLevelEntity($user, $domainObject, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
+    {
+        $result = parent::isAssociatedWithBasicLevelEntity($user, $domainObject, $organization);
+
+        if (!$result) {
+            $result = $this->isSharedWithUser($user, $domainObject, $organization);
+        }
+
+        return $result;
     }
 
     /**
@@ -183,7 +202,9 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      * @param object $user
      * @param object $organization
      * @param object $domainObject
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function isSharedWithUser($user, $domainObject, $organization)
@@ -215,6 +236,7 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
 
     /**
      * @param object $domainObject
+     *
      * @return bool
      */
     protected function isSharingApplicable($domainObject)
