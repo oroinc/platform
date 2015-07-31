@@ -86,14 +86,6 @@ define(function(require) {
             return this;
         },
 
-        dispose: function () {
-            if (this.disposed) {
-                return;
-            }
-            $(document).off('zoomchange', this.onZoomChange);
-            FlowchartJsPlumbAreaView.__super__.dispose.apply(this, arguments);
-        },
-
         render: function() {
             // do nothing except connect()
             if (!this.isConnected) {

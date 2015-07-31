@@ -20,22 +20,22 @@ define(function(require) {
             'change model': 'render'
         },
 
-        onZoomInClick: function (e) {
+        onZoomInClick: function(e) {
             e.preventDefault();
             this.model.zoomIn();
         },
 
-        onZoomOutClick: function (e) {
+        onZoomOutClick: function(e) {
             e.preventDefault();
             this.model.zoomOut();
         },
 
-        onAutoZoomClick: function (e) {
+        onAutoZoomClick: function(e) {
             e.preventDefault();
             this.model.autoZoom();
         },
 
-        onSetZoomClick: function (e) {
+        onSetZoomClick: function(e) {
             e.preventDefault();
             this.model.setZoom(parseFloat($(e.currentTarget).attr('data-size')) / 100);
         }

@@ -47,7 +47,7 @@ define(function(require) {
             }
         },
 
-        onMouseWheel: function (event, delta, deltaX, deltaY) {
+        onMouseWheel: function(event, delta, deltaX, deltaY) {
             var clientRect = this.el.getBoundingClientRect();
             event.preventDefault();
             if (deltaY > 0) {
@@ -57,7 +57,7 @@ define(function(require) {
             }
         },
 
-        onMouseDown: function (event) {
+        onMouseDown: function(event) {
             var _this = this;
             var currentPosition = {
                 x: event.originalEvent.screenX,
@@ -82,26 +82,26 @@ define(function(require) {
             addEventListener('mouseup', handleMouseUp, true);
         },
 
-        notifyChangeZoom: function () {
+        notifyChangeZoom: function() {
             $(document).trigger('zoomchange', {
                 el: this.el,
                 zoom: this.model.get('zoom')
             });
         },
 
-        onZoomIn: function () {
+        onZoomIn: function() {
             this.model.zoomIn();
         },
 
-        onZoomOut: function () {
+        onZoomOut: function() {
             this.model.zoomOut();
         },
 
-        onZoomAuto: function () {
+        onZoomAuto: function() {
             this.model.autoZoom();
         },
 
-        render: function () {
+        render: function() {
             if (this.controls !== false && !this.subview('controls')) {
                 var el = $('<div class="zoom-controls"></div>');
                 this.subview('controls', new ZoomControlsView({

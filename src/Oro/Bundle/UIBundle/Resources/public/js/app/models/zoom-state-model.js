@@ -58,7 +58,7 @@ define(function(require) {
                 autoZoomPadding: 50
             };
         },
-        
+
         initialize: function(attributes, options) {
             ZoomStateModel.__super__.initialize.apply(this, arguments);
             if (!options.wrapper || !options.inner) {
@@ -68,22 +68,22 @@ define(function(require) {
             this.inner = options.inner;
         },
 
-        getCenter: function () {
+        getCenter: function() {
             return {
                 x: this.wrapper.clientWidth / 2 + this.get('dx'),
                 y: this.wrapper.clientHeight / 2 + this.get('dy')
             };
         },
 
-        zoomIn: function (dx, dy) {
+        zoomIn: function(dx, dy) {
             this.setZoom(this.get('zoom') * this.get('zoomSpeed'), dx, dy);
         },
 
-        zoomOut: function (dx, dy) {
+        zoomOut: function(dx, dy) {
             this.setZoom(this.get('zoom') / this.get('zoomSpeed'), dx, dy);
         },
 
-        getPosition: function (el) {
+        getPosition: function(el) {
             var pos = {
                 left: el.offsetLeft,
                 top: el.offsetTop,
@@ -130,7 +130,7 @@ define(function(require) {
             return pos;
         },
 
-        autoZoom: function () {
+        autoZoom: function() {
             var inner = this.inner;
             var left = Infinity;
             var right = -Infinity;
@@ -195,12 +195,12 @@ define(function(require) {
 
             this.set({
                 zoom: zoomLevel,
-                dx: - currentCenter.x, //zeroPoint.x + currentCenter.x,
-                dy: - currentCenter.y + this.get('autoZoomPadding') * (1 - zoomLevel) //zeroPoint.y + currentCenter.y
+                dx: -currentCenter.x, //zeroPoint.x + currentCenter.x,
+                dy: -currentCenter.y + this.get('autoZoomPadding') * (1 - zoomLevel) //zeroPoint.y + currentCenter.y
             });
         },
 
-        setZoom: function (zoom, dx, dy) {
+        setZoom: function(zoom, dx, dy) {
             if (dx === void 0) {
                 dx = this.getCenter().x;
             }
@@ -218,7 +218,7 @@ define(function(require) {
             });
         },
 
-        move: function (dx, dy) {
+        move: function(dx, dy) {
             this.set({
                 dx: this.get('dx') + dx,
                 dy: this.get('dy') + dy
