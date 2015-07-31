@@ -49,7 +49,7 @@ class ActivityListManager
     protected $doctrineHelper;
 
     /** @var ActivityListAclCriteriaHelper */
-    protected $ActivityListAclHelper;
+    protected $activityListAclHelper;
 
     /**
      * @param Registry                  $doctrine
@@ -86,7 +86,7 @@ class ActivityListManager
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
-        $this->ActivityListAclHelper    = $aclHelper;
+        $this->activityListAclHelper    = $aclHelper;
     }
 
     /**
@@ -110,7 +110,7 @@ class ActivityListManager
         $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->ActivityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -137,7 +137,7 @@ class ActivityListManager
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
-        $this->ActivityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
 
         $query = $qb->getQuery();
