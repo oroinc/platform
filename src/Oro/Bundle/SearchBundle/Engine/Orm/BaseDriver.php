@@ -266,14 +266,16 @@ abstract class BaseDriver
      */
     public function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
+        $value     = $searchCondition['fieldValue'];
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        $qb->setParameter('value' . $index, $searchCondition['fieldValue']);
+        $qb->setParameter('value' . $index, $value);
 
         return $this->createNonTextQuery(
             $joinAlias,
             $index,
-            $searchCondition['condition']
+            $searchCondition['condition'],
+            is_array($searchCondition['fieldName']) ? 'in' : '='
         );
     }
 
@@ -286,23 +288,35 @@ abstract class BaseDriver
      *
      * @return string
      */
-    protected function createNonTextQuery($joinAlias, $index, $condition)
+    protected function createNonTextQuery($joinAlias, $index, $condition, $operator)
     {
-        if ($condition == Query::OPERATOR_IN) {
-            $searchString
-                = $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value ' . $condition . ' (:value'
-                . $index . ')';
-        } elseif ($condition == Query::OPERATOR_NOT_IN) {
-            $searchString
-                =
-                $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value NOT IN (:value' . $index . ')';
-        } else {
-            $searchString
-                = $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value ' . $condition . ' :value'
-                . $index;
+        $openBrackets  = '';
+        $closeBrackets = '';
+        if ($operator === 'in') {
+            $openBrackets  = '(';
+            $closeBrackets = ')';
         }
 
-        return $searchString;
+        switch ($condition) {
+            case Query::OPERATOR_IN:
+            case Query::OPERATOR_NOT_IN:
+                $queryString = '(%s.field %s %s :field%s %s AND %s.value %s (:value%s))';
+                break;
+            default:
+                $queryString = '(%s.field %s %s :field%s %s AND %s.value %s :value%s)';
+        }
+
+        return sprintf(
+            $queryString,
+            $joinAlias,
+            $operator,
+            $openBrackets,
+            $index,
+            $closeBrackets,
+            $joinAlias,
+            $condition !== Query::OPERATOR_NOT_IN ? $condition : 'not in',
+            $index
+        );
     }
 
     /**
@@ -318,7 +332,7 @@ abstract class BaseDriver
 
         $this->setFrom($query, $qb);
 
-        $criteria        = $query->getCriteria();
+        $criteria = $query->getCriteria();
 
         $whereExpression = $criteria->getWhereExpression();
         if ($whereExpression) {
