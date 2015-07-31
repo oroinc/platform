@@ -96,12 +96,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $lastSynchronizedAt = $this->syncEmails($imapFolder, $sqb->get());
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
-            $endDate = $folder->getSynchronizedAt();
-            $startDate = clone $endDate;
+            $startDate = $folder->getSynchronizedAt();
             $startDate = $startDate->modify('-1 month');
 
             // set seen flags from previously synchronized emails
-            $this->checkFlags($imapFolder, $startDate, $endDate);
+            $this->checkFlags($imapFolder, $startDate);
 
             $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
@@ -116,12 +115,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * @param ImapEmailFolder $imapFolder
      * @param \DateTime $startDate
-     * @param \DateTime $endDate
      */
-    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate, $endDate)
+    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate)
     {
         try {
-            $uids = $this->manager->getUnseenEmailUIDs($startDate, $endDate);
+            $uids = $this->manager->getUnseenEmailUIDs($startDate);
 
             $emailImapRepository = $this->em->getRepository('OroImapBundle:ImapEmail');
             $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');

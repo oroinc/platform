@@ -130,6 +130,15 @@ class EmailControllerTest extends WebTestCase
         $this->assertTrue($data['successful']);
     }
 
+    public function testMarkAllEmailsAsSeen()
+    {
+        $url = $this->getUrl('oro_email_mark_all_as_seen');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
     public function testMarkReadMass()
     {
         $url = $this->getUrl(
@@ -218,5 +227,15 @@ class EmailControllerTest extends WebTestCase
             0,
             $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
         );
+    }
+
+    public function testGetLastEmail()
+    {
+        $url = $this->getUrl('oro_email_last');
+        $this->client->request('GET', $url);
+
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEquals(1, $response['count']);
+        $this->assertCount(1, $response['emails']);
     }
 }
