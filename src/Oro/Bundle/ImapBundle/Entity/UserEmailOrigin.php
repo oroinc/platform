@@ -275,7 +275,6 @@ class UserEmailOrigin extends EmailOrigin
         $smtpPort = $this->getSmtpPort();
         $user = $this->getUser();
         $password = $this->getPassword();
-
         if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && !empty($password)) {
             return true;
         }
