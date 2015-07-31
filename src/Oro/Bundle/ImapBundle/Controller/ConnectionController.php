@@ -51,7 +51,7 @@ class ConnectionController extends Controller
             $config = new ImapConfig(
                 $origin->getImapHost(),
                 $origin->getImapPort(),
-                $origin->getSsl(),
+                $origin->getImapEncryption(),
                 $origin->getUser(),
                 $this->get('oro_security.encoder.mcrypt')->decryptData($origin->getPassword())
             );

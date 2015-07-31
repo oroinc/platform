@@ -58,7 +58,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
         $config = new ImapConfig(
             $origin->getImapHost(),
             $origin->getImapPort(),
-            $origin->getSsl(),
+            $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword())
         );

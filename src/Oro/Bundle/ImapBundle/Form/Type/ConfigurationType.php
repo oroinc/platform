@@ -75,6 +75,14 @@ class ConfigurationType extends AbstractType
                 'attr'     => ['class' => 'imap-config'],
                 'required' => false
             ])
+            ->add('imapEncryption', 'choice', [
+                'label'       => 'oro.imap.configuration.imap_encryption.label',
+                'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'attr'        => ['class' => 'imap-config'],
+                'empty_data'  => null,
+                'empty_value' => '',
+                'required'    => false
+            ])
             ->add('useSmtp', 'checkbox', [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config'],
@@ -92,9 +100,10 @@ class ConfigurationType extends AbstractType
                 'attr'     => ['class' => 'smtp-config'],
                 'required' => false
             ])
-            ->add('ssl', 'choice', [
-                'label'       => 'oro.imap.configuration.ssl.label',
+            ->add('smtpEncryption', 'choice', [
+                'label'       => 'oro.imap.configuration.smtp_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
+                'attr'        => ['class' => 'smtp-config'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -257,6 +266,7 @@ class ConfigurationType extends AbstractType
                             : $this->securityFacade->getLoggedUser()->getOrganization();
                         $data->setOrganization($organization);
                     }
+
                     $event->setData($data);
                 }
             }
@@ -275,13 +285,11 @@ class ConfigurationType extends AbstractType
                 $entity = $event->getForm()->getData();
 
                 if ($entity instanceof UserEmailOrigin) {
-                    if (array_key_exists('useImap', $data) === false || $data['useImap'] === 0) {
-                        unset($data['imapHost']);
-                        unset($data['imapPort']);
+                    if (!array_key_exists('useImap', $data) || $data['useImap'] === 0) {
+                        unset($data['imapHost'], $data['imapPort'], $data['imapEncryption']);
                     }
-                    if (array_key_exists('useSmtp', $data) === false || $data['useSmtp'] === 0) {
-                        unset($data['smtpHost']);
-                        unset($data['smtpPort']);
+                    if (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0) {
+                        unset($data['smtpHost'], $data['smtpPort'], $data['smtpEncryption']);
                     }
                     $event->setData($data);
                 }

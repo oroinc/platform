@@ -94,7 +94,7 @@ class UserEmailOriginListener
         $config = new ImapConfig(
             $origin->getImapHost(),
             $origin->getImapPort(),
-            $origin->getSsl(),
+            $origin->getImapEncryption(),
             $origin->getUser(),
             $this->mcrypt->decryptData($origin->getPassword())
         );
