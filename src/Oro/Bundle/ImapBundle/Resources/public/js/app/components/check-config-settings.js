@@ -8,11 +8,12 @@ define(['jquery', 'underscore'], function($, _) {
      * @param {string} options.elementNamePrototype
      */
     return function(options) {
-        var useImap = $('.imap-config:checkbox');
-        var useSmtp = $('.smtp-config:checkbox');
-
-        var imapFields = $('input.imap-config,select.imap-config').not(':checkbox');
-        var smtpFields = $('input.smtp-config,select.smtp-config').not(':checkbox');
+        var $el = $(options._sourceElement);
+        var $parentContainer = $el.parent();
+        var useImap = $parentContainer.find('.imap-config:checkbox');
+        var useSmtp = $parentContainer.find('.smtp-config:checkbox');
+        var imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
+        var smtpFields = $parentContainer.find('input.smtp-config,select.smtp-config').not(':checkbox');
 
         if (useImap.prop('checked') === false) {
             imapFields.each(function() {
