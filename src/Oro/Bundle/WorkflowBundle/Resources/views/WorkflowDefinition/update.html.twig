@@ -511,7 +511,10 @@
         <div class="span7">
             <div class="workflow-flowchart-container">
                 <div class="workflow-flowchart-controls clearfix"></div>
-                <div class="workflow-flowchart-wrapper"><div class="workflow-flowchart clearfix"></div></div>
+                <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
+                    'module': 'oroui/js/app/components/view-component',
+                    'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                }) }}><div class="workflow-flowchart clearfix"></div></div>
             </div>
         </div>
         {% endif %}
