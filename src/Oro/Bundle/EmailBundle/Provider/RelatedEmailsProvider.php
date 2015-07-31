@@ -90,7 +90,7 @@ class RelatedEmailsProvider
             } else {
                 if ($depth > 1) {
                     $assocObject = $propertyAccessor->getValue($object, $name);
-                    if (!$assocObject instanceof \Traversable) {
+                    if (!$assocObject instanceof \Traversable && !is_array($assocObject)) {
                         if ($assocObject) {
                             $assocObject = [$assocObject];
                         } else {
