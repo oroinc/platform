@@ -146,7 +146,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _createFilter: function(filterOptions, fieldId) {
-
             var moduleName = mapFilterModuleName(filterOptions.type);
             var requires = [moduleName];
 
@@ -160,6 +159,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
             }, this), 100);
 
             require(requires, _.bind(function(Filter, optionResolver) {
+                console.log(1);
                 var fieldCondition = this;
                 function appendFilter() {
                     clearTimeout(showLoadingTimeout);

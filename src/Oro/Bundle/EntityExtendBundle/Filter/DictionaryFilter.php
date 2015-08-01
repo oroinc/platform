@@ -4,13 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
-class MultiEnumFilter extends AbstractMultiChoiceFilter
+class DictionaryFilter extends AbstractMultiChoiceFilter
 {
     /**
      * Constructor
@@ -38,9 +38,9 @@ class MultiEnumFilter extends AbstractMultiChoiceFilter
             $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
             unset($params['class']);
         }
-        if (isset($params['enum_code'])) {
-            $params[FilterUtility::FORM_OPTIONS_KEY]['enum_code'] = $params['enum_code'];
-            unset($params['enum_code']);
+        if (isset($params['dictionary_code'])) {
+            $params[FilterUtility::FORM_OPTIONS_KEY]['dictionary_code'] = $params['dictionary_code'];
+            unset($params['dictionary_code']);
         }
         parent::init($name, $params);
     }
@@ -66,6 +66,19 @@ class MultiEnumFilter extends AbstractMultiChoiceFilter
     /**
      * {@inheritdoc}
      */
+    public function getMetadata()
+    {
+        $metadata = parent::getMetadata();
+
+        if ($metadata[FilterUtility::TYPE_KEY] === 'multichoice') {
+            $metadata[FilterUtility::TYPE_KEY] = 'dictionary';
+        }
+        return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function buildNullValueExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,
@@ -84,6 +97,6 @@ class MultiEnumFilter extends AbstractMultiChoiceFilter
      */
     protected function getFormType()
     {
-        return EnumFilterType::NAME;
+        return DictionaryFilterType::NAME;
     }
 }
