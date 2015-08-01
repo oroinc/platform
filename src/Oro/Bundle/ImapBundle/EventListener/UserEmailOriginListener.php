@@ -10,11 +10,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
-class ImapEmailOriginListener
+class UserEmailOriginListener
 {
     /**
      * @var Mcrypt
@@ -44,14 +44,14 @@ class ImapEmailOriginListener
     }
 
     /**
-     * Create ImapEmailFolder instances for each newly created EmailFolder related to ImapEmailOrigin
+     * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
      *
      * @param LifecycleEventArgs $event
      */
     public function prePersist(LifecycleEventArgs $event)
     {
         $origin = $event->getObject();
-        if ($origin instanceof ImapEmailOrigin && !$origin->getFolders()->isEmpty()) {
+        if ($origin instanceof UserEmailOrigin && !$origin->getFolders()->isEmpty()) {
             $manager = $this->createManager($origin);
             $folders = $origin->getRootFolders();
 
@@ -85,16 +85,16 @@ class ImapEmailOriginListener
     }
 
     /**
-     * @param ImapEmailOrigin $origin
+     * @param UserEmailOrigin $origin
      *
      * @return ImapEmailFolderManager
      */
-    protected function createManager(ImapEmailOrigin $origin)
+    protected function createManager(UserEmailOrigin $origin)
     {
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
-            $origin->getSsl(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
+            $origin->getImapEncryption(),
             $origin->getUser(),
             $this->mcrypt->decryptData($origin->getPassword())
         );

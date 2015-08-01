@@ -78,15 +78,9 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->beforeSearchEvent($event);
 
-        $wherePart = $query->getOptions();
-        $this->assertCount(2, $wherePart);
-        $expexted = [
-            'fieldName' => 'organization',
-            'condition' => 'in',
-            'fieldValue' => [5, 0],
-            'fieldType' => 'integer',
-            'type' => 'and'
-        ];
-        $this->assertEquals($expexted, $wherePart[1]);
+        $this->assertEquals(
+            ' from testEntity where (text name ~ "string" and integer organization in (5, 0))',
+            $query->getStringQuery()
+        );
     }
 }
