@@ -3,17 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\OptionsResolver\Options;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class DictionaryFilterType extends AbstractType
@@ -76,14 +71,6 @@ class DictionaryFilterType extends AbstractType
     {
         return self::NAME;
     }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public function getParent()
-//    {
-//        return ChoiceFilterType::NAME;
-//    }
 
     /**
      * {@inheritDoc}

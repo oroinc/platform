@@ -18,15 +18,15 @@ class DictionaryApiEntityManager extends ApiEntityManager
     protected $dictionaryHelper;
 
     /**
-     * @param ObjectManager                    $om
+     * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
+     * @param DictionaryHelper $dictionaryHelper
      */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
         DictionaryHelper $dictionaryHelper
-    )
-    {
+    ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
@@ -112,9 +112,9 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /**
      * Transform Entity data to array for dictionary filter
      *
-     * @param $results
-     * @param $keyField
-     * @param $labelField
+     * @param array $results
+     * @param string $keyField
+     * @param string $labelField
      *
      * @return array
      */

@@ -42,8 +42,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function handleGetCountListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
     {
-        $manager    = $this->getManager();
-        $qb         = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+        $manager = $this->getManager();
+        $qb = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
         $qb->select('Count(e)');
         $result = $qb->getQuery()->getSingleScalarResult();
 

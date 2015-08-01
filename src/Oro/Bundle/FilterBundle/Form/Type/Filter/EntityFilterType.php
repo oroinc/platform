@@ -5,16 +5,6 @@ namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-
-
-
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
-
 class EntityFilterType extends AbstractChoiceType
 {
     const NAME = 'oro_type_entity_filter';
@@ -45,7 +35,6 @@ class EntityFilterType extends AbstractChoiceType
                 'field_type'    => 'entity',
                 'field_options' => array(),
                 'translatable'  => false,
-//                'class'            => null
             )
         );
 

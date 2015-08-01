@@ -3,17 +3,25 @@
 namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Rhumsaa\Uuid\Console\Exception;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class DictionaryHelper {
-
+class DictionaryHelper
+{
+    /** @var \Symfony\Component\PropertyAccess\PropertyAccessor */
     protected $accessor;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
+    /**
+     * @param ClassMetadata $metadata
+     * @return mixed
+     */
     public function getNamePrimaryKeyField(ClassMetadata $metadata)
     {
         $idNames = $metadata->getIdentifierFieldNames();
@@ -23,6 +31,10 @@ class DictionaryHelper {
         return $idNames[0];
     }
 
+    /**
+     * @param ClassMetadata $meteData
+     * @return string
+     */
     public function getNameLabelField(ClassMetadata $meteData)
     {
         $fieldNames = $meteData->getFieldNames();

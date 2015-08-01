@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
+use FOS\RestBundle\Util\Codes;
+
 use Rhumsaa\Uuid\Console\Exception;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -20,7 +21,7 @@ class DictionaryController extends Controller
     /**
      * Grid of Custom/Extend entity.
      *
-     * @param string $entityName
+     * @param string $dictionary
      *
      * @return array
      *
@@ -48,7 +49,7 @@ class DictionaryController extends Controller
     /**
      * Grid of Custom/Extend entity.
      *
-     * @param string $entityName
+     * @param string $dictionary
      *
      * @return array
      *

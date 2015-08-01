@@ -327,6 +327,5 @@ services:
             - @oro_entity.dictionary_value_list_provider
             - @oro_entity.helper.dictionary
 
-
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
