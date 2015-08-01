@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var FlowchartEditorStepView;
+    var _ = require('underscore');
     var FlowchartViewerStepView = require('../viewer/step-view');
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
@@ -23,6 +24,20 @@ define(function(require) {
             'click .workflow-step-delete': 'triggerRemoveStep'
         },
 
+        connect: function() {
+            var instance = this.areaView.jsPlumbInstance;
+            // add element as source to jsPlumb
+            if (this.model.get('draggable') !== false) {
+                instance.draggable(this.$el, {
+                    stop: _.bind(function(e) {
+                        // update model position when dragging stops
+                        this.model.set({position: e.pos});
+                    }, this)
+                });
+            }
+            FlowchartEditorStepView.__super__.connect.apply(this, arguments);
+        },
+
         triggerEditStep: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestEditStep', this.model);
@@ -40,6 +55,11 @@ define(function(require) {
 
         triggerAddStep: function() {
             this.areaView.model.trigger('requestAddTransition', this.model);
+        },
+
+        render: function() {
+            FlowchartEditorStepView.__super__.render.call(this);
+            this.$el.toggleClass('final-step', Boolean(this.model.get('is_final')));
         }
     });
 

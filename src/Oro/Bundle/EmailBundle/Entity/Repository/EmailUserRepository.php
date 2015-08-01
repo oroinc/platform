@@ -15,15 +15,17 @@ class EmailUserRepository extends EntityRepository
 {
     /**
      * @param Email $email
-     * @param User  $user
+     * @param User $user
+     * @param Organization $organisation
      *
-     * @return null|EmailUser
+     * @return EmailUser[]
      */
-    public function findByEmailAndOwner(Email $email, User $user)
+    public function findByEmailAndOwner(Email $email, User $user, Organization $organisation)
     {
-        return $this->findOneBy([
+        return $this->findBy([
             'email' => $email,
-            'owner' => $user
+            'owner' => $user,
+            'organization' => $organisation
         ]);
     }
 
@@ -103,6 +105,26 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * Get all unseen user email
+     *
+     * @param User $user
+     * @param Organization $organization
+     * @return mixed
+     */
+    public function findUnseenUserEmail(User $user, Organization $organization)
+    {
+        $qb = $this->createQueryBuilder('eu');
+
+        return $qb
+            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+            ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
+            ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
+            ->setParameter('owner', $user)
+            ->setParameter('organization', $organization)
+            ->setParameter('seen', false);
+    }
+
+    /**
      * @param array $ids
      * @param User $user
      * @param string $folderType
@@ -115,7 +137,7 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->join('eu.email', 'e');
 
         $this->applyOwnerFilter($queryBuilder, $user);
-        $this->applyHeadFilter($queryBuilder, 1);
+        $this->applyHeadFilter($queryBuilder, true);
 
         if ($folderType) {
             $this->applyFolderFilter($queryBuilder, $folderType);

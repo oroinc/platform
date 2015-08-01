@@ -4,106 +4,96 @@ namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError;
+
+/**
+ * @TODO: In platform 2.0 this class should be extended from the Doctrine\Common\Collections\Criteria.
+ *        We should refactor this class only from platform v2.0 because it will break backward compatibility.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Query
 {
     const SELECT = 'select';
 
-    const ORDER_ASC = 'asc';
+    const ORDER_ASC  = 'asc';
     const ORDER_DESC = 'desc';
 
-    const KEYWORD_FROM = 'from';
-    const KEYWORD_WHERE = 'where';
-    const KEYWORD_AND = 'and';
-    const KEYWORD_OR = 'or';
-    const KEYWORD_OFFSET = 'offset';
+    const KEYWORD_FROM        = 'from';
+    const KEYWORD_WHERE       = 'where';
+    const KEYWORD_AND         = 'and';
+    const KEYWORD_OR          = 'or';
+    const KEYWORD_OFFSET      = 'offset';
     const KEYWORD_MAX_RESULTS = 'max_results';
-    const KEYWORD_ORDER_BY = 'order_by';
+    const KEYWORD_ORDER_BY    = 'order_by';
 
-    const OPERATOR_EQUALS = '=';
-    const OPERATOR_NOT_EQUALS = '!=';
-    const OPERATOR_GREATER_THAN = '>';
+    const OPERATOR_EQUALS              = '=';
+    const OPERATOR_NOT_EQUALS          = '!=';
+    const OPERATOR_GREATER_THAN        = '>';
     const OPERATOR_GREATER_THAN_EQUALS = '>=';
-    const OPERATOR_LESS_THAN = '<';
-    const OPERATOR_LESS_THAN_EQUALS = '<=';
-    const OPERATOR_CONTAINS = '~';
-    const OPERATOR_NOT_CONTAINS = '!~';
-    const OPERATOR_IN = 'in';
-    const OPERATOR_NOT_IN = '!in';
+    const OPERATOR_LESS_THAN           = '<';
+    const OPERATOR_LESS_THAN_EQUALS    = '<=';
+    const OPERATOR_CONTAINS            = '~';
+    const OPERATOR_NOT_CONTAINS        = '!~';
+    const OPERATOR_IN                  = 'in';
+    const OPERATOR_NOT_IN              = '!in';
 
-    const TYPE_TEXT = 'text';
-    const TYPE_INTEGER = 'integer';
+    const TYPE_TEXT     = 'text';
+    const TYPE_INTEGER  = 'integer';
     const TYPE_DATETIME = 'datetime';
-    const TYPE_DECIMAL = 'decimal';
+    const TYPE_DECIMAL  = 'decimal';
 
     const INFINITY = 10000000;
     const FINITY   = 0.000001;
 
     const DELIMITER = ' ';
 
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * @var  string
-     */
+    /** @var  string */
     protected $query;
 
-    /**
-     * @var int
-     */
-    protected $maxResults;
-
-    /**
-     * @var int
-     */
-    protected $firstResult;
-
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $from;
 
-    /**
-     * @var string
-     */
-    protected $orderType;
-
-    /**
-     * @var string
-     */
-    protected $orderBy;
-
-    /**
-     * @var string
-     */
-    protected $orderDirection;
-
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $mappingConfig;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $fields;
 
-    /**
-     * @var ObjectManager
-     */
-    private $em;
+    /** @var Criteria */
+    protected $criteria;
 
+    /**
+     * @param null|string $queryType
+     */
     public function __construct($queryType = null)
     {
         if ($queryType) {
             $this->createQuery($queryType);
         }
 
-        $this->options    = array();
         $this->maxResults = 0;
         $this->from       = false;
+
+        $this->criteria = Criteria::create();
+
+        $this->criteria->setMaxResults(0);
+    }
+
+    /**
+     * @return Criteria
+     */
+    public function getCriteria()
+    {
+        return $this->criteria;
+    }
+
+    /**
+     * @param Criteria $criteria
+     */
+    public function setCriteria(Criteria $criteria)
+    {
+        $this->criteria = $criteria;
     }
 
     /**
@@ -131,7 +121,7 @@ class Query
      */
     public function setMappingConfig($mappingConfig)
     {
-        $fields = array();
+        $fields = [];
 
         foreach ($mappingConfig as $entity => $config) {
             foreach ($config['fields'] as $field) {
@@ -190,6 +180,8 @@ class Query
     /**
      * Add "AND WHERE" parameter
      *
+     * @deprecated Since 1.8 use criteria to add conditions
+     *
      * @param string $fieldName
      * @param string $condition
      * @param string $fieldValue
@@ -204,6 +196,8 @@ class Query
 
     /**
      * Add "OR WHERE" parameter
+     *
+     * @deprecated Since 1.8 use criteria to add conditions
      *
      * @param string $fieldName
      * @param string $condition
@@ -220,6 +214,8 @@ class Query
     /**
      * Add "WHERE" parameter
      *
+     * @deprecated Since 1.8 use criteria to add conditions
+     *
      * @param string $keyWord
      * @param string $fieldName
      * @param string $condition
@@ -230,13 +226,52 @@ class Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
-        $this->options[] = [
-            'fieldName'  => $fieldName,
-            'condition'  => $condition,
-            'fieldValue' => $fieldValue,
-            'fieldType'  => $fieldType,
-            'type'       => $keyWord
-        ];
+        $expr      = Criteria::expr();
+        $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldName);
+
+        switch ($condition) {
+            case self::OPERATOR_CONTAINS:
+                $expr = $expr->contains($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_NOT_CONTAINS:
+                $expr = $expr->notContains($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_EQUALS:
+                $expr = $expr->eq($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_NOT_EQUALS:
+                $expr = $expr->neq($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_GREATER_THAN:
+                $expr = $expr->gt($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_GREATER_THAN_EQUALS:
+                $expr = $expr->gte($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_LESS_THAN:
+                $expr = $expr->lt($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_LESS_THAN_EQUALS:
+                $expr = $expr->lte($fieldName, $fieldValue);
+                break;
+
+            case self::OPERATOR_IN:
+                $expr = $expr->in($fieldName, $fieldValue);
+                break;
+            case self::OPERATOR_NOT_IN:
+                $expr = $expr->notIn($fieldName, $fieldValue);
+                break;
+            default:
+                throw new ExpressionSyntaxError(
+                    sprintf('Unsupported operator "%s"', $condition)
+                );
+        }
+
+        if ($keyWord === self::KEYWORD_AND) {
+            $this->criteria->andWhere($expr);
+        } else {
+            $this->criteria->orWhere($expr);
+        }
 
         return $this;
     }
@@ -262,11 +297,12 @@ class Query
     /**
      * Get query options
      *
-     * @return array
+     * @deprecated Since 1.8 use getCriteria method
+     * @throws \Exception
      */
     public function getOptions()
     {
-        return $this->options;
+        throw new \Exception('Method getOptions is depricated for Query class. Please use getCriteria method');
     }
 
     /**
@@ -292,13 +328,15 @@ class Query
     /**
      * Set max results
      *
+     * @deprecated Since 1.8 use criteria's setMaxResults method
+     *
      * @param int $maxResults
      *
      * @return Query
      */
     public function setMaxResults($maxResults)
     {
-        $this->maxResults = (int) $maxResults;
+        $this->criteria->setMaxResults((int)$maxResults);
 
         return $this;
     }
@@ -306,15 +344,19 @@ class Query
     /**
      * Get limit parameter
      *
+     * @deprecated Since 1.8 use criteria's getMaxResults method
+     *
      * @return int
      */
     public function getMaxResults()
     {
-        return $this->maxResults;
+        return $this->criteria->getMaxResults();
     }
 
     /**
      * Set first result offset
+     *
+     * @deprecated Since 1.8 use criteria's setFirstResult method
      *
      * @param int $firstResult
      *
@@ -322,7 +364,7 @@ class Query
      */
     public function setFirstResult($firstResult)
     {
-        $this->firstResult = (int) $firstResult;
+        $this->criteria->setFirstResult((int)$firstResult);
 
         return $this;
     }
@@ -330,15 +372,19 @@ class Query
     /**
      * Get first result offset
      *
+     * @deprecated Since 1.8 use criteria's getFirstResult method
+     *
      * @return int
      */
     public function getFirstResult()
     {
-        return $this->firstResult;
+        return $this->criteria->getFirstResult();
     }
 
     /**
      * Set order by
+     *
+     * @deprecated Since 1.8 use criteria's orderBy method
      *
      * @param string $fieldName
      * @param string $direction
@@ -348,9 +394,7 @@ class Query
      */
     public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
     {
-        $this->orderBy        = $fieldName;
-        $this->orderDirection = $direction;
-        $this->orderType      = $type;
+        $this->criteria->orderBy([$type . '.' . $fieldName => $direction]);
 
         return $this;
     }
@@ -358,37 +402,52 @@ class Query
     /**
      * Get order by field
      *
+     * @deprecated Since 1.8 use criteria's getOrderings method
+     *
      * @return string
      */
     public function getOrderBy()
     {
-        return $this->orderBy;
+        $orders = array_keys($this->criteria->getOrderings());
+        $fieldName = array_pop($orders);
+
+        return Criteria::explodeFieldTypeName($fieldName)[1];
     }
 
     /**
      * Get "order by" field type
      *
+     * @deprecated Since 1.8 use criteria's getOrderings method
+     *
      * @return string
      */
     public function getOrderType()
     {
-        return $this->orderType;
+        $orders = array_keys($this->criteria->getOrderings());
+        $fieldName = array_pop($orders);
+
+        return Criteria::explodeFieldTypeName($fieldName)[0];
     }
 
     /**
      * Get order by direction
      *
+     * @deprecated Since 1.8 use criteria's getOrderings method
+     *
      * @return string
      */
     public function getOrderDirection()
     {
-        return $this->orderDirection;
+        $orders = $this->criteria->getOrderings();
+
+        return array_pop($orders);
     }
 
     /**
      * Clear string
      *
      * @param  string $inputString
+     *
      * @return string
      */
     public static function clearString($inputString)
@@ -410,9 +469,51 @@ class Query
     }
 
     /**
+     * Returns string representation of the query
+     *
+     * @return string
+     */
+    public function getStringQuery()
+    {
+        $selectString = $this->getQuery();
+
+        $fromString = '';
+        if ($this->getFrom()) {
+            $fromString .=  ' from ' . implode(', ', $this->getFrom());
+        }
+
+        $visitor = new QueryStringExpressionVisitor();
+        $whereString = ' where ' . $this->criteria->getWhereExpression()->visit($visitor);
+
+        $orderByString = '';
+        if ($this->getOrderBy()) {
+            $orderByString .= ' ' . $this->getOrderBy();
+        }
+        if ($this->getOrderDirection()) {
+            $orderByString .= ' ' . $this->getOrderDirection();
+        }
+        if ($orderByString) {
+            $orderByString = ' order by' . $orderByString;
+        }
+
+        $limitString = '';
+        if ($this->getMaxResults() && $this->getMaxResults() != Query::INFINITY) {
+            $limitString = ' limit ' . $this->getMaxResults();
+        }
+
+        $offsetString = '';
+        if ($this->getFirstResult()) {
+            $offsetString .= ' offset ' . $this->getFirstResult();
+        }
+
+        return $selectString . $fromString. $whereString . $orderByString . $limitString . $offsetString;
+    }
+
+    /**
      * @param array  $fields
      * @param array  $field
      * @param string $entity
+     *
      * @return array
      */
     private function mapTargetFields($fields, $field, $entity)
@@ -430,6 +531,7 @@ class Query
      * @param array  $fields
      * @param array  $field
      * @param string $entity
+     *
      * @return array
      */
     private function mapRelationFields($fields, $field, $entity)

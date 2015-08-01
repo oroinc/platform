@@ -122,7 +122,7 @@ abstract class AbstractEngine implements EngineInterface
 
         $logRecord = new QueryLog;
         $logRecord->setEntity(implode(',', array_values($result->getQuery()->getFrom())));
-        $logRecord->setQuery(serialize($result->getQuery()->getOptions()));
+        $logRecord->setQuery(serialize($result->getQuery()->getCriteria()));
         $logRecord->setResultCount($result->count());
 
         $entityManager->persist($logRecord);

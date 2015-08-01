@@ -21,12 +21,12 @@ define(function(require) {
             name: '',
             label: '',
             entity: '',
-            entity_attribute: 'entity',
-            start_step: null,
-            steps_display_ordered: false,
+            'entity_attribute': 'entity',
+            'start_step': null,
+            'steps_display_ordered': false,
             steps: null,
             transitions: null,
-            transition_definitions: null,
+            'transition_definitions': null,
             attributes: null
         },
 
