@@ -31,7 +31,6 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  */
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
-
     /**
      * @var integer
      *
@@ -310,15 +309,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function getLastName()
     {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmailOwnerName()
-    {
-        return $this->label;
+        return 'Mailbox';
     }
 
     /**

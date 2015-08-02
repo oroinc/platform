@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
-
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 

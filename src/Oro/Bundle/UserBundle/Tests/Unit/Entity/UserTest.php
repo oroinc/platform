@@ -253,7 +253,7 @@ class UserTest extends AbstractUserTest
         $entity = $this->getUser();
         $imapConfiguration = $this->getMock('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin');
         $imapConfiguration->expects($this->once())
-            ->method('isActive')
+            ->method('setActive')
             ->with(false);
         $imapConfiguration->expects($this->exactly(2))
             ->method('isActive')

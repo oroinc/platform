@@ -88,12 +88,4 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
     public function eraseCredentials()
     {
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmailOwnerName()
-    {
-        return $this->getFullname();
-    }
 }

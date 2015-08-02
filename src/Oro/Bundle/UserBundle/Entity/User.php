@@ -1139,29 +1139,4 @@ class User extends ExtendUser implements
     {
         return $this->currentOrganization;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmailOwnerName()
-    {
-        $names = [];
-        if ($this->getNamePrefix()) {
-            $names[] = $this->getNamePrefix();
-        }
-        if ($this->getFirstName()) {
-            $names[] = $this->getFirstName();
-        }
-        if ($this->getMiddleName()) {
-            $names[] = $this->getMiddleName();
-        }
-        if ($this->getLastName()) {
-            $names[] = $this->getLastName();
-        }
-        if ($this->getNameSuffix()) {
-            $names[] = $this->getNameSuffix();
-        }
-
-        return implode(' ', $names);
-    }
 }
