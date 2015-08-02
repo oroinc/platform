@@ -12,6 +12,7 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class SmtpType extends AbstractType
 {
+    /** @var string[] */
     protected $requiredFields = [
         'host',
         'port',
@@ -85,7 +86,7 @@ class SmtpType extends AbstractType
         );
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function(FormEvent $event) {
+            function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $event->getData();
 
