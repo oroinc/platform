@@ -122,7 +122,7 @@ class ShareHandler
         }
         // $newSids - $oldSids: to insert
         foreach (array_diff($newSids, $oldSidsCopy) as $sid) {
-            $acl->insertObjectAce($sid, EntityMaskBuilder::MASK_VIEW_SYSTEM);
+            $acl->insertObjectAce($sid, $this->getMaskBySid($sid));
         }
 
         $this->aclProvider->updateAcl($acl);
@@ -252,5 +252,23 @@ class ShareHandler
         }
 
         return $newSids;
+    }
+
+    /**
+     * Get VIEW mask by Security Identity
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @return int
+     */
+    protected function getMaskBySid(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            return EntityMaskBuilder::MASK_VIEW_BASIC;
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            return EntityMaskBuilder::MASK_VIEW_LOCAL;
+        } else {
+            return EntityMaskBuilder::IDENTITY;
+        }
     }
 }
