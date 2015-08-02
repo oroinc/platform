@@ -84,7 +84,7 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $emailMock->expects($this->exactly(3))
             ->method('getFromEmailAddress')
             ->willReturn($emailMock);
-        $emailMock->expects($this->once())
+        $emailMock->expects($this->exactly(2))
             ->method('hasOwner')
             ->willReturn(true);
         $emailMock->expects($this->exactly(2))
