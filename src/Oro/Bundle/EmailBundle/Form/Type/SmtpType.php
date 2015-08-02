@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotNull;
+
+use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class SmtpType extends AbstractType
 {
@@ -83,7 +83,6 @@ class SmtpType extends AbstractType
                 'required' => false,
             ]
         );
-
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function(FormEvent $event) {
@@ -97,12 +96,15 @@ class SmtpType extends AbstractType
 
                 if (isset($data['enabled']) && $data['enabled']) {
                     foreach ($this->requiredFields as $field) {
-                        FormUtils::replaceField($form, $field, [
-                            //'required' => true,
-                            'constraints' => [
-                                new NotNull()
+                        FormUtils::replaceField(
+                            $form,
+                            $field,
+                            [
+                                'constraints' => [
+                                    new NotNull()
+                                ]
                             ]
-                        ]);
+                        );
                     }
                 }
             }

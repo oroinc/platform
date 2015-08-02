@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
  * Represents an email owner
@@ -33,11 +32,4 @@ interface EmailOwnerInterface extends FirstNameInterface, LastNameInterface
      * @return integer
      */
     public function getId();
-
-    /**
-     * Get organization of owner
-     *
-     * @return OrganizationInterface|null
-     */
-    public function getOrganization();
 }
