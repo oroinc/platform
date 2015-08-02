@@ -143,6 +143,10 @@ class ConfigurationType extends AbstractType
                 $data = $event->getData();
                 $form = $event->getForm();
 
+                if ($data === null) {
+                    return;
+                }
+
                 if (array_key_exists('folders', $data)) {
                     /** @var ImapEmailOrigin $origin */
                     $origin = $form->getData();

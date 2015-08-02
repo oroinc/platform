@@ -4,46 +4,48 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
-use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\User;
+
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class MailboxHandler
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Oro\Bundle\TagBundle\Entity\Taggable;
+
+class MailboxHandler implements FormAwareInterface
 {
-    /** @var FormInterface */
-    private $form;
-    /** @var Request */
-    private $request;
+    const FORM = 'oro_email_mailbox';
+
     /** @var Registry */
     protected $doctrine;
-    /** @var AclManager */
-    private $aclManager;
+    /** @var FormInterface */
+    protected $form;
     /** @var MailboxProcessStorage */
-    private $mailboxProcessStorage;
+    protected $mailboxProcessStorage;
+    /** @var Request */
+    protected $request;
+    /** @var FormFactoryInterface */
+    private $formFactory;
 
     /**
-     * @param FormInterface         $form
+     * @param FormFactoryInterface  $formFactory
      * @param Request               $request
      * @param Registry              $doctrine
-     * @param AclManager            $aclManager
      * @param MailboxProcessStorage $mailboxProcessStorage
      */
     public function __construct(
-        FormInterface $form,
+        FormFactoryInterface $formFactory,
         Request $request,
         Registry $doctrine,
-        AclManager $aclManager,
         MailboxProcessStorage $mailboxProcessStorage
     ) {
-        $this->doctrine = $doctrine;
-        $this->form = $form;
-        $this->request = $request;
-        $this->aclManager = $aclManager;
+        $this->doctrine              = $doctrine;
+        $this->formFactory           = $formFactory;
+        $this->form                  = $this->formFactory->create(self::FORM);
+        $this->request               = $request;
         $this->mailboxProcessStorage = $mailboxProcessStorage;
     }
 
@@ -63,16 +65,8 @@ class MailboxHandler
                 $this->processReload();
             } else {
                 $this->form->submit($this->request);
-
                 if ($this->form->isValid()) {
-                    $mailbox = $this->form->getData();
-                    $this->getEntityManager()->persist($mailbox);
-
-                    $this->setPermissions(
-                        $mailbox,
-                        $this->form->get('allowedUsers')->getData(),
-                        $this->form->get('allowedRoles')->getData()
-                    );
+                    $this->onSuccess();
 
                     return true;
                 }
@@ -82,8 +76,19 @@ class MailboxHandler
         return false;
     }
 
+    protected function onSuccess()
+    {
+        /** @var Mailbox $mailbox */
+        $mailbox = $this->form->getData();
+
+        $this->getEntityManager()->persist($mailbox);
+        $this->getEntityManager()->flush();
+    }
+
     protected function processReload()
     {
+        $this->form->handleRequest($this->request);
+
         $type = $this->form->get('processType')->getViewData();
         /** @var Mailbox $data */
         $data = $this->form->getData();
@@ -95,43 +100,12 @@ class MailboxHandler
             $data->setProcessSettings(null);
         }
 
-        $this->form->setData($data);
+        $this->form = $this->formFactory->create(self::FORM, $data);
     }
 
     public function getForm()
     {
         return $this->form;
-    }
-
-    /**
-     * @param Mailbox $mailbox
-     * @param User[]  $users
-     * @param Role[]  $roles
-     */
-    protected function setPermissions(Mailbox $mailbox, array $users = [], array $roles = [])
-    {
-        $this->grandPermissionTo($mailbox, $users);
-        $this->grandPermissionTo($mailbox, $roles);
-
-        $this->aclManager->flush();
-    }
-
-    /**
-     * @param Mailbox $mailbox
-     * @param array   $granted
-     */
-    protected function grandPermissionTo(Mailbox $mailbox, array $granted)
-    {
-        foreach ($granted as $subject) {
-            $this->aclManager->setPermission(
-                $this->aclManager->getSid($subject),
-                $this->aclManager->getOid($mailbox),
-                $this->aclManager->getMaskBuilder(
-                    $this->aclManager->getOid($mailbox),
-                    'VIEW'
-                )->get()
-            );
-        }
     }
 
     /**

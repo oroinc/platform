@@ -47,6 +47,7 @@
 
 {% block content %}
     {% set buttons = '' %}
+    {% set html = '' %}
     {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
         {% set buttons = buttons ~ UI.deleteButton({
             'dataUrl': path('oro_api_delete_mailbox', {'id': form.vars.value.id}),
@@ -60,10 +61,10 @@
             'entity_label': 'oro.email.mailbox.entity_label'|trans
         }) %}
         {% set buttons = buttons ~ UI.buttonSeparator() %}
+        {% set html = html ~ UI.saveAndStayButton() %}
     {% endif %}
 
-    {% set html = UI.saveAndCloseButton() %}
-    {% set html = html ~ UI.saveAndStayButton() %}
+    {% set html = html ~ UI.saveAndCloseButton() %}
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     <form

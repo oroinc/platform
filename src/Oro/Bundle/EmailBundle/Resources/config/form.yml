@@ -171,21 +171,10 @@ services:
         class: %oro_email.form.handler.mailbox.class%
         scope: request
         arguments:
-            - @oro_email.form.mailbox
+            - @form.factory
             - @request
             - @doctrine
-            - @oro_security.acl.manager
             - @oro_email.mailbox.process_storage
-
-    oro_email.form.mailbox:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments:
-            - ~
-            - 'oro_email_mailbox'
-            - ~
-            - {csrf_protection: true, csrf_field_name: _token}
 
     oro_email.form.type.smtp:
         class: %oro_email.form.type.smtp.class%

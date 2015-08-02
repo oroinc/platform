@@ -15,13 +15,13 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::createOroEmailMailboxTable($schema);
-
+        self::createOroEmailMailboxUsersTable($schema);
+        self::createOroEmailMailboxRolesTable($schema);
         self::createOroEmailMailboxProcessSettingsTable($schema);
 
         self::addOwnerMailboxColumn($schema);
-
         self::addOroEmailMailboxForeignKeys($schema);
-
+        self::addOroEmailMailboxUsersAndRolesForeignKeys($schema);
         self::addEmailUserMailboxOwnerColumn($schema);
     }
 
@@ -91,6 +91,7 @@ class OroEmailBundle implements Migration
             ['onDelete' => null, 'onUpdate' => null]
         );
     }
+
     public static function addEmailUserMailboxOwnerColumn(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

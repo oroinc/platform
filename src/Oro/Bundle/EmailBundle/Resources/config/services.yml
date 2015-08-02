@@ -707,6 +707,7 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @doctrine
+            - @oro_email.mailbox.process_storage
         tags:
             - { name: oro_workflow.action, alias: request_mailboxes|find_mailboxes }
 

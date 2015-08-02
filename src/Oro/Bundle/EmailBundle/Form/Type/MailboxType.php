@@ -145,7 +145,7 @@ class MailboxType extends AbstractType
         $form = $event->getForm();
         $data = $event->getData();
 
-        $processType = $data['processType'];
+        $processType = isset($data['processType']) ? $data['processType'] : null;
         $originalProcessType = $form->get('processType')->getData();
 
         if ($processType !== $originalProcessType) {
