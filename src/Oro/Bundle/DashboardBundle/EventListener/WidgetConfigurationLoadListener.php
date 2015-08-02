@@ -31,11 +31,8 @@ class WidgetConfigurationLoadListener
     public function onWidgetConfigurationLoad(WidgetConfigurationLoadEvent $event)
     {
         $configuration = $event->getConfiguration();
-        if (!isset(
-                $configuration['route'],
-                $configuration['route_parameters'],
-                $configuration['route_parameters']['gridName'])
-                || $configuration['route'] !== 'oro_dashboard_grid'
+        if (!isset($configuration['route'], $configuration['route_parameters']['gridName'])
+            || $configuration['route'] !== 'oro_dashboard_grid'
         ) {
             return;
         }

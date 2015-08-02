@@ -5,17 +5,22 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EmailBundle\Entity\Email;
+
+use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
+use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -37,49 +42,35 @@ class Indexer
 
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
-    /**
-     * @var EngineInterface
-     */
+    /** @var EngineInterface */
     protected $engine;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $em;
 
-    /**
-     * @var ObjectMapper
-     */
+    /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @var SecurityProvider
-     */
+    /** @var SecurityProvider */
     protected $securityProvider;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $entityProvider;
-
-    /**
-     * @var Translator
-     */
+    
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param ObjectManager     $em
-     * @param EngineInterface   $engine
-     * @param ObjectMapper      $mapper
-     * @param SecurityProvider  $securityProvider
-     * @param ConfigManager     $configManager
-     * @param EntityProvider    $entityProvider
-     * @param Translator        $translator
+     * @param ObjectManager       $em
+     * @param EngineInterface     $engine
+     * @param ObjectMapper        $mapper
+     * @param SecurityProvider    $securityProvider
+     * @param ConfigManager       $configManager
+     * @param EntityProvider      $entityProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ObjectManager       $em,
@@ -88,7 +79,7 @@ class Indexer
         SecurityProvider    $securityProvider,
         ConfigManager       $configManager,
         EntityProvider      $entityProvider,
-        Translator          $translator
+        TranslatorInterface $translator
     ) {
         $this->em               = $em;
         $this->engine           = $engine;
@@ -108,7 +99,6 @@ class Indexer
     {
         return $this->mapper->getEntitiesListAliases();
     }
-
 
     /**
      * Gets search aliases for entities
@@ -160,7 +150,7 @@ class Indexer
     public function getSimpleSearchQuery($searchString, $offset = 0, $maxResults = 0, $from = null, $page = 0)
     {
         $searchString = trim($searchString);
-        $query = $this->select();
+        $query        = $this->select();
 
         if ($from) {
             $query->from($from);
@@ -203,16 +193,16 @@ class Indexer
     }
 
     /**
-     * @param User $user
+     * @param User   $user
      * @param string $searchString
-     * @param int $offset
-     * @param int $maxResults
+     * @param int    $offset
+     * @param int    $maxResults
      * @return array
      */
     public function autocompleteSearch(User $user, $searchString, $offset = 0, $maxResults = 0)
     {
         $entityDescriptions = $this->entityProvider->getEntities();
-        $classNames = [];
+        $classNames         = [];
         foreach ($entityDescriptions as $description) {
             $classNames[] = $description['name'];
         }
@@ -234,7 +224,7 @@ class Indexer
             $tables[] = $metadata->getTableName();
         }
 
-        $results = [];
+        $results       = [];
         $searchResults = $this->simpleSearch($searchString, $offset, $maxResults, $tables);
         foreach ($searchResults->getElements() as $item) {
             $className = $item->getEntityName();
@@ -258,7 +248,7 @@ class Indexer
     }
 
     /**
-     * @param User $user
+     * @param User   $user
      * @param string $searchString
      * @return array
      */
@@ -273,7 +263,8 @@ class Indexer
                 }
                 $target = json_decode($target, true);
                 if (!isset($target['entityClass']) || !$target['entityClass']
-                    || !isset($target['entityId']) || !$target['entityId']) {
+                    || !isset($target['entityId']) || !$target['entityId']
+                ) {
                     continue;
                 }
                 if (ClassUtils::getClass($user) === $target['entityClass'] && $user->getId() === $target['entityId']) {
@@ -315,7 +306,7 @@ class Indexer
             return null;
         }
         $entityConfig = new EntityConfigId('entity', $className);
-        $label = $this->configManager->getConfig($entityConfig)->get('label');
+        $label        = $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
     }
@@ -338,7 +329,7 @@ class Indexer
     /**
      * Run query with query builder
      *
-     * @param  Query  $query
+     * @param  Query $query
      * @return Result
      */
     public function query(Query $query)
@@ -346,7 +337,7 @@ class Indexer
         $this->prepareQuery($query);
         // we haven't allowed entities, so return null search result
         if (count($query->getFrom()) == 0) {
-            return new Result($query, array(), 0);
+            return new Result($query, [], 0);
         }
 
         return $this->engine->search($query);
@@ -355,14 +346,23 @@ class Indexer
     /**
      * Advanced search from API
      *
-     * @param  string $searchString
+     * @param  string $expression
      * @return Result
      */
-    public function advancedSearch($searchString)
+    public function advancedSearch($expression)
     {
-        $parser = new Parser($this->mapper->getMappingConfig());
+        $lexer  = new Lexer();
+        $parser = new ExpressionParser();
 
-        return $this->query($parser->getQueryFromString($searchString));
+        /** @var Query $query */
+        $query = $parser->parse($lexer->tokenize($expression));
+
+        $query->setMappingConfig($this->mapper->getMappingConfig());
+
+        /** @var Result $result */
+        $result = $this->query($query);
+
+        return $result;
     }
 
     /**
@@ -384,9 +384,9 @@ class Indexer
      */
     protected function applyAclToQuery(Query $query)
     {
-        $allowedEntities = $this->getAllowedEntitiesListAliases();
+        $allowedEntities   = $this->getAllowedEntitiesListAliases();
         $queryFromEntities = $query->getFrom();
-        $entitiesList = array_values($allowedEntities);
+        $entitiesList      = array_values($allowedEntities);
 
         // in query, from record !== '*'
         if (!empty($queryFromEntities) && $queryFromEntities[0] !== '*') {
@@ -410,7 +410,7 @@ class Indexer
     {
         // process abstract indexes
         // make hashes increasing performance
-        $fromParts   = (array)$query->getFrom();
+        $fromParts   = (array) $query->getFrom();
         $fromHash    = array_combine($fromParts, $fromParts);
         $aliases     = $this->mapper->getEntitiesListAliases();
         $aliasesHash = array_flip($aliases);
@@ -466,7 +466,7 @@ class Indexer
             if ($this->securityProvider->isProtectedEntity($entityClass)
                 && !$this->securityProvider->isGranted($attribute, $objectString)
             ) {
-                unset ($entities[$entityClass]);
+                unset($entities[$entityClass]);
             }
         }
 

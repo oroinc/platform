@@ -8,8 +8,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
-use Symfony\Component\Form\Extension\Core\View\ChoiceView;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType;
@@ -27,14 +26,14 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /** @var  CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
     protected function setUp()
     {
         $this->registry    = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
             ->disableOriginalConstructor()->getMock();
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
             ->disableOriginalConstructor()->getMock();
         $this->em          = $this->getTestEntityManager();
         $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
@@ -92,15 +91,15 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
         $this->type->finishView($view, $this->getMock('Symfony\Component\Form\Test\FormInterface'), []);
 
-        $this->assertInstanceOf('Oro\Bundle\FormBundle\Form\Type\ChoiceListItem', $view->vars['choices'][0]->label);
-        $this->assertInstanceOf('Oro\Bundle\FormBundle\Form\Type\ChoiceListItem', $view->vars['choices'][1]->label);
+        $this->assertEquals($testIntegration1Label, $view->vars['choices'][0]->label);
+        $this->assertEquals($testIntegration2Label, $view->vars['choices'][1]->label);
 
-        $this->assertSame(
+        $this->assertEquals(
             [
                 'data-status' => true,
                 'data-icon'   => 'bundles/acmedemo/img/logo.png'
             ],
-            $view->vars['choices'][0]->label->getAttr()
+            $view->vars['choices'][0]->attr
         );
     }
 

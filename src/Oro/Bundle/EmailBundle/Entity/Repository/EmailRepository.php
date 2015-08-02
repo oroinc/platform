@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailRepository extends EntityRepository
 {
@@ -42,5 +43,51 @@ class EmailRepository extends EntityRepository
             ->setParameter('messageId', $messageId)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Get $limit last emails
+     *
+     * @param User $user
+     * @param $limit
+     *
+     * @return mixed
+     */
+    public function getNewEmails(User $user, $limit)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('e, eu.seen')
+            ->leftJoin('e.emailUsers', 'eu')
+            ->where('eu.organization = :organizationId')
+            ->andWhere('eu.owner = :ownerId')
+            ->groupBy('e, eu.seen')
+            ->orderBy('e.sentAt', 'DESC')
+            ->setParameter('organizationId', $user->getOrganization()->getId())
+            ->setParameter('ownerId', $user->getId())
+            ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Get count new emails
+     *
+     * @param User $user
+     *
+     * @return mixed
+     */
+    public function getCountNewEmails(User $user)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('COUNT(DISTINCT e)')
+            ->leftJoin('e.emailUsers', 'eu')
+            ->where('eu.organization = :organizationId')
+            ->andWhere('eu.owner = :ownerId')
+            ->andWhere('eu.seen = :seen')
+            ->setParameter('organizationId', $user->getOrganization()->getId())
+            ->setParameter('ownerId', $user->getId())
+            ->setParameter('seen', false)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

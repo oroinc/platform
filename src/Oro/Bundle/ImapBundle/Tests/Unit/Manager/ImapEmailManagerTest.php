@@ -176,13 +176,12 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetUnseenEmailUIDs()
     {
         $startDate = new \DateTime('29-05-2015');
-        $endDate = new \DateTime('29-06-2015');
 
         $this->connector->expects($this->at(0))
             ->method('findUIDs')
-            ->with('UNSEEN SINCE "29-May-2015" BEFORE "29-Jun-2015"');
+            ->with('UNSEEN SINCE 29-May-2015');
 
-        $this->manager->getUnseenEmailUIDs($startDate, $endDate);
+        $this->manager->getUnseenEmailUIDs($startDate);
     }
 
     // @codingStandardsIgnoreStart

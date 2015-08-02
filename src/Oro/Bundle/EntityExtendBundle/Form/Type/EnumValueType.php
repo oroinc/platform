@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -45,7 +45,7 @@ class EnumValueType extends AbstractType
             new Assert\Length(['max' => 255])
         ];
         if (empty($data['id'])) {
-            $callback = function ($value, ExecutionContext $context) {
+            $callback = function ($value, ExecutionContextInterface $context) {
                 if (!empty($value)) {
                     $id = ExtendHelper::buildEnumValueId($value, false);
                     if (empty($id)) {

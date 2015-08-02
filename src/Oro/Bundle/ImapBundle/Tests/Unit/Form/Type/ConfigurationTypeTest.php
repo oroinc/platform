@@ -9,7 +9,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -128,33 +128,45 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         return array(
             'should bind correct data except password' => array(
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
-                    'ssl'      => 'ssl',
-                    'user'     => 'someUser',
-                    'password' => self::TEST_PASSWORD,
+                    'imapHost'       => 'someHost',
+                    'imapPort'       => '123',
+                    'smtpHost'       => '',
+                    'smtpPort'       => '',
+                    'imapEncryption' => 'ssl',
+                    'smtpEncryption' => 'ssl',
+                    'user'           => 'someUser',
+                    'password'       => self::TEST_PASSWORD,
                 ),
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
-                    'ssl'      => 'ssl',
-                    'user'     => 'someUser',
+                    'imapHost'       => 'someHost',
+                    'imapPort'       => '123',
+                    'smtpHost'       => '',
+                    'smtpPort'       => '',
+                    'imapEncryption' => 'ssl',
+                    'smtpEncryption' => 'ssl',
+                    'user'           => 'someUser',
                 ),
                 array(
-                    'host'     => 'someHost',
-                    'port'     => '123',
-                    'ssl'      => 'ssl',
-                    'user'     => 'someUser',
-                    'password' => self::TEST_PASSWORD
+                    'imapHost'        => 'someHost',
+                    'imapPort'        => '123',
+                    'smtpHost'        => '',
+                    'smtpPort'        => '',
+                    'imapEncryption'  => 'ssl',
+                    'smtpEncryption'  => 'ssl',
+                    'user'            => 'someUser',
+                    'password'        => self::TEST_PASSWORD
                 ),
             ),
-            'should not create empty entity'           => array(
+            'should not create empty entity' => array(
                 array(
-                    'host'     => '',
-                    'port'     => '',
-                    'ssl'      => '',
-                    'user'     => '',
-                    'password' => ''
+                    'imapHost'       => '',
+                    'imapPort'       => '',
+                    'smtpHost'       => '',
+                    'smtpPort'       => '',
+                    'imapEncryption' => '',
+                    'smtpEncryption' => '',
+                    'user'           => '',
+                    'password'       => ''
                 ),
                 false,
                 false
@@ -170,17 +182,20 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
         $entity->setPassword(self::TEST_PASSWORD);
 
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => 'someHost',
-                'port'     => '123',
-                'ssl'      => 'ssl',
-                'user'     => 'someUser',
-                'password' => ''
+                'imapHost'       => 'someHost',
+                'imapPort'       => '123',
+                'smtpHost'       => '',
+                'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
+                'user'           => 'someUser',
+                'password'       => ''
             )
         );
 
@@ -196,23 +211,27 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
+        $entity->setImapHost('someHost');
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => 'someHost',
-                'port'     => '123',
-                'ssl'      => 'ssl',
-                'user'     => 'someUser',
-                'password' => 'somPassword'
+                'imapHost'       => 'someHost',
+                'imapPort'       => '123',
+                'smtpHost'       => '',
+                'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
+                'user'           => 'someUser',
+                'password'       => 'somPassword'
             )
         );
 
         $this->assertNotSame($entity, $form->getData());
 
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
+        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertTrue($form->getData()->isActive());
     }
 
@@ -225,23 +244,25 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
         $form = $this->factory->create($type);
 
-        $entity = new ImapEmailOrigin();
+        $entity = new UserEmailOrigin();
         $this->assertTrue($entity->isActive());
 
         $form->setData($entity);
         $form->submit(
             array(
-                'host'     => '',
-                'port'     => '',
-                'ssl'      => '',
-                'user'     => '',
-                'password' => ''
+                'imapHost'       => '',
+                'imapPort'       => '',
+                'smtpHost'       => '',
+                'smtpPort'       => '',
+                'imapEncryption' => '',
+                'smtpEncryption' => '',
+                'user'           => '',
+                'password'       => ''
             )
         );
 
         $this->assertNotSame($entity, $form->getData());
-
-        $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin', $form->getData());
+        $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
     }
 }

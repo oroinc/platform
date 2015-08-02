@@ -19,22 +19,22 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ID_FIELD            = 'id';
-    const TEST_ENTITY_CLASS        = 'FooEntityClass';
+    const TEST_ID_FIELD = 'id';
+    const TEST_ENTITY_CLASS = 'FooEntityClass';
     const TEST_ENTITY_SEARCH_ALIAS = 'foo_entity';
-    const TEST_SEARCH_STRING       = 'test_search_string';
-    const TEST_FIRST_RESULT        = 30;
-    const TEST_MAX_RESULTS         = 10;
+    const TEST_SEARCH_STRING = 'test_search_string';
+    const TEST_FIRST_RESULT = 30;
+    const TEST_MAX_RESULTS = 10;
 
     /**
      * @var array
      */
-    protected $testProperties = array('name', 'email');
+    protected $testProperties = ['name', 'email', 'property.path'];
 
     /**
      * @var array
      */
-    protected $testSearchConfig = array(self::TEST_ENTITY_CLASS => array('alias' => self::TEST_ENTITY_SEARCH_ALIAS));
+    protected $testSearchConfig = [self::TEST_ENTITY_CLASS => ['alias' => self::TEST_ENTITY_SEARCH_ALIAS]];
 
     /**
      * @var Indexer|\PHPUnit_Framework_MockObject_MockObject
@@ -89,17 +89,17 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->indexer = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->setMethods(array('simpleSearch'))
+            ->setMethods(['simpleSearch'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder'))
+            ->setMethods(['createQueryBuilder'])
             ->getMock();
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setMethods(array('getSingleIdentifierFieldName'))
+            ->setMethods(['getSingleIdentifierFieldName'])
             ->disableOriginalConstructor()
             ->getMock();
         $metadata->expects($this->once())
@@ -107,7 +107,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(self::TEST_ID_FIELD));
 
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->setMethods(array('getMetadataFor'))
+            ->setMethods(['getMetadataFor'])
             ->disableOriginalConstructor()
             ->getMock();
         $metadataFactory->expects($this->once())
@@ -117,7 +117,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('getRepository', 'getMetadataFactory'))
+            ->setMethods(['getRepository', 'getMetadataFactory'])
             ->getMock();
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -134,27 +134,27 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(array('expr', 'getQuery', 'where'))
+            ->setMethods(['expr', 'getQuery', 'where'])
             ->getMock();
 
         $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult', 'getAST'))
+            ->setMethods(['getResult', 'getAST'])
             ->getMockForAbstractClass();
 
         $this->expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
             ->disableOriginalConstructor()
-            ->setMethods(array('in'))
+            ->setMethods(['in'])
             ->getMock();
 
         $this->searchResult = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result')
-            ->setMethods(array('getElements'))
+            ->setMethods(['getElements'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
-            ->setMethods(array('apply'))
+            ->setMethods(['apply'])
             ->getMock();
 
         $this->searchHandler = new SearchHandler(
@@ -209,14 +209,14 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider searchDataProvider
      * @param string $query
-     * @param array  $expectedResult
-     * @param array  $expectedIndexerCalls
-     * @param array  $expectSearchResultCalls
-     * @param array  $expectEntityRepositoryCalls
-     * @param array  $expectQueryBuilderCalls
-     * @param array  $expectExprCalls
-     * @param array  $expectQueryCalls
-     * @param array  $expectAclHelperCalls
+     * @param array $expectedResult
+     * @param array $expectedIndexerCalls
+     * @param array $expectSearchResultCalls
+     * @param array $expectEntityRepositoryCalls
+     * @param array $expectQueryBuilderCalls
+     * @param array $expectExprCalls
+     * @param array $expectQueryCalls
+     * @param array $expectAclHelperCalls
      */
     public function testSearch(
         $query,
@@ -247,110 +247,132 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function searchDataProvider()
     {
-        return array(
-            'default' => array(
-                'query' => array('query' => 'search', 'page' => 1, 'perPage' => 100),
-                'expectedResult' => array(
-                    'results' => array(
-                        array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com'),
-                        array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com'),
-                        array(self::TEST_ID_FIELD => 3, 'name' => 'Jack', 'email' => null),
-                        array(self::TEST_ID_FIELD => 4, 'name' => 'Bill', 'email' => 'bill@example.com')
-                    ),
-                    'more' => false
-                ),
-                'expectIndexerCalls' => array(
-                    array(
+        return [
+            'default' => [
+                'query' => ['query' => 'search', 'page' => 1, 'perPage' => 100],
+                'expectedResult' => [
+                    'results' => [
+                        [
+                            self::TEST_ID_FIELD => 1,
+                            'name' => 'John',
+                            'email' => 'john@example.com',
+                            'property.path' => null,
+                        ],
+                        [
+                            self::TEST_ID_FIELD => 2,
+                            'name' => 'Jane',
+                            'email' => 'jane@example.com',
+                            'property.path' => null,
+                        ],
+                        [self::TEST_ID_FIELD => 3, 'name' => 'Jack', 'email' => null, 'property.path' => null],
+                        [
+                            self::TEST_ID_FIELD => 4,
+                            'name' => 'Bill',
+                            'email' => 'bill@example.com',
+                            'property.path' => 'value',
+                        ],
+                    ],
+                    'more' => false,
+                ],
+                'expectIndexerCalls' => [
+                    [
                         'simpleSearch',
-                        array('search', 0, 101, self::TEST_ENTITY_SEARCH_ALIAS), 'getMockSearchResult'
-                    )
-                ),
-                'expectSearchResultCalls' => array(
-                    array('getElements', array(), $this->createMockSearchItems(array(1, 2, 3, 4)))
-                ),
-                'expectEntityRepositoryCalls' => array(
-                    array('createQueryBuilder', array('e'), 'getMockQueryBuilder')
-                ),
-                'expectQueryBuilderCalls' => array(
-                    array('expr', array(), 'getMockExpr'),
-                    array('where', array('e.id IN (1, 2, 3, 4)'), 'getMockQueryBuilder'),
-                ),
-                'expectExprCalls' => array(
-                    array('in', array('e.' . self::TEST_ID_FIELD, array(1, 2, 3, 4)), 'e.id IN (1, 2, 3, 4)')
-                ),
-                'expectQueryCalls' => array(
-                    array(
+                        ['search', 0, 101, self::TEST_ENTITY_SEARCH_ALIAS],
+                        'getMockSearchResult',
+                    ],
+                ],
+                'expectSearchResultCalls' => [
+                    ['getElements', [], $this->createMockSearchItems([1, 2, 3, 4])],
+                ],
+                'expectEntityRepositoryCalls' => [
+                    ['createQueryBuilder', ['e'], 'getMockQueryBuilder'],
+                ],
+                'expectQueryBuilderCalls' => [
+                    ['expr', [], 'getMockExpr'],
+                    ['where', ['e.id IN (1, 2, 3, 4)'], 'getMockQueryBuilder'],
+                ],
+                'expectExprCalls' => [
+                    ['in', ['e.' . self::TEST_ID_FIELD, [1, 2, 3, 4]], 'e.id IN (1, 2, 3, 4)'],
+                ],
+                'expectQueryCalls' => [
+                    [
                         'getResult',
-                        array(),
-                        array(
+                        [],
+                        [
                             $this->createMockEntity(
-                                array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com')
+                                [self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com']
                             ),
                             $this->createMockEntity(
-                                array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
+                                [self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com']
                             ),
-                            array(self::TEST_ID_FIELD => 3,'name' => 'Jack'),
+                            [self::TEST_ID_FIELD => 3, 'name' => 'Jack'],
                             $this->createStubEntityWithProperties(
-                                array(
+                                [
                                     self::TEST_ID_FIELD => 4,
                                     'name' => 'Bill',
-                                    'email' => 'bill@example.com'
-                                )
-                            )
-                        )
-                    ),
-                ),
-                'expectAclHelperCalls' => array(
-                    array('apply', array(), 'getMockQuery')
-                )
-            ),
-            'hasMore' => array(
-                'query' => array('query' => 'search', 'page' => 1, 'perPage' => 1),
-                'expectedResult' => array(
-                    'results' => array(
-                        array(
-                            self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com'
-                        )
-                    ),
-                    'more' => true
-                ),
-                'expectIndexerCalls' => array(
-                    array(
-                        'simpleSearch', array('search', 0, 2, self::TEST_ENTITY_SEARCH_ALIAS), 'getMockSearchResult'
-                    )
-                ),
-                'expectSearchResultCalls' => array(
-                    array('getElements', array(), $this->createMockSearchItems(array(1, 2)))
-                ),
-                'expectEntityRepositoryCalls' => array(
-                    array('createQueryBuilder', array('e'), 'getMockQueryBuilder')
-                ),
-                'expectQueryBuilderCalls' => array(
-                    array('expr', array(), 'getMockExpr'),
-                    array('where', array('e.id IN (1, 2)'), 'getMockQueryBuilder'),
-                ),
-                'expectExprCalls' => array(
-                    array('in', array('e.' . self::TEST_ID_FIELD, array(1, 2)), 'e.id IN (1, 2)')
-                ),
-                'expectQueryCalls' => array(
-                    array(
+                                    'email' => 'bill@example.com',
+                                    'property' => ['path' => 'value'],
+                                ]
+                            ),
+                        ],
+                    ],
+                ],
+                'expectAclHelperCalls' => [
+                    ['apply', [], 'getMockQuery'],
+                ],
+            ],
+            'hasMore' => [
+                'query' => ['query' => 'search', 'page' => 1, 'perPage' => 1],
+                'expectedResult' => [
+                    'results' => [
+                        [
+                            self::TEST_ID_FIELD => 1,
+                            'name' => 'John',
+                            'email' => 'john@example.com',
+                            'property.path' => null,
+                        ],
+                    ],
+                    'more' => true,
+                ],
+                'expectIndexerCalls' => [
+                    [
+                        'simpleSearch',
+                        ['search', 0, 2, self::TEST_ENTITY_SEARCH_ALIAS],
+                        'getMockSearchResult',
+                    ],
+                ],
+                'expectSearchResultCalls' => [
+                    ['getElements', [], $this->createMockSearchItems([1, 2])],
+                ],
+                'expectEntityRepositoryCalls' => [
+                    ['createQueryBuilder', ['e'], 'getMockQueryBuilder'],
+                ],
+                'expectQueryBuilderCalls' => [
+                    ['expr', [], 'getMockExpr'],
+                    ['where', ['e.id IN (1, 2)'], 'getMockQueryBuilder'],
+                ],
+                'expectExprCalls' => [
+                    ['in', ['e.' . self::TEST_ID_FIELD, [1, 2]], 'e.id IN (1, 2)'],
+                ],
+                'expectQueryCalls' => [
+                    [
                         'getResult',
-                        array(),
-                        array(
+                        [],
+                        [
                             $this->createMockEntity(
-                                array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com')
+                                [self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com']
                             ),
                             $this->createMockEntity(
-                                array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
-                            )
-                        )
-                    ),
-                ),
-                'expectAclHelperCalls' => array(
-                    array('apply', array(), 'getMockQuery')
-                )
-            ),
-        );
+                                [self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com']
+                            ),
+                        ],
+                    ],
+                ],
+                'expectAclHelperCalls' => [
+                    ['apply', [], 'getMockQuery'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -386,16 +408,16 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  array  $ids
+     * @param  array $ids
      * @return Item[]
      */
     public function createMockSearchItems(array $ids)
     {
-        $result = array();
+        $result = [];
         foreach ($ids as $id) {
             $item = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
                 ->disableOriginalConstructor()
-                ->setMethods(array('getRecordId'))
+                ->setMethods(['getRecordId'])
                 ->getMock();
             $item->expects($this->once())
                 ->method('getRecordId')
@@ -406,21 +428,39 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
+    /**
+     * @param array $data
+     * @return \stdClass
+     */
     public function createStubEntityWithProperties(array $data)
     {
         $result = new \stdClass();
         foreach ($data as $name => $property) {
-            $result->$name = $property;
+            if (is_array($property)) {
+                foreach ($property as $propertyKey => $propertyValue) {
+                    if (!isset($result->$name)) {
+                        $result->$name = new \stdClass();
+                    }
+
+                    $result->$name->$propertyKey = $propertyValue;
+                }
+            } else {
+                $result->$name = $property;
+            }
         }
 
         return $result;
     }
 
+    /**
+     * @param array $data
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     public function createMockEntity(array $data)
     {
-        $methods = array();
+        $methods = [];
         foreach (array_keys($data) as $name) {
-            $methods[$name] = 'get' .ucfirst($name);
+            $methods[$name] = 'get' . ucfirst($name);
         }
         $result = $this->getMock('stdClass', array_values($methods));
         foreach ($data as $name => $property) {

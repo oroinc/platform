@@ -233,5 +233,14 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 ####AddressBundle
 - `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.
 
+####DataGridBundle
+- `Oro\Bundle\DataGridBundle\Datasource\ResultRecord` now has method `addData` that allows to add additional information to record
+
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` `logEntityClass` and `logEntityFieldClass` parameters replaced by `oro_dataaudit.loggable.audit_entity_mapper` service `getAuditEntryClass` and `getAuditEntryFieldClass` methods
+
+####SearchBundle
+
+ - Added brackets for search queries. Now user available to do queries like 'from oro_test where all_text ~ test and (integer count > 10 or float price = 10)'
+ - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
+
