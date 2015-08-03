@@ -49,5 +49,5 @@ oro_email_mailbox_edit:
 oro_email_autoresponserule_view:
     type: entity
     class: OroEmailBundle:AutoResponseRule
-    permissions: VIEW
+    permission: VIEW
     group_name: ""
