@@ -33,6 +33,9 @@ oro:
             success_mark_read: "Email has been market as read"
             success_mark_unread: "Email has been market as unread"
             error: Error has occurred
+        error:
+            get_email_last: "Getting last emails failed"
+            mark_as_read: "Marking all as read failed"
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"

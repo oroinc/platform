@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -66,6 +67,43 @@ class EmailController extends Controller
     }
 
     /**
+     * Get new Unread Emails for email notification
+     *
+     * @Template("OroEmailBundle:Notification:button.html.twig")
+     */
+    public function placeholderLastAction()
+    {
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        $emailNotificationManager = $this->get('oro_email.manager.notification');
+        return [
+            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser(), $currentOrganization),
+            'emails' => json_encode($emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)),
+            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser())
+        ];
+    }
+
+    /**
+     * Get last N user emails (N - can be configured by application config)
+     *
+     * @Route("/last", name="oro_email_last")
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @return JsonResponse
+     */
+    public function lastAction()
+    {
+        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        $emailNotificationManager = $this->get('oro_email.manager.notification');
+        $result = [
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser()),
+            'emails' => $emailNotificationManager->getEmails($this->getUser(), $maxEmailsDisplay)
+        ];
+
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
@@ -73,7 +111,7 @@ class EmailController extends Controller
     public function viewThreadAction(Email $entity)
     {
         $this->getEmailManager()->setSeenStatus($entity, true);
-        
+
         return ['entity' => $entity];
     }
 
@@ -375,6 +413,8 @@ class EmailController extends Controller
     }
 
     /**
+     * Togle user emails seen status
+     *
      * @Route("/toggle-seen/{id}", name="oro_email_toggle_seen", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
@@ -387,11 +427,13 @@ class EmailController extends Controller
         if ($emailUser) {
             $this->getEmailManager()->toggleEmailUserSeen($emailUser);
         }
-    
+
         return new JsonResponse(['successful' => (bool)$emailUser]);
     }
 
     /**
+     * Mark email as seen for user
+     *
      * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
      * @AclAncestor("oro_email_email_user_edit")
      *
@@ -414,6 +456,26 @@ class EmailController extends Controller
     }
 
     /**
+     * Mark all user emails as seen
+     *
+     * @Route("/mark_all_as_seen", name="oro_email_mark_all_as_seen")
+     * @AclAncestor("oro_email_email_user_edit")
+     * @return JsonResponse
+     */
+    public function markAllEmailsAsSeenAction()
+    {
+        $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $result = false;
+
+        if ($loggedUser) {
+            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization);
+        }
+
+        return new JsonResponse(['successful' => (bool)$result]);
+    }
+
+    /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_email_mark_massaction")
      *
      * @param string $gridName
@@ -430,7 +492,7 @@ class EmailController extends Controller
 
         $data = [
             'successful' => $response->isSuccessful(),
-            'message'    => $response->getMessage()
+            'message' => $response->getMessage()
         ];
 
         return new JsonResponse(array_merge($data, $response->getOptions()));

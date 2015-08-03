@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
@@ -28,6 +29,8 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * Class Processor
@@ -68,6 +71,9 @@ class Processor
     /** @var array */
     protected $origins = [];
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param \Swift_Mailer            $mailer
@@ -86,7 +92,8 @@ class Processor
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Mcrypt $encryptor
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
@@ -96,6 +103,7 @@ class Processor
         $this->emailActivityManager = $emailActivityManager;
         $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
+        $this->encryptor            = $encryptor;
     }
 
     /**
@@ -131,11 +139,8 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if (!$this->mailer->send($message)) {
-            throw new \Swift_SwiftException('An email was not delivered.');
-        }
-
         $origin = $this->getEmailOrigin($model->getFrom());
+        $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(
             $model->getSubject(),
@@ -150,8 +155,7 @@ class Processor
             $origin->getOwner(),
             $origin->getOrganization()
         );
-
-        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $emailUser->setFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );
@@ -178,6 +182,68 @@ class Processor
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $emailUser;
+    }
+
+    /**
+     * Get origin's folder
+     *
+     * @param string $email
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($email, EmailOrigin $origin)
+    {
+        $folder = $origin->getFolder(FolderType::SENT);
+
+        //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
+        if (!$folder && $origin instanceof UserEmailOrigin) {
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, InternalEmailOrigin::BAP, false);
+            return $origin->getFolder(FolderType::SENT);
+        }
+
+        return $folder;
+    }
+
+    /**
+     * Process send email message. In case exist custom smtp host/port use it
+     *
+     * @param object $message
+     * @param object $emailOrigin
+     * @throws \Swift_SwiftException
+     */
+    public function processSend($message, $emailOrigin)
+    {
+        if ($emailOrigin instanceof UserEmailOrigin) {
+            $this->modifySmtpSettings($emailOrigin);
+        }
+
+        if (!$this->mailer->send($message)) {
+            throw new \Swift_SwiftException('An email was not delivered.');
+        }
+    }
+
+    /**
+     * Modify transport smtp settings
+     *
+     * @param UserEmailOrigin $userEmailOrigin
+     */
+    protected function modifySmtpSettings(UserEmailOrigin $userEmailOrigin)
+    {
+        $transport = $this->mailer->getTransport();
+
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $transport->setHost($userEmailOrigin->getSmtpHost());
+            $transport->setPort($userEmailOrigin->getSmtpPort());
+            $transport->setUsername($userEmailOrigin->getUser());
+            $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
+            if ($userEmailOrigin->getSmtpEncryption()) {
+                $transport->setEncryption($userEmailOrigin->getSmtpEncryption());
+            }
+        }
     }
 
     /**
@@ -290,10 +356,11 @@ class Processor
      *
      * @param string $email
      * @param string $originName
+     * @param boolean $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $enableUseUserEmailOrigin = true)
     {
         $originKey    = $originName . $email;
         $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
@@ -306,18 +373,7 @@ class Processor
             );
 
             if ($emailOwner instanceof User) {
-                $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) use ($organization) {
-                        return
-                            $item instanceof InternalEmailOrigin
-                            && (!$organization || $item->getOrganization() === $organization);
-                    }
-                );
-
-                $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin === null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
-                }
+                $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')
@@ -440,5 +496,63 @@ class Processor
         }
 
         return $this->em;
+    }
+
+    /**
+     * Get imap origin if exists.
+     *
+     * @param $enableUseUserEmailOrigin
+     * @param $emailOwner
+     * @param $organization
+     * @return mixed|null|InternalEmailOrigin
+     */
+    protected function getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization)
+    {
+        $origins = new ArrayCollection();
+
+        if ($enableUseUserEmailOrigin) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getImapEnabledFilter($organization)
+            );
+        }
+        if ($origins->isEmpty()) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getInternalFilter($organization)
+            );
+        }
+        $origin = $origins->isEmpty() ? null : $origins->first();
+        if ($origin === null) {
+            $origin = $this->createUserInternalOrigin($emailOwner, $organization);
+
+            return $origin;
+        }
+
+        return $origin;
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getImapEnabledFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
+                && (!$organization || $item->getOrganization() === $organization);
+        };
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getInternalFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof InternalEmailOrigin
+                && (!$organization || $item->getOrganization() === $organization);
+        };
     }
 }
