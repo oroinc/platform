@@ -76,13 +76,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $origin;
 
     /**
-     * @var array
-     *
-     * @ORM\Column(name="smtp_settings", type="array")
-     */
-    protected $smtpSettings;
-
-    /**
      * @var EmailUser[]
      *
      * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailUser", mappedBy="mailboxOwner")
@@ -131,7 +124,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 
     public function __construct()
     {
-        $this->smtpSettings = [];
         $this->authorizedUsers = new ArrayCollection();
         $this->authorizedRoles = new ArrayCollection();
     }
@@ -230,26 +222,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function getEmailFields()
     {
         return ['email'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getSmtpSettings()
-    {
-        return $this->smtpSettings;
-    }
-
-    /**
-     * @param array $smtpSettings
-     *
-     * @return $this
-     */
-    public function setSmtpSettings($smtpSettings)
-    {
-        $this->smtpSettings = $smtpSettings;
-
-        return $this;
     }
 
     /**

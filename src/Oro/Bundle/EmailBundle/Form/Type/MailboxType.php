@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class MailboxType extends AbstractType
@@ -33,7 +33,7 @@ class MailboxType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
@@ -62,13 +62,6 @@ class MailboxType extends AbstractType
             ],
         ]);
         $builder->add('origin', 'oro_imap_configuration');
-        $builder->add('activeOrigin', 'checkbox', [
-            'required' => false,
-            'label'    => 'oro.email.mailbox.origin.enable.label',
-            'mapped'   => false,
-            'data'     => false,
-        ]);
-        $builder->add('smtpSettings', 'oro_email_smtp');
         $builder->add('processType', 'choice', [
             'label'       => 'oro.email.mailbox.process.type.label',
             'choices'     => $this->storage->getProcessTypeChoiceList(),
@@ -128,11 +121,6 @@ class MailboxType extends AbstractType
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
 
         $this->addProcessField($form, $processType);
-
-        if ($data->getOrigin() !== null) {
-            $originActive = $data->getOrigin()->isActive();
-            FormUtils::replaceField($form, 'activeOrigin', ['data' => $originActive]);
-        }
     }
 
     /**
@@ -150,11 +138,6 @@ class MailboxType extends AbstractType
 
         if ($processType !== $originalProcessType) {
             $form->getViewData()->setProcessSettings(null);
-        }
-
-        $originActive = isset($data['activeOrigin']) && $data['activeOrigin'];
-        if ($form->getViewData()->getOrigin() !== null) {
-            $form->getViewData()->getOrigin()->setActive($originActive);
         }
 
         $this->addProcessField($form, $processType);

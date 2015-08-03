@@ -250,13 +250,10 @@ oro:
             label.label:              Mailbox Label
             general.label:            General
             email.label:              Email
-            name.label:               Name
             authorized_roles.label:   Authorized Roles
             authorized_users.label:   Authorized Users
             email_users.label:        Email Users
-            origin:
-                label:                IMAP Synchronization
-                enable.label:         Use IMAP Synchronization
+            origin.label:             Synchronization
             organization.label:       Organization
             action:
                 create:               Add Mailbox
@@ -266,14 +263,6 @@ oro:
                 label:                Email Processing
                 type.label:           Action
                 default.label:        Do Nothing
-            smtp_settings:
-                label:                SMTP Settings
-                enabled.label:        Use SMTP
-                host.label:           Host
-                port.label:           Port
-                encryption.label:     SSL
-                username.label:       Username
-                password.label:       Password
             access:
                 label:                Access Management
 
