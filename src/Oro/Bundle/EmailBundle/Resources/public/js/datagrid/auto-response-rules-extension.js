@@ -1,16 +1,16 @@
-define(['jquery', 'underscore', 'oroui/js/mediator'], function ($, _, mediator) {
+define(['jquery', 'oroui/js/mediator'], function($, mediator) {
     var FIELD_SELECTOR = '[name="oro_email_mailbox[unboundRules]"]';
     var DELIMITER = ',';
 
     return {
-        init: function (deferred, options) {
+        init: function(deferred, options) {
             if (options.metadata.options.urlParams.mailbox) {
                 deferred.resolve();
                 return;
             }
 
             options.gridPromise.done(function(grid) {
-                grid.listenTo(mediator, 'auto_response_rule:save', function (id) {
+                grid.listenTo(mediator, 'auto_response_rule:save', function(id) {
                     var param = {};
                     param[options.inputName] = {'ids': [id]};
                     var paramString = $.param(param);

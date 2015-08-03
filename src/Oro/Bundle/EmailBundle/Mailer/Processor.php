@@ -375,6 +375,8 @@ class Processor
 
             if ($emailOwner instanceof User) {
                 $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
+            } elseif ($emailOwner instanceof Mailbox) {
+                $origin = $emailOwner->getOrigin();
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')

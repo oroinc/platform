@@ -73,6 +73,7 @@ oro:
             type.label:          Type
             translations.label:  Translations
             organization.label:  Organization
+            visible.label:       Visible
 
             # sections for email template variables
             variables:
@@ -218,6 +219,8 @@ oro:
             label:                Status
             unread.label:         Unread
             read.label:           Read
+        accept_language_header:
+            label: Accept-Language
 
         entity_config:
             email:
