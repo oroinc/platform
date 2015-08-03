@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
@@ -37,7 +38,7 @@ class Orm extends AbstractEngine
     /**
      * {@inheritdoc}
      */
-    public function reindex($class = null)
+    public function reindex($class = null, $offset = null, $limit = null)
     {
         if (null === $class) {
             $this->clearAllSearchIndexes();
@@ -51,8 +52,10 @@ class Orm extends AbstractEngine
                 $entityNames = $this->mapper->getRegisteredDescendants($class);
             }
 
-            foreach ($entityNames as $class) {
-                //$this->clearSearchIndexForEntity($class);
+            if (null === $offset && null === $limit) {
+                foreach ($entityNames as $class) {
+                    $this->clearSearchIndexForEntity($class);
+                }
             }
         }
 
@@ -271,6 +274,12 @@ class Orm extends AbstractEngine
      */
     protected function clearSearchIndexForEntity($entityName)
     {
+        /** @var ObjectManager $entityManager */
+        //$entityManager = $this->registry->getManager();
+        //$entityManager->
+
+
+
         $itemsCount    = 0;
         $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
         $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')

@@ -19,6 +19,7 @@ class ReindexCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:search:reindex';
 
+
     /**
      * {@inheritdoc}
      */
@@ -30,6 +31,20 @@ class ReindexCommand extends ContainerAwareCommand
                 InputArgument::OPTIONAL,
                 'Full or compact class name of entity which should be reindexed' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
+            )
+            ->addArgument(
+                'offset',
+                InputArgument::OPTIONAL,
+                'INTEGER. Tells indexer to start indexation from given entity number. '.
+                'Works only in combination with "class" argument.',
+                null
+            )
+            ->addArgument(
+                'limit',
+                InputArgument::OPTIONAL,
+                'INTEGER .Limit indexation of entity by given number. '.
+                'Works ONLY in combination with "class" and "offset" arguments.',
+                null
             )
             ->setDescription('Rebuild search index');
     }
@@ -44,6 +59,10 @@ class ReindexCommand extends ContainerAwareCommand
             // convert from short format to FQСN
             $class = $this->getContainer()->get('doctrine')
                 ->getManagerForClass($class)->getClassMetadata($class)->getName();
+
+            $offset = $input->getArgument('offset');
+            $limit  = $input->getArgument('limit');
+
         }
 
         $placeholder = $class ? '"' . $class . '" entity' : 'all mapped entities';
@@ -52,6 +71,7 @@ class ReindexCommand extends ContainerAwareCommand
 
         /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
+
         $recordsCount = $searchEngine->reindex($class);
 
         $output->writeln(sprintf('Total indexed items: %u', $recordsCount));

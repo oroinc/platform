@@ -23,7 +23,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 /**
  * Connector abstract class
  */
-abstract class AbstractEngine implements EngineInterface
+abstract class  AbstractEngine implements EngineInterface
 {
     const BATCH_SIZE = 1000;
 
@@ -177,9 +177,6 @@ abstract class AbstractEngine implements EngineInterface
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
         $queryBuilder = $entityManager->getRepository($entityName)->createQueryBuilder('entity');
-
-        //$queryBuilder->setFirstResult(100101);
-
         $iterator     = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
