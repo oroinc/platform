@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
  * Class AddActivityTarget
  *
  * @add_email_activity_target:
- *      activity_entity: $.activityEntity
+ *      email: $.emailEntity
  *      target_entity: $.targetEntity
  *      attribute: $.attribute              # status if activity was added is stored in this optional attribute
  *

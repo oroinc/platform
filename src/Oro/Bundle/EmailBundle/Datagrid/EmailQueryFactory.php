@@ -57,10 +57,9 @@ class EmailQueryFactory
      */
     public function filterQueryByUserId(QueryBuilder $qb, $userId)
     {
-
         if ($userId) {
             $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-                 ->findIdsOfAllAuthorized($userId);
+                 ->findAvailableMailboxIds($userId);
             if (!empty($mailboxIds)) {
                 $qb->andWhere(
                     $qb->expr()->orX(
