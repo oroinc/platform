@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEmailBundle implements Migration
@@ -17,7 +18,7 @@ class OroEmailBundle implements Migration
     {
         self::addEmailFolderFields($schema);
         self::addEmailOriginFields($schema);
-        self::updateMailboxName($queries);
+        self::updateMailboxName($schema, $queries);
         self::updateEmailRecipientConstraint($schema);
     }
 
@@ -55,21 +56,37 @@ class OroEmailBundle implements Migration
     }
 
     /**
+     * @param Schema   $schema
      * @param QueryBag $queries
      */
-    public static function updateMailboxName(QueryBag $queries)
+    public static function updateMailboxName(Schema $schema, QueryBag $queries)
     {
-        $sql = 'UPDATE oro_email_origin SET mailbox_name = %s WHERE name = %s';
-        $originFields = [
-            'internalemailorigin' => '\'' . InternalEmailOrigin::MAILBOX_NAME . '\'',
-            'imapemailorigin' => 'imap_user',
-            'useremailorigin' => 'imap_user',
-            'ewsemailorigin' => 'ews_user_email',
-        ];
+        $table = $schema->getTable('oro_email_origin');
+        $sql = 'UPDATE oro_email_origin SET mailbox_name = %s WHERE name = :name';
 
-        foreach ($originFields as $name => $value) {
-            $query = sprintf($sql, $value, "'{$name}'");
-            $queries->addQuery($query);
+        $queries->addQuery(
+            new ParametrizedSqlMigrationQuery(
+                sprintf($sql, "'" . InternalEmailOrigin::MAILBOX_NAME . "'"),
+                ['name' => 'internalemailorigin']
+            )
+        );
+
+        if ($table->hasColumn('imap_user')) {
+            $queries->addQuery(new ParametrizedSqlMigrationQuery(
+                sprintf($sql, 'imap_user'),
+                ['name' => 'imapemailorigin']
+            ));
+            $queries->addQuery(new ParametrizedSqlMigrationQuery(
+                sprintf($sql, 'imap_user'),
+                ['name' => 'useremailorigin']
+            ));
+        }
+
+        if ($table->hasColumn('ews_user_email')) {
+            $queries->addQuery(new ParametrizedSqlMigrationQuery(
+                sprintf($sql, 'ews_user_email'),
+                ['name' => 'ewsemailorigin']
+            ));
         }
     }
 
