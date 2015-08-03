@@ -251,6 +251,9 @@ oro:
             general.label:            General
             email.label:              Email
             name.label:               Name
+            authorized_roles.label:   Authorized Roles
+            authorized_users.label:   Authorized Users
+            email_users.label:        Email Users
             origin:
                 label:                IMAP Synchronization
                 enable.label:         Use IMAP Synchronization
