@@ -2,14 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
+use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 
@@ -21,7 +28,8 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
  */
 abstract class AbstractEntityOwnershipDecisionMaker implements
     AccessLevelOwnershipDecisionMakerInterface,
-    ContainerAwareInterface
+    ContainerAwareInterface,
+    AceAwareModelInterface
 {
     /**
      * @var OwnerTreeProvider
@@ -47,6 +55,16 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
      * @var ContainerAwareInterface
      */
     private $container;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $configProvider;
+
+    /**
+     * @var EntryInterface
+     */
+    protected $ace;
 
     /**
      * @return OwnershipMetadataProvider
@@ -97,11 +115,92 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     }
 
     /**
+     * @return ConfigProvider
+     */
+    public function getSecurityConfigProvider()
+    {
+        if (!$this->configProvider) {
+            $this->configProvider = $this->getContainer()->get('oro_entity_config.provider.security');
+        }
+
+        return $this->configProvider;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAce(EntryInterface $ace)
+    {
+        $this->ace = $ace;
+    }
+
+    /**
+     * @param object $user
+     * @param object $organization
+     * @param object $domainObject
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function isSharedWithUser($user, $domainObject, $organization)
+    {
+        if (!$this->isSharingApplicable($domainObject)) {
+            return false;
+        }
+        $organizationId = null;
+        if ($organization) {
+            $organizationId = $this->getObjectId($organization);
+        }
+        $tree = $this->getTreeProvider()->getTree();
+        $securityIdentity = $this->ace->getSecurityIdentity();
+        // skip RoleSecurityIdentity because there is no way to share object for whole role
+        if ($securityIdentity instanceof UserSecurityIdentity && $user instanceof UserInterface) {
+            return $securityIdentity->equals(UserSecurityIdentity::fromAccount($user));
+        } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
+            $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($this->getObjectId($user), $organizationId);
+            $businessUnitClass = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
+            foreach ($ownerBusinessUnitIds as $buId) {
+                if ($securityIdentity->equals(new BusinessUnitSecurityIdentity($buId, $businessUnitClass))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param object $domainObject
+     *
+     * @return bool
+     */
+    protected function isSharingApplicable($domainObject)
+    {
+        $entityName = ClassUtils::getRealClass($domainObject);
+        $shareScopes = $this->getSecurityConfigProvider()->hasConfig($entityName)
+            ? $this->getSecurityConfigProvider()->getConfig($entityName)->get('share_scopes')
+            : null;
+        if (!$this->ace || !$shareScopes) {
+            return false;
+        }
+
+        $sharedToScope = false;
+        if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
+            $sharedToScope = Share::SHARE_SCOPE_USER;
+        } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
+            $sharedToScope = Share::SHARE_SCOPE_BUSINESS_UNIT;
+        }
+
+        return in_array($sharedToScope, $shareScopes, true);
     }
 
     /**
@@ -151,6 +250,10 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         $tree = $this->getTreeProvider()->getTree();
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
+
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
 
         $organizationId = null;
         if ($organization) {
@@ -219,6 +322,10 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
 
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
+
         $organizationId = null;
         if ($organization) {
             $organizationId = $this->getObjectId($organization);
@@ -283,6 +390,10 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
 
         $this->validateUserObject($user);
         $this->validateObject($domainObject);
+
+        if ($this->isSharedWithUser($user, $domainObject, $organization)) {
+            return true;
+        }
 
         if ($this->isBasicLevelEntity($domainObject)) {
             return $this->getObjectId($domainObject) === $this->getObjectId($user);

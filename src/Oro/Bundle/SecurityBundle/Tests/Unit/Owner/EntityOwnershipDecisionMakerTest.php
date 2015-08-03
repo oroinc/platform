@@ -71,6 +71,13 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             ->disableOriginalConstructor()
             ->getMock();
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
@@ -101,6 +108,11 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
                             'oro_security.owner.entity_owner_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                        [
+                            'oro_entity_config.provider.security',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $configProvider
                         ],
                     ]
                 )

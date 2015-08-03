@@ -2,23 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\OwnershipDecisionMakerInterface;
-use Oro\Bundle\SecurityBundle\Form\Model\Share;
-use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker implements
-    OwnershipDecisionMakerInterface, AceAwareModelInterface
+    OwnershipDecisionMakerInterface
 {
     /**
      * @deprecated since 1.8, use getTreeProvider method instead
@@ -49,16 +39,6 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
     protected $metadataProvider;
 
     /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @var EntryInterface
-     */
-    protected $ace;
-
-    /**
      * Constructor
      *
      * @param OwnerTreeProvider         $treeProvider
@@ -68,20 +48,17 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
      *
      * @deprecated since 1.8,
      *      use getTreeProvider, getObjectIdAccessor, getEntityOwnerAccessor, getMetadataProvider method instead
-     * @param ConfigProvider            $configProvider
      */
     public function __construct(
         OwnerTreeProvider $treeProvider,
         ObjectIdAccessor $objectIdAccessor,
         EntityOwnerAccessor $entityOwnerAccessor,
-        OwnershipMetadataProvider $metadataProvider,
-        ConfigProvider $configProvider
+        OwnershipMetadataProvider $metadataProvider
     ) {
         $this->treeProvider = $treeProvider;
         $this->objectIdAccessor = $objectIdAccessor;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->metadataProvider = $metadataProvider;
-        $this->configProvider = $configProvider;
     }
 
     /**
@@ -124,39 +101,11 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
 
     /**
      * {@inheritdoc}
-     */
-    public function isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization = null)
-    {
-        $result = parent::isAssociatedWithGlobalLevelEntity($user, $domainObject, $organization);
-
-        if (!$result) {
-            $result = $this->isSharedWithUser($user, $domainObject, $organization);
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
      * @deprecated since 1.8 Please use isAssociatedWithDeepLevelEntity() instead
      */
     public function isAssociatedWithBusinessUnit($user, $domainObject, $deep = false, $organization = null)
     {
         return $this->isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAssociatedWithLocalLevelEntity($user, $domainObject, $deep = false, $organization = null)
-    {
-        $result = parent::isAssociatedWithLocalLevelEntity($user, $domainObject, $deep, $organization);
-
-        if (!$result) {
-            $result = $this->isSharedWithUser($user, $domainObject, $organization);
-        }
-
-        return $result;
     }
 
     /**
@@ -171,91 +120,8 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker 
     /**
      * {@inheritdoc}
      */
-    public function isAssociatedWithBasicLevelEntity($user, $domainObject, $organization = null)
-    {
-        $result = parent::isAssociatedWithBasicLevelEntity($user, $domainObject, $organization);
-
-        if (!$result) {
-            $result = $this->isSharedWithUser($user, $domainObject, $organization);
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports()
     {
         return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAce(EntryInterface $ace)
-    {
-        $this->ace = $ace;
-    }
-
-    /**
-     * @param object $user
-     * @param object $organization
-     * @param object $domainObject
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    public function isSharedWithUser($user, $domainObject, $organization)
-    {
-        if (!$this->isSharingApplicable($domainObject)) {
-            return false;
-        }
-        $organizationId = null;
-        if ($organization) {
-            $organizationId = $this->getObjectId($organization);
-        }
-        $tree = $this->treeProvider->getTree();
-        $securityIdentity = $this->ace->getSecurityIdentity();
-        // skip RoleSecurityIdentity because there is no way to share object for whole role
-        if ($securityIdentity instanceof UserSecurityIdentity && $user instanceof UserInterface) {
-            return $securityIdentity->equals(UserSecurityIdentity::fromAccount($user));
-        } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
-            $ownerBusinessUnitIds = $tree->getUserBusinessUnitIds($this->getObjectId($user), $organizationId);
-            $businessUnitClass = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
-            foreach ($ownerBusinessUnitIds as $buId) {
-                if ($securityIdentity->equals(new BusinessUnitSecurityIdentity($buId, $businessUnitClass))) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param object $domainObject
-     *
-     * @return bool
-     */
-    protected function isSharingApplicable($domainObject)
-    {
-        $entityName = ClassUtils::getClass($domainObject);
-        $shareScopes = $this->configProvider->hasConfig($entityName)
-            ? $this->configProvider->getConfig($entityName)->get('share_scopes')
-            : null;
-        if (!$this->ace || !$shareScopes) {
-            return false;
-        }
-
-        $sharedToScope = false;
-        if ($this->ace->getSecurityIdentity() instanceof UserSecurityIdentity) {
-            $sharedToScope = Share::SHARE_SCOPE_USER;
-        } elseif ($this->ace->getSecurityIdentity() instanceof BusinessUnitSecurityIdentity) {
-            $sharedToScope = Share::SHARE_SCOPE_BUSINESS_UNIT;
-        }
-
-        return in_array($sharedToScope, $shareScopes, true);
     }
 }

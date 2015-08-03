@@ -81,6 +81,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->ownerTree));
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
@@ -107,20 +114,20 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             new EntityOwnerAccessor($this->metadataProvider),
                         ],
+                        [
+                            'oro_entity_config.provider.security',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $configProvider
+                        ],
                     ]
                 )
             );
-
-        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             $objectIdAccessor,
             new EntityOwnerAccessor($this->metadataProvider),
-            $this->metadataProvider,
-            $configProviderMock
+            $this->metadataProvider
         );
         $decisionMaker->setContainer($this->container);
 
@@ -179,7 +186,6 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testObjIsGrantedUsesClassAcesIfNoApplicableObjectAceWasFound()
     {
-
         $obj = new TestEntity(1);
         $this->context->setObject($obj);
         $masks = $this->getMasks('VIEW', $obj);

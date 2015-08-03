@@ -3,20 +3,20 @@
 namespace Oro\Bundle\SecurityBundle\Twig;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OroSecurityExtension extends \Twig_Extension
 {
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
      * @param SecurityFacade $securityFacade
      */
-    public function __construct(SecurityFacade $securityFacade, Translator $translator)
+    public function __construct(SecurityFacade $securityFacade, TranslatorInterface $translator)
     {
         $this->securityFacade = $securityFacade;
         $this->translator = $translator;
