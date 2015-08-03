@@ -12,7 +12,7 @@ class ActivityListTest extends Selenium2TestCase
     const USERNAME  = 'admin';
 
     /**
-     * Test Notes functionality set On
+     * Test Calendar event and Send Email functionality availability for User entity
      */
     public function testActivitiesOn()
     {
@@ -21,10 +21,10 @@ class ActivityListTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->filterBy('Name', $entityName)
+            ->filterBy('Name', $entityName, 'is equal to')
             ->open([$entityName])
             ->edit()
-            ->setActivitiesOn(array('Emails', 'Calendar events'))
+            ->setActivitiesOn(array('Calendar events'))
             ->save()
             ->updateSchema()
             ->assertMessage('Schema updated');
@@ -36,7 +36,7 @@ class ActivityListTest extends Selenium2TestCase
     }
 
     /**
-     * Test add new Note to User entity
+     * Test add new Calendar event to User entity
      * @depends testActivitiesOn
      * @return string
      */
