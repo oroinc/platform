@@ -15,10 +15,10 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        self::addEmailFolderFields($schema);
-        self::addEmailOriginFields($schema);
+        //self::addEmailFolderFields($schema);
+        //self::addEmailOriginFields($schema);
         self::updateMailboxName($queries);
-        self::updateEmailRecipientConstraint($schema);
+        //self::updateEmailRecipientConstraint($schema);
     }
 
     /**
@@ -68,7 +68,8 @@ class OroEmailBundle implements Migration
         ];
 
         foreach ($originFields as $name => $value) {
-            $queries->addQuery(sprintf($sql, $value, $name));
+            $query = sprintf($sql, $value, "'{$name}'");
+            $queries->addQuery($query);
         }
     }
 
