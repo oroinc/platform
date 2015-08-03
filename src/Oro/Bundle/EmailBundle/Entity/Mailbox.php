@@ -68,7 +68,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @var EmailOrigin
      *
      * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
+     *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
      *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)

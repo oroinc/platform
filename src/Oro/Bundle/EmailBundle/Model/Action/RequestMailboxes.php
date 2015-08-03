@@ -6,8 +6,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
@@ -50,20 +52,24 @@ class RequestMailboxes extends AbstractAction
         $manager = $this->doctrine->getManager();
 
         $type = $this->contextAccessor->getValue($context, $this->processType);
-
         $type = $this->processStorage->getProcess($type)->getSettingsEntityFQCN();
 
         $qb = $manager->createQueryBuilder();
         $qb->select('mb')
             ->from('OroEmailBundle:Mailbox', 'mb')
-            ->join('mb.emailUsers', 'eu')
+            ->leftJoin('mb.emailUsers', 'eu')
+            ->leftJoin('eu.folder', 'f')
             ->leftJoin('mb.processSettings', 'ps')
             ->where($qb->expr()->isInstanceOf('ps', $type))
-            ->andWhere('eu.email = :email');
+            ->andWhere('eu.email = :email')
+            ->andWhere(
+                $qb->expr()->orX(
+                    'f.type = \'inbox\'',
+                    'f.type = \'other\''
+                )
+            );
 
-        $qb->setParameters([
-            'email' => $this->contextAccessor->getValue($context, $this->email),
-        ]);
+        $qb->setParameter('email', $this->contextAccessor->getValue($context, $this->email));
 
         $results = $qb->getQuery()->getResult();
 

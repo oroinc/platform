@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,14 +69,28 @@ class ConnectionController extends Controller
                     $emailFolders = $this->manager->getFolders();
                     $origin->setFolders($emailFolders);
 
-                    $user = new User();
-                    $user->setImapConfiguration($origin);
-                    $userForm = $this->get('oro_user.form.user');
-                    $userForm->setData($user);
+                    if ($request->get('for_entity', 'user') === 'user') {
+                        $user = new User();
+                        $user->setImapConfiguration($origin);
+                        $userForm = $this->get('oro_user.form.user');
+                        $userForm->setData($user);
 
-                    $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
-                        'form' => $userForm->createView(),
-                    ]);
+                        $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
+                            'form' => $userForm->createView(),
+                        ]);
+                    } elseif ($request->get('for_entity', 'user') === 'mailbox') {
+                        $mailbox = new Mailbox();
+                        $mailbox->setOrigin($origin);
+                        $mailboxForm = $this->createForm('oro_email_mailbox');
+                        $mailboxForm->setData($mailbox);
+
+                        $response['imap']['folders'] = $this->renderView(
+                            'OroImapBundle:Connection:checkMailbox.html.twig',
+                            [
+                                'form' => $mailboxForm->createView(),
+                            ]
+                        );
+                    }
                 } catch (\Exception $e) {
                     $response['imap']['error'] = $e->getMessage();
                 }

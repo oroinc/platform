@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -260,7 +261,10 @@ class EmailActivityListProvider implements
                 ->getRoute('view');
             if (null !== $route) {
                 $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
-                $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+                try {
+                    $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+                } catch (RouteNotFoundException $e) {
+                }
             }
         }
 

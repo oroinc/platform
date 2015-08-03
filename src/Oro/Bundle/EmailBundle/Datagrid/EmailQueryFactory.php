@@ -59,7 +59,7 @@ class EmailQueryFactory
     {
         if ($userId) {
             $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-                 ->findAvailableMailboxIds($userId);
+                 ->findAvailableMailboxes($userId);
             if (!empty($mailboxIds)) {
                 $qb->andWhere(
                     $qb->expr()->orX(

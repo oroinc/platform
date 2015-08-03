@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Builder\Helper;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
@@ -249,6 +250,14 @@ class EmailModelBuilderHelper
     public function getTargetEntity($entityClass, $entityId)
     {
         return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
+    }
+
+    public function getMailboxes()
+    {
+        $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')
+            ->findAvailableMailboxes($this->getUser()->getId(), false);
+
+        return $mailboxes;
     }
 
     /**

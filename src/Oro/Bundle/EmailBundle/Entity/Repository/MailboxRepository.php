@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class MailboxRepository extends EntityRepository
 {
@@ -32,13 +33,16 @@ class MailboxRepository extends EntityRepository
     /**
      * Returns all mailbox ids accessible by user.
      *
-     * @param integer $userId
+     * @param User|integer $user    User entity or user id.
+     * @param bool         $idsOnly Whether to return ids only or not.
      *
-     * @return integer[]
+     * @return \integer[]|mixed
      */
-    public function findAvailableMailboxIds($userId)
+    public function findAvailableMailboxes($user, $idsOnly = true)
     {
-        $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($userId);
+        if (!$user instanceof User) {
+            $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
+        }
 
         // Get ids of all user roles.
         $roles = $user->getRoles();
@@ -51,16 +55,24 @@ class MailboxRepository extends EntityRepository
 
         // Find mailboxes which have user in list of authorized users or any of his roles in list of authorized roles.
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('mb.id')
-            ->from('OroEmailBundle:Mailbox', 'mb')
+        if ($idsOnly) {
+            $qb->select('mb.id');
+        } else {
+            $qb->select('mb');
+        }
+        $qb->from('OroEmailBundle:Mailbox', 'mb')
             ->leftJoin('mb.authorizedUsers', 'au')
             ->leftJoin('mb.authorizedRoles', 'ar')
             ->where('au = :user')
             ->orWhere(
                 $qb->expr()->in('ar', $roleList)
             );
-        $qb->setParameter('user', $userId);
+        $qb->setParameter('user', $user);
 
-        return array_map('current', $qb->getQuery()->getScalarResult());
+        if ($idsOnly) {
+            return array_map('current', $qb->getQuery()->getScalarResult());
+        }
+
+        return $qb->getQuery()->execute();
     }
 }

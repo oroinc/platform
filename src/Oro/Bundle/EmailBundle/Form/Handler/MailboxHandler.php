@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
+use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;

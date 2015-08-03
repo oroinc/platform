@@ -104,7 +104,6 @@ parameters:
     oro_email.mailbox_email_owner_provider.class:       Oro\Bundle\EmailBundle\Provider\MailboxEmailOwnerProvider
     oro_email.mailbox_choice_list.class:                Oro\Bundle\EmailBundle\Datagrid\MailboxChoiceList
     oro_email.mailbox.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_email.mailbox.mailer_manager.class:             Oro\Bundle\EmailBundle\Mailer\MailboxMailerManager
     oro_email.mailbox.entity_name_provider.class:       Oro\Bundle\EmailBundle\Provider\MailboxEntityNameProvider
 
     # Workflow conditions
@@ -695,6 +694,7 @@ services:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
             - @doctrine
+            - @oro_security.security_facade
 
     oro_email.mailbox.manager.api:
         class: %oro_email.mailbox.manager.api.class%
@@ -702,11 +702,6 @@ services:
         arguments:
             - %oro_email.mailbox.entity.class%
             - @doctrine.orm.entity_manager
-
-    oro_email.mailbox.mailer_manager:
-        class: %oro_email.mailbox.mailer_manager.class%
-        arguments:
-            - @doctrine
 
     oro_email.mailbox.entity_name_provider:
         class: %oro_email.mailbox.entity_name_provider.class%

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
@@ -374,6 +375,8 @@ class Processor
 
             if ($emailOwner instanceof User) {
                 $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
+            } elseif ($emailOwner instanceof Mailbox) {
+                $origin = $emailOwner->getOrigin();
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')

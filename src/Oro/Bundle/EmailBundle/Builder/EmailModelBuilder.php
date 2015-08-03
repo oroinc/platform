@@ -219,6 +219,8 @@ class EmailModelBuilder
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $userEmails = $this->helper->getUser()->getEmails();
+        $mailboxes = $this->helper->getMailboxes();
+        $userEmails = array_merge($mailboxes, $userEmails->toArray());
         $toEmails = [];
         $emailRecipients = $parentEmailEntity->getTo();
         /** @var EmailRecipient $emailRecipient */
