@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\EventListener;
+namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -12,12 +12,13 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
+use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 
-class EmailRecipientsLoadListener
+class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
     /** @var Registry */
     protected $registry;
@@ -50,27 +51,28 @@ class EmailRecipientsLoadListener
     }
 
     /**
-     * @param EmailRecipientsLoadEvent $event
+     * {@inheritdoc}
      */
-    public function onLoad(EmailRecipientsLoadEvent $event)
+    public function getRecipients(EmailRecipientsProviderArgs $args)
     {
-        if (!$event->getRemainingLimit() || !$event->getRelatedEntity()) {
-            return;
+        if (!$args->getRelatedEntity()) {
+            return [];
         }
 
-        $relatedEntity = $event->getRelatedEntity();
+        $relatedEntity = $args->getRelatedEntity();
         $relatedEntityClass = ClassUtils::getClass($relatedEntity);
         $em = $this->registry->getManagerForClass($relatedEntityClass);
         $metadata = $em->getClassMetadata($relatedEntityClass);
         $idNames = $metadata->getIdentifierFieldNames();
 
         if (count($idNames) !== 1) {
-            return;
+            return [];
         }
 
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $relatedEntityId = $propertyAccessor->getValue($relatedEntity, $idNames[0]);
 
+        $result = [];
         $activities = $this->activityManager->getActivities($relatedEntityClass);
         foreach ($activities as $class => $field) {
             $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
@@ -83,7 +85,7 @@ class EmailRecipientsLoadListener
                 ->setParameter('related_activity_class', $class);
 
             $iterator = new BufferedQueryResultIterator($qb);
-            $iterator->setBufferSize($event->getRemainingLimit());
+            $iterator->setBufferSize($args->getLimit());
 
             foreach ($iterator as $entity) {
                 $emails = $this->relatedEmailsProvider->getEmails($entity, 2);
@@ -91,13 +93,23 @@ class EmailRecipientsLoadListener
                     continue;
                 }
 
-                $this->emailRecipientsHelper->addEmailsToContext($event, $emails);
+                $result = array_merge($result, $emails);
 
-                if (!$event->getRemainingLimit()) {
+                if ($args->getLimit() - count($result) <= 0) {
                     break 2;
                 }
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSection()
+    {
+        return 'oro.email.autocomplete.contexts';
     }
 
     /**

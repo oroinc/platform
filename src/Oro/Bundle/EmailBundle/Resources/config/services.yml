@@ -35,7 +35,6 @@ parameters:
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
     oro_email.email_attachment_transformer.class: Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer
     oro_email.email_websocket.processor.class:    Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor
-    oro_email.listener.email_recipients_load.listener.class: Oro\Bundle\EmailBundle\EventListener\EmailRecipientsLoadListener
 
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
     oro_email.emailtemplate.entity.class:         Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -57,6 +56,8 @@ parameters:
     oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
     oro_email.related_emails.provider.class: Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider
     oro_email.email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider
+    oro_email.recent_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider
+    oro_email.context_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider
     oro_email.provider.email_recipients.helper.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper
 
     # Managers
@@ -572,25 +573,29 @@ services:
     oro_email.email_recipients.provider:
         class: %oro_email.email_recipients.provider.class%
         arguments:
-            - @event_dispatcher
+            - @translator
+
+    oro_email.recent_email_recipients.provider:
+        class: %oro_email.recent_email_recipients.provider.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_email.related_emails.provider
+            - @oro_security.acl_helper
+            - @doctrine
+        tags:
+            - { name: oro_email.recipients_provider }
+
+    oro_email.context_email_recipients.provider:
+        class: %oro_email.context_email_recipients.provider.class%
+        arguments:
+            - @oro_email.related_emails.provider
+        tags:
+            - { name: oro_email.recipients_provider }
 
     oro_email.provider.email_recipients.helper:
         class: %oro_email.provider.email_recipients.helper.class%
         arguments:
             - @translator
-
-    oro_email.listener.email_recipients_load.listener:
-        class: %oro_email.listener.email_recipients_load.listener.class%
-        arguments:
-            - @oro_security.security_facade
-            - @oro_security.acl_helper
-            - @oro_email.related_emails.provider
-            - @doctrine
-            - @translator
-            - @oro_email.provider.email_recipients.helper
-        tags:
-            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: loadRecentEmails }
-            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: loadContextEmails }
 
     oro_email.link.formatter.name:
         tags:

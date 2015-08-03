@@ -10,6 +10,7 @@ parameters:
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+    oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
     oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
     oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
 
@@ -24,8 +25,6 @@ parameters:
 
     oro_activity_list.filter.activity_list.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
     oro_activity_list.filter.datagrid_helper.class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
-
-    oro_activity_list.listener.email_recipients_load.listener.class: Oro\Bundle\ActivityListBundle\EventListener\EmailRecipientsLoadListener
 
     # helper
     oro_activity_list.helper.acl_criteria.class: Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper
@@ -89,6 +88,16 @@ services:
             - @translator
             - @oro_entity.routing_helper
             - @oro_ui.html_tag_helper
+
+    oro_activity_list.provider.email_recipients:
+        class: %oro_activity_list.provider.email_recipients.class%
+        arguments:
+            - @doctrine
+            - @oro_activity.manager
+            - @oro_email.related_emails.provider
+            - @oro_email.provider.email_recipients.helper
+        tags:
+            - { name: oro_email.recipients_provider }
 
     oro_activity_list.event_listener.segment_widget_options_listener:
         class: %oro_activity_list.event_listener.segment_widget_options_listener.class%
@@ -163,16 +172,6 @@ services:
             - @oro_query_designer.grid.datagrid_configuration_builder
             - @oro_activity_list.datagrid.builder.link
             - @event_dispatcher
-
-    oro_activity_list.listener.email_recipients_load.listener:
-        class: %oro_activity_list.listener.email_recipients_load.listener.class%
-        arguments:
-            - @doctrine
-            - @oro_activity.manager
-            - @oro_email.related_emails.provider
-            - @oro_email.provider.email_recipients.helper
-        tags:
-            - { name: kernel.event_listener, event: oro_email.email_recipients_load, method: onLoad }
 
     oro_activity_list.helper.acl_criteria:
         class: %oro_activity_list.helper.acl_criteria.class%

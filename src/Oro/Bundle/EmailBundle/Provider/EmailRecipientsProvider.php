@@ -2,21 +2,25 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EmailBundle\Event\EmailRecipientsLoadEvent;
+use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 
 class EmailRecipientsProvider
 {
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /** @var EmailRecipientsProviderInterface[] */
+    protected $providers = [];
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param TranslatorInterface $translator
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->dispatcher = $dispatcher;
+        $this->translator = $translator;
     }
 
     /**
@@ -28,31 +32,43 @@ class EmailRecipientsProvider
      */
     public function getEmailRecipients($relatedEntity = null, $query = null, $limit = 100)
     {
-        if (!$this->dispatcher->hasListeners(EmailRecipientsLoadEvent::NAME)) {
-            return [];
+        $emails = [];
+        $excludeEmails = [];
+        foreach ($this->providers as $provider) {
+            $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails);
+            $recipients = $provider->getRecipients($args);
+            if (!$recipients) {
+                continue;
+            }
+
+            $excludeEmails = array_merge($excludeEmails, array_keys($recipients));
+            $limit = max([0, $limit - count($recipients)]);
+            if (!array_key_exists($provider->getSection(), $emails)) {
+                $emails[$provider->getSection()] = [];
+            }
+            $emails[$provider->getSection()] = array_merge($emails[$provider->getSection()], $recipients);
         }
 
-        $event = new EmailRecipientsLoadEvent($relatedEntity, $query, $limit);
-        $this->dispatcher->dispatch(EmailRecipientsLoadEvent::NAME, $event);
+        $result = [];
+        foreach ($emails as $section => $sectionEmails) {
+            $items = array_map(function ($name) {
+                return ['id' => $name, 'text' => $name];
+            }, $sectionEmails);
 
-        return $this->valuesAsKeys($event->getResults());
+            $result[] = [
+                'text'     => $this->translator->trans($section),
+                'children' => array_values($items),
+            ];
+        }
+
+        return $result;
     }
 
     /**
-     * @param array $data
-     *
-     * @return array
+     * @param EmailRecipientsProviderInterface[] $providers
      */
-    public function valuesAsKeys(array $data)
+    public function setProviders(array $providers)
     {
-        foreach ($data as $key => $record) {
-            if (isset($record['children'])) {
-                $data[$key]['children'] = $this->valuesAsKeys($record['children']);
-            } else {
-                $data[$key]['id'] = $record['text'];
-            }
-        }
-
-        return $data;
+        $this->providers = $providers;
     }
 }
