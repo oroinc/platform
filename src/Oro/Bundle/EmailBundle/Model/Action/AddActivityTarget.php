@@ -1,8 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ActivityBundle\Model\Action;
+namespace Oro\Bundle\EmailBundle\Model\Action;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
@@ -10,7 +13,7 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 /**
  * Class AddActivityTarget
  *
- * @add_activity_target:
+ * @add_email_activity_target:
  *      activity_entity: $.activityEntity
  *      target_entity: $.targetEntity
  *      attribute: $.attribute              # status if activity was added is stored in this optional attribute
@@ -27,15 +30,27 @@ class AddActivityTarget extends AbstractAction
     protected $targetEntity;
     /** @var string */
     protected $attribute = null;
+    /** @var ActivityListChainProvider */
+    private $chainProvider;
+    /** @var EntityManager */
+    private $entityManager;
 
     /**
-     * @param ContextAccessor $contextAccessor
-     * @param ActivityManager $activityManager
+     * @param ContextAccessor           $contextAccessor
+     * @param EmailActivityManager      $activityManager
+     * @param ActivityListChainProvider $chainProvider
+     * @param EntityManager             $entityManager
      */
-    public function __construct(ContextAccessor $contextAccessor, ActivityManager $activityManager)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        EmailActivityManager $activityManager,
+        ActivityListChainProvider $chainProvider,
+        EntityManager $entityManager
+    ) {
         parent::__construct($contextAccessor);
         $this->activityManager = $activityManager;
+        $this->chainProvider = $chainProvider;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -43,10 +58,14 @@ class AddActivityTarget extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $activityEntity = $this->contextAccessor->getValue($context, $this->activityEntity);
+        $email = $this->contextAccessor->getValue($context, $this->activityEntity);
         $targetEntity = $this->contextAccessor->getValue($context, $this->targetEntity);
 
-        $result = $this->activityManager->addActivityTarget($activityEntity, $targetEntity);
+        $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($email);
+        if ($activityList) {
+            $this->entityManager->persist($activityList);
+        }
+        $result = $this->activityManager->addAssociation($email, $targetEntity);
 
         if ($this->attribute !== null) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);
@@ -62,12 +81,12 @@ class AddActivityTarget extends AbstractAction
             throw new InvalidParameterException('Two or three parameters are required.');
         }
 
-        if (isset($options['activity_entity'])) {
-            $this->activityEntity = $options['activity_entity'];
+        if (isset($options['email'])) {
+            $this->activityEntity = $options['email'];
         } elseif (isset($options[0])) {
             $this->activityEntity = $options[0];
         } else {
-            throw new InvalidParameterException('Parameter "activity_entity" has to be set.');
+            throw new InvalidParameterException('Parameter "email" has to be set.');
         }
 
         if (isset($options['target_entity'])) {

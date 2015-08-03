@@ -13,7 +13,6 @@ parameters:
     oro_activity.handler.delete.activity_entity.class:  Oro\Bundle\ActivityBundle\Entity\Manager\ActivityEntityDeleteHandler
     oro_activity.form.handler.activity_entity.api.class:  Oro\Bundle\ActivityBundle\Form\Handler\ActivityEntityApiHandler
     oro_activity.manager.activity_target.api.class:     Oro\Bundle\ActivityBundle\Entity\Manager\ActivityTargetApiEntityManager
-    oro_activity.workflow.action.add_activity_target.class: Oro\Bundle\ActivityBundle\Model\Action\AddActivityTarget
 
 services:
     oro_activity.manager:
@@ -129,11 +128,3 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
-
-    oro_activity.workflow.action.add_activity_target:
-        class: %oro_activity.workflow.action.add_activity_target.class%
-        arguments:
-            - @oro_workflow.context_accessor
-            - @oro_activity.manager
-        tags:
-            - { name: oro_workflow.action, alias: add_activity_target }

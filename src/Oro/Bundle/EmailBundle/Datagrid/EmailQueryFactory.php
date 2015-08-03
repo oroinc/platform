@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -18,16 +19,22 @@ class EmailQueryFactory
     /** @var string */
     protected $fromEmailExpression;
 
+    /** @var Registry */
+    private $doctrine;
+
     /**
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
+     * @param Registry                  $doctrine
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        Registry $doctrine
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityNameResolver        = $entityNameResolver;
+        $this->doctrine                  = $doctrine;
     }
 
     /**
@@ -50,10 +57,22 @@ class EmailQueryFactory
      */
     public function filterQueryByUserId(QueryBuilder $qb, $userId)
     {
+
         if ($userId) {
-            $qb->andWhere(
-                $qb->expr()->orX('eu.owner = :owner', 'eu.mailboxOwner IS NOT NULL')
-            );
+            $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
+                 ->findIdsOfAllAuthorized($userId);
+            if (!empty($mailboxIds)) {
+                $qb->andWhere(
+                    $qb->expr()->orX(
+                        'eu.owner = :owner',
+                        $qb->expr()->in('eu.mailboxOwner', $mailboxIds)
+                    )
+                );
+            } else {
+                $qb->andWhere(
+                    'eu.owner = :owner'
+                );
+            }
             $qb->setParameter('owner', $userId);
         }
     }

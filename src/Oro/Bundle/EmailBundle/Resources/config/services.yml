@@ -116,6 +116,7 @@ parameters:
     oro_email.workflow.action.parse_last_name.class:    Oro\Bundle\EmailBundle\Model\Action\ParseLastNameFromEmailAddress
     oro_email.workflow.action.request_mailboxes.class:  Oro\Bundle\EmailBundle\Model\Action\RequestMailboxes
     oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
+    oro_email.workflow.action.add_activity_target.class: Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget
 
 services:
     oro_email.entity.cache.warmer:
@@ -396,6 +397,7 @@ services:
         arguments:
             - @oro_email.email.owner.provider.storage
             - @oro_entity.entity_name_resolver
+            - @doctrine
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
@@ -754,3 +756,13 @@ services:
             - @oro_workflow.context_accessor
         tags:
             - { name: oro_workflow.action, alias: strip_html_tags }
+
+    oro_email.workflow.action.add_activity_target:
+        class: %oro_email.workflow.action.add_activity_target.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_email.email.activity.manager
+            - @oro_activity_list.provider.chain
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_workflow.action, alias: add_email_activity_target }
