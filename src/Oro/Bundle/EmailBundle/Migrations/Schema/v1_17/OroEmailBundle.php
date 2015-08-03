@@ -78,8 +78,8 @@ class OroEmailBundle implements Migration
      */
     public static function oroEmailTemplateTable(Schema $schema)
     {
-       $table = $schema->getTable('oro_email_template');
-       $table->addColumn('visible', 'boolean', ['default' => '1']);
+        $table = $schema->getTable('oro_email_template');
+        $table->addColumn('visible', 'boolean', ['default' => '1']);
     }
 
     /**
