@@ -24,8 +24,6 @@ define([
         $existingEntity: null,
         $dialog: null,
 
-        updateDialogPositionCb: null,
-
         initialize: function(options) {
             var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
             if (missingProperties.length) {
@@ -36,17 +34,15 @@ define([
                 );
             }
 
-            this.updateDialogPositionCb = _.bind(this._updateDialogPosition, this);
-
             this.$el = options._sourceElement;
             this.$mode = this.$el.find(options.modeSelector);
             this.$newEntity = this.$el.find(options.newEntitySelector);
             this.$existingEntity = this.$el.find(options.existingEntitySelector);
             this.$dialog = this.$el.closest('.ui-dialog');
+            this.$dialog.css('top', 0);
 
             this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
             this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
-            this.$mode.on('change', this.updateDialogPositionCb);
 
             this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
         },
@@ -54,19 +50,6 @@ define([
         _onEntityChange: function(e) {
             var mode = e.val ? this.MODE_VIEW : this.MODE_CREATE;
             this._setMode(mode);
-        },
-
-        _updateDialogPosition: function() {
-            var maxHeight = $(window).height();
-            var dialogHeight = this.$dialog.height();
-            var dialogBottom = dialogHeight + this.$dialog.position.top;
-
-            if (dialogBottom <= maxHeight) {
-                return;
-            }
-
-            var top = Math.max(0, (maxHeight - dialogHeight) / 2);
-            this.$dialog.css('top', top + 'px');
         },
 
         _updateNewEntityVisibility: function() {
