@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Component\Layout\Util;
+namespace Oro\Component\PhpUtils;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-class ArrayUtils
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
+class ArrayUtil
 {
     /**
      * Checks whether the array is associative or sequential.
@@ -101,7 +102,7 @@ class ArrayUtils
      */
     private static function prepareSortable($array, $propertyPath, $reverse, $stringComparison, $caseInsensitive)
     {
-        $propertyAccessor     = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor     = new PropertyAccessor();
         $isSimplePropertyPath = is_string($propertyPath) && !preg_match('/.\[/', $propertyPath);
         $isCallback           = is_callable($propertyPath);
         $defaultValue         = $stringComparison ? '' : 0;

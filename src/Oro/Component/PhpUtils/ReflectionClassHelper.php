@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Util;
+namespace Oro\Component\PhpUtils;
 
-class ReflectionUtils
+class ReflectionClassHelper
 {
     /** @var string */
     protected $className;
@@ -25,6 +25,8 @@ class ReflectionUtils
     }
 
     /**
+     * Returns the last occurred error
+     *
      * @return string
      */
     public function getLastError()
@@ -36,9 +38,9 @@ class ReflectionUtils
     }
 
     /**
-     * Does given method exist in class declaration
+     * Checks whether the given method exist in class declaration
      *
-     * @param string $method
+     * @param string $method The name of a method
      *
      * @return bool
      */
@@ -54,30 +56,30 @@ class ReflectionUtils
     /**
      * Validates arguments list. $this->getLastError() will return error message if this method return FALSE
      *
-     * @param string $action
-     * @param array  $arguments
+     * @param string $method    The name of a method
+     * @param array  $arguments The list of expected arguments
      *
      * @return bool
      */
-    public function isValidArguments($action, array $arguments)
+    public function isValidArguments($method, array $arguments)
     {
-        $method = $this->getMethod($action);
+        $refMethod = $this->getMethod($method);
 
-        $params     = $method->getParameters();
+        $params     = $refMethod->getParameters();
         $paramNames = $this->mapParameterListToNames($params);
 
         $argumentsCount = count($arguments);
         $argumentsKeys  = array_keys($arguments);
-        $isAssoc        = ArrayUtils::isAssoc($arguments);
+        $isAssoc        = ArrayUtil::isAssoc($arguments);
         $diff           = array_diff($argumentsKeys, $paramNames);
 
         if ($isAssoc && $diff) {
-            $this->lastError = sprintf('Unknown argument(s) for "%s" action given: ', $action);
+            $this->lastError = sprintf('Unknown argument(s) for "%s" method given: ', $method);
             $this->lastError .= implode(', ', $diff);
 
             return false;
-        } elseif (!$isAssoc && $method->getNumberOfParameters() < $argumentsCount) {
-            $this->lastError = sprintf('Number of arguments given greater than declared in "%s" action', $action);
+        } elseif (!$isAssoc && $refMethod->getNumberOfParameters() < $argumentsCount) {
+            $this->lastError = sprintf('Number of arguments given greater than declared in "%s" method', $method);
 
             return false;
         }
@@ -93,16 +95,16 @@ class ReflectionUtils
 
             $missingArguments = array_diff($requiredParamNames, $argumentsKeys);
             if (!empty($missingArguments)) {
-                $this->lastError = sprintf('Missing required argument(s) for "%s" action: ', $action);
+                $this->lastError = sprintf('Missing required argument(s) for "%s" method: ', $method);
                 $this->lastError .= implode(', ', $missingArguments);
 
                 return false;
             }
-        } elseif ($argumentsCount < $method->getNumberOfRequiredParameters()) {
+        } elseif ($argumentsCount < $refMethod->getNumberOfRequiredParameters()) {
             $this->lastError = sprintf(
-                '"%s" action requires at least %d argument(s) to be passed, %d given',
-                $action,
-                $method->getNumberOfRequiredParameters(),
+                '"%s" method requires at least %d argument(s) to be passed, %d given',
+                $method,
+                $refMethod->getNumberOfRequiredParameters(),
                 $argumentsCount
             );
 
@@ -113,17 +115,17 @@ class ReflectionUtils
     }
 
     /**
-     * Complete arguments array by default values that were not passed, but set at declaration
+     * Completes arguments array by default values that were not passed, but set at declaration
      *
-     * @param string $method
-     * @param array  $arguments
+     * @param string $method    The name of a method
+     * @param array  $arguments The list of arguments
      */
     public function completeArguments($method, array &$arguments)
     {
-        if (ArrayUtils::isAssoc($arguments)) {
-            $result = [];
-            $method = $this->getMethod($method);
-            $params = $method->getParameters();
+        if (ArrayUtil::isAssoc($arguments)) {
+            $result    = [];
+            $refMethod = $this->getMethod($method);
+            $params    = $refMethod->getParameters();
 
             foreach ($params as $param) {
                 $hasValue = isset($arguments[$param->name]) || array_key_exists($param->name, $arguments);
