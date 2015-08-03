@@ -137,6 +137,33 @@ Configurable entities can use attachments for adding additional files to records
 
 To turn attachments for entity, administrator should turn attachments in UI for current entity configuration.
 
-Additional, admin can set array with allowed nine types and maximun attached file size. If mime types was not set, for validation will be taken mime types from `Upload settings` block mime types of system configuraton.
+Additional, admin can set array with allowed mine types and maximum attached file size. 
+If mime types was not set, the mime types from `Upload settings` (system configuration) will be used for validation.
 
 After the schema was updated, for current entity will be available button `Add attachment`.
+
+#Image formatters
+
+User can use 3 formatters for image type fields.
+
+`image_encoded` returns img tag with embedded image content in src attribute. Additional parameters:
+
+- `alt` - custom alt attribute for img tag. By default - original file name.
+
+- `height` - custom height attribute for img tag. Has no default value.
+
+- `width`- custom width attribute for img tag. Has no default value.
+
+`image_link` returns link to the resized image (e.g. <a href='http://test.com/path/to/image.jpg'>image name</a>). Additional parameters:
+
+- `title` - custom image text value. By default - original file name.
+
+- `height` - custom image height. By default - 100 px.
+
+- `width`- custom image width. By default - 100 px.
+
+`image_src` returns url to the resized image (e.g. http://test.com/path/to/image.jpg). Additional parameters:
+
+- `height` - custom image height. By default - 100 px.
+
+- `width`- custom image width. By default - 100 px.

@@ -21,4 +21,12 @@ class TestConverter extends ConfigValueConverterAbstract
     {
         return 'test view value';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormValue(array $converterAttributes, $value)
+    {
+        return $converterAttributes['value'];
+    }
 }

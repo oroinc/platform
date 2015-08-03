@@ -3,7 +3,9 @@ parameters:
     oro_attachment.listener.file_listener.class:          Oro\Bundle\AttachmentBundle\EventListener\FileListener
 
     oro_attachment.entity.class:                          Oro\Bundle\AttachmentBundle\Entity\Attachment
-    oro_attachment.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_attachment.file.entity.class:                     Oro\Bundle\AttachmentBundle\Entity\File
+    oro_attachment.manager.api.class:                     Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
+    oro_attachment.manager.file.api.class:                Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
 
     oro_attachment.twig.file_extension.class:             Oro\Bundle\AttachmentBundle\Twig\FileExtension
 
@@ -22,10 +24,19 @@ parameters:
     oro_attachment.provider.attachment.class:             Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
     oro_attachment.config.class:                          Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig
 
+    oro_attachment.formatter.image_encoded.class:         Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
+    oro_attachment.formatter.image_link.class:            Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
+    oro_attachment.formatter.image_src.class:             Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+
 services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
-        arguments: [@knp_gaufrette.filesystem_map, @router, @oro_security.security_facade.link, %oro_attachment.files%]
+        arguments:
+          - @knp_gaufrette.filesystem_map
+          - @router
+          - @oro_security.security_facade.link
+          - %oro_attachment.files%
+          - @oro_entity_extend.association_manager
 
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
@@ -33,6 +44,18 @@ services:
         arguments:
             - %oro_attachment.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
+            - @oro_attachment.manager
+            - @oro_entity.doctrine_helper
+
+    oro_attachment.manager.file.api:
+        class: %oro_attachment.manager.file.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_attachment.file.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
+            - @oro_attachment.manager
 
     oro_attachment.listener.file_listener:
         class: %oro_attachment.listener.file_listener.class%
@@ -120,3 +143,26 @@ services:
         arguments:
             - @oro_entity_config.provider.attachment
             - @oro_entity_config.provider.entity
+
+    oro_attachment.formatter.image_encoded:
+        class: %oro_attachment.formatter.image_encoded.class%
+        arguments:
+          - @oro_attachment.manager
+          - @file_locator
+        tags:
+          - { name: oro_formatter, formatter: image_encoded }
+
+    oro_attachment.formatter.image_link:
+        class: %oro_attachment.formatter.image_link.class%
+        arguments:
+          - @oro_attachment.manager
+          - @translator
+        tags:
+          - { name: oro_formatter, formatter: image_link }
+
+    oro_attachment.formatter.image_src:
+        class: %oro_attachment.formatter.image_src.class%
+        arguments:
+          - @oro_attachment.manager
+        tags:
+          - { name: oro_formatter, formatter: image_src }

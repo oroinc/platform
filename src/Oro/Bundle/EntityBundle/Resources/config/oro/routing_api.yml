@@ -5,3 +5,7 @@ oro_entity_api:
 oro_entity_field_api:
     resource: "@OroEntityBundle/Controller/Api/Rest/EntityFieldController.php"
     type:     rest
+
+oro_entity_alias_api:
+    resource: "@OroEntityBundle/Controller/Api/Rest/EntityAliasController.php"
+    type:     rest

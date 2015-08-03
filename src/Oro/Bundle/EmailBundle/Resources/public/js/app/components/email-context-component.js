@@ -1,15 +1,16 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailContextComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        widgetManager = require('oroui/js/widget-manager'),
-        messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        EmailContextView = require('oroemail/js/app/views/email-context-view');
+    var EmailContextComponent;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
+    var widgetManager = require('oroui/js/widget-manager');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailContextView = require('oroemail/js/app/views/email-context-view');
 
     /**
      * @exports EmailContextComponent
@@ -41,9 +42,9 @@ define(function (require) {
          * Bind event handlers on grid widget
          * @protected
          */
-        _bindGridEvent: function () {
-            var self = this,
-                gridWidgetName = this.options.gridWidgetName;
+        _bindGridEvent: function() {
+            var self = this;
+            var gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
                 return;
             }
@@ -59,26 +60,28 @@ define(function (require) {
          * @param {} gridWidget
          * @param {} data
          */
-        onRowSelect: function (gridWidget, data) {
-            var id = data.model.get('id'),
-                dialogWidgetName = this.options.dialogWidgetName,
-                contextTargetClass = this.contextView.currentTargetClass();
+        onRowSelect: function(gridWidget, data) {
+            var id = data.model.get('id');
+            var dialogWidgetName = this.options.dialogWidgetName;
+            var contextTargetClass = this.contextView.currentTargetClass();
 
             gridWidget._showLoading();
             $.ajax({
-                url: this.options.apiUrl,
+                url: routing.generate('oro_api_post_activity_relation', {
+                    activity: 'emails', id: this.options.sourceEntityId
+                }),
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    entityId: this.options.sourceEntityId,
-                    targetClassName: contextTargetClass,
-                    targetId: id
+                    targets: [{entity: contextTargetClass, id: id}]
                 }
-            }).done(function (response) {
-                messenger.notificationFlashMessage(response.status, response.message);
+            }).done(function() {
+                messenger.notificationFlashMessage('success', __('oro.email.contexts.added'));
                 mediator.trigger('widget_success:activity_list:item:update');
                 mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
-            }).always(function () {
+            }).fail(function(response) {
+                messenger.showErrorMessage(__('oro.ui.item_add_error'), response.responseJSON || {});
+            }).always(function() {
                 gridWidget._hideLoading();
                 if (!dialogWidgetName) {
                     return;

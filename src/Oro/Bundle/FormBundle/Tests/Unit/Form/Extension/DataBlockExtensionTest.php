@@ -30,8 +30,12 @@ class DataBlockExtensionTest extends \PHPUnit_Framework_TestCase
         $this->formExtension->setDefaultOptions($resolver);
 
         $this->assertEquals(
+            [],
+            $resolver->resolve()
+        );
+        $this->assertEquals(
             $this->options,
-            $this->readAttribute($resolver, 'knownOptions')
+            $resolver->resolve($this->options)
         );
     }
 

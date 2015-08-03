@@ -39,12 +39,12 @@ class Calendar extends Calendars
             "/following-sibling::*//input[contains(@class,'timepicker-input')]");
         $startDate->clear();
         $startTime->clear();
-        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
+        if (preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $date, $dateParts)) {
             $startDate->click(); // focus
-            $startDate->value($dueDateParts[1]);
+            $startDate->value($dateParts[1]);
             $startTime->click(); // focus
             $startTime->clear();
-            $startTime->value($dueDateParts[2]);
+            $startTime->value($dateParts[2]);
         } else {
             throw new Exception("Value {$date} is not a valid date");
         }
@@ -65,12 +65,12 @@ class Calendar extends Calendars
             "/following-sibling::*//input[contains(@class,'timepicker-input')]");
         $endDate->clear();
         $endTime->clear();
-        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $dueDateParts)) {
+        if (preg_match('/^(.+\d{4}),?\s(\d{1,2}\:\d{2}\s\w{2})$/', $date, $dateParts)) {
             $endDate->click(); // focus
-            $endDate->value($dueDateParts[1]);
+            $endDate->value($dateParts[1]);
             $endTime->click(); // focus
             $endTime->clear();
-            $endTime->value($dueDateParts[2]);
+            $endTime->value($dateParts[2]);
         } else {
             throw new \Exception("Value {$date} is not a valid date");
         }

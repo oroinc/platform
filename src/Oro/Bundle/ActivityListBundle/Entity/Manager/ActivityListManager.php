@@ -17,8 +17,10 @@ use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 
 class ActivityListManager
 {
@@ -31,8 +33,8 @@ class ActivityListManager
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var ConfigManager */
     protected $config;
@@ -46,37 +48,45 @@ class ActivityListManager
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ActivityListAclCriteriaHelper */
+    protected $activityListAclHelper;
+
     /**
      * @param Registry                  $doctrine
      * @param SecurityFacade            $securityFacade
-     * @param NameFormatter             $nameFormatter
+     * @param EntityNameResolver        $entityNameResolver
      * @param Pager                     $pager
      * @param ConfigManager             $config
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param CommentApiManager         $commentManager
      * @param DoctrineHelper            $doctrineHelper
+     * @param ActivityListAclCriteriaHelper $aclHelper
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         Pager $pager,
         ConfigManager $config,
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        ActivityListAclCriteriaHelper $aclHelper
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
-        $this->nameFormatter            = $nameFormatter;
+        $this->entityNameResolver       = $entityNameResolver;
         $this->pager                    = $pager;
         $this->config                   = $config;
         $this->chainProvider            = $provider;
         $this->activityListFilterHelper = $activityListFilterHelper;
         $this->commentManager           = $commentManager;
         $this->doctrineHelper           = $doctrineHelper;
+        $this->activityListAclHelper    = $aclHelper;
     }
 
     /**
@@ -100,6 +110,7 @@ class ActivityListManager
         $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -125,13 +136,23 @@ class ActivityListManager
     public function getListCount($entityClass, $entityId, $filter)
     {
         $qb = $this->getBaseQB($entityClass, $entityId);
-
-        $qb->select('COUNT(activity.id)');
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
 
-        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+        $query = $qb->getQuery();
+        $parserResult      = QueryUtils::parseQuery($query);
+        $parameterMappings = $parserResult->getParameterMappings();
+        list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
+        $statement = $query->getEntityManager()->getConnection()->executeQuery(
+            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
+            $params,
+            $types
+        );
 
-        return $qb->getQuery()->getSingleScalarResult();
+        $result = $statement->fetchColumn();
+
+        return $result;
     }
 
     /**
@@ -176,18 +197,22 @@ class ActivityListManager
     public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
+        $activity = $this->doctrineHelper->getEntity(
+            $entity->getRelatedActivityClass(),
+            $entity->getRelatedActivityId()
+        );
 
         $ownerName = '';
         $ownerId   = '';
         if ($entity->getOwner()) {
-            $ownerName = $this->nameFormatter->format($entity->getOwner());
+            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
             $ownerId   = $entity->getOwner()->getId();
         }
 
         $editorName = '';
         $editorId   = '';
         if ($entity->getEditor()) {
-            $editorName = $this->nameFormatter->format($entity->getEditor());
+            $editorName = $this->entityNameResolver->getName($entity->getEditor());
             $editorId   = $entity->getEditor()->getId();
         }
 
@@ -217,8 +242,8 @@ class ActivityListManager
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
-            'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
-            'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
+            'editable'             => $this->securityFacade->isGranted('EDIT', $activity),
+            'removable'            => $this->securityFacade->isGranted('DELETE', $activity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
             'targetEntityData'     => $targetEntityData,

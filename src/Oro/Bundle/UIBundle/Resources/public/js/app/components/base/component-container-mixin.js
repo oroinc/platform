@@ -1,60 +1,87 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var componentContainerMixin,
-        _ = require('underscore');
+    var componentContainerMixin;
+    var ComponentManager = require('oroui/js/app/components/component-manager');
 
     componentContainerMixin = {
+        /**
+         * @returns {jQuery}
+         */
+        getLayoutElement: function() {
+            throw Error('"getLayoutElement" method have to be defined in the component container');
+        },
+
+        /**
+         * Getter for component manager
+         *
+         * @returns {ComponentManager}
+         */
+        _getComponentManager: function() {
+            if (!this.componentManager) {
+                this.componentManager = new ComponentManager(this.getLayoutElement());
+            }
+            return this.componentManager;
+        },
+
         /**
          * Getter/setter for components
          *
          * @param {string} name
          * @param {BaseComponent=} component to set
+         * @param {HTMLElement=} el
          */
-        pageComponent: function (name, component) {
+        pageComponent: function(name, component, el) {
             if (this.disposed) {
                 component.dispose();
                 return;
             }
-            if (!this.pageComponents) {
-                this.pageComponents = {};
-            }
+
             if (name && component) {
-                this.removePageComponent(name);
-                this.pageComponents[name] = component;
-                component.once('dispose', _.bind(function () {
-                    delete this.pageComponents[name];
-                }, this));
-                return component;
+                if (!el) {
+                    throw Error('The element related to the component is required');
+                }
+                return this._getComponentManager().add(name, component, el);
             } else {
-                return this.pageComponents[name];
+                return this._getComponentManager().get(name);
             }
         },
 
         /**
          * @param {string} name component name to remove
          */
-        removePageComponent: function (name) {
-            if (!this.pageComponents) {
-                this.pageComponents = {};
-            }
-            var component = this.pageComponents[name];
-            if (component) {
-                component.dispose();
-            }
+        removePageComponent: function(name) {
+            this._getComponentManager().remove(name);
+        },
+
+        /**
+         * Applies callback function to all component
+         *
+         * @param {Function} callback
+         * @param {Object?} context
+         */
+        forEachComponent: function(callback, context) {
+            this._getComponentManager().forEachComponent(callback, context || this);
+        },
+
+        /**
+         * Initializes all linked page components
+         */
+        initPageComponents: function() {
+            return this._getComponentManager().init();
         },
 
         /**
          * Destroys all linked page components
          */
-        disposePageComponents: function () {
-            if (!this.pageComponents) {
+        disposePageComponents: function() {
+            if (this.disposed) {
                 return;
             }
-            _.each(this.pageComponents, function (component) {
-                component.dispose();
-            });
-            delete this.pageComponents;
+            if (this.componentManager) {
+                this._getComponentManager().dispose();
+                delete this.componentManager;
+            }
         }
     };
 

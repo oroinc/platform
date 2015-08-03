@@ -1,67 +1,43 @@
 {% extends 'OroUIBundle:Form:fields.html.twig' %}
 
 {% block genemu_jqueryselect2_widget %}
-    {{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
-    {{ form_javascript(form) }}
+    {% if configs.grid is defined and configs.grid.name is defined %}
+        {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
+    {% elseif configs.route_name is defined and configs.route_name %}
+        {% set url = path(configs.route_name, configs.route_parameters | default([])) %}
+    {%  else %}
+        {% set url = '' %}
+    {% endif %}
+    {% if configs.placeholder is defined %}
+        {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
+    {% endif %}
+    {% if configs.result_template_twig is defined and configs.result_template_twig %}
+        {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
+    {% endif %}
+    {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
+        {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
+    {% endif %}
+    {% if configs.component is defined %}
+        {% set component = 'oro/select2-'~configs.component~'-component' %}
+    {%  else %}
+        {% set component = 'oro/select2-component' %}
+    {% endif %}
+    {% if component_options is not defined %}
+        {% set component_options = {} %}
+    {% endif %}
+    {% set component_options = component_options|merge({'configs': configs, 'url': url}) %}
+    {% if excluded is defined %}
+        {% set component_options = component_options|merge({'excluded': excluded }) %}
+    {% endif %}
+    {{ form_widget(form, { 'attr': {
+        'class': 'select2',
+        'data-page-component-module': component,
+        'data-page-component-options': component_options|json_encode|raw
+    } }) }}
 {% endblock %}
 
 {% block genemu_jqueryselect2_javascript %}
-    <script type="text/javascript">
-        require(['underscore', 'jquery', 'oroform/js/select2-config', 'oroform/js/select2_relevancy_order_handler'
-            {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
-                {%- for path in configs.extra_modules -%}
-                    , '{{ path }}'
-                {%- endfor -%}
-            {% endif -%}
-            , 'jquery.select2'],
-        function(_, $, Select2Config, orderHandler
-            {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
-                {%- for name in configs.extra_modules|keys -%}
-                    , {{ name }}
-                {%- endfor -%}
-            {% endif -%}
-                ){
-            var $field = $('#{{ id }}');
-
-            {% block genemu_jqueryselect2_javascript_prototype %}
-                {% set routeParameters = configs.route_parameters is defined ? configs.route_parameters : [] %}
-                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, routeParameters) : '' %}
-                {% if configs.placeholder is defined %}
-                    {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
-                {% endif %}
-                {% if configs.result_template_twig is defined and configs.result_template_twig %}
-                    {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
-                {% endif %}
-                {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
-                    {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
-                {% endif %}
-
-                var select2Config = {{ configs|json_encode|raw }};
-                {% if configs.extra_config is defined and configs.extra_config %}
-                    {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
-                {% endif %}
-
-                orderHandler.handle(select2Config);
-
-                {% if excluded is not defined %}
-                    {% set excluded = [] %}
-                {% endif %}
-                if ($field.length) {
-                    var configurator = new Select2Config(
-                        select2Config,
-                        {{ url|json_encode|raw }},
-                        {{ configs.per_page|default(10) }},
-                        {{ excluded|json_encode|raw }}
-                    );
-                    select2Config = configurator.getConfig();
-                }
-
-                $field.select2(select2Config);
-
-                $field.trigger('select2-init');
-            {% endblock %}
-        });
-    </script>
+    {% block genemu_jqueryselect2_javascript_prototype %}{% endblock %}
 {% endblock %}
 
 {% block oro_ticker_symbol_widget %}
@@ -114,84 +90,6 @@
     {{ form_widget(form) }}
 {% endblock %}
 
-{# used to populate selected data on pintab restore #}
-{% block oro_combobox_dataconfig_onselect %}
-    $field.on('select2-init', function(e) {
-        $(e.target).on('change', function(e){
-            $(this).data('selected-data', e.added);
-        });
-    });
-{% endblock %}
-
-{% block oro_combobox_dataconfig_autocomplete %}
-    select2Config.ajax = {
-        url: {{ url|json_encode|raw }},
-        data: function (query, page) {
-            return {
-                page: page,
-                per_page: {{ configs.per_page|default(10)|json_encode|raw }},
-                name: {{ configs.autocomplete_alias|json_encode|raw }},
-                query: query
-            };
-        },
-        results: function (data, page) {
-            return data;
-        }
-    };
-
-    {{ block('oro_combobox_dataconfig_onselect') }}
-{% endblock %}
-
-{% block oro_combobox_dataconfig_relation %}
-    select2Config.ajax = {
-        'url': {{ url|json_encode|raw }},
-        'data': function (query, page) {
-            return {
-                'page': page,
-                'per_page': {{ configs.per_page|default(10) }},
-                'name': "{{ configs.autocomplete_alias }}",
-                'query': query + ',{{ configs.target_entity }},{{ configs.target_field }}'
-            };
-        },
-        'results': function (data, page) {
-            return data;
-        }
-    };
-{% endblock %}
-
-{% block oro_combobox_dataconfig_grid %}
-    {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
-    {% set perPage = configs.per_page|default(10) %}
-
-    select2Config.ajax = {
-        'url': {{ url|json_encode|raw }},
-        'data': function (query, page, searchById) {
-            if (searchById) {
-                return {
-                    '{{ configs.grid.name }}[_pager][_page]': 1,
-                    '{{ configs.grid.name }}[_pager][_per_page]': 1,
-                    '{{ configs.grid.name }}[_filter][id][type]': 3,
-                    '{{ configs.grid.name }}[_filter][id][value]': query
-                };
-            } else {
-                return {
-                    '{{ configs.grid.name }}[_pager][_page]': page,
-                    '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
-                    '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
-                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
-                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
-                };
-            }
-        },
-        'results': function (data, page) {
-            return {
-                results: data.data,
-                more: page*{{ perPage }} < data.options.totalRecords
-            };
-        }
-    };
-{% endblock %}
-
 {% block oro_multiple_entity_widget %}
     {{ form_widget(form) }}
 
@@ -205,6 +103,7 @@
         ],
         function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
             {% set selectionUrl = null %}
+            {% set originalFieldId = attr['data-ftid'] %}
             {% if form.vars.grid_url is defined and form.vars.grid_url %}
                 {% set selectionUrl = form.vars.grid_url %}
             {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
@@ -217,8 +116,8 @@
                 el: '#{{ id }}-container',
                 template: EntitiesTpl,
                 elementTemplate: EntityTpl,
-                addedElement: '#{{ id }}_added',
-                removedElement: '#{{ id }}_removed',
+                addedElement: 'input[data-ftid="{{ originalFieldId }}_added"]',
+                removedElement: 'input[data-ftid="{{ originalFieldId }}_removed"]',
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
                 selectionUrl: {{ selectionUrl|json_encode|raw }},
@@ -243,6 +142,7 @@
 
 {% block form_label %}
     {% spaceless %}
+    {% if label is not sameas(false) %}
         {% if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {% endif %}
@@ -253,7 +153,11 @@
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
         {% endif %}
         {% if label is empty %}
-            {% set label = name|humanize %}
+            {% if label_format is not empty -%}
+                {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
+            {% else %}
+                {% set label = name|humanize %}
+            {% endif %}
         {% endif %}
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
@@ -278,6 +182,7 @@
             {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
+    {%- endif -%}
     {% endspaceless %}
 {% endblock form_label %}
 
@@ -422,17 +327,18 @@
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
         <div class="row-oro">
-            <div {{ block('widget_container_attributes') }}{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+            {% set prototype_name = form.vars.prototype_name %}
+            <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                 {% if form.children|length %}
                     {% for child in form.children %}
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
-                    {{ prototype_html|replace({'__name__': '0'})|raw }}
+                    {{ prototype_html|replace({(prototype_name): '0'})|raw }}
                 {% endif %}
             </div>
             {% if allow_add %}
-            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
             {% endif %}
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}

@@ -161,11 +161,14 @@ abstract class AbstractImportHandler extends AbstractHandler
                 )
         ];
 
+        $isValidationMode = $this->jobExecutor->isValidationMode();
+        $this->jobExecutor->setValidationMode(true);
         $jobResult = $this->jobExecutor->executeJob(
             ProcessorRegistry::TYPE_IMPORT_VALIDATION,
             $jobName,
             $configuration
         );
+        $this->jobExecutor->setValidationMode($isValidationMode);
 
         return $jobResult;
     }

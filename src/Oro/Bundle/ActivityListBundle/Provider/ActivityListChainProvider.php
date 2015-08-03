@@ -16,11 +16,13 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
  * Class ActivityListChainProvider
  * @package Oro\Bundle\ActivityListBundle\Provider
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActivityListChainProvider
 {
@@ -42,22 +44,28 @@ class ActivityListChainProvider
     /** @var array */
     protected $targetClasses = [];
 
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      * @param EntityRoutingHelper $routingHelper
+     * @param HtmlTagHelper       $htmlTagHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
         TranslatorInterface $translator,
-        EntityRoutingHelper $routingHelper
+        EntityRoutingHelper $routingHelper,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
         $this->translator     = $translator;
         $this->routingHelper  = $routingHelper;
+        $this->htmlTagHelper  = $htmlTagHelper;
     }
 
     /**
@@ -68,6 +76,16 @@ class ActivityListChainProvider
     public function addProvider(ActivityListProviderInterface $provider)
     {
         $this->providers[$provider->getActivityClass()] = $provider;
+    }
+
+    /**
+     * Get array providers
+     *
+     * @return \Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface[]
+     */
+    public function getProviders()
+    {
+        return $this->providers;
     }
 
     /**
@@ -107,6 +125,20 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get array with supported activity owner classes
+     *
+     * @return array
+     */
+    public function getSupportedOwnerActivities()
+    {
+        $ownerClasses = [];
+        foreach ($this->providers as $provider) {
+            $ownerClasses[] = $provider->getAclClass();
+        }
+        return $ownerClasses;
+    }
+
+    /**
      * Check if given activity entity supports by activity list providers
      *
      * @param $entity
@@ -116,6 +148,22 @@ class ActivityListChainProvider
     public function isSupportedEntity($entity)
     {
         return in_array($this->doctrineHelper->getEntityClass($entity), array_keys($this->providers));
+    }
+
+    /**
+     * Check if given owner activity entity supports by activity list providers
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function isSupportedOwnerEntity($entity)
+    {
+        $ownerClasses = [];
+        foreach ($this->providers as $provider) {
+            $ownerClasses[] = $provider->getAclClass();
+        }
+        return in_array($this->doctrineHelper->getEntityClass($entity), $ownerClasses);
     }
 
     /**
@@ -133,6 +181,33 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list by class and id of entity
+     *
+     * @param object $entity
+     * @param EntityManager $entityManager
+     *
+     * @return mixed
+     */
+    public function getActivityListByEntity($entity, EntityManager $entityManager)
+    {
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        foreach ($this->providers as $provider) {
+            if ($entityClass === $provider->getAclClass()) {
+                $entityClass = $provider->getActivityClass();
+                $entityId = $provider->getActivityId($entity);
+            }
+        }
+
+        return $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
+            [
+                'relatedActivityClass' => $entityClass,
+                'relatedActivityId'    => $entityId
+            ]
+        );
+    }
+
+    /**
      * Returns updated activity list entity for given activity
      *
      * @param object        $entity
@@ -143,12 +218,7 @@ class ActivityListChainProvider
     public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
         $provider        = $this->getProviderForEntity($entity);
-        $existListEntity = $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
-            [
-                'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
-                'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
-            ]
-        );
+        $existListEntity = $this->getActivityListByEntity($entity, $entityManager);
 
         if ($existListEntity) {
             return $this->getActivityListEntityForEntity(
@@ -185,7 +255,7 @@ class ActivityListChainProvider
             }
 
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
-            $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
+            $templates[$this->routingHelper->getUrlSafeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $template,
@@ -230,6 +300,22 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list provider for given activity owner entity
+     *
+     * @param $activityOwnerEntity
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderForOwnerEntity($activityOwnerEntity)
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->getAclClass() === $this->doctrineHelper->getEntityClass($activityOwnerEntity)) {
+                return $this->getProviderForEntity($provider->getActivityClass());
+            }
+        }
+    }
+
+    /**
      * Get activity list provider for given activity entity
      *
      * @param $activityEntity
@@ -254,6 +340,18 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get activity list provider for entity owner class name
+     *
+     * @param string $className
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderByOwnerClass($className)
+    {
+        return $this->providers[$className];
+    }
+
+    /**
      * @param object                        $entity
      * @param ActivityListProviderInterface $provider
      * @param string                        $verb
@@ -273,11 +371,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            $list->setDescription($provider->getDescription($entity));
-            if ($this->hasCustomDate($provider)) {
-                $list->setCreatedAt($provider->getDate($entity));
-                $list->setUpdatedAt($provider->getDate($entity));
-            }
+            $list->setDescription($this->htmlTagHelper->stripTags(
+                $this->htmlTagHelper->purify($provider->getDescription($entity))
+            ));
+            $this->setDate($entity, $provider, $list);
             if ($this->hasGrouping($provider)) {
                 $list->setHead($provider->isHead($entity));
             }
@@ -326,5 +423,20 @@ class ActivityListChainProvider
     protected function hasGrouping(ActivityListProviderInterface $provider)
     {
         return $provider instanceof ActivityListGroupProviderInterface;
+    }
+
+    /**
+     * Set Create and Update fields
+     *
+     * @param $entity
+     * @param ActivityListProviderInterface $provider
+     * @param ActivityList $list
+     */
+    protected function setDate($entity, ActivityListProviderInterface $provider, $list)
+    {
+        if ($this->hasCustomDate($provider)) {
+            $list->setCreatedAt($provider->getDate($entity));
+            $list->setUpdatedAt($provider->getDate($entity));
+        }
     }
 }

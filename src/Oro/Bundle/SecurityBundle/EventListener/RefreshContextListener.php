@@ -3,11 +3,12 @@
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -62,16 +63,19 @@ class RefreshContextListener
         }
 
         $user = $token->getUser();
-        if (is_object($user) && (!$className || $className == ClassUtils::getClass($user))) {
+        if (is_object($user) && (!$className || $className == ClassUtils::getRealClass($user))) {
             $user = $this->refreshEntity($user);
             if ($user) {
                 $token->setUser($user);
+            } else {
+                $securityContext->setToken(null);
+                $token = null;
             }
         }
 
-        if ($token instanceof OrganizationContextTokenInterface) {
+        if ($token && $token instanceof OrganizationContextTokenInterface) {
             $organization = $token->getOrganizationContext();
-            if (is_object($organization) && (!$className || $className == ClassUtils::getClass($organization))) {
+            if (is_object($organization) && (!$className || $className == ClassUtils::getRealClass($organization))) {
                 /** @var Organization $organization */
                 $organization = $this->refreshEntity($organization);
                 if ($organization) {
@@ -87,7 +91,7 @@ class RefreshContextListener
      */
     protected function refreshEntity($entity)
     {
-        $entityClass = ClassUtils::getClass($entity);
+        $entityClass = ClassUtils::getRealClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
         /** @var EntityManager $entityManager */
@@ -102,6 +106,10 @@ class RefreshContextListener
             return $entityManager->find($entityClass, $entityId);
         }
 
-        return $entityManager->merge($entity);
+        try {
+            return $entityManager->merge($entity);
+        } catch (EntityNotFoundException $e) {
+            return null;
+        }
     }
 }

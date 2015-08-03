@@ -53,12 +53,8 @@ class TransactionEmails extends AbstractPageFilteredGrid
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
         $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $action->click();
-        $action->click();
-        $this->waitForAjax();
+        $this->test->moveto($action);
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        //$this->waitForAjax();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();

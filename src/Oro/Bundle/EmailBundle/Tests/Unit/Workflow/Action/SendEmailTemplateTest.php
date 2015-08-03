@@ -29,7 +29,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -74,10 +74,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
@@ -86,9 +83,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -108,7 +103,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             $this->contextAccessor,
             $this->emailProcessor,
             new EmailAddressHelper(),
-            $this->nameFormatter,
+            $this->entityNameResolver,
             $this->renderer,
             $this->objectManager,
             $this->validator
@@ -290,9 +285,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
+     *
+     * @expectedException \Doctrine\ORM\EntityNotFoundException
+     */
     public function testExecuteWithoutTemplateEntity()
     {
-        $this->setExpectedException('\Doctrine\ORM\EntityNotFoundException', 'Entity was not found.');
         $options = [
             'from' => 'test@test.com',
             'to' => 'test@test.com',
@@ -305,8 +304,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
             ->will($this->returnArgument(1));
-        $this->nameFormatter->expects($this->any())
-            ->method('format')
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
             ->will(
                 $this->returnCallback(
                     function () {
@@ -356,8 +355,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
             ->will($this->returnArgument(1));
-        $this->nameFormatter->expects($this->any())
-            ->method('format')
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
             ->will(
                 $this->returnCallback(
                     function () {
@@ -383,7 +382,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($violationListInterface);
         $this->validator->expects($this->once())
-            ->method('validateValue')
+            ->method('validate')
             ->willReturn($violationList);
 
         $this->objectRepository->expects($this->never())
@@ -423,8 +422,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
             ->will($this->returnArgument(1));
-        $this->nameFormatter->expects($this->any())
-            ->method('format')
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
             ->will(
                 $this->returnCallback(
                     function () {
@@ -446,21 +445,26 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->willReturn([$expected['subject'], $expected['body']]);
 
         $self = $this;
-        $emailEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\Email')
+        $emailUserEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\EmailUser')
             ->disableOriginalConstructor()
+            ->setMethods(['getEmail'])
             ->getMock();
+        $emailEntity = $this->getMock('\Oro\Bundle\EmailBundle\Entity\Email');
+        $emailUserEntity->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($emailEntity);
         $this->emailProcessor->expects($this->once())
             ->method('process')
             ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email'))
             ->will(
                 $this->returnCallback(
-                    function (Email $model) use ($emailEntity, $expected, $self) {
+                    function (Email $model) use ($emailUserEntity, $expected, $self) {
                         $self->assertEquals($expected['body'], $model->getBody());
                         $self->assertEquals($expected['subject'], $model->getSubject());
                         $self->assertEquals($expected['from'], $model->getFrom());
                         $self->assertEquals($expected['to'], $model->getTo());
 
-                        return $emailEntity;
+                        return $emailUserEntity;
                     }
                 )
             );

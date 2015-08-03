@@ -22,6 +22,9 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
+    /** @var  \PHPUnit_Framework_MockObject_MockObject */
+    protected $associationManager;
+
     /** @var TestAttachment */
     protected $attachment;
 
@@ -67,7 +70,18 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $securityFacade->expects($this->any())->method('getLoggedUser')
             ->will($this->returnValue(null));
 
-        $this->attachmentManager = new AttachmentManager($filesystemMap, $this->router, $serviceLink, $ileIcons);
+        $this->associationManager = $this
+            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->attachmentManager = new AttachmentManager(
+            $filesystemMap,
+            $this->router,
+            $serviceLink,
+            $ileIcons,
+            $this->associationManager
+        );
     }
 
     public function testGetContent()
@@ -279,5 +293,84 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             [pow(1024, 3), '1.07 GB'],
             [pow(1024, 4), pow(1024, 4)],
         ];
+    }
+
+    public function testFileKey()
+    {
+        $fileId           = 123;
+        $ownerEntityClass = 'Acme\MyClass';
+        $ownerEntityId    = 456;
+
+        $key = $this->attachmentManager->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId);
+        $this->assertNotEmpty($key);
+        $this->assertTrue(is_string($key));
+
+        list($extractedFileId, $extractedOwnerEntityClass, $extractedOwnerEntityId) =
+            $this->attachmentManager->parseFileKey($key);
+
+        $this->assertSame($fileId, $extractedFileId);
+        $this->assertSame($ownerEntityClass, $extractedOwnerEntityClass);
+        $this->assertSame($ownerEntityId, $extractedOwnerEntityId);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid file key: "Invalid Key".
+     */
+    public function testParseInvalidFileKey()
+    {
+        $this->attachmentManager->parseFileKey('Invalid Key');
+    }
+
+    public function testCopyLocalFileToStorage()
+    {
+        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $newFileName = 'test2.txt';
+
+        $resultStream = new InMemoryBuffer($this->filesystem, $newFileName);
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($newFileName)
+            ->will($this->returnValue($resultStream));
+
+        $this->attachmentManager->copyLocalFileToStorage($localFilePath, $newFileName);
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+
+        $this->assertEquals('Test data', $resultStream->read(100));
+    }
+
+    public function testCopyAttachmentFile()
+    {
+        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $sourceStream = new InMemoryBuffer($this->filesystem, $this->attachment->getFilename());
+        $sourceStream->open(new StreamMode('wb+'));
+        $sourceStream->write(file_get_contents($localFilePath));
+        $sourceStream->seek(0);
+        $sourceStream->close();
+
+        $resultStream = new InMemoryBuffer($this->filesystem, 'test2.txt');
+
+        $this->filesystem->expects($this->at(0))
+            ->method('createStream')
+            ->with($this->attachment->getFilename())
+            ->will($this->returnValue($sourceStream));
+
+        $this->filesystem->expects($this->at(1))
+            ->method('createStream')
+            ->with($this->anything())
+            ->will($this->returnValue($resultStream));
+
+        $newAttachment = $this->attachmentManager->copyAttachmentFile($this->attachment);
+
+        $this->assertEquals($this->attachment->getOriginalFilename(), $newAttachment->getOriginalFilename());
+        $this->assertNotEquals($this->attachment->getFilename(), $newAttachment->getFilename());
+
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+        $this->assertEquals('Test data', $resultStream->read(100));
     }
 }

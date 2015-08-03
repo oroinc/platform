@@ -13,7 +13,7 @@
 
     {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
     <script type="text/javascript">
-        require(['jquery', 'oroui/js/init-layout', 'orouser/js/init-signin'],
+        require(['jquery', 'oroui/js/init-layout'],
         function($) {
             $(function() {
                 // emulates 'document ready state' for selenium tests

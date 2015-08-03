@@ -289,9 +289,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $element = $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
         );
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $element->click();
-        $element->click();
+        $this->test->moveto($element);
 
         $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
@@ -301,7 +299,7 @@ abstract class AbstractPageGrid extends AbstractPage
         }
 
         $this->waitPageToLoad();
-        sleep(1);
+        //sleep(1);
         $this->waitForAjax();
         return $this;
     }
@@ -431,29 +429,28 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
-     * @param string $message Message to verify
+     * @param string $message Grid message to verify
      *
      * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
      */
     public function assertNoDataMessage($message)
     {
-        PHPUnit_Framework_Assert::assertTrue(
-            $this->isElementPresent("//div[@class='no-data']/span[contains(., '{$message}')]")
-        );
+        $this->assertElementPresent("//div[@class='no-data']/span[contains(., '{$message}')]");
+
         return $this;
     }
 
     /**
-     * Method checks action menu items in grid
+     * Method checks if no item in action grid menu
      * @param $actionName
      * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
      */
-    public function checkActionMenu($actionName)
+    public function assertNoActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $actionMenu->click();
-        $actionMenu->click();
+        $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+        $this->test->moveto($actionMenu);
         $this->waitForAjax();
         $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 

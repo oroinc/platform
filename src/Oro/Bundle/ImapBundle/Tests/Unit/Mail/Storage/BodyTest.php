@@ -150,8 +150,8 @@ class BodyTest extends \PHPUnit_Framework_TestCase
             );
         $obj->expects($this->any())->method('next');
         $obj->expects($this->any())->method('rewind');
-        $obj->expects($this->exactly(4))->method('valid')
-            ->will($this->onConsecutiveCalls(true, true, true, false));
+        $obj->expects($this->exactly(3))->method('valid')
+            ->will($this->onConsecutiveCalls(true, true, true));
     }
 
     private function preparePartMock(

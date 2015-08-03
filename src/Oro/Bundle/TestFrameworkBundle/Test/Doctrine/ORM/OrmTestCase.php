@@ -12,6 +12,8 @@ use Doctrine\DBAL\Driver\Connection;
 
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
@@ -31,6 +33,14 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * The query cache that is shared between all ORM tests (except functional tests).
      */
     private static $queryCacheImpl = null;
+
+    public function __destruct()
+    {
+        $fs = new Filesystem();
+        if ($fs->exists(__DIR__ . '/Proxies')) {
+            $fs->remove(__DIR__ . '/Proxies');
+        }
+    }
 
     /**
      * @param array $paths

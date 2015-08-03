@@ -1,14 +1,20 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var FlowchartViewerStepView = require('../viewer/step-view'),
-        mediator = require('oroui/js/mediator'),
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        FlowchartEditorStepView;
+
+    var FlowchartEditorStepView;
+    var _ = require('underscore');
+    var FlowchartViewerStepView = require('../viewer/step-view');
 
     FlowchartEditorStepView = FlowchartViewerStepView.extend({
         template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),
+
+        className: function() {
+            var classNames = [FlowchartEditorStepView.__super__.className.call(this)];
+            if (!this.model.get('_is_start')) {
+                classNames.push('dropdown');
+            }
+            return classNames.join(' ');
+        },
 
         events: {
             'dblclick': 'triggerEditStep',
@@ -18,78 +24,42 @@ define(function (require) {
             'click .workflow-step-delete': 'triggerRemoveStep'
         },
 
-        targetDefaults: {
-            dropOptions: {hoverClass: 'dragHover'},
-            anchor: 'Continuous',
-            allowLoopback: true
-        },
-
-        sourceDefaults: {
-            filter: '.jsplumb-source',
-            anchor: 'Continuous',
-            connector: ['StateMachine', {curviness: 20}],
-            maxConnections: 100
-        },
-
-        connect: function () {
+        connect: function() {
+            var instance = this.areaView.jsPlumbInstance;
+            // add element as source to jsPlumb
+            if (this.model.get('draggable') !== false) {
+                instance.draggable(this.$el, {
+                    stop: _.bind(function(e) {
+                        // update model position when dragging stops
+                        this.model.set({position: e.pos});
+                    }, this)
+                });
+            }
             FlowchartEditorStepView.__super__.connect.apply(this, arguments);
-            var instance = this.areaView.jsPlumbInstance;
-
-            instance.batch(_.bind(function () {
-                // add element as source to jsPlumb
-                if (this.model.get('draggable') !== false) {
-                    instance.draggable(this.$el, {
-                        containment: 'parent',
-                        stop: _.bind(function (e) {
-                            // update model position when dragging stops
-                            this.model.set({position: e.pos});
-                        }, this)
-                    });
-                }
-                this.makeTarget();
-                this.makeSource();
-            }, this));
         },
 
-        makeTarget: function () {
-            var instance = this.areaView.jsPlumbInstance;
-            instance.makeTarget(this.$el, $.extend(true, {}, _.result(this, 'targetDefaults')));
-        },
-
-        makeSource: function () {
-            var instance = this.areaView.jsPlumbInstance;
-            instance.makeSource(this.$el, $.extend(true,
-                {},
-                _.result(this, 'sourceDefaults'),
-                {
-                    onMaxConnections: function (info, e) {
-                        mediator.execute(
-                            'showErrorMessage',
-                            __('Maximum connections ({{ maxConnections }}) reached', info),
-                            e
-                        );
-                    }
-                }
-            ));
-        },
-
-        triggerEditStep: function (e) {
+        triggerEditStep: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestEditStep', this.model);
         },
 
-        triggerRemoveStep: function (e) {
+        triggerRemoveStep: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestRemoveStep', this.model);
         },
 
-        triggerCloneStep: function (e) {
+        triggerCloneStep: function(e) {
             e.preventDefault();
             this.areaView.model.trigger('requestCloneStep', this.model);
         },
 
-        triggerAddStep: function () {
+        triggerAddStep: function() {
             this.areaView.model.trigger('requestAddTransition', this.model);
+        },
+
+        render: function() {
+            FlowchartEditorStepView.__super__.render.call(this);
+            this.$el.toggleClass('final-step', Boolean(this.model.get('is_final')));
         }
     });
 

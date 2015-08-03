@@ -1,9 +1,9 @@
-/*global define*/
 define([
+    'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/modal'
-], function (_, __, Modal) {
+], function($, _, __, Modal) {
     'use strict';
 
     var ViewNameModal = Modal.extend({
@@ -25,12 +25,21 @@ define([
             options.okText =  __('oro.datagrid.gridView.save_name');
 
             ViewNameModal.__super__.initialize.call(this, options);
+
+            this.events = _.extend({}, this.events, {'keydown #gridViewName': _.bind(this.onKeyDown, this)});
+        },
+
+        onKeyDown: function(e) {
+            if (e.which === 13) {
+                this.trigger('close');
+                this.trigger('ok');
+            }
         },
 
         setNameError: function(error) {
             this.$('.validation-failed').remove();
             if (error) {
-                var error = this.nameErrorTemplate({
+                error = this.nameErrorTemplate({
                     error: error
                 });
                 this.$('#gridViewName').after(error);

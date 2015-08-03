@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/app/views/base/collection-view'
-], function (_, BaseCollectionView) {
+], function(_, BaseCollectionView) {
     'use strict';
 
     var BarCollectionView;
@@ -15,8 +13,8 @@ define([
          * @param {Chaplin.Model} model
          * @returns {boolean}
          */
-        isVisibleItem: function (model) {
-            var itemView = this.subview("itemView:" + model.cid);
+        isVisibleItem: function(model) {
+            var itemView = this.subview('itemView:' + model.cid);
             return this.isVisibleView(itemView);
         },
 
@@ -26,8 +24,8 @@ define([
          * @param {Chaplin.View} itemView
          * @returns {boolean}
          */
-        isVisibleView: function (itemView) {
-            if(!itemView) {
+        isVisibleView: function(itemView) {
+            if (!itemView) {
                 return false;
             }
             return this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;

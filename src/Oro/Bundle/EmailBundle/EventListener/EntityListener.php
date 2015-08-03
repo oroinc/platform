@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
@@ -20,10 +23,13 @@ class EntityListener
     /** @var EmailThreadManager */
     protected $emailThreadManager;
 
+    /** @var Email[] */
+    protected $emailsToRemove = [];
+
     /**
-     * @param EmailOwnerManager $emailOwnerManager
+     * @param EmailOwnerManager    $emailOwnerManager
      * @param EmailActivityManager $emailActivityManager
-     * @param EmailThreadManager $emailThreadManager
+     * @param EmailThreadManager   $emailThreadManager
      */
     public function __construct(
         EmailOwnerManager    $emailOwnerManager,
@@ -52,5 +58,31 @@ class EntityListener
     {
         $this->emailThreadManager->handlePostFlush($event);
         $this->emailActivityManager->handlePostFlush($event);
+
+        if ($this->emailsToRemove) {
+            $em = $event->getEntityManager();
+
+            foreach ($this->emailsToRemove as $email) {
+                $em->remove($email);
+            }
+
+            $this->emailsToRemove = [];
+            $em->flush();
+        }
+    }
+
+    /**
+     * @param LifecycleEventArgs $args
+     */
+    public function postRemove(LifecycleEventArgs $args)
+    {
+        $emailUser = $args->getEntity();
+        if ($emailUser instanceof EmailUser) {
+            $email = $emailUser->getEmail();
+
+            if ($email->getEmailUsers()->isEmpty()) {
+                $this->emailsToRemove[] = $email;
+            }
+        }
     }
 }

@@ -1,12 +1,12 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var StepRowView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        TransitionsShortListView = require('../transition/transition-list-short-view');
+    var StepRowView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var TransitionsShortListView = require('../transition/transition-list-short-view');
+    var StepModel = require('../../models/step-model');
 
     StepRowView = BaseView.extend({
         tagName: 'tr',
@@ -27,7 +27,7 @@ define(function (require) {
             'destroy model': 'remove'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
@@ -62,6 +62,9 @@ define(function (require) {
         },
 
         render: function() {
+            if (!(this.model instanceof StepModel)) {
+                throw new Error('Model must be an instance of StepModel');
+            }
             this.transitionsListView = new TransitionsShortListView({
                 'collection': this.model.getAllowedTransitions(this.options.workflow),
                 'workflow': this.options.workflow,
