@@ -84,10 +84,25 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $emMap = [];
+
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->any())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
         foreach ($config as $entity => $fields) {
             $em      = $this->getMockBuilder('Doctrine\ORM\EntityManager')
                 ->disableOriginalConstructor()
                 ->getMock();
+            $em->expects($this->any())
+                ->method('getConfiguration')
+                ->will($this->returnValue($configuration));
+
             $emMap[] = [$entity, $em];
 
             $typeMap = [];
@@ -134,36 +149,5 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
         }
 
         return $doctrine;
-    }
-
-    /**
-     * @param QueryDesignerModel                            $model
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $doctrine
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $functionProvider
-     * @param \PHPUnit_Framework_MockObject_MockObject|null $virtualFieldProvider
-     * @param array                                         $guessers
-     *
-     * @return DatagridConfigurationBuilder
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    protected function createDatagridConfigurationBuilder(
-        QueryDesignerModel $model,
-        $doctrine = null,
-        $functionProvider = null,
-        $virtualFieldProvider = null,
-        array $guessers = []
-    ) {
-        $builder = new DatagridConfigurationBuilder(
-            $functionProvider ? : $this->getFunctionProvider(),
-            $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
-            $doctrine ? : $this->getDoctrine(),
-            new DatagridGuesserMock($guessers)
-        );
-
-        $builder->setGridName('test_grid');
-        $builder->setSource($model);
-
-        return $builder;
     }
 }

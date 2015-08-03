@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 
 class DefaultOwnerHelper
@@ -44,16 +44,16 @@ class DefaultOwnerHelper
         $doctrineMetadata  = $this->getEm()->getClassMetadata($className);
         $ownershipMetadata = $this->getMetadata($className);
 
-        if ($defaultUserOwner && $ownershipMetadata->isUserOwned()) {
+        if ($defaultUserOwner && $ownershipMetadata->isBasicLevelOwned()) {
             $defaultUserOwner = $this->ensureNotDetached($defaultUserOwner);
             $doctrineMetadata->setFieldValue($entity, $ownershipMetadata->getOwnerFieldName(), $defaultUserOwner);
         }
         $defaultOrganization = $integration->getOrganization();
-        if ($defaultOrganization && $ownershipMetadata->getOrganizationFieldName()) {
+        if ($defaultOrganization && $ownershipMetadata->getGlobalOwnerFieldName()) {
             $defaultOrganization = $this->ensureNotDetached($defaultOrganization);
             $doctrineMetadata->setFieldValue(
                 $entity,
-                $ownershipMetadata->getOrganizationFieldName(),
+                $ownershipMetadata->getGlobalOwnerFieldName(),
                 $defaultOrganization
             );
         }
@@ -64,7 +64,7 @@ class DefaultOwnerHelper
      *
      * @param string $entityFQCN
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getMetadata($entityFQCN)
     {

@@ -1,37 +1,31 @@
-/*jslint browser:true, eqeq:true, nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page-model',
-    'oroui/js/app/components/base/component-container-mixin'
-], function ($, _, Chaplin, __, BaseController, PageModel, componentContainerMixin) {
+    'oroui/js/app/models/page-model'
+], function($, _, Chaplin, __, BaseController, PageModel) {
     'use strict';
 
-    var document, location, history, console, utils, mediator, PageController;
-
-    document = window.document;
-    location = window.location;
-    history = window.history;
-    console = window.console;
-    utils = Chaplin.utils;
-    mediator = Chaplin.mediator;
+    var PageController;
+    var document = window.document;
+    var location = window.location;
+    var history = window.history;
+    var console = window.console;
+    var utils = Chaplin.utils;
+    var mediator = Chaplin.mediator;
 
     PageController = BaseController.extend({});
-    _.extend(PageController.prototype, componentContainerMixin);
     _.extend(PageController.prototype, {
         /**
          * Creates page model
          * @override
          */
-        initialize: function () {
-            var page, isInAction;
+        initialize: function() {
             PageController.__super__.initialize.apply(this, arguments);
 
-            page = new PageModel();
+            var page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
             this.listenTo(page, 'sync', this.onPageLoaded);
             this.listenTo(page, 'invalid', this.onPageInvalid);
@@ -39,15 +33,15 @@ define([
             this.model = page;
 
             // application is in action till first 'page:afterChange' event
-            isInAction = true;
+            var isInAction = true;
 
-            this.subscribeEvent('page:beforeChange', function () {
+            this.subscribeEvent('page:beforeChange', function() {
                 isInAction = true;
             });
-            this.subscribeEvent('page:afterChange', function () {
+            this.subscribeEvent('page:afterChange', function() {
                 isInAction = false;
             });
-            mediator.setHandler('isInAction', function () {
+            mediator.setHandler('isInAction', function() {
                 return isInAction;
             });
         },
@@ -56,11 +50,10 @@ define([
          * Disposes page components
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            this.disposePageComponents();
             PageController.__super__.dispose.call(this);
         },
 
@@ -73,12 +66,12 @@ define([
          * @param {Object} route
          * @param {Object} options
          */
-        index: function (params, route, options) {
-            var url, cacheItem, args;
+        index: function(params, route, options) {
+            var cacheItem;
 
-            url = this._combineRouteUrl(route);
+            var url = this._combineRouteUrl(route);
             this._setNavigationHandlers(url);
-            args = {// collect arguments to reuse in events of page_fetch state change
+            var args = {// collect arguments to reuse in events of page_fetch state change
                 params: params,
                 route: route,
                 options: options
@@ -125,11 +118,11 @@ define([
          * @returns {boolean}
          * @private
          */
-        _beforePageLoad: function (route, params, options) {
-            var oldRoute, newRoute, url, opts;
-
-            oldRoute = route.previous;
-            newRoute = _.extend(_.omit(route, ['previous']), {params: params});
+        _beforePageLoad: function(route, params, options) {
+            var url;
+            var opts;
+            var oldRoute = route.previous;
+            var newRoute = _.extend(_.omit(route, ['previous']), {params: params});
             this.publishEvent('page:beforeChange', oldRoute, newRoute, options);
 
             // if route has been changed during 'page:beforeChange' event,
@@ -138,7 +131,7 @@ define([
                 url = this._combineRouteUrl(newRoute);
                 opts = _.pick(options, ['forceStartup', 'changeURL', 'force', 'silent']);
                 opts.replace = true;
-                _.defer(function () {
+                _.defer(function() {
                     mediator.execute('redirectTo', {url: url}, opts);
                 });
                 return false;
@@ -154,7 +147,7 @@ define([
          * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageRequest: function (model, jqXHR, options) {
+        onPageRequest: function(model, jqXHR, options) {
             this.publishEvent('page:request', options.actionArgs);
         },
 
@@ -167,14 +160,12 @@ define([
          * @param {Object} result
          * @param {Object} options
          */
-        onPageLoaded: function (model, result, options) {
-            var pageData, actionArgs, jqXHR, self, updatePromises;
-
-            self = this;
-            updatePromises = [];
-            pageData = model.getAttributes();
-            actionArgs = options.actionArgs;
-            jqXHR = options.xhr;
+        onPageLoaded: function(model, result, options) {
+            var self = this;
+            var updatePromises = [];
+            var pageData = model.getAttributes();
+            var actionArgs = options.actionArgs;
+            var jqXHR = options.xhr;
 
             if (pageData.title) {
                 this.adjustTitle(pageData.title);
@@ -183,7 +174,7 @@ define([
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
             // once all views are have updated, trigger page:afterChange
-            $.when.apply($, updatePromises).done(_.debounce(function () {
+            $.when.apply($, updatePromises).done(_.debounce(function() {
                 self.publishEvent('page:afterChange');
             }, 0));
         },
@@ -196,7 +187,7 @@ define([
          * @param {*} error
          * @param {Object} options
          */
-        onPageInvalid: function (model, error, options) {
+        onPageInvalid: function(model, error, options) {
             var pathDesc;
             if (error.redirect) {
                 pathDesc = {url: error.location};
@@ -213,10 +204,9 @@ define([
          * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageError: function (model, jqXHR, options) {
-            var rawData, data, payload;
-            rawData = jqXHR.responseText;
-            data = {};
+        onPageError: function(model, jqXHR, options) {
+            var rawData = jqXHR.responseText;
+            var data = {};
 
             if (jqXHR.status === 200 && rawData.indexOf('http') === 0) {
                 data = {redirect: true, fullRedirect: true, location: rawData};
@@ -224,7 +214,7 @@ define([
                 return;
             }
 
-            payload = {stopPageProcessing: false};
+            var payload = {stopPageProcessing: false};
             this.publishEvent('page:beforeError', jqXHR, payload);
             if (payload.stopPageProcessing) {
                 history.back();
@@ -236,6 +226,7 @@ define([
                 model.set(data, options);
             } else {
                 if (mediator.execute('retrieveOption', 'debug')) {
+                    // jshint -W060
                     document.writeln(rawData);
                     if (console) {
                         console.error('Unexpected content format');
@@ -258,10 +249,13 @@ define([
          * @param {Object=} options
          * @private
          */
-        _processRedirect: function (pathDesc, params, options) {
-            var url, parser, pathname, query;
+        _processRedirect: function(pathDesc, params, options) {
+            var url;
+            var parser;
+            var pathname;
+            var query;
             options = options || {};
-            if (typeof pathDesc === 'object' && pathDesc.url != null) {
+            if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0) {
                 options = params || {};
                 // fetch from URL only pathname and query
                 parser = document.createElement('a');
@@ -269,7 +263,7 @@ define([
                 pathname = parser.pathname;
                 query = parser.search.substr(1);
                 // IE removes starting slash
-                pathDesc.url = (pathname[0] == '/' ? '' : '/') + pathname + (query && ('?' + query));
+                pathDesc.url = (pathname[0] === '/' ? '' : '/') + pathname + (query && ('?' + query));
             }
             if (options.fullRedirect) {
                 query = utils.queryParams.parse(query);
@@ -292,15 +286,15 @@ define([
          * @param {string} url
          * @private
          */
-        _setNavigationHandlers: function (url) {
+        _setNavigationHandlers: function(url) {
             mediator.setHandler('redirectTo', this._processRedirect, this);
 
-            mediator.setHandler('refreshPage', function (options) {
+            mediator.setHandler('refreshPage', function(options) {
                 var queue;
                 mediator.trigger('page:beforeRefresh', (queue = []));
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                $.when.apply($, queue).done(function (customOptions) {
+                $.when.apply($, queue).done(function(customOptions) {
                     _.extend(options, customOptions || {});
                     utils.redirectTo({url: url}, options);
                     mediator.trigger('page:afterRefresh');
@@ -317,15 +311,15 @@ define([
          * @param {number=} prevPos
          * @returns {Object}
          */
-        _parseRawData: function (rawData, prevPos) {
-            var jsonStartPos, additionalData, dataObj, data;
+        _parseRawData: function(rawData, prevPos) {
             if (_.isUndefined(prevPos)) {
                 prevPos = -1;
             }
             rawData = rawData.trim();
-            jsonStartPos = rawData.indexOf('{', prevPos + 1);
-            additionalData = '';
-            dataObj = null;
+            var jsonStartPos = rawData.indexOf('{', prevPos + 1);
+            var additionalData = '';
+            var dataObj = null;
+            var data;
             if (jsonStartPos > 0) {
                 additionalData = rawData.substr(0, jsonStartPos);
                 data = rawData.substr(jsonStartPos);
@@ -361,7 +355,7 @@ define([
          * @param options
          * @private
          */
-        _submitPage: function (options) {
+        _submitPage: function(options) {
             this.publishEvent('page:beforeChange');
             options.actionArgs = options.actionArgs || {};
             _.defaults(options.actionArgs, {params: {}, route: {}, options: {}});

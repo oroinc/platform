@@ -160,13 +160,7 @@ class RenameExtensionTest extends \PHPUnit_Framework_TestCase
             [new MySqlPlatform(), 'ALTER TABLE test_table CHANGE old_column new_column VARCHAR(100) NOT NULL'],
             [new PostgreSqlPlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
             [new OraclePlatform(), 'ALTER TABLE test_table RENAME COLUMN old_column TO new_column'],
-            [
-                new SQLServer2005Platform(),
-                [
-                    "sp_RENAME 'test_table.old_column' , 'new_column', 'COLUMN'",
-                    'ALTER TABLE test_table ALTER COLUMN new_column NVARCHAR(100) NOT NULL'
-                ]
-            ],
+            [new SQLServer2005Platform(), "sp_RENAME 'test_table.old_column', 'new_column', 'COLUMN'",],
         ];
     }
 

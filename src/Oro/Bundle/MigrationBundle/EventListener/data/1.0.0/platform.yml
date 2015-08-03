@@ -15,11 +15,6 @@ OroCalendarBundle:
             - Oro\Bundle\CalendarBundle\Migrations\Data\ORM\LoadEmailTemplates
             - Oro\Bundle\CalendarBundle\Migrations\Data\ORM\UpdateAclRoles
 
-OroEmailBundle:
-    main:
-        v1_0:
-            - Oro\Bundle\EmailBundle\Migrations\Data\ORM\LoadInternalEmailOrigins
-
 OroNotificationBundle:
     main:
         v1_0:

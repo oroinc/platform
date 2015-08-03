@@ -1,5 +1,5 @@
 /** @exports persistentStorage */
-define(function () {
+define(function() {
     'use strict';
 
     var persistentStorage;
@@ -27,7 +27,7 @@ define(function () {
              * @param sKey {string}
              * @returns {string}
              */
-            getItem: function (sKey) {
+            getItem: function(sKey) {
                 if (!sKey || !this.hasOwnProperty(sKey)) { return null; }
                 return decodeURIComponent(document.cookie.replace(new RegExp('(?:^|.*;\\s*)' + encodeURIComponent(sKey)
                     .replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*((?:[^;](?!;))*[^;]?).*'), '$1'));
@@ -38,7 +38,7 @@ define(function () {
              *
              * @param nKeyId {number}
              */
-            key: function (nKeyId) {
+            key: function(nKeyId) {
                 return decodeURIComponent(
                         document.cookie
                             .replace(/\s*=(?:.(?!;))*$/, '')
@@ -53,7 +53,7 @@ define(function () {
              * @param sKey {string}
              * @param sValue {string}
              */
-            setItem: function (sKey, sValue) {
+            setItem: function(sKey, sValue) {
                 if (!sKey) { return; }
                 document.cookie = encodeURIComponent(sKey) +
                     '=' + encodeURIComponent(sValue) + '; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/';
@@ -72,7 +72,7 @@ define(function () {
              *
              * @param sKey {string}
              */
-            removeItem: function (sKey) {
+            removeItem: function(sKey) {
                 if (!sKey || !this.hasOwnProperty(sKey)) { return; }
                 document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
                 this.length--;
@@ -81,15 +81,17 @@ define(function () {
             /**
              * @inheritDoc
              */
-            hasOwnProperty: function (sKey) {
+            // jshint -W001
+            hasOwnProperty: function(sKey) {
                 return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))
                     .test(document.cookie);
             },
+            // jshint +W001
 
             /**
              * When invoked, will empty all keys out of the storage.
              */
-            clear: function () {
+            clear: function() {
                 throw new Error('Clearing of cookie persistent storage may cause issues');
             }
         };

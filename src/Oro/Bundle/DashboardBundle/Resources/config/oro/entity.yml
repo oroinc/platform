@@ -1,0 +1,8 @@
+oro_entity:
+    entity_aliases:
+        Oro\Bundle\DashboardBundle\Entity\Widget:
+            alias:        dashboardwidget
+            plural_alias: dashboardwidgets
+        Oro\Bundle\DashboardBundle\Entity\WidgetState:
+            alias:        dashboardwidgetstate
+            plural_alias: dashboardwidgetstates

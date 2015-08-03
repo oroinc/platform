@@ -1,7 +1,10 @@
-/* jshint browser:true  */
-/*global define, google*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/locale-settings'
-    ], function (_, Backbone, __, localeSettings) {
+/*global google*/
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'orolocale/js/locale-settings'
+], function(_, Backbone, __, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
@@ -28,7 +31,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
         mapLocationCache: {},
         mapsLoadExecuted: false,
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
@@ -37,7 +40,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             this.mapLocationUnknown();
         },
 
-        _initMapOptions: function () {
+        _initMapOptions: function() {
             if (_.isUndefined(this.options.mapOptions.mapTypeControlOptions)) {
                 this.options.mapOptions.mapTypeControlOptions = {
                     style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
@@ -53,8 +56,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
         },
 
-        _initMap: function (location) {
-            var weatherLayer, cloudLayer;
+        _initMap: function(location) {
+            var weatherLayer;
+            var cloudLayer;
             this._initMapOptions();
             this.map = new google.maps.Map(
                 this.$mapContainer[0],
@@ -81,7 +85,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
         },
 
-        loadGoogleMaps: function () {
+        loadGoogleMaps: function() {
             var googleMapsSettings = 'sensor=' + (this.options.sensor ? 'true' : 'false');
 
             if (this.options.showWeather) {
@@ -93,10 +97,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
 
             $.ajax({
-                url: window.location.protocol + "//www.google.com/jsapi",
-                dataType: "script",
+                url: window.location.protocol + '//www.google.com/jsapi',
+                dataType: 'script',
                 cache: true,
-                success: _.bind(function () {
+                success: _.bind(function() {
                     google.load('maps', this.options.apiVersion, {
                         other_params: googleMapsSettings,
                         callback: _.bind(this.onGoogleMapsInit, this)
@@ -107,7 +111,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             });
         },
 
-        updateMap: function (address, label) {
+        updateMap: function(address, label) {
             // Load google maps js
             if (!this.hasGoogleMaps()) {
                 if (this.mapsLoadExecuted) {
@@ -127,7 +131,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             if (this.mapLocationCache.hasOwnProperty(address)) {
                 this.updateMapLocation(this.mapLocationCache[address], label);
             } else {
-                this.getGeocoder().geocode({'address': address}, _.bind(function (results, status) {
+                this.getGeocoder().geocode({'address': address}, _.bind(function(results, status) {
                     if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
                         //Move location marker and map center to new coordinates
@@ -139,28 +143,28 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
         },
 
-        onGoogleMapsInit: function () {
+        onGoogleMapsInit: function() {
             if (!_.isUndefined(this.requestedLocation)) {
                 this.updateMap(this.requestedLocation.address, this.requestedLocation.label);
                 delete this.requestedLocation;
             }
         },
 
-        hasGoogleMaps: function () {
+        hasGoogleMaps: function() {
             return !_.isUndefined(window.google) && google.hasOwnProperty('maps');
         },
 
-        mapLocationUnknown: function () {
+        mapLocationUnknown: function() {
             this.$mapContainer.hide();
             this.$unknownAddress.show();
         },
 
-        mapLocationKnown: function () {
+        mapLocationKnown: function() {
             this.$mapContainer.show();
             this.$unknownAddress.hide();
         },
 
-        updateMapLocation: function (location, label) {
+        updateMapLocation: function(location, label) {
             this.mapLocationKnown();
             if (location && (!this.location || location.toString() !== this.location.toString())) {
                 this._initMap(location);
@@ -171,7 +175,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/
             }
         },
 
-        getGeocoder: function () {
+        getGeocoder: function() {
             if (_.isUndefined(this.geocoder)) {
                 this.geocoder = new google.maps.Geocoder();
             }

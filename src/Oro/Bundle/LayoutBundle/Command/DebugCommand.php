@@ -126,10 +126,10 @@ class DebugCommand extends ContainerAwareCommand
         }
         $table->render($output);
 
-        $output->writeln('Known options:');
+        $output->writeln('Defined options:');
         $table->setHeaders(['Name', 'Type(s)']);
         $table->setRows([]);
-        $options = $resolver->getKnownOptions();
+        $options = $resolver->getDefinedOptions();
         ksort($options);
         foreach ($options as $name => $types) {
             $table->addRow([$name, implode(', ', $types)]);

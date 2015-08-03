@@ -72,7 +72,7 @@ use Oro\Component\Layout\DataProviderInterface;
 
 use Acme\Bundle\ProductBundle\Entity\Repository\ProductRepository;
 
-class ProductDataProvider implements DataProviderInterface, ContextAwareInterface
+class ProductDataProvider implements DataProviderInterface
 {
     /** @var ProductRepository */
     protected $productRepository;

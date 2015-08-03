@@ -1,13 +1,13 @@
-/*global define*/
 define([
-        'jquery',
-        'orotranslation/js/translator',
-        'routing',
-        'oroui/js/messenger',
-        'oroui/js/app/views/base/view',
-        'oroui/js/mediator',
-        'oroemail/js/app/models/email-context-activity-collection'
-    ], function ($, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'routing',
+    'oroui/js/messenger',
+    'oroui/js/app/views/base/view',
+    'oroui/js/mediator',
+    'oroemail/js/app/models/email-context-activity-collection'
+], function($, _, __, routing, messenger, BaseView, mediator, EmailContextActivityCollection) {
     'use strict';
 
     var EmailContextActivityView;
@@ -25,7 +25,7 @@ define([
             this.template = _.template($('#email-context-activity-list').html());
             this.$container = options.$container;
             this.$containerContextTargets = $(options.$container.context).find('.email-context-activity-items');
-            this.collection = new EmailContextActivityCollection('oro_api_delete_email_association');
+            this.collection = new EmailContextActivityCollection('oro_api_delete_activity_relation');
             this.initEvents();
 
             if (this.options.contextTargets) {
@@ -52,11 +52,11 @@ define([
 
         doRefresh: function() {
             var self = this;
-            var  url = routing.generate('oro_api_get_email_associations_data', {entityId: this.options.entityId });
+            var  url = routing.generate('oro_api_get_email_context', {id: this.options.entityId});
             $.ajax({
-                method: "GET",
+                method: 'GET',
                 url: url,
-                success:function(r) {
+                success: function(r) {
                     self.collection.reset();
                     self.collection.add(r);
                     self.render();
@@ -65,7 +65,7 @@ define([
         },
 
         render: function() {
-            if (this.collection.length == 0) {
+            if (this.collection.length === 0) {
                 this.$el.hide();
             } else {
                 this.$el.show();
@@ -91,27 +91,18 @@ define([
                 $view.find('i.icon-remove').click(function() {
                     model.destroy({
                         success: function(model, response) {
-                            if (response.status != 'success') {
-                                var $view = self.$containerContextTargets.find('[data-cid="' + model.cid + '"]');
-                                $view.remove();
-                                self.render();
-                            }
-                            messenger.notificationFlashMessage(response.status, response.message);
+                            messenger.notificationFlashMessage('success', __('oro.email.contexts.removed'));
 
                             if (self.options.target &&
-                                model.get('targetClassName') == self.options.target.className &&
-                                model.get('targetId') == self.options.target.id) {
+                                model.get('targetClassName') === self.options.target.className &&
+                                model.get('targetId') === self.options.target.id) {
                                 mediator.trigger('widget_success:activity_list:item:update');
                             } else {
                                 mediator.trigger('widget:doRefresh:email-context-activity-list-widget');
                             }
                         },
                         error: function(model, response) {
-                            if (response.status == 'error') {
-                                messenger.notificationFlashMessage('error', response.message);
-                            } else {
-                                messenger.notificationFlashMessage('error', response.status + '  ' + __(response.statusText));
-                            }
+                            messenger.showErrorMessage(__('oro.ui.item_delete_error'), response.responseJSON || {});
                         }
                     });
                 });

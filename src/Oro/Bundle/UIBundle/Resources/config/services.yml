@@ -17,6 +17,12 @@ parameters:
 
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
+    oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+
+    ## Formatters
+    oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
+    oro_ui.twig.extension.formatter.class:                 Oro\Bundle\UIBundle\Twig\FormatExtension
+
 services:
     # Placeholder services
     oro_ui.placeholder.provider:
@@ -58,6 +64,7 @@ services:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
 
@@ -90,3 +97,20 @@ services:
         class: %oro_ui.provider.widget_context.class%
         calls:
             - [setRequest, ["@?request="]]
+
+    oro_ui.html_tag_helper:
+        class: %oro_ui.html_tag_helper.class%
+        arguments:
+            - @oro_form.provider.html_tag_provider
+            - %kernel.cache_dir%
+
+    ## Formatters
+    oro_ui.formatter:
+        class: %oro_ui.formatter.class%
+
+    oro_ui.twig.extension.formatter:
+        class: %oro_ui.twig.extension.formatter.class%
+        arguments:
+            - @oro_ui.formatter
+        tags:
+            - { name: twig.extension }

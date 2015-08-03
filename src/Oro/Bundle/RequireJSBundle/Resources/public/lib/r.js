@@ -11,7 +11,6 @@
  * the shell of the r.js file.
  */
 
-/*jslint evil: true, nomen: true, sloppy: true */
 /*global readFile: true, process: false, Packages: false, print: false,
 console: false, java: false, module: false, requirejsVars, navigator,
 document, importScripts, self, location, Components, FileUtils */
@@ -244,8 +243,6 @@ var requirejs, require, define, xpcUtil;
  */
 //Not using strict: uneven strict support in browsers, #392, and causes
 //problems with requirejs.exec()/transpiler plugins that may not be strict.
-/*jslint regexp: true, nomen: true, sloppy: true */
-/*global window, navigator, document, importScripts, setTimeout, opera */
 
 
 (function (global) {
@@ -1259,8 +1256,7 @@ var requirejs, require, define, xpcUtil;
                     //Allow plugins to load other code without having to know the
                     //context or how to 'complete' the load.
                     load.fromText = bind(this, function (text, textAlt) {
-                        /*jslint evil: true */
-                        var moduleName = map.name,
+                                                var moduleName = map.name,
                             moduleMap = makeModuleMap(moduleName),
                             hasInteractive = useInteractive;
 
@@ -2306,8 +2302,7 @@ var requirejs, require, define, xpcUtil;
      * @param {String} text the text to execute/evaluate.
      */
     req.exec = function (text) {
-        /*jslint evil: true */
-        return eval(text);
+                return eval(text);
     };
 
     //Set up with config info.
@@ -2331,8 +2326,6 @@ var requirejs, require, define, xpcUtil;
 
 //sloppy since eval enclosed with use strict causes problems if the source
 //text is not strict-compliant.
-/*jslint sloppy: true, evil: true */
-/*global require, XMLHttpRequest */
 
 (function () {
     require.load = function (context, moduleName, url) {
@@ -2359,7 +2352,6 @@ var requirejs, require, define, xpcUtil;
  */
 
 /*jslint */
-/*global require: false, java: false, load: false */
 
 (function () {
     'use strict';
@@ -2382,8 +2374,6 @@ var requirejs, require, define, xpcUtil;
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint regexp: false */
-/*global require: false, define: false, requirejsVars: false, process: false */
 
 /**
  * This adapter assumes that x.js has loaded it and set up
@@ -2548,8 +2538,7 @@ var requirejs, require, define, xpcUtil;
 
     //Override to provide the function wrapper for define/require.
     req.exec = function (text) {
-        /*jslint evil: true */
-        text = req.makeNodeWrapper(text);
+                text = req.makeNodeWrapper(text);
         return eval(text);
     };
 }());
@@ -2562,7 +2551,6 @@ var requirejs, require, define, xpcUtil;
  */
 
 /*jslint */
-/*global require, load */
 
 (function () {
     'use strict';
@@ -2596,7 +2584,6 @@ var requirejs, require, define, xpcUtil;
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
 /*global Packages: false, process: false, window: false, navigator: false,
   document: false, define: false */
 
@@ -2650,8 +2637,6 @@ var requirejs, require, define, xpcUtil;
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint plusplus: true */
-/*global define, java */
 
 define('lang', function () {
     'use strict';
@@ -2867,7 +2852,6 @@ define('lang', function () {
  * see: http://github.com/requirejs/prim for details
  */
 
-/*global setImmediate, process, setTimeout, define, module */
 
 //Set prime.hideResolutionConflict = true to allow "resolution-races"
 //in promise-tests to pass.
@@ -3062,8 +3046,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 //Just a stub for use with uglify's consolidator.js
 define('browser/assert', function () {
@@ -3079,8 +3061,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 //Needed so that rhino/assert can return a stub for uglify's consolidator.js
 define('node/assert', ['assert'], function (assert) {
@@ -3096,8 +3076,6 @@ if(env === 'rhino') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 //Just a stub for use with uglify's consolidator.js
 define('rhino/assert', function () {
@@ -3113,8 +3091,6 @@ if(env === 'xpconnect') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 //Just a stub for use with uglify's consolidator.js
 define('xpconnect/assert', function () {
@@ -3130,8 +3106,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, process: false */
 
 define('browser/args', function () {
     //Always expect config via an API call
@@ -3147,8 +3121,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, process: false */
 
 define('node/args', function () {
     //Do not return the "node" or "r.js" arguments
@@ -3171,8 +3143,6 @@ if(env === 'rhino') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, process: false */
 
 var jsLibRhinoArgs = (typeof rhinoArgs !== 'undefined' && rhinoArgs) || [].concat(Array.prototype.slice.call(arguments, 0));
 
@@ -3196,8 +3166,6 @@ if(env === 'xpconnect') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define, xpconnectArgs */
 
 var jsLibXpConnectArgs = (typeof xpconnectArgs !== 'undefined' && xpconnectArgs) || [].concat(Array.prototype.slice.call(arguments, 0));
 
@@ -3221,8 +3189,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, console: false */
 
 define('browser/load', ['./file'], function (file) {
     function load(fileName) {
@@ -3241,8 +3207,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, console: false */
 
 define('node/load', ['fs'], function (fs) {
     function load(fileName) {
@@ -3262,8 +3226,6 @@ if(env === 'rhino') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 define('rhino/load', function () {
     return load;
@@ -3278,8 +3240,6 @@ if(env === 'xpconnect') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, load: false */
 
 define('xpconnect/load', function () {
     return load;
@@ -3294,8 +3254,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint sloppy: true, nomen: true */
-/*global require, define, console, XMLHttpRequest, requirejs, location */
 
 define('browser/file', ['prim'], function (prim) {
 
@@ -3472,8 +3430,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint plusplus: false, octal:false, strict: false */
-/*global define: false, process: false */
 
 define('node/file', ['fs', 'path', 'prim'], function (fs, path, prim) {
 
@@ -3783,8 +3739,6 @@ if(env === 'rhino') {
  */
 //Helper functions to deal with file I/O.
 
-/*jslint plusplus: false */
-/*global java: false, define: false */
 
 define('rhino/file', ['prim'], function (prim) {
     var file = {
@@ -4077,8 +4031,6 @@ if(env === 'xpconnect') {
  */
 //Helper functions to deal with file I/O.
 
-/*jslint plusplus: false */
-/*global define, Components, xpcUtil */
 
 define('xpconnect/file', ['prim'], function (prim) {
     var file,
@@ -4332,7 +4284,6 @@ define('xpconnect/file', ['prim'], function (prim) {
 }
 
 if(env === 'browser') {
-/*global process */
 define('browser/quit', function () {
     'use strict';
     return function (code) {
@@ -4341,7 +4292,6 @@ define('browser/quit', function () {
 }
 
 if(env === 'node') {
-/*global process */
 define('node/quit', function () {
     'use strict';
     return function (code) {
@@ -4368,7 +4318,6 @@ define('node/quit', function () {
 }
 
 if(env === 'rhino') {
-/*global quit */
 define('rhino/quit', function () {
     'use strict';
     return function (code) {
@@ -4379,7 +4328,6 @@ define('rhino/quit', function () {
 }
 
 if(env === 'xpconnect') {
-/*global quit */
 define('xpconnect/quit', function () {
     'use strict';
     return function (code) {
@@ -4396,8 +4344,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, console: false */
 
 define('browser/print', function () {
     function print(msg) {
@@ -4416,8 +4362,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, console: false */
 
 define('node/print', function () {
     function print(msg) {
@@ -4436,8 +4380,6 @@ if(env === 'rhino') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, print: false */
 
 define('rhino/print', function () {
     return print;
@@ -4452,8 +4394,6 @@ if(env === 'xpconnect') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false, print: false */
 
 define('xpconnect/print', function () {
     return print;
@@ -4466,8 +4406,6 @@ define('xpconnect/print', function () {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint nomen: false, strict: false */
-/*global define: false */
 
 define('logger', ['env!env/print'], function (print) {
     var logger = {
@@ -4555,7 +4493,6 @@ define('logger', ['env!env/print'], function (print) {
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/*jslint bitwise:true plusplus:true */
 /*global esprima:true, define:true, exports:true, window: true,
 throwErrorTolerant: true,
 throwError: true, generateStatement: true, peek: true,
@@ -8284,7 +8221,6 @@ parseStatement: true, parseSourceElement: true */
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*global define, Reflect */
 
 /*
  * xpcshell has a smaller stack on linux and windows (1MB vs 9MB on mac),
@@ -8375,8 +8311,6 @@ define('uglifyjs/consolidator', ["require", "exports", "module", "./parse-js", "
  *     </ul>
  */
 
-/*global console:false, exports:true, module:false, require:false */
-/*jshint sub:true */
 /**
  * Consolidates null, Boolean, and String values found inside an <abbr title=
  * "abstract syntax tree">AST</abbr>.
@@ -9509,7 +9443,6 @@ exports['ast_consolidate'] = function(oAbstractSyntaxTree) {
    }(oAbstractSyntaxTree = oProcessor.ast_add_scope(oAbstractSyntaxTree)));
   return oAbstractSyntaxTree;
 };
-/*jshint sub:false */
 
 /* Local Variables:      */
 /* mode: js              */
@@ -22743,8 +22676,6 @@ exports.describe_ast = function() {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint plusplus: true */
-/*global define: false */
 
 define('parse', ['./esprimaAdapter', 'lang'], function (esprima, lang) {
     'use strict';
@@ -23145,8 +23076,7 @@ define('parse', ['./esprimaAdapter', 'lang'], function (esprima, lang) {
      * a build context to valid JavaScript.
      */
     parse.findConfig = function (fileContents) {
-        /*jslint evil: true */
-        var jsConfig, foundConfig, stringData, foundRange, quote, quoteMatch,
+                var jsConfig, foundConfig, stringData, foundRange, quote, quoteMatch,
             quoteRegExp = /(:\s|\[\s*)(['"])/,
             astRoot = esprima.parse(fileContents, {
                 loc: true
@@ -23727,7 +23657,6 @@ define('parse', ['./esprimaAdapter', 'lang'], function (esprima, lang) {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*global define */
 
 define('transform', [ './esprimaAdapter', './parse', 'logger', 'lang'],
 function (esprima, parse, logger, lang) {
@@ -24171,8 +24100,6 @@ function (esprima, parse, logger, lang) {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint regexp: true, plusplus: true  */
-/*global define: false */
 
 define('pragma', ['parse', 'logger'], function (parse, logger) {
     'use strict';
@@ -24284,8 +24211,7 @@ define('pragma', ['parse', 'logger'], function (parse, logger) {
          * processes the fileContents for some //>> conditional statements
          */
         process: function (fileName, fileContents, config, onLifecycleName, pluginCollector) {
-            /*jslint evil: true */
-            var foundIndex = -1, startIndex = 0, lineEndIndex, conditionLine,
+                        var foundIndex = -1, startIndex = 0, lineEndIndex, conditionLine,
                 matches, type, marker, condition, isTrue, endRegExp, endMatches,
                 endMarkerIndex, shouldInclude, startLength, lifecycleHas, deps,
                 i, dep, moduleName, collectorMod,
@@ -24438,8 +24364,6 @@ if(env === 'browser') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false */
 
 define('browser/optimize', {});
 
@@ -24452,8 +24376,6 @@ if(env === 'node') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint strict: false */
-/*global define: false */
 
 define('node/optimize', {});
 
@@ -24466,8 +24388,6 @@ if(env === 'rhino') {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint sloppy: true, plusplus: true */
-/*global define, java, Packages, com */
 
 define('rhino/optimize', ['logger', 'env!env/file'], function (logger, file) {
 
@@ -24648,8 +24568,6 @@ define('xpconnect/optimize', {});
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true */
-/*global define: false */
 
 define('optimize', [ 'lang', 'logger', 'env!env/optimize', 'env!env/file', 'parse',
          'pragma', 'uglifyjs/index', 'uglifyjs2',
@@ -25159,8 +25077,6 @@ function (lang,   logger,   envOptimize,        file,           parse,
 //Using sloppy since this uses eval for some code like plugins,
 //which may not be strict mode compliant. So if use strict is used
 //below they will have strict rules applied and may cause an error.
-/*jslint sloppy: true, nomen: true, plusplus: true, regexp: true */
-/*global require, define: true */
 
 //NOT asking for require as a dependency since the goal is to modify the
 //global require below
@@ -25342,8 +25258,7 @@ define('requirePatch', [ 'env!env/file', 'pragma', 'parse', 'lang', 'logger', 'c
 
                 //Override load so that the file paths can be collected.
                 context.load = function (moduleName, url) {
-                    /*jslint evil: true */
-                    var contents, pluginBuilderMatch, builderName,
+                                        var contents, pluginBuilderMatch, builderName,
                         shim, shimExports;
 
                     //Do not mark the url as fetched if it is
@@ -25671,7 +25586,6 @@ define('requirePatch', [ 'env!env/file', 'pragma', 'parse', 'lang', 'logger', 'c
  */
 
 /*jslint */
-/*global define: false, console: false */
 
 define('commonJs', ['env!env/file', 'parse'], function (file, parse) {
     'use strict';
@@ -25774,8 +25688,6 @@ define('commonJs', ['env!env/file', 'parse'], function (file, parse) {
  * see: http://github.com/jrburke/requirejs for details
  */
 
-/*jslint plusplus: true, nomen: true, regexp: true  */
-/*global define, requirejs, java, process, console */
 
 
 define('build', function (require) {
@@ -26801,8 +26713,7 @@ define('build', function (require) {
      * @param {Object} the created config object.
      */
     build.createConfig = function (cfg) {
-        /*jslint evil: true */
-        var buildFileContents, buildFileConfig, mainConfig,
+                var buildFileContents, buildFileConfig, mainConfig,
             mainConfigFile, mainConfigPath, buildFile, absFilePath,
             config = {},
             buildBaseConfig = makeBuildBaseConfig();
@@ -27928,8 +27839,6 @@ define('build', function (require) {
  * build file to this file to do the build. See example.build.js for more information.
  */
 
-/*jslint strict: false, nomen: false */
-/*global require: false */
 
 require({
     baseUrl: require.s.contexts._.config.baseUrl,

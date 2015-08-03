@@ -119,7 +119,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -133,7 +133,7 @@
         {% set data = data|striptags('<a>')|raw|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -468,6 +468,7 @@
 
 {#
     A button with javascript handler
+
     Parameters - array:
         [
             'class' - default class
@@ -524,9 +525,35 @@
     </a>
 {% endmacro %}
 
+{#
+    Renders page component attributes passed in array
+
+    Parameters - array:
+        [
+            'module' - module name to load, will be loaded through RequireJS
+            'options' - options to pass into page-component
+        ]
+#}
+{% macro renderPageComponentAttributes(pageComponent) %}
+    data-page-component-module="{{ pageComponent.module }}"
+    {% if pageComponent.options is defined %}
+        data-page-component-options="{{ pageComponent.options|json_encode }}"
+    {% endif %}
+    {% if pageComponent.layout is defined %}
+        data-layout="{{ pageComponent.layout }}"
+    {% endif %}
+{% endmacro %}
+
+{#
+    Renders attributes for widget
+
+    Parameters: options array for widget
+#}
 {% macro renderWidgetAttributes(options) %}
-    data-page-component-module="oroui/js/app/components/widget-component"
-    data-page-component-options="{{ options|json_encode }}"
+    {{ _self.renderPageComponentAttributes({
+        module:  "oroui/js/app/components/widget-component",
+        options: options
+    }) }}
 {% endmacro %}
 {#
     @deprecated
@@ -725,6 +752,8 @@
         ]
 #}
 {% macro scrollData(dataTarget, data, form = null) %}
+    {% set data = oro_ui_scroll_data_before(dataTarget, data, form) %}
+
     {% if form is defined and form %}
         {% set isForm = true %}
     {% else %}
@@ -811,8 +840,9 @@
     Render link to entity owner
     Parameters:
         entity - entity record
+        renderLabel - need render default label
 #}
-{% macro entityOwnerLink(entity) %}
+{% macro entityOwnerLink(entity, renderLabel = true) %}
     {%- if entity.owner is defined and entity.owner %}
         {% if resource_granted('VIEW', entity.owner)  %}
             {% set ownerType = oro_get_owner_type(entity) %}
@@ -826,7 +856,9 @@
                 {% set ownerName = entity.owner.name %}
             {% endif %}
             {% if ownerName is defined %}
-                {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+                {% if renderLabel %}
+                    {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+                {% endif %}
                 {% if ownerPath is defined %}
                     <a href="{{ ownerPath }}">{{ ownerName }}</a>
                 {% else %}

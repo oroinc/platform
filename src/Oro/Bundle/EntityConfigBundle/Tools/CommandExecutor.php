@@ -31,8 +31,13 @@ class CommandExecutor
      */
     protected $dataCacheManager;
 
+    /** @var array */
+    protected $defaultOptions;
+
     /**
      * @var int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
      */
     protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
@@ -51,6 +56,9 @@ class CommandExecutor
         $this->consoleCmdPath   = $consoleCmdPath;
         $this->env              = $env;
         $this->dataCacheManager = $dataCacheManager;
+        $this->defaultOptions   = [
+            'process-timeout' => self::DEFAULT_TIMEOUT
+        ];
     }
 
     /**
@@ -60,25 +68,21 @@ class CommandExecutor
      * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
+     * If '--disable-cache-sync' parameter is specified a synchronization of caches between current
+     * process and its child processes are disabled.
      *
      * @param string               $command
      * @param array                $params
      * @param LoggerInterface|null $logger
      *
      * @return integer The exit status code
+     *
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
     public function runCommand($command, $params = [], LoggerInterface $logger = null)
     {
-        $params = array_merge(
-            [
-                'command' => $command
-            ],
-            $params
-        );
-        if ($this->env && $this->env !== 'dev') {
-            $params['--env'] = $this->env;
-        }
+        $params = $this->prepareParameters($command, $params);
+
         $ignoreErrors = false;
         if (array_key_exists('--ignore-errors', $params)) {
             $ignoreErrors = true;
@@ -93,8 +97,12 @@ class CommandExecutor
         if (array_key_exists('--process-timeout', $params)) {
             $pb->setTimeout($params['--process-timeout']);
             unset($params['--process-timeout']);
-        } else {
-            $pb->setTimeout($this->defaultTimeout);
+        }
+
+        $disableCacheSync = false;
+        if (array_key_exists('--disable-cache-sync', $params)) {
+            $disableCacheSync = $params['--disable-cache-sync'];
+            unset($params['--disable-cache-sync']);
         }
 
         foreach ($params as $name => $val) {
@@ -119,13 +127,40 @@ class CommandExecutor
         );
 
         // synchronize all data caches
-        if ($this->dataCacheManager) {
+        if ($this->dataCacheManager && !$disableCacheSync) {
             $this->dataCacheManager->sync();
         }
 
         $this->processResult($exitCode, $ignoreErrors, $logger);
 
         return $exitCode;
+    }
+
+    /**
+     * Gets the default value of a given option
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getDefaultOption($name)
+    {
+        return isset($this->defaultOptions[$name]) ? $this->defaultOptions[$name] : null;
+    }
+
+    /**
+     * Sets the default value of a given option
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function setDefaultOption($name, $value = true)
+    {
+        $this->defaultOptions[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -146,6 +181,35 @@ class CommandExecutor
     }
 
     /**
+     * @param string $command
+     * @param array  $params
+     *
+     * @return array
+     */
+    protected function prepareParameters($command, array $params)
+    {
+        $params = array_merge(
+            [
+                'command' => $command
+            ],
+            $params
+        );
+
+        if ($this->env && $this->env !== 'dev') {
+            $params['--env'] = $this->env;
+        }
+
+        foreach ($this->defaultOptions as $name => $value) {
+            $paramName = '--' . $name;
+            if (!array_key_exists($paramName, $params)) {
+                $params[$paramName] = $value;
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * @param ProcessBuilder    $pb
      * @param string            $name
      * @param array|string|null $value
@@ -155,7 +219,7 @@ class CommandExecutor
         if ($name && '-' === $name[0]) {
             if ($value === true) {
                 $this->addParameter($pb, $name);
-            } else {
+            } elseif ($value !== false) {
                 $this->addParameter($pb, $name, $value);
             }
         } else {
@@ -208,17 +272,21 @@ class CommandExecutor
 
     /**
      * @return int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
      */
     public function getDefaultTimeout()
     {
-        return $this->defaultTimeout;
+        return $this->getDefaultOption('process-timeout');
     }
 
     /**
      * @param int $defaultTimeout
+     *
+     * @deprecated since 1.8. Use {@see setDefaultOption('process-timeout', $timeout)} instead
      */
     public function setDefaultTimeout($defaultTimeout)
     {
-        $this->defaultTimeout = $defaultTimeout;
+        $this->setDefaultOption('process-timeout', $defaultTimeout);
     }
 }

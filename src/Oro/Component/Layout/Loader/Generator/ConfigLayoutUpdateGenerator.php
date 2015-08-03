@@ -4,8 +4,8 @@ namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
-use Oro\Component\Layout\Util\ArrayUtils;
-use Oro\Component\Layout\Util\ReflectionUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\PhpUtils\ReflectionClassHelper;
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
@@ -21,7 +21,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     /** @var ConfigLayoutUpdateGeneratorExtensionInterface[] */
     protected $extensions = [];
 
-    /** @var ReflectionUtils */
+    /** @var ReflectionClassHelper */
     protected $helper;
 
     /**
@@ -83,7 +83,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         foreach ($actions as $nodeNo => $actionDefinition) {
             if (isset($actionDefinition[self::PATH_ATTR])) {
                 $path = $actionDefinition[self::PATH_ATTR];
-                unset ($actionDefinition[self::PATH_ATTR]);
+                unset($actionDefinition[self::PATH_ATTR]);
             } else {
                 $path = self::NODE_ACTIONS . '.' . $nodeNo;
             }
@@ -207,7 +207,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             $itemDefinition = $items[$blockId];
 
-            if (ArrayUtils::isAssoc($itemDefinition)) {
+            if (ArrayUtil::isAssoc($itemDefinition)) {
                 // merge associative values to arguments
                 $itemDefinition = array_merge($itemDefinition, ['id' => $blockId, 'parentId' => $parentId]);
             } else {
@@ -222,12 +222,12 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     }
 
     /**
-     * @return ReflectionUtils
+     * @return ReflectionClassHelper
      */
     protected function getHelper()
     {
         if (null === $this->helper) {
-            $this->helper = new ReflectionUtils('Oro\Component\Layout\LayoutManipulatorInterface');
+            $this->helper = new ReflectionClassHelper('Oro\Component\Layout\LayoutManipulatorInterface');
         }
 
         return $this->helper;

@@ -8,6 +8,9 @@
         count: 1
     } %}
     {% block widget_content %}
+
+        {% placeholder oro_activity_list_before with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
+
         {% block widget_actions %}
         <div class="grid-toolbar">
             <div class="filter-box oro-clearfix-width">
@@ -91,5 +94,8 @@
             {% endfor %}
             {% include 'OroCommentBundle:Comment/js:list.js.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
+
+        {% placeholder oro_activity_list_after with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
+
     {% endblock %}
 </div>

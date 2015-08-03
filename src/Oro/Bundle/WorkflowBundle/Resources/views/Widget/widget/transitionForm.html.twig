@@ -42,7 +42,8 @@
                   data-nohash="true"
                   data-disable-autofocus="true"
                   {% if transition.displayType != 'dialog' %}data-collect="true"{% endif %}
-                  id="{{ form.vars.name }}"
+                  id="{{ form.vars.id }}"
+                  name="{{ form.vars.name }}"
                   action="{{ app.request.uri }}"
                   class="form-dialog"
             >

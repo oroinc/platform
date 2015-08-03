@@ -1,6 +1,4 @@
-/*jslint nomen:true*/
-/*global define, require*/
-define(['jquery', 'underscore'], function ($, _) {
+define(['jquery', 'underscore'], function($, _) {
     'use strict';
 
     /**
@@ -29,11 +27,11 @@ define(['jquery', 'underscore'], function ($, _) {
          * @return {Object}
          */
         unpackFromQueryString: function(query) {
-            var setValue = function (root, path, value) {
+            var setValue = function(root, path, value) {
                 if (path.length > 1) {
                     var dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
-                        root[dir] = path[0] == '' ? [] : {};
+                        root[dir] = path[0] === '' ? [] : {};
                     }
                     setValue(root[dir], path, value);
                 } else {
@@ -47,8 +45,8 @@ define(['jquery', 'underscore'], function ($, _) {
             var nvp = query.split('&');
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
-                var pair  = nvp[i].split('=');
-                var name  = this.decodeUriComponent(pair[0]);
+                var pair = nvp[i].split('=');
+                var name = this.decodeUriComponent(pair[0]);
                 var value = this.decodeUriComponent(pair[1]);
 
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
@@ -95,9 +93,11 @@ define(['jquery', 'underscore'], function ($, _) {
         invertKeys: function(object, keys) {
             var result = _.extend({}, object);
             for (var key in keys) {
-                var mirrorKey, baseKey;
-                baseKey = key;
-                mirrorKey = keys[key];
+                if (!keys.hasOwnProperty(key)) {
+                    continue;
+                }
+                var baseKey = key;
+                var mirrorKey = keys[key];
 
                 if (baseKey in result) {
                     result[mirrorKey] = result[baseKey];
@@ -114,24 +114,27 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {*} value2
          * @return {Boolean} TRUE if values are equal, otherwise - FALSE
          */
-        isEqualsLoosely: function (value1, value2) {
+        isEqualsLoosely: function(value1, value2) {
             if (!_.isObject(value1)) {
                 if (_.isNumber(value1) || _.isNumber(value2)) {
-                    var toNumber = function (v) {
-                        if (_.isString(v) && v == '') {
+                    var toNumber = function(v) {
+                        if (_.isString(v) && v === '') {
                             return NaN;
                         }
                         return Number(v);
                     };
-                    return (toNumber(value1) == toNumber(value2));
+                    return (toNumber(value1) === toNumber(value2));
                 }
-                return ((value1 || '') == (value2 || ''));
+                return ((value1 || '') === (value2 || ''));
             } else if (_.isObject(value1)) {
                 var valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
                     for (var index in valueKeys) {
+                        if (!valueKeys.hasOwnProperty(index)) {
+                            continue;
+                        }
                         var key = valueKeys[index];
                         if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
                             return false;
@@ -141,6 +144,7 @@ define(['jquery', 'underscore'], function ($, _) {
                 }
                 return false;
             } else {
+                // jshint -W116
                 return value1 == value2;
             }
         },
@@ -158,7 +162,7 @@ define(['jquery', 'underscore'], function ($, _) {
         /**
          * Are we currently on mobile
          */
-        isMobile: function () {
+        isMobile: function() {
             return $('body').hasClass('mobile-version');
         },
 
@@ -172,14 +176,15 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {function(Object)} callback
          * @param {Object=} context
          */
-        loadModules: function (modules, callback, context) {
-            var requirements, onLoadHandler;
+        loadModules: function(modules, callback, context) {
+            var requirements;
+            var onLoadHandler;
             if (_.isObject(modules)) {
                 // if modules is an object of {formal_name: module_name}
                 requirements = _.values(modules);
-                onLoadHandler = function () {
+                onLoadHandler = function() {
                     // maps loaded modules into original object
-                    _.each(modules, _.bind(function (value, key) {
+                    _.each(modules, _.bind(function(value, key) {
                         modules[key] = this[value];
                     }, _.object(requirements, _.toArray(arguments))));
                     callback.call(context || null, modules);
@@ -187,9 +192,9 @@ define(['jquery', 'underscore'], function ($, _) {
             } else {
                 // if modules is an array of module_names or single module_name
                 requirements = !_.isArray(modules) ? [modules] : modules;
-                onLoadHandler = function () {
+                onLoadHandler = function() {
                     callback.apply(context || null, arguments);
-                }
+                };
             }
             // loads requirements and execute onLoadHandler handler
             require(requirements, onLoadHandler);
@@ -199,7 +204,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */
-        isErrorPage: function () {
+        isErrorPage: function() {
             return Boolean($('meta[name=error]').length);
         },
 
@@ -209,11 +214,20 @@ define(['jquery', 'underscore'], function ($, _) {
          * @param {string} str
          * @param {string} flags
          */
-        safeRegExp: function (str, flags) {
+        safeRegExp: function(str, flags) {
             var expression;
-            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             expression = new RegExp(str, flags);
             return expression;
+        },
+
+        /**
+         * Checks input values and if it isn't an array wraps it
+         *
+         * @returns {Array}
+         */
+        ensureArray: function(value) {
+            return _.isArray(value) ? value : [value];
         }
     };
 });

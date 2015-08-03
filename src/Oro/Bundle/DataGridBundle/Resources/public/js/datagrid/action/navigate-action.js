@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     './model-action'
-], function (_, __, mediator, ModelAction) {
+], function(_, __, mediator, ModelAction) {
     'use strict';
 
     var NavigateAction;
@@ -33,7 +31,7 @@ define([
          * @param {Object} options
          * @param {Boolean} options.useDirectLauncherLink
          */
-        initialize: function (options) {
+        initialize: function(options) {
             NavigateAction.__super__.initialize.apply(this, arguments);
 
             if (options.useDirectLauncherLink) {
@@ -54,12 +52,11 @@ define([
          * Execute redirect
          *  - extends URL with grid state parameter
          */
-        execute: function () {
-            var url, key, value;
-            url = this.getLink();
+        execute: function() {
+            var url = this.getLink();
 
-            key = this.datagrid.collection.stateHashKey();
-            value = this.datagrid.collection.stateHashValue();
+            var key = this.datagrid.collection.stateHashKey();
+            var value = this.datagrid.collection.stateHashValue();
 
             url = this.addUrlParameter(url, key, value);
             mediator.execute('redirectTo', {url: url});
@@ -70,8 +67,8 @@ define([
          *
          * @private
          */
-        _preExecuteSubscriber: function (action, options) {
-            mediator.once('page:beforeError', function (xmlHttp, options) {
+        _preExecuteSubscriber: function(action, options) {
+            mediator.once('page:beforeError', function(xmlHttp, options) {
                 var message;
                 if (403 === xmlHttp.status) {
                     options.stopPageProcessing = true;

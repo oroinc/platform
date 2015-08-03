@@ -41,8 +41,13 @@ class CommandExecutor
      */
     protected $lastCommandExitCode;
 
+    /** @var array */
+    protected $defaultOptions;
+
     /**
      * @var int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
      */
     protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
@@ -64,12 +69,17 @@ class CommandExecutor
         $this->output           = $output;
         $this->application      = $application;
         $this->dataCacheManager = $dataCacheManager;
+        $this->defaultOptions   = [
+            'process-timeout' => self::DEFAULT_TIMEOUT
+        ];
     }
 
     /**
      * Launches a command.
      * If '--process-isolation' parameter is specified the command will be launched as a separate process.
      * In this case you can parameter '--process-timeout' to set the process timeout
+     * in seconds. Default timeout is 300 seconds.
+     * The '--process-timeout' parameter can be used to set the process timeout
      * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
@@ -81,15 +91,8 @@ class CommandExecutor
      */
     public function runCommand($command, $params = [])
     {
-        $params = array_merge(
-            [
-                'command' => $command
-            ],
-            $params
-        );
-        if ($this->env && $this->env !== 'dev') {
-            $params['--env'] = $this->env;
-        }
+        $params = $this->prepareParameters($command, $params);
+
         $ignoreErrors = false;
         if (array_key_exists('--ignore-errors', $params)) {
             $ignoreErrors = true;
@@ -106,8 +109,6 @@ class CommandExecutor
             if (array_key_exists('--process-timeout', $params)) {
                 $pb->setTimeout($params['--process-timeout']);
                 unset($params['--process-timeout']);
-            } else {
-                $pb->setTimeout($this->defaultTimeout);
             }
 
             foreach ($params as $name => $val) {
@@ -131,11 +132,42 @@ class CommandExecutor
                 $this->dataCacheManager->sync();
             }
         } else {
+            if (array_key_exists('--process-timeout', $params)) {
+                unset($params['--process-timeout']);
+            }
+
             $this->application->setAutoExit(false);
             $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
         $this->processResult($ignoreErrors);
+
+        return $this;
+    }
+
+    /**
+     * Gets the default value of a given option
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getDefaultOption($name)
+    {
+        return isset($this->defaultOptions[$name]) ? $this->defaultOptions[$name] : null;
+    }
+
+    /**
+     * Sets the default value of a given option
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function setDefaultOption($name, $value = true)
+    {
+        $this->defaultOptions[$name] = $value;
 
         return $this;
     }
@@ -173,6 +205,35 @@ class CommandExecutor
     }
 
     /**
+     * @param string $command
+     * @param array  $params
+     *
+     * @return array
+     */
+    protected function prepareParameters($command, array $params)
+    {
+        $params = array_merge(
+            [
+                'command' => $command
+            ],
+            $params
+        );
+
+        if ($this->env && $this->env !== 'dev') {
+            $params['--env'] = $this->env;
+        }
+
+        foreach ($this->defaultOptions as $name => $value) {
+            $paramName = '--' . $name;
+            if (!array_key_exists($paramName, $params)) {
+                $params[$paramName] = $value;
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * @param ProcessBuilder    $pb
      * @param string            $name
      * @param array|string|null $value
@@ -182,7 +243,7 @@ class CommandExecutor
         if ($name && '-' === $name[0]) {
             if ($value === true) {
                 $this->addParameter($pb, $name);
-            } else {
+            } elseif ($value !== false) {
                 $this->addParameter($pb, $name, $value);
             }
         } else {
@@ -224,6 +285,37 @@ class CommandExecutor
      */
     protected function getPhp()
     {
+        return self::getPhpExecutable();
+    }
+
+    /**
+     * @return int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
+     */
+    public function getDefaultTimeout()
+    {
+        return $this->getDefaultOption('process-timeout');
+    }
+
+    /**
+     * @param int $defaultTimeout
+     *
+     * @deprecated since 1.8. Use {@see setDefaultOption('process-timeout', $timeout)} instead
+     */
+    public function setDefaultTimeout($defaultTimeout)
+    {
+        $this->setDefaultOption('process-timeout', $defaultTimeout);
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public static function getPhpExecutable()
+    {
         $phpFinder = new PhpExecutableFinder();
         $phpPath   = $phpFinder->find();
         if (!$phpPath) {
@@ -234,37 +326,23 @@ class CommandExecutor
     }
 
     /**
-     * @return int
-     */
-    public function getDefaultTimeout()
-    {
-        return $this->defaultTimeout;
-    }
-
-    /**
-     * @param int $defaultTimeout
-     */
-    public function setDefaultTimeout($defaultTimeout)
-    {
-        $this->defaultTimeout = $defaultTimeout;
-    }
-
-    /**
      * Check whether specified command is running now
      *
-     * @param string $commandName
+     * @param string $command  The command name or prefix
+     * @param bool   $isPrefix Determines whether $command is a command name or prefix
+     *
      * @return bool
      */
-    public static function isCommandRunning($commandName)
+    public static function isCommandRunning($command, $isPrefix = false)
     {
-        if (self::isCurrentCommand($commandName)) {
+        if (self::isCurrentCommand($command, $isPrefix)) {
             return true;
         }
 
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
             $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
         } else {
-            $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $commandName);
+            $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $command);
         }
 
         $process = new Process($cmd);
@@ -277,11 +355,25 @@ class CommandExecutor
     /**
      * Check if this process executes specified command
      *
-     * @param string $commandName
+     * @param string $command  The command name or prefix
+     * @param bool   $isPrefix Determines whether $command is a command name or prefix
+     *
      * @return bool
      */
-    public static function isCurrentCommand($commandName)
+    public static function isCurrentCommand($command, $isPrefix = false)
     {
-        return php_sapi_name() == 'cli' && isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
+        if (isset($_SERVER['argv']) && php_sapi_name() === 'cli') {
+            if (!$isPrefix) {
+                return in_array($command, $_SERVER['argv'], true);
+            } else {
+                foreach ($_SERVER['argv'] as $arg) {
+                    if (is_string($arg) && strpos($arg, $command) === 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

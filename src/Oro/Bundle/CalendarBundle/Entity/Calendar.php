@@ -92,6 +92,8 @@ class Calendar extends ExtendCalendar
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->events = new ArrayCollection();
     }
 

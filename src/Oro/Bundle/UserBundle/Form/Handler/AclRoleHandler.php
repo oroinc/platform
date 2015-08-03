@@ -8,11 +8,15 @@ use Symfony\Component\Form\FormInterface;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
-use Oro\Bundle\UserBundle\Entity\Role;
-
+use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 
@@ -34,7 +38,14 @@ class AclRoleHandler
     protected $form;
 
     /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
+    /**
      * @var ObjectManager
+     *
+     * @deprecated since 1.8
      */
     protected $manager;
 
@@ -52,6 +63,13 @@ class AclRoleHandler
      * @var array
      */
     protected $privilegeConfig;
+
+    /**
+     * ['<extension_key>' => ['<allowed_group>', ...], ...]
+     *
+     * @var array
+     */
+    protected $extensionFilters = [];
 
     /**
      * @param FormFactory $formFactory
@@ -80,7 +98,17 @@ class AclRoleHandler
     }
 
     /**
+     * @param ManagerRegistry $registry
+     */
+    public function setManagerRegistry(ManagerRegistry $registry)
+    {
+        $this->managerRegistry = $registry;
+    }
+
+    /**
      * @param ObjectManager $manager
+     *
+     * @deprecated since 1.8
      */
     public function setEntityManager(ObjectManager $manager)
     {
@@ -96,35 +124,58 @@ class AclRoleHandler
     }
 
     /**
+     * @param string $extensionKey
+     * @param string $allowedGroup
+     */
+    public function addExtensionFilter($extensionKey, $allowedGroup)
+    {
+        if (!array_key_exists($extensionKey, $this->extensionFilters)) {
+            $this->extensionFilters[$extensionKey] = [];
+        }
+
+        if (!in_array($allowedGroup, $this->extensionFilters[$extensionKey])) {
+            $this->extensionFilters[$extensionKey][] = $allowedGroup;
+        }
+    }
+
+    /**
      * Create form for role manipulation
      *
-     * @param Role $role
+     * @param AbstractRole $role
      * @return FormInterface
      */
-    public function createForm(Role $role)
+    public function createForm(AbstractRole $role)
     {
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
                 = $this->privilegeRepository->getPermissionNames($config['types']);
         }
 
-        $this->form = $this->formFactory->create(
-            new ACLRoleType(
-                $this->privilegeConfig
-            ),
-            $role
-        );
+        $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
 
         return $this->form;
     }
 
     /**
+     * @param AbstractRole $role
+     * @param array $privilegeConfig
+     * @return FormInterface
+     */
+    protected function createRoleFormInstance(AbstractRole $role, array $privilegeConfig)
+    {
+        return $this->formFactory->create(
+            new ACLRoleType($privilegeConfig),
+            $role
+        );
+    }
+
+    /**
      * Save role
      *
-     * @param Role $role
+     * @param AbstractRole $role
      * @return bool
      */
-    public function process(Role $role)
+    public function process(AbstractRole $role)
     {
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
@@ -155,12 +206,11 @@ class AclRoleHandler
     }
 
     /**
-     * @param Role $role
+     * @param AbstractRole $role
      */
-    protected function setRolePrivileges(Role $role)
+    protected function setRolePrivileges(AbstractRole $role)
     {
-        /** @var ArrayCollection $privileges */
-        $privileges = $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        $privileges = $this->getRolePrivileges($role);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
@@ -184,9 +234,18 @@ class AclRoleHandler
     }
 
     /**
-     * @param Role $role
+     * @param AbstractRole $role
+     * @return ArrayCollection|AclPrivilege[]
      */
-    protected function processPrivileges(Role $role)
+    protected function getRolePrivileges(AbstractRole $role)
+    {
+        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+    }
+
+    /**
+     * @param AbstractRole $role
+     */
+    protected function processPrivileges(AbstractRole $role)
     {
         $formPrivileges = array();
         foreach ($this->privilegeConfig as $fieldName => $config) {
@@ -197,6 +256,13 @@ class AclRoleHandler
             $formPrivileges = array_merge($formPrivileges, $privileges);
         }
 
+        array_walk(
+            $formPrivileges,
+            function (AclPrivilege $privilege) {
+                $privilege->setGroup($this->getAclGroup());
+            }
+        );
+
         $this->privilegeRepository->savePrivileges(
             $this->aclManager->getSid($role),
             new ArrayCollection($formPrivileges)
@@ -206,19 +272,32 @@ class AclRoleHandler
     /**
      * @param ArrayCollection $privileges
      * @param array $rootIds
-     * @return ArrayCollection
+     * @return ArrayCollection|AclPrivilege[]
      */
     protected function filterPrivileges(ArrayCollection $privileges, array $rootIds)
     {
         return $privileges->filter(
-            function ($entry) use ($rootIds) {
-                return in_array($entry->getExtensionKey(), $rootIds);
+            function (AclPrivilege $entry) use ($rootIds) {
+                $extensionKey = $entry->getExtensionKey();
+
+                // only current extension privileges
+                if (!in_array($extensionKey, $rootIds, true)) {
+                    return false;
+                }
+
+                // not filtered are allowed
+                if (!array_key_exists($extensionKey, $this->extensionFilters)) {
+                    return true;
+                }
+
+                // filter by groups
+                return in_array($entry->getGroup(), $this->extensionFilters[$extensionKey], true);
             }
         );
     }
 
     /**
-     * @param ArrayCollection|array $privileges
+     * @param ArrayCollection|AclPrivilege[] $privileges
      * @param $value
      */
     protected function fxPrivilegeValue($privileges, $value)
@@ -233,45 +312,68 @@ class AclRoleHandler
     /**
      * "Success" form handler
      *
-     * @param Role   $entity
+     * @param AbstractRole $entity
      * @param User[] $appendUsers
      * @param User[] $removeUsers
      */
-    protected function onSuccess(Role $entity, array $appendUsers, array $removeUsers)
+    protected function onSuccess(AbstractRole $entity, array $appendUsers, array $removeUsers)
     {
+        $manager = $this->getManager($entity);
+
         $this->appendUsers($entity, $appendUsers);
         $this->removeUsers($entity, $removeUsers);
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $manager->persist($entity);
+        $manager->flush();
     }
 
     /**
      * Append users to role
      *
-     * @param Role   $role
+     * @param AbstractRole $role
      * @param User[] $users
      */
-    protected function appendUsers(Role $role, array $users)
+    protected function appendUsers(AbstractRole $role, array $users)
     {
-        /** @var $user User */
+        $manager = $this->getManager($role);
+
+        /** @var $user AbstractUser */
         foreach ($users as $user) {
             $user->addRole($role);
-            $this->manager->persist($user);
+            $manager->persist($user);
         }
     }
 
     /**
      * Remove users from role
      *
-     * @param Role   $role
+     * @param AbstractRole $role
      * @param User[] $users
      */
-    protected function removeUsers(Role $role, array $users)
+    protected function removeUsers(AbstractRole $role, array $users)
     {
-        /** @var $user User */
+        $manager = $this->getManager($role);
+
+        /** @var $user AbstractUser */
         foreach ($users as $user) {
             $user->removeRole($role);
-            $this->manager->persist($user);
+            $manager->persist($user);
         }
+    }
+
+    /**
+     * @param AbstractRole $role
+     * @return ObjectManager
+     */
+    protected function getManager(AbstractRole $role)
+    {
+        return $this->managerRegistry->getManagerForClass(ClassUtils::getClass($role));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAclGroup()
+    {
+        return AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
     }
 }

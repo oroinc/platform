@@ -16,7 +16,7 @@ class EmailAddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(
-            new EmailAddressTransformer(isset($options['multiple']) ? (bool) $options['multiple'] : false)
+            new EmailAddressTransformer($options['multiple'])
         );
     }
 
@@ -26,9 +26,9 @@ class EmailAddressType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'multiple' => false
-            )
+            ]
         );
     }
 

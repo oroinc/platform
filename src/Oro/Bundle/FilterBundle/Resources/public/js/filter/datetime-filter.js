@@ -1,15 +1,14 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DatetimeFilter,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view'),
-        DateFilter = require('./date-filter'),
-        tools = require('oroui/js/tools');
+    var DatetimeFilter;
+    var _ = require('underscore');
+    var moment = require('moment');
+    var __ = require('orotranslation/js/translator');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
+    var DateFilter = require('./date-filter');
+    var tools = require('oroui/js/tools');
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
@@ -60,9 +59,9 @@ define(function (require) {
          * @param {Event} e
          * @protected
          */
-        _onClickOutsideCriteria: function (e) {
+        _onClickOutsideCriteria: function(e) {
             if (this._justPickedTime) {
-                this._justPickedTime = false
+                this._justPickedTime = false;
             } else {
                 DatetimeFilter.__super__._onClickOutsideCriteria.apply(this, arguments);
             }
@@ -74,18 +73,18 @@ define(function (require) {
          *
          * @protected
          */
-        _preventClickOutsideCriteria: function () {
+        _preventClickOutsideCriteria: function() {
             this._justPickedTime = true;
         },
 
         /**
          * @inheritDoc
          */
-        _getPickerConfigurationOptions: function (options) {
+        _getPickerConfigurationOptions: function(options) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
-                timezoneShift: 0,
+                timezone: 'UTC',
                 timeInputAttrs: {
                     'class': 'timepicker-input',
                     'placeholder': __('oro.form.choose_time')
@@ -101,7 +100,7 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _toDisplayValue: function (value) {
+        _toDisplayValue: function(value) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
@@ -119,7 +118,7 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _toRawValue: function (value) {
+        _toRawValue: function(value) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
@@ -133,7 +132,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             this.subview('start').checkConsistency();
             this.subview('end').checkConsistency();
             return DatetimeFilter.__super__._readDOMValue.apply(this, arguments);
@@ -142,10 +141,10 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _triggerUpdate: function (newValue, oldValue) {
+        _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
-                var start = this.subview('start'),
-                    end = this.subview('end');
+                var start = this.subview('start');
+                var end = this.subview('end');
                 if (start && start.updateFront) {
                     start.updateFront();
                 }

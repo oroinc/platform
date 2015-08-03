@@ -4,11 +4,12 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use \Datetime;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 {
@@ -20,15 +21,15 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     /** @var Compiler */
     protected $dateCompiler;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
-     * @param DateTimeFormatter $formatter
-     * @param Compiler          $dateCompiler
-     * @param Translator        $translator
+     * @param DateTimeFormatter   $formatter
+     * @param Compiler            $dateCompiler
+     * @param TranslatorInterface $translator
      */
-    public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler, Translator $translator)
+    public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler, TranslatorInterface $translator)
     {
         $this->formatter    = $formatter;
         $this->dateCompiler = $dateCompiler;

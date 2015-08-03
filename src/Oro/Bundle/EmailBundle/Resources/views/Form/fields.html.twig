@@ -50,7 +50,8 @@
                 $(function () {
                     var selectorEl = '{{ form.vars.id }}';
                     var emailLinkToScopeEl = $('#' + selectorEl);
-                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form').find('#oro_entity_config_type_attachment_enabled');
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
+                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
                     initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
                     $(enableAttachmentEl).on('change', function() {
                         initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
@@ -134,7 +135,7 @@
     {% endfor %}
 
     {% set options = options|merge({
-        container: id,
+        containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
         attachmentsAvailable: attachmentsAvailableArray
@@ -193,6 +194,57 @@
     </script>
 {% endblock %}
 
+{% block oro_email_email_folder_row %}
+    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
+        <div>
+            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
+            {{ form_widget(form.fullName) }}
+            {{ form_widget(form.name) }}
+            {{ form_widget(form.type) }}
+            {% if form.vars.value.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {{ form_widget(form.subFolders) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_row %}
+    {% if form.vars.value is not null and form.vars.value|length > 0 %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_widget %}
+    <div class="folder-tree-widget">
+        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
+        <div id="folder-list">
+            {% for child in form.children %}
+                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery'], function($) {
+            var $folderList = $('#folder-list');
+            var $checkAll = $('#check-all');
+            $checkAll.click(function() {
+                var checked = this.checked;
+                $folderList.find(':checkbox').each(function() {
+                    this.checked = checked;
+                });
+            });
+
+            $folderList.find(':checkbox').each(function() {
+                $(this).css('margin', 0);
+            });
+        });
+    </script>
+{% endblock %}
 {#
     Renders tab `li` tag for bootstrap tab panels
     paramters:
@@ -205,7 +257,7 @@
 
     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
         <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
-            {{- localeLabels[locale]|default('N/A')|trans|capitalize -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
+            {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>
 {% endmacro %}
