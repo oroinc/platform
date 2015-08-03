@@ -67,7 +67,7 @@ class AclHelper
 
                         // in case if we should not limit data for entity
                         if (count($condition) === 0 || $condition[1] === null) {
-                            $ownerExpressions[] = $expr->gt('integer.' . $ownerField, SearchListener::EMPTY_OWNER_ID);
+                            $ownerExpressions[] = $expr->gte('integer.' . $ownerField, SearchListener::EMPTY_OWNER_ID);
 
                             continue;
                         }
@@ -99,7 +99,7 @@ class AclHelper
         $organizationId = $this->getOrganizationId();
         if ($organizationId) {
             $query->getCriteria()->andWhere(
-                $expr->in('integer.organization', [$organizationId, 0])
+                $expr->in('integer.organization', [$organizationId, SearchListener::EMPTY_ORGANIZATION_ID])
             );
         }
 
