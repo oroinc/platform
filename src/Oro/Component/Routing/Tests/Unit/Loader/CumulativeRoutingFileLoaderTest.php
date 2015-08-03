@@ -50,7 +50,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loadedRoutes = new RouteCollection();
         $loadedRoutes->add('route1', new Route('/route1'));
-        $loadedRoutes->add('route2', new Route('/route2', [], [], ['priority' => -1]));
+        $loadedRoutes->add('route2', new Route('/route2', [], [], ['priority' => 1]));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject[] $bundles */
         $bundles = [
