@@ -113,14 +113,10 @@ define(function(require) {
 
         it('should correct iterate through its sides', function() {
             var rectangle = new Rectangle(10, 20, 30, 40);
-            var point = new Point2d(15, 60);
-            var callback = jasmine.createSpy();
-            rectangle.eachSide(function(side) {
-                if (side instanceof Interval2d && side.includesPoint(point)) {
-                    callback('contains');
-                }
-            });
-            expect(callback).toHaveBeenCalledWith('contains');
+            var callback = jasmine.createSpy('callback');
+            rectangle.eachSide(callback);
+            expect(callback.calls.count()).toBe(4);
+            expect(callback).toHaveBeenCalledWith(jasmine.any(Interval2d));
         });
     });
 });
