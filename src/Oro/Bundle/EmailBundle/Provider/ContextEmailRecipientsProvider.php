@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
@@ -26,7 +27,10 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
             return [];
         }
 
-        return $this->relatedEmailsProvider->getEmails($args->getRelatedEntity(), 2);
+        return array_filter(
+            $this->relatedEmailsProvider->getEmails($args->getRelatedEntity(), 2),
+            EmailRecipientsHelper::createRecipientsFilter($args)
+        );
     }
 
     /**

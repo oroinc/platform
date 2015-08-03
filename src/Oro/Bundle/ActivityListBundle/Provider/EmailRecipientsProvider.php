@@ -74,7 +74,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         $activities = $this->activityManager->getActivities($relatedEntityClass);
-        foreach ($activities as $class => $field) {
+        foreach (array_keys($activities) as $class) {
             $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
 
             $qb = $this->getRepository($class)
@@ -88,12 +88,13 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             $iterator->setBufferSize($args->getLimit());
 
             foreach ($iterator as $entity) {
-                $emails = $this->relatedEmailsProvider->getEmails($entity, 2);
-                if (!$emails) {
-                    continue;
-                }
-
-                $result = array_merge($result, $emails);
+                $result = array_merge(
+                    $result,
+                    array_filter(
+                        $this->relatedEmailsProvider->getEmails($entity, 2),
+                        EmailRecipientsHelper::createRecipientsFilter($args)
+                    )
+                );
 
                 if ($args->getLimit() - count($result) <= 0) {
                     break 2;
