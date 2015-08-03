@@ -15,13 +15,10 @@ class OroEmailBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         self::createOroEmailMailboxTable($schema);
-
         self::createOroEmailMailboxProcessSettingsTable($schema);
 
         self::addOwnerMailboxColumn($schema);
-
         self::addOroEmailMailboxForeignKeys($schema);
-
         self::addEmailUserMailboxOwnerColumn($schema);
     }
 
@@ -34,8 +31,8 @@ class OroEmailBundle implements Migration
         $table->addColumn('origin_id', 'integer', ['notnull' => false]);
         $table->addColumn('email', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
-        $table->addColumn('smtp_settings', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['email'], 'UNIQ_574C364FE7927C74');
         $table->addUniqueIndex(['process_settings_id'], 'UNIQ_574C364F37BAC19A');
         $table->addUniqueIndex(['origin_id'], 'UNIQ_574C364F56A273CC');
         $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE', []);
@@ -91,6 +88,7 @@ class OroEmailBundle implements Migration
             ['onDelete' => null, 'onUpdate' => null]
         );
     }
+
     public static function addEmailUserMailboxOwnerColumn(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

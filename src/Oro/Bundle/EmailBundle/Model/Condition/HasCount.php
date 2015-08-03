@@ -28,7 +28,7 @@ class HasCount extends AbstractCondition implements ContextAccessorAwareInterfac
         $count = count($countable);
         $value = $this->resolveValue($context, $this->value);
 
-        switch($this->operation) {
+        switch ($this->operation) {
             case self::OP_EQUAL:
                 return ($count == $value);
             case self::OP_GREATER:

@@ -110,7 +110,10 @@ oro:
             shortcut_compose_email.description: Compose email
             mark_read.label: Mark read
             mark_unread.label: Mark unread
-
+        notification:
+            mark_read.label: Mark all as Read
+            empty: You don't have any emails yet
+            new_email: You have a new email
         datagrid:
             emailtemplate:
                 action:
@@ -247,24 +250,19 @@ oro:
             label.label:              Mailbox Label
             general.label:            General
             email.label:              Email
-            name.label:               Name
-            origin:
-                label:                IMAP Synchronization
-                enable.label:         Use IMAP Synchronization
+            authorized_roles.label:   Authorized Roles
+            authorized_users.label:   Authorized Users
+            email_users.label:        Email Users
+            origin.label:             Synchronization
             organization.label:       Organization
-            action.create:            Add Mailbox
+            action:
+                create:               Add Mailbox
+                new:                  New Mailbox
+                saved:                "%mailbox% has been saved."
             process:
                 label:                Email Processing
                 type.label:           Action
                 default.label:        Do Nothing
-            smtp_settings:
-                label:                SMTP Settings
-                enabled.label:        Use SMTP
-                host.label:           Host
-                port.label:           Port
-                encryption.label:     SSL
-                username.label:       Username
-                password.label:       Password
             access:
                 label:                Access Management
         autoresponserule:

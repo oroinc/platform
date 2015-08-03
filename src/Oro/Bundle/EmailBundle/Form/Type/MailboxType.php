@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
 class MailboxType extends AbstractType
@@ -33,7 +33,7 @@ class MailboxType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'         => 'Oro\Bundle\EmailBundle\Entity\Mailbox',
@@ -53,7 +53,7 @@ class MailboxType extends AbstractType
                 new NotNull(),
             ],
         ]);
-        $builder->add('email', 'email', [
+        $builder->add('email', 'oro_email_email_address', [
             'required'    => true,
             'label'       => 'oro.email.mailbox.email.label',
             'constraints' => [
@@ -62,13 +62,6 @@ class MailboxType extends AbstractType
             ],
         ]);
         $builder->add('origin', 'oro_imap_configuration');
-        $builder->add('activeOrigin', 'checkbox', [
-            'required' => false,
-            'label'    => 'oro.email.mailbox.origin.enable.label',
-            'mapped'   => false,
-            'data'     => true,
-        ]);
-        $builder->add('smtpSettings', 'oro_email_smtp');
         $builder->add('processType', 'choice', [
             'label'       => 'oro.email.mailbox.process.type.label',
             'choices'     => $this->storage->getProcessTypeChoiceList(),
@@ -78,27 +71,17 @@ class MailboxType extends AbstractType
             'empty_data'  => null,
         ]);
         $builder->add(
-            'allowedUsers',
+            'authorizedUsers',
             'oro_user_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
-                'mapped' => false
             ]
         );
         $builder->add(
-            'allowedUsers',
-            'oro_user_multiselect',
-            [
-                'label' => 'oro.user.entity_plural_label',
-                'mapped' => false
-            ]
-        );
-        $builder->add(
-            'allowedRoles',
+            'authorizedRoles',
             'oro_role_multiselect',
             [
                 'label' => 'oro.user.role.entity_plural_label',
-                'mapped' => false
             ]
         );
 
@@ -131,16 +114,11 @@ class MailboxType extends AbstractType
         }
 
         $processType = null;
-        if ($processEntity = $data->getProcessSettings()) {
+        if (null !== $processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
         }
 
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
-
-        if ($data->getOrigin() !== null) {
-            $originActive = $data->getOrigin()->isActive();
-            FormUtils::replaceField($form, 'activeOrigin', ['data' => $originActive]);
-        }
 
         $this->addProcessField($form, $processType);
     }
@@ -155,16 +133,11 @@ class MailboxType extends AbstractType
         $form = $event->getForm();
         $data = $event->getData();
 
-        $processType = $data['processType'];
+        $processType = isset($data['processType']) ? $data['processType'] : null;
         $originalProcessType = $form->get('processType')->getData();
 
         if ($processType !== $originalProcessType) {
             $form->getViewData()->setProcessSettings(null);
-        }
-
-        $originActive = isset($data['activeOrigin']) && $data['activeOrigin'];
-        if ($form->getViewData()->getOrigin() !== null) {
-            $form->getViewData()->getOrigin()->setActive($originActive);
         }
 
         $this->addProcessField($form, $processType);

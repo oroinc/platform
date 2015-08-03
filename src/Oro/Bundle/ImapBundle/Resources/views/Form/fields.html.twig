@@ -12,11 +12,11 @@
     <div class="control-group" id="{{ wrapperId }}">
         <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
     </div>
-
+    <div class="container-config-group"
+         data-page-component-module="oroimap/js/app/components/check-config-settings"
+         data-page-component-options="">
+    </div>
     <style type="text/css">
-        {{ '#' ~ wrapperId }} {
-            max-width: 465px;
-        }
         {{ '#' ~ wrapperId }} .alert {
             margin-top: 10px;
         }

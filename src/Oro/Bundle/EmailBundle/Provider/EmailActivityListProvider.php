@@ -8,21 +8,23 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 /**
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
@@ -197,11 +199,13 @@ class EmailActivityListProvider implements
      */
     public function getOrganization($activityEntity)
     {
-        /** @var $activityEntity Email */
-        if ($activityEntity->getFromEmailAddress()->getHasOwner() &&
-            $activityEntity->getFromEmailAddress()->getOwner()->getOrganization()
-        ) {
-            return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        /**
+         * @var $activityEntity Email
+         * @var $emailAddressOwner EmailOwnerInterface
+         */
+        $emailAddressOwner = $activityEntity->getFromEmailAddress()->getOwner();
+        if ($emailAddressOwner && $emailAddressOwner->getOrganization()) {
+            return $emailAddressOwner->getOrganization();
         }
 
         /** @var SecurityContextInterface $securityContext */
@@ -353,6 +357,7 @@ class EmailActivityListProvider implements
         }
 
         $activityArray = [];
+        /** @var EmailUser[] $owners */
         $owners = $this->doctrineRegistryLink->getService()
             ->getRepository('OroEmailBundle:EmailUser')
             ->findBy($filter);

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Condition;
 
-
 use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;

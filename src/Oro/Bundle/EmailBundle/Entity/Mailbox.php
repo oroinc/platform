@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -13,7 +15,7 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- * @ORM\HasLifecycleCallbacks
+ * @UniqueEntity(fields={"email", "label"})
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -29,7 +31,6 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
  */
 class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 {
-
     /**
      * @var integer
      *
@@ -42,7 +43,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=255)
+     * @ORM\Column(name="email", type="string", unique=true)
      */
     protected $email;
 
@@ -75,13 +76,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $origin;
 
     /**
-     * @var array
-     *
-     * @ORM\Column(name="smtp_settings", type="array")
-     */
-    protected $smtpSettings;
-
-    /**
      * @var EmailUser[]
      *
      * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailUser", mappedBy="mailboxOwner")
@@ -97,6 +91,38 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $organization;
 
     /**
+     * Collection of users authorized to view mailbox emails.
+     *
+     * @var Collection<User>
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\User",
+     *      cascade={"persist", "remove"}
+     * )
+     * @ORM\JoinTable(name="oro_email_mailbox_users",
+     *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     * )
+     */
+    protected $authorizedUsers;
+
+    /**
+     * Collection of roles authorised to view mailbox emails.
+     *
+     * @var Collection<Role>
+     *
+     * @ORM\ManyToMany(
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role",
+     *      cascade={"persist", "remove"}
+     * )
+     * @ORM\JoinTable(name="oro_email_mailbox_roles",
+     *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     */
+    protected $authorizedRoles;
+
+    /**
      * @var AutoResponseRule[]|Collection
      *
      * @ORM\OneToMany(targetEntity="AutoResponseRule", mappedBy="mailbox")
@@ -105,7 +131,8 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 
     public function __construct()
     {
-        $this->smtpSettings = [];
+        $this->authorizedUsers = new ArrayCollection();
+        $this->authorizedRoles = new ArrayCollection();
         $this->autoResponseRules = new ArrayCollection();
     }
 
@@ -206,26 +233,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return array
-     */
-    public function getSmtpSettings()
-    {
-        return $this->smtpSettings;
-    }
-
-    /**
-     * @param array $smtpSettings
-     *
-     * @return $this
-     */
-    public function setSmtpSettings($smtpSettings)
-    {
-        $this->smtpSettings = $smtpSettings;
-
-        return $this;
-    }
-
-    /**
      * @return EmailOrigin
      */
     public function getOrigin()
@@ -282,15 +289,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function getLastName()
     {
-        return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEmailOwnerName()
-    {
-        return $this->label;
+        return 'Mailbox';
     }
 
     /**
@@ -309,6 +308,52 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function setEmailUsers($emailUsers)
     {
         $this->emailUsers = $emailUsers;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAuthorizedRoles()
+    {
+        return $this->authorizedRoles->toArray();
+    }
+
+    /**
+     * @param array|Collection $authorizedRoles
+     *
+     * @return $this
+     */
+    public function setAuthorizedRoles($authorizedRoles)
+    {
+        if (!($authorizedRoles instanceof Collection) && is_array($authorizedRoles)) {
+            $authorizedRoles = new ArrayCollection($authorizedRoles);
+        }
+        $this->authorizedRoles = $authorizedRoles;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAuthorizedUsers()
+    {
+        return $this->authorizedUsers->toArray();
+    }
+
+    /**
+     * @param array|Collection $authorizedUsers
+     *
+     * @return $this
+     */
+    public function setAuthorizedUsers($authorizedUsers)
+    {
+        if (!($authorizedUsers instanceof Collection) && is_array($authorizedUsers)) {
+            $authorizedUsers = new ArrayCollection($authorizedUsers);
+        }
+        $this->authorizedUsers = $authorizedUsers;
 
         return $this;
     }

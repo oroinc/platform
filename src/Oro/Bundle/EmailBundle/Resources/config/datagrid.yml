@@ -535,17 +535,17 @@ datagrid:
             label:
                 label: oro.email.mailbox.label.label
             imap:
-                label: oro.email.mailbox.origin.label
+                label: oro.imap.configuration.use_imap.label
                 type: twig
                 frontend_type: html
                 data_name: origin
                 template: OroEmailBundle:Mailbox:Datagrid/Property/origin.html.twig
             smtp:
-                label: oro.email.mailbox.smtp_settings.enabled.label
+                label: oro.imap.configuration.use_smtp.label
                 type: twig
                 frontend_type: html
-                data_name: smtpSettings
-                template: OroEmailBundle:Mailbox:Datagrid/Property/smtpSettings.html.twig
+                data_name: origin
+                template: OroEmailBundle:Mailbox:Datagrid/Property/originSmtp.html.twig
             processing:
                 data_name: processSettings
                 type: twig

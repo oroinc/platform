@@ -274,13 +274,11 @@
 {% endblock %}
 
 {% block oro_email_mailbox_widget %}
-    {% set email_origin = form_row(form.children.activeOrigin) ~
-        form_widget(form.children.origin) %}
-    {% set smtp = form_widget(form.children.smtpSettings) %}
+    {% set email_origin = form_widget(form.children.origin) %}
     {% set process = form_row(form.children.processType) ~
     form_widget(form.children.processSettings) %}
-    {% set access = form_row(form.children.allowedUsers) ~
-        form_row(form.children.allowedRoles)
+    {% set access = form_row(form.children.authorizedUsers) ~
+        form_row(form.children.authorizedRoles)
     %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
@@ -289,10 +287,6 @@
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
         {{ email_origin|raw }}
-    </fieldset>
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5>SMTP</h5>
-        {{ smtp|raw }}
     </fieldset>
     <fieldset class="form-horizontal form-horizontal-large">
         <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>

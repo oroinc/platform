@@ -24,7 +24,7 @@ parameters:
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
     oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
     oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
-    oro_email.form.type.smtp.class:                       Oro\Bundle\EmailBundle\Form\Type\SmtpType
+    oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
     oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
@@ -213,10 +213,14 @@ services:
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 
-    oro_email.form.type.smtp:
-        class: %oro_email.form.type.smtp.class%
-        tags:
-            - { name: form.type, alias: oro_email_smtp }
+    oro_email.form.handler.mailbox:
+        class: %oro_email.form.handler.mailbox.class%
+        scope: request
+        arguments:
+            - @form.factory
+            - @request
+            - @doctrine
+            - @oro_email.mailbox.process_storage
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%

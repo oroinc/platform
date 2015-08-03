@@ -31,6 +31,41 @@ class MailboxRepository extends EntityRepository
     }
 
     /**
+     * Returns all mailbox ids accessible by user.
+     *
+     * @param integer $userId
+     *
+     * @return integer[]
+     */
+    public function findAvailableMailboxIds($userId)
+    {
+        $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($userId);
+
+        // Get ids of all user roles.
+        $roles = $user->getRoles();
+        $roleList = array_map(
+            function ($value) {
+                return $value->getId();
+            },
+            $roles
+        );
+
+        // Find mailboxes which have user in list of authorized users or any of his roles in list of authorized roles.
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('mb.id')
+            ->from('OroEmailBundle:Mailbox', 'mb')
+            ->leftJoin('mb.authorizedUsers', 'au')
+            ->leftJoin('mb.authorizedRoles', 'ar')
+            ->where('au = :user')
+            ->orWhere(
+                $qb->expr()->in('ar', $roleList)
+            );
+        $qb->setParameter('user', $userId);
+
+        return array_map('current', $qb->getQuery()->getScalarResult());
+    }
+
+    /**
      * @param Email $email
      *
      * @return Mailbox[]
