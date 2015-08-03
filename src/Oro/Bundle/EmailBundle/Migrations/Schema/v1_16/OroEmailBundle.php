@@ -33,6 +33,7 @@ class OroEmailBundle implements Migration
         $table->addColumn('label', 'string', ['length' => 255]);
         $table->addColumn('smtp_settings', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['email'], 'UNIQ_574C364FE7927C74');
         $table->addUniqueIndex(['process_settings_id'], 'UNIQ_574C364F37BAC19A');
         $table->addUniqueIndex(['origin_id'], 'UNIQ_574C364F56A273CC');
         $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE', []);
