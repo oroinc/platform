@@ -64,7 +64,7 @@
     {% set userInformationWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_user_widget_info', {id: entity.id})
+            'url': path('oro_user_widget_info', {id: entity.id, viewProfile: editRoute is defined })
         }) }}
     {% endset %}
     {% set dataBlocks = [
