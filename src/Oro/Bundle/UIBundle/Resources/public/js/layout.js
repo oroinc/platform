@@ -149,14 +149,14 @@ define(function(require) {
                 };
 
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);;
+                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
                 }
 
                 // bind uniform plugin to input:file elements
-                $elements = $container.find('input:file').filter(notUniformFilter);;
+                $elements = $container.find('input:file').filter(notUniformFilter);
                 $elements.uniform({
                     fileDefaultHtml: __('Please select a file...'),
                     fileButtonHtml: __('Choose File')

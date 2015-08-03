@@ -1,4 +1,6 @@
 define(['jquery', 'oroui/js/mediator'], function($, mediator) {
+    'use strict';
+
     var FIELD_SELECTOR = '[name="oro_email_mailbox[unboundRules]"]';
     var DELIMITER = ',';
 

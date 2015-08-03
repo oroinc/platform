@@ -1,8 +1,8 @@
 define([
     'underscore',
+    'jquery',
     'oroui/js/app/components/base/component',
-    'tinymce/jquery.tinymce.min'
-], function(_, BaseComponent) {
+], function(_, $, BaseComponent) {
     'use strict';
 
     var CreateOrSelectChoiceComponent =  BaseComponent.extend({
@@ -49,21 +49,6 @@ define([
             this.$mode.on('change', this.updateDialogPositionCb);
 
             this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
-
-            var self = this;
-            tinymce.EditorManager.once('AddEditor', function(e) {
-                e.editor.once('init', self.updateDialogPositionCb);
-            });
-        },
-
-        dispose: function() {
-            if (this.disposed) {
-                return;
-            }
-
-            tinymce.EditorManager.off('init', this.updateDialogPositionCb);
-
-            CreateOrSelectChoiceComponent.__super__.dispose.apply(this, arguments);
         },
 
         _onEntityChange: function(e) {
