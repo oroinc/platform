@@ -144,7 +144,7 @@ define(function(require) {
         styleForm: function($container) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
-                var notUniformFilter = function (i, el) {
+                var notUniformFilter = function(i, el) {
                     return $(el).parent('.selector, .uploader').length === 0;
                 };
 

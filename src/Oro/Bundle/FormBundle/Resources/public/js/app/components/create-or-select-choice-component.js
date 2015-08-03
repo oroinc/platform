@@ -2,7 +2,7 @@ define([
     'underscore',
     'oroui/js/app/components/base/component',
     'tinymce/jquery.tinymce.min'
-], function (_, BaseComponent) {
+], function(_, BaseComponent) {
     'use strict';
 
     var CreateOrSelectChoiceComponent =  BaseComponent.extend({
@@ -29,7 +29,11 @@ define([
         initialize: function(options) {
             var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
             if (missingProperties.length) {
-                throw new Error('Following properties are required but weren\'t passed: ' + missingProperties.join(', ') + '.');
+                throw new Error(
+                    'Following properties are required but weren\'t passed: ' +
+                    missingProperties.join(', ') +
+                    '.'
+                );
             }
 
             this.updateDialogPositionCb = _.bind(this._updateDialogPosition, this);
@@ -47,12 +51,12 @@ define([
             this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
 
             var self = this;
-            tinymce.EditorManager.once('AddEditor', function (e) {
+            tinymce.EditorManager.once('AddEditor', function(e) {
                 e.editor.once('init', self.updateDialogPositionCb);
             });
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -88,7 +92,7 @@ define([
             }
         },
 
-        _setMode: function (mode) {
+        _setMode: function(mode) {
             if (this.$mode.val() === mode) {
                 return;
             }
