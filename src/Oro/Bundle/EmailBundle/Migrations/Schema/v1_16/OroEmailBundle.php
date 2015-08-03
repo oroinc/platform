@@ -22,6 +22,11 @@ class OroEmailBundle implements Migration
         self::addEmailUserMailboxOwnerColumn($schema);
     }
 
+    /**
+     * Creates 'oro_email_mailbox' table which represents Mailbox entity.
+     *
+     * @param Schema $schema
+     */
     public static function createOroEmailMailboxTable(Schema $schema)
     {
         $table = $schema->createTable('oro_email_mailbox');
@@ -38,6 +43,12 @@ class OroEmailBundle implements Migration
         $table->addIndex(['organization_id'], 'IDX_574C364F32C8A3DE', []);
     }
 
+    /**
+     * Creates 'oro_email_mailbox_process' table which represents MailboxProcessSettings entity.
+     * A common shared mapped superclass for all mailbox process settings types.
+     *
+     * @param Schema $schema
+     */
     public static function createOroEmailMailboxProcessSettingsTable(Schema $schema)
     {
         $table = $schema->createTable('oro_email_mailbox_process');
@@ -46,6 +57,11 @@ class OroEmailBundle implements Migration
         $table->setPrimaryKey(['id']);
     }
 
+    /**
+     * Adds mailbox owner to EmailUser entity.
+     *
+     * @param Schema $schema
+     */
     public static function addOwnerMailboxColumn(Schema $schema)
     {
         $table = $schema->getTable('oro_email_address');
@@ -62,7 +78,7 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * Add oro_email_mailbox foreign keys.
+     * Add 'oro_email_mailbox' table foreign keys.
      *
      * @param Schema $schema
      */
@@ -89,6 +105,11 @@ class OroEmailBundle implements Migration
         );
     }
 
+    /**
+     * Adds foreign keys to new columns in 'oro_email_user' table.
+     *
+     * @param Schema $schema
+     */
     public static function addEmailUserMailboxOwnerColumn(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

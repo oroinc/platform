@@ -264,6 +264,7 @@ class EmailActivityListProvider implements
                 try {
                     $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
                 } catch (RouteNotFoundException $e) {
+                    // Do not set owner link if route is not found.
                 }
             }
         }

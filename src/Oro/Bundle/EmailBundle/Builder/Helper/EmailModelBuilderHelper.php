@@ -5,21 +5,21 @@ namespace Oro\Bundle\EmailBundle\Builder\Helper;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
 
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -252,6 +252,11 @@ class EmailModelBuilderHelper
         return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
     }
 
+    /**
+     * Returns mailboxes available to currently logged in user.
+     *
+     * @return Mailbox[]
+     */
     public function getMailboxes()
     {
         $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')

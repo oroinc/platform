@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\DataGridBundle\Extension\GridViews\AbstractViewsList;
-use Oro\Bundle\EmailBundle\Model\FolderType;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\DataGridBundle\Extension\GridViews\AbstractViewsList;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class EmailFolderViewList extends AbstractViewsList
 {

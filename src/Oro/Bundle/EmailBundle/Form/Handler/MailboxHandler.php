@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
-use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +13,6 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 
 class MailboxHandler implements FormAwareInterface
 {
@@ -62,6 +60,7 @@ class MailboxHandler implements FormAwareInterface
         $this->form->setData($mailbox);
 
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+            // If this request is marked as reload, process as reload.
             if ($this->request->get(MailboxType::RELOAD_MARKER, false)) {
                 $this->processReload();
             } else {
@@ -77,6 +76,9 @@ class MailboxHandler implements FormAwareInterface
         return false;
     }
 
+    /**
+     * Form validated and can be processed.
+     */
     protected function onSuccess()
     {
         /** @var Mailbox $mailbox */
@@ -86,6 +88,9 @@ class MailboxHandler implements FormAwareInterface
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Processing of form reload.
+     */
     protected function processReload()
     {
         $this->form->handleRequest($this->request);
@@ -104,6 +109,9 @@ class MailboxHandler implements FormAwareInterface
         $this->form = $this->formFactory->create(self::FORM, $data);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getForm()
     {
         return $this->form;

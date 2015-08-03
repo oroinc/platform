@@ -87,7 +87,6 @@ class MailboxType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -100,6 +99,8 @@ class MailboxType extends AbstractType
 
     /**
      * PreSet event handler.
+     *
+     * Adds appropriate process field to form based on set value.
      *
      * @param FormEvent $event
      */
@@ -126,6 +127,8 @@ class MailboxType extends AbstractType
     /**
      * PreSubmit event handler.
      *
+     * If process type is changed ... replace with proper form type and set process type to null.
+     *
      * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
@@ -141,16 +144,6 @@ class MailboxType extends AbstractType
         }
 
         $this->addProcessField($form, $processType);
-    }
-
-    public function postSubmit(FormEvent $event)
-    {
-        /** @var Mailbox $data */
-        $data = $event->getData();
-
-        if (($data !== null) && ($data->getOrigin() !== null)) {
-            $data->getOrigin()->setOwner(null);
-        }
     }
 
     /**

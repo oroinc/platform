@@ -115,6 +115,7 @@ class EmailNotificationManager
                     ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
                 );
             } catch (RouteNotFoundException $e) {
+                return false;
             }
         }
 

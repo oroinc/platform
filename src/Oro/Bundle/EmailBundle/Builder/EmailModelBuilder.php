@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Builder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -219,8 +220,11 @@ class EmailModelBuilder
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $userEmails = $this->helper->getUser()->getEmails();
+        if ($userEmails instanceof Collection) {
+            $userEmails = $userEmails->toArray();
+        }
         $mailboxes = $this->helper->getMailboxes();
-        $userEmails = array_merge($mailboxes, $userEmails->toArray());
+        $userEmails = array_merge((array)$mailboxes, (array)$userEmails);
         $toEmails = [];
         $emailRecipients = $parentEmailEntity->getTo();
         /** @var EmailRecipient $emailRecipient */

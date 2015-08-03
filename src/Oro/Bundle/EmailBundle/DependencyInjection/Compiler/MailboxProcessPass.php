@@ -8,7 +8,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class MailboxProcessPass implements CompilerPassInterface
 {
-
     /**
      * {@inheritdoc}
      */

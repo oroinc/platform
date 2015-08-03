@@ -43,7 +43,7 @@ class MailboxProcessStorage
     /**
      * Returns all registered processes.
      *
-     * @return MailboxProcessProviderInterface['type' => processProvider]
+     * @return MailboxProcessProviderInterface['type' => MailboxProcessProviderInterface]
      */
     public function getProcesses()
     {

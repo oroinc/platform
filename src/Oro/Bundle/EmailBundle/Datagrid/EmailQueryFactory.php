@@ -52,6 +52,8 @@ class EmailQueryFactory
     }
 
     /**
+     * Filters to leave only emails available to user with provided id.
+     *
      * @param QueryBuilder $qb
      * @param string $userId
      */
