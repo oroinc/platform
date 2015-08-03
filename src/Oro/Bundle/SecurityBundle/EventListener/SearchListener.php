@@ -51,9 +51,9 @@ class SearchListener
                 'target_fields' => ['organization']
             ];
             $mapConfig[$className]['fields'][] = [
-                'name'          => sprintf('%s_owner', $mapping['alias']),
+                'name'          => 'owner',
                 'target_type'   => 'integer',
-                'target_fields' => ['owner']
+                'target_fields' => [sprintf('%s_owner', $mapping['alias'])]
             ];
         }
 

@@ -3,7 +3,10 @@
 
 .workflow-definition-buttons {
   margin-top: -13px;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
+  button {
+    margin-bottom: 7px;
+  }
 }
 .workflow-step-list {
   list-style: none outside none;
@@ -27,6 +30,23 @@
     position: relative;
     overflow: hidden;
     font-size: 11px;
+  }
+  .step-name {
+    a.edit-step {
+      display: inline-block;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .transitions-list-short {
+    a.edit-transition {
+      display: inline-block;
+      white-space: nowrap;
+      max-width: 128px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 .workflow-step-list.more-than-one-step {
