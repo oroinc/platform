@@ -161,7 +161,7 @@ class AutoResponseManager
             }
         }
 
-        $comparator =  ArrayUtil::createOrderedComparator($flippedLocales);
+        $comparator = ArrayUtil::createOrderedComparator($flippedLocales);
         uksort($translatedSubjects, $comparator);
         uksort($translatedContents, $comparator);
 
@@ -271,6 +271,10 @@ class AutoResponseManager
 
         if (in_array($type, $arrayTypes)) {
             return array_map('trim', explode(',', $value));
+        }
+
+        if ($value === null) {
+            return '';
         }
 
         return $value;
