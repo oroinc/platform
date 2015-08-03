@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    require('jasmine-jquery');
+    var $ = require('jquery');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
     var Rectangle = require('oroworkflow/js/tools/path-finder/rectangle');
@@ -26,6 +28,16 @@ define(function(require) {
             expect(rectangle.height).toBe(40);
             expect(rectangle.center.x).toBe(25);
             expect(rectangle.center.y).toBe(40);
+            rectangle.left = 15;
+            rectangle.width = 100;
+            expect(rectangle.right).toBe(115);
+            rectangle.right = 20;
+            expect(rectangle.width).toBe(5);
+            rectangle.top = 35;
+            rectangle.height = 45;
+            expect(rectangle.bottom).toBe(80);
+            rectangle.bottom = 40;
+            expect(rectangle.height).toBe(5);
         });
 
         it('should correct clone', function() {
@@ -42,10 +54,12 @@ define(function(require) {
             var rectangle1 = new Rectangle(10, 20, 30, 40);
             var rectangle2 = new Rectangle(20, 30, 30, 40);
             var rectangle3 = rectangle1.intersection(rectangle2);
+            var rectangle4 = new Rectangle(120, 130, 30, 40);
             expect(rectangle3.left).toBe(20);
             expect(rectangle3.right).toBe(40);
             expect(rectangle3.top).toBe(30);
             expect(rectangle3.bottom).toBe(60);
+            expect(rectangle1.intersection(rectangle4)).toBe(null);
         });
 
         it('should calculate correct uion', function() {
@@ -60,23 +74,16 @@ define(function(require) {
 
         it('should correct validate itself', function() {
             var rectangle1 = new Rectangle(10, 20, 30, 40);
-            var rectangle2 = new Rectangle(20, 30, -30, 40);
-            var rectangle3 = new Rectangle(20, 30, 30, -40);
-            var rectangle4 = new Rectangle(20, 30, -30, -40);
-            expect(rectangle1.isValid).toBe(true);
-            expect(rectangle2.isValid).toBe(false);
-            expect(rectangle3.isValid).toBe(false);
-            expect(rectangle4.isValid).toBe(false);
-        });
-
-        it('should correct calculate relative position', function() {
-            var point = new Point2d(5, 5);
-            var rectangle1 = new Rectangle(10, 20, 30, 40);
-            var rectangle2 = rectangle1.relative(point);
-            expect(rectangle2.left).toBe(5);
-            expect(rectangle2.right).toBe(35);
-            expect(rectangle2.top).toBe(15);
-            expect(rectangle2.bottom).toBe(55);
+            expect(rectangle1 instanceof Rectangle).toBe(true);
+            expect(function() {
+                return new Rectangle(20, 30, -30, 40);
+            }).toThrow('Rectangle shouldn\'t have negative dimensions');
+            expect(function() {
+                return new Rectangle(20, 30, 30, -40);
+            }).toThrow('Rectangle shouldn\'t have negative dimensions');
+            expect(function() {
+                return new Rectangle(20, 30, -30, -40);
+            }).toThrow('Rectangle shouldn\'t have negative dimensions');
         });
 
         it('should correct calculate its sides', function() {
@@ -117,6 +124,16 @@ define(function(require) {
             rectangle.eachSide(callback);
             expect(callback.calls.count()).toBe(4);
             expect(callback).toHaveBeenCalledWith(jasmine.any(Interval2d));
+        });
+
+        it('check point draw', function() {
+            var rectangle = new Rectangle(10, 20, 30, 40);
+            rectangle.draw();
+            expect(document.body).toContainElement('path[d="M 10 20 L 40 20"]');
+            expect(document.body).toContainElement('path[d="M 10 20 L 10 60"]');
+            expect(document.body).toContainElement('path[d="M 10 60 L 40 60"]');
+            expect(document.body).toContainElement('path[d="M 40 20 L 40 60"]');
+            $('svg').remove();
         });
     });
 });

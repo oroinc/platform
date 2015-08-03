@@ -568,7 +568,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 if (this.rectangles[i] === ignoreRect) {
                     continue;
                 }
-                if (rectangle.intersection(this.rectangles[i]).isValid) {
+                if (rectangle.intersection(this.rectangles[i]) !== null) {
                     return true;
                 }
             }

@@ -92,11 +92,11 @@ define(function(require) {
             var b = new Point2d(70, 60);
             var interval = new Interval2d(a, b);
             var line1 = interval.line;
-            var line2 = new Line2d(Infinity, 90);
+            var line2 = new Line2d(Infinity, 110);
             var point = line1.intersection(line2);
             expect(point instanceof Point2d).toBe(true);
-            expect(point.x).toBe(90);
-            expect(point.y).toBe(110);
+            expect(point.x).toBe(110);
+            expect(point.y).toBe(90);
         });
     });
 });
