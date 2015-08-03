@@ -95,17 +95,15 @@ define(function(require) {
             // sloping interval
             interval = new Interval2d(new Point2d(15, 15), new Point2d(45, 45));
             point = vector.getCrossPointWithInterval(interval);
-            // @ToDo fix intersection
-            //expect(point.x).toBe(30);
-            //expect(point.y).toBe(30);
+            expect(point.x).toBe(30);
+            expect(point.y).toBe(30);
 
             // sloping vector
             direction = new Point2d(1, -1);
             vector = new Vector2d(15, 45, direction);
             point = vector.getCrossPointWithInterval(interval);
-            // @ToDo fix intersection
-            //expect(point.x).toBe(30);
-            //expect(point.y).toBe(30);
+            expect(point.x).toBe(30);
+            expect(point.y).toBe(30);
         });
 
         it('check vector draw', function() {
