@@ -53,8 +53,10 @@ datagrid:
             columns:
                 command:
                     type: command_with_args
-                    fields: [j.command, j.args]
                     data_name: j.command
+                    data_name_filter:
+                        contains: [j.command, j.args]
+                        not_contains: [j.command, j.args]
                 state:
                     type: choice
                     data_name: j.state

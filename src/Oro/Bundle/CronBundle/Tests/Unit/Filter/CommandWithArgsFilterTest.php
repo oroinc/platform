@@ -24,49 +24,12 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * test Init
+     * @dataProvider parseValueDataProvider
+     * @param $value
+     * @param $type
+     * @param $expected
      */
-    public function testInit()
-    {
-        $name = 'command';
-
-        $params = [
-            'type' => 'command_with_args',
-            'data_name' => 'j.command',
-            'label' => 'oro.cron.header.command',
-            'enabled' => true,
-            'translatable' => true,
-            'fields' => ['j.command', 'j.args']
-        ];
-
-        $expectedParams = $params;
-        $expectedParams['data_name'] = 'CONCAT(j.command,j.args)';
-
-        $this->filter->init($name, $params);
-
-        $this->assertEquals($name, $this->filter->getName());
-
-        $reflection = new \ReflectionObject($this->filter);
-        $reflectionParams = $reflection->getProperty('params');
-        $reflectionParams->setAccessible(true);
-
-        $this->assertEquals($expectedParams, $reflectionParams->getValue($this->filter));
-    }
-
-    /**
-     * test Init Exception situation
-     *
-     * @expectedException InvalidArgumentException
-     */
-    public function testInitException()
-    {
-        $this->filter->init(null, []);
-    }
-
-    /**
-     * test parseValue
-     */
-    public function testParseValue()
+    public function testParseValue($value, $type, $expected)
     {
         $reflection = new \ReflectionObject($this->filter);
         $reflectionMethod = $reflection->getMethod('parseValue');
@@ -74,8 +37,39 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
         $parseValue = $reflectionMethod->getClosure($this->filter);
 
         $this->assertEquals(
-            'oro:process:execute:job["--id=1',
-            $parseValue(TextFilterType::TYPE_EQUAL, 'oro:process:execute:job --id=1')
+            $expected,
+            $parseValue($type, $value)
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function parseValueDataProvider()
+    {
+        return [
+            [
+                'oro:process:execute:job --id=1',
+                TextFilterType::TYPE_CONTAINS,
+                [
+                    '%oro:process:execute:job%',
+                    '%--id=1%',
+                ]
+            ],
+            [
+                'oro:process:execute:job --id=1 --id=2',
+                TextFilterType::TYPE_NOT_CONTAINS,
+                [
+                    '%oro:process:execute:job%',
+                    '%--id=1%',
+                    '%--id=2%',
+                ]
+            ],
+            [
+                'oro:process:execute:job --id=1 --id=2',
+                TextFilterType::TYPE_EQUAL,
+                'oro:process:execute:job --id=1 --id=2'
+            ]
+        ];
     }
 }
