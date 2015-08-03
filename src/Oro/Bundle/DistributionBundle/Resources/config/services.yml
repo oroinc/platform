@@ -1,5 +1,5 @@
 parameters:
-    oro_distribution.routing_loader.class:                    Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
+    oro_distribution.routing_loader.class:                    Oro\Component\Routing\Loader\CumulativeRoutingFileLoader
     oro_distribution.package_manager.class:                   Oro\Bundle\DistributionBundle\Manager\PackageManager
     oro_distribution.script_runner.class:                     Oro\Bundle\DistributionBundle\Script\Runner
     oro_distribution.composer.class:                          Composer\Composer
@@ -28,10 +28,18 @@ services:
     oro_distribution.routing_loader:
         class:                                        %oro_distribution.routing_loader.class%
         arguments:
-            - "@file_locator"
-            - "@kernel"
+            - @kernel
+            - @oro_distribution.routing_options_resolver
+            - [Resources/config/oro/routing.yml]
+            - oro_auto
+        calls:
+            - [setResolver, [@routing.resolver]]
         tags:
             - { name: routing.loader }
+
+    oro_distribution.routing_options_resolver:
+        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
+        public: false
 
     oro_distribution.package_manager:
         class: %oro_distribution.package_manager.class%
