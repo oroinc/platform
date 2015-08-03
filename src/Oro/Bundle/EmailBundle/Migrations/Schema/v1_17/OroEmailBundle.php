@@ -87,7 +87,7 @@ class OroEmailBundle implements Migration
      */
     public static function oroEmailTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_email');
+        $table = $schema->getTable('oro_email');
         $table->addColumn('acceptLanguageHeader', 'text', ['notnull' => false]);
     }
 }
