@@ -2,33 +2,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
     ], function($, _, __, routing, messenger) {
     'use strict';
 
-    function loadEnumChoices(className, successCallback, errorCallback) {
-        $.ajax({
-            url: routing.generate(
-                'oro_dictionary_filter',
-                {dictionary: className.replace(/\\/g, '_'), limit: -1}
-            ),
-            success: function(data) {
-
-                data = _.sortBy(data, 'order');
-                var choices = data;
-                //console.log(data);
-                //var choices = _.map(data, function(item) {
-                //    console.log(item);
-                //    return item;
-                //});
-
-                successCallback(choices);
-            },
-            error: function(jqXHR) {
-                messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                if (errorCallback) {
-                    errorCallback(jqXHR);
-                }
-            }
-        });
-    }
-
     /**
      * Resolves filter options
      *
@@ -37,31 +10,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
      *
      * @return {jQuery.Deferred} promise
      */
-    return function(filterOptions, context) {
+    return function (filterOptions, context) {
         var promise = new $.Deferred();
         var className = _.last(context).field.related_entity_name;
 
-        loadEnumChoices(className, function(choices) {
-            var nullValue = null;
-            var filterParams = {'class': className};
+        filterOptions.filterParams = {'class': className};
 
-            // keep null value option if defined in options
-            if (filterOptions.nullValue) {
-                filterParams.null_value = filterOptions.nullValue;
-                nullValue = _.find(filterOptions.choices, function(choice) {
-                    return choice.value === filterOptions.nullValue;
-                });
-                if (nullValue) {
-                    choices.unshift(nullValue);
-                }
-            }
-
-            filterOptions.filterParams = filterParams;
-            filterOptions.choices = choices;
-
-            // mark promise as resolved
-            promise.resolveWith(filterOptions);
-        });
+        // mark promise as resolved
+        promise.resolveWith(filterOptions);
 
         return promise;
     };

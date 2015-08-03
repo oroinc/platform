@@ -38,8 +38,7 @@ class DictionaryHelper
     public function getNameLabelField(ClassMetadata $meteData)
     {
         $fieldNames = $meteData->getFieldNames();
-        $label = $this->accessor->getValue($fieldNames, '[label]');
-        if ($label) {
+        if (in_array('label', $fieldNames)) {
             return 'label';
         }
 

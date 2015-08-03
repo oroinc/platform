@@ -20,8 +20,7 @@ class DictionaryFilter extends AbstractFilter
             return false;
         }
 
-        $type = $data['type'];
-
+        $type =  $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
 
         $this->applyFilterToClause(
@@ -63,6 +62,18 @@ class DictionaryFilter extends AbstractFilter
             return false;
         }
 
+        if (count($data['value']) === 1) {
+            switch($type) {
+                case DictionaryFilterType::TYPE_NOT_IN:
+                    $type = DictionaryFilterType::NOT_EQUAL;
+                    break;
+                case DictionaryFilterType::TYPE_IN:
+                    $type = DictionaryFilterType::EQUAL;
+                    break;
+            }
+        }
+
+
         $data['type']  = $type;
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
@@ -77,7 +88,7 @@ class DictionaryFilter extends AbstractFilter
      * @param string                           $fieldName
      * @param string                           $parameterName
      *
-     * @return string
+     * @return mixed
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
@@ -85,7 +96,20 @@ class DictionaryFilter extends AbstractFilter
         $fieldName,
         $parameterName
     ) {
-        return $ds->expr()->in($fieldName, $parameterName, true);
+        switch ($comparisonType) {
+            case DictionaryFilterType::TYPE_NOT_IN:
+                return $ds->expr()->notIn($fieldName, $parameterName, true);
+                break;
+            case DictionaryFilterType::EQUAL:
+                return $ds->expr()->eq($fieldName, $parameterName, true);
+                break;
+            case DictionaryFilterType::NOT_EQUAL:
+                return $ds->expr()->neq($fieldName, $parameterName, true);
+                break;
+            default:
+                return $ds->expr()->in($fieldName, $parameterName, true);
+                break;
+        }
     }
 
     /**
@@ -102,26 +126,14 @@ class DictionaryFilter extends AbstractFilter
     /**
      * Return a value depending on comparison type
      *
-     * @param int    $comparisonType
      * @param string $value
      *
      * @return mixed
      */
-    protected function parseValue($comparisonType, $value)
+    protected function parseValue($value)
     {
-        switch ($comparisonType) {
-            case TextFilterType::TYPE_CONTAINS:
-            case TextFilterType::TYPE_NOT_CONTAINS:
-                return sprintf('%%%s%%', $value);
-            case TextFilterType::TYPE_STARTS_WITH:
-                return sprintf('%s%%', $value);
-            case TextFilterType::TYPE_ENDS_WITH:
-                return sprintf('%%%s', $value);
-            case TextFilterType::TYPE_IN:
-            case TextFilterType::TYPE_NOT_IN:
-                return array_map('trim', explode(',', $value));
-            default:
-                return $value;
-        }
+        $value = count($value == 1) ? $value[0] : $value;
+
+        return $value;
     }
 }
