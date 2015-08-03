@@ -12,13 +12,10 @@ use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
  * Use carefully on large data sets - do not run this task too often.
- *
- * @author magedan
  */
 class ReindexCommand extends ContainerAwareCommand
 {
     const COMMAND_NAME = 'oro:search:reindex';
-
 
     /**
      * {@inheritdoc}
@@ -35,15 +32,13 @@ class ReindexCommand extends ContainerAwareCommand
             ->addArgument(
                 'offset',
                 InputArgument::OPTIONAL,
-                'INTEGER. Tells indexer to start indexation from given entity number. '.
-                'Works only in combination with "class" argument.',
+                'INTEGER. Tells indexer to start indexation from given entity number.',
                 null
             )
             ->addArgument(
                 'limit',
                 InputArgument::OPTIONAL,
-                'INTEGER .Limit indexation of entity by given number. '.
-                'Works ONLY in combination with "class" and "offset" arguments.',
+                'INTEGER. Limit indexation of entity by given number. ',
                 null
             )
             ->setDescription('Rebuild search index');
@@ -54,15 +49,20 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $class = $input->getArgument('class');
+        $class  = $input->getArgument('class');
+        $offset = null;
+        $limit  = null;
         if ($class) {
             // convert from short format to FQСN
             $class = $this->getContainer()->get('doctrine')
                 ->getManagerForClass($class)->getClassMetadata($class)->getName();
 
-            $offset = $input->getArgument('offset');
-            $limit  = $input->getArgument('limit');
-
+            $offsetArg = $input->getArgument('offset');
+            $limitArg  = $input->getArgument('limit');
+            if (null !== $offsetArg && null !== $limitArg) {
+                $offset = (int) $offsetArg;
+                $limit  = (int) $limitArg;
+            }
         }
 
         $placeholder = $class ? '"' . $class . '" entity' : 'all mapped entities';
@@ -72,7 +72,8 @@ class ReindexCommand extends ContainerAwareCommand
         /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
 
-        $recordsCount = $searchEngine->reindex($class);
+
+        $recordsCount = $searchEngine->reindex($class, $offset, $limit);
 
         $output->writeln(sprintf('Total indexed items: %u', $recordsCount));
     }

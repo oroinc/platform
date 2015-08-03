@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
@@ -52,7 +51,7 @@ class Orm extends AbstractEngine
                 $entityNames = $this->mapper->getRegisteredDescendants($class);
             }
 
-            if (null === $offset && null === $limit) {
+            if ((null === $offset && null === $limit) || ($offset === 0 && $limit)) {
                 foreach ($entityNames as $class) {
                     $this->clearSearchIndexForEntity($class);
                 }
@@ -63,7 +62,7 @@ class Orm extends AbstractEngine
         $recordsCount = 0;
 
         while ($class = array_shift($entityNames)) {
-            $itemsCount    = $this->reindexSingleEntity($class);
+            $itemsCount = $this->reindexSingleEntity($class, $offset, $limit);
             $recordsCount += $itemsCount;
         }
 
@@ -274,35 +273,21 @@ class Orm extends AbstractEngine
      */
     protected function clearSearchIndexForEntity($entityName)
     {
-        /** @var ObjectManager $entityManager */
-        //$entityManager = $this->registry->getManager();
-        //$entityManager->
+        /** @var OroEntityManager $em */
+        $em = $this->registry->getManager();
 
-
-
-        $itemsCount    = 0;
-        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')
-            ->where('item.entity = :entity')
-            ->setParameter('entity', $entityName);
-
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(static::BATCH_SIZE);
-
-        foreach ($iterator as $entity) {
-            $itemsCount++;
-            $entityManager->remove($entity);
-
-            if (0 == $itemsCount % static::BATCH_SIZE) {
-                $entityManager->flush();
-                $entityManager->clear();
-            }
-        }
-
-        if ($itemsCount % static::BATCH_SIZE > 0) {
-            $entityManager->flush();
-            $entityManager->clear();
-        }
+        $query = <<<EOF
+DELETE FROM oro_search_index_integer  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_datetime WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_decimal  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_text     WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_item           WHERE entity = ?;
+EOF;
+        $em->getConnection()->executeQuery(
+            $query,
+            [$entityName, $entityName, $entityName, $entityName, $entityName],
+            [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]
+        );
     }
 
     /**

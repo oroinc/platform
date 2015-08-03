@@ -5,10 +5,11 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Doctrine\ORM\Query\Expr\OrderBy;
 
 use JMS\JobQueueBundle\Entity\Job;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
@@ -23,7 +24,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 /**
  * Connector abstract class
  */
-abstract class  AbstractEngine implements EngineInterface
+abstract class AbstractEngine implements EngineInterface
 {
     const BATCH_SIZE = 1000;
 
@@ -167,31 +168,50 @@ abstract class  AbstractEngine implements EngineInterface
     }
 
     /**
-     * @param string $entityName
+     * @param string       $entityName
+     * @param integer|null $offset
+     * @param integer|null $limit
      * @return int
      */
-    protected function reindexSingleEntity($entityName)
+    protected function reindexSingleEntity($entityName, $offset = null, $limit = null)
     {
         /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityName);
+            $entityManager = $this->registry->getManagerForClass($entityName);
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
-        $queryBuilder = $entityManager->getRepository($entityName)->createQueryBuilder('entity');
-        $iterator     = new BufferedQueryResultIterator($queryBuilder);
+        $pk = $entityManager->getClassMetadata($entityName)->getIdentifier();
+
+        $orderingsExpr = new OrderBy();
+        foreach ($pk as $fieldName) {
+            $orderingsExpr->add('entity.' . $fieldName);
+        }
+
+        $queryBuilder = $entityManager->getRepository($entityName)
+            ->createQueryBuilder('entity')
+            ->orderBy($orderingsExpr);
+
+        if (null !== $offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
+        if (null !== $limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
+
+        $iterator = new BufferedQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(static::BATCH_SIZE);
 
         $itemsCount = 0;
         $entities   = [];
 
         foreach ($iterator as $entity) {
-             $entities[] = $entity;
+            $entities[] = $entity;
             $itemsCount++;
 
             if (0 == $itemsCount % static::BATCH_SIZE) {
                 $this->save($entities, true);
                 $entityManager->clear();
-                gc_collect_cycles();
                 $entities = [];
+                gc_collect_cycles();
             }
         }
 
