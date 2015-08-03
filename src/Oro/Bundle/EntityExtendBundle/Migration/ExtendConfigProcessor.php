@@ -152,6 +152,9 @@ class ExtendConfigProcessor
         if (isset($configs['configs'])) {
             if ($this->configManager->hasConfig($className)) {
                 $this->updateEntityModel($className, $configs['configs']);
+                if (isset($configs['mode'])) {
+                    $this->changeEntityMode($className, $configs['mode']);
+                }
             } else {
                 $this->createEntityModel(
                     $className,
@@ -183,6 +186,9 @@ class ExtendConfigProcessor
             }
             if (isset($configs['type'])) {
                 $this->changeFieldType($className, $fieldName, $configs['type']);
+            }
+            if (isset($configs['mode'])) {
+                $this->changeFieldMode($className, $fieldName, $configs['mode']);
             }
         } else {
             $this->createFieldModel(
@@ -246,6 +252,20 @@ class ExtendConfigProcessor
                 $extendConfig->set('state', ExtendScope::STATE_UPDATE);
             }
             $this->configManager->persist($extendConfig);
+        }
+    }
+
+    /**
+     * @param string $className
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     */
+    protected function changeEntityMode($className, $mode)
+    {
+        if ($this->configManager->getConfigEntityModel($className)->getMode() !== $mode) {
+            $this->logger->notice(
+                sprintf('Update a mode to "%s". Entity: %s.', $mode, $className)
+            );
+            $this->configManager->changeEntityMode($className, $mode);
         }
     }
 
@@ -323,6 +343,21 @@ class ExtendConfigProcessor
                 sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
             );
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
+        }
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     */
+    protected function changeFieldMode($className, $fieldName, $mode)
+    {
+        if ($this->configManager->getConfigFieldModel($className, $fieldName)->getMode() !== $mode) {
+            $this->logger->notice(
+                sprintf('Update a mode of field "%s" to "%s". Entity: %s.', $fieldName, $mode, $className)
+            );
+            $this->configManager->changeFieldMode($className, $fieldName, $mode);
         }
     }
 

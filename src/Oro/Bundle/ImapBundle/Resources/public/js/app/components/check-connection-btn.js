@@ -27,7 +27,7 @@ function($, _, routing, __, mediator, messenger) {
             });
 
             $el.click(function() {
-                var data = $form.serializeArray();
+                var data = $form.find('.check-connection').serializeArray();
 
                 if (isNestedForm) {
                     // pick only values from needed nested form
@@ -40,8 +40,6 @@ function($, _, routing, __, mediator, messenger) {
 
                         return field;
                     });
-                    // clear folders data
-                    data = data.splice(0, 6);
                 }
 
                 url = routing.generate(routeName);
@@ -56,11 +54,38 @@ function($, _, routing, __, mediator, messenger) {
                 $('.folder-tree').remove();
                 $.post(url, data)
                     .done(function(response) {
-                        $el.parent().parent().parent().append(response);
-                    })
+                        if (response.imap) {
+                            if (response.imap.error) {
+                                messenger.notificationFlashMessage('error', __('oro.imap.connection.imap.error'), {
+                                    container: $el.parent(),
+                                    delay: 5000
+                                });
+                            } else {
+                                messenger.notificationFlashMessage('success', __('oro.imap.connection.imap.success'), {
+                                    container: $el.parent(),
+                                    delay: 5000
+                                });
+                                $el.parent().parent().parent().append(response.imap.folders);
+                            }
+                        }
+                        if (response.smtp) {
+                            if (response.smtp.error) {
+                                messenger.notificationFlashMessage('error', __('oro.imap.connection.smtp.error'), {
+                                    container: $el.parent(),
+                                    delay: 5000
+                                });
+                            } else {
+                                messenger.notificationFlashMessage('success', __('oro.imap.connection.smtp.success'), {
+                                    container: $el.parent(),
+                                    delay: 5000
+                                });
+                            }
+                        }
+                    }, 'json')
                     .error(function() {
                         messenger.notificationFlashMessage('error', __('oro.imap.connection.error'), {
-                            container: $el.parent()
+                            container: $el.parent(),
+                            delay: 5000
                         });
                     })
                     .always(function() {

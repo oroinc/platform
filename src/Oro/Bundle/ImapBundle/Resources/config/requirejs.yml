@@ -1,0 +1,4 @@
+config:
+    paths:
+        'oroimap/js/app/components/check-connection-btn': 'bundles/oroimap/js/app/components/check-connection-btn.js'
+        'oroimap/js/app/components/check-config-settings': 'bundles/oroimap/js/app/components/check-config-settings.js'
