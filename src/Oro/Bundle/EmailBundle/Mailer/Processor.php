@@ -236,7 +236,7 @@ class Processor
     {
         $transport = $this->mailer->getTransport();
 
-        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+        if ($transport instanceof \Swift_Transport_EsmtpTransport && $userEmailOrigin->isSmtpConfigured()) {
             $transport->setHost($userEmailOrigin->getSmtpHost());
             $transport->setPort($userEmailOrigin->getSmtpPort());
             $transport->setUsername($userEmailOrigin->getUser());
