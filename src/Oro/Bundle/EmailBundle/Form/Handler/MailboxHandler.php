@@ -13,8 +13,11 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 
-class MailboxHandler implements FormAwareInterface
+class MailboxHandler implements FormAwareInterface, TagHandlerInterface
 {
     const FORM = 'oro_email_mailbox';
 
@@ -28,6 +31,8 @@ class MailboxHandler implements FormAwareInterface
     protected $request;
     /** @var FormFactoryInterface */
     private $formFactory;
+    /** @var TagManager*/
+    private $tagManager;
 
     /**
      * @param FormFactoryInterface  $formFactory
@@ -84,6 +89,12 @@ class MailboxHandler implements FormAwareInterface
         /** @var Mailbox $mailbox */
         $mailbox = $this->form->getData();
 
+        if (null !== $settings = $mailbox->getProcessSettings()) {
+            if ($settings instanceof Taggable) {
+                $this->tagManager->saveTagging($settings, false);
+            }
+        }
+
         $this->getEntityManager()->persist($mailbox);
         $this->getEntityManager()->flush();
     }
@@ -123,5 +134,15 @@ class MailboxHandler implements FormAwareInterface
     protected function getEntityManager()
     {
         return $this->doctrine->getManager();
+    }
+
+    /**
+     * Setter for tag manager
+     *
+     * @param TagManager $tagManager
+     */
+    public function setTagManager(TagManager $tagManager)
+    {
+        $this->tagManager = $tagManager;
     }
 }

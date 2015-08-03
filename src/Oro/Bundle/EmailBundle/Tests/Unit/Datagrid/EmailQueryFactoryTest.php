@@ -120,7 +120,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         $qb = $em->createQueryBuilder();
 
         $this->mailboxRepository->expects($this->any())
-            ->method('findAvailableMailboxIds')
+            ->method('findAvailableMailboxes')
             ->with(1)
             ->will($this->returnValue([1, 3, 5]));
 
