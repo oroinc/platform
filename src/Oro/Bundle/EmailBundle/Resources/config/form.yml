@@ -174,8 +174,6 @@ services:
             - @request
             - @doctrine
             - @oro_email.mailbox.process_storage
-        tags:
-            - { name: oro_tag.tag_manager }
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%

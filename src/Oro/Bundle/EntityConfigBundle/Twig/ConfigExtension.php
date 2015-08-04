@@ -4,22 +4,25 @@ namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Symfony\Component\Routing\Router;
 
 class ConfigExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
+    /** @var Router */
+    private $router;
 
     /**
      * @param ConfigManager $configManager
+     * @param Router        $router
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, Router $router)
     {
         $this->configManager = $configManager;
+        $this->router = $router;
     }
 
     /**
@@ -139,6 +142,14 @@ class ConfigExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
+        $route = $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
+
+        if ($collection = $this->router->getRouteCollection()) {
+            if ($collection->get($route) === null) {
+                return null;
+            }
+        }
+
+        return $route;
     }
 }
