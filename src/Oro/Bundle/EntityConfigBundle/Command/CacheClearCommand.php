@@ -27,6 +27,11 @@ class CacheClearCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+//        $job = new \JMS\JobQueueBundle\Entity\Job('test:cmd', ['-v', '--prm1="Test Param"']);
+//        $em  = $this->getContainer()->get('doctrine')->getManager();
+//        $em->persist($job);
+//        $em->flush($job);
+//return;
         $output->writeln('Clear the entity config cache');
 
         /** @var ConfigManager $configManager */
