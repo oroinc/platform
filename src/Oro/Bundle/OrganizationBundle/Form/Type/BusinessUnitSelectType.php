@@ -2,11 +2,34 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 class BusinessUnitSelectType extends AbstractType
 {
+    /** @var Registry */
+    private $doctrine;
+    /** @var SecurityFacade */
+    private $securityFacade;
+
+    /**
+     * BusinessUnitSelectType constructor.
+     *
+     * @param Registry       $doctrine
+     * @param SecurityFacade $securityFacade
+     */
+    public function __construct(Registry $doctrine, SecurityFacade $securityFacade)
+    {
+        $this->doctrine = $doctrine;
+        $this->securityFacade = $securityFacade;
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -19,6 +42,23 @@ class BusinessUnitSelectType extends AbstractType
                 'class'       => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
             ]
         );
+
+        $securityFacade = $this->securityFacade;
+        $doctrine = $this->doctrine;
+
+        $queryBuilderNormalizer = function () use ($securityFacade, $doctrine) {
+            $qb = $doctrine->getRepository('OroOrganizationBundle:BusinessUnit')
+                ->createQueryBuilder('bu');
+
+            $qb->select('bu')
+                ->where('bu.organization = :organization');
+
+            $qb->setParameter('organization', $securityFacade->getOrganization());
+
+            return $qb;
+        };
+
+        $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
     }
 
     /**

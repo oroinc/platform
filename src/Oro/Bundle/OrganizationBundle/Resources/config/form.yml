@@ -80,6 +80,9 @@ services:
 
     oro_organization.form.type.businesS_unit_select:
         class: %oro_organization.form.type.business_unit_select.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_business_unit_select }
 
