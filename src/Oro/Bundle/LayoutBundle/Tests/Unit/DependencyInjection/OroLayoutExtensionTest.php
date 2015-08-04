@@ -268,9 +268,16 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $updateResources = $container->getParameter('oro_layout.theme_updates_resources');
-        ksort($updateResources);
+        $this->normalizeResources($updateResources);
+        $this->normalizeResources($expectedResult);
+        $this->assertEquals($expectedResult, $updateResources);
+    }
+
+    protected function normalizeResources(array &$resources)
+    {
+        ksort($resources);
         array_walk(
-            $updateResources,
+            $resources,
             function (&$resource) {
                 ksort($resource);
                 array_walk(
@@ -281,6 +288,5 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                 );
             }
         );
-        $this->assertEquals($expectedResult, $updateResources);
     }
 }

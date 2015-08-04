@@ -33,13 +33,14 @@ services:
     oro_search.index:
         class:                        %oro_search.index.class%
         arguments:
-            - "@doctrine.orm.entity_manager"
-            - "@oro_search.search.engine"
-            - "@oro_search.mapper"
-            - "@oro_search.security_provider"
+            - @doctrine.orm.entity_manager
+            - @oro_search.search.engine
+            - @oro_search.mapper
+            - @oro_search.security_provider
             - @oro_entity_config.config_manager
             - @oro_entity.entity_provider
             - @translator
+            - @oro_security.search.acl_helper
 
     oro_search.security_provider:
         class:                        %oro_search.security_provider.class%

@@ -305,6 +305,8 @@
 
     <script type="text/template" id="step-list-template">
         <div class="grid-container steps-list">
+            <input name="oro_workflow_definition_form[steps]" type="hidden" value=''>
+            <input name="oro_workflow_definition_form[transitions]" type="hidden" value=''>
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
@@ -500,17 +502,22 @@
     </div>
 
     <div class="workflow-step-editor row-fluid clearfix">
-        <div class="span5">
+        <div class="{% if isMobileVersion() %}span12{% else %}span5{% endif %}">
             <div class="workflow-table-container">
                 <div class="workflow-definition-steps-list-container clearfix"></div>
             </div>
         </div>
+        {% if not isMobileVersion() %}
         <div class="span7">
             <div class="workflow-flowchart-container">
                 <div class="workflow-flowchart-controls clearfix"></div>
-                <div class="workflow-flowchart-wrapper"><div class="workflow-flowchart clearfix"></div></div>
+                <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
+                    'module': 'oroui/js/app/components/view-component',
+                    'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                }) }}><div class="workflow-flowchart clearfix"></div></div>
             </div>
         </div>
+        {% endif %}
     </div>
     {% endset %}
 

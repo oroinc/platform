@@ -416,6 +416,7 @@ services:
             - @oro_email.email.activity.manager
             - @oro_security.security_facade.link
             - @event_dispatcher
+            - @oro_security.encoder.mcrypt
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%

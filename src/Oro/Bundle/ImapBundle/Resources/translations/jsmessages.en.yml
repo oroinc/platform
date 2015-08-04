@@ -1,4 +1,10 @@
 oro.imap:
     connection:
-        success: Connection established successfully!
-        error:   Parameters are not valid!
+        success:     Connection established successfully!
+        error:       Parameters are not valid!
+        imap:
+            success: IMAP connection established successfully
+            error:   Could not establish IMAP connection
+        smtp:
+            success: SMTP connection established successfully
+            error:   Could not establish SMTP connection
