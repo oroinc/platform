@@ -21,6 +21,6 @@ Usefull classes
 ---------------
 
     * Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider - extracts emails from given object and it's relations
-    * EmailRecipientsHelper - helper to filter given emails by array_filter function
+    * EmailRecipientsHelper - helper to filter given emails
 
 Check code for some examples
