@@ -14,6 +14,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 class DictionaryFilterType extends AbstractType
 {
     const NAME = 'oro_type_dictionary_filter';
+    const TYPE_IN = 1;
+    const TYPE_NOT_IN = 2;
+    const EQUAL = 3;
+    const NOT_EQUAL = 4;
 
     /**
      * @var TranslatorInterface
@@ -101,8 +105,8 @@ class DictionaryFilterType extends AbstractType
                 'null_value'       => null,
                 'class'            => null,
                 'operator_choices' => [
-                    FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
-                    FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
+                    self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
+                    self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
                 ],
             )
         )->setRequired(

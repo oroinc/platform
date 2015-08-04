@@ -80,7 +80,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         if (!empty($searchQuery)) {
-            $qb->andWhere('e.' . $keyField . ' LIKE :like')
+            $qb->andWhere('e.' . $labelField . ' LIKE :like')
                 ->setParameter('like', '%' . $searchQuery . '%');
         }
         $results = $qb->getQuery()->getResult();
@@ -102,7 +102,8 @@ class DictionaryApiEntityManager extends ApiEntityManager
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         $qb->andWhere('e.' . $keyField . ' in (:keys)')
-            ->setParameter('keys', $keys);
+           ->setParameter('keys', $keys);
+
 
         $results = $qb->getQuery()->getResult();
 

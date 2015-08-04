@@ -39,13 +39,6 @@ class FilterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-//        if ($options['field_type'] === 'choice') {
-//            if (!isset($options['field_options'])) {
-//                $options['field_options'] = [];
-//            }
-//            $options['field_options']['choices'] = ['low' => 'Low'];
-//        }
-
         $builder->add('type', $options['operator_type'], $this->createOperatorOptions($options));
         $builder->add('value', $options['field_type'], $this->createFieldOptions($options));
     }
