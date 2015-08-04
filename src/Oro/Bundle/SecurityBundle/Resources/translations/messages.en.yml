@@ -27,7 +27,7 @@ oro:
                 short_label: User
             widget.title: Sharing Entities
         action:
-            share: Share record
+            share: Share
             shared: Record shared
         status:
             shared: Shared
