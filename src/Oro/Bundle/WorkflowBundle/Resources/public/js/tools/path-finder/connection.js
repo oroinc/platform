@@ -1,4 +1,6 @@
-define(['./extends', './interval2d', './point2d', './settings'], function(__extends, Interval2d, Point2d, settings) {
+define([
+    './extends', './interval2d', './node-point', './point2d', './settings'
+], function(__extends, Interval2d, NodePoint, Point2d, settings) {
     'use strict';
     __extends(Connection, Interval2d);
     function Connection(a, b, vector) {
@@ -31,37 +33,23 @@ define(['./extends', './interval2d', './point2d', './settings'], function(__exte
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Connection.prototype, 'leftSibling', {
-        get: function() {
-            var leftPoint = this.a.nextNode(this.vector.rot90());
-            if (leftPoint && leftPoint.x === this.a.x && leftPoint.y === this.a.y) {
-                return leftPoint.connections[this.directionFrom(this.a).id];
-            }
-            return null;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Connection.prototype, 'rightSibling', {
-        get: function() {
-            var rightPoint = this.a.nextNode(this.vector.rot270());
-            if (rightPoint && rightPoint.x === this.a.x && rightPoint.y === this.a.y) {
-                return rightPoint.connections[this.directionFrom(this.a).id];
-            }
-            return null;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Connection.prototype.remove = function() {
         this.a.removeConnection(this);
         this.b.removeConnection(this);
     };
     Connection.prototype.second = function(first) {
-        return (first === this.a) ? this.b : this.a;
+        if (first === this.a) {
+            return this.b;
+        } else if (first === this.b) {
+            return this.a;
+        }
     };
     Connection.prototype.directionFrom = function(first) {
-        return this.b === first ? this.vector.rot180() : this.vector;
+        if (first === this.a) {
+            return this.vector;
+        } else if (first === this.b) {
+            return this.vector.rot180();
+        }
     };
     Connection.prototype.draw = function(color) {
         if (color === void 0) {
