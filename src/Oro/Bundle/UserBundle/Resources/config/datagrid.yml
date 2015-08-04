@@ -187,6 +187,7 @@ datagrid:
                     data_name: g.name
 
     roles-grid:
+        extended_entity_name: %oro_user.role.entity.class%
         options:
             entityHint: role
             entity_pagination: true
@@ -199,7 +200,7 @@ datagrid:
                     - r.role
                     - r.label
                 from:
-                    - { table: OroUserBundle:Role, alias: r }
+                    - { table: %oro_user.role.entity.class%, alias: r }
                 where:
                     and:
                         - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'

@@ -19,6 +19,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
@@ -363,10 +364,8 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
-     * @ORM\JoinTable(name="oro_user_email_origin",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="origin_id", referencedColumnName="id", onDelete="CASCADE")}
+     * @ORM\OneToMany(
+     *      targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"persist", "remove"}
      * )
      */
     protected $emailOrigins;
@@ -400,8 +399,12 @@ class User extends ExtendUser implements
     protected $updatedAt;
 
     /**
-     * {@inheritdoc}
+     * @var OrganizationInterface
+     *
+     * Organization that user logged in
      */
+    protected $currentOrganization;
+
     public function __construct()
     {
         parent::__construct();
@@ -980,7 +983,10 @@ class User extends ExtendUser implements
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
-                return $item instanceof ImapEmailOrigin;
+                return
+                    $item instanceof ImapEmailOrigin
+                    && $item->isActive()
+                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
 
@@ -1013,6 +1019,8 @@ class User extends ExtendUser implements
     public function addEmailOrigin(EmailOrigin $emailOrigin)
     {
         $this->emailOrigins->add($emailOrigin);
+
+        $emailOrigin->setOwner($this);
 
         return $this;
     }
@@ -1110,5 +1118,25 @@ class User extends ExtendUser implements
         }
 
         return array_unique($roles);
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setCurrentOrganization(OrganizationInterface $organization)
+    {
+        $this->currentOrganization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getCurrentOrganization()
+    {
+        return $this->currentOrganization;
     }
 }

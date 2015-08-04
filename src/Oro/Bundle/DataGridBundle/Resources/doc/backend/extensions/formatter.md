@@ -7,7 +7,7 @@ Formatters
 -----------
 
 ### Field
-```
+```yaml
 column_name:
     type: field # default value `field`, so this key could be skipped here
     frontend_type: date|datetime|decimal|integer|percent|currency|select|text|html|boolean # optional default string
@@ -16,7 +16,7 @@ column_name:
 Represents default data field.
 
 ### Url
-```
+```yaml
 column_name:
     type: url
     route: some_route # required
@@ -27,7 +27,7 @@ column_name:
 Represents url field, mostly used for generating urls for actions.
 
 ### Link
-```
+```yaml
 column_name:
     type: link
     route: some_route # required
@@ -39,7 +39,7 @@ column_name:
 Represents link field to display a link as html. Link text is value of records "column_name", values for url generation are specified via "params". 
 
 ### Twig
-```
+```yaml
 column_name:
     type: twig
     template: string # required, template name
@@ -48,7 +48,7 @@ column_name:
 Represents twig template formatted field.
 
 ### Translatable
-```
+```yaml
 column_name:
     type: translatable
     data_name: string #optional if need to took value from another column
@@ -58,15 +58,50 @@ column_name:
 Used when field should be translated by symfony translator.
 
 ### Callback
-```
+```yaml
 column_name:
     type: callback
     callable: @link # required
 ```
-Used when field should be formatted using some callback, format [see](./../../references_in_configuration.md).
+Used when field should be formatted using some callback, format [see](./../references_in_configuration.md).
+
+Note that the whole node configuration is passed to the callback method as the `$node` argument.
+Therefore, if you need is to pass some arguments to the callback method, you can add any parameter to the grid config, e.g.:
+
+```yaml
+column_name:
+    type: callback
+    callable: @link.to.some.service->myCallbackMethod
+    myCallbackParam: 'Some Value'
+```
+
+And then use this parameter in the callback method like this:
+
+```php
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+
+class MyFormatterService
+{
+    public function myCallbackMethod($gridName, $keyName, $node)
+    {
+        if (!array_key_exists('myCallbackParam', $node)) {
+            return false;
+        }
+
+        $myCallbackParam = $node['myCallbackParam'];
+
+        return function (ResultRecordInterface $record) use ($myCallbackParam) {
+            $result = '';
+            // Do something using $myCallbackParam
+
+            return $result;
+        };
+    }
+}
+```
 
 ### Localized Number
-```
+```yaml
 column_name:
     type: localized_number
     method: formatCurrency      # required
@@ -83,7 +118,7 @@ function (ResultRecordInterface $record, $value, NumberFormatter $formatter) {}
 
 Example:
 We would like to format currency, but currency code should be retrieved from current row
-```
+```yaml
 column_name:
     type: localized_number
     method: formatCurrency

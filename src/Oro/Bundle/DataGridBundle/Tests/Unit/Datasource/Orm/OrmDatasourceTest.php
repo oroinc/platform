@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 
 class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,7 +32,13 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 
         $this->parameterBinder = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datasource\\ParameterBinderInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->datasource      = new OrmDatasource($this->em, $this->eventDispatcher, $this->parameterBinder);
+        $queryHintResolver     = new QueryHintResolver();
+        $this->datasource      = new OrmDatasource(
+            $this->em,
+            $this->eventDispatcher,
+            $this->parameterBinder,
+            $queryHintResolver
+        );
     }
 
     /**
@@ -60,7 +67,7 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(new ClassMetadata($entityClass)));
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$this->em])
             ->getMock();
         $this->em->expects($this->once())
             ->method('createQueryBuilder')
@@ -90,21 +97,6 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('getConnection')
             ->will($this->returnValue($connection));
-
-        $persister = $this->getMockBuilder('Doctrine\ORM\Persisters\BasicEntityPersister')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow       = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow->expects($this->once())
-            ->method('getEntityPersister')
-            ->with($entityClass)
-            ->will($this->returnValue($persister));
-        $this->em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-
         $hydrator = $this->getMockBuilder('Doctrine\ORM\Internal\Hydration\SimpleObjectHydrator')
             ->disableOriginalConstructor()
             ->getMock();
@@ -186,9 +178,9 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     public function testBindParametersWorks()
     {
         $parameters = ['foo'];
-        $append = true;
+        $append     = true;
 
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid         = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
         $configs['query'] = [
             'select' => ['t'],
             'from'   => [
@@ -197,7 +189,7 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         ];
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([$this->em])
             ->getMock();
         $this->em->expects($this->once())
             ->method('createQueryBuilder')
@@ -223,7 +215,8 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     public function testClone()
     {
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()->getMock();
+            ->setConstructorArgs([$this->em])
+            ->getMock();
 
         $this->datasource->setQueryBuilder($qb);
         $this->datasource = clone $this->datasource;

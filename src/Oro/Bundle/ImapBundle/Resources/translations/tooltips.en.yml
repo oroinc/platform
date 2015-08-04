@@ -1,0 +1,4 @@
+oro:
+    imap:
+        configuration:
+            tooltip: If the value is changed, new mailbox will be registered. All data from this mailbox will be lost

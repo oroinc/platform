@@ -120,4 +120,122 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
+
+    public function testEmailSeen()
+    {
+        $url = $this->getUrl('oro_email_toggle_seen', ['id' => $this->getReference('emailUser_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
+    public function testMarkAllEmailsAsSeen()
+    {
+        $url = $this->getUrl('oro_email_mark_all_as_seen');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful']);
+    }
+
+    public function testMarkReadMass()
+    {
+        $url = $this->getUrl(
+            'oro_email_mark_massaction',
+            [
+                'gridName' => 'user-email-grid',
+                'actionName' => 'emailmarkread',
+                'user-email-grid[userId]' => $this->getReference('simple_user')->getId(),
+                'inset' => 1,
+                'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
+            ]
+        );
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful'] === true);
+        $this->assertTrue($data['count'] === 1);
+    }
+
+    public function testMarkUnreadMass()
+    {
+        $url = $this->getUrl(
+            'oro_email_mark_massaction',
+            [
+                'gridName' => 'user-email-grid',
+                'actionName' => 'emailmarkunread',
+                'user-email-grid[userId]' => $this->getReference('simple_user')->getId(),
+                'inset' => 1,
+                'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
+            ]
+        );
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $data = json_decode($result->getContent(), true);
+        $this->assertTrue($data['successful'] === true);
+        $this->assertTrue($data['count'] === 1);
+    }
+
+    public function testReply()
+    {
+        $email = $this->getReference('email_1');
+        $id = $email->getId();
+        $url = $this->getUrl('oro_email_email_reply', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->getCrawler();
+        $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+        );
+        $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $cc . '\']')->count()
+        );
+        $bcc = $email->getBcc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
+        );
+    }
+
+    public function testReplyAll()
+    {
+        $email = $this->getReference('email_1');
+        $id = $email->getId();
+        $url = $this->getUrl('oro_email_email_reply_all', ['id' => $id, '_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+        $crawler = $this->client->getCrawler();
+        $this->assertEquals(1, $crawler->filter('div.widget-content input[name=\'oro_email_email[cc]\']')->count());
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $email->getFromName() . '\']')->count()
+        );
+        $cc = $email->getCc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            1,
+            $crawler->filter('div.widget-content input[value=\'' . $cc . '\']')->count()
+        );
+        $bcc = $email->getBcc()->first()->getEmailAddress()->getEmail();
+        $this->assertEquals(
+            0,
+            $crawler->filter('div.widget-content input[value=\'' . $bcc . '\']')->count()
+        );
+    }
+
+    public function testGetLastEmail()
+    {
+        $url = $this->getUrl('oro_email_last');
+        $this->client->request('GET', $url);
+
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEquals(1, $response['count']);
+        $this->assertCount(1, $response['emails']);
+    }
 }

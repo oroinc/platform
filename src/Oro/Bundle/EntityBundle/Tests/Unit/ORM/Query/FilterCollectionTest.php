@@ -102,7 +102,7 @@ class FilterCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($this->filterCollection->getHash());
         $this->filterCollection->addFilter('test', $this->filter);
         $this->filterCollection->enable('test');
-        $this->assertEquals('testN;', $this->filterCollection->getHash());
+        $this->assertEquals('testa:0:{}', $this->filterCollection->getHash());
         $this->filterCollection->disable('test');
         $this->assertEmpty($this->filterCollection->getHash());
     }

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class SystemAwareResolver implements ContainerAwareInterface
 {
@@ -81,9 +82,7 @@ class SystemAwareResolver implements ContainerAwareInterface
      * @param string $key key from datagrid definition (columns, filters, sorters, etc)
      * @param string $val value to be resolved/replaced
      *
-     * @return string
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @return mixed
      */
     protected function resolveSystemCall($datagridName, $key, $val)
     {
@@ -93,60 +92,14 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        $match = [];
-        switch (true) {
-            case preg_match('#^%([\w\._]+)%$#', $val, $match):
-                $val = $this->container->getParameter($match[1]);
-                // static call class:method or class::const
-            case preg_match('#%([\w\._]+)%::([\w\._]+)#', $val, $match):
-                // with class as param
-                $class = $this->container->getParameter($match[1]);
-                // fall-through
-            case preg_match('#([^\'"%:\s]+)::([\w\._]+)#', $val, $match):
-                // with class real name
-                $class = isset($class) ? $class : $match[1];
+        if (strpos($val, '%') !== false) {
+            $val = $this->resolveParameter($val);
+        }
 
-                $method = $match[2];
-                if (is_callable([$class, $method])) {
-                    $_val = $class::$method($datagridName, $key);
-                    if (is_scalar($_val) && $match[0] !== $val) {
-                        $val = str_replace($match[0], (string)$_val, $val);
-                    } else {
-                        $val = $_val;
-                    }
-                } elseif (defined("$class::$method")) {
-                    $_val = constant("$class::$method");
-                    if (is_scalar($_val) && $match[0] !== $val) {
-                        $val = str_replace($match[0], (string)$_val, $val);
-                    } else {
-                        $val = $_val;
-                    }
-                }
-                break;
-            // service method call @service->method
-            case preg_match('#@([\w\._]+)->([\w\._]+)#', $val, $match):
-                $service = $match[1];
-                $method  = $match[2];
-                $_val    = $this->container
-                    ->get($service)
-                    ->$method(
-                        $datagridName,
-                        $key,
-                        $this->parentNode
-                    );
-                if (is_scalar($_val) && $match[0] !== $val) {
-                    $val = str_replace($match[0], (string)$_val, $val);
-                } else {
-                    $val = $_val;
-                }
-                break;
-            // service pass @service
-            case preg_match('#@([\w\._]+)#', $val, $match):
-                $service = $match[1];
-                $val     = $this->container->get($service);
-                break;
-            default:
-                break;
+        if (strpos($val, '::') !== false) {
+            $val = $this->resolveStatic($datagridName, $key, $val);
+        } elseif (strpos($val, '@') !== false) {
+            $val = $this->resolveService($datagridName, $key, $val);
         }
 
         return $val;
@@ -162,5 +115,166 @@ class SystemAwareResolver implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Replace %parameter% with it's value.
+     *
+     * @param string $val
+     * @return mixed
+     */
+    protected function resolveParameter($val)
+    {
+        if (preg_match('#%([\w\._]+)%#', $val, $match)) {
+            $val = $this->replaceValueInString(
+                $val,
+                $match[0],
+                $this->container->getParameter($match[1])
+            );
+        }
+
+        return $val;
+    }
+
+    /**
+     * Resolve static call class:method or class::const
+     *
+     * @param string $datagridName
+     * @param string $key
+     * @param string $val
+     * @return mixed
+     */
+    protected function resolveStatic($datagridName, $key, $val)
+    {
+        if (preg_match('#([^\'"%:\s]+)::([\w\._]+)#', $val, $match)) {
+            $matchedString = $match[0];
+            $class = $match[1];
+            $method = $match[2];
+
+            $classMethod = [$class, $method];
+            if (is_callable($classMethod)) {
+                return $this->replaceValueInString(
+                    $val,
+                    $matchedString,
+                    call_user_func_array($classMethod, [$datagridName, $key, $this->parentNode])
+                );
+            } elseif (defined(implode('::', $classMethod))) {
+                return $this->replaceValueInString(
+                    $val,
+                    $matchedString,
+                    constant(implode('::', $classMethod))
+                );
+            }
+        }
+
+        return $val;
+    }
+
+    /**
+     * Resolve service or service->method call.
+     *
+     * @param string $datagridName
+     * @param string $key
+     * @param string $val
+     * @return mixed
+     */
+    protected function resolveService($datagridName, $key, $val)
+    {
+        $serviceRegex = '@(?P<service>[\w\.]+)';
+        $methodRegex = '(?P<method>\w+)';
+        $argumentsRegex = '(?P<arguments>\(.*?\))';
+
+        $service = null;
+        $method = null;
+        $arguments = null;
+        $matchedString = null;
+        if (strpos($val, '->') !== false) {
+            if (preg_match("~{$serviceRegex}->{$methodRegex}{$argumentsRegex}~six", $val, $matches)) {
+                // Match @service->method("argument")
+                $matchedString = $matches[0];
+                $service = $matches['service'];
+                $method = $matches['method'];
+                $arguments = $this->getArguments($matches['arguments']);
+            } elseif (preg_match("~{$serviceRegex}->{$methodRegex}~six", $val, $matches)) {
+                // Match @service->method
+                $matchedString = $matches[0];
+                $service = $matches['service'];
+                $method = $matches['method'];
+                $arguments = [
+                    $datagridName,
+                    $key,
+                    $this->parentNode
+                ];
+            }
+        } else {
+            if (preg_match("~{$serviceRegex}~six", $val, $matches)) {
+                // Match @service
+                $service = $matches['service'];
+            }
+        }
+
+        if ($service) {
+            // Resolve service
+            $service = $this->container->get($service);
+
+            // Perform method call
+            if ($method) {
+                return $this->replaceValueInString(
+                    $val,
+                    $matchedString,
+                    call_user_func_array([$service, $method], $arguments)
+                );
+            }
+
+            return $service;
+        }
+
+        return $val;
+    }
+
+    /**
+     * Replace matched string with resolved value in original string.
+     *
+     * Example:
+     *    Input: Hello, @user_provider->getCurrentUserName
+     *    Output: Hello, Some User
+     *
+     * @param string $originalString
+     * @param string $matchedString
+     * @param mixed $resolved
+     * @return mixed
+     */
+    protected function replaceValueInString($originalString, $matchedString, $resolved)
+    {
+        if (is_scalar($resolved) && $originalString !== $matchedString) {
+            return str_replace($matchedString, (string)$resolved, $originalString);
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Get arguments as array from parsed arguments string.
+     *
+     * Example:
+     *      Input: ("The", 'answer', 42)
+     *      Output: ['The', 'answer', 42]
+     *
+     * @param string $argumentsString
+     * @return array
+     */
+    protected function getArguments($argumentsString)
+    {
+        $argumentsString = trim($argumentsString);
+        $argumentsString = trim($argumentsString, '()');
+        $arguments = explode(',', $argumentsString);
+
+        return array_map(
+            function ($val) {
+                $val = trim($val);
+                return trim($val, '\'"');
+            },
+            $arguments
+        );
     }
 }
