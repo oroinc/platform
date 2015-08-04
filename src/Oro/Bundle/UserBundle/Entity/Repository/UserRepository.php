@@ -3,9 +3,9 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class UserRepository extends EntityRepository
 {
@@ -45,59 +45,22 @@ class UserRepository extends EntityRepository
     }
 
     /**
-     * @param AclHelper $aclHelper
      * @param string $fullNameQueryPart
      * @param array $excludedEmails
      * @param string|null $query
-     * @param int $limit
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getEmails(
-        AclHelper $aclHelper,
+    public function getPrimaryEmailsQb(
         $fullNameQueryPart,
         array $excludedEmails = [],
-        $query = null,
-        $limit = 100
-    ) {
-        $primaryEmails = $this->getPrimaryEmails($aclHelper, $fullNameQueryPart, $excludedEmails, $query, $limit);
-
-        $limit -= count($primaryEmails);
-        $excludedEmails = array_merge($excludedEmails, $primaryEmails);
-        $secondaryEmails = $this->getSecondaryEmails($aclHelper, $fullNameQueryPart, $excludedEmails, $query, $limit);
-
-        $emailResults = array_merge($primaryEmails, $secondaryEmails);
-
-        $emails = [];
-        foreach ($emailResults as $row) {
-            $emails[$row['email']] = sprintf('%s <%s>', $row['name'], $row['email']);
-        }
-
-        return $emails;
-    }
-
-    /**
-     * @param AclHelper $aclHelper
-     * @param string $fullNameQueryPart
-     * @param array $excludedEmails
-     * @param string|null $query
-     * @param int $limit
-     *
-     * @return array
-     */
-    protected function getPrimaryEmails(
-        AclHelper $aclHelper,
-        $fullNameQueryPart,
-        array $excludedEmails = [],
-        $query = 100,
-        $limit = 100
+        $query = null
     ) {
         $qb = $this->createQueryBuilder('u');
 
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
-            ->addSelect('u.email')
-            ->setMaxResults($limit);
+            ->addSelect('u.email');
 
         if ($query) {
             $qb
@@ -114,32 +77,27 @@ class UserRepository extends EntityRepository
                 ->setParameter('excluded_emails', $excludedEmails);
         }
 
-        return $aclHelper->apply($qb)->getResult();
+        return $qb;
     }
 
     /**
-     * @param AclHelper $aclHelper
      * @param string $fullNameQueryPart
      * @param array $excludedEmails
      * @param string|null $query
-     * @param int $limit
      *
-     * @return array
+     * @return QueryBuilder
      */
-    protected function getSecondaryEmails(
-        AclHelper $aclHelper,
+    public function getSecondaryEmailsQb(
         $fullNameQueryPart,
         array $excludedEmails = [],
-        $query = null,
-        $limit = 100
+        $query = null
     ) {
         $qb = $this->createQueryBuilder('u');
 
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
             ->addSelect('e.email')
-            ->join('u.emails', 'e')
-            ->setMaxResults($limit);
+            ->join('u.emails', 'e');
 
         if ($query) {
             $qb
@@ -156,6 +114,6 @@ class UserRepository extends EntityRepository
                 ->setParameter('excluded_emails', $excludedEmails);
         }
 
-        return $aclHelper->apply($qb)->getResult();
+        return $qb;
     }
 }

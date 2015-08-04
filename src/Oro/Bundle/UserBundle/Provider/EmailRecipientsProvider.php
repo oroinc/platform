@@ -53,15 +53,26 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             'Oro\Bundle\UserBundle\Entity\User'
         );
 
-        $userEmails = $this->getUserRepository()->getEmails(
-            $this->aclHelper,
-            $fullNameQueryPart,
-            $args->getExcludedEmails(),
-            $args->getQuery(),
-            $args->getLimit()
-        );
+        $primaryEmailsQb = $this->getUserRepository()
+            ->getPrimaryEmailsQb($fullNameQueryPart, $args->getExcludedEmails(), $args->getQuery())
+            ->setMaxResults($args->getLimit());
 
-        return $userEmails;
+        $primaryEmailsResult = $this->aclHelper->apply($primaryEmailsQb)->getResult();
+        $emails = $this->emailsFromResult($primaryEmailsResult);
+
+        $limit = $args->getLimit() - count($emails);
+
+        if ($limit > 0) {
+            $excludedEmails = array_merge($args->getExcludedEmails(), array_keys($emails));
+            $secondaryEmailsQb = $this->getUserRepository()
+                ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
+                ->setMaxResults($limit);
+
+            $secondaryEmailsResult = $this->aclHelper->apply($secondaryEmailsQb)->getResult();
+            $emails = array_merge($emails, $this->emailsFromResult($secondaryEmailsResult));
+        }
+
+        return $emails;
     }
 
     /**
@@ -70,6 +81,21 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     public function getSection()
     {
         return 'oro.user.entity_plural_label';
+    }
+
+    /**
+     * @param array $result
+     *
+     * @return array
+     */
+    protected function emailsFromResult(array $result)
+    {
+        $emails = [];
+        foreach ($result as $row) {
+            $emails[$row['email']] = sprintf('%s <%s>', $row['name'], $row['email']);
+        }
+
+        return $emails;
     }
 
     /**

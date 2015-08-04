@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class EmailRecipientRepository extends EntityRepository
 {
@@ -34,20 +34,16 @@ class EmailRecipientRepository extends EntityRepository
     }
 
     /**
-     * @param AclHelper $aclHelper
      * @param array $senderEmails
      * @param array $excludedEmails
      * @param string|null $query
-     * @param int $limit
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getEmailsUsedInLast30Days(
-        AclHelper $aclHelper,
+    public function getEmailsUsedInLast30DaysQb(
         array $senderEmails = [],
         array $excludedEmails = [],
-        $query = null,
-        $limit = 100
+        $query = null
     ) {
         if (!$senderEmails) {
             return [];
@@ -72,7 +68,6 @@ class EmailRecipientRepository extends EntityRepository
             ->select('re.name, ea.email')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
-            ->setMaxResults($limit)
             ->setParameter('from', new \DateTime('-30 days'))
             ->setParameter('senders', $senderEmails);
 
@@ -86,13 +81,6 @@ class EmailRecipientRepository extends EntityRepository
             $recepientsQb->setParameter('excluded_emails', $excludedEmails);
         }
 
-        $emails = $aclHelper->apply($recepientsQb)->getResult();
-
-        $result = [];
-        foreach ($emails as $email) {
-            $result[$email['email']] = $email['name'];
-        }
-
-        return $result;
+        return $recepientsQb;
     }
 }

@@ -52,14 +52,28 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $userEmailAddresses = array_keys($this->relatedEmailsProvider->getEmails($user));
 
-        return $this->getEmailRecipientRepository()
-            ->getEmailsUsedInLast30Days(
-                $this->aclHelper,
+        $recipientsQb = $this->getEmailRecipientRepository()
+            ->getEmailsUsedInLast30DaysQb(
                 $userEmailAddresses,
                 $args->getExcludedEmails(),
-                $args->getQuery(),
-                $args->getLimit()
-            );
+                $args->getQuery()
+            )
+            ->setMaxResults($args->getLimit());
+
+        return $this->emailsFromResult($this->aclHelper->apply($recipientsQb)->getResult());
+    }
+
+    /**
+     * @param array $result
+     */
+    protected function emailsFromResult(array $result)
+    {
+        $emails = [];
+        foreach ($result as $row) {
+            $result[$row['email']] = $row['name'];
+        }
+
+        return $emails;
     }
 
     /**
