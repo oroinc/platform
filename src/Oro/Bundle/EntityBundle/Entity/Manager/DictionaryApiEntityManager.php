@@ -84,8 +84,6 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueBySearchQuery($searchQuery)
     {
-        $locale = $this->localeSettings->getLocale();
-
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
         $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
 
@@ -100,7 +98,6 @@ class DictionaryApiEntityManager extends ApiEntityManager
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
         );
-        $query->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale);
         $results = $query->getResult();
 
         return $this->prepareData($results, $keyField, $labelField);
