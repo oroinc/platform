@@ -63,7 +63,7 @@ class DictionaryFilter extends AbstractFilter
         }
 
         if (count($data['value']) === 1) {
-            switch($type) {
+            switch ($type) {
                 case DictionaryFilterType::TYPE_NOT_IN:
                     $type = DictionaryFilterType::NOT_EQUAL;
                     break;
