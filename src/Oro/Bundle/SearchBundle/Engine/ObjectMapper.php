@@ -115,7 +115,12 @@ class ObjectMapper extends AbstractMapper
             /**
              *  Dispatch oro_search.prepare_entity_map event
              */
-            $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
+            $event = new PrepareEntityMapEvent(
+                $object,
+                $objectClass,
+                $objectData,
+                $this->getEntityConfig($objectClass)
+            );
             $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
             $objectData = $event->getData();
         }

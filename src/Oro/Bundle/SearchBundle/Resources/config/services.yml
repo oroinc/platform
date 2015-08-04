@@ -40,6 +40,7 @@ services:
             - @oro_entity_config.config_manager
             - @oro_entity.entity_provider
             - @translator
+            - @oro_security.search.acl_helper
 
     oro_search.security_provider:
         class:                        %oro_search.security_provider.class%
