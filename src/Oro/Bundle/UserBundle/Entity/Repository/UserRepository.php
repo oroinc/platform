@@ -6,8 +6,9 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 
-class UserRepository extends EntityRepository
+class UserRepository extends EntityRepository implements EmailAwareRepository
 {
     /**
      * @param bool|null $enabled
@@ -51,11 +52,8 @@ class UserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getPrimaryEmailsQb(
-        $fullNameQueryPart,
-        array $excludedEmails = [],
-        $query = null
-    ) {
+    public function getPrimaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null)
+    {
         $qb = $this->createQueryBuilder('u');
 
         $qb
@@ -88,11 +86,8 @@ class UserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getSecondaryEmailsQb(
-        $fullNameQueryPart,
-        array $excludedEmails = [],
-        $query = null
-    ) {
+    public function getSecondaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null)
+    {
         $qb = $this->createQueryBuilder('u');
 
         $qb

@@ -181,8 +181,7 @@ services:
         class: %oro_user.email_recipients_provider.class%
         arguments:
             - @doctrine
-            - @oro_security.acl_helper
-            - @oro_locale.dql.formatter.name
+            - @oro_email.provider.email_recipients.helper
         tags:
             - { name: oro_email.recipients_provider }
 

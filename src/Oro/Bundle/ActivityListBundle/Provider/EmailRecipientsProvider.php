@@ -14,7 +14,6 @@ use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 
@@ -29,25 +28,19 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
-    /** @var EmailRecipientsHelper */
-    protected $emailRecipientsHelper;
-
     /**
      * @param Registry $registry
      * @param ActivityManager $activityManager
      * @param RelatedEmailsProvider $relatedEmailsProvider
-     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
     public function __construct(
         Registry $registry,
         ActivityManager $activityManager,
-        RelatedEmailsProvider $relatedEmailsProvider,
-        EmailRecipientsHelper $emailRecipientsHelper
+        RelatedEmailsProvider $relatedEmailsProvider
     ) {
         $this->registry = $registry;
         $this->activityManager = $activityManager;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
-        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**

@@ -95,7 +95,6 @@ services:
             - @doctrine
             - @oro_activity.manager
             - @oro_email.related_emails.provider
-            - @oro_email.provider.email_recipients.helper
         tags:
             - { name: oro_email.recipients_provider }
 

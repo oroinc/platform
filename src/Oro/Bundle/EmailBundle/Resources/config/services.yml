@@ -595,7 +595,8 @@ services:
     oro_email.provider.email_recipients.helper:
         class: %oro_email.provider.email_recipients.helper.class%
         arguments:
-            - @translator
+            - @oro_security.acl_helper
+            - @oro_locale.dql.formatter.name
 
     oro_email.link.formatter.name:
         tags:
