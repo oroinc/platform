@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
@@ -120,6 +121,19 @@ class Channel
      * @Oro\Versioned()
      */
     protected $defaultUserOwner;
+
+    /**
+     * @var BusinessUnit
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
+     * @ORM\JoinColumn(
+     *      name="default_business_unit_owner_id",
+     *      referencedColumnName="id",
+     *      onDelete="SET NULL",
+     *      nullable=true
+     * )
+     * @Oro\Versioned()
+     */
+    protected $defaultBusinessUnitOwner;
 
     /**
      * @var Organization
@@ -430,5 +444,25 @@ class Channel
     public function getEditMode()
     {
         return $this->editMode;
+    }
+
+    /**
+     * @return BusinessUnit
+     */
+    public function getDefaultBusinessUnitOwner()
+    {
+        return $this->defaultBusinessUnitOwner;
+    }
+
+    /**
+     * @param BusinessUnit $defaultBusinessUnitOwner
+     *
+     * @return $this
+     */
+    public function setDefaultBusinessUnitOwner($defaultBusinessUnitOwner)
+    {
+        $this->defaultBusinessUnitOwner = $defaultBusinessUnitOwner;
+
+        return $this;
     }
 }

@@ -10,6 +10,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ForceConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
@@ -339,6 +340,27 @@ class TypesRegistry
         }
 
         return false;
+    }
+
+    /**
+     * Returns type of default owner for entities created by this integration.
+     *
+     * @param string|null $integrationType
+     *
+     * @return string 'user'\'business_unit'
+     */
+    public function getDefaultOwnerType($integrationType = null)
+    {
+        if ($integrationType === null) {
+            return DefaultOwnerTypeAwareInterface::USER;
+        }
+        $type = $this->integrationTypes[$integrationType];
+
+        if ($type instanceof DefaultOwnerTypeAwareInterface) {
+            return $type->getDefaultOwnerType();
+        }
+
+        return DefaultOwnerTypeAwareInterface::USER;
     }
 
     /**

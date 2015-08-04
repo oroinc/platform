@@ -36,6 +36,7 @@ oro:
             remote_wins.label: Remote wins
             local_wins.label: Local wins
             default_user_owner.label: Default owner
+            default_business_unit_owner.label: Default Business Unit Owner
             organization.label: Organization
             enabled:
                 label:           Status
