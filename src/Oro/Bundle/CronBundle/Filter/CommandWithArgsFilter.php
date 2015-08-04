@@ -16,7 +16,7 @@ class CommandWithArgsFilter extends StringFilter
     protected function parseValue($comparisonType, $value)
     {
         if (in_array($comparisonType, [TextFilterType::TYPE_CONTAINS, TextFilterType::TYPE_NOT_CONTAINS], true)) {
-            $values = explode(' ', $value);
+            $values = explode(' ', preg_replace('/ +/', ' ', $value));
 
             return array_map(
                 function ($val) use ($comparisonType) {
@@ -40,25 +40,20 @@ class CommandWithArgsFilter extends StringFilter
 
         $type = $data['type'];
 
-        $parameterName = $ds->generateParameterName($this->getName());
-
-        $this->applyFilterToClause(
-            $ds,
-            $this->buildComparisonExpr(
+        $values = is_array($data['value']) ? $data['value'] : [$data['value']];
+        foreach ($values as $value) {
+            $parameterName = $ds->generateParameterName($this->getName());
+            $this->applyFilterToClause(
                 $ds,
-                $type,
-                $this->getDataNameKey($type),
-                $parameterName
-            )
-        );
-
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-            if (is_array($data['value'])) {
-                foreach ($data['value'] as $value) {
-                    $ds->setParameter($parameterName, $value);
-                }
-            } else {
-                $ds->setParameter($parameterName, $data['value']);
+                $this->buildComparisonExpr(
+                    $ds,
+                    $type,
+                    $this->getDataNameKey($type),
+                    $parameterName
+                )
+            );
+            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+                $ds->setParameter($parameterName, $value);
             }
         }
 
@@ -74,14 +69,10 @@ class CommandWithArgsFilter extends StringFilter
      */
     protected function getDataNameKey($type)
     {
-        $data = $this->params['data_name_filter'];
-
         switch ($type) {
             case TextFilterType::TYPE_CONTAINS:
-                $dataName = sprintf('CONCAT(%s)', implode(',', $data['contains']));
-                break;
             case TextFilterType::TYPE_NOT_CONTAINS:
-                $dataName = sprintf('CONCAT(%s)', implode(',', $data['not_contains']));
+                $dataName = sprintf('CONCAT(%s)', implode(',', ['j.command', 'j.args']));
                 break;
             default:
                 $dataName = $this->params[FilterUtility::DATA_NAME_KEY];
