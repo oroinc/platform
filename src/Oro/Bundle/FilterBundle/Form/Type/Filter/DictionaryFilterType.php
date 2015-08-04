@@ -65,7 +65,6 @@ class DictionaryFilterType extends AbstractType
         return array_merge(['required' => false], $options['field_options']);
     }
 
-
     /**
      * {@inheritDoc}
      */

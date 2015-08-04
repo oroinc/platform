@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
-
 use Rhumsaa\Uuid\Console\Exception;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 /**
  * Entities controller.
@@ -18,11 +15,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  */
 class DictionaryController extends Controller
 {
-
     /**
-     * Get count values of a dictionary entity.
+     * Get count values of a dictionary.
      *
-     * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
+     * @param string $dictionary - Class Name Entity that was configured as Dictionary
      *
      * @Route(
      *      "{dictionary}/count",
@@ -44,19 +40,18 @@ class DictionaryController extends Controller
     }
 
     /**
-     * Grid of Custom/Extend entity.
+     * Get dictionary values by search query
      *
-     * @param string $dictionary
-     *
-     * @return array
+     * @param string $dictionary - Class Name Entity that was configured as Dictionary
      *
      * @Route(
-     *      "filter/{dictionary}",
-     *      name="oro_dictionary_filter"
+     *      "{dictionary}/search",
+     *      name="oro_dictionary_search"
      * )
-     * @Template()
+     *
+     * @return JsonResponse
      */
-    public function filterAction($dictionary)
+    public function searchAction($dictionary)
     {
         try {
             $searchQuery = $this->get('request_stack')->getCurrentRequest()->get('q');
@@ -72,19 +67,18 @@ class DictionaryController extends Controller
     }
 
     /**
-     * Grid of Custom/Extend entity.
+     * Get dictionary values by keys
      *
-     * @param string $dictionary
-     *
-     * @return array
+     * @param string $dictionary - Class Name Entity that was configured as Dictionary
      *
      * @Route(
-     *      "values/{dictionary}",
+     *      "{dictionary}/values",
      *      name="oro_dictionary_value"
      * )
-     * @Template()
+     *
+     * @return JsonResponse
      */
-    public function loadValuesAction($dictionary)
+    public function valuesAction($dictionary)
     {
         try {
             $keys = $this->get('request_stack')->getCurrentRequest()->get('keys');

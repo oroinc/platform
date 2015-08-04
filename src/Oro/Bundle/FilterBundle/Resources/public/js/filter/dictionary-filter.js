@@ -143,7 +143,7 @@ define([
                     containerCssClass: 'dictionary-filter',
                     ajax: {
                         url: routing.generate(
-                            'oro_dictionary_filter',
+                            'oro_dictionary_search',
                             {
                                 dictionary: className.filterParams.class.replace(/\\/g, '_')
                             }
@@ -184,7 +184,7 @@ define([
             if (this.componentMode === 'select2') {
                 $.ajax({
                     url: routing.generate(
-                        'oro_dictionary_filter',
+                        'oro_dictionary_search',
                         {
                             dictionary: className.filterParams.class.replace(/\\/g, '_')
                         }

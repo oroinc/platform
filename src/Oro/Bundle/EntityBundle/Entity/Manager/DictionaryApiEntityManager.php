@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Entity\Manager;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-use Gedmo\Translatable\TranslatableListener;
 
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -76,7 +75,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
     }
 
     /**
-     * Search entities by search string
+     * Search entities by search query
      *
      * @param $searchQuery
      *
@@ -126,7 +125,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
     }
 
     /**
-     * Transform Entity data to array for dictionary filter
+     * Transform Entity data to array
      *
      * @param array $results
      * @param string $keyField
