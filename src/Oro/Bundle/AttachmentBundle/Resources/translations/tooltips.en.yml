@@ -6,3 +6,4 @@ oro.attachment:
     max_size.tooltip:     Max allowed file size to upload in MB.
     thumb_width.tooltip:  Thumbnail width in pixels.
     thumb_height.tooltip: Thumbnail height in pixels.
+    mimetypes.tooltip:    'The format of MIME types must follow the examples: application/pdf, image/*'
