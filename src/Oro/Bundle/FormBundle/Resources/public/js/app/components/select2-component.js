@@ -51,11 +51,11 @@ define(function(require) {
                 };
             }
 
-            if (!config.hasOwnProperty('createSearchChoice')
-                && config.hasOwnProperty('ajax')
-                && config.hasOwnProperty('tags')
+            if (!config.hasOwnProperty('createSearchChoice') &&
+                config.hasOwnProperty('ajax') &&
+                config.hasOwnProperty('tags')
             ) {
-                config.createSearchChoice = function (term, data) {
+                config.createSearchChoice = function(term, data) {
                     if (!dataHasText(data, term)) {
                         return {
                             id: term,
@@ -246,7 +246,7 @@ define(function(require) {
     }
 
     function dataHasText(data, text) {
-        return _.some(data, function (row) {
+        return _.some(data, function(row) {
             if (!row.hasOwnProperty('children')) {
                 return row.text.localeCompare(text) === 0;
             }
