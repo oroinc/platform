@@ -73,7 +73,6 @@ class DictionaryFilter extends AbstractFilter
             }
         }
 
-
         $data['type']  = $type;
         $data['value'] = $this->parseValue($data['value']);
 
