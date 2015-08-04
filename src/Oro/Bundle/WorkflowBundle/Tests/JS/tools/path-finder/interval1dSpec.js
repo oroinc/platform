@@ -6,22 +6,18 @@ define(function(require) {
     describe('oroworkflow/js/tools/path-finder/interval1d', function() {
         it('interval initialization', function() {
             var a = new Interval1d(5, 7);
-            expect(a.min).toEqual(5);
-            expect(a.max).toEqual(7);
+            expect(a.min).toBe(5);
+            expect(a.max).toBe(7);
+            expect(function() {
+                return new Interval1d(10, 7);
+            }).toThrow(jasmine.any(RangeError));
         });
 
         it('check width calculation', function() {
             var a = new Interval1d(5, 7);
-            expect(a.width).toEqual(2);
+            expect(a.width).toBe(2);
             a.width = 10;
-            expect(a.max).toEqual(15);
-        });
-
-        it('check validation', function() {
-            var a = new Interval1d(10, 4);
-            var b = new Interval1d(4, 10);
-            expect(a.isValid).toEqual(false);
-            expect(b.isValid).toEqual(true);
+            expect(a.max).toBe(15);
         });
 
         it('check intersections', function() {
@@ -29,43 +25,44 @@ define(function(require) {
             var b = new Interval1d(2, 8);
             var c = new Interval1d(30, 40);
             var intersection = a.intersection(b);
-            expect(intersection.min).toEqual(5);
-            expect(intersection.max).toEqual(8);
-            expect(a.intersection(c).isValid).toEqual(false);
+            expect(intersection instanceof Interval1d).toBe(true);
+            expect(intersection.min).toBe(5);
+            expect(intersection.max).toBe(8);
+            expect(a.intersection(c)).toBe(null);
         });
 
         it('check union', function() {
             var a = new Interval1d(5, 15);
             var b = new Interval1d(2, 8);
             var union = a.union(b);
-            expect(union.min).toEqual(2);
-            expect(union.max).toEqual(15);
-            expect(union.isValid).toEqual(true);
+            expect(union instanceof Interval1d).toBe(true);
+            expect(union.min).toBe(2);
+            expect(union.max).toBe(15);
         });
 
         it('check contains', function() {
             var a = new Interval1d(2, 12);
-            expect(a.contains(1)).toEqual(false);
-            expect(a.contains(2)).toEqual(true);
-            expect(a.contains(6)).toEqual(true);
-            expect(a.contains(12)).toEqual(true);
-            expect(a.contains(17)).toEqual(false);
+            expect(a.contains(1)).toBe(false);
+            expect(a.contains(2)).toBe(true);
+            expect(a.contains(6)).toBe(true);
+            expect(a.contains(12)).toBe(true);
+            expect(a.contains(17)).toBe(false);
         });
 
         it('check containsNonInclusive', function() {
             var a = new Interval1d(2, 12);
-            expect(a.containsNonInclusive(1)).toEqual(false);
-            expect(a.containsNonInclusive(2)).toEqual(false);
-            expect(a.containsNonInclusive(6)).toEqual(true);
-            expect(a.containsNonInclusive(12)).toEqual(false);
-            expect(a.containsNonInclusive(17)).toEqual(false);
+            expect(a.containsNonInclusive(1)).toBe(false);
+            expect(a.containsNonInclusive(2)).toBe(false);
+            expect(a.containsNonInclusive(6)).toBe(true);
+            expect(a.containsNonInclusive(12)).toBe(false);
+            expect(a.containsNonInclusive(17)).toBe(false);
         });
 
         it('check calculate distance', function() {
             var a = new Interval1d(9, 12);
-            expect(a.distanceTo(3)).toEqual(6);
-            expect(a.distanceTo(10)).toEqual(0);
-            expect(a.distanceTo(23)).toEqual(11);
+            expect(a.distanceTo(3)).toBe(6);
+            expect(a.distanceTo(10)).toBe(0);
+            expect(a.distanceTo(23)).toBe(11);
         });
     });
 });
