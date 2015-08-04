@@ -71,7 +71,6 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $activityListDql = $activityListQb->getQuery()->getDQL();
         $limit = $args->getLimit();
         foreach (array_keys($activities) as $class) {
-
             $qb = $this->getRepository($class)
                 ->createQueryBuilder('e');
             $qb
