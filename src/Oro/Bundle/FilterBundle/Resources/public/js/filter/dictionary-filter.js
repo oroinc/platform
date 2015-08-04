@@ -73,7 +73,7 @@ define([
             var self = this;
             $.ajax({
                 url: routing.generate(
-                    'oro_api_get_dictionary_value_count',
+                    'oro_dictionary_count',
                     {dictionary: className.filterParams.class.replace(/\\/g, '_'), limit: -1}
                 ),
                 success: function(data) {

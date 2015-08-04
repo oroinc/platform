@@ -18,6 +18,31 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  */
 class DictionaryController extends Controller
 {
+
+    /**
+     * Get count values of a dictionary entity.
+     *
+     * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
+     *
+     * @Route(
+     *      "{dictionary}/count",
+     *      name="oro_dictionary_count"
+     * )
+     *
+     * @return JsonResponse
+     */
+    public function countAction($dictionary)
+    {
+        $manager = $this->container->get('oro_entity.manager.dictionary.api');
+        $manager->setClass($manager->resolveEntityClass($dictionary, true));
+
+        $resalt = $manager->count();
+
+        $responseContext = ['result' => $resalt];
+
+        return new JsonResponse($responseContext);
+    }
+
     /**
      * Grid of Custom/Extend entity.
      *

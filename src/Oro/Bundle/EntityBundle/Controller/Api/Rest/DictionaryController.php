@@ -64,50 +64,6 @@ class DictionaryController extends RestGetController
     }
 
     /**
-     * Get count values of a dictionary entity.
-     *
-     * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
-     *
-     * @Get("/{dictionary}/count", name="")
-     *
-     * @QueryParam(
-     *      name="page",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Page number, starting from 1. Defaults to 1."
-     * )
-     * @QueryParam(
-     *      name="limit",
-     *      requirements="\d+",
-     *      nullable=true,
-     *      description="Number of items per page. Defaults to 10. Set -1 to get all items."
-     * )
-     * @QueryParam(
-     *      name="locale",
-     *      requirements=".+",
-     *      nullable=true,
-     *      description="The preferred locale for dictionary values. Falls back to the default locale."
-     * )
-     *
-     * @ApiDoc(
-     *      description="Get count values of a dictionary entity",
-     *      resource=true
-     * )
-     *
-     * @return Response
-     */
-    public function getCountAction($dictionary)
-    {
-        $manager = $this->getManager();
-        $manager->setClass($manager->resolveEntityClass($dictionary, true));
-
-        $page  = (int)$this->getRequest()->get('page', 1);
-        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
-
-        return $this->handleGetCountListRequest($page, $limit);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getManager()

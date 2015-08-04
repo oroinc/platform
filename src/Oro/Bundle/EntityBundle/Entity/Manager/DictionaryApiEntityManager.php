@@ -38,7 +38,6 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
         $this->localeSettings = $localeSettings;
-
     }
 
     /**
@@ -148,5 +147,19 @@ class DictionaryApiEntityManager extends ApiEntityManager
         }
 
         return $resultD;
+    }
+
+    /**
+     * Get count items in dictionary
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb->select('COUNT(e)');
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        return $result;
     }
 }
