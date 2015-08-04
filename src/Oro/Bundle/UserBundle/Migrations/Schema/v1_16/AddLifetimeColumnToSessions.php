@@ -9,11 +9,11 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class AddLifetimeColumnToSessions implements Migration
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $t = $schema->getTable('oro_session');
-        $t->addColumn('sess_lifetime', 'integer', ['nullable' => false]);
+        $table = $schema->getTable('oro_session');
+        $table->addColumn('sess_lifetime', 'integer', ['nullable' => false]);
     }
 }
