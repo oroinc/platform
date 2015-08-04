@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+
+use LogicException;
 
 class DictionaryFilter extends AbstractFilter
 {
@@ -28,12 +28,12 @@ class DictionaryFilter extends AbstractFilter
             $this->buildComparisonExpr(
                 $ds,
                 $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
+                $this->getFilteredFieldName($ds),
                 $parameterName
             )
         );
 
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -55,8 +55,8 @@ class DictionaryFilter extends AbstractFilter
      */
     protected function parseData($data)
     {
-        $type = isset($data['type']) ? $data['type'] : null;
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])
+        $type = array_key_exists('type', $data) ? $data['type'] : null;
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)
             && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
         ) {
             return false;
@@ -75,7 +75,7 @@ class DictionaryFilter extends AbstractFilter
 
 
         $data['type']  = $type;
-        $data['value'] = $this->parseValue($data['type'], $data['value']);
+        $data['value'] = $this->parseValue($data['value']);
 
         return $data;
     }
@@ -132,8 +132,40 @@ class DictionaryFilter extends AbstractFilter
      */
     protected function parseValue($value)
     {
-        $value = count($value == 1) ? $value[0] : $value;
+        $value = count($value) === 1 ? $value[0] : $value;
 
         return $value;
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     *
+     * @return string
+     *
+     * @throws LogicException
+     */
+    protected function getFilteredFieldName(FilterDatasourceAdapterInterface $ds)
+    {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            throw new LogicException(
+                sprintf(
+                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
+                    get_class($ds)
+                )
+            );
+        }
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        list($joinAlias) = explode('.', $fieldName);
+        $qb = $ds->getQueryBuilder();
+        $em = $qb->getEntityManager();
+        $class = $this->get('class');
+        $metadata = $em->getClassMetadata($class);
+        $fieldNames = $metadata->getIdentifierFieldNames();
+        if ($count = count($fieldNames) !== 1) {
+            throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+        }
+        $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);
+
+        return $field;
     }
 }

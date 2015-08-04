@@ -64,7 +64,7 @@ class DictionaryController extends RestGetController
     }
 
     /**
-     * Get values of a dictionary entity.
+     * Get count values of a dictionary entity.
      *
      * @param string $dictionary The URL safe name or plural alias of a dictionary entity.
      *
@@ -90,7 +90,7 @@ class DictionaryController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Get values of a dictionary entity",
+     *      description="Get count values of a dictionary entity",
      *      resource=true
      * )
      *
