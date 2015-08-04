@@ -55,7 +55,7 @@ class DictionaryFilter extends AbstractFilter
      */
     protected function parseData($data)
     {
-        $type = isset($data['type']) ? $data['type'] : null;
+        $type = array_key_exists($data, 'type') ? $data['type'] : null;
         if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)
             && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
         ) {
