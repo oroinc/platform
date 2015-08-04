@@ -2,19 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
-
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -22,7 +18,6 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 
 /**
  * @RouteResource("email")
@@ -155,38 +150,6 @@ class EmailController extends RestController
     }
 
     /**
-     * @param Request $request
-     *
-     * @return Response
-     */
-    public function getRecipientAutocompleteAction(Request $request)
-    {
-        $relatedEntity = null;
-
-        $entityClass = $request->query->get('entityClass');
-        $entityId = $request->query->get('entityId');
-        if ($entityClass && $entityId) {
-            $em = $this->getEntityManagerForClass($entityClass);
-            $relatedEntity = $em->getReference($entityClass, $entityId);
-        }
-
-        $query = $request->query->get('query');
-        if ($request->query->get('search_by_id', false)) {
-            $results = [
-                [
-                    'id'   => $query,
-                    'text' => $query,
-                ],
-            ];
-        } else {
-            $limit = $request->query->get('per_page', 100);
-            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($relatedEntity, $query, $limit);
-        }
-
-        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
-    }
-
-    /**
      * Get email cache manager
      *
      * @return EmailCacheManager
@@ -231,23 +194,5 @@ class EmailController extends RestController
     protected function assertEmailAccessGranted($attribute, Email $email)
     {
         return $this->get('oro_security.security_facade')->isGranted($attribute, $email);
-    }
-
-    /**
-     * @return EmailRecipientsProvider
-     */
-    protected function getEmailRecipientsProvider()
-    {
-        return $this->get('oro_email.email_recipients.provider');
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return EntityManager
-     */
-    protected function getEntityManagerForClass($className)
-    {
-        return $this->getDoctrine()->getManagerForClass($className);
     }
 }

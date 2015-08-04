@@ -60,7 +60,8 @@ class UserRepository extends EntityRepository
 
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
-            ->addSelect('u.email');
+            ->addSelect('u.email')
+            ->orderBy('name');
 
         if ($query) {
             $qb
@@ -97,6 +98,7 @@ class UserRepository extends EntityRepository
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
             ->addSelect('e.email')
+            ->orderBy('name')
             ->join('u.emails', 'e');
 
         if ($query) {

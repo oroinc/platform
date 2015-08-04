@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
@@ -25,6 +26,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -496,6 +498,57 @@ class EmailController extends Controller
         ];
 
         return new JsonResponse(array_merge($data, $response->getOptions()));
+    }
+
+    /**
+     * @Route("/autocomplete-recipient", name="oro_email_autocomplete_recipient")
+     * @AclAncestor("oro_email_email_create")
+     *
+     * @return Response
+     */
+    public function autocompleteRecipientAction(Request $request)
+    {
+        $relatedEntity = null;
+
+        $entityClass = $request->query->get('entityClass');
+        $entityId = $request->query->get('entityId');
+        if ($entityClass && $entityId) {
+            $em = $this->getEntityManagerForClass($entityClass);
+            $relatedEntity = $em->getReference($entityClass, $entityId);
+        }
+
+        $query = $request->query->get('query');
+        if ($request->query->get('search_by_id', false)) {
+            $results = [
+                [
+                    'id'   => $query,
+                    'text' => $query,
+                ],
+            ];
+        } else {
+            $limit = $request->query->get('per_page', 100);
+            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($relatedEntity, $query, $limit);
+        }
+
+        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
+    }
+
+    /**
+     * @return EmailRecipientsProvider
+     */
+    protected function getEmailRecipientsProvider()
+    {
+        return $this->get('oro_email.email_recipients.provider');
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return EntityManager
+     */
+    protected function getEntityManagerForClass($className)
+    {
+        return $this->getDoctrine()->getManagerForClass($className);
     }
 
     /**

@@ -66,6 +66,7 @@ class EmailRecipientRepository extends EntityRepository
         $recepientsQb = $this->createQueryBuilder('re');
         $recepientsQb
             ->select('re.name, ea.email')
+            ->orderBy('re.name')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
             ->setParameter('from', new \DateTime('-30 days'))

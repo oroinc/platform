@@ -30,11 +30,11 @@ class EmailAddressRecipientsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (null === $parent = $view->parent) {
+        if (null === $view->parent) {
             return;
         }
 
-        if (!isset($view->parent->vars['data']) || !$view->parent->vars['data'] instanceof Email) {
+        if (!array_key_exists('data', $view->parent->vars) || !$view->parent->vars['data'] instanceof Email) {
             return;
         }
 
@@ -61,7 +61,7 @@ class EmailAddressRecipientsType extends AbstractType
             'configs' => [
                 'allowClear'         => true,
                 'multiple'           => true,
-                'route_name'         => 'oro_api_get_email_recipient_autocomplete',
+                'route_name'         => 'oro_email_autocomplete_recipient',
                 'minimumInputLength' => $this->cm->get('oro_email.minimum_input_length'),
                 'per_page'           => 100,
                 'containerCssClass'  => 'taggable-email',

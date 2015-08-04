@@ -74,18 +74,20 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         $activities = $this->activityManager->getActivities($relatedEntityClass);
+        $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
+        $activityListDql = $activityListQb->getQuery()->getDQL();
+        $limit = $args->getLimit();
         foreach (array_keys($activities) as $class) {
-            $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
 
             $qb = $this->getRepository($class)
                 ->createQueryBuilder('e');
             $qb
-                ->andWhere($qb->expr()->exists($activityListQb->getQuery()->getDQL()))
+                ->andWhere($qb->expr()->exists($activityListDql))
                 ->setParameter('related_entity_id', $relatedEntityId)
                 ->setParameter('related_activity_class', $class);
 
             $iterator = new BufferedQueryResultIterator($qb);
-            $iterator->setBufferSize($args->getLimit());
+            $iterator->setBufferSize($limit);
 
             foreach ($iterator as $entity) {
                 $result = array_merge(
@@ -96,7 +98,8 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
                     )
                 );
 
-                if ($args->getLimit() - count($result) <= 0) {
+                $limit -= count($result);
+                if ($limit <= 0) {
                     break 2;
                 }
             }
@@ -114,8 +117,8 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     }
 
     /**
-     * @param QueryBuilder $relatedEntityClass
-     * @param QueryBuilder $relatedEntityIdFieldName
+     * @param string $relatedEntityClass
+     * @param string $relatedEntityIdFieldName
      *
      * @return QueryBuilder
      */

@@ -76,7 +76,7 @@ class RelatedEmailsProvider
         $attributes = [];
         $metadata = $this->getMetadata($className);
 
-        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className))) {
+        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className), true)) {
             $attributes[] = new EmailAttribute('email');
         }
 
@@ -85,7 +85,11 @@ class RelatedEmailsProvider
         $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));
 
         foreach ($metadata->associationMappings as $name => $assoc) {
-            if (in_array('Oro\Bundle\EmailBundle\Entity\EmailInterface', class_implements($assoc['targetEntity']))) {
+            if (in_array(
+                'Oro\Bundle\EmailBundle\Entity\EmailInterface',
+                class_implements($assoc['targetEntity']),
+                true
+            )) {
                 $attributes[] = new EmailAttribute($name, true);
             } else {
                 if ($depth > 1) {
@@ -156,11 +160,7 @@ class RelatedEmailsProvider
             }
 
             $fieldConfig = $this->entityConfigProvider->getConfig($metadata->name, $fieldName);
-            if (!$fieldConfig->has('contact_information')) {
-                continue;
-            }
-
-            if ($fieldConfig->get('contact_information') === 'email') {
+            if ($fieldConfig->has('contact_information') && $fieldConfig->get('contact_information') === 'email') {
                 $attributes[] = new EmailAttribute($fieldName);
             }
         }
