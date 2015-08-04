@@ -55,8 +55,7 @@ define([
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name="dictionary_part"]',
-            data: 'input.select2-focusser'
+            type: 'select[name="dictionary_part"]'
         },
 
         /**
@@ -253,13 +252,13 @@ define([
 
         getParts: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var dictionaryPartTemplate = this._getTemplate(this.fieldTemplateSelector);
             var parts = [];
             var selectedPartLabel = this._getSelectedChoiceLabel('choices', this.value);
             // add date parts only if embed template used
             if (this.templateTheme !== '') {
                 parts.push(
-                    datePartTemplate({
+                    dictionaryPartTemplate({
                         name: this.name + '_part',
                         choices: this.choices,
                         selectedChoice: value.type,
@@ -273,7 +272,6 @@ define([
 
         _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
-            this._setInputValue(this.criteriaValueSelectors.data, value.data);
 
             return this;
         },
