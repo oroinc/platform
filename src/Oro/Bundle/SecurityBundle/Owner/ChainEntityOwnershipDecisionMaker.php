@@ -4,11 +4,19 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Exception\NotFoundSupportedOwnershipDecisionMakerException;
+use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 
-class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface
+class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionMakerInterface, AceAwareModelInterface
 {
+    /**
+     * @var EntryInterface
+     */
+    protected $ace;
+
     /**
      * @var ArrayCollection|AccessLevelOwnershipDecisionMakerInterface[]
      */
@@ -112,6 +120,35 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
             $domainObject,
             $organization
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isShared()
+    {
+        return $this->getSupportedOwnershipDecisionMaker()->isShared();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resetShared()
+    {
+        $this->getSupportedOwnershipDecisionMaker()->resetShared();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAce(EntryInterface $ace)
+    {
+        $this->ace = $ace;
+
+        $decisionMaker = $this->getSupportedOwnershipDecisionMaker();
+        if ($decisionMaker instanceof AceAwareModelInterface) {
+            $decisionMaker->setAce($ace);
+        }
     }
 
     /**

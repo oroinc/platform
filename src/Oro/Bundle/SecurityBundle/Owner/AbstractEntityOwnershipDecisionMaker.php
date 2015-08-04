@@ -32,6 +32,11 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
     AceAwareModelInterface
 {
     /**
+     * @var bool
+     */
+    protected $shared = false;
+
+    /**
      * @var OwnerTreeProvider
      */
     private $treeProvider;
@@ -407,6 +412,22 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isShared()
+    {
+        return $this->shared;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resetShared()
+    {
+        $this->shared = false;
     }
 
     /**
