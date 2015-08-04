@@ -42,7 +42,7 @@ parameters:
     oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
 
     # halpers
-    oro_entity.helper.dictionary.class:                     Oro\Bundle\EntityBundle\Helper\DictionaryHelper
+    oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
 
 services:
     oro_entity.listener.navigation_listener:

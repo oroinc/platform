@@ -2,14 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Doctrine\ORM\Query\Expr\Join;
-use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
 use LogicException;
 
@@ -38,7 +33,7 @@ class DictionaryFilter extends AbstractFilter
             )
         );
 
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -61,7 +56,7 @@ class DictionaryFilter extends AbstractFilter
     protected function parseData($data)
     {
         $type = isset($data['type']) ? $data['type'] : null;
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)
             && (!is_array($data) || !array_key_exists('value', $data) || empty($data['value']))
         ) {
             return false;
@@ -144,7 +139,10 @@ class DictionaryFilter extends AbstractFilter
 
     /**
      * @param FilterDatasourceAdapterInterface $ds
+     *
      * @return string
+     *
+     * @throws LogicException
      */
     protected function getFilteredFieldName(FilterDatasourceAdapterInterface $ds)
     {

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -81,10 +79,10 @@ class DictionaryFilterType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $children                     = $form->all();
-        $view->vars['value']['type']  = $children['type']->getViewData();
+        $children = $form->all();
+        $view->vars['value']['type'] = $children['type']->getViewData();
         $view->vars['value']['value'] = $children['value']->getViewData();
-        $view->vars['show_filter']    = $options['show_filter'];
+        $view->vars['show_filter'] = $options['show_filter'];
     }
 
     /**
@@ -94,19 +92,18 @@ class DictionaryFilterType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'field_type'       => 'text',
-                'field_options'    => array(),
-                'operator_type'    => 'choice',
+                'field_type' => 'text',
+                'field_options' => array(),
+                'operator_type' => 'choice',
                 'operator_options' => array(),
-                'show_filter'      => false,
-
+                'show_filter' => false,
                 'populate_default' => false,
-                'default_value'    => null,
-                'null_value'       => null,
-                'class'            => null,
+                'default_value' => null,
+                'null_value' => null,
+                'class' => null,
                 'operator_choices' => [
-                    self::TYPE_IN                 => $this->translator->trans('oro.filter.form.label_type_in'),
-                    self::TYPE_NOT_IN             => $this->translator->trans('oro.filter.form.label_type_not_in'),
+                    self::TYPE_IN => $this->translator->trans('oro.filter.form.label_type_in'),
+                    self::TYPE_NOT_IN => $this->translator->trans('oro.filter.form.label_type_not_in'),
                 ],
             )
         )->setRequired(

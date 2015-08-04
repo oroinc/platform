@@ -29,7 +29,8 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
+abstract class RestGetController extends FOSRestController
+    implements EntityManagerAwareInterface, RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
 
@@ -44,7 +45,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     {
         $manager = $this->getManager();
         $qb = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
-        $qb->select('Count(e)');
+        $qb->select('COUNT(e)');
         $result = $qb->getQuery()->getSingleScalarResult();
 
         $responseContext = ['result' => $result, 'query' => $qb];

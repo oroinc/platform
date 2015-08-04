@@ -50,23 +50,4 @@ class EntityFilterType extends AbstractChoiceType
             )
         );
     }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public function finishView(FormView $view, FormInterface $form, array $options)
-//    {
-//        parent::finishView($view, $form, $options);
-//        if (isset($options['populate_default'])) {
-//            $view->vars['populate_default'] = $options['populate_default'];
-//            $view->vars['default_value']    = $options['default_value'];
-//        }
-//        if (!empty($options['null_value'])) {
-//            $view->vars['null_value'] = $options['null_value'];
-//        }
-//
-//        if (!empty($options['class'])) {
-//            $view->vars['class'] = $options['class'];
-//        }
-//    }
 }
