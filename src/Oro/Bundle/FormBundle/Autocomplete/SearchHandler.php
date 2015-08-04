@@ -7,6 +7,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -58,6 +62,11 @@ class SearchHandler implements SearchHandlerInterface
     protected $latestFoundIdsCount = 0;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param string $entityName
      * @param array  $properties
      */
@@ -65,6 +74,7 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->entityName = $entityName;
         $this->properties = $properties;
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -261,26 +271,28 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string $name
+     * @param string $propertyPath
      * @param object|array $item
      * @return mixed
      */
-    protected function getPropertyValue($name, $item)
+    protected function getPropertyValue($propertyPath, $item)
     {
-        $result = null;
+        if (is_array($item)) {
+            $keys = array_map(
+                function ($key) {
+                    return sprintf('[%s]', $key);
 
-        if (is_object($item)) {
-            $method = 'get' . str_replace(' ', '', str_replace('_', ' ', ucwords($name)));
-            if (method_exists($item, $method)) {
-                $result = $item->$method();
-            } elseif (isset($item->$name)) {
-                $result = $item->$name;
-            }
-        } elseif (is_array($item) && array_key_exists($name, $item)) {
-            $result = $item[$name];
+                },
+                explode('.', $propertyPath)
+            );
+            $propertyPath = implode('', $keys);
         }
 
-        return $result;
+        try {
+            return $this->propertyAccessor->getValue($item, $propertyPath);
+        } catch (NoSuchPropertyException $e) {
+            return null;
+        }
     }
 
     /**

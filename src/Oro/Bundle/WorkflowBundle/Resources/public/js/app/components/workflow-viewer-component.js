@@ -4,6 +4,7 @@ define(function(require) {
 
     var WorkflowViewerComponent;
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var workflowModelFactory = require('../../tools/workflow-model-factory');
     var FlowchartViewerWorkflowView = require('../views/flowchart/viewer/workflow-view');
@@ -22,11 +23,14 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            var flowchartOptions = _.pick(options, ['connectionOptions', 'chartOptions']);
+            this.flowchartEnabled = !tools.isMobile();
+            var flowchartOptions = this.flowchartEnabled ? {} : _.pick(options, ['connectionOptions', 'chartOptions']);
             WorkflowViewerComponent.__super__.initialize.apply(this, arguments);
             this.model = workflowModelFactory.createWorkflowModel(options);
-            this.flowchartState = new FlowchartStateModel();
-            this.FlowchartWorkflowView = FlowchartViewerWorkflowView;
+            if (this.flowchartEnabled) {
+                this.flowchartState = new FlowchartStateModel();
+                this.FlowchartWorkflowView = FlowchartViewerWorkflowView;
+            }
             this.initViews(options._sourceElement, flowchartOptions);
         },
 
@@ -38,16 +42,18 @@ define(function(require) {
          *  contain connectionOptions and chartOptions properties
          */
         initViews: function($el, flowchartOptions) {
-            flowchartOptions = _.extend(flowchartOptions, {
-                model: this.model,
-                el: $el.find('.workflow-flowchart'),
-                flowchartState: this.flowchartState
-            });
-            this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
-            this.flowchartControlView = new FlowchartControlView({
-                model: this.flowchartState,
-                el: $el.find('.workflow-flowchart-controls')
-            });
+            if (this.flowchartEnabled) {
+                flowchartOptions = _.extend(flowchartOptions, {
+                    model: this.model,
+                    el: $el.find('.workflow-flowchart'),
+                    flowchartState: this.flowchartState
+                });
+                this.flowchartView = new this.FlowchartWorkflowView(flowchartOptions);
+                this.flowchartControlView = new FlowchartControlView({
+                    model: this.flowchartState,
+                    el: $el.find('.workflow-flowchart-controls')
+                });
+            }
         }
 
     });

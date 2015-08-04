@@ -43,7 +43,7 @@ class OroRichTextType extends AbstractType
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
      * @var array
      */
-    protected $toolbars = [
+    public static $toolbars = [
         self::TOOLBAR_SMALL   => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo'],
         self::TOOLBAR_DEFAULT => [
             'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
@@ -52,6 +52,11 @@ class OroRichTextType extends AbstractType
             'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
         ],
     ];
+
+    /**
+     * @var array
+     */
+    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo'];
 
     /**
      * @param ConfigManager   $configManager
@@ -93,7 +98,7 @@ class OroRichTextType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $defaultWysiwygOptions = [
-            'plugins'            => ['textcolor', 'code', 'link', 'bdesk_photo'],
+            'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
             'skin_url'           => 'bundles/oroform/css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
@@ -120,14 +125,21 @@ class OroRichTextType extends AbstractType
         $resolver->setNormalizers(
             [
                 'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
+                    if (!empty($wysiwygOptions['toolbar'])) {
+                        $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                        unset($wysiwygOptions['toolbar_type']);
+
+                        return $wysiwygOptions;
+                    }
+
                     if (empty($wysiwygOptions['toolbar_type'])
-                        || !array_key_exists($wysiwygOptions['toolbar_type'], $this->toolbars)
+                        || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
                     ) {
                         $toolbarType = self::TOOLBAR_DEFAULT;
                     } else {
                         $toolbarType = $wysiwygOptions['toolbar_type'];
                     }
-                    $wysiwygOptions['toolbar'] = $this->toolbars[$toolbarType];
+                    $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
 
                     $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
                     unset($wysiwygOptions['toolbar_type']);
