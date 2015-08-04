@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\ORM\Query\Expr\Join;
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+
+use LogicException;
 
 class DictionaryFilter extends AbstractFilter
 {
@@ -29,7 +34,7 @@ class DictionaryFilter extends AbstractFilter
             $this->buildComparisonExpr(
                 $ds,
                 $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
+                $this->getFilteredFieldName($ds),
                 $parameterName
             )
         );
@@ -123,5 +128,34 @@ class DictionaryFilter extends AbstractFilter
             default:
                 return $value;
         }
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @return string
+     */
+    protected function getFilteredFieldName(FilterDatasourceAdapterInterface $ds)
+    {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            throw new LogicException(
+                sprintf(
+                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
+                    get_class($ds)
+                )
+            );
+        }
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        list($joinAlias, $field) = explode('.', $fieldName);
+        $qb = $ds->getQueryBuilder();
+        $em = $qb->getEntityManager();
+        $class = $this->get('class');
+        $metadata = $em->getClassMetadata($class);
+        $fieldNames = $metadata->getIdentifierFieldNames();
+        if ($count = count($fieldNames) !== 1) {
+            throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+        }
+        $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);
+
+        return $field;
     }
 }
