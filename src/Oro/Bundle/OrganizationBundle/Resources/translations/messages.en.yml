@@ -4,6 +4,7 @@ oro:
     custom_entity:
         owner.label:          Owner
         owner.description:    ""
+        organization.label:   Organization
 
     business_unit:
         menu:
