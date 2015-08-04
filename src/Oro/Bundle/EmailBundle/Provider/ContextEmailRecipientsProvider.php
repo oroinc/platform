@@ -27,9 +27,9 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
             return [];
         }
 
-        return array_filter(
-            $this->relatedEmailsProvider->getEmails($args->getRelatedEntity(), 2),
-            EmailRecipientsHelper::createRecipientsFilter($args)
+        return EmailRecipientsHelper::filterRecipients(
+            $args,
+            $this->relatedEmailsProvider->getEmails($args->getRelatedEntity(), 2)
         );
     }
 

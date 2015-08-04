@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Closure;
-
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 
 class EmailRecipientsHelper
 {
     /**
-     * @param EmailRecipientsProviderArgs $providerArgs
-     * @return Closure
+     * @param EmailRecipientsProviderArgs $args
+     * @param array $recipients
+     *
+     * @return array
      */
-    public static function createRecipientsFilter(EmailRecipientsProviderArgs $providerArgs)
+    public static function filterRecipients(EmailRecipientsProviderArgs $args, array $recipients)
     {
-        $query = $providerArgs->getQuery();
-        $excludedEmails = $providerArgs->getExcludedEmails();
+        $unExcludedEmails = array_filter(array_keys($recipients), function ($email) use ($args) {
+            return !in_array($email, $args->getExcludedEmails());
+        });
 
-        return function ($email) use ($excludedEmails, $query) {
-            return !in_array($email, $excludedEmails, true) && stripos($email, $query) !== false;
-        };
+        $unExcludedRecipients = array_intersect_key($recipients, array_flip($unExcludedEmails));
+        return array_filter($unExcludedRecipients, function ($email) use ($args) {
+            return stripos($email, $args->getQuery()) !== false;
+        });
     }
 }

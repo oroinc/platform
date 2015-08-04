@@ -92,9 +92,9 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             foreach ($iterator as $entity) {
                 $result = array_merge(
                     $result,
-                    array_filter(
-                        $this->relatedEmailsProvider->getEmails($entity, 2),
-                        EmailRecipientsHelper::createRecipientsFilter($args)
+                    EmailRecipientsHelper::filterRecipients(
+                        $args,
+                        $this->relatedEmailsProvider->getEmails($entity, 2)
                     )
                 );
 

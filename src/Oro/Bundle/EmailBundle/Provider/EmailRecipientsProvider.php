@@ -35,6 +35,10 @@ class EmailRecipientsProvider
         $emails = [];
         $excludeEmails = [];
         foreach ($this->providers as $provider) {
+            if ($limit <= 0) {
+                break;
+            }
+
             $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails);
             $recipients = $provider->getRecipients($args);
             if (!$recipients) {
