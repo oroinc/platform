@@ -4,10 +4,13 @@ namespace Oro\Bundle\EntityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
+use Gedmo\Translatable\TranslatableListener;
 
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
@@ -17,6 +20,9 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var DictionaryHelper */
     protected $dictionaryHelper;
 
+    /** @var  LocaleSettings */
+    protected $localeSettings;
+
     /**
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
@@ -25,11 +31,14 @@ class DictionaryApiEntityManager extends ApiEntityManager
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
-        DictionaryHelper $dictionaryHelper
+        DictionaryHelper $dictionaryHelper,
+        LocaleSettings $localeSettings
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
+        $this->localeSettings = $localeSettings;
+
     }
 
     /**
@@ -75,15 +84,24 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueBySearchQuery($searchQuery)
     {
+        $locale = $this->localeSettings->getLocale();
+
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
         $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         if (!empty($searchQuery)) {
-            $qb->andWhere('e.' . $labelField . ' LIKE :like')
-                ->setParameter('like', '%' . $searchQuery . '%');
+            $qb->andWhere('e.' . $labelField . ' LIKE :translated_title')
+                ->setParameter('translated_title', '%' . $searchQuery . '%');
         }
-        $results = $qb->getQuery()->getResult();
+
+        $query = $qb->getQuery();
+        $query->setHint(
+            Query::HINT_CUSTOM_OUTPUT_WALKER,
+            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+        );
+        $query->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale);
+        $results = $query->getResult();
 
         return $this->prepareData($results, $keyField, $labelField);
     }
@@ -104,8 +122,8 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $qb->andWhere('e.' . $keyField . ' in (:keys)')
            ->setParameter('keys', $keys);
 
-
-        $results = $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+        $results = $query->getResult();
 
         return $this->prepareData($results, $keyField, $labelField);
     }
