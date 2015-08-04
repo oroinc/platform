@@ -45,7 +45,7 @@ class UserRepository extends EntityRepository
 
     /**
      * @param array $usernames
-     * 
+     *
      * @return array
      */
     public function findUsersByUsernames(array $usernames)
