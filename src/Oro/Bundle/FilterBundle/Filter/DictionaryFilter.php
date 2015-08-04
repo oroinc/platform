@@ -80,7 +80,7 @@ class DictionaryFilter extends AbstractFilter
 
 
         $data['type']  = $type;
-        $data['value'] = $this->parseValue($data['type'], $data['value']);
+        $data['value'] = $this->parseValue($data['value']);
 
         return $data;
     }
@@ -137,7 +137,7 @@ class DictionaryFilter extends AbstractFilter
      */
     protected function parseValue($value)
     {
-        $value = count($value == 1) ? $value[0] : $value;
+        $value = count($value) === 1 ? $value[0] : $value;
 
         return $value;
     }
@@ -157,7 +157,7 @@ class DictionaryFilter extends AbstractFilter
             );
         }
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-        list($joinAlias, $field) = explode('.', $fieldName);
+        list($joinAlias) = explode('.', $fieldName);
         $qb = $ds->getQueryBuilder();
         $em = $qb->getEntityManager();
         $class = $this->get('class');
