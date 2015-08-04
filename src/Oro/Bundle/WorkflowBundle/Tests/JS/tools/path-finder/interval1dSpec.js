@@ -10,7 +10,7 @@ define(function(require) {
             expect(a.max).toBe(7);
             expect(function() {
                 return new Interval1d(10, 7);
-            }).toThrow('Start of interval shouldn\'t be more that its end');
+            }).toThrow(jasmine.any(RangeError));
         });
 
         it('check width calculation', function() {
@@ -25,6 +25,7 @@ define(function(require) {
             var b = new Interval1d(2, 8);
             var c = new Interval1d(30, 40);
             var intersection = a.intersection(b);
+            expect(intersection instanceof Interval1d).toBe(true);
             expect(intersection.min).toBe(5);
             expect(intersection.max).toBe(8);
             expect(a.intersection(c)).toBe(null);

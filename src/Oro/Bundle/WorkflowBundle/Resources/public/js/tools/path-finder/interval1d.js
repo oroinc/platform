@@ -2,7 +2,7 @@ define(function() {
     'use strict';
     function Interval1d(min, max) {
         if (min > max) {
-            throw 'Start of interval shouldn\'t be more that its end';
+            throw new RangeError('Start of interval shouldn\'t be more that its end');
         }
         this.min = min;
         this.max = max;

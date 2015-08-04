@@ -2,7 +2,7 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
     'use strict';
     function Rectangle(left, top, width, height) {
         if (width < 0 || height < 0) {
-            throw 'Rectangle shouldn\'t have negative dimensions';
+            throw new RangeError('Rectangle shouldn\'t have negative dimensions');
         }
         if (left === void 0) {
             left = 0;

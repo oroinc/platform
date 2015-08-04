@@ -9,6 +9,10 @@ define(function(require) {
     var Interval1d = require('oroworkflow/js/tools/path-finder/interval1d');
 
     describe('oroworkflow/js/tools/path-finder/rectangle', function() {
+        afterEach(function() {
+            $('svg').remove();
+        });
+
         it('should correct initialize', function() {
             var rectangle1 = new Rectangle(10, 20, 30, 40);
             var rectangle2 = new Rectangle(new Interval1d(10, 40), new Interval1d(20, 60));
@@ -75,15 +79,9 @@ define(function(require) {
         it('should correct validate itself', function() {
             var rectangle1 = new Rectangle(10, 20, 30, 40);
             expect(rectangle1 instanceof Rectangle).toBe(true);
-            expect(function() {
-                return new Rectangle(20, 30, -30, 40);
-            }).toThrow('Rectangle shouldn\'t have negative dimensions');
-            expect(function() {
-                return new Rectangle(20, 30, 30, -40);
-            }).toThrow('Rectangle shouldn\'t have negative dimensions');
-            expect(function() {
-                return new Rectangle(20, 30, -30, -40);
-            }).toThrow('Rectangle shouldn\'t have negative dimensions');
+            expect(function() { return new Rectangle(20, 30, -30, 40); }).toThrow(jasmine.any(RangeError));
+            expect(function() { return new Rectangle(20, 30, 30, -40); }).toThrow(jasmine.any(RangeError));
+            expect(function() { return new Rectangle(20, 30, -30, -40); }).toThrow(jasmine.any(RangeError));
         });
 
         it('should correct calculate its sides', function() {
@@ -128,12 +126,11 @@ define(function(require) {
 
         it('check point draw', function() {
             var rectangle = new Rectangle(10, 20, 30, 40);
-            rectangle.draw();
-            expect(document.body).toContainElement('path[d="M 10 20 L 40 20"]');
-            expect(document.body).toContainElement('path[d="M 10 20 L 10 60"]');
-            expect(document.body).toContainElement('path[d="M 10 60 L 40 60"]');
-            expect(document.body).toContainElement('path[d="M 40 20 L 40 60"]');
-            $('svg').remove();
+            rectangle.draw('blue');
+            expect(document.body).toContainElement('path[d="M 10 20 L 40 20"][stroke=blue]');
+            expect(document.body).toContainElement('path[d="M 10 20 L 10 60"][stroke=blue]');
+            expect(document.body).toContainElement('path[d="M 10 60 L 40 60"][stroke=blue]');
+            expect(document.body).toContainElement('path[d="M 40 20 L 40 60"][stroke=blue]');
         });
     });
 });
