@@ -46,7 +46,7 @@ oro_entity_config:
                             required:       false
                             label:          oro.attachment.mimetypes
                             association_class: 'OroAttachmentBundle:Attachment'
-
+                            tooltip:        oro.attachment.mimetypes.tooltip
 
                 # this attribute can be used to prohibit changing the attachment association state (no matter whether
                 # it is enabled or not) for the entity
