@@ -2,24 +2,46 @@
 
 namespace Oro\Bundle\CronBundle\Filter;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
+use Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class CommandWithArgsFilter extends StringFilter
 {
-    const REGEX_STRING = '([^\s]+?)(?:\s|(?<!\\\\)"|(?<!\\\\)\'|$)';
-    const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')';
+    /** @var CommandArgsTokenizer */
+    protected $tokenizer;
+
+    /** @var FilterDatasourceAdapterInterface */
+    protected $ds;
+
+    /**
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     * @param CommandArgsTokenizer $tokenizer
+     */
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        CommandArgsTokenizer $tokenizer
+    ) {
+        parent::__construct($factory, $util);
+        $this->tokenizer = $tokenizer;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $data = $this->parseData($data);
+        $this->ds = $ds;
+        $data     = $this->parseData($data);
+        $this->ds = null;
+
         if (!$data) {
             return false;
         }
@@ -93,61 +115,11 @@ class CommandWithArgsFilter extends StringFilter
      */
     protected function getValueParts($comparisonType, $value)
     {
-        try {
-            $tokens = $this->tokenize($value);
-        } catch (\InvalidArgumentException $e) {
-            // use simplifier tokenizer for an invalid value
-            $tokens = preg_split('/ /', $value, -1, PREG_SPLIT_NO_EMPTY);
-        }
-
         return array_map(
             function ($val) use ($comparisonType) {
                 return parent::parseValue($comparisonType, $val);
             },
-            $tokens
+            $this->tokenizer->tokenize($value, $this->ds->getDatabasePlatform())
         );
-    }
-
-    /**
-     * @param string $str The input string to tokenize
-     *
-     * @return string[] An array of tokens
-     *
-     * @throws \InvalidArgumentException When unable to parse the input string
-     */
-    protected function tokenize($str)
-    {
-        $tokens = [];
-        $length = strlen($str);
-        $i      = 0;
-        while ($i < $length) {
-            if (preg_match('/\s+/A', $str, $match, null, $i)) {
-            } elseif (preg_match('/([^="\'\s]+?)(=?)(' . self::REGEX_QUOTED_STRING . '+)/A', $str, $match, null, $i)) {
-                $tokens[] = $match[1] . $match[2] . $this->encloseString(substr($match[3], 1, strlen($match[3]) - 2));
-            } elseif (preg_match('/' . self::REGEX_QUOTED_STRING . '/A', $str, $match, null, $i)) {
-                $tokens[] = $this->encloseString(substr($match[0], 1, strlen($match[0]) - 2));
-            } elseif (preg_match('/' . self::REGEX_STRING . '/A', $str, $match, null, $i)) {
-                $tokens[] = stripcslashes($match[1]);
-            } else {
-                // should never happen
-                throw new \InvalidArgumentException(
-                    sprintf('Unable to parse input near "... %s ..."', substr($str, $i, 10))
-                );
-            }
-
-            $i += strlen($match[0]);
-        }
-
-        return $tokens;
-    }
-
-    /**
-     * @param string $str
-     *
-     * @return string
-     */
-    protected function encloseString($str)
-    {
-        return '\\\\"' . str_replace('\\', '\\\\', $str) . '\\\\"';
     }
 }
