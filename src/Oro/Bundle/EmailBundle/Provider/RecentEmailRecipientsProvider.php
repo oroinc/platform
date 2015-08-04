@@ -70,7 +70,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     {
         $emails = [];
         foreach ($result as $row) {
-            $result[$row['email']] = $row['name'];
+            $emails[$row['email']] = $row['name'];
         }
 
         return $emails;

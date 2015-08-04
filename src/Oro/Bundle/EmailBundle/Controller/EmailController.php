@@ -32,6 +32,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class EmailController
@@ -508,15 +509,6 @@ class EmailController extends Controller
      */
     public function autocompleteRecipientAction(Request $request)
     {
-        $relatedEntity = null;
-
-        $entityClass = $request->query->get('entityClass');
-        $entityId = $request->query->get('entityId');
-        if ($entityClass && $entityId) {
-            $em = $this->getEntityManagerForClass($entityClass);
-            $relatedEntity = $em->getReference($entityClass, $entityId);
-        }
-
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
             $results = [
@@ -526,11 +518,22 @@ class EmailController extends Controller
                 ],
             ];
         } else {
+            $relatedEntity = null;
+            $entityClass = $request->query->get('entityClass');
+            $entityId = $request->query->get('entityId');
+            if ($entityClass && $entityId) {
+                $em = $this->getEntityManagerForClass($entityClass);
+                $relatedEntity = $em->getReference($entityClass, $entityId);
+                if ($relatedEntity === $this->getUser()) {
+                    $relatedEntity = null;
+                }
+            }
+
             $limit = $request->query->get('per_page', 100);
             $results = $this->getEmailRecipientsProvider()->getEmailRecipients($relatedEntity, $query, $limit);
         }
 
-        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
+        return new JsonResponse(['results' => $results]);
     }
 
     /**
