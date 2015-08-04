@@ -9,12 +9,11 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
@@ -32,7 +31,7 @@ class ApiEntityManager
     /** @var ClassMetadata|ClassMetadataInfo */
     protected $metadata;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DoctrineHelper */
@@ -75,9 +74,9 @@ class ApiEntityManager
     /**
      * Sets a event dispatcher
      *
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -242,13 +241,23 @@ class ApiEntityManager
         $qb = $this->getRepository()->createQueryBuilder('e');
         $this->applyJoins($qb, $joins);
 
-        // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-        // http://www.doctrine-project.org/jira/browse/DDC-2798
-        // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-        QueryBuilderHelper::addCriteria($qb, $criteria);
-        // $qb->addCriteria($criteria);
+        $qb->addCriteria($criteria);
 
         return $qb;
+    }
+
+    /**
+     * Returns query builder that could be used for fetching entity by its id
+     *
+     * @param mixed $id The id of an entity
+     *
+     * @return QueryBuilder
+     */
+    public function getItemQueryBuilder($id)
+    {
+        return $this->getRepository()->createQueryBuilder('e')
+            ->where(sprintf('e.%s = :id', $this->doctrineHelper->getSingleEntityIdentifierFieldName($this->class)))
+            ->setParameter('id', $id);
     }
 
     /**
@@ -272,10 +281,7 @@ class ApiEntityManager
      */
     public function serializeOne($id)
     {
-        $qb = $this->getRepository()->createQueryBuilder('e')
-            ->where('e.id = :id')
-            ->setParameter('id', $id);
-
+        $qb     = $this->getItemQueryBuilder($id);
         $config = $this->getCachedSerializationConfig();
         $this->entitySerializer->prepareQuery($qb, $config);
         $entity = $qb->getQuery()->getResult();

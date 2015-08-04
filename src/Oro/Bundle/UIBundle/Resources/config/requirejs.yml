@@ -48,6 +48,22 @@ config:
         'oroui/lib/jquery.datepair-0.4.4/jquery.datepair':
             deps:
                 - 'oroui/lib/jquery.datepair-0.4.4/datepair'
+        'cryptojs/enc-base64':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/hmac':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/sha256':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
+        'cryptojs/pbkdf2':
+            deps:
+                - 'cryptojs/core'
+            exports: 'CryptoJS'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -58,6 +74,7 @@ config:
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/jquery-timepicker-l10n'
+            'base64': 'oroui/js/extend/base64'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
@@ -81,7 +98,8 @@ config:
         'oroui/js/app/components/base/component':
             'backbone': 'backbone'
             'chaplin': 'chaplin'
-
+        'oroui/js/extend/base64':
+            'base64': 'base64'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
@@ -89,7 +107,7 @@ config:
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
-        'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.min.js'
+        'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
@@ -107,6 +125,11 @@ config:
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
+        'cryptojs/core': 'bundles/oroui/lib/cryptojs/core-min.js'
+        'cryptojs/enc-base64': 'bundles/oroui/lib/cryptojs/enc-base64-min.js'
+        'cryptojs/hmac': 'bundles/oroui/lib/cryptojs/hmac-min.js'
+        'cryptojs/sha256': 'bundles/oroui/lib/cryptojs/sha256-min.js'
+        'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
@@ -173,4 +196,9 @@ build:
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
-        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty'
+        'oroui/lib/jquery.datepair-0.4.4/jquery.datepair': 'empty:'
+        'cryptojs/core': 'empty:'
+        'cryptojs/enc-base64': 'empty:'
+        'cryptojs/hmac': 'empty:'
+        'cryptojs/sha256': 'empty:'
+        'cryptojs/pbkdf2': 'empty:'

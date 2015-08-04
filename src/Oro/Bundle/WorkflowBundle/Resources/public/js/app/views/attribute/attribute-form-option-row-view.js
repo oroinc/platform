@@ -1,13 +1,12 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var AttributeFormOptionRowView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        __ = require('orotranslation/js/translator'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        Confirmation = require('oroui/js/delete-confirmation');
+    var AttributeFormOptionRowView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var Confirmation = require('oroui/js/delete-confirmation');
 
     AttributeFormOptionRowView = BaseView.extend({
         tagName: 'tr',
@@ -27,7 +26,7 @@ define(function(require) {
             }
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-row-template').html();
             this.template = _.template(template);
@@ -45,7 +44,7 @@ define(function(require) {
             var confirm = new Confirmation({
                 content: __('Are you sure you want to delete this field?')
             });
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 this.trigger('removeFormOption', this.options.data);
                 this.remove();
             }, this));

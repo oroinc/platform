@@ -33,7 +33,7 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $container->expects($this->once())
-            ->method('getDefinition')
+            ->method('findDefinition')
             ->with('event_dispatcher')
             ->will($this->returnValue($dispatcher));
 

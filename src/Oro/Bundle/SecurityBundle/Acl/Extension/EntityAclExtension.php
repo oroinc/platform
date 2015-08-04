@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Doctrine\Common\Util\ClassUtils;
-
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -172,6 +171,11 @@ class EntityAclExtension extends AbstractAclExtension
             return true;
         }
 
+        $delim = strpos($type, '@');
+        if ($delim !== false) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
+        }
+
         if ($id === $this->getExtensionKey()) {
             $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
         } else {
@@ -228,10 +232,10 @@ class EntityAclExtension extends AbstractAclExtension
         if (is_string($val)) {
             return $this->fromDescriptor($val);
         } elseif ($val instanceof AclAnnotation) {
-            return new ObjectIdentity(
-                $val->getType(),
-                $this->entityClassResolver->getEntityClass($val->getClass())
-            );
+            $class = $this->entityClassResolver->getEntityClass($val->getClass());
+            $group = $val->getGroup();
+
+            return new ObjectIdentity($val->getType(), !empty($group) ? $group . '@' . $class : $class);
         }
 
         return $this->fromDomainObject($val);
@@ -514,14 +518,13 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function fromDescriptor($descriptor)
     {
-        $type = $id = null;
-        $this->parseDescriptor($descriptor, $type, $id);
+        $type = $id = $group = null;
+        $this->parseDescriptor($descriptor, $type, $id, $group);
+
+        $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
 
         if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity(
-                $id,
-                $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type))
-            );
+            return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
         }
 
         throw new \InvalidArgumentException(
@@ -546,7 +549,7 @@ class EntityAclExtension extends AbstractAclExtension
         try {
             return new ObjectIdentity(
                 $this->objectIdAccessor->getId($domainObject),
-                ClassUtils::getClass($domainObject)
+                ClassUtils::getRealClass($domainObject)
             );
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
@@ -660,10 +663,10 @@ class EntityAclExtension extends AbstractAclExtension
         if ($object instanceof ObjectIdentity) {
             $className = $object->getType();
         } elseif (is_string($object)) {
-            $className = $id = null;
-            $this->parseDescriptor($object, $className, $id);
+            $className = $id = $group = null;
+            $this->parseDescriptor($object, $className, $id, $group);
         } else {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
         }
 
         return $className;

@@ -125,6 +125,26 @@ class SearchMappingProvider
     }
 
     /**
+     * Gets the FQCN of an entity by given search alias
+     *
+     * @param $alias
+     *
+     * @return null|string
+     */
+    public function getEntityClass($alias)
+    {
+        $mappingConfig = $this->getMappingConfig();
+
+        foreach ($mappingConfig as $className => $config) {
+            if ($config['alias'] == $alias) {
+                return $className;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get list of available entity classes
      *
      * @return array

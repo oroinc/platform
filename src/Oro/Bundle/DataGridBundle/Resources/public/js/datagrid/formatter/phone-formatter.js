@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'backgrid'
-    ], function (_, Backgrid) {
+    ], function(_, Backgrid) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ define(['underscore', 'backgrid'
      * @class   orodatagrid.datagrid.formatter.PhoneFormatter
      * @extends Backgrid.CellFormatter
      */
-    var PhoneFormatter = function (options) {
+    var PhoneFormatter = function(options) {
         Backgrid.CellFormatter.call(this, options);
     };
     PhoneFormatter.prototype = Object.create(Backgrid.CellFormatter);
@@ -21,7 +20,7 @@ define(['underscore', 'backgrid'
          * @param {string|number} rawData
          * @return {string}
          */
-        fromRaw: function (rawData) {
+        fromRaw: function(rawData) {
             if (rawData === null) {
                 return '';
             }

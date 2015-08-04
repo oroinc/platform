@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backbone',
     'underscore',
     'routing'
-], function (Backbone, _, routing) {
+], function(Backbone, _, routing) {
     'use strict';
 
     var GridViewsModel;
@@ -26,8 +24,8 @@ define([
 
         /** @property */
         directions: {
-            "ASC": "-1",
-            "DESC": "1"
+            ASC: '-1',
+            DESC: '1'
         },
 
         /**
@@ -40,7 +38,7 @@ define([
          * @param {Array}  data.sorters
          * @param {Array}  data.filters
          */
-        initialize: function (data) {
+        initialize: function(data) {
             this.urlRoot = routing.generate(this.route);
 
             if (_.isArray(data.filters) && _.isEmpty(data.filters)) {
@@ -65,7 +63,7 @@ define([
          *
          * @returns {}
          */
-        toGridState: function () {
+        toGridState: function() {
             return {
                 filters:  this.get('filters'),
                 sorters:  this.get('sorters'),
@@ -76,7 +74,7 @@ define([
         /**
          * @returns {Array}
          */
-        toJSON: function () {
+        toJSON: function() {
             return _.omit(this.attributes, ['editable', 'deletable']);
         }
     });

@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor;
 
@@ -55,7 +55,7 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSyncFolders()
     {
-        $origin              = new ImapEmailOrigin();
+        $origin              = new UserEmailOrigin();
         /** @var ImapEmailFolder[] $existingImapFolders */
         $existingImapFolders = [
             // existing with UIDVALIDITY equal

@@ -6,10 +6,9 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -24,7 +23,7 @@ class AssociationManager
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DoctrineHelper */
@@ -34,14 +33,14 @@ class AssociationManager
     protected $entityNameResolver;
 
     /**
-     * @param ConfigManager      $configManager
-     * @param EventDispatcher    $eventDispatcher
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager            $configManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param EntityNameResolver       $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver
     ) {
@@ -215,11 +214,7 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-            // http://www.doctrine-project.org/jira/browse/DDC-2798
-            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-            QueryBuilderHelper::addCriteria($subQb, $subCriteria);
-            // $subQb->addCriteria($criteria);
+            $subQb->addCriteria($subCriteria);
 
             $subQuery = $subQb->getQuery();
 
@@ -339,11 +334,7 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-            // http://www.doctrine-project.org/jira/browse/DDC-2798
-            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-            QueryBuilderHelper::addCriteria($subQb, $subCriteria);
-            // $subQb->addCriteria($criteria);
+            $subQb->addCriteria($subCriteria);
 
             $subQuery = $subQb->getQuery();
 
