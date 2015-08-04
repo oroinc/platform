@@ -29,8 +29,7 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class RestGetController extends FOSRestController
-    implements EntityManagerAwareInterface, RestApiReadInterface
+abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
 
