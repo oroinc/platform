@@ -87,12 +87,11 @@ define(['./util', './line2d'], function(util, Line2d) {
             if (this._line) {
                 return this._line;
             }
-            var direction = this.a.sub(this.b).unitVector;
-            var slope = direction.y / direction.x;
+            var slope = (this.a.y - this.b.y) / (this.a.x - this.b.x);
             if (slope === Infinity || slope === -Infinity) {
                 this._line = new Line2d(Infinity, this.a.x);
             } else {
-                this._line = new Line2d(slope, this.a.y + this.a.x * slope);
+                this._line = new Line2d(slope, this.a.y - this.a.x * slope);
             }
             return this._line;
         },

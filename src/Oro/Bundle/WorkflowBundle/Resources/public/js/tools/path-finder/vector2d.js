@@ -18,7 +18,7 @@ define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Li
             if (slope === Infinity || slope === -Infinity) {
                 return new Line2d(Infinity, this.start.x);
             }
-            return new Line2d(slope, this.start.y + this.start.x * slope);
+            return new Line2d(slope, this.start.y - this.start.x * slope);
         },
         enumerable: true,
         configurable: true
