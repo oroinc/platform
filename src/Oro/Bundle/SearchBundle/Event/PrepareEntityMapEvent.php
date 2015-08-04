@@ -8,26 +8,38 @@ class PrepareEntityMapEvent extends Event
 {
     const EVENT_NAME = 'oro_search.prepare_entity_map';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $data;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $entity;
 
-    public function __construct($entity, $className, $data)
+    /** @var array */
+    protected $entityMapping;
+
+    /**
+     * @param object $entity
+     * @param string $className
+     * @param array  $data
+     * @param array  $entityMapping
+     */
+    public function __construct($entity, $className, $data, $entityMapping)
     {
-        $this->className = $className;
-        $this->data = $data;
-        $this->entity = $entity;
+        $this->className     = $className;
+        $this->data          = $data;
+        $this->entity        = $entity;
+        $this->entityMapping = $entityMapping;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityMapping()
+    {
+        return $this->entityMapping;
     }
 
     /**
