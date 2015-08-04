@@ -46,9 +46,12 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
         // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
         // Example: explode(',', '') => array(0=>'').
         // @todo remove after vendor fixation
-        $value = array_filter($value, function($val){
-            return $val !== '';
-        });
+        $value = array_filter(
+            $value,
+            function ($val) {
+                return $val !== '';
+            }
+        );
 
         if (!$value) {
             return array();

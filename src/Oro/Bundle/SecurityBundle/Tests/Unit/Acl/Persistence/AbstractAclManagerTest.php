@@ -16,7 +16,7 @@ class AbstractAclManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->abstract = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Persistence\AbstractAclManager')
-            ->getMockForAbstractClass();;
+            ->getMockForAbstractClass();
     }
 
     public function testGetSid()

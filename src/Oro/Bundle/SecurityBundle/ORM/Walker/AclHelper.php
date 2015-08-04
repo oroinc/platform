@@ -515,7 +515,6 @@ class AclHelper
         $requiredKeys = array('metadata', 'parent', 'relation', 'map', 'nestingLevel', 'token');
 
         foreach ($queryComponents as $dqlAlias => $queryComponent) {
-
             if (array_diff($requiredKeys, array_keys($queryComponent))) {
                 throw QueryException::invalidQueryComponent($dqlAlias);
             }

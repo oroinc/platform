@@ -27,12 +27,10 @@ class ShareTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $builder->expects($this->at(0))->method('add')->with(
-            'entityClass', 'hidden', ['required' => false]
-        )->willReturn($builder);
-        $builder->expects($this->at(1))->method('add')->with(
-            'entityId', 'hidden', ['required' => false]
-        )->willReturn($builder);
+        $builder->expects($this->at(0))->method('add')->with('entityClass', 'hidden', ['required' => false])
+            ->willReturn($builder);
+        $builder->expects($this->at(1))->method('add')->with('entityId', 'hidden', ['required' => false])
+            ->willReturn($builder);
         $builder->expects($this->at(2))->method('add')->with(
             'users',
             'oro_user_organization_acl_multiselect',

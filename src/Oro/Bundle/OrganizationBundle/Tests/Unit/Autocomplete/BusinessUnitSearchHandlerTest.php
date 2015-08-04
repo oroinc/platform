@@ -43,7 +43,9 @@ class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $this->serviceLink = $this->getMockBuilder(
+            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,7 +54,11 @@ class BusinessUnitSearchHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->handler = new BusinessUnitSearchHandler(
-            $this->entityManager, $this->className, $this->fields, $this->displayFields, $this->serviceLink
+            $this->entityManager,
+            $this->className,
+            $this->fields,
+            $this->displayFields,
+            $this->serviceLink
         );
     }
 

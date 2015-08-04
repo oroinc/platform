@@ -63,7 +63,10 @@ class RemoveAceByShareScopeAction extends AbstractAction
     {
         $aclClass = $this->manager->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $context->data->getClassName()]);
-        $removeScopes = array_diff($context->old['security']['share_scopes'], $context->new['security']['share_scopes']);
+        $removeScopes = array_diff(
+            $context->old['security']['share_scopes'],
+            $context->new['security']['share_scopes']
+        );
 
         if (!$aclClass || empty($removeScopes)) {
             return;
