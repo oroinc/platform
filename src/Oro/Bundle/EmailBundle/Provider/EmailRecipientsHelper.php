@@ -18,7 +18,7 @@ class EmailRecipientsHelper
         $excludedEmails = $providerArgs->getExcludedEmails();
 
         return function ($email) use ($excludedEmails, $query) {
-            return !in_array($email, $excludedEmails) && stripos($email, $query) !== false;
+            return !in_array($email, $excludedEmails, true) && stripos($email, $query) !== false;
         };
     }
 }
