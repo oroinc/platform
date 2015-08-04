@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger'
-    ], function($, _, __, routing, messenger) {
+define(['jquery', 'underscore'
+    ], function($, _) {
     'use strict';
 
     /**
@@ -10,7 +10,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
      *
      * @return {jQuery.Deferred} promise
      */
-    return function (filterOptions, context) {
+    return function(filterOptions, context) {
         var promise = new $.Deferred();
         var className = _.last(context).field.related_entity_name;
 

@@ -4,9 +4,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
-    './abstract-filter',
-    './choice-filter'
-], function($, routing, _, __, tools, AbstractFilter, ChoiceFilter) {
+    './choice-filter',
+    'oroui/js/messenger'
+], function($, routing, _, __, tools, ChoiceFilter, messenger) {
     'use strict';
 
     var DictionaryFilter;
@@ -19,7 +19,15 @@ define([
      * @extends oro.filter.SelectFilter
      */
     DictionaryFilter = ChoiceFilter.extend({
-        renderMode: 'select2',
+        /**
+          * List available modes for filter
+         * @property
+         */
+        mode: {
+            dropdown: 'select2',
+            autocomplete: 'select2autocomplate'
+        },
+
         /**
          * Filter selector template
          *
@@ -28,28 +36,18 @@ define([
         templateSelector: '#dictionary-filter-template',
 
         /**
-         * Template selector for date field parts
+         * Template selector for dictionary field parts
          *
          * @property
          */
         fieldTemplateSelector: '#select-field-template',
 
         /**
-         * Select widget options
-         *
-         * @property
+         * Maximum value of count items for drop down menu.
+         * If count values will be bigger than this value then
+         * this filter will use select2 with autocomplete
          */
-        widgetOptions: {
-            multiple: true,
-            classes: ''
-        },
-
-        /**
-         * Minimal width of dropdown
-         *
-         * @private
-         */
-        minimumDropdownWidth: 120,
+        maxCountForDropDownMode: 10,
 
         /**
          * Selectors for filter data
@@ -65,45 +63,48 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
+            this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
 
         render: function() {
-            var className = this.constructor.prototype;
             var self = this;
+            this.getCountDeferred = $.Deferred();
             $.ajax({
                 url: routing.generate(
                     'oro_dictionary_count',
-                    {dictionary: className.filterParams.class.replace(/\\/g, '_'), limit: -1}
+                    {dictionary: this.dictionaryClass, limit: -1}
                 ),
                 success: function(response) {
                     self.count = response.result;
-                    if (response.result > 10) {
-                        self.componentMode = 'select2autocomplate';
-                    } else {
-                        self.componentMode = 'select2';
-                    }
-
-                    self.renderSelect2();
+                    self.getCountDeferred.resolve();
                 },
                 error: function(jqXHR) {
-                    //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                    //if (errorCallback) {
-                    //    errorCallback(jqXHR);
-                    //}
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
+
+            this.getCountDeferred.done(_.bind(this.renderSelect2, this));
+        },
+
+        renderSelect2: function() {
+            if (this.count > this.maxCountForDropDownMode) {
+                this.setComponentMode(this.mode.autocomplete);
+            } else {
+                this.setComponentMode(this.mode.dropdown);
+            }
+            this.loadSelectedValue();
         },
 
         loadSelectedValue: function() {
             var self = this;
-            var className = this.constructor.prototype;
+            this.selecteValueDeferred = $.Deferred();
 
             $.ajax({
                 url: routing.generate(
                     'oro_dictionary_value',
                     {
-                        dictionary: className.filterParams.class.replace(/\\/g, '_')
+                        dictionary: this.dictionaryClass
                     }
                 ),
                 data: {
@@ -111,41 +112,86 @@ define([
                 },
                 success: function(reposne) {
                     self.value.value = reposne.results;
-                    self._writeDOMValue(self.value);
-                    self.applySelect2();
+                    self.selecteValueDeferred.resolve();
                 },
                 error: function(jqXHR) {
-                    //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                    //if (errorCallback) {
-                    //    errorCallback(jqXHR);
-                    //}
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
+            });
+
+            this.selecteValueDeferred.done(function() {
+                self._writeDOMValue(self.value);
+                self.renderTemplate();
+                self.applySelect2();
             });
         },
 
-        renderSelect2: function() {
-            this.loadSelectedValue();
+        renderTemplate: function() {
+            var parts = this.getParts();
+            var template = _.template($(this.templateSelector).html());
+            this.$el.append(template({
+                parts: parts
+            }));
         },
 
         applySelect2: function() {
             var self = this;
-            var className = this.constructor.prototype;
-            var parts = this.getParts();
-            var tt = _.template($(this.templateSelector).html());
-            this.$el.append(tt({
-                parts: parts
-            }));
+            var select2Config = this.getSelect2Config();
 
-            if (this.componentMode === 'select2autocomplate') {
-                this.$el.find('.select-values-autocomplete').removeClass('hide');
-                this.$el.find('.select-values-autocomplete').attr('multiple','multiple').select2({
+            var select2element = this.$el.find(this.getElementClass());
+            if (this.componentMode === this.mode.autocomplete) {
+                var values = this.getDataForSelect2();
+                select2element.removeClass('hide')
+                    .attr('multiple', 'multiple')
+                    .select2(select2Config);
+                select2element.select2('data',  values);
+            }
+
+            if (this.componentMode === this.mode.dropdown) {
+                $.ajax({
+                    url: routing.generate(
+                        'oro_dictionary_search',
+                        {
+                            dictionary: this.dictionaryClass
+                        }
+                    ),
+                    data: {
+                        'q': ''
+                    },
+                    success: function(reposne) {
+                        select2element.removeClass('hide');
+                        $.each(reposne.results, function(index, value) {
+                            var html = '<option value="' + value.id + '">' + value.text + '</option>';
+                            select2element.append(html);
+                        });
+                        select2element.attr('multiple', 'multiple').select2(select2Config).on('change', function(e) {
+                            self.applyValue();
+                        });
+
+                        var values = self.getDataForSelect2();
+                        select2element.select2('data', values);
+                    },
+                    error: function(jqXHR) {
+                        messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                    }
+                });
+            }
+
+            this._criteriaRenderd = true;
+        },
+
+        getSelect2Config: function() {
+            var config = {};
+
+            if (this.componentMode === this.mode.autocomplete) {
+                config = {
                     multiple: true,
                     containerCssClass: 'dictionary-filter',
                     ajax: {
                         url: routing.generate(
                             'oro_dictionary_search',
                             {
-                                dictionary: className.filterParams.class.replace(/\\/g, '_')
+                                dictionary: this.dictionaryClass
                             }
                         ),
                         dataType: 'json',
@@ -157,9 +203,6 @@ define([
                             };
                         },
                         results: function(data, page) {
-                            // parse the results into the format expected by Select2.
-                            // since we are using custom formatting functions we do not need to
-                            // alter the remote JSON data
                             return {
                                 results: data.results
                             };
@@ -169,63 +212,39 @@ define([
                     dropdownAutoWidth: true,
                     escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
                     minimumInputLength: 1
-                });
-
-                var value1 = [];
-                $.each(this.value.value, function(index, value) {
-                    value1.push({
-                        'id': value.id,
-                        'text': value.text
-                    });
-                });
-                this.$el.find('.select-values-autocomplete').select2('data',  value1);
+                };
+            } else {
+                config = {
+                    containerCssClass: 'dictionary-filter',
+                    dropdownAutoWidth: true
+                };
             }
 
-            if (this.componentMode === 'select2') {
-                $.ajax({
-                    url: routing.generate(
-                        'oro_dictionary_search',
-                        {
-                            dictionary: className.filterParams.class.replace(/\\/g, '_')
-                        }
-                    ),
-                    data: {
-                        'q': ''
-                    },
-                    success: function(reposne) {
-                        self.$el.find('.select-values').removeClass('hide');
-                        $.each(reposne.results, function(index, value) {
-                            var html = '<option value="' + value.id + '">' + value.text + '</option>';
-                            self.$el.find('.select-values').append(html);
-                        });
-                        self.$el.find('.select-values').attr('multiple','multiple').select2({
-                            containerCssClass: 'dictionary-filter',
-                            dropdownAutoWidth: true
-                        }).on('change', function(e) {
-                            self.applyValue();
-                        });
+            return config;
+        },
 
-                        var value1 = [];
-                        $.each(self.value.value, function(index, value) {
-                            value1.push({
-                                'id': value.id,
-                                'text': value.text
-                            });
-                        });
-
-                        self.$el.find('.select-values').select2('data', value1);
-                    },
-                    error: function(jqXHR) {
-                        //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                        //if (errorCallback) {
-                        //    errorCallback(jqXHR);
-                        //}
-                    }
-                });
-
+        getElementClass: function() {
+            if (this.componentMode === this.mode.autocomplete) {
+                this.elementSelector = '.select-values-autocomplete';
             }
 
-            this._criteriaRenderd = true;
+            if (this.componentMode === this.mode.dropdown) {
+                this.elementSelector = '.select-values';
+            }
+
+            return this.elementSelector;
+        },
+
+        getDataForSelect2: function() {
+            var values = [];
+            $.each(this.value.value, function(index, value) {
+                values.push({
+                    'id': value.id,
+                    'text': value.text
+                });
+            });
+
+            return values;
         },
 
         isEmptyValue: function() {
@@ -263,9 +282,9 @@ define([
             var value = {};
             value.type = this._getInputValue(this.criteriaValueSelectors.type);
 
-            if (this.componentMode === 'select2autocomplate') {
+            if (this.componentMode === this.mode.autocomplete) {
                 value.value = this.$el.find('.select-values-autocomplete').select2('val');
-            } else if (this.componentMode === 'select2') {
+            } else if (this.componentMode === this.mode.dropdown) {
                 value.value = this.$el.find('.select-values').select2('val');
             } else {
                 value.value = this.value.value;
@@ -284,6 +303,12 @@ define([
             }
 
             return selectedChoiceLabel;
+        },
+
+        setComponentMode: function(mode) {
+            this.componentMode = mode;
+
+            return this;
         }
     });
 
