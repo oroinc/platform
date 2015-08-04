@@ -128,7 +128,7 @@ Change a route priority
 
 In Symfony if several routes match the same URL the earlier route always win. The routes order registered by the cumulative loader depends on the order of bundles. But sometimes you may need to change this order.
 
-To achieve this, the `priority` option was introduced. By default all routes have zero priority. If you need to move a route up, set lesser number for the `priority` option. For example the following route will be moved at the top of the route list:
+To achieve this, the `priority` option was introduced. By default all routes have zero priority. If you need to move a route up, set bigger number for the `priority` option. For example the following route will be moved at the top of the route list:
 
 ``` yaml
 acme_product:
@@ -136,8 +136,10 @@ acme_product:
     type:         annotation
     prefix:       /product
     options:
-        priority: -1
+        priority: 1
 ```
+
+Please note the bigger the priority number is, the sooner the route will be checked.
 
 Create own route options resolver
 ---------------------------------

@@ -15,4 +15,15 @@ class PlaceholderFilter
     {
         return $obj instanceof $className;
     }
+
+    /**
+     * Checks whether a given value equals TRUE
+     *
+     * @param mixed $val
+     * @return bool
+     */
+    public function isTrue($val)
+    {
+        return (bool)$val;
+    }
 }
