@@ -27,6 +27,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param DictionaryHelper $dictionaryHelper
+     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         ObjectManager $om,
@@ -135,18 +136,18 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     protected function prepareData($results, $keyField, $labelField)
     {
-        $resultD = [];
+        $resultsData = [];
         $methodGetPK = 'get' . ucfirst($keyField);
         $methodGetLabel = 'get' . ucfirst($labelField);
         foreach ($results as $result) {
-            $resultD[] = [
+            $resultsData[] = [
                 'id' => $result->$methodGetPK(),
                 'value' => $result->$methodGetPK(),
                 'text' => $result->$methodGetLabel()
             ];
         }
 
-        return $resultD;
+        return $resultsData;
     }
 
     /**

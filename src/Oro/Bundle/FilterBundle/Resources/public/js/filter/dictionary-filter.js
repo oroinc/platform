@@ -76,9 +76,9 @@ define([
                     'oro_dictionary_count',
                     {dictionary: className.filterParams.class.replace(/\\/g, '_'), limit: -1}
                 ),
-                success: function(data) {
-                    self.count = data;
-                    if (data > 10) {
+                success: function(response) {
+                    self.count = response.result;
+                    if (response.result > 10) {
                         self.componentMode = 'select2autocomplate';
                     } else {
                         self.componentMode = 'select2';
