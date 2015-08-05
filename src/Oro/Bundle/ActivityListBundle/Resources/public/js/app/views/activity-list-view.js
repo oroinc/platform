@@ -54,6 +54,8 @@ define(function(require) {
             });
 
             this.template = _.template($(this.options.template).html());
+            this.isFiltersEmpty = true;
+            this.gridToolbar = $('.activity-list .grid-toolbar');
 
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
@@ -119,6 +121,11 @@ define(function(require) {
             }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+
+            this.gridToolbar.show();
+            if (this.collection.getCount() == 0 && this.isFiltersEmpty) {
+                this.gridToolbar.hide();
+            }
         },
 
         /**
