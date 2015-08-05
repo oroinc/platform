@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs;
+namespace Oro\Component\PhpUtils\Tests\Unit\Stubs;
 
-interface StubLayoutBuilderInterface
+interface StubInterface
 {
     public function add($id, $parentId, $blockType, array $options = [], $siblingId = null, $prepend = false);
 

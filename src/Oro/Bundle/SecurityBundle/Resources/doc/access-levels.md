@@ -64,3 +64,9 @@ if (!$this->securityFacade->isGranted('VIEW', $entity)) {
     // access is granted
 }  
 ```
+
+###Check ACL for search queries
+
+During collecting entities to search, information about owner and organization will be added to search index automatically.
+
+Every search query is ACL protected with Search ACL helper. This helper limit data with current access levels for entities which are used in the query.

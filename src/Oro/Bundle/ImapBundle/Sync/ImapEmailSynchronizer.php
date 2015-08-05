@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
@@ -52,7 +52,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     public function supports(EmailOrigin $origin)
     {
-        return $origin instanceof ImapEmailOrigin;
+        return $origin instanceof UserEmailOrigin;
     }
 
     /**
@@ -60,21 +60,21 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     protected function getEmailOriginClass()
     {
-        return 'OroImapBundle:ImapEmailOrigin';
+        return 'OroImapBundle:UserEmailOrigin';
     }
 
     /**
      * Creates a processor is used to synchronize emails
      *
-     * @param ImapEmailOrigin $origin
+     * @param UserEmailOrigin $origin
      * @return ImapEmailSynchronizationProcessor
      */
     protected function createSynchronizationProcessor($origin)
     {
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
-            $origin->getSsl(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
+            $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword())
         );
