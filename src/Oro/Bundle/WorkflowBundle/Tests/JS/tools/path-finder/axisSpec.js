@@ -9,6 +9,16 @@ define(function(require) {
     var directions = require('oroworkflow/js/tools/path-finder/directions');
 
     describe('oroworkflow/js/tools/path-finder/axis', function() {
+        function createAxisWithThreeNodes() {
+            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), new Graph(), 1);
+            axis.addNode(new NodePoint(0, 0));
+            axis.addNode(new NodePoint(0, 50));
+            axis.addNode(new NodePoint(0, 100));
+            axis.sortNodes();
+            axis.finalize();
+            return axis;
+        }
+
         it('should construct', function () {
             var axis1 = new Axis(new Point2d(0,0), new Point2d(0, 100), null, 1);
             expect(axis1.costMultiplier).toBe(1);
@@ -23,6 +33,7 @@ define(function(require) {
 
             expect(axis2.uid).not.toBe(axis1.uid);
         });
+
         it('should add nodes and finalize correctly', function() {
             var graph = new Graph();
             var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
@@ -56,6 +67,7 @@ define(function(require) {
             expect(axis.nodes[2].connections[directions.BOTTOM_TO_TOP.id]).toBeDefined();
             expect(axis.nodes[2].connections[directions.TOP_TO_BOTTOM.id]).not.toBeDefined();
         });
+
         it('should add final nodes correctly', function() {
             var graph = new Graph();
             var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
@@ -77,23 +89,68 @@ define(function(require) {
             expect(axis.nodes[0]).toEqual(topNode);
             expect(axis.nodes[1]).toEqual(centerNode);
             expect(axis.nodes[2]).toEqual(bottomNode);
-        });
-        it('should ensure traversable siblings', function() {
-            // ensureTraversableSiblings
-        });
-        it('should have valid connection vectors', function() {
-            // nextNodeConnVector
-        });
-        it('should have valid connection list', function() {
 
+            var topClone = topNode.clone();
+            topClone.connect(directions.TOP_TO_BOTTOM, topNode);
+            axis.addFinalNode(topClone);
+            expect(axis.nodes[0]).toEqual(topClone);
+            expect(axis.nodes[1]).toEqual(topNode);
+
+            var bottomClone = bottomNode.clone();
+            bottomClone.connect(directions.BOTTOM_TO_TOP, bottomNode);
+            axis.addFinalNode(bottomClone);
+            expect(axis.nodes[axis.nodes.length - 2]).toEqual(bottomNode);
+            expect(axis.nodes[axis.nodes.length - 1]).toEqual(bottomClone);
         });
-        it('should be cloneable', function() {
-            // clone
-            // closest left/right clones
-            // all clones
+
+        it('should have valid connection vectors', function() {
+            var axisV = createAxisWithThreeNodes();
+            expect(axisV.nextNodeConnVector.id).toBe(directions.TOP_TO_BOTTOM.id);
+            expect(axisV.prevNodeConnVector.id).toBe(directions.BOTTOM_TO_TOP.id);
+
+            var axisH = new Axis(new Point2d(0,0), new Point2d(100, 0), null, 1);
+            expect(axisH.nextNodeConnVector.id).toBe(directions.LEFT_TO_RIGHT.id);
+            expect(axisH.prevNodeConnVector.id).toBe(directions.RIGHT_TO_LEFT.id);
+
+            axisH = new Axis(new Point2d(100,0), new Point2d(0, 0), null, 1);
+            expect(axisH.nextNodeConnVector.id).toBe(directions.LEFT_TO_RIGHT.id);
+            expect(axisH.prevNodeConnVector.id).toBe(directions.RIGHT_TO_LEFT.id);
         });
-        it('should draw', function() {
-            // nextNodeConnVector
+
+        it('should have valid connection list', function() {
+            var axis = createAxisWithThreeNodes();
+            expect(axis.connections.length).toBe(2);
+            expect(axis.connections[0]).toEqual(axis.nodes[1].connections[directions.TOP_TO_BOTTOM.id]);
+            expect(axis.connections[0]).toEqual(axis.nodes[2].connections[directions.BOTTOM_TO_TOP.id]);
+            expect(axis.connections[1]).toEqual(axis.nodes[0].connections[directions.TOP_TO_BOTTOM.id]);
+            expect(axis.connections[1]).toEqual(axis.nodes[1].connections[directions.BOTTOM_TO_TOP.id]);
+        });
+
+        it('should ensure traversable siblings', function() {
+            var axis = createAxisWithThreeNodes();
+            expect(axis.allClones.length).toBe(1);
+            axis.ensureTraversableSiblings();
+            expect(axis.closestLeftClone).toBeDefined();
+            expect(axis.closestRightClone).toBeDefined();
+            expect(axis.allClones.length).toBe(3);
+            var leftClone = axis.closestLeftClone;
+            var rightClone = axis.closestRightClone;
+            axis.ensureTraversableSiblings();
+            expect(axis.closestLeftClone).toBe(leftClone);
+            expect(axis.closestRightClone).toBe(rightClone);
+            expect(axis.allClones.length).toBe(3);
+
+            leftClone.used = true;
+            axis.ensureTraversableSiblings();
+            expect(axis.closestLeftClone).not.toBe(leftClone);
+            expect(axis.closestRightClone).toBe(rightClone);
+            expect(axis.allClones.length).toBe(4);
+
+            rightClone.used = true;
+            axis.ensureTraversableSiblings();
+            expect(axis.closestLeftClone).not.toBe(leftClone);
+            expect(axis.closestRightClone).not.toBe(rightClone);
+            expect(axis.allClones.length).toBe(5);
         });
     });
 });
