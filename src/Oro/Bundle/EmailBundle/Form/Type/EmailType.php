@@ -68,7 +68,7 @@ class EmailType extends AbstractType
                 ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
             )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
-            ->add('body', 'oro_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
+            ->add('body', 'oro_resizeable_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
             ->add(
                 'template',
                 'oro_email_template_list',
