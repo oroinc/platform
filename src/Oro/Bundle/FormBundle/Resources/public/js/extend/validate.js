@@ -99,6 +99,17 @@ define([
     };
 
     /**
+     * Removes error message from an element
+     *
+     * @param {Element|jQuery} element
+     */
+    $.validator.prototype.hideElementErrors = function(element) {
+        this.settings.unhighlight.call( this, element, this.settings.errorClass, this.settings.validClass );
+        this.settings.errorPlacement(false, element);
+        return this;
+    }
+
+    /**
      * Fetches descendant form elements which available for validation
      *
      * @param {Element|jQuery} element
@@ -239,7 +250,9 @@ define([
             var $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
             // we need this to remove server side error, because js does not know about it
             $sibling.next('.' + this.errorClass).remove();
-            label.insertAfter($sibling);
+            if (label !== false) {
+                label.insertAfter($sibling);
+            }
         },
         highlight: function(element) {
             this.settings.unhighlight.call(this, element);
