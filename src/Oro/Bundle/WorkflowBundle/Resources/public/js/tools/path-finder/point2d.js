@@ -187,7 +187,6 @@ define(function() {
             '"></circle></svg>');
     };
 
-
     /**
      * Draws text on point
      *
