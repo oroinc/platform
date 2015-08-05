@@ -351,4 +351,12 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
 
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getLabel();
+    }
 }
