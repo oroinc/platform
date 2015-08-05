@@ -122,7 +122,7 @@ define(function(require) {
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
 
-            if (this.collection.getCount() == 0 && this.isFiltersEmpty) {
+            if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
                 this.gridToolbar.hide();
             } else {
                 this.gridToolbar.show();
