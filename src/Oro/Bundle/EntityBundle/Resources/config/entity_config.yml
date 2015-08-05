@@ -22,6 +22,7 @@ oro_entity_config:
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.icon
                             block:          general
+                            required:       false
                 label:
                     options:
                         translatable:       true
