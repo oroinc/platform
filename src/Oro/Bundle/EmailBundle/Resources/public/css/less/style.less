@@ -2,14 +2,31 @@
 
 .emailtemplate-translatation {
   .tab-content {
-    padding-top: 20px;
-    padding-bottom: 10px;
+    padding: 20px 16px 10px 0;
+    overflow-x: hidden;
+    .mce-tinymce {
+      width: 100%;
+      max-width: 542px;
+    }
     .tab-pane {
       input,
       textarea {
         width: 100%;
+        box-sizing: border-box;
+      }
+      input {
+        height: 32px;
       }
     }
+  }
+}
+
+.choice-template-type .oro-clearfix {
+  display: inline-block;
+  margin-right: 10px;
+  width: auto;
+  input[type="radio"] {
+    margin: -2px 6px 0 0;
   }
 }
 
@@ -574,10 +591,6 @@ a.attachment .icon .icon-link {
 
 .attachment-list-popup .attachment-list-row span {
   padding-top: 1px;
-}
-
-.template-editor .mce-tinymce {
-  width: 542px;
 }
 
 .email-row-is-readed {
