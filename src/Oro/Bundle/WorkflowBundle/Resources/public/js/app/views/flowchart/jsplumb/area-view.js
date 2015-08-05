@@ -3,6 +3,7 @@ define(function(require) {
 
     var FlowchartJsPlumbAreaView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var jsPlumb = require('jsplumb');
     var JPManager = require('../../../../tools/jsplumb-manager');
     var FlowchartJsPlumbBaseView = require('./base-view');
@@ -16,6 +17,11 @@ define(function(require) {
         jsPlumbManager: null,
 
         jsPlumbInstance: null,
+
+        /**
+         * @type {number}
+         */
+        connectionWidth: 12,
 
         /**
          * @type {function(): Object|Object}
@@ -47,8 +53,8 @@ define(function(require) {
                     ['Arrow', {
                         location: 1,
                         id: 'arrow',
-                        length: 12,
-                        width: 10,
+                        length: 10,
+                        width: 8,
                         foldback: 0.7
                     }]
                 ]
@@ -64,7 +70,20 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
+
             FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+        },
+
+        delegateEvents: function() {
+            FlowchartJsPlumbAreaView.__super__.delegateEvents.apply(this, arguments);
+            $(document).on('zoomchange' + this.eventNamespace(), _.bind(this.onZoomChange, this));
+            return this;
+        },
+
+        undelegateEvents: function() {
+            FlowchartJsPlumbAreaView.__super__.undelegateEvents.apply(this, arguments);
+            $(document).off(this.eventNamespace());
+            return this;
         },
 
         render: function() {
@@ -90,7 +109,10 @@ define(function(require) {
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
             }
-            this.jsPlumbManager.debounceRecalculateConnections();
+        },
+
+        onZoomChange: function(event, options) {
+            this.jsPlumbInstance.setZoom(options.zoom);
         }
     });
 

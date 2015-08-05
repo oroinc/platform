@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 /**
  * Class ImapClearManager
@@ -64,15 +64,15 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param int $originId
      *
-     * @return ImapEmailOrigin[]
+     * @return UserEmailOrigin[]
      * @throws \Exception
      */
     protected function getOriginsToClear($originId)
     {
-        $originRepository = $this->em->getRepository('OroImapBundle:ImapEmailOrigin');
+        $originRepository = $this->em->getRepository('OroImapBundle:UserEmailOrigin');
 
         if ($originId !== null) {
-            /** @var ImapEmailOrigin $origin */
+            /** @var UserEmailOrigin $origin */
             $origin = $originRepository->find($originId);
             if ($origin === null) {
                 $this->logger->notice(sprintf('Origin with ID %s does not exist', $originId));
@@ -89,9 +89,9 @@ class ImapClearManager implements LoggerAwareInterface
     }
 
     /**
-     * @param ImapEmailOrigin $origin
+     * @param UserEmailOrigin $origin
      */
-    protected function clearOrigin(ImapEmailOrigin $origin)
+    protected function clearOrigin(UserEmailOrigin $origin)
     {
         $folders = $origin->getFolders();
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
