@@ -11,7 +11,6 @@ oro.user.gender.female: Female
 Login: Login
 Logout: Logout
 Login page: Login page
-"Bad credentials": "Invalid user name or password."
 "Forgot Password": "Forgot Password"
 "Password Reset": "Password Reset"
 "Reset password": "Reset password"
