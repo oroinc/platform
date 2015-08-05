@@ -24,7 +24,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twigExtension = new ConfigExtension($this->configManager);
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+
+        $this->twigExtension = new ConfigExtension($this->configManager, $router);
     }
 
     protected function tearDown()

@@ -361,6 +361,14 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getLabel();
+    }
+
+    /**
      * @param AutoResponseRule[]|Collection $autoResponseRules
      */
     public function setAutoResponseRules(Collection $autoResponseRules)
