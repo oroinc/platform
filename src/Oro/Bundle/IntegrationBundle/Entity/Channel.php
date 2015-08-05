@@ -117,7 +117,12 @@ class Channel
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(
+     *      name="default_user_owner_id",
+     *      referencedColumnName="id",
+     *      onDelete="SET NULL",
+     *      nullable=true
+     * )
      * @Oro\Versioned()
      */
     protected $defaultUserOwner;
