@@ -152,3 +152,8 @@
         </div>
     </div>
 </script>
+<script type="text/template" id="dictionary-filter-template">
+    <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %></span><%= parts.join('') %>:
+    <input type="hidden" name="select-values-autocomplete" class="select-values-autocomplete hide" value="" />
+    <select name="select-values" class="select-values hide"></select>
+</script>

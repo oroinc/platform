@@ -12,49 +12,31 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class IndexerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Indexer
-     */
+    /** @var Indexer */
     protected $indexService;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mapper;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $engine;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $config;
 
     protected function setUp()
@@ -91,6 +73,18 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $searchAclHelper->expects($this->any())
+            ->method('apply')
+            ->willReturnCallback(
+                function ($query) {
+                    return $query;
+                }
+            );
+
         $this->indexService = new Indexer(
             $this->entityManager,
             $this->engine,
@@ -98,7 +92,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->securityProvider,
             $this->configManager,
             $this->entityProvider,
-            $this->translator
+            $this->translator,
+            $searchAclHelper
         );
     }
 
@@ -191,7 +186,7 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
                 'from'          => 'task',
             ],
             'unknown from'                    => [
-                'expectedQuery' => 'select where text all_text ~ "qwerty"',
+                'expectedQuery' => 'select from unknown_entity where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
