@@ -1,9 +1,22 @@
 define(['./util', './line2d'], function(util, Line2d) {
     'use strict';
+    /**
+     * Interval on 2d surface specified by two points
+     *
+     * @param {Point2d} a
+     * @param {Point2d} b
+     * @constructor
+     */
     function Interval2d(a, b) {
         this.a = a;
         this.b = b;
     }
+
+    /**
+     * Returns distance between start and end point
+     *
+     * @type {number}
+     */
     Object.defineProperty(Interval2d.prototype, 'length', {
         get: function() {
             if (this._length === void 0) {
@@ -14,6 +27,12 @@ define(['./util', './line2d'], function(util, Line2d) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Simplified distance version, if only horizontal and vertical moves encounted.
+     *
+     * @type {number}
+     */
     Object.defineProperty(Interval2d.prototype, 'simpleLength', {
         get: function() {
             if (this._simpleLength === void 0) {
@@ -24,9 +43,23 @@ define(['./util', './line2d'], function(util, Line2d) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Returns true if interval crosses another
+     *
+     * @param {Interval2d} interval
+     * @returns {boolean}
+     */
     Interval2d.prototype.crosses = function(interval) {
         return this.getCrossPoint(interval) !== null;
     };
+
+    /**
+     * Returns cross point with another interval or null if it doesn't exists.
+     *
+     * @param {Interval2d} interval
+     * @returns {Point2d}
+     */
     Interval2d.prototype.getCrossPoint = function(interval) {
         if (interval.simpleLength === 0) {
             return this.includesPoint(interval.a) ? interval.a : null;
@@ -57,31 +90,38 @@ define(['./util', './line2d'], function(util, Line2d) {
         }
         return null;
     };
+
+    /**
+     * Returns true if point is on interval
+     *
+     * @param {Point2d} point
+     * @returns {boolean}
+     */
     Interval2d.prototype.includesPoint = function(point) {
         var line = this.line;
         return line.slope === Infinity ?
             (point.x === this.a.x && util.between(point.y, this.a.y, this.b.y)) :
             (util.between(point.x, this.a.x, this.b.x) && point.y === line.intercept + point.x * line.slope);
     };
-    Interval2d.prototype.crossesNonInclusive = function(interval) {
-        var point = this.line.intersection(interval.line);
-        if (!isNaN(point.x)) {
-            if (this.a.x !== this.b.x) {
-                // compare by x
-                return util.betweenNonInclusive(point.x, this.a.x, this.b.x);
-            } else {
-                // compare by y
-                return util.betweenNonInclusive(point.y, this.a.y, this.b.y);
-            }
-        }
-        return false;
-    };
+
+    /**
+     * Returns whether interval crosses rectangle or not
+     *
+     * @param {Rectangle} rect
+     * @returns {boolean|*}
+     */
     Interval2d.prototype.crossesRect = function(rect) {
         return rect.topSide.crosses(this) ||
             rect.bottomSide.crosses(this) ||
             rect.leftSide.crosses(this) ||
             rect.rightSide.crosses(this);
     };
+
+    /**
+     * Returns line which goes over this interval
+     *
+     * @type {Line2d}
+     */
     Object.defineProperty(Interval2d.prototype, 'line', {
         get: function() {
             if (this._line) {
@@ -98,6 +138,12 @@ define(['./util', './line2d'], function(util, Line2d) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Returns point at center of this interval
+     *
+     * @type {Point2d}
+     */
     Object.defineProperty(Interval2d.prototype, 'center', {
         get: function() {
             if (this._center === void 0) {
@@ -108,6 +154,12 @@ define(['./util', './line2d'], function(util, Line2d) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Draws interval
+     *
+     * @param {string} color
+     */
     Interval2d.prototype.draw = function(color) {
         if (color === void 0) {
             color = 'green';
@@ -117,5 +169,6 @@ define(['./util', './line2d'], function(util, Line2d) {
             '" fill="none" d="' + 'M ' + this.a.x + ' ' + this.a.y + ' L ' + this.b.x + ' ' + this.b.y +
             '"></path></svg>');
     };
+
     return Interval2d;
 });

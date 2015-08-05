@@ -67,17 +67,6 @@ define(function(require) {
                 expect(connection instanceof Connection).toBe(true);
             });
 
-            it('check removeConnection method', function() {
-                var connections = {};
-                connections[this.direction.id] = this.connection;
-                expect(this.a.connections).toEqual(connections);
-
-                this.a.removeConnection(this.connection);
-
-                connections[this.direction.id] = null;
-                expect(this.a.connections).toEqual(connections);
-            });
-
             it('check eachConnection method', function() {
                 var callback = jasmine.createSpy('spy');
                 var c = new NodePoint(5, 70);
