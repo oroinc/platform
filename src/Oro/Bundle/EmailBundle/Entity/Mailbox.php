@@ -6,10 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 /**
@@ -65,10 +68,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $processSettings;
 
     /**
-     * @var EmailOrigin
+     * @var UserEmailOrigin
      *
      * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin",
+     *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
      *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
@@ -129,6 +132,9 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     protected $autoResponseRules;
 
+    /**
+     * Mailbox constructor.
+     */
     public function __construct()
     {
         $this->authorizedUsers = new ArrayCollection();
@@ -145,7 +151,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getEmail()
     {
@@ -153,7 +159,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param mixed $email
+     * @param string $email
      *
      * @return $this
      */
@@ -165,7 +171,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLabel()
     {
@@ -173,7 +179,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param mixed $label
+     * @param string $label
      *
      * @return $this
      */
@@ -205,7 +211,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param mixed $id
+     * @param integer $id
      *
      * @return $this
      */
@@ -233,7 +239,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return EmailOrigin
+     * @return UserEmailOrigin
      */
     public function getOrigin()
     {
@@ -241,7 +247,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param EmailOrigin $origin
+     * @param UserEmailOrigin $origin
      *
      * @return $this
      */
@@ -273,9 +279,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * Get first name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getFirstName()
     {
@@ -283,9 +287,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * Get last name
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLastName()
     {
@@ -293,7 +295,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return EmailUser[]
+     * @return Collection<EmailUser>
      */
     public function getEmailUsers()
     {
@@ -301,7 +303,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param EmailUser[] $emailUsers
+     * @param Collection<EmailUser> $emailUsers
      *
      * @return $this
      */
@@ -313,7 +315,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return Collection
+     * @return Role[]
      */
     public function getAuthorizedRoles()
     {
@@ -321,7 +323,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param array|Collection $authorizedRoles
+     * @param User[]|Collection<User> $authorizedRoles
      *
      * @return $this
      */
@@ -336,7 +338,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return Collection
+     * @return User[]
      */
     public function getAuthorizedUsers()
     {
@@ -344,7 +346,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param array|Collection $authorizedUsers
+     * @param User[]|Collection<User> $authorizedUsers
      *
      * @return $this
      */

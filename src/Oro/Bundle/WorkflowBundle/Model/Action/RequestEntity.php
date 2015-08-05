@@ -13,14 +13,10 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class RequestEntity extends AbstractAction
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /**
@@ -150,20 +146,7 @@ class RequestEntity extends AbstractAction
             if ($this->isCaseInsensitive()) {
                 $field = "LOWER($field)";
             }
-            if (is_array($value)) {
-                if (count($value) == 1) {
-                    $operator = $value[0];
-                    $queryBuilder->andWhere("$field $operator");
-                } elseif (count($value) == 2) {
-                    $operator = $value[0];
-                    $value = $value[1];
-                    $queryBuilder->andWhere("$field $operator :$parameter")
-                        ->setParameter($parameter, $value);
-                }
-            } else {
-                $queryBuilder->andWhere("$field = :$parameter")
-                    ->setParameter($parameter, $value);
-            }
+            $queryBuilder->andWhere("$field = :$parameter")->setParameter($parameter, $value);
             $counter++;
         }
 

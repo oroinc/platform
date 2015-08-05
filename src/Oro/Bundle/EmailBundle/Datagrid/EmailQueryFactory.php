@@ -52,6 +52,8 @@ class EmailQueryFactory
     }
 
     /**
+     * Filters to leave only emails available to user with provided id.
+     *
      * @param QueryBuilder $qb
      * @param string $userId
      */
@@ -59,7 +61,7 @@ class EmailQueryFactory
     {
         if ($userId) {
             $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-                 ->findAvailableMailboxIds($userId);
+                 ->findAvailableMailboxes($userId);
             if (!empty($mailboxIds)) {
                 $qb->andWhere(
                     $qb->expr()->orX(

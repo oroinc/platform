@@ -7,7 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
@@ -18,6 +18,9 @@ class RoleMultiSelectType extends AbstractType
      */
     protected $entityManager;
 
+    /**
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -42,7 +45,10 @@ class RoleMultiSelectType extends AbstractType
         );
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

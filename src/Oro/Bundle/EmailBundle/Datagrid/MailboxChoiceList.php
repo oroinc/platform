@@ -5,20 +5,24 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MailboxChoiceList
 {
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     private $doctrine;
 
+    /** @var SecurityFacade */
+    private $securityFacade;
+
     /**
-     * @param Registry $doctrine
+     * @param Registry       $doctrine
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(Registry $doctrine, SecurityFacade $securityFacade)
     {
         $this->doctrine = $doctrine;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -31,7 +35,7 @@ class MailboxChoiceList
         $repo = $this->doctrine->getRepository('OroEmailBundle:Mailbox');
 
         /** @var Mailbox[] $results */
-        $results = $repo->findAll();
+        $results = $repo->findAvailableMailboxes($this->securityFacade->getLoggedUser(), false);
 
         $choiceList = [];
         foreach ($results as $mailbox) {

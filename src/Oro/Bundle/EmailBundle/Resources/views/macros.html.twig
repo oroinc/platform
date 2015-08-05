@@ -261,8 +261,13 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|default(emailAddressName|default('N/A')) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ label }}</a>
+    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% if route is not null %}
+        <a href="{{ path(route, {id:emailAddress.owner.id}) }}">
+            {{ label }}</a>
+    {% else %}
+        {{ label }}
+    {% endif %}
 {%- endmacro -%}
 
 {#

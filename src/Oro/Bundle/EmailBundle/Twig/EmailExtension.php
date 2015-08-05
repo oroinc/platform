@@ -4,12 +4,12 @@ namespace Oro\Bundle\EmailBundle\Twig;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
