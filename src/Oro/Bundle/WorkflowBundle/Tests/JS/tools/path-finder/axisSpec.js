@@ -10,10 +10,23 @@ define(function(require) {
 
     describe('oroworkflow/js/tools/path-finder/axis', function() {
         function createAxisWithThreeNodes() {
-            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), new Graph(), 1);
-            axis.addNode(new NodePoint(0, 0));
-            axis.addNode(new NodePoint(0, 50));
-            axis.addNode(new NodePoint(0, 100));
+            var graph = new Graph();
+            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
+            var a = new NodePoint(0, 0);
+            var b = new NodePoint(0, 50);
+            var c = new NodePoint(0, 100);
+            a.hAxis = new Axis(a.clone(), a.clone(), graph, 1);
+            a.hAxis.addNode(a);
+            a.hAxis.isVertical = false;
+            b.hAxis = new Axis(b.clone(), b.clone(), graph, 1);
+            b.hAxis.addNode(b);
+            b.hAxis.isVertical = false;
+            c.hAxis = new Axis(c.clone(), c.clone(), graph, 1);
+            c.hAxis.addNode(c);
+            c.hAxis.isVertical = false;
+            axis.addNode(a);
+            axis.addNode(b);
+            axis.addNode(c);
             axis.sortNodes();
             axis.finalize();
             return axis;
@@ -128,11 +141,13 @@ define(function(require) {
 
         it('should ensure traversable siblings', function() {
             var axis = createAxisWithThreeNodes();
+
             expect(axis.allClones.length).toBe(1);
             axis.ensureTraversableSiblings();
             expect(axis.closestLeftClone).toBeDefined();
             expect(axis.closestRightClone).toBeDefined();
             expect(axis.allClones.length).toBe(3);
+
             var leftClone = axis.closestLeftClone;
             var rightClone = axis.closestRightClone;
             axis.ensureTraversableSiblings();
@@ -140,13 +155,13 @@ define(function(require) {
             expect(axis.closestRightClone).toBe(rightClone);
             expect(axis.allClones.length).toBe(3);
 
-            leftClone.used = true;
+            leftClone.isUsed = true;
             axis.ensureTraversableSiblings();
             expect(axis.closestLeftClone).not.toBe(leftClone);
             expect(axis.closestRightClone).toBe(rightClone);
             expect(axis.allClones.length).toBe(4);
 
-            rightClone.used = true;
+            rightClone.isUsed = true;
             axis.ensureTraversableSiblings();
             expect(axis.closestLeftClone).not.toBe(leftClone);
             expect(axis.closestRightClone).not.toBe(rightClone);

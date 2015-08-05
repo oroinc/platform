@@ -568,7 +568,9 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 if (this.rectangles[i] === ignoreRect) {
                     continue;
                 }
-                if (rectangle.intersection(this.rectangles[i]) !== null) {
+                var intersection = rectangle.intersection(this.rectangles[i]);
+                // non-inclusive
+                if (intersection !== null && intersection.width !== 0 && intersection.height !== 0) {
                     return true;
                 }
             }
