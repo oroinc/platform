@@ -65,9 +65,6 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             this.buildCenterLinesBetweenNodes();
             this.createAxises();
             this.buildMergeRequests();
-            console.log(this.horizontalAxises.map(function (a) {return a.uid}));
-            console.log(this.verticalAxises.map(function (a) {return a.uid}));
-            console.log(this.mergeAxisesQueue.map(function (a) {return a.map(function (a) {return a.uid})}));
             this.mergeAxises();
             this.buildNodes();
             this.finalizeAxises();
