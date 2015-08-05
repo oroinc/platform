@@ -21,14 +21,6 @@ class Pgsql92CommandArgsNormalizer extends CommandArgsNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize($value)
-    {
-        return str_replace('\\', '\\\\\\\\', $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function quoteArg($value)
     {
         return '"' . $value . '"';

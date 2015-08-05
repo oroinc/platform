@@ -30,7 +30,7 @@ class CommandArgsNormalizer
      */
     public function normalize($value)
     {
-        return str_replace('\\', '\\\\', $value);
+        return str_replace('\\', '\\\\\\\\', $value);
     }
 
     /**
