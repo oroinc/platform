@@ -4,23 +4,40 @@ namespace Oro\Bundle\EntityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query;
 
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
 
+    /** @var DictionaryHelper */
+    protected $dictionaryHelper;
+
+    /** @var  LocaleSettings */
+    protected $localeSettings;
+
     /**
-     * @param ObjectManager                    $om
+     * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
+     * @param DictionaryHelper $dictionaryHelper
+     * @param LocaleSettings $localeSettings
      */
-    public function __construct(ObjectManager $om, ChainDictionaryValueListProvider $dictionaryProvider)
-    {
+    public function __construct(
+        ObjectManager $om,
+        ChainDictionaryValueListProvider $dictionaryProvider,
+        DictionaryHelper $dictionaryHelper,
+        LocaleSettings $localeSettings
+    ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
+        $this->dictionaryHelper = $dictionaryHelper;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -55,5 +72,94 @@ class DictionaryApiEntityManager extends ApiEntityManager
         }
 
         return $qb;
+    }
+
+    /**
+     * Search entities by search query
+     *
+     * @param $searchQuery
+     *
+     * @return array
+     */
+    public function findValueBySearchQuery($searchQuery)
+    {
+        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        if (!empty($searchQuery)) {
+            $qb->andWhere('e.' . $labelField . ' LIKE :translated_title')
+                ->setParameter('translated_title', '%' . $searchQuery . '%');
+        }
+
+        $query = $qb->getQuery();
+        $query->setHint(
+            Query::HINT_CUSTOM_OUTPUT_WALKER,
+            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+        );
+        $results = $query->getResult();
+
+        return $this->prepareData($results, $keyField, $labelField);
+    }
+
+    /**
+     * Search entities by primary key
+     *
+     * @param $keys[]
+     *
+     * @return array
+     */
+    public function findValueByPrimaryKey($keys)
+    {
+        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb->andWhere('e.' . $keyField . ' in (:keys)')
+           ->setParameter('keys', $keys);
+
+        $query = $qb->getQuery();
+        $results = $query->getResult();
+
+        return $this->prepareData($results, $keyField, $labelField);
+    }
+
+    /**
+     * Transform Entity data to array
+     *
+     * @param array $results
+     * @param string $keyField
+     * @param string $labelField
+     *
+     * @return array
+     */
+    protected function prepareData($results, $keyField, $labelField)
+    {
+        $resultsData = [];
+        $methodGetPK = 'get' . ucfirst($keyField);
+        $methodGetLabel = 'get' . ucfirst($labelField);
+        foreach ($results as $result) {
+            $resultsData[] = [
+                'id' => $result->$methodGetPK(),
+                'value' => $result->$methodGetPK(),
+                'text' => $result->$methodGetLabel()
+            ];
+        }
+
+        return $resultsData;
+    }
+
+    /**
+     * Get count items in dictionary
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb->select('COUNT(e)');
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        return $result;
     }
 }
