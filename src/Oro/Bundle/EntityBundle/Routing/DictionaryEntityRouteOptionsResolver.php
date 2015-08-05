@@ -55,7 +55,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
             if (!empty($entities)) {
                 $entities = $this->adjustRoutes($route, $routes, $entities);
-                $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
+                if (!empty($entities)) {
+                    $route->setRequirement(self::ENTITY_ATTRIBUTE, implode('|', $entities));
+                }
             }
         }
     }
@@ -83,10 +85,22 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                 // move existing route before the current route
                 $existingRouteName = $routes->getName($existingRoute);
                 $routes->remove($existingRouteName);
+                $routes->insert($existingRouteName, $existingRoute, $routeName, true);
+                //additional route for entities which has api, but it not recognize urls like
+                // /api/rest/latest/Oro_Bundle_AddressBundle_Entity_Country
+                //TODO: This should be removed in scope of https://magecore.atlassian.net/browse/BAP-8650
+                $dictionaryRoute = $routes->cloneRoute($existingRoute);
+                $dictionaryRoute->setPath(
+                    str_replace(
+                        self::ENTITY_PLACEHOLDER,
+                        $this->entityClassNameHelper->getUrlSafeClassName($className),
+                        $route->getPath()
+                    )
+                );
                 $routes->insert(
+                    $routes->generateRouteName($existingRouteName),
+                    $dictionaryRoute,
                     $existingRouteName,
-                    $existingRoute,
-                    $routeName,
                     true
                 );
             } else {

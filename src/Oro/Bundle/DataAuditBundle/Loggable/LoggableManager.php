@@ -11,11 +11,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata as DoctrineClassMetadata;
 
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
-
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -27,6 +26,9 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
  */
 class LoggableManager
 {
+    /**
+     * @var AbstractUser[]
+     */
     protected static $userCache = [];
 
     const ACTION_CREATE = 'create';
@@ -37,18 +39,26 @@ class LoggableManager
     protected $em;
 
     /** @var array */
-    protected $configs = array();
+    protected $configs = [];
 
     /** @var string */
     protected $username;
 
     /** @var Organization|null */
-    protected $organization = null;
+    protected $organization;
 
-    /** @var string */
+    /**
+     * @deprecated 1.8.0:2.1.0 use AuditEntityMapper::getAuditEntryClass
+     *
+     * @var string
+     */
     protected $logEntityClass;
 
-    /** @var string */
+    /**
+     * @deprecated 1.8.0:2.1.0 use AuditEntityMapper::getAuditEntryFieldClass
+     *
+     * @var string
+     */
     protected $logEntityFieldClass;
 
     /** @var array */
@@ -69,22 +79,28 @@ class LoggableManager
     /** @var ServiceLink  */
     protected $securityContextLink;
 
+    /** @var AuditEntityMapper  */
+    protected $auditEntityMapper;
+
     /**
      * @param string $logEntityClass
      * @param string $logEntityFieldClass
      * @param ConfigProvider $auditConfigProvider
      * @param ServiceLink $securityContextLink
+     * @param AuditEntityMapper $auditEntityMapper
      */
     public function __construct(
         $logEntityClass,
         $logEntityFieldClass,
         ConfigProvider $auditConfigProvider,
-        ServiceLink $securityContextLink
+        ServiceLink $securityContextLink,
+        AuditEntityMapper $auditEntityMapper
     ) {
         $this->auditConfigProvider = $auditConfigProvider;
-        $this->logEntityClass      = $logEntityClass;
+        $this->logEntityClass = $logEntityClass;
         $this->logEntityFieldClass = $logEntityFieldClass;
         $this->securityContextLink = $securityContextLink;
+        $this->auditEntityMapper = $auditEntityMapper;
     }
 
     /**
@@ -96,7 +112,7 @@ class LoggableManager
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return ClassMetadata
      * @throws InvalidParameterException
      */
@@ -110,7 +126,7 @@ class LoggableManager
     }
 
     /**
-     * @param $username
+     * @param string $username
      * @throws \InvalidArgumentException
      */
     public function setUsername($username)
@@ -120,7 +136,7 @@ class LoggableManager
         } elseif (is_object($username) && method_exists($username, 'getUsername')) {
             $this->username = (string) $username->getUsername();
         } else {
-            throw new \InvalidArgumentException("Username must be a string, or object should have method: getUsername");
+            throw new \InvalidArgumentException('Username must be a string, or object should have method: getUsername');
         }
     }
 
@@ -190,14 +206,15 @@ class LoggableManager
     }
 
     /**
-     * @param               $entity
+     * @param object $entity
      * @param EntityManager $em
      */
     public function handlePostPersist($entity, EntityManager $em)
     {
         $this->em = $em;
-        $uow      = $em->getUnitOfWork();
-        $oid      = spl_object_hash($entity);
+        $uow = $em->getUnitOfWork();
+        $oid = spl_object_hash($entity);
+        $logEntryMeta = null;
 
         if ($this->pendingLogEntityInserts && array_key_exists($oid, $this->pendingLogEntityInserts)) {
             $logEntry     = $this->pendingLogEntityInserts[$oid];
@@ -206,12 +223,7 @@ class LoggableManager
             $id = $this->getIdentifier($entity);
             $logEntryMeta->getReflectionProperty('objectId')->setValue($logEntry, $id);
 
-            $uow->scheduleExtraUpdate(
-                $logEntry,
-                array(
-                    'objectId' => array(null, $id)
-                )
-            );
+            $uow->scheduleExtraUpdate($logEntry, ['objectId' => [null, $id]]);
             $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $id);
 
             unset($this->pendingLogEntityInserts[$oid]);
@@ -221,7 +233,7 @@ class LoggableManager
             $identifiers = $uow->getEntityIdentifier($entity);
 
             foreach ($this->pendingRelatedEntities[$oid] as $props) {
-                /** @var Audit $logEntry */
+                /** @var AbstractAudit $logEntry */
                 $logEntry = $props['log'];
                 $data     = $logEntry->getData();
                 if (empty($data[$props['field']]['new'])) {
@@ -234,7 +246,9 @@ class LoggableManager
                         $oldField->getOldValue()
                     );
 
-                    $uow->computeChangeSet($logEntryMeta, $logEntry);
+                    if ($logEntryMeta) {
+                        $uow->computeChangeSet($logEntryMeta, $logEntry);
+                    }
                     $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
                 }
             }
@@ -326,10 +340,10 @@ class LoggableManager
                 }
 
                 $fieldName = $collectionMapping['fieldName'];
-                $this->collectionLogData[$ownerEntityClassName][$entityIdentifier][$fieldName] = array(
+                $this->collectionLogData[$ownerEntityClassName][$entityIdentifier][$fieldName] = [
                     'old' => $oldData,
                     'new' => $newData,
-                );
+                ];
             }
         }
     }
@@ -358,7 +372,7 @@ class LoggableManager
 
     /**
      * @param string $action
-     * @param mixed  $entity
+     * @param object $entity
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -387,14 +401,14 @@ class LoggableManager
         $entityMeta = $this->em->getClassMetadata($entityClassName);
 
         $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
-        /** @var Audit $logEntry */
+        /** @var AbstractAudit $logEntry */
         $logEntry = $logEntryMeta->newInstance();
         $logEntry->setAction($action);
         $logEntry->setObjectClass($meta->name);
         $logEntry->setLoggedAt();
         $logEntry->setUser($user);
         $logEntry->setOrganization($this->getOrganization());
-        $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
+        $logEntry->setObjectName(method_exists($entity, '__toString') ? (string)$entity : $meta->name);
 
         $entityId = $this->getIdentifier($entity);
 
@@ -404,7 +418,7 @@ class LoggableManager
 
         $logEntry->setObjectId($entityId);
 
-        $newValues = array();
+        $newValues = [];
 
         if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
             foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
@@ -422,7 +436,7 @@ class LoggableManager
                 $fieldMapping = null;
                 if ($entityMeta->hasField($field)) {
                     $fieldMapping = $entityMeta->getFieldMapping($field);
-                    if ($fieldMapping['type'] == 'date') {
+                    if ($fieldMapping['type'] === 'date') {
                         // leave only date
                         $utc = new \DateTimeZone('UTC');
                         if ($old && $old instanceof \DateTime) {
@@ -447,10 +461,10 @@ class LoggableManager
                     $value = $this->getIdentifier($new);
 
                     if (!is_array($value) && !$value) {
-                        $this->pendingRelatedEntities[$oid][] = array(
+                        $this->pendingRelatedEntities[$oid][] = [
                             'log'   => $logEntry,
                             'field' => $field
-                        );
+                        ];
                     }
 
                     $method = $meta->propertyMetadata[$field]->method;
@@ -474,11 +488,11 @@ class LoggableManager
                     }
                 }
 
-                $newValues[$field] = array(
+                $newValues[$field] = [
                     'old' => $old,
                     'new' => $new,
                     'type' => $this->getFieldType($entityMeta, $field),
-                );
+                ];
             }
 
             $entityIdentifier = $this->getEntityIdentifierString($entity);
@@ -526,7 +540,9 @@ class LoggableManager
         $this->em->persist($logEntry);
         $uow->computeChangeSet($logEntryMeta, $logEntry);
 
-        $logEntryFieldMeta = $this->em->getClassMetadata($this->logEntityFieldClass);
+        $logEntryFieldMeta = $this->em->getClassMetadata(
+            $this->auditEntityMapper->getAuditEntryFieldClass($this->getLoadedUser())
+        );
         foreach ($logEntry->getFields() as $field) {
             $this->em->persist($field);
             $uow->computeChangeSet($logEntryFieldMeta, $field);
@@ -534,7 +550,7 @@ class LoggableManager
     }
 
     /**
-     * @return User
+     * @return AbstractUser
      */
     protected function getLoadedUser()
     {
@@ -542,17 +558,20 @@ class LoggableManager
         if (!$isInCache
             || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
         ) {
-            $this->loadUser();
+            /** @var SecurityContextInterface $securityContext */
+            $securityContext = $this->securityContextLink->getService();
+            $token = $securityContext->getToken();
+            if ($token) {
+                /** @var AbstractUser $user */
+                $user = $token->getUser();
+                self::$userCache[$this->username] = $this->em->getReference(
+                    ClassUtils::getClass($user),
+                    $user->getId()
+                );
+            }
         }
 
         return self::$userCache[$this->username];
-    }
-
-    protected function loadUser()
-    {
-        self::$userCache[$this->username] = $this->em
-            ->getRepository('OroUserBundle:User')
-            ->findOneBy(array('username' => $this->username));
     }
 
     /**
@@ -562,12 +581,12 @@ class LoggableManager
      */
     protected function getLogEntityClass()
     {
-        return $this->logEntityClass;
+        return $this->auditEntityMapper->getAuditEntryClass($this->getLoadedUser());
     }
 
     /**
-     * @param $logEntityMeta
-     * @param $entity
+     * @param DoctrineClassMetadata $logEntityMeta
+     * @param object $entity
      * @return mixed
      */
     protected function getNewVersion($logEntityMeta, $entity)
@@ -575,34 +594,40 @@ class LoggableManager
         $entityMeta = $this->em->getClassMetadata($this->getEntityClassName($entity));
         $entityId   = $this->getIdentifier($entity);
 
-        $dql = "SELECT MAX(log.version) FROM {$logEntityMeta->name} log";
-        $dql .= " WHERE log.objectId = :objectId";
-        $dql .= " AND log.objectClass = :objectClass";
-
-        $q = $this->em->createQuery($dql);
-        $q->setParameters(
-            array(
-                'objectId'    => $entityId,
-                'objectClass' => $entityMeta->name
+        $qb = $this->em->createQueryBuilder();
+        $query = $qb
+            ->select($qb->expr()->max('log.version'))
+            ->from($logEntityMeta->name, 'log')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('log.objectId', ':objectId'),
+                    $qb->expr()->eq('log.objectClass', ':objectClass')
+                )
             )
-        );
+            ->setParameter('objectId', $entityId)
+            ->setParameter('objectClass', $entityMeta->name)
+            ->getQuery();
 
-        return $q->getSingleScalarResult() + 1;
+        return $query->getSingleScalarResult() + 1;
     }
 
     /**
-     * @param       $entity
-     * @param  null $entityMeta
+     * @param  object $entity
+     * @param  DoctrineClassMetadata|null $entityMeta
      * @return mixed
      */
     protected function getIdentifier($entity, $entityMeta = null)
     {
-        $entityMeta      = $entityMeta ? $entityMeta : $this->em->getClassMetadata($this->getEntityClassName($entity));
-        $identifierField = $entityMeta->getSingleIdentifierFieldName($entityMeta);
+        $entityMeta      = $entityMeta ?: $this->em->getClassMetadata($this->getEntityClassName($entity));
+        $identifierField = $entityMeta->getSingleIdentifierFieldName();
 
         return $entityMeta->getReflectionProperty($identifierField)->getValue($entity);
     }
 
+    /**
+     * @param string $entityClassName
+     * @return bool
+     */
     protected function checkAuditable($entityClassName)
     {
         if ($this->auditConfigProvider->hasConfig($entityClassName)
@@ -636,7 +661,7 @@ class LoggableManager
     }
 
     /**
-     * @param $entity
+     * @param object|string $entity
      * @return string
      */
     private function getEntityClassName($entity)
@@ -677,7 +702,7 @@ class LoggableManager
         } elseif ($entityMeta->hasAssociation($field)) {
             $type = Type::STRING;
         } else {
-            throw new \InvalidArgumentExcepttion(sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Field "%s" is not mapped field of "%s" entity.',
                 $field,
                 $entityMeta->getName()

@@ -81,9 +81,9 @@ Acme\DemoBundle\Entity\Product:
                                                              # Supported: one-to-one, many-to-many, one-to-many, many-to-one.
             relation_fields:                                 # Array of fields from relation record we must to index.
                 -
-                    name: name
-                    target_type: text
-                    target_fields: [manufacturer, all_data]
+                    name: name                               # related entity field name to index
+                    target_type: text                        # related entity field name type
+                    target_fields: [manufacturer, all_data]  # target fields to store field index
                 -
                     name: id
                     target_type: integer

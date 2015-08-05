@@ -15,7 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -371,7 +371,9 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|Collection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"all"})
+     * @ORM\OneToMany(
+     *      targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"persist", "remove"}
+     * )
      */
     protected $emailOrigins;
 
@@ -958,11 +960,11 @@ class User extends ExtendUser implements
     /**
      * Set IMAP configuration
      *
-     * @param ImapEmailOrigin $imapConfiguration
+     * @param UserEmailOrigin $imapConfiguration
      *
      * @return User
      */
-    public function setImapConfiguration(ImapEmailOrigin $imapConfiguration = null)
+    public function setImapConfiguration(UserEmailOrigin $imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
         if ($currentImapConfiguration &&
@@ -982,17 +984,16 @@ class User extends ExtendUser implements
     /**
      * Get IMAP configuration
      *
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function getImapConfiguration()
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
                 return
-                    $item instanceof ImapEmailOrigin
-                    && (!$this->getCurrentOrganization()
-                        || $item->getOrganization() === $this->getCurrentOrganization())
-                    && $item->isActive();
+                    $item instanceof UserEmailOrigin
+                    && $item->isActive()
+                    && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
 
@@ -1025,6 +1026,8 @@ class User extends ExtendUser implements
     public function addEmailOrigin(EmailOrigin $emailOrigin)
     {
         $this->emailOrigins->add($emailOrigin);
+
+        $emailOrigin->setOwner($this);
 
         return $this;
     }

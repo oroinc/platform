@@ -7,15 +7,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
-class MultiEnumFilter extends ChoiceFilter
+class MultiEnumFilter extends AbstractMultiChoiceFilter
 {
-    /** @var ManyRelationBuilder */
-    protected $manyRelationBuilder;
-
     /**
      * Constructor
      *

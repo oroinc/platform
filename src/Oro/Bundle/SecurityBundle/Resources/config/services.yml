@@ -16,6 +16,7 @@ parameters:
     oro_security.acl.object_identity_factory.class:            Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory
     oro_security.acl.object_identity_retrieval_strategy.class: Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityRetrievalStrategy
     oro_security.acl.object_id_accessor.class:                 Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor
+    oro_security.acl.group_provider.chain.class:               Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
 
     oro_security.owner.tree.class:                             Oro\Bundle\SecurityBundle\Owner\OwnerTree
     oro_security.owner.decision_maker.class:                   Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker
@@ -49,6 +50,7 @@ parameters:
     oro_security.encoder.mcrypt.class:                         Oro\Bundle\SecurityBundle\Encoder\Mcrypt
 
     oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
+    oro_security.search.acl_helper.class:                      Oro\Bundle\SecurityBundle\Search\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
     oro_security.abstract_ownership_tree_provider.class:       Oro\Bundle\SecurityBundle\Owner\AbstractOwnerTreeProvider
@@ -183,6 +185,9 @@ services:
     oro_security.acl.object_id_accessor:
         public: false
         class: %oro_security.acl.object_id_accessor.class%
+
+    oro_security.acl.group_provider.chain:
+        class: %oro_security.acl.group_provider.chain.class%
 
     oro_security.owner.tree:
         public: false
@@ -367,6 +372,13 @@ services:
              - @oro_security.orm.ownership_sql_walker_builder
              - @event_dispatcher
 
+    oro_security.search.acl_helper:
+        class: %oro_security.search.acl_helper.class%
+        arguments:
+            - @oro_search.provider.search_mapping
+            - @oro_security.security_facade
+            - @oro_security.orm.ownership_sql_walker_builder
+
     oro_security.orm.ownership_sql_walker_builder:
         public: false
         class: %oro_security.orm.ownership_sql_walker_builder.class%
@@ -400,6 +412,7 @@ services:
         tags:
             - { name: oro_security.ownership.tree_provider }
 
+    # deprecated 1.8:2.1 use @oro_security.ownership_tree_provider.chain instead
     oro_security.link.ownership_tree_provider:
         tags:
             - { name: oro_service_link,  service: oro_security.ownership_tree_provider }
@@ -430,6 +443,11 @@ services:
         class: %oro_security.ownership_tree_subscriber.class%
         arguments:
             - @oro_security.link.ownership_tree_provider
+        calls:
+            - ['setContainer', [@service_container]]
+            - ['addSupportedClass', [%oro_user.entity.class%]]
+            - ['addSupportedClass', [%oro_organization.business_unit.entity.class%]]
+            - ['addSupportedClass', [%oro_organization.organization.entity.class%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
@@ -516,7 +534,6 @@ services:
               - @oro_security.security_facade
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 100 }
-              - { name: kernel.event_listener, event: oro_search.before_search, method: beforeSearchEvent }
               - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: collectEntityMapEvent, priority: -100 }
 
     oro_security.layout_expression.acl_granted:

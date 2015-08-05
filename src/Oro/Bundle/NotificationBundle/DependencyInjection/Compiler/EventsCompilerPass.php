@@ -27,7 +27,7 @@ class EventsCompilerPass implements CompilerPassInterface
 
         $eventClassName = $container->getParameter('oro_notification.event_entity.class');
 
-        $dispatcher = $container->getDefinition(self::DISPATCHER_KEY);
+        $dispatcher = $container->findDefinition(self::DISPATCHER_KEY);
         $em         = $container->get('doctrine.orm.entity_manager');
 
         $eventNames = array();

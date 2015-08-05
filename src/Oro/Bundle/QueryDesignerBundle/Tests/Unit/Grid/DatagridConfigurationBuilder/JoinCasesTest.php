@@ -6,9 +6,8 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
-class JoinCasesTest extends OrmQueryConverterTest
+class JoinCasesTest extends DatagridConfigurationBuilderTestCase
 {
     public function testJoinFromColumns()
     {

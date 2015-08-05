@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -20,7 +22,6 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
@@ -28,7 +29,7 @@ use Oro\Bundle\UIBundle\Tools\ArrayUtils;
  */
 class OrmTotalsExtension extends AbstractExtension
 {
-    /** @var  Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var QueryBuilder */
@@ -46,8 +47,14 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var array */
     protected $groupParts = [];
 
+    /**
+     * @param TranslatorInterface $translator
+     * @param NumberFormatter     $numberFormatter
+     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param AclHelper           $aclHelper
+     */
     public function __construct(
-        Translator $translator,
+        TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
         DateTimeFormatter $dateTimeFormatter,
         AclHelper $aclHelper
@@ -195,9 +202,8 @@ class OrmTotalsExtension extends AbstractExtension
                     $totalData['columns'][$field]['total'] = $totalValue;
                 }
                 if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
-                    $totalData['columns'][$field][Configuration::TOTALS_LABEL_KEY] = $this->
-                        translator
-                        ->trans($total[Configuration::TOTALS_LABEL_KEY]);
+                    $totalData['columns'][$field][Configuration::TOTALS_LABEL_KEY] =
+                        $this->translator->trans($total[Configuration::TOTALS_LABEL_KEY]);
                 }
             };
         }
@@ -284,19 +290,21 @@ class OrmTotalsExtension extends AbstractExtension
             }
         };
 
-        $query = clone $this->masterQB;
-        $query
+        $queryBuilder = clone $this->masterQB;
+        $queryBuilder
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
-        $parameters = $query->getParameters();
+        $parameters = $queryBuilder->getParameters();
         if ($parameters->count()) {
-            $query->resetDQLPart('where')
+            $queryBuilder->resetDQLPart('where')
                 ->resetDQLPart('having')
                 ->setParameters(new ArrayCollection());
         }
 
-        $this->addPageLimits($query, $pageData, $perPage);
+        $this->addPageLimits($queryBuilder, $pageData, $perPage);
+        
+        $query = $queryBuilder->getQuery();
 
         if (!$skipAclWalkerCheck) {
             $query = $this->aclHelper->apply($query);
@@ -322,8 +330,8 @@ class OrmTotalsExtension extends AbstractExtension
         $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
 
         if (!$perPage) {
-            $query = clone $this->masterQB;
-            $data = $query
+            $queryBuilder = clone $this->masterQB;
+            $data = $queryBuilder
                 ->getQuery()
                 ->setFirstResult(null)
                 ->setMaxResults(null)

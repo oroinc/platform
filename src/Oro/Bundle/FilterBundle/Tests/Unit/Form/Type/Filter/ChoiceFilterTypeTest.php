@@ -52,7 +52,8 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                     ),
                     'populate_default' => false,
                     'default_value' => null,
-                    'null_value' => null
+                    'null_value' => null,
+                    'class' => null
                 )
             )
         );

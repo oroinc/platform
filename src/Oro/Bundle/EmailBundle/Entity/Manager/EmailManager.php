@@ -4,12 +4,12 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContext;
-
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
-use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class EmailManager
@@ -31,9 +31,9 @@ class EmailManager
     protected $em;
 
     /**
-     * @var SecurityContext
+     * @var SecurityFacade
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * Constructor
@@ -41,18 +41,18 @@ class EmailManager
      * @param EntityManager       $em                  - Entity Manager
      * @param EmailThreadManager  $emailThreadManager  - Email Thread Manager
      * @param EmailThreadProvider $emailThreadProvider - Email Thread Provider
-     * @param SecurityContext     $securityContext     - Security Context
+     * @param SecurityFacade      $securityFacade      - Security Facade
      */
     public function __construct(
         EntityManager $em,
         EmailThreadManager $emailThreadManager,
         EmailThreadProvider $emailThreadProvider,
-        SecurityContext $securityContext
+        SecurityFacade $securityFacade
     ) {
         $this->em = $em;
         $this->emailThreadManager = $emailThreadManager;
         $this->emailThreadProvider = $emailThreadProvider;
-        $this->securityContext = $securityContext;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -82,9 +82,11 @@ class EmailManager
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
-            $emailUser = $this->getCurrentEmailUser($email);
-            if ($emailUser) {
-                $this->setEmailUserSeen($emailUser, true, true);
+            $emailUsers = $this->getCurrentEmailUser($email);
+            if ($emailUsers) {
+                foreach ($emailUsers as $emailUser) {
+                    $this->setEmailUserSeen($emailUser, true, true);
+                }
             }
         }
     }
@@ -132,6 +134,35 @@ class EmailManager
     }
 
     /**
+     * Mark all email as seen
+     *
+     * @param User $user
+     * @param Organization $organization
+     *
+     * @return boolean
+     */
+    public function markAllEmailsAsSeen(User $user, Organization $organization)
+    {
+        $emailUserQueryBuilder = $this
+            ->em
+            ->getRepository('OroEmailBundle:EmailUser')
+            ->findUnseenUserEmail($user, $organization);
+        $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
+
+        foreach ($unseenUserEmails as $userEmail) {
+            $this->setEmailUserSeen($userEmail);
+        }
+
+        if (count($unseenUserEmails) > 0) {
+            $this->em->flush();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param Email $entity
      * @param $target
      */
@@ -168,9 +199,10 @@ class EmailManager
      */
     protected function getCurrentEmailUser(Email $entity)
     {
-        $user = $this->securityContext->getToken()->getUser();
+        $user = $this->securityFacade->getToken()->getUser();
+        $currentOrganization = $this->securityFacade->getOrganization();
         $emailUser = $this->em->getRepository('OroEmailBundle:EmailUser')
-            ->findByEmailAndOwner($entity, $user);
+            ->findByEmailAndOwner($entity, $user, $currentOrganization);
 
         return $emailUser;
     }

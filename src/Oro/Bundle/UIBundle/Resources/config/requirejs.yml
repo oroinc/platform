@@ -107,7 +107,7 @@ config:
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
-        'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.min.js'
+        'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'

@@ -16,14 +16,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
     /**
-     * @deprecated 1.8:2.1 use AbstractOwnerTreeProvider::CACHE_KEY instead
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::CACHE_KEY instead
      */
     const CACHE_KEY = 'data';
 
     /**
      * @var EntityManager
      *
-     * @deprecated 1.8:2.1 use AbstractOwnerTreeProvider::getManagerForClass instead
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getManagerForClass instead
      */
     protected $em;
 
@@ -77,7 +77,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      * @param EntityManager $em
      * @param CacheProvider $cache
      *
-     * @deprecated 1.8:2.1 use AbstractOwnerTreeProvider::getContainer instead
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getContainer instead
      */
     public function __construct(EntityManager $em, CacheProvider $cache)
     {
@@ -117,7 +117,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
                 foreach ($user->getBusinessUnits() as $businessUnit) {
                     $buOrganizationId = $businessUnit->getOrganization()->getId();
                     if ($organizationId == $buOrganizationId) {
-                        $tree->addLocalEntityToBasic($user->getId(), $organizationId, $businessUnit->getId());
+                        $tree->addLocalEntityToBasic($user->getId(), $businessUnit->getId(), $organizationId);
                     }
                 }
             }
