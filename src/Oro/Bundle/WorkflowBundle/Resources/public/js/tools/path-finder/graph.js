@@ -65,6 +65,9 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             this.buildCenterLinesBetweenNodes();
             this.createAxises();
             this.buildMergeRequests();
+            console.log(this.horizontalAxises.map(function (a) {return a.uid}));
+            console.log(this.verticalAxises.map(function (a) {return a.uid}));
+            console.log(this.mergeAxisesQueue.map(function (a) {return a.map(function (a) {return a.uid})}));
             this.mergeAxises();
             this.buildNodes();
             this.finalizeAxises();
@@ -356,13 +359,13 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                         locationDirective: new CenterLocationDirective()
                     },
                     {
-                        vector: new Vector2d(center.x + 1, center.y, directions.RIGHT_TO_LEFT),
+                        vector: new Vector2d(center.x + 1, center.y, directions.LEFT_TO_RIGHT),
                         leftConstraint: new LeftSimpleConstraint(rect.top),
                         rightConstraint: new RightSimpleConstraint(rect.bottom),
                         locationDirective: new CenterLocationDirective()
                     },
                     {
-                        vector: new Vector2d(center.x - 1, center.y, directions.LEFT_TO_RIGHT),
+                        vector: new Vector2d(center.x - 1, center.y, directions.RIGHT_TO_LEFT),
                         leftConstraint: new LeftSimpleConstraint(rect.top),
                         rightConstraint: new RightSimpleConstraint(rect.bottom),
                         locationDirective: new CenterLocationDirective()

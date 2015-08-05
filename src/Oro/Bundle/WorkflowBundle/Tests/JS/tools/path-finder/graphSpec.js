@@ -31,6 +31,7 @@ define(function(require) {
             var graph = prepareGraph();
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.build();
+            expect(graph.verticalAxises.length).toBe(13);
             expect(graph.verticalAxises.length).toBe(graph.horizontalAxises.length);
         });
         it('should keep graph traversable after updating with path', function () {
