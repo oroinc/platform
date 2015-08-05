@@ -142,7 +142,7 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
                 'SELECT j FROM TestEntity j '
                 . 'WHERE CONCAT(j.command, j.args) LIKE :param1',
                 [
-                    'param1' => '%--prm1=\\\\"Test Param\\\\1\\\\"%'
+                    'param1' => '%--prm1=\\\\"Test Param\\\\\\\\1\\\\"%'
                 ]
             ],
             [
@@ -164,7 +164,7 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
                 . 'AND CONCAT(j.command, j.args) LIKE :param2',
                 [
                     'param1' => '%cmd%',
-                    'param2' => '%\\\\\\"Acme\\\\Class\\\\\\"%'
+                    'param2' => '%\\\\\\"Acme\\\\\\\\Class\\\\\\"%'
                 ]
             ],
             [
