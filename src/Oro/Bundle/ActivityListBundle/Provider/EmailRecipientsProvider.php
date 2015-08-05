@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
@@ -70,7 +71,8 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
         $activityListDql = $activityListQb->getQuery()->getDQL();
         $limit = $args->getLimit();
-        foreach (array_keys($activities) as $class) {
+        $activityKeys = array_keys($activities);
+        foreach ($activityKeys as $class) {
             $qb = $this->getRepository($class)
                 ->createQueryBuilder('e');
             $qb
