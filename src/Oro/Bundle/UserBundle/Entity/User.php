@@ -334,6 +334,13 @@ class User extends ExtendUser implements
      * @var Email[]|Collection
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $emails;
 
