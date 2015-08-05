@@ -70,6 +70,18 @@ define([
         return $target;
     }
 
+    /**
+     * Gets element after which it needs insert error message
+     *
+     * @param {Element} element
+     * @returns {jQuery}
+     */
+    function getErrorPlacement(element) {
+        var $targetElem = getErrorTarget(element);
+        var $errorHolder = $targetElem.parent();
+        return $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+    }
+
     // turn off adding rules from attributes
     $.validator.attributeRules = function() { return {}; };
 
@@ -104,8 +116,9 @@ define([
      * @param {Element|jQuery} element
      */
     $.validator.prototype.hideElementErrors = function(element) {
-        this.settings.unhighlight.call( this, element, this.settings.errorClass, this.settings.validClass );
-        this.settings.errorPlacement(false, element);
+        var $placement = getErrorPlacement(element);
+        $placement.next('.' + this.settings.errorClass).remove();
+        this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
         return this;
     }
 
@@ -245,14 +258,10 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function(label, $el) {
-            var $targetElem = getErrorTarget($el);
-            var $errorHolder = $targetElem.parent();
-            var $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+            var $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
-            $sibling.next('.' + this.errorClass).remove();
-            if (label !== false) {
-                label.insertAfter($sibling);
-            }
+            $placement.next('.' + this.errorClass).remove();
+            label.insertAfter($placement);
         },
         highlight: function(element) {
             this.settings.unhighlight.call(this, element);
