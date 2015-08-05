@@ -156,5 +156,20 @@ define(['./util', './line2d'], function(util, Line2d) {
         configurable: true
     });
 
+    /**
+     * Draws interval
+     *
+     * @param {string} color
+     */
+    Interval2d.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'green';
+        }
+        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
+            '<path stroke-width="1" stroke="' + color +
+            '" fill="none" d="' + 'M ' + this.a.x + ' ' + this.a.y + ' L ' + this.b.x + ' ' + this.b.y +
+            '"></path></svg>');
+    };
+
     return Interval2d;
 });

@@ -99,5 +99,22 @@ define(['./point2d', './line2d', './interval2d', './util'], function(Point2d, Li
         return null;
     };
 
+    /**
+     * Draws vector
+     *
+     * @param {string} color
+     */
+    Vector2d.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'rgba(0,0,0,0.7)';
+        }
+        this.start.draw(color, 3);
+        var interval = new Interval2d(this.start, this.start.add(this.direction.unitVector.mul(100000)));
+        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height: 1000px;">' +
+            '<path stroke-width="1" stroke="' + color + '" fill="none" d="' +
+            'M ' + interval.a.x + ' ' + interval.a.y + ' L ' + interval.b.x + ' ' + interval.b.y +
+            '"></path></svg>');
+    };
+
     return Vector2d;
 });

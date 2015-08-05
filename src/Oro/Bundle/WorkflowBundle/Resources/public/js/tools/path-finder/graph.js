@@ -73,7 +73,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         /**
          * Returns outgoing path from initial rectangle found by cid
          *
-         * @param {String} cid content id of initial rectangles passed into graph
+         * @param {string} cid content id of initial rectangles passed into graph
          * @param {Point2d} direction of outgoing connection
          * @returns {Path}
          */
@@ -113,7 +113,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         /**
          * Finds and recturns one of initial rectangle by cid
          *
-         * @param {String} cid
+         * @param {string} cid
          * @returns {Rectangle}
          */
         Graph.prototype.getRectByCid = function(cid) {
@@ -124,6 +124,31 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
             return null;
+        };
+
+        /**
+         * Draws graph
+         */
+        Graph.prototype.draw = function() {
+            var i;
+            this.outerRect.draw('red');
+            function drawFn(item) {
+                return item.draw('cyan');
+            }
+            for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
+                this.horizontalAxises[i].allClones.forEach(drawFn);
+            }
+            for (i = this.verticalAxises.length - 1; i >= 0; i--) {
+                this.verticalAxises[i].allClones.forEach(drawFn);
+            }
+            for (i = this.rectangles.length - 1; i >= 0; i--) {
+                this.rectangles[i].draw('black');
+            }
+            for (var key in this.nodes) {
+                if (this.nodes.hasOwnProperty(key)) {
+                    this.nodes[key].draw('black');
+                }
+            }
         };
 
         /**

@@ -144,5 +144,16 @@ function(__extends, Point2d, directions, Connection) {
         var connection = this.connections[direction.id];
         return connection ? connection.second(this) : null;
     };
+
+    /**
+     * Draws nodePoint
+     *
+     * @param {string} color
+     * @param {number} radius
+     */
+    NodePoint.prototype.draw = function(color, radius) {
+        this.recommendedPoint.draw(color, radius);
+    };
+
     return NodePoint;
 });

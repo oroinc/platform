@@ -168,5 +168,40 @@ define(function() {
     Point2d.prototype.clone = function() {
         return new Point2d(this.x, this.y);
     };
+
+    /**
+     * Draws point
+     *
+     * @param {string} color
+     * @param {number} radius
+     */
+    Point2d.prototype.draw = function(color, radius) {
+        if (color === void 0) {
+            color = 'red';
+        }
+        if (radius === void 0) {
+            radius = 2;
+        }
+        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
+            '<circle fill="' + color + '" r="' + radius + '" ' + 'cx="' + this.x + '" cy="' + this.y +
+            '"></circle></svg>');
+    };
+
+
+    /**
+     * Draws text on point
+     *
+     * @param {string} text
+     * @param {string} color
+     */
+    Point2d.prototype.drawText = function(text, color) {
+        if (color === void 0) {
+            color = 'black';
+        }
+        document.body.insertAdjacentHTML('beforeEnd', '<svg style="position:absolute;width:1000px;height:1000px;">' +
+            '<text x="' + (this.x + 5) + '" y="' + (this.y - 5) + '" fill="' + color + '" font-size="10">' +
+            text + '</text></svg>');
+    };
+
     return Point2d;
 });

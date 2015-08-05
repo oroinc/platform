@@ -196,5 +196,21 @@ define(['./directions', './settings'], function(directions, settings) {
         }
         return result;
     };
+
+    /**
+     * Draws path
+     *
+     * @param {string} color
+     */
+    Path.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'red';
+        }
+        this.connection.draw(color);
+        if (this.previous) {
+            this.previous.draw(color);
+        }
+    };
+
     return Path;
 });

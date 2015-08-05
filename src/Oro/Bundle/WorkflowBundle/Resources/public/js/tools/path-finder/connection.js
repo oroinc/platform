@@ -87,5 +87,20 @@ define(['./extends', './interval2d', './point2d', './settings'], function(__exte
         return this.b === first ? this.vector.rot180() : this.vector;
     };
 
+    /**
+     * Draws connection
+     *
+     * @param {string} color
+     */
+    Connection.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'green';
+        }
+        (new Interval2d(
+            new Point2d(this.a.recommendedX, this.a.recommendedY),
+            new Point2d(this.b.recommendedX, this.b.recommendedY))
+            ).draw(color);
+    };
+
     return Connection;
 });

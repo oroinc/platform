@@ -316,5 +316,27 @@ function(__extends, Interval2d, directions, Point2d) {
             this.clonesAtRight.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs()));
         }
     };
+
+    /**
+     * Draws axis
+     *
+     * @param {string} color
+     */
+    Axis.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'green';
+        }
+        if (this.nodes.length) {
+            (new Interval2d(
+                new Point2d(this.nodes[0].recommendedX, this.nodes[0].recommendedY),
+                new Point2d(
+                    this.nodes[this.nodes.length - 1].recommendedX,
+                    this.nodes[this.nodes.length - 1].recommendedY)
+            )).draw(color);
+        } else {
+            Interval2d.prototype.draw.call(this, color);
+        }
+    };
+
     return Axis;
 });

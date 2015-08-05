@@ -268,5 +268,19 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
             this.verticalInterval.containsNonInclusive(point.y);
     };
 
+    /**
+     * Draws rectangle
+     *
+     * @param {string} color
+     */
+    Rectangle.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'violet';
+        }
+        this.eachSide(function(side) {
+            return side.draw(color);
+        });
+    };
+
     return Rectangle;
 });
