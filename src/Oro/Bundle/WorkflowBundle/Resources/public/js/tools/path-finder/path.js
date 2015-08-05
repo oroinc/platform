@@ -13,55 +13,65 @@ define(['./directions', './settings'], function(directions, settings) {
         shortDirectionUid[directionIds[i]] = i;
     }
 
+    /**
+     * Path constructor
+     *
+     * @param {Connection} connection
+     * @param {NodePoint} fromNode
+     * @param {Path} previous
+     * @constructor
+     */
     function Path(connection, fromNode, previous) {
         this.connection = connection;
         this.previous = previous;
         this.fromNode = fromNode;
-        this.cost = (this.previous ? this.previous.cost : 0) + this.connection.cost;
-        if (this.previous && this.connection.directionFrom(this.fromNode).id !==
-            this.previous.connection.directionFrom(this.previous.fromNode).id) {
+        /**
+         * Node this path points to
+         * @type {NodePoint}
+         */
+        this.toNode = connection.second(fromNode);
+        this.cost = (previous ? previous.cost : 0) + connection.cost;
+        if (previous && connection.directionFrom(fromNode).id !==
+            previous.connection.directionFrom(previous.fromNode).id) {
             this.cost += settings.cornerCost;
         }
     }
+
+    /**
+     * Returns uid of this path.
+     * Uid is fromNode and connection direction combined into one value
+     *
+     * @type {number}
+     */
     Object.defineProperty(Path.prototype, 'uid', {
         get: function() {
             if (this._uid === void 0) {
                 var vectorId = this.connection.a === this.fromNode ?
                     this.connection.vector.id :
                     this.connection.vector.rot180().id;
-                this._uid = this.fromNode.uid * 10 + shortDirectionUid[vectorId];
+                this._uid = this.fromNode.uid * 8 + shortDirectionUid[vectorId];
             }
             return this._uid;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(Path.prototype, 'toNode', {
-        get: function() {
-            return this.connection.second(this.fromNode);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Path.prototype.eachAvailableStep = function(fn) {
-        var _this = this;
-        var toNode = this.toNode;
-        toNode.eachTraversableConnection(this.connection, function(to, conn) {
-            fn(new Path(conn, toNode, _this));
-        });
-    };
+
+    /**
+     * Returns true if two pathes are complementary
+     *
+     * @param {Path} path
+     * @returns {boolean}
+     */
     Path.prototype.canJoinWith = function(path) {
         return this.connection === path.connection && this.toNode === path.fromNode;
     };
-    Path.prototype.draw = function(color) {
-        if (color === void 0) {
-            color = 'red';
-        }
-        this.connection.draw(color);
-        if (this.previous) {
-            this.previous.draw(color);
-        }
-    };
+
+    /**
+     * All connection specified by path
+     *
+     * @type {Array.<Connection>}
+     */
     Object.defineProperty(Path.prototype, 'allConnections', {
         get: function() {
             if (this.previous) {
@@ -74,6 +84,12 @@ define(['./directions', './settings'], function(directions, settings) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Connections included into current path step
+     *
+     * @type {Array.<Connection>}
+     */
     Object.defineProperty(Path.prototype, 'includedConnections', {
         get: function() {
             var node = this.fromNode;
@@ -97,6 +113,12 @@ define(['./directions', './settings'], function(directions, settings) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * All Nodes specified by this path
+     *
+     * @type {Array.<NodePoint>}
+     */
     Object.defineProperty(Path.prototype, 'allNodes', {
         get: function() {
             if (this.previous) {
@@ -109,6 +131,12 @@ define(['./directions', './settings'], function(directions, settings) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Returns real points on 2d surface
+     *
+     * @type {Array.<Point2d>}
+     */
     Object.defineProperty(Path.prototype, 'points', {
         get: function() {
             var points = [];
@@ -130,6 +158,12 @@ define(['./directions', './settings'], function(directions, settings) {
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Finds all siblings of current path withing current axis clones
+     *
+     * @returns {Array,<Path>}
+     */
     Path.prototype.getSiblings = function() {
         if (this.previous) {
             throw new Error('Unable to get path siblings');
@@ -162,5 +196,21 @@ define(['./directions', './settings'], function(directions, settings) {
         }
         return result;
     };
+
+    /**
+     * Draws path
+     *
+     * @param {string} color
+     */
+    Path.prototype.draw = function(color) {
+        if (color === void 0) {
+            color = 'red';
+        }
+        this.connection.draw(color);
+        if (this.previous) {
+            this.previous.draw(color);
+        }
+    };
+
     return Path;
 });
