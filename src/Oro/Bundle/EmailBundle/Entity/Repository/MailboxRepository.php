@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -31,19 +32,72 @@ class MailboxRepository extends EntityRepository
     }
 
     /**
-     * Returns all mailbox ids accessible by user.
+     * Returns a list of mailboxes available to user.
      *
-     * @param User|integer $user    User entity or user id.
-     * @param bool         $idsOnly Whether to return ids only or not.
+     * @param User|integer $user User or user id
      *
-     * @return \integer[]|mixed
+     * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
-    public function findAvailableMailboxes($user, $idsOnly = true)
+    public function findAvailableMailboxes($user)
     {
         if (!$user instanceof User) {
             $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
         }
 
+        $roles = $this->getUserRoleIds($user);
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('mb')
+           ->from('OroEmailBundle:Mailbox', 'mb')
+           ->leftJoin('mb.authorizedUsers', 'au')
+           ->leftJoin('mb.authorizedRoles', 'ar')
+           ->where('au = :user')
+           ->orWhere(
+               $qb->expr()->in('ar', $roles)
+           );
+        $qb->setParameter('user', $user);
+
+        return $qb->getQuery()->execute();
+    }
+
+    /**
+     * Returns a list of ids of mailboxes available to user.
+     *
+     * @param User|integer $user User or user id
+     *
+     * @return array Array of ids
+     */
+    public function findAvailableMailboxIds($user)
+    {
+        if (!$user instanceof User) {
+            $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
+        }
+
+        $roles = $this->getUserRoleIds($user);
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('mb.id')
+            ->from('OroEmailBundle:Mailbox', 'mb')
+            ->leftJoin('mb.authorizedUsers', 'au')
+            ->leftJoin('mb.authorizedRoles', 'ar')
+            ->where('au = :user')
+            ->orWhere(
+                $qb->expr()->in('ar', $roles)
+            );
+        $qb->setParameter('user', $user);
+
+        return array_map('current', $qb->getQuery()->getScalarResult());
+    }
+
+    /**
+     * Returns a list of ids of roles assigned ot user.
+     *
+     * @param User $user
+     *
+     * @return array Array of ids
+     */
+    protected function getUserRoleIds(User $user)
+    {
         // Get ids of all user roles.
         $roles = $user->getRoles();
         $roleList = array_map(
@@ -53,26 +107,6 @@ class MailboxRepository extends EntityRepository
             $roles
         );
 
-        // Find mailboxes which have user in list of authorized users or any of his roles in list of authorized roles.
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        if ($idsOnly) {
-            $qb->select('mb.id');
-        } else {
-            $qb->select('mb');
-        }
-        $qb->from('OroEmailBundle:Mailbox', 'mb')
-            ->leftJoin('mb.authorizedUsers', 'au')
-            ->leftJoin('mb.authorizedRoles', 'ar')
-            ->where('au = :user')
-            ->orWhere(
-                $qb->expr()->in('ar', $roleList)
-            );
-        $qb->setParameter('user', $user);
-
-        if ($idsOnly) {
-            return array_map('current', $qb->getQuery()->getScalarResult());
-        }
-
-        return $qb->getQuery()->execute();
+        return $roleList;
     }
 }

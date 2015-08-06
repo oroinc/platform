@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -17,17 +18,18 @@ class MailboxController extends Controller
 
     /**
      * @Route(
-     *      "/system/platform/email_configuration/mailbox/update/{mailbox}",
+     *      "/system/platform/email_configuration/mailbox/update/{id}",
      *      name="oro_email_mailbox_update"
      * )
      * @Template
      * @AclAncestor("oro_email_mailbox_edit")
+     * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
      *
      * @param $mailbox
      *
      * @return array
      */
-    public function editAction($mailbox)
+    public function updateAction(Mailbox $mailbox)
     {
         $mailboxRepository = $this->getDoctrine()->getRepository('OroEmailBundle:Mailbox');
         $data = $mailboxRepository->find($mailbox);
@@ -51,7 +53,6 @@ class MailboxController extends Controller
         $tree = $provider->getTree();
 
         $handler = $this->get('oro_email.form.handler.mailbox');
-        //$bc = $provider->getSubtree(self::ACTIVE_SUBGROUP)->toBlockConfig();
 
         if ($handler->process($mailbox)) {
             $this->get('session')->getFlashBag()->add(
@@ -65,7 +66,7 @@ class MailboxController extends Controller
             return $this->get('oro_ui.router')->redirectAfterSave(
                 [
                     'route' => 'oro_email_mailbox_update',
-                    'parameters' => ['mailbox' => $mailbox->getId()]
+                    'parameters' => ['id' => $mailbox->getId()]
                 ],
                 [
                     'route' => 'oro_config_configuration_system',
@@ -90,7 +91,7 @@ class MailboxController extends Controller
      *      "/system/platform/email_configuration/mailbox/create",
      *      name="oro_email_mailbox_create"
      * )
-     * @Template("OroEmailBundle:Configuration/Mailbox:edit.html.twig")
+     * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
      * @AclAncestor("oro_email_mailbox_create")
      *
      * @return array

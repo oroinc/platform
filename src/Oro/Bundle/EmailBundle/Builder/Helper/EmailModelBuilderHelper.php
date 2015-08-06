@@ -260,7 +260,7 @@ class EmailModelBuilderHelper
     public function getMailboxes()
     {
         $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')
-            ->findAvailableMailboxes($this->getUser()->getId(), false);
+            ->findAvailableMailboxes($this->getUser());
 
         return $mailboxes;
     }

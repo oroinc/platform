@@ -472,7 +472,7 @@ datagrid:
                 type: url
                 route: oro_email_mailbox_update
                 params:
-                    mailbox: id
+                    id: id
             delete_link:
                 type: url
                 route: oro_api_delete_mailbox

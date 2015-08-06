@@ -26,7 +26,7 @@
 {% if form.vars.data.id is not null %}
     {% set formAction = path(
         'oro_email_mailbox_update',
-        { mailbox: form.vars.data.id }
+        { id: form.vars.data.id }
     )
     %}
 {% else %}
