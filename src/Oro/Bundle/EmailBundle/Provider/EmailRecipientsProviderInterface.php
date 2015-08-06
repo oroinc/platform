@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Oro\Bundle\EmailBundle\Model\Email;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 
 interface EmailRecipientsProviderInterface
 {
     /**
-     * @return Email[]
+     * @return Recipient[]
      */
     public function getRecipients(EmailRecipientsProviderArgs $args);
 

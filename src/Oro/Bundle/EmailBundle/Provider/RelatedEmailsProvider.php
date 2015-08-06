@@ -68,8 +68,8 @@ class RelatedEmailsProvider
     {
         $emails = [];
 
-        if (!$depth || !($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
-            if ($this->securityFacade->getLoggedUser() === $object) {
+        if (!$depth || ($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
+            if ($depth && $this->securityFacade->getLoggedUser() === $object) {
                 $ignoreAcl = true;
             } else {
                 return $emails;

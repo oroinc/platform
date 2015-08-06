@@ -40,7 +40,12 @@ class EmailRecipientsProvider
             }
 
             $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails);
-            $recipients = $provider->getRecipients($args);
+            $recipientModels = $provider->getRecipients($args);
+            $recipients = [];
+            foreach ($recipientModels as $model) {
+                $recipients[$model->getEmail()] = $model->getName();
+            }
+
             if (!$recipients) {
                 continue;
             }

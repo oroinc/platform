@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Provider;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
@@ -34,12 +35,19 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
      */
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
-        return $this->emailRecipientsHelper->getRecipients(
+        $recipients = $this->emailRecipientsHelper->getRecipients(
             $args,
             $this->getUserRepository(),
             'u',
             'Oro\Bundle\UserBundle\Entity\User'
         );
+
+        $result = [];
+        foreach ($recipients as $email => $name) {
+            $result[] = new Recipient($email, $name);
+        }
+
+        return $result;
     }
 
     /**

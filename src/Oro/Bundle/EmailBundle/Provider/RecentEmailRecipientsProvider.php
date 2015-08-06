@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -60,7 +61,14 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
             )
             ->setMaxResults($args->getLimit());
 
-        return $this->emailsFromResult($this->aclHelper->apply($recipientsQb)->getResult());
+        $emails = $this->emailsFromResult($this->aclHelper->apply($recipientsQb)->getResult());
+
+        $result = [];
+        foreach ($emails as $email => $name) {
+            $result[] = new Recipient($email, $name);
+        }
+
+        return $result;
     }
 
     /**

@@ -14,6 +14,7 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
@@ -114,7 +115,12 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             }
         }
 
-        return $result;
+        $recipients = [];
+        foreach ($result as $email => $name) {
+            $recipients[] = new Recipient($email, $name);
+        }
+
+        return $recipients;
     }
 
     /**
