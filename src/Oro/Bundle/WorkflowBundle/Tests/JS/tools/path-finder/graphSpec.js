@@ -25,25 +25,25 @@ define(function(require) {
             return node.hAxis !== node.vAxis;
         }
 
-        it('should add axises around block', function () {
+        it('should add axises around block', function() {
             var graph = prepareGraph();
             var firstRect = graph.rectangles[0];
             graph.buildCornerAxises();
             expect(graph.baseAxises.length).toBe(4);
-            expect(_.any(graph.baseAxises, function (axis) {return axis.a.x === firstRect.top;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function (axis) {return axis.a.x === firstRect.bottom;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function (axis) {return axis.a.y === firstRect.left;})).toBeTruthy();
-            expect(_.any(graph.baseAxises, function (axis) {return axis.a.y === firstRect.right;})).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {return axis.a.x === firstRect.top;})).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {return axis.a.x === firstRect.bottom;})).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {return axis.a.y === firstRect.left;})).toBeTruthy();
+            expect(_.any(graph.baseAxises, function(axis) {return axis.a.y === firstRect.right;})).toBeTruthy();
         });
 
-        it('should add axises out from block center', function () {
+        it('should add axises out from block center', function() {
             var graph = prepareGraph();
             var firstRect = graph.rectangles[0];
             var rectCenter = firstRect.center;
             graph.buildCenterAxises();
 
-            var vX = _.countBy(graph.baseAxises, function (axis) {return axis.a.x;});
-            var vY = _.countBy(graph.baseAxises, function (axis) {return axis.a.y;});
+            var vX = _.countBy(graph.baseAxises, function(axis) {return axis.a.x;});
+            var vY = _.countBy(graph.baseAxises, function(axis) {return axis.a.y;});
 
             expect(graph.baseAxises.length).toBe(8);
 
@@ -56,15 +56,15 @@ define(function(require) {
             expect(vY[rectCenter.y + 1]).toBe(2);
         });
 
-        it('should add axises at center between block pairs', function () {
+        it('should add axises at center between block pairs', function() {
             var graph = prepareGraph();
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.buildCenterLinesBetweenNodes();
             expect(graph.baseAxises.length).toBe(2);
-            expect(_.every(graph.baseAxises, function (ax) {return ax.a.x === 250 || ax.a.y === 250;})).toBeTruthy();
+            expect(_.every(graph.baseAxises, function(ax) {return ax.a.x === 250 || ax.a.y === 250;})).toBeTruthy();
         });
 
-        it('should finalize (setup connections) correctly', function () {
+        it('should finalize (setup connections) correctly', function() {
             var graph = prepareGraph();
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.build();

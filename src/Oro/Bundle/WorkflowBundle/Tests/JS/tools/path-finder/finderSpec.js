@@ -20,7 +20,7 @@ define(function(require) {
             return graph;
         }
 
-        it('should add `to` path specs', function () {
+        it('should add `to` path specs', function() {
             var graph = prepareGraph();
             var finder = new Finder();
 
@@ -32,7 +32,7 @@ define(function(require) {
                 graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP).fromNode).toBeTruthy();
         });
 
-        it('should add `to` path siblings', function () {
+        it('should add `to` path siblings', function() {
             var graph = prepareGraph();
             var finder = new Finder();
             graph.updateWithPath(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
@@ -40,10 +40,10 @@ define(function(require) {
             expect(finder.to.length).toBe(3);
         });
 
-        it('should add `from` path specs', function () {
+        it('should add `from` path specs', function() {
             var graph = prepareGraph();
             var finder = new Finder();
-            expect(function () {
+            expect(function() {
                 finder.addFrom(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             }).toThrow();
             finder.addTo(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
@@ -57,11 +57,11 @@ define(function(require) {
                 graph.getPathFromCid('rect2', directions.TOP_TO_BOTTOM).addFrom).toBeTruthy();
         });
 
-        it('should add `from` path siblings', function () {
+        it('should add `from` path siblings', function() {
             var graph = prepareGraph();
             var finder = new Finder();
             graph.updateWithPath(graph.getPathFromCid('rect2', directions.TOP_TO_BOTTOM));
-            expect(function () {
+            expect(function() {
                 finder.addFrom(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             }).toThrow();
             finder.addTo(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
@@ -71,7 +71,7 @@ define(function(require) {
             expect(finder.from.length).toBe(3);
         });
 
-        it('should find pathes', function () {
+        it('should find pathes', function() {
             var graph = prepareGraph();
             for (var firstDirection in directions) {
                 if (directions.hasOwnProperty(firstDirection)) {
@@ -93,7 +93,7 @@ define(function(require) {
             }
         });
 
-        it('should select center axis', function () {
+        it('should select center axis', function() {
             var graph = prepareGraph();
             var finder = new Finder();
             finder.addTo(graph.getPathFromCid('rect1', directions.TOP_TO_BOTTOM));

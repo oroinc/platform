@@ -5,13 +5,12 @@ define(function(require) {
     var Graph = require('oroworkflow/js/tools/path-finder/graph');
     var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
     var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
-    var Connection = require('oroworkflow/js/tools/path-finder/connection');
     var directions = require('oroworkflow/js/tools/path-finder/directions');
 
     describe('oroworkflow/js/tools/path-finder/axis', function() {
         function createAxisWithThreeNodes() {
             var graph = new Graph();
-            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
+            var axis = new Axis(new Point2d(0, 0), new Point2d(0, 100), graph, 1);
             var a = new NodePoint(0, 0);
             var b = new NodePoint(0, 50);
             var c = new NodePoint(0, 100);
@@ -32,14 +31,14 @@ define(function(require) {
             return axis;
         }
 
-        it('should construct', function () {
-            var axis1 = new Axis(new Point2d(0,0), new Point2d(0, 100), null, 1);
+        it('should construct', function() {
+            var axis1 = new Axis(new Point2d(0, 0), new Point2d(0, 100), null, 1);
             expect(axis1.costMultiplier).toBe(1);
             expect(axis1.isVertical).toBe(true);
             expect(axis1.used).toBe(false);
             expect(axis1.graph).toBe(null);
 
-            var axis2 = new Axis(new Point2d(0,0), new Point2d(100, 0), null, 1);
+            var axis2 = new Axis(new Point2d(0, 0), new Point2d(100, 0), null, 1);
             expect(axis2.isVertical).toBe(false);
             expect(axis2.used).toBe(false);
             expect(axis2.graph).toBe(null);
@@ -49,13 +48,13 @@ define(function(require) {
 
         it('should add nodes and finalize correctly', function() {
             var graph = new Graph();
-            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
+            var axis = new Axis(new Point2d(0, 0), new Point2d(0, 100), graph, 1);
 
-            axis.addNode(new NodePoint(0,0));
+            axis.addNode(new NodePoint(0, 0));
             expect(axis.nodes[0].x).toBe(0);
             expect(axis.nodes[0].y).toBe(0);
 
-            axis.addNode(new NodePoint(0,100));
+            axis.addNode(new NodePoint(0, 100));
             expect(axis.nodes[1].x).toBe(0);
             expect(axis.nodes[1].y).toBe(100);
 
@@ -83,9 +82,9 @@ define(function(require) {
 
         it('should add final nodes correctly', function() {
             var graph = new Graph();
-            var axis = new Axis(new Point2d(0,0), new Point2d(0, 100), graph, 1);
-            var topNode = new NodePoint(0,0);
-            var bottomNode = new NodePoint(0,100);
+            var axis = new Axis(new Point2d(0, 0), new Point2d(0, 100), graph, 1);
+            var topNode = new NodePoint(0, 0);
+            var bottomNode = new NodePoint(0, 100);
             axis.addNode(topNode);
             axis.addNode(bottomNode);
             axis.sortNodes();
@@ -121,11 +120,11 @@ define(function(require) {
             expect(axisV.nextNodeConnVector.id).toBe(directions.TOP_TO_BOTTOM.id);
             expect(axisV.prevNodeConnVector.id).toBe(directions.BOTTOM_TO_TOP.id);
 
-            var axisH = new Axis(new Point2d(0,0), new Point2d(100, 0), null, 1);
+            var axisH = new Axis(new Point2d(0, 0), new Point2d(100, 0), null, 1);
             expect(axisH.nextNodeConnVector.id).toBe(directions.LEFT_TO_RIGHT.id);
             expect(axisH.prevNodeConnVector.id).toBe(directions.RIGHT_TO_LEFT.id);
 
-            axisH = new Axis(new Point2d(100,0), new Point2d(0, 0), null, 1);
+            axisH = new Axis(new Point2d(100, 0), new Point2d(0, 0), null, 1);
             expect(axisH.nextNodeConnVector.id).toBe(directions.LEFT_TO_RIGHT.id);
             expect(axisH.prevNodeConnVector.id).toBe(directions.RIGHT_TO_LEFT.id);
         });
