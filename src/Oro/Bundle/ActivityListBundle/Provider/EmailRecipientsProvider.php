@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
@@ -83,7 +84,8 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $activityListQb = $this->createActivityListQb($relatedEntityClass, $relatedEntityId);
         $activityListDql = $activityListQb->getQuery()->getDQL();
         $limit = $args->getLimit();
-        foreach (array_keys($activities) as $class) {
+        $activityKeys = array_keys($activities);
+        foreach ($activityKeys as $class) {
             $qb = $this->getRepository($class)
                 ->createQueryBuilder('e');
             $qb
