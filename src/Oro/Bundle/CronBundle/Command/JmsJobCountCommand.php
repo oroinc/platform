@@ -12,8 +12,6 @@ use JMS\JobQueueBundle\Entity\Job;
 
 class JmsJobCountCommand extends ContainerAwareCommand
 {
-    const COMMAND_NAME = 'oro:jms-job:count';
-
     /**
      * Jms job states
      * @var array
@@ -35,9 +33,9 @@ class JmsJobCountCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName(self::COMMAND_NAME)
+            ->setName('oro:jms-job-queue:count')
             ->setDescription(sprintf(
-                'Shows count of jms jobs in one of the defined states (%s). By default: %s.',
+                'Shows a number of jobs in one of the defined states (%s). By default: %s.',
                 implode(', ', $this->states),
                 Job::STATE_PENDING
             ))
