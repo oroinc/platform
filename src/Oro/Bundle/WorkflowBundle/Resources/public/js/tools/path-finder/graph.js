@@ -99,13 +99,17 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                     node = this.getNodeAt(new Point2d(center.x, center.y + 1));
                     break;
                 case directions.LEFT_TO_RIGHT.id:
-                    node = this.getNodeAt(new Point2d(center.x - 1, center.y));
+                    node = this.getNodeAt(new Point2d(center.x + 1, center.y));
                     break;
                 case directions.RIGHT_TO_LEFT.id:
-                    node = this.getNodeAt(new Point2d(center.x + 1, center.y));
+                    node = this.getNodeAt(new Point2d(center.x - 1, center.y));
                     break;
                 default:
                     throw new Error('Not supported direction');
+            }
+            if (node.connections[direction.id] === void 0 || node.connections[direction.id] === null) {
+                throw new Error('Path not found. Node at (' + node.x + ', ' + node.y +
+                    '), direction(' + direction.x + ', ' + direction.y + ')');
             }
             return new Path(node.connections[direction.id], node, null);
         };

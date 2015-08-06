@@ -34,6 +34,9 @@ define(['./settings', './path', './directions'], function(settings, Path, direct
      * @param {Path} path
      */
     Finder.prototype.addFrom = function(path) {
+        if (!this.to.length) {
+            throw new Error('Please add required destination before this call (use addTo())')
+        }
         var siblings = path.getSiblings();
         for (var i = siblings.length - 1; i >= 0; i--) {
             this.internalAddFrom(siblings[i]);
@@ -72,7 +75,7 @@ define(['./settings', './path', './directions'], function(settings, Path, direct
     };
 
     /**
-     * Adds needed path end chunk
+     * Adds required path end chunk
      *
      * @param {Path} path
      */
