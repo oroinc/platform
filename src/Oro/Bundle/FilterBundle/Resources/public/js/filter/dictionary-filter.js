@@ -58,12 +58,12 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            this.renderDeferred = $.Deferred();
             this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
 
         render: function() {
+            this.renderDeferred = $.Deferred();
             this.loadSelectedValue();
         },
 
