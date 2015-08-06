@@ -35,19 +35,12 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
      */
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
-        $recipients = $this->emailRecipientsHelper->getRecipients(
+        return $this->emailRecipientsHelper->getRecipients(
             $args,
             $this->getUserRepository(),
             'u',
             'Oro\Bundle\UserBundle\Entity\User'
         );
-
-        $result = [];
-        foreach ($recipients as $email => $name) {
-            $result[] = new Recipient($email, $name);
-        }
-
-        return $result;
     }
 
     /**

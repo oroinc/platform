@@ -67,15 +67,10 @@ class EmailRecipientsHelper
             return null;
         }
 
-        $label = $this->nameFormatter->format($object);
-        if ($classLabel = $this->getClassLabel($objectMetadata->name)) {
-            $label .= ' (' . $classLabel . ')';
-        }
-
         return new RecipientEntity(
             $objectMetadata->name,
             reset($identifiers),
-            $label
+            $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name)
         );
     }
 
@@ -100,7 +95,7 @@ class EmailRecipientsHelper
             ->setMaxResults($args->getLimit());
 
         $primaryEmailsResult = $this->aclHelper->apply($primaryEmailsQb)->getResult();
-        $emails = $this->emailsFromResult($primaryEmailsResult);
+        $emails = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
 
         $limit = $args->getLimit() - count($emails);
 
@@ -111,7 +106,7 @@ class EmailRecipientsHelper
                 ->setMaxResults($limit);
 
             $secondaryEmailsResult = $this->aclHelper->apply($secondaryEmailsQb)->getResult();
-            $emails = array_merge($emails, $this->emailsFromResult($secondaryEmailsResult));
+            $emails = array_merge($emails, $this->recipientsFromResult($secondaryEmailsResult, $entityClass));
         }
 
         return $emails;
@@ -157,6 +152,21 @@ class EmailRecipientsHelper
     }
 
     /**
+     * @param string $label
+     * @param string $entityClass
+     *
+     * @return string
+     */
+    protected function createRecipientEntityLabel($label, $entityClass)
+    {
+        if ($classLabel = $this->getClassLabel($entityClass)) {
+            $label .= ' (' . $classLabel . ')';
+        }
+
+        return $label;
+    }
+
+    /**
      * @param string $className
      * @return null|string
      */
@@ -173,14 +183,23 @@ class EmailRecipientsHelper
 
     /**
      * @param array $result
+     * @param string $entityClass
      *
      * @return array
      */
-    protected function emailsFromResult(array $result)
+    private function recipientsFromResult(array $result, $entityClass)
     {
         $emails = [];
         foreach ($result as $row) {
-            $emails[$row['email']] = sprintf('%s <%s>', $row['name'], $row['email']);
+            $emails[$row['email']] = new Recipient(
+                $row['email'],
+                sprintf('%s <%s>', $row['name'], $row['email']),
+                new RecipientEntity(
+                    $entityClass,
+                    $row['entityId'],
+                    $this->createRecipientEntityLabel($row['name'], $entityClass)
+                )
+            );
         }
 
         return $emails;
