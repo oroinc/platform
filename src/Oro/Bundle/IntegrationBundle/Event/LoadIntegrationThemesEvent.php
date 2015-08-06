@@ -17,7 +17,7 @@ class LoadIntegrationThemesEvent extends Event
 
     /**
      * @param FormView $formView
-     * @param type $themes
+     * @param array    $themes
      */
     public function __construct(FormView $formView, array $themes = [])
     {
