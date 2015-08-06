@@ -95,6 +95,8 @@ services:
             - @doctrine
             - @oro_activity.manager
             - @oro_email.related_emails.provider
+            - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.provider.chain
         tags:
             - { name: oro_email.recipients_provider }
 

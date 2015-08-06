@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 
 class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
@@ -28,19 +29,31 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var RelatedEmailsProvider */
     protected $relatedEmailsProvider;
 
+    /** @var ActivityListAclCriteriaHelper */
+    protected $activityListAclHelper;
+
+    /** @var ActivityListChainProvider */
+    protected $activityListProvider;
+
     /**
      * @param Registry $registry
      * @param ActivityManager $activityManager
      * @param RelatedEmailsProvider $relatedEmailsProvider
+     * @param ActivityListAclCriteriaHelper $activityListAclHelper
+     * @param ActivityListChainProvider $activityListChainProvider
      */
     public function __construct(
         Registry $registry,
         ActivityManager $activityManager,
-        RelatedEmailsProvider $relatedEmailsProvider
+        RelatedEmailsProvider $relatedEmailsProvider,
+        ActivityListAclCriteriaHelper $activityListAclHelper,
+        ActivityListChainProvider $activityListChainProvider
     ) {
         $this->registry = $registry;
         $this->activityManager = $activityManager;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
+        $this->activityListAclHelper = $activityListAclHelper;
+        $this->activityListProvider = $activityListChainProvider;
     }
 
     /**
@@ -67,7 +80,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         $activities = $this->activityManager->getActivities($relatedEntityClass);
-        $activityListQb = $this->createActivityListQb($relatedEntityClass, $idNames[0]);
+        $activityListQb = $this->createActivityListQb($relatedEntityClass, $relatedEntityId);
         $activityListDql = $activityListQb->getQuery()->getDQL();
         $limit = $args->getLimit();
         foreach (array_keys($activities) as $class) {
@@ -75,8 +88,11 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
                 ->createQueryBuilder('e');
             $qb
                 ->andWhere($qb->expr()->exists($activityListDql))
-                ->setParameter('related_entity_id', $relatedEntityId)
                 ->setParameter('related_activity_class', $class);
+
+            foreach ($activityListQb->getParameters() as $param) {
+                $qb->setParameter($param->getName(), $param->getValue(), $param->getType());
+            }
 
             $iterator = new BufferedQueryResultIterator($qb);
             $iterator->setBufferSize($limit);
@@ -110,31 +126,32 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 
     /**
      * @param string $relatedEntityClass
-     * @param string $relatedEntityIdFieldName
+     * @param mixed $relatedEntityId
      *
      * @return QueryBuilder
      */
-    protected function createActivityListQb($relatedEntityClass, $relatedEntityIdFieldName)
+    protected function createActivityListQb($relatedEntityClass, $relatedEntityId)
     {
-        $joinField = sprintf(
-            'al.%s',
-            ExtendHelper::buildAssociationName(
-                $relatedEntityClass,
-                ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
-            )
+        $activityListQb = $this->getActivityListRepository()->getBaseActivityListQueryBuilder(
+            $relatedEntityClass,
+            $relatedEntityId
         );
 
-        $activityListQb = $this->getRepository('OroActivityListBundle:ActivityList')
-                ->createQueryBuilder('al');
-
         $activityListQb
-                ->select('1')
-                ->join($joinField, 'a')
-                ->andWhere(sprintf('a.%s = :related_entity_id', $relatedEntityIdFieldName))
-                ->andWhere('al.relatedActivityClass = :related_activity_class')
-                ->andWhere('al.relatedActivityId = e.id');
+            ->andWhere('activity.relatedActivityId = e.id')
+            ->andWhere('activity.relatedActivityClass = :related_activity_class');
+
+        $this->activityListAclHelper->applyAclCriteria($activityListQb, $this->activityListProvider->getProviders());
 
         return $activityListQb;
+    }
+
+    /**
+     * @return ActivityListRepository
+     */
+    protected function getActivityListRepository()
+    {
+        return $this->getRepository('OroActivityListBundle:ActivityList');
     }
 
     /**
