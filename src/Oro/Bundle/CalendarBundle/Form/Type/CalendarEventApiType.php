@@ -113,6 +113,7 @@ class CalendarEventApiType extends CalendarEventType
                 'intention'            => 'calendar_event',
                 'csrf_protection'      => false,
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'cascade_validation'   => true,
             )
         );
     }
