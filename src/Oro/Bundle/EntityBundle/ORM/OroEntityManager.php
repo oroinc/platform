@@ -9,19 +9,10 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 
-use Oro\Bundle\EntityBundle\ORM\Query\FilterCollection;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class OroEntityManager extends EntityManager
 {
-    /**
-     * Collection of query filters.
-     *
-     * @var FilterCollection
-     */
-    protected $filterCollection;
-
     /**
      * Entity config provider for "extend" scope
      *
@@ -51,6 +42,8 @@ class OroEntityManager extends EntityManager
     /**
      * @param ConfigProvider $extendConfigProvider
      * @return $this
+     *
+     * @deprecated since 1.8. Will be removed in 2.0
      */
     public function setExtendConfigProvider($extendConfigProvider)
     {
@@ -61,64 +54,11 @@ class OroEntityManager extends EntityManager
 
     /**
      * @return ConfigProvider
+     *
+     * @deprecated since 1.8. Will be removed in 2.0
      */
     public function getExtendConfigProvider()
     {
         return $this->extendConfigProvider;
-    }
-
-    /**
-     * @param FilterCollection $collection
-     */
-    public function setFilterCollection(FilterCollection $collection)
-    {
-        $this->filterCollection = $collection;
-    }
-
-    /**
-     * Gets the enabled filters.
-     *
-     * @return FilterCollection The active filter collection.
-     */
-    public function getFilters()
-    {
-        if (null === $this->filterCollection) {
-            $this->filterCollection = new FilterCollection($this);
-        }
-
-        return $this->filterCollection;
-    }
-
-    /**
-     * Checks whether the state of the filter collection is clean.
-     *
-     * @return boolean True, if the filter collection is clean.
-     */
-    public function isFiltersStateClean()
-    {
-        return null === $this->filterCollection || $this->filterCollection->isClean();
-    }
-
-    /**
-     * Checks whether the Entity Manager has filters.
-     *
-     * @return boolean True, if the EM has a filter collection with enabled filters.
-     */
-    public function hasFilters()
-    {
-        return null !== $this->filterCollection && $this->filterCollection->getEnabledFilters();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository($className)
-    {
-        $repo = parent::getRepository($className);
-        if ($repo instanceof EntityConfigAwareRepositoryInterface) {
-            $repo->setEntityConfigManager($this->extendConfigProvider->getConfigManager());
-        }
-
-        return $repo;
     }
 }
