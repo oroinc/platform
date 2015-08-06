@@ -60,15 +60,20 @@ class RelatedEmailsProvider
     /**
      * @param object $object
      * @param int $depth
+     * @param bool $ignoreAcl
      *
      * @return array
      */
-    public function getEmails($object, $depth = 1)
+    public function getEmails($object, $depth = 1, $ignoreAcl = false)
     {
         $emails = [];
 
-        if (!$depth || !$this->securityFacade->isGranted('VIEW', $object)) {
-            return $emails;
+        if (!$depth || !($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
+            if ($this->securityFacade->getLoggedUser() === $object) {
+                $ignoreAcl = true;
+            } else {
+                return $emails;
+            }
         }
 
         $className = ClassUtils::getClass($object);
@@ -108,9 +113,7 @@ class RelatedEmailsProvider
             }
         }
 
-        $emails = array_merge($emails, $this->createEmailsFromAttributes($attributes, $object));
-
-        return $emails;
+        return array_merge($emails, $this->createEmailsFromAttributes($attributes, $object));
     }
 
     /**
