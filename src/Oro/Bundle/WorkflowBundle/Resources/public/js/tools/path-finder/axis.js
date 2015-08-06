@@ -1,7 +1,21 @@
 define(['./extends', './interval2d', './directions', './point2d'],
-    function(__extends, Interval2d, directions, Point2d) {
+function(__extends, Interval2d, directions, Point2d) {
     'use strict';
     __extends(Axis, Interval2d);
+
+    var TOP_TO_BOTTOM_ID = directions.TOP_TO_BOTTOM.id;
+    var BOTTOM_TO_TOP_ID = directions.BOTTOM_TO_TOP.id;
+    var LEFT_TO_RIGHT_ID = directions.LEFT_TO_RIGHT.id;
+    var RIGHT_TO_LEFT_ID = directions.RIGHT_TO_LEFT.id;
+    /**
+     * Creates axis
+     *
+     * @param {NodePoint} a
+     * @param {NodePoint} b
+     * @param {Graph} graph
+     * @param {number} costMultiplier
+     * @constructor
+     */
     function Axis(a, b, graph, costMultiplier) {
         if (costMultiplier === void 0) {
             costMultiplier = 1;
@@ -16,6 +30,17 @@ define(['./extends', './interval2d', './directions', './point2d'],
         this.costMultiplier = costMultiplier;
         this.graph = graph;
     }
+
+    /**
+     * @type {number}
+     */
+    Axis.uidCounter = 0;
+
+    /**
+     * Returns all connection on axis
+     *
+     * @type {Array.<Connection>}
+     */
     Object.defineProperty(Axis.prototype, 'connections', {
         get: function() {
             var result = [];
@@ -29,6 +54,10 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * @type {Axis}
+     */
     Object.defineProperty(Axis.prototype, 'closestLeftClone', {
         get: function() {
             var closestLeftClone = null;
@@ -42,6 +71,10 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * @type {Axis}
+     */
     Object.defineProperty(Axis.prototype, 'closestRightClone', {
         get: function() {
             var closestRightClone = null;
@@ -55,6 +88,10 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * @type {Array.<Axis>}
+     */
     Object.defineProperty(Axis.prototype, 'allClones', {
         get: function() {
             var clones = [];
@@ -74,27 +111,31 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Creates Axis from given interval
+     *
+     * @param {Interval2d} interval
+     * @param {Graph} graph
+     * @returns {Axis}
+     */
     Axis.createFromInterval = function(interval, graph) {
         var costMultiplier = interval.costMultiplier;
         var isVertical = interval.isVertical;
-        var clone = new Axis(interval.a, interval.b, graph, costMultiplier);
+        var axis = new Axis(interval.a, interval.b, graph, costMultiplier);
         // this is fix for zero length axises
         if (isVertical !== undefined) {
-            clone.isVertical = isVertical;
+            axis.isVertical = isVertical;
         }
-        return clone;
+        return axis;
     };
-    Axis.prototype.addNode = function(node) {
-        if (this.isVertical) {
-            node.vAxis = this;
-        } else {
-            node.hAxis = this;
-        }
-        if (this.nodes.indexOf(node) !== -1) {
-            return;
-        }
-        this.nodes.push(node);
-    };
+
+    /**
+     * Vector to the next node (node that matches following condition nextNode.x >= node.x && nextNode.y >= node.y)
+     * Used for navigation between nodes
+     *
+     * @type {Point2d}
+     */
     Object.defineProperty(Axis.prototype, 'nextNodeConnVector', {
         get: function() {
             if (this.isVertical) {
@@ -106,6 +147,13 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Vector to the previous node (node that matches following condition nextNode.x <= node.x && nextNode.y <= node.y)
+     * Used for navigation between nodes
+     *
+     * @type {Point2d}
+     */
     Object.defineProperty(Axis.prototype, 'prevNodeConnVector', {
         get: function() {
             if (this.isVertical) {
@@ -117,6 +165,29 @@ define(['./extends', './interval2d', './directions', './point2d'],
         enumerable: true,
         configurable: true
     });
+
+    /**
+     * Adds node to axis.
+     * @param {NodePoint} node
+     */
+    Axis.prototype.addNode = function(node) {
+        if (this.isVertical) {
+            node.vAxis = this;
+        } else {
+            node.hAxis = this;
+        }
+        if (this.nodes.indexOf(node) !== -1) {
+            return;
+        }
+        this.nodes.push(node);
+    };
+
+    /**
+     * Adds node to axis. That function keeps all connections up to date, while regular addNode() require
+     * axis.finalize() call after all nodes addition. Used to update axis on fly
+     *
+     * @param {NodePoint}
+     */
     Axis.prototype.addFinalNode = function(node) {
         var nextNodeConnVector = this.nextNodeConnVector;
         var nextNodeConn;
@@ -139,6 +210,10 @@ define(['./extends', './interval2d', './directions', './point2d'],
             throw new Error('Node should be connected before addition');
         }
     };
+
+    /**
+     * Used in pair with addNode(). This function establishes connection between axis nodes.
+     */
     Axis.prototype.finalize = function() {
         // this.nodes.forEach((node)=>node.draw('red'));
         var firstNode = this.nodes[0];
@@ -146,16 +221,25 @@ define(['./extends', './interval2d', './directions', './point2d'],
         var node;
         var i;
         if (this.isVertical) {
-            firstNode.removeConnection(firstNode.connections[directions.TOP_TO_BOTTOM.id]);
-            lastNode.removeConnection(firstNode.connections[directions.BOTTOM_TO_TOP.id]);
+            if (firstNode.connections[TOP_TO_BOTTOM_ID]) {
+                firstNode.connections[TOP_TO_BOTTOM_ID].remove();
+            }
+            if (lastNode.connections[BOTTOM_TO_TOP_ID]) {
+                lastNode.connections[BOTTOM_TO_TOP_ID].remove();
+            }
             for (i = this.nodes.length - 1; i >= 0; i--) {
                 node = this.nodes[i];
                 node.vAxis = this;
                 node.connect(directions.BOTTOM_TO_TOP, this.nodes[i - 1]);
             }
         } else {
-            firstNode.removeConnection(firstNode.connections[directions.LEFT_TO_RIGHT.id]);
-            lastNode.removeConnection(firstNode.connections[directions.RIGHT_TO_LEFT.id]);
+            if (firstNode.connections[LEFT_TO_RIGHT_ID]) {
+                firstNode.connections[LEFT_TO_RIGHT_ID].remove();
+            }
+            if (lastNode.connections[RIGHT_TO_LEFT_ID]) {
+                lastNode.connections[RIGHT_TO_LEFT_ID].remove();
+            }
+
             for (i = this.nodes.length - 1; i >= 0; i--) {
                 node = this.nodes[i];
                 node.hAxis = this;
@@ -163,20 +247,36 @@ define(['./extends', './interval2d', './directions', './point2d'],
             }
         }
     };
+
+    /**
+     * Sort axis nodes.
+     */
     Axis.prototype.sortNodes = function() {
         // sort nodes and connect them
         this.nodes.sort(function(a, b) {
             return a.x - b.x + a.y - b.y;
         });
     };
+
+    /**
+     * Updates axis endpoints, so axis becomes include both itself and axis passed as an argument
+     *
+     * @param {Axis} axis
+     */
     Axis.prototype.merge = function(axis) {
         var points = [this.a, this.b, axis.a, axis.b];
         points.sort(function(a, b) {
-            return a.x + a.y - b.x - b.y;
+            return a.x - b.x + a.y - b.y;
         });
         this.a = points[0];
         this.b = points[points.length - 1];
     };
+
+    /**
+     * Allows to create clone of axis at left/right side.
+     *
+     * @param {Point2d} direction
+     */
     Axis.prototype.cloneAtDirection = function(direction) {
         var axis = Axis.createFromInterval(this, this.graph);
         for (var i = 0; i < this.nodes.length; i++) {
@@ -200,19 +300,28 @@ define(['./extends', './interval2d', './directions', './point2d'],
         axis.finalize();
         return axis;
     };
+
+    /**
+     * Function checks if axis has an siblings(clones) at left and right side which are not used
+     * It will creates them if they are not found.
+     */
     Axis.prototype.ensureTraversableSiblings = function() {
         var clone;
         clone = this.closestLeftClone;
         if (!clone || clone.isUsed) {
-            // console.log(this.a.sub(this.b).unitVector.rot90().abs().rot180());
             this.clonesAtLeft.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs().rot180()));
         }
         clone = this.closestRightClone;
         if (!clone || clone.isUsed) {
-            // console.log(this.a.sub(this.b).unitVector.rot90().abs());
             this.clonesAtRight.unshift(this.cloneAtDirection(this.nextNodeConnVector.rot90().abs()));
         }
     };
+
+    /**
+     * Draws axis
+     *
+     * @param {string} color
+     */
     Axis.prototype.draw = function(color) {
         if (color === void 0) {
             color = 'green';
@@ -223,11 +332,11 @@ define(['./extends', './interval2d', './directions', './point2d'],
                 new Point2d(
                     this.nodes[this.nodes.length - 1].recommendedX,
                     this.nodes[this.nodes.length - 1].recommendedY)
-                )).draw(color);
+            )).draw(color);
         } else {
             Interval2d.prototype.draw.call(this, color);
         }
     };
-    Axis.uidCounter = 0;
+
     return Axis;
 });

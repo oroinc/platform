@@ -27,7 +27,7 @@
             </script>
             {% if error %}
                 <div class="alert alert-error">
-                    <div>{{ error|trans }}</div>
+                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 </div>
             {% endif %}
             {{ messagesContent }}
