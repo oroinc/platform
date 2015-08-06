@@ -29,7 +29,6 @@ class BusinessUnitSelectType extends AbstractType
         $this->securityFacade = $securityFacade;
     }
 
-
     /**
      * {@inheritdoc}
      */

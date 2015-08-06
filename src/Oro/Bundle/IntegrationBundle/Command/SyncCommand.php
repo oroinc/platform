@@ -125,7 +125,7 @@ class SyncCommand extends AbstractSyncCronCommand
             $integrations = $repository->getConfiguredChannelsForSync(null, true);
         }
 
-        /* @var $integration Integration */
+        /* @var Integration $integration */
         foreach ($integrations as $integration) {
             try {
                 $logger->notice(sprintf('Run sync for "%s" integration.', $integration->getName()));
