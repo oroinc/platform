@@ -460,8 +460,9 @@ services:
             - null
             - null
             - @oro_organization.organization_manager
-            - @oro_security.token.factory.username_password_organization
             - @?logger
+        calls:
+            - [setTokenFactory, [@oro_security.token.factory.username_password_organization]]
         public: false
         abstract: true
 

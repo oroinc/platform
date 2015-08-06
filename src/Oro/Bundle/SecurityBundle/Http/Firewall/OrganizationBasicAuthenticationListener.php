@@ -49,7 +49,6 @@ class OrganizationBasicAuthenticationListener
      * @param string $providerKey
      * @param AuthenticationEntryPointInterface $authenticationEntryPoint
      * @param OrganizationManager $manager
-     * @param TokenFactory $tokenFactory
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -58,7 +57,6 @@ class OrganizationBasicAuthenticationListener
         $providerKey,
         AuthenticationEntryPointInterface $authenticationEntryPoint,
         OrganizationManager $manager,
-        TokenFactory $tokenFactory,
         LoggerInterface $logger = null
     ) {
         if (empty($providerKey)) {
@@ -72,6 +70,13 @@ class OrganizationBasicAuthenticationListener
         $this->logger = $logger;
         $this->manager = $manager;
         $this->ignoreFailure = false;
+    }
+
+    /**
+     * @param TokenFactory $tokenFactory
+     */
+    public function setTokenFactory(TokenFactory $tokenFactory)
+    {
         $this->tokenFactory = $tokenFactory;
     }
 
