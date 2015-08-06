@@ -56,19 +56,17 @@ class ConfigCache
     public function putConfigInCache(ConfigInterface $config)
     {
         $configId = $config->getId();
-        if ($this->isDebug && $configId instanceof FieldConfigId) {
-            if ($configId->getFieldType() === null) {
-                // undefined field type can cause unpredictable logical bugs
-                throw new \LogicException(
-                    sprintf(
-                        'A field config "%s::%s" with undefined field type cannot be cached.'
-                        . ' It seems that there is some critical bug in entity config core functionality.'
-                        . ' Please contact ORO team if you see this error.',
-                        $configId->getClassName(),
-                        $configId->getFieldName()
-                    )
-                );
-            }
+        if ($this->isDebug && $configId instanceof FieldConfigId && null === $configId->getFieldType()) {
+            // undefined field type can cause unpredictable logical bugs
+            throw new \LogicException(
+                sprintf(
+                    'A field config "%s::%s" with undefined field type cannot be cached.'
+                    . ' It seems that there is some critical bug in entity config core functionality.'
+                    . ' Please contact ORO team if you see this error.',
+                    $configId->getClassName(),
+                    $configId->getFieldName()
+                )
+            );
         }
 
         return $this->cache->save($this->buildConfigCacheKey($config->getId()), $config);

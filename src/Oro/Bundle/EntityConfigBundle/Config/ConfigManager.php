@@ -112,13 +112,15 @@ class ConfigManager
      * @param ServiceLink              $providerBagLink
      * @param ConfigModelManager       $modelManager
      * @param AuditManager             $auditManager
+     * @param ConfigCache              $cache
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcherInterface $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager
+        AuditManager $auditManager,
+        ConfigCache $cache
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->eventDispatcher = $eventDispatcher;
@@ -131,14 +133,7 @@ class ConfigManager
 
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
-    }
-
-    /**
-     * @param ConfigCache $cache
-     */
-    public function setCache(ConfigCache $cache)
-    {
-        $this->cache = $cache;
+        $this->cache        = $cache;
     }
 
     /**
@@ -261,10 +256,7 @@ class ConfigManager
             throw new RuntimeException(sprintf('Entity "%s" is not configurable', $configId->getClassName()));
         }
 
-        $config = null !== $this->cache
-            ? $this->cache->loadConfigFromCache($configId)
-            : null;
-
+        $config = $this->cache->loadConfigFromCache($configId);
         if (!$config) {
             $model = $configId instanceof FieldConfigId
                 ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
@@ -273,9 +265,7 @@ class ConfigManager
             $config = new Config($configId);
             $config->setValues($model->toArray($configId->getScope()));
 
-            if (null !== $this->cache) {
-                $this->cache->putConfigInCache($config);
-            }
+            $this->cache->putConfigInCache($config);
         }
 
         // local cache
@@ -360,9 +350,7 @@ class ConfigManager
                 $configId = $this->localCache[$configKey]->getId();
             } else {
                 // next try to find a model in the cache
-                $config = null !== $this->cache
-                    ? $this->cache->loadConfigFromCache($configId)
-                    : null;
+                $config = $this->cache->loadConfigFromCache($configId);
                 if ($config) {
                     // if found, use field config id from the cache
                     $configId = $config->getId();
@@ -396,14 +384,10 @@ class ConfigManager
     public function clearCache(ConfigIdInterface $configId = null)
     {
         if ($configId) {
-            if ($this->cache) {
-                $this->cache->removeConfigFromCache($configId);
-            }
+            $this->cache->removeConfigFromCache($configId);
             unset($this->localCache[$this->buildConfigKey($configId)]);
         } else {
-            if ($this->cache) {
-                $this->cache->removeAll();
-            }
+            $this->cache->removeAll();
             $this->localCache = [];
         }
     }
@@ -414,9 +398,7 @@ class ConfigManager
     public function clearConfigurableCache()
     {
         $this->modelManager->clearCheckDatabase();
-        if ($this->cache) {
-            $this->cache->removeAllConfigurable();
-        }
+        $this->cache->removeAllConfigurable();
     }
 
     /**
@@ -476,7 +458,7 @@ class ConfigManager
             new FlushConfigEvent($models, $this)
         );
 
-        if ($this->cache && !empty($models)) {
+        if (!empty($models)) {
             $this->cache->removeAllConfigurable();
         }
 
@@ -513,9 +495,7 @@ class ConfigManager
                 ->getIndexedValues($config->getId());
             $model->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
 
-            if ($this->cache) {
-                $this->cache->removeConfigFromCache($config->getId());
-            }
+            $this->cache->removeConfigFromCache($config->getId());
         }
 
         if (count($this->persistConfigs) != count($this->configChangeSets)) {

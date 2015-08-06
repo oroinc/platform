@@ -119,10 +119,9 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             new ServiceLink($this->container, 'ConfigProviderBag'),
             $this->modelManager,
-            $this->auditManager
+            $this->auditManager,
+            $this->configCache
         );
-
-        $this->configManager->setCache($this->configCache);
     }
 
     public function testFlush()
