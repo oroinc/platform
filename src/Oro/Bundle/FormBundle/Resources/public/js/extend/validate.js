@@ -120,7 +120,7 @@ define([
         $placement.next('.' + this.settings.errorClass).remove();
         this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
         return this;
-    }
+    };
 
     /**
      * Fetches descendant form elements which available for validation
