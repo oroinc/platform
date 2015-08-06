@@ -37,6 +37,8 @@ class IntegrationExtension extends Twig_Extension
 
     /**
      * @param FormView $view
+     *
+     * @return array
      */
     public function getThemes(FormView $view)
     {
