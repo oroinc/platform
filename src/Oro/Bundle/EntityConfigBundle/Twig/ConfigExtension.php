@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class ConfigExtension extends \Twig_Extension
 {
@@ -12,14 +12,14 @@ class ConfigExtension extends \Twig_Extension
 
     /** @var ConfigManager */
     protected $configManager;
-    /** @var Router */
+    /** @var RouterInterface */
     private $router;
 
     /**
      * @param ConfigManager $configManager
-     * @param Router        $router
+     * @param RouterInterface $router
      */
-    public function __construct(ConfigManager $configManager, Router $router)
+    public function __construct(ConfigManager $configManager, RouterInterface $router)
     {
         $this->configManager = $configManager;
         $this->router = $router;
