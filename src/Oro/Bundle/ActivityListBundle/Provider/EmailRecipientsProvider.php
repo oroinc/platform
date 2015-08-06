@@ -9,7 +9,6 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityListAclCriteriaHelper;
