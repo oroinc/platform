@@ -28,17 +28,10 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
             return [];
         }
 
-        $recipients = EmailRecipientsHelper::filterRecipients(
+        return EmailRecipientsHelper::filterRecipients(
             $args,
-            $this->relatedEmailsProvider->getEmails($args->getRelatedEntity(), 2)
+            $this->relatedEmailsProvider->getRecipients($args->getRelatedEntity(), 2)
         );
-
-        $result = [];
-        foreach ($recipients as $email => $name) {
-            $result[] = new Recipient($email, $name);
-        }
-
-        return $result;
     }
 
     /**

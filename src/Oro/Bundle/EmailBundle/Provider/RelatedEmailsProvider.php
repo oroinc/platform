@@ -11,6 +11,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -36,25 +37,31 @@ class RelatedEmailsProvider
     /** @var PropertyAccessor*/
     protected $propertyAccessor;
 
+    /** @var EmailRecipientsHelper */
+    protected $emailRecipientsHelper;
+
     /**
      * @param Registry $registry
      * @param ConfigProvider $entityConfigProvider
      * @param SecurityFacade $securityFacade
      * @param NameFormatter $nameFormatter
      * @param EmailAddressHelper $emailAddressHelper
+     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
     public function __construct(
         Registry $registry,
         ConfigProvider $entityConfigProvider,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
-        EmailAddressHelper $emailAddressHelper
+        EmailAddressHelper $emailAddressHelper,
+        EmailRecipientsHelper $emailRecipientsHelper
     ) {
         $this->registry = $registry;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->securityFacade = $securityFacade;
         $this->nameFormatter = $nameFormatter;
         $this->emailAddressHelper = $emailAddressHelper;
+        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**
@@ -62,17 +69,16 @@ class RelatedEmailsProvider
      * @param int $depth
      * @param bool $ignoreAcl
      *
-     * @return array
+     * @return Recipient[]
      */
-    public function getEmails($object, $depth = 1, $ignoreAcl = false)
+    public function getRecipients($object, $depth = 1, $ignoreAcl = false)
     {
-        $emails = [];
-
+        $recipients = [];
         if (!$depth || ($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
             if ($depth && $this->securityFacade->getLoggedUser() === $object) {
                 $ignoreAcl = true;
             } else {
-                return $emails;
+                return $recipients;
             }
         }
 
@@ -107,13 +113,35 @@ class RelatedEmailsProvider
                         }
                     }
                     foreach ($assocObject as $obj) {
-                        $emails = array_merge($emails, $this->getEmails($obj, $depth - 1));
+                        $recipients = array_merge($recipients, $this->getRecipients($obj, $depth - 1));
                     }
                 }
             }
         }
 
-        return array_merge($emails, $this->createEmailsFromAttributes($attributes, $object));
+        return array_merge(
+            $recipients,
+            $this->createRecipientsFromEmails($this->createEmailsFromAttributes($attributes, $object), $object, $metadata)
+        );
+    }
+
+    /**
+     * @param object $object
+     * @param int $depth
+     * @param bool $ignoreAcl
+     *
+     * @return Recipient[]
+     */
+    public function getEmails($object, $depth = 1, $ignoreAcl = false)
+    {
+        $recipients = $this->getRecipients($object, $depth, $ignoreAcl);
+
+        $emails = [];
+        foreach ($recipients as $recipient) {
+            $emails[$recipient->getEmail()] = $recipient->getName();
+        }
+
+        return $emails;
     }
 
     /**
@@ -142,6 +170,25 @@ class RelatedEmailsProvider
         }
 
         return $emails;
+    }
+
+    /**
+     * @param array $emails
+     * @param object $object
+     * @param ClassMetadata $objectMetadata
+     *
+     * @return Recipient[]
+     */
+    protected function createRecipientsFromEmails(array $emails, $object, ClassMetadata $objectMetadata)
+    {
+        $recipientEntity = $this->emailRecipientsHelper->createRecipientEntity($object, $objectMetadata);
+
+        $recipients = [];
+        foreach ($emails as $email => $name) {
+            $recipients[$email] = new Recipient($email, $name, $recipientEntity);
+        }
+
+        return $recipients;
     }
 
     /**

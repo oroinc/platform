@@ -570,6 +570,7 @@ services:
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_email.email.address.helper
+            - @oro_email.provider.email_recipients.helper
 
     oro_email.email_recipients.provider:
         class: %oro_email.email_recipients.provider.class%
@@ -598,6 +599,9 @@ services:
         arguments:
             - @oro_security.acl_helper
             - @oro_locale.dql.formatter.name
+            - @oro_locale.formatter.name
+            - @oro_entity_config.config_manager
+            - @translator
 
     oro_email.link.formatter.name:
         tags:

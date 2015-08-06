@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 
 class EmailRecipientsProvider
@@ -40,17 +41,15 @@ class EmailRecipientsProvider
             }
 
             $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails);
-            $recipientModels = $provider->getRecipients($args);
-            $recipients = [];
-            foreach ($recipientModels as $model) {
-                $recipients[$model->getEmail()] = $model->getName();
-            }
-
+            $recipients = $provider->getRecipients($args);
             if (!$recipients) {
                 continue;
             }
 
-            $excludeEmails = array_merge($excludeEmails, array_keys($recipients));
+            $recipientEmails = array_map(function (Recipient $recipient) {
+                return $recipient->getEmail();
+            }, $recipients);
+            $excludeEmails = array_merge($excludeEmails, $recipientEmails);
             $limit = max([0, $limit - count($recipients)]);
             if (!array_key_exists($provider->getSection(), $emails)) {
                 $emails[$provider->getSection()] = [];
@@ -60,8 +59,22 @@ class EmailRecipientsProvider
 
         $result = [];
         foreach ($emails as $section => $sectionEmails) {
-            $items = array_map(function ($name) {
-                return ['id' => $name, 'text' => $name];
+            $items = array_map(function (Recipient $recipient) {
+                $id = ['key' => $recipient->getName()];
+                if ($recipientEntity = $recipient->getEntity()) {
+                    $id['contextText'] = $recipient->getEntity()->getLabel();
+                    $id['contextValue'] = [
+                        'entityClass' => $recipient->getEntity()->getClass(),
+                        'entityId' => $recipient->getEntity()->getId(),
+                    ];
+                }
+
+                return [
+                    'id' => [
+                        json_encode($id),
+                    ],
+                    'text' => $recipient->getName(),
+                ];
             }, $sectionEmails);
 
             $result[] = [
