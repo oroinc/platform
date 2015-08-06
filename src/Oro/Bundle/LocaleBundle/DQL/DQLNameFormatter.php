@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\DQL;
 
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class DQLNameFormatter
@@ -65,7 +66,7 @@ class DQLNameFormatter
      */
     private function buildExpression($nameFormat, array $nameParts)
     {
-        $parts = $stack = [];
+        $parts = [];
         preg_match_all('/%(\w+)%([^%]*)/', $nameFormat, $matches);
         if (!empty($matches[0])) {
             foreach ($matches[0] as $idx => $match) {
@@ -88,19 +89,7 @@ class DQLNameFormatter
             throw new \LogicException('Unexpected name format given');
         }
 
-        for ($i = count($parts) - 1; $i >= 0; $i--) {
-            if (count($stack) === 0) {
-                array_push($stack, $parts[$i]);
-            } else {
-                array_push($stack, sprintf('CONCAT(%s, %s)', $parts[$i], array_pop($stack)));
-            }
-        }
-
-        if (empty($stack)) {
-            return '';
-        }
-
-        return array_pop($stack);
+        return QueryUtils::buildConcatExpr($parts);
     }
 
     /**
