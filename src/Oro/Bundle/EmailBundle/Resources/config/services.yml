@@ -592,7 +592,7 @@ services:
         arguments:
             - @oro_email.related_emails.provider
         tags:
-            - { name: oro_email.recipients_provider }
+            - { name: oro_email.recipients_provider, priority: 10 }
 
     oro_email.provider.email_recipients.helper:
         class: %oro_email.provider.email_recipients.helper.class%

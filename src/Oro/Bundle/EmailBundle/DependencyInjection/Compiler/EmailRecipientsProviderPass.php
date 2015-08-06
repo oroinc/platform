@@ -24,9 +24,18 @@ class EmailRecipientsProviderPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
 
         $references = [];
-        foreach ($taggedServices as $serviceId => $tagAttributes) {
-            $references[] = new Reference($serviceId);
+        $priorities = [];
+        foreach ($taggedServices as $serviceId => $tags) {
+            foreach ($tags as $attributes) {
+                $references[$serviceId] = new Reference($serviceId);
+                $priorities[$serviceId] = array_key_exists('priority', $attributes) ? $attributes['priority'] : 0;
+            }
         }
+
+        asort($priorities);
+        uksort($references, function ($a, $b) use ($priorities) {
+            return $priorities[$a] - $priorities[$b];
+        });
 
         $providerDef->addMethodCall('setProviders', [$references]);
     }

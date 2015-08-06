@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
-use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
