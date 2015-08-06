@@ -79,7 +79,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $relatedEntityId = $propertyAccessor->getValue($relatedEntity, $idNames[0]);
 
-        $result = [];
+        $recipients = [];
         $activities = $this->activityManager->getActivities($relatedEntityClass);
         $activityListQb = $this->createActivityListQb($relatedEntityClass, $relatedEntityId);
         $activityListDql = $activityListQb->getQuery()->getDQL();
@@ -100,24 +100,19 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
             $iterator->setBufferSize($limit);
 
             foreach ($iterator as $entity) {
-                $result = array_merge(
-                    $result,
+                $recipients = array_merge(
+                    $recipients,
                     EmailRecipientsHelper::filterRecipients(
                         $args,
-                        $this->relatedEmailsProvider->getEmails($entity, 2)
+                        $this->relatedEmailsProvider->getRecipients($entity, 2)
                     )
                 );
 
-                $limit -= count($result);
+                $limit -= count($recipients);
                 if ($limit <= 0) {
                     break 2;
                 }
             }
-        }
-
-        $recipients = [];
-        foreach ($result as $email => $name) {
-            $recipients[] = new Recipient($email, $name);
         }
 
         return $recipients;
