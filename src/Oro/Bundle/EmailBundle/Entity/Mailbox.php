@@ -18,7 +18,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- * @UniqueEntity(fields={"email", "label"})
+ * @UniqueEntity(fields={"email"})
+ * @UniqueEntity(fields={"label"})
  * @Config(
  *      defaultValues={
  *          "entity"={
