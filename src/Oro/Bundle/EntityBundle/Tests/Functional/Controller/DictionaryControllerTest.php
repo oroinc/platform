@@ -20,9 +20,10 @@ class DictionaryControllerTest extends WebTestCase
         $expectedJson = '{"results":[{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},
         {"id":"US","value":"US","text":"United States"}]}';
 
-        $this->client->request('POST',
-            $this->getUrl('oro_dictionary_search', ['dictionary'=>'Oro_Bundle_AddressBundle_Entity_Country']),
-            ['q'=>'United States']
+        $this->client->request(
+            'POST',
+            $this->getUrl('oro_dictionary_search', ['dictionary' => 'Oro_Bundle_AddressBundle_Entity_Country']),
+            ['q' => 'United States']
         );
         $result = $this->client->getResponse();
 
@@ -35,7 +36,8 @@ class DictionaryControllerTest extends WebTestCase
         $expectedJson = '{"results":[{"id":"UM","value":"UM","text":"United States Minor Outlying Islands"},
         {"id":"US","value":"US","text":"United States"}]}';
 
-        $this->client->request('POST',
+        $this->client->request(
+            'POST',
             $this->getUrl('oro_dictionary_value', ['dictionary'=>'Oro_Bundle_AddressBundle_Entity_Country']),
             [
                 'keys'=>['US','UM']
