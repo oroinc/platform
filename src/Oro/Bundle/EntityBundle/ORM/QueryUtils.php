@@ -125,4 +125,27 @@ class QueryUtils
 
         return $parser->parse();
     }
+
+    /**
+     * Builds CONCAT(...) DQL expression
+     *
+     * @param string[] $parts
+     *
+     * @return string
+     */
+    public static function buildConcatExpr(array $parts)
+    {
+        $stack = [];
+        for ($i = count($parts) - 1; $i >= 0; $i--) {
+            $stack[] = count($stack) === 0
+                ? $parts[$i]
+                : sprintf('CONCAT(%s, %s)', $parts[$i], array_pop($stack));
+        }
+
+        if (empty($stack)) {
+            return '';
+        }
+
+        return array_pop($stack);
+    }
 }

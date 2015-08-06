@@ -134,9 +134,14 @@ define(function(require) {
          * Triggered when filter state is changed
          */
         onFilterStateChange: function() {
+            this.listView.isFiltersEmpty = this.isFiltersEmpty();
             this.collection.setFilter(this.getFilterState());
             this.collection.setPage(1);
             this.listView._reload();
+        },
+
+        isFiltersEmpty: function() {
+            return (this.dateRangeFilter.isEmptyValue() && this.activityTypeFilter.isEmptyValue());
         },
 
         /**
