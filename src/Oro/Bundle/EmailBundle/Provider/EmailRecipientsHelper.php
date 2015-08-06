@@ -114,40 +114,15 @@ class EmailRecipientsHelper
 
     /**
      * @param EmailRecipientsProviderArgs $args
-     * @param array $recipients
+     * @param Recipient[] $recipients
      *
      * @return array
      */
     public static function filterRecipients(EmailRecipientsProviderArgs $args, array $recipients)
     {
-        $keys = array_keys($recipients);
-        if ($keys && is_scalar($recipients[$keys[0]])) {
-            return static::filterEmails($args, $recipients);
-        }
-
         return array_filter($recipients, function (Recipient $recipient) use ($args) {
             return !in_array($recipient->getEmail(), $args->getExcludedEmails()) &&
                 stripos($recipient->getName(), $args->getQuery()) !== false;
-        });
-    }
-
-    /**
-     * @deprecated
-     * @param EmailRecipientsProviderArgs $args
-     * @param string[] $recipients
-     *
-     * @return array
-     */
-    protected static function filterEmails(EmailRecipientsProviderArgs $args, array $recipients)
-    {
-        $unExcludedEmails = array_filter(array_keys($recipients), function ($email) use ($args) {
-            return !in_array($email, $args->getExcludedEmails());
-        });
-
-        $unExcludedRecipients = array_intersect_key($recipients, array_flip($unExcludedEmails));
-
-        return array_filter($unExcludedRecipients, function ($email) use ($args) {
-            return stripos($email, $args->getQuery()) !== false;
         });
     }
 
@@ -187,7 +162,7 @@ class EmailRecipientsHelper
      *
      * @return array
      */
-    private function recipientsFromResult(array $result, $entityClass)
+    protected function recipientsFromResult(array $result, $entityClass)
     {
         $emails = [];
         foreach ($result as $row) {

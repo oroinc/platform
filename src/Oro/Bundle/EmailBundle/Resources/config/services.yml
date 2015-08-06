@@ -584,6 +584,8 @@ services:
             - @oro_email.related_emails.provider
             - @oro_security.acl_helper
             - @doctrine
+            - @oro_email.email.owner.provider
+            - @oro_email.provider.email_recipients.helper
         tags:
             - { name: oro_email.recipients_provider }
 

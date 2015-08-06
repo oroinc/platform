@@ -3,10 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Model\RecipientEntity;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -24,22 +28,34 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     /** @var Registry */
     protected $registry;
 
+    /** @var EmailOwnerProvider */
+    protected $emailOwnerProvider;
+
+    /** @var EmailRecipientsHelper */
+    protected $emailRecipientsHelper;
+
     /**
      * @param SecurityFacade $securityFacade
      * @param RelatedEmailsProvider $relatedEmailsProvider
      * @param AclHelper $aclHelper
      * @param Registry $registry
+     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
     public function __construct(
         SecurityFacade $securityFacade,
         RelatedEmailsProvider $relatedEmailsProvider,
         AclHelper $aclHelper,
-        Registry $registry
+        Registry $registry,
+        EmailOwnerProvider $emailOwnerProvider,
+        EmailRecipientsHelper $emailRecipientsHelper
     ) {
         $this->securityFacade = $securityFacade;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->aclHelper = $aclHelper;
         $this->registry = $registry;
+        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**
@@ -65,10 +81,31 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         foreach ($emails as $email => $name) {
-            $result[] = new Recipient($email, $name);
+            $result[] = new Recipient(
+                $email,
+                $name,
+                $this->createRecipientEntity($email)
+            );
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return RecipientEntity
+     */
+    protected function createRecipientEntity($email)
+    {
+        $owner = $this->emailOwnerProvider->findEmailOwner($this->registry->getManager(), $email);
+        if (!$owner) {
+            return null;
+        }
+
+        $metadata = $this->registry->getManager()->getClassMetadata(ClassUtils::getClass($owner));
+
+        return $this->emailRecipientsHelper->createRecipientEntity($owner, $metadata);
     }
 
     /**
