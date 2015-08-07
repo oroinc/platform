@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
@@ -32,6 +34,9 @@ class EmailRecipientsHelper
 
     /** @var TranslatorInterface */
     protected $translator;
+
+    /** @var PropertyAccessor*/
+    protected $propertyAccessor;
 
     /**
      * @param AclHelper $aclHelper
@@ -67,10 +72,17 @@ class EmailRecipientsHelper
             return null;
         }
 
+        $organizationName = null;
+        if ($this->getPropertyAccessor()->isReadable($object, 'organization')) {
+            $organization = $this->getPropertyAccessor()->getValue($object, 'organization');
+            $organizationName = $organization->getName();
+        }
+
         return new RecipientEntity(
             $objectMetadata->name,
             reset($identifiers),
-            $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name)
+            $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name),
+            $organizationName
         );
     }
 
@@ -172,12 +184,24 @@ class EmailRecipientsHelper
                 new RecipientEntity(
                     $entityClass,
                     $row['entityId'],
-                    $this->createRecipientEntityLabel($row['name'], $entityClass)
-                ),
-                $row['organization']
+                    $this->createRecipientEntityLabel($row['name'], $entityClass),
+                    $row['organization']
+                )
             );
         }
 
         return $emails;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }
