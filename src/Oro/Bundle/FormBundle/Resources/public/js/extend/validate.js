@@ -22,7 +22,7 @@ define([
         // instance of validator
         var validator = $(form).data('validator');
         if (validator instanceof $.validator) {
-            return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function (el) {
+            return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
                 var $el = $(el);
                 // is it current element or first in a group of elements
                 return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
