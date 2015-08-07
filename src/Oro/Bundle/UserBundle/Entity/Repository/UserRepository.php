@@ -58,8 +58,9 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
 
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
-            ->addSelect('u.id AS entityId, u.email')
-            ->orderBy('name');
+            ->addSelect('u.id AS entityId, u.email, o.name AS organization')
+            ->orderBy('name')
+            ->leftJoin('u.organization', 'o');
 
         if ($query) {
             $qb
@@ -93,9 +94,10 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
         $qb
             ->select(sprintf('%s AS name', $fullNameQueryPart))
             ->addSelect('e.email')
-            ->addSelect('u.id AS entityId, e.email')
+            ->addSelect('u.id AS entityId, e.email, o.name AS organization')
             ->orderBy('name')
-            ->join('u.emails', 'e');
+            ->join('u.emails', 'e')
+            ->leftJoin('u.organization', 'o');
 
         if ($query) {
             $qb

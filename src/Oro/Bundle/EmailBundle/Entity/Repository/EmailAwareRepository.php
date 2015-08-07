@@ -11,7 +11,7 @@ interface EmailAwareRepository
      * @param array $excludedEmails
      * @param string|null $query
      *
-     * @return QueryBuilder
+     * @return QueryBuilder With preselected: email, name, entityId, organization
      */
     public function getPrimaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null);
 
@@ -20,7 +20,7 @@ interface EmailAwareRepository
      * @param array $excludedEmails
      * @param string|null $query
      *
-     * @return QueryBuilder
+     * @return QueryBuilder With preselected: email, name, entityId, organization
      */
     public function getSecondaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null);
 }

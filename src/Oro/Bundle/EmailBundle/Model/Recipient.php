@@ -13,16 +13,21 @@ class Recipient
     /** @var RecipientEntity|null */
     protected $entity;
 
+    /** @var string|null */
+    protected $organization;
+
     /**
      * @param string $email
      * @param string $name
-     * @param RecipientEntity $entity
+     * @param RecipientEntity|null $entity
+     * @param string|null $organization
      */
-    public function __construct($email, $name, RecipientEntity $entity = null)
+    public function __construct($email, $name, RecipientEntity $entity = null, $organization = null)
     {
         $this->email = $email;
         $this->name = $name;
         $this->entity = $entity;
+        $this->organization = $organization;
     }
 
     /**
@@ -39,6 +44,18 @@ class Recipient
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        if (!$this->organization) {
+            return $this->name;
+        }
+
+        return sprintf('(%s) %s', $this->organization, $this->name);
     }
 
     /**

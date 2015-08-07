@@ -173,7 +173,8 @@ class EmailRecipientsHelper
                     $entityClass,
                     $row['entityId'],
                     $this->createRecipientEntityLabel($row['name'], $entityClass)
-                )
+                ),
+                $row['organization']
             );
         }
 

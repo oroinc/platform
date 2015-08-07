@@ -73,7 +73,7 @@ class EmailRecipientsProvider
                     'id' => [
                         json_encode($id),
                     ],
-                    'text' => $recipient->getName(),
+                    'text' => $recipient->getLabel(),
                 ];
             }, $sectionEmails);
 

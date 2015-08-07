@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                             }
 
                             return {
-                                id: item.text,
+                                id: parsedItem.key,
                                 text: item.text
                             };
                         })
