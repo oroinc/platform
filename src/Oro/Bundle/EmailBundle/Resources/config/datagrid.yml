@@ -475,7 +475,7 @@ datagrid:
                     id: id
             delete_link:
                 type: url
-                route: oro_api_delete_mailbox
+                route: oro_email_mailbox_delete
                 params:
                     id: id
         options:

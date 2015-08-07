@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use FOS\RestBundle\Controller\Annotations\Delete;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -101,5 +103,23 @@ class MailboxController extends Controller
         $data = new Mailbox();
 
         return $this->update($data);
+    }
+
+    /**
+     * @Delete("/system/platform/email_configuration/mailbox/delete/{id}", name="oro_email_mailbox_delete")
+     * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
+     * @AclAncestor("oro_email_mailbox_delete")
+     *
+     * @param Mailbox $mailbox
+     *
+     * @return Response
+     */
+    public function deleteAction(Mailbox $mailbox)
+    {
+        $mailboxManager = $this->getDoctrine()->getManagerForClass('OroEmailBundle:Mailbox');
+        $mailboxManager->remove($mailbox);
+        $mailboxManager->flush();
+
+        return new Response(Response::HTTP_OK);
     }
 }
