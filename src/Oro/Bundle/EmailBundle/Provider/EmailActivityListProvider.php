@@ -95,7 +95,7 @@ class EmailActivityListProvider implements
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->securityFacadeLink   = $securityFacadeLink;
     }
 
     /**

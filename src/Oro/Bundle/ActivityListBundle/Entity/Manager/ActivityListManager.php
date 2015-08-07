@@ -52,15 +52,15 @@ class ActivityListManager
     protected $activityListAclHelper;
 
     /**
-     * @param Registry                  $doctrine
-     * @param SecurityFacade            $securityFacade
-     * @param EntityNameResolver        $entityNameResolver
-     * @param Pager                     $pager
-     * @param ConfigManager             $config
-     * @param ActivityListChainProvider $provider
-     * @param ActivityListFilterHelper  $activityListFilterHelper
-     * @param CommentApiManager         $commentManager
-     * @param DoctrineHelper            $doctrineHelper
+     * @param Registry                      $doctrine
+     * @param SecurityFacade                $securityFacade
+     * @param EntityNameResolver            $entityNameResolver
+     * @param Pager                         $pager
+     * @param ConfigManager                 $config
+     * @param ActivityListChainProvider     $provider
+     * @param ActivityListFilterHelper      $activityListFilterHelper
+     * @param CommentApiManager             $commentManager
+     * @param DoctrineHelper                $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -140,7 +140,7 @@ class ActivityListManager
         $this->activityListAclHelper->applyAclCriteria($qb, $this->chainProvider->getProviders());
         $qb->resetDQLPart('orderBy');
 
-        $query = $qb->getQuery();
+        $query             = $qb->getQuery();
         $parserResult      = QueryUtils::parseQuery($query);
         $parameterMappings = $parserResult->getParameterMappings();
         list($params, $types) = QueryUtils::processParameterMappings($query, $parameterMappings);
@@ -197,34 +197,34 @@ class ActivityListManager
     public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
-        $activity = $this->doctrineHelper->getEntity(
+        $activity       = $this->doctrineHelper->getEntity(
             $entity->getRelatedActivityClass(),
             $entity->getRelatedActivityId()
         );
 
         $ownerName = '';
         $ownerId   = '';
-        $owner = $entity->getOwner();
+        $owner     = $entity->getOwner();
         if ($owner) {
             $ownerName = $this->entityNameResolver->getName($owner);
             if ($this->securityFacade->isGranted('VIEW', $owner)) {
-                $ownerId   = $owner->getId();
+                $ownerId = $owner->getId();
             }
         }
 
         $editorName = '';
         $editorId   = '';
-        $editor   = $entity->getEditor();
+        $editor     = $entity->getEditor();
         if ($editor) {
             $editorName = $this->entityNameResolver->getName($editor);
             if ($this->securityFacade->isGranted('VIEW', $editor)) {
-                $editorId   = $editor->getId();
+                $editorId = $editor->getId();
             }
         }
 
-        $isHead = $this->getHeadStatus($entity, $entityProvider);
+        $isHead                  = $this->getHeadStatus($entity, $entityProvider);
         $relatedActivityEntities = $this->getRelatedActivityEntities($entity, $entityProvider);
-        $numberOfComments = $this->commentManager->getCommentCount(
+        $numberOfComments        = $this->commentManager->getCommentCount(
             $entity->getRelatedActivityClass(),
             $relatedActivityEntities
         );
@@ -281,25 +281,26 @@ class ActivityListManager
      *
      * @param object $entity
      * @param string $widgetId
-     * @param array $filterMetadata
+     * @param array  $filterMetadata
+     *
      * @return array
      */
     public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
-        $results = [];
-        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+        $results        = [];
+        $entityProvider = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
-            $activityResults = $this->getEntityViewModels($groupedActivities, [
+            $activityResults   = $this->getEntityViewModels($groupedActivities, [
                 'class' => $targetActivityClass,
-                'id' => $targetActivityId,
+                'id'    => $targetActivityId,
             ]);
 
             $results = [
                 'entityId'            => $entity->getId(),
                 'ignoreHead'          => true,
                 'widgetId'            => $widgetId,
-                'activityListData'    => json_encode(['count' => count($activityResults), 'data'  => $activityResults]),
+                'activityListData'    => json_encode(['count' => count($activityResults), 'data' => $activityResults]),
                 'commentOptions'      => [
                     'listTemplate' => '#template-activity-item-comment',
                     'canCreate'    => true,
@@ -322,6 +323,7 @@ class ActivityListManager
 
     /**
      * @param object $entityProvider
+     *
      * @return bool
      */
     protected function isGroupingApplicable($entityProvider)
@@ -331,7 +333,7 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param object $entityProvider
+     * @param object       $entityProvider
      *
      * @return bool
      */
@@ -347,7 +349,7 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
-     * @param object $entityProvider
+     * @param object       $entityProvider
      *
      * @return array
      */
