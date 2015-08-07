@@ -206,6 +206,10 @@ define(function(require) {
             return this._getByName('steps', name);
         },
 
+        getStartStep: function() {
+            return this.get('steps').where({'_is_start': true});
+        },
+
         getTransitionByName: function(name) {
             return this._getByName('transitions', name);
         },

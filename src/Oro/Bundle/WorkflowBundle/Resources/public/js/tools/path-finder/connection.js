@@ -1,4 +1,6 @@
-define(['./extends', './interval2d', './point2d', './settings'], function(__extends, Interval2d, Point2d, settings) {
+define([
+    './extends', './interval2d', './node-point', './point2d', './settings'
+], function(__extends, Interval2d, NodePoint, Point2d, settings) {
     'use strict';
     __extends(Connection, Interval2d);
     /**
@@ -74,7 +76,11 @@ define(['./extends', './interval2d', './point2d', './settings'], function(__exte
      * @returns {NodePoint}
      */
     Connection.prototype.second = function(first) {
-        return (first === this.a) ? this.b : this.a;
+        if (first === this.a) {
+            return this.b;
+        } else if (first === this.b) {
+            return this.a;
+        }
     };
 
     /**
@@ -84,7 +90,11 @@ define(['./extends', './interval2d', './point2d', './settings'], function(__exte
      * @returns {Point2d}
      */
     Connection.prototype.directionFrom = function(first) {
-        return this.b === first ? this.vector.rot180() : this.vector;
+        if (first === this.a) {
+            return this.vector;
+        } else if (first === this.b) {
+            return this.vector.rot180();
+        }
     };
 
     /**

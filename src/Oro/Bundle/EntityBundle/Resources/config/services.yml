@@ -326,7 +326,6 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_entity.dictionary_value_list_provider
             - @oro_entity.helper.dictionary
-            - @oro_locale.settings
 
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
