@@ -61,7 +61,7 @@
                     {% endfor %}
                 </tr>
                 {% for child in form %}
-                    {{ form_widget(child, {view_type: 'grid'}) }}
+                    {{ form_widget(child) }}
                 {% endfor %}
                 </tbody>
             </table>
