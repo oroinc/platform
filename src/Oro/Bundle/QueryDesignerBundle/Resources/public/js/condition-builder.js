@@ -1,4 +1,4 @@
-define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
+define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdown-select'], function($, __) {
     'use strict';
 
     /**
@@ -74,6 +74,10 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
             opts.conditionsGroup.appendTo = opts.criteriaListSelector;
             opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
             opts.conditionsGroup.update = $.proxy(this._onHierarchyChange, this);
+            opts.conditionsGroup.over = $.proxy(this._onConditionsGroupOver, this);
+            opts.conditionsGroup.out = $.proxy(this._onConditionsGroupOut, this);
+            opts.conditionsGroup.start = $.proxy(this._onConditionsGroupGrab, this);
+            opts.conditionsGroup.stop = $.proxy(this._onConditionsGroupDrop, this);
             opts.conditionsGroup.remove = function() {
                 $(this).trigger('changed');
             };
@@ -164,7 +168,18 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
             var $origin = ui.item;
             var $clone = $origin.clone();
             $origin.data('clone', $clone);
-            $clone.data('origin', $origin).removeAttr('style').insertAfter($origin);
+            this.$rootCondition.parent().prepend('<div class="drop-area-marker"><span>' +
+                __('Drop condition here') +
+                '</span></div>');
+            this.$rootCondition
+                .parent()
+                .find('.drop-area-marker')
+                // please do not replace to $smth.height(value) call because of bugs
+                .css({height: this.$rootCondition.height()});
+            $clone
+                .data('origin', $origin)
+                .removeAttr('style')
+                .insertAfter($origin);
             ui.helper.addClass(this.options.helperClass);
         },
 
@@ -172,7 +187,30 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function($) {
             // put item back instead of it's clone
             var $origin = ui.item;
             var $clone = $origin.data('clone');
+            this.$rootCondition.parent().find('.drop-area-marker').remove();
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
+        },
+
+        _onConditionsGroupGrab: function (e, ui) {
+            var index = _.indexOf(ui.item[0].parentNode.children, ui.item[0]);
+            if (index === 0) {
+                this.$rootCondition.addClass('drag-start-from-first');
+            }
+            if (index === ui.item[0].parentNode.children.length - 2 /* placeholder is already added into DOM*/) {
+                this.$rootCondition.addClass('drag-start-from-last');
+            }
+        },
+
+        _onConditionsGroupDrop: function (e, ui) {
+            this.$rootCondition.removeClass('drag-start-from-first drag-start-from-last');
+        },
+
+        _onConditionsGroupOver: function(e, ui) {
+            this.$rootCondition.parent().addClass('drop-area-over');
+        },
+
+        _onConditionsGroupOut: function(e, ui) {
+            this.$rootCondition.parent().removeClass('drop-area-over');
         },
 
         _getCriteriaOrigin: function(criteria) {
