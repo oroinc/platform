@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity\Repository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -87,6 +88,37 @@ class MailboxRepository extends EntityRepository
         $qb->setParameter('user', $user);
 
         return array_map('current', $qb->getQuery()->getScalarResult());
+    }
+
+    /**
+     * Finds all mailboxes containing provided email and with settings of type.
+     *
+     * @param string $type  Fully qualified class name of settings entity of mailbox.
+     * @param Email  $email Email entity
+     *
+     * @return Collection|Mailbox[]
+     */
+    public function findMailboxesBySettingsTypeWhichContainEmail($type, Email $email)
+    {
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('mb')
+           ->from('OroEmailBundle:Mailbox', 'mb')
+           ->leftJoin('mb.emailUsers', 'eu')
+           ->leftJoin('eu.folder', 'f')
+           ->leftJoin('mb.processSettings', 'ps')
+           ->where($qb->expr()->isInstanceOf('ps', $type))
+           ->andWhere('eu.email = :email')
+           ->andWhere(
+               $qb->expr()->orX(
+                   'f.type = \'inbox\'',
+                   'f.type = \'other\''
+               )
+           );
+
+        $qb->setParameter('email', $email);
+
+        return $qb->getQuery()->getResult();
     }
 
     /**

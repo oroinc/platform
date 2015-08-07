@@ -22,7 +22,7 @@ class MailboxController extends Controller
      *      name="oro_email_mailbox_update"
      * )
      * @Template
-     * @AclAncestor("oro_email_mailbox_edit")
+     * @AclAncestor("oro_email_mailbox_update")
      * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
      *
      * @param $mailbox

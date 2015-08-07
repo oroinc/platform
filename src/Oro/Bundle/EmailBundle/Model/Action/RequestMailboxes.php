@@ -45,30 +45,13 @@ class RequestMailboxes extends AbstractAction
      */
     protected function executeAction($context)
     {
-        /** @var EntityManager $manager */
-        $manager = $this->doctrine->getManager();
-
         $type = $this->contextAccessor->getValue($context, $this->processType);
         $type = $this->processStorage->getProcess($type)->getSettingsEntityFQCN();
 
-        $qb = $manager->createQueryBuilder();
-        $qb->select('mb')
-            ->from('OroEmailBundle:Mailbox', 'mb')
-            ->leftJoin('mb.emailUsers', 'eu')
-            ->leftJoin('eu.folder', 'f')
-            ->leftJoin('mb.processSettings', 'ps')
-            ->where($qb->expr()->isInstanceOf('ps', $type))
-            ->andWhere('eu.email = :email')
-            ->andWhere(
-                $qb->expr()->orX(
-                    'f.type = \'inbox\'',
-                    'f.type = \'other\''
-                )
-            );
+        $email = $this->contextAccessor->getValue($context, $this->email);
 
-        $qb->setParameter('email', $this->contextAccessor->getValue($context, $this->email));
-
-        $results = $qb->getQuery()->getResult();
+        $results = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
+            ->findMailboxesBySettingsTypeWhichContainEmail($type, $email);
 
         $this->contextAccessor->setValue($context, $this->attribute, $results);
     }

@@ -40,7 +40,7 @@ oro_email_mailbox_create:
     permission: CREATE
     group_name: ""
 
-oro_email_mailbox_edit:
+oro_email_mailbox_update:
     type: entity
     class: OroEmailBundle:Mailbox
     permission: EDIT

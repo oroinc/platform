@@ -484,7 +484,7 @@ datagrid:
         actions:
             update:
                 type:         navigate
-                acl_resource: oro_email_mailbox_edit
+                acl_resource: oro_email_mailbox_update
                 label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit

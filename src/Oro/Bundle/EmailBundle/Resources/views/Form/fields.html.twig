@@ -267,40 +267,32 @@
 {% block oro_email_mailbox_widget %}
     {% set email_origin = form_widget(form.children.origin) %}
     {% set process = form_row(form.children.processType) ~
-    form_widget(form.children.processSettings) %}
+        form_widget(form.children.processSettings) %}
     {% set access = form_row(form.children.authorizedUsers) ~
         form_row(form.children.authorizedRoles)
     %}
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
-        {{ form_widget(form) }}
-    </fieldset>
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
-        {{ email_origin|raw }}
-    </fieldset>
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
-        {{ process|raw }}
-    </fieldset>
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
-        {{ access|raw }}
-    </fieldset>
-
-    <script type="text/javascript">
-        require(['oroemail/js/app/views/mailbox-update-view'], function(MailboxUpdateView) {
-            "use strict";
-
-            $(function() {
-                var options = {
-                    el: '#{{ form.vars.id }}'
-                };
-
-                new MailboxUpdateView(options);
-            });
-        });
-    </script>
+    {% set options = {
+        el: '#' ~ form.vars.id
+    } %}
+    <div data-page-component-module="oroemail/js/app/views/mailbox-update-view"
+         data-page-component-options="{{ options|json_encode }}">
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
+            {{ form_widget(form) }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
+            {{ email_origin|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
+            {{ process|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
+            {{ access|raw }}
+        </fieldset>
+    </div>
 {% endblock %}
 
 {#
