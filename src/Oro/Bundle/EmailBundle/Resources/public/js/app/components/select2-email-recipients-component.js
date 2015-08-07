@@ -1,6 +1,22 @@
 define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2Component) {
     'use strict';
 
+    var contexts = {};
+    var organizations = {};
+    var currentOrganization = null;
+
+    function processData(data) {
+        var parsedItem = JSON.parse(data);
+        if (parsedItem.contextText) {
+            contexts[parsedItem.key] = {};
+            contexts[parsedItem.key] = {
+                id: JSON.stringify(parsedItem.contextValue),
+                text: parsedItem.contextText,
+            };
+            organizations[parsedItem.key] = parsedItem.organization;
+        }
+    }
+
     var Select2EmailRecipientsComponent = Select2Component.extend({
         $el: null,
         $contextEl: null,
@@ -14,28 +30,23 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
         preConfig: function() {
             var config = Select2EmailRecipientsComponent.__super__.preConfig.apply(this, arguments);
 
-            var currentOrganization = null;
-            var contexts = {};
-            var organizations = {};
             var self = this;
             config.ajax.results = function(data) {
                 var results = _.map(data.results, function(section) {
                     if (typeof section.children === 'undefined') {
-                        return section;
+                        processData(section.data);
+                        self._onRecipientAdd.call(self, section.id);
+
+                        return {
+                            id: section.id,
+                            text: section.text
+                        };
                     }
 
                     return {
                         text: section.text,
                         children: _.map(section.children, function(item) {
-                            var parsedItem = JSON.parse(item.data);
-                            if (parsedItem.contextText) {
-                                contexts[parsedItem.key] = {};
-                                contexts[parsedItem.key] = {
-                                    id: JSON.stringify(parsedItem.contextValue),
-                                    text: parsedItem.contextText,
-                                };
-                                organizations[parsedItem.key] = parsedItem.organization;
-                            }
+                            processData(item.data);
 
                             return {
                                 id: item.id,
@@ -48,10 +59,8 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                 self.$el.on('change', function(e) {
                     var data = self.$contextEl.select2('data');
 
-                    if (e.added && typeof contexts[e.added.id] !== 'undefined') {
-                        currentOrganization = _.result(organizations, e.added.id, null);
-                        data.push(contexts[e.added.id]);
-                        self.$contextEl.select2('data', data);
+                    if (e.added) {
+                        self._onRecipientAdd.call(self, e.added.id);
                     }
 
                     if (e.removed) {
@@ -83,6 +92,17 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
             };
 
             return config;
+        },
+
+        _onRecipientAdd: function(id) {
+            if (typeof contexts[id] === 'undefined') {
+                return;
+            }
+
+            var data = this.$contextEl.select2('data');
+            currentOrganization = _.result(organizations, id, null);
+            data.push(contexts[id]);
+            this.$contextEl.select2('data', data);
         }
     });
 

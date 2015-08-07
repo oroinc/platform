@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
@@ -19,6 +21,8 @@ use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailRecipientsHelper
 {
@@ -40,25 +44,43 @@ class EmailRecipientsHelper
     /** @var PropertyAccessor*/
     protected $propertyAccessor;
 
+    /** @var EmailOwnerProvider */
+    protected $emailOwnerProvider;
+
+    /** @var Registry */
+    protected $registry;
+
+    /** @var EmailAddressHelper */
+    protected $addressHelper;
+
     /**
      * @param AclHelper $aclHelper
      * @param DQLNameFormatter $dqlNameFormatter
      * @param NameFormatter $nameFormatter
      * @param ConfigManager $configManager
      * @param TranslatorInterface $translator
+     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param Registry $registry
+     * @param EmailAddressHelper $addressHelper
      */
     public function __construct(
         AclHelper $aclHelper,
         DQLNameFormatter $dqlNameFormatter,
         NameFormatter $nameFormatter,
         ConfigManager $configManager,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EmailOwnerProvider $emailOwnerProvider,
+        Registry $registry,
+        EmailAddressHelper $addressHelper
     ) {
         $this->aclHelper = $aclHelper;
         $this->dqlNameFormatter = $dqlNameFormatter;
         $this->nameFormatter = $nameFormatter;
         $this->configManager = $configManager;
         $this->translator = $translator;
+        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->registry = $registry;
+        $this->addressHelper = $addressHelper;
     }
 
     /**
@@ -86,6 +108,61 @@ class EmailRecipientsHelper
             $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name),
             $organizationName
         );
+    }
+
+    /**
+     * @param string $name
+     * @param Organization|null $organization
+     *
+     * @return Recipient
+     */
+    public function createRecipientFromEmail($name, Organization $organization = null)
+    {
+        $em = $this->registry->getManager();
+        $email = $this->addressHelper->extractPureEmailAddress($name);
+        $owner = $this->emailOwnerProvider->findEmailOwner($em, $email);
+        if (!$owner || !$this->isObjectAllowedForOrganization($owner, $organization)) {
+            return null;
+        }
+
+        $metadata = $em->getClassMetadata(ClassUtils::getClass($owner));
+
+        return new Recipient(
+            $email,
+            $name,
+            $this->createRecipientEntity($owner, $metadata)
+        );
+    }
+
+    /**
+     * @param Recipient $recipient
+     *
+     * @return array
+     */
+    public function createRecipientData(Recipient $recipient)
+    {
+        $data = ['key' => $recipient->getName()];
+        if ($recipientEntity = $recipient->getEntity()) {
+            $data = array_merge(
+                $data,
+                [
+                    'contextText'  => $recipient->getEntity()->getLabel(),
+                    'contextValue' => [
+                        'entityClass' => $recipient->getEntity()->getClass(),
+                        'entityId'    => $recipient->getEntity()->getId(),
+                    ],
+                    'organization' => $recipient->getEntity()->getOrganization(),
+                ]
+            );
+        }
+
+        return [
+            'id' => $recipient->getName(),
+            'text' => $recipient->getLabel(),
+            'data' => [
+                json_encode($data)
+            ],
+        ];
     }
 
     /**

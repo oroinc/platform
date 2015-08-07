@@ -576,6 +576,7 @@ services:
         class: %oro_email.email_recipients.provider.class%
         arguments:
             - @translator
+            - @oro_email.provider.email_recipients.helper
 
     oro_email.recent_email_recipients.provider:
         class: %oro_email.recent_email_recipients.provider.class%
@@ -604,6 +605,9 @@ services:
             - @oro_locale.formatter.name
             - @oro_entity_config.config_manager
             - @translator
+            - @oro_email.email.owner.provider
+            - @doctrine
+            - @oro_email.email.address.helper
 
     oro_email.link.formatter.name:
         tags:

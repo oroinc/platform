@@ -6,6 +6,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -14,15 +15,20 @@ class EmailRecipientsProvider
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EmailRecipientsHelper */
+    protected $emailRecipientsHelper;
+
     /** @var EmailRecipientsProviderInterface[] */
     protected $providers = [];
 
     /**
      * @param TranslatorInterface $translator
+     * @param EmailRecipientsHelper $emailRecipientsHelper
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, EmailRecipientsHelper $emailRecipientsHelper)
     {
         $this->translator = $translator;
+        $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
 
     /**
@@ -66,23 +72,7 @@ class EmailRecipientsProvider
         $result = [];
         foreach ($emails as $section => $sectionEmails) {
             $items = array_map(function (Recipient $recipient) {
-                $data = ['key' => $recipient->getName()];
-                if ($recipientEntity = $recipient->getEntity()) {
-                    $data['contextText'] = $recipient->getEntity()->getLabel();
-                    $data['contextValue'] = [
-                        'entityClass' => $recipient->getEntity()->getClass(),
-                        'entityId' => $recipient->getEntity()->getId(),
-                    ];
-                    $data['organization'] = $recipient->getEntity()->getOrganization();
-                }
-
-                return [
-                    'id' => $recipient->getName(),
-                    'text' => $recipient->getLabel(),
-                    'data' => [
-                        json_encode($data)
-                    ],
-                ];
+                return $this->emailRecipientsHelper->createRecipientData($recipient);
             }, $sectionEmails);
 
             $result[] = [

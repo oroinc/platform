@@ -34,6 +34,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
  * Class EmailController
@@ -512,12 +513,18 @@ class EmailController extends Controller
     {
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
-            $results = [
-                [
-                    'id'   => $query,
-                    'text' => $query,
-                ],
-            ];
+            $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($query);
+
+            if ($recipient) {
+                $results = [$this->getEmailRecipientsHelper()->createRecipientData($recipient)];
+            } else {
+                $results = [
+                    [
+                        'id'   => $query,
+                        'text' => $query,
+                    ],
+                ];
+            }
         } else {
             $organization = $request->query->get('organization');
             if ($organization) {
@@ -545,6 +552,14 @@ class EmailController extends Controller
         }
 
         return new JsonResponse(['results' => $results]);
+    }
+
+    /**
+     * @return EmailRecipientsHelper
+     */
+    protected function getEmailRecipientsHelper()
+    {
+        return $this->get('oro_email.provider.email_recipients.helper');
     }
 
     /**
