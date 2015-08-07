@@ -204,16 +204,22 @@ class ActivityListManager
 
         $ownerName = '';
         $ownerId   = '';
-        if ($entity->getOwner()) {
-            $ownerName = $this->entityNameResolver->getName($entity->getOwner());
-            $ownerId   = $entity->getOwner()->getId();
+        $owner = $entity->getOwner();
+        if ($owner) {
+            $ownerName = $this->entityNameResolver->getName($owner);
+            if ($this->securityFacade->isGranted('VIEW', $owner)) {
+                $ownerId   = $owner->getId();
+            }
         }
 
         $editorName = '';
         $editorId   = '';
-        if ($entity->getEditor()) {
-            $editorName = $this->entityNameResolver->getName($entity->getEditor());
-            $editorId   = $entity->getEditor()->getId();
+        $editor   = $entity->getEditor();
+        if ($editor) {
+            $editorName = $this->entityNameResolver->getName($editor);
+            if ($this->securityFacade->isGranted('VIEW', $editor)) {
+                $editorId   = $editor->getId();
+            }
         }
 
         $isHead = $this->getHeadStatus($entity, $entityProvider);
