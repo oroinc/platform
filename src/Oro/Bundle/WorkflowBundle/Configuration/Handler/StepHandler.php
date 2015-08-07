@@ -36,15 +36,13 @@ class StepHandler extends AbstractHandler
             if (!empty($rawStep['_is_start'])) {
                 $configuration = $this->processStartingPoint($configuration, $rawStep);
                 $handledStep = $this->handleStepConfiguration($configuration, $rawStep);
-                $handledSteps[] = $handledStep;
             } else {
                 $handledStep = $this->handleStepConfiguration($configuration, $rawStep);
-                $handledSteps[] = $handledStep;
-
                 if (!empty($configuration['start_step']) && $configuration['start_step'] == $handledStep['name']) {
                     $startStepExists = true;
                 }
             }
+            $handledSteps[] = $handledStep;
         }
 
         $configuration[WorkflowConfiguration::NODE_STEPS] = $handledSteps;
