@@ -40,6 +40,14 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDatabasePlatform()
+    {
+        return $this->qb->getEntityManager()->getConnection()->getDatabasePlatform();
+    }
+
+    /**
      * Adds a new WHERE or HAVING restriction depends on the given parameters.
      *
      * @param mixed  $restriction The restriction to add.

@@ -44,6 +44,8 @@ maximize: maximize
 restore: restore
 minimize: minimize
 close: close
+Undo: Undo
+Redo: Redo
 
 oro:
     ui:

@@ -42,7 +42,7 @@ class GridController extends Controller
         return array(
             'gridName'     => $gridName,
             'params'       => $this->getRequest()->get('params', array()),
-            'renderParams' => $this->getRequest()->get('renderParams', array()),
+            'renderParams' => $this->getRenderParams(),
             'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
         );
     }
@@ -192,5 +192,31 @@ class GridController extends Controller
             flush();
             $executor->execute();
         };
+    }
+
+    /**
+     * @return array
+     */
+    protected function getRenderParams()
+    {
+        $renderParams = $this->getRequest()->get('renderParams', []);
+        $renderParamsTypes = $this->getRequest()->get('renderParamsTypes', []);
+
+        foreach ($renderParamsTypes as $param => $type) {
+            if (array_key_exists($param, $renderParams)) {
+                switch ($type) {
+                    case 'bool':
+                    case 'boolean':
+                        $renderParams[$param] = (bool)$renderParams[$param];
+                        break;
+                    case 'int':
+                    case 'integer':
+                        $renderParams[$param] = (int)$renderParams[$param];
+                        break;
+                }
+            }
+        }
+
+        return $renderParams;
     }
 }

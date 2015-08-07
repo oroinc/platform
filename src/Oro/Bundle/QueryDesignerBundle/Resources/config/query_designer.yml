@@ -51,3 +51,13 @@ query_designer:
             type: many-to-many
             applicable: [{type: manyToMany}]
             query_type: [all]
+        dictionary:
+            applicable: [{type: dictionary}]
+            type:       dictionary
+            options:
+                null_value: ':empty:'
+                populate_default: true
+                default_value: Any
+                class: ''
+            init_module: oroquerydesigner/js/dictionary-filter-initialized
+            query_type: [all]

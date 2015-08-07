@@ -173,6 +173,17 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bccEmail', $bccRecipients[0]);
     }
 
+    public function testGetUnseenEmailUIDs()
+    {
+        $startDate = new \DateTime('29-05-2015');
+
+        $this->connector->expects($this->at(0))
+            ->method('findUIDs')
+            ->with('UNSEEN SINCE 29-May-2015');
+
+        $this->manager->getUnseenEmailUIDs($startDate);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \RuntimeException

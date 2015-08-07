@@ -17,6 +17,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 
 /**
  * @RouteResource("email")
@@ -46,7 +47,7 @@ class EmailController extends RestController
      *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
      * )
      * @ApiDoc(
-     *      description="Get all emails",
+     *      description="Get emails",
      *      resource=true
      * )
      * @AclAncestor("oro_email_email_view")
@@ -69,7 +70,7 @@ class EmailController extends RestController
     }
 
     /**
-     * REST GET item
+     * Get email.
      *
      * @param string $id
      *
@@ -122,12 +123,12 @@ class EmailController extends RestController
     }
 
     /**
-     * Returns email context data.
+     * Get email context data.
      *
      * @param int $id The email id
      *
      * @ApiDoc(
-     *      description="Returns email context data",
+     *      description="Get email context data",
      *      resource=true
      * )
      *
@@ -143,10 +144,19 @@ class EmailController extends RestController
             return $this->buildNotFoundResponse();
         }
 
-
         $result = $this->getManager()->getEmailContext($email);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
+    }
+
+    /**
+     * Get email cache manager
+     *
+     * @return EmailCacheManager
+     */
+    protected function getEmailCacheManager()
+    {
+        return $this->container->get('oro_email.email.cache.manager');
     }
 
     /**

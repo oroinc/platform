@@ -16,7 +16,15 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_9\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBundle112_1;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBundle112_2;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_15\OroEmailBundle as OroEmailBundle115;
 
+/**
+ * Class OroEmailBundleInstaller
+ * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OroEmailBundleInstaller implements Installation
 {
     /**
@@ -24,7 +32,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_13';
+        return 'v1_15';
     }
 
     /**
@@ -70,5 +78,11 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle112_2::removeOldSchema($schema);
 
         OroEmailBundle113::addColumnMultiMessageId($schema);
+
+        OroEmailBundle114::addEmbeddedContentIdField($schema);
+
+        OroEmailBundle115::addEmailFolderFields($schema);
+        OroEmailBundle115::addEmailOriginFields($schema);
+        OroEmailBundle115::updateEmailRecipientConstraint($schema);
     }
 }

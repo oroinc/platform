@@ -23,6 +23,8 @@ interface PropertyInterface
     const TYPE_STRING   = 'string';
     const TYPE_HTML     = 'html';
     const TYPE_BOOLEAN  = 'boolean';
+    const TYPE_ARRAY    = 'array';
+    const TYPE_SIMPLE_ARRAY = 'simple_array';
 
     const METADATA_NAME_KEY = 'name';
     const METADATA_TYPE_KEY = 'type';

@@ -3,11 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
@@ -19,12 +23,14 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * Class Processor
@@ -32,6 +38,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
  * @package Oro\Bundle\EmailBundle\Mailer
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Processor
 {
@@ -63,16 +70,19 @@ class Processor
     protected $eventDispatcher;
 
     /** @var array */
-    protected $origins = array();
+    protected $origins = [];
+
+    /** @var Mcrypt */
+    protected $encryptor;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param \Swift_Mailer $mailer
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EmailActivityManager $emailActivityManager
-     * @param ServiceLink $serviceLink
+     * @param DoctrineHelper           $doctrineHelper
+     * @param \Swift_Mailer            $mailer
+     * @param EmailAddressHelper       $emailAddressHelper
+     * @param EmailEntityBuilder       $emailEntityBuilder
+     * @param EmailOwnerProvider       $emailOwnerProvider
+     * @param EmailActivityManager     $emailActivityManager
+     * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -83,16 +93,18 @@ class Processor
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Mcrypt $encryptor
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->mailer = $mailer;
-        $this->emailAddressHelper = $emailAddressHelper;
-        $this->emailEntityBuilder = $emailEntityBuilder;
-        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->doctrineHelper       = $doctrineHelper;
+        $this->mailer               = $mailer;
+        $this->emailAddressHelper   = $emailAddressHelper;
+        $this->emailEntityBuilder   = $emailEntityBuilder;
+        $this->emailOwnerProvider   = $emailOwnerProvider;
         $this->emailActivityManager = $emailActivityManager;
-        $this->securityFacade = $serviceLink->getService();
-        $this->eventDispatcher = $eventDispatcher;
+        $this->securityFacade       = $serviceLink->getService();
+        $this->eventDispatcher      = $eventDispatcher;
+        $this->encryptor            = $encryptor;
     }
 
     /**
@@ -106,7 +118,7 @@ class Processor
     public function process(EmailModel $model)
     {
         $this->assertModel($model);
-        $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
         $parentMessageId = $this->getParentMessageId($model);
 
         /** @var \Swift_Message $message */
@@ -124,14 +136,12 @@ class Processor
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
         $this->addAttachments($message, $model);
+        $this->processEmbeddedImages($message, $model);
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if (!$this->mailer->send($message)) {
-            throw new \Swift_SwiftException('An email was not delivered.');
-        }
-
         $origin = $this->getEmailOrigin($model->getFrom());
+        $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(
             $model->getSubject(),
@@ -146,10 +156,9 @@ class Processor
             $origin->getOwner(),
             $origin->getOrganization()
         );
-
-        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $emailUser->setFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
-            $this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true)
+            $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );
         $emailUser->getEmail()->setMessageId($messageId);
         $emailUser->setSeen(true);
@@ -177,14 +186,136 @@ class Processor
     }
 
     /**
+     * Get origin's folder
+     *
+     * @param string $email
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($email, EmailOrigin $origin)
+    {
+        $folder = $origin->getFolder(FolderType::SENT);
+
+        //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
+        if (!$folder && $origin instanceof UserEmailOrigin) {
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, InternalEmailOrigin::BAP, false);
+            return $origin->getFolder(FolderType::SENT);
+        }
+
+        return $folder;
+    }
+
+    /**
+     * Process send email message. In case exist custom smtp host/port use it
+     *
+     * @param object $message
+     * @param object $emailOrigin
+     * @throws \Swift_SwiftException
+     */
+    public function processSend($message, $emailOrigin)
+    {
+        if ($emailOrigin instanceof UserEmailOrigin) {
+            $this->modifySmtpSettings($emailOrigin);
+        }
+
+        if (!$this->mailer->send($message)) {
+            throw new \Swift_SwiftException('An email was not delivered.');
+        }
+    }
+
+    /**
+     * Modify transport smtp settings
+     *
+     * @param UserEmailOrigin $userEmailOrigin
+     */
+    protected function modifySmtpSettings(UserEmailOrigin $userEmailOrigin)
+    {
+        $transport = $this->mailer->getTransport();
+
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $transport->setHost($userEmailOrigin->getSmtpHost());
+            $transport->setPort($userEmailOrigin->getSmtpPort());
+            $transport->setUsername($userEmailOrigin->getUser());
+            $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
+            if ($userEmailOrigin->getSmtpEncryption()) {
+                $transport->setEncryption($userEmailOrigin->getSmtpEncryption());
+            }
+        }
+    }
+
+    /**
+     * Process inline images. Convert it to embedded attachments and update message body.
+     *
+     * @param \Swift_Message $message
+     * @param EmailModel     $model
+     */
+    protected function processEmbeddedImages(\Swift_Message $message, EmailModel $model)
+    {
+        if ($model->getType() === 'html') {
+            $guesser = ExtensionGuesser::getInstance();
+            $body    = $message->getBody();
+            $body    = preg_replace_callback(
+                '/<img(.*)src(\s*)=(\s*)["\'](.*)["\']/U',
+                function ($matches) use ($message, $guesser, $model) {
+                    if (count($matches) === 5) {
+                        // 1st match contains any data between '<img' and 'src' parts (e.g. 'width=100')
+                        $imgConfig = $matches[1];
+
+                        // 4th match contains src attribute value
+                        $srcData = $matches[4];
+
+                        if (strpos($srcData, 'data:image') === 0) {
+                            list($mime, $content) = explode(';', $srcData);
+                            list($encoding, $file) = explode(',', $content);
+                            $mime            = str_replace('data:', '', $mime);
+                            $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
+                            $swiftAttachment = \Swift_Image::newInstance(
+                                ContentDecoder::decode($file, $encoding),
+                                $fileName,
+                                $mime
+                            );
+
+                            /** @var $message \Swift_Message */
+                            $id = $message->embed($swiftAttachment);
+
+                            $attachmentContent = new EmailAttachmentContent();
+                            $attachmentContent->setContent($file);
+                            $attachmentContent->setContentTransferEncoding($encoding);
+
+                            $emailAttachment = new EmailAttachment();
+                            $emailAttachment->setEmbeddedContentId($swiftAttachment->getId());
+                            $emailAttachment->setFileName($fileName);
+                            $emailAttachment->setContentType($mime);
+                            $attachmentContent->setEmailAttachment($emailAttachment);
+                            $emailAttachment->setContent($attachmentContent);
+
+                            $emailAttachmentModel = new EmailAttachmentModel();
+                            $emailAttachmentModel->setEmailAttachment($emailAttachment);
+                            $model->addAttachment($emailAttachmentModel);
+
+                            return sprintf('<img%ssrc="%s"', $imgConfig, $id);
+                        }
+                    }
+                },
+                $body
+            );
+            $message->setBody($body, 'text/html');
+        }
+    }
+
+    /**
      * @param \Swift_Message $message
      * @param EmailModel     $model
      */
     protected function addAttachments(\Swift_Message $message, EmailModel $model)
     {
-        /** @var AttachmentModel $attachmentModel */
-        foreach ($model->getAttachments() as $attachmentModel) {
-            $attachment = $attachmentModel->getEmailAttachment();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        foreach ($model->getAttachments() as $emailAttachmentModel) {
+            $attachment      = $emailAttachmentModel->getEmailAttachment();
             $swiftAttachment = new \Swift_Attachment(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -203,15 +334,15 @@ class Processor
      */
     protected function persistAttachments(EmailModel $model, Email $email)
     {
-        /** @var AttachmentModel $attachmentModel */
-        foreach ($model->getAttachments() as $attachmentModel) {
-            $attachment = $attachmentModel->getEmailAttachment();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        foreach ($model->getAttachments() as $emailAttachmentModel) {
+            $attachment = $emailAttachmentModel->getEmailAttachment();
 
             if (!$attachment->getId()) {
                 $this->getEntityManager()->persist($attachment);
             } else {
                 $attachmentContent = clone $attachment->getContent();
-                $attachment = clone $attachment;
+                $attachment        = clone $attachment;
                 $attachment->setContent($attachmentContent);
                 $this->getEntityManager()->persist($attachment);
             }
@@ -226,11 +357,13 @@ class Processor
      *
      * @param string $email
      * @param string $originName
+     * @param boolean $enableUseUserEmailOrigin
+     *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $enableUseUserEmailOrigin = true)
     {
-        $originKey = $originName . $email;
+        $originKey    = $originName . $email;
         $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
             ? $this->securityFacade->getOrganization()
             : null;
@@ -241,22 +374,11 @@ class Processor
             );
 
             if ($emailOwner instanceof User) {
-                $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) use ($organization) {
-                        return
-                            $item instanceof InternalEmailOrigin
-                            && (!$organization || $item->getOrganization() === $organization);
-                    }
-                );
-
-                $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin === null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
-                }
+                $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
             } else {
                 $origin = $this->getEntityManager()
                     ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                    ->findOneBy(array('internalName' => $originName));
+                    ->findOneBy(['internalName' => $originName]);
             }
             $this->origins[$originKey] = $origin;
         }
@@ -265,7 +387,7 @@ class Processor
     }
 
     /**
-     * @param User $emailOwner
+     * @param User                  $emailOwner
      * @param OrganizationInterface $organization
      *
      * @return InternalEmailOrigin
@@ -275,7 +397,7 @@ class Processor
         $organization = $organization
             ? $organization
             : $emailOwner->getOrganization();
-        $originName = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
+        $originName   = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
 
         $outboxFolder = new EmailFolder();
         $outboxFolder
@@ -300,6 +422,7 @@ class Processor
 
     /**
      * @param EmailModel $model
+     *
      * @throws \InvalidArgumentException
      */
     protected function assertModel(EmailModel $model)
@@ -308,7 +431,7 @@ class Processor
             throw new \InvalidArgumentException('Sender can not be empty');
         }
         if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
-                throw new \InvalidArgumentException('Recipient can not be empty');
+            throw new \InvalidArgumentException('Recipient can not be empty');
         }
     }
 
@@ -317,15 +440,16 @@ class Processor
      *
      * @param string|string[] $addresses Examples of correct email addresses: john@example.com, <john@example.com>,
      *                                   John Smith <john@example.com> or "John Smith" <john@example.com>
+     *
      * @return array
      * @throws \InvalidArgumentException
      */
     protected function getAddresses($addresses)
     {
-        $result = array();
+        $result = [];
 
         if (is_string($addresses)) {
-            $addresses = array($addresses);
+            $addresses = [$addresses];
         }
         if (!is_array($addresses) && !$addresses instanceof \Iterator) {
             throw new \InvalidArgumentException(
@@ -352,13 +476,13 @@ class Processor
      */
     protected function getParentMessageId(EmailModel $model)
     {
-        $messageId = '';
+        $messageId     = '';
         $parentEmailId = $model->getParentEmailId();
         if ($parentEmailId && $model->getMailType() == EmailModel::MAIL_TYPE_REPLY) {
             $parentEmail = $this->getEntityManager()
                 ->getRepository('OroEmailBundle:Email')
                 ->find($parentEmailId);
-            $messageId = $parentEmail->getMessageId();
+            $messageId   = $parentEmail->getMessageId();
         }
         return $messageId;
     }
@@ -373,5 +497,63 @@ class Processor
         }
 
         return $this->em;
+    }
+
+    /**
+     * Get imap origin if exists.
+     *
+     * @param $enableUseUserEmailOrigin
+     * @param $emailOwner
+     * @param $organization
+     * @return mixed|null|InternalEmailOrigin
+     */
+    protected function getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization)
+    {
+        $origins = new ArrayCollection();
+
+        if ($enableUseUserEmailOrigin) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getImapEnabledFilter($organization)
+            );
+        }
+        if ($origins->isEmpty()) {
+            $origins = $emailOwner->getEmailOrigins()->filter(
+                $this->getInternalFilter($organization)
+            );
+        }
+        $origin = $origins->isEmpty() ? null : $origins->first();
+        if ($origin === null) {
+            $origin = $this->createUserInternalOrigin($emailOwner, $organization);
+
+            return $origin;
+        }
+
+        return $origin;
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getImapEnabledFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
+                && (!$organization || $item->getOrganization() === $organization);
+        };
+    }
+
+    /**
+     * @param $organization
+     * @return \Closure
+     */
+    protected function getInternalFilter($organization)
+    {
+        return function ($item) use ($organization) {
+            return
+                $item instanceof InternalEmailOrigin
+                && (!$organization || $item->getOrganization() === $organization);
+        };
     }
 }

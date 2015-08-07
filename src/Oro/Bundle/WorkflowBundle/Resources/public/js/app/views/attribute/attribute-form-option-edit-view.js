@@ -1,13 +1,12 @@
-/* global define */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var AttributeFormOptionEditView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        $ = require('jquery'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        __ = require('orotranslation/js/translator');
+    var AttributeFormOptionEditView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var $ = require('jquery');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var __ = require('orotranslation/js/translator');
     require('oroentity/js/field-choice');
     require('jquery.validate');
 
@@ -29,12 +28,13 @@ define(function (require) {
             workflow: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-edit-template').html();
             this.template = _.template(template);
 
-            this.entity_field_template = this.options.entity_field_template || $('#entity-column-chain-template').html();
+            this.entity_field_template = this.options.entity_field_template ||
+                $('#entity-column-chain-template').html();
 
             this.editViewId = null;
         },
@@ -67,7 +67,7 @@ define(function (require) {
             this.entityFieldSelectEl.fieldChoice({
                 fieldsLoaderSelector: this.options.entity_select_el,
                 select2: {
-                    placeholder: __("Choose field...")
+                    placeholder: __('Choose field...')
                 }
             });
         },

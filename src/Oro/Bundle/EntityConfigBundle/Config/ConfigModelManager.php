@@ -300,6 +300,72 @@ class ConfigModelManager
     }
 
     /**
+     * Changes a mode of a field
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeFieldMode($className, $fieldName, $mode)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+        if (empty($mode)) {
+            throw new \InvalidArgumentException('$mode must not be empty');
+        }
+
+        $result     = false;
+        $fieldModel = $this->findFieldModel($className, $fieldName);
+        if ($fieldModel && $fieldModel->getMode() !== $mode) {
+            $fieldModel->setMode($mode);
+            $this->getEntityManager()->persist($fieldModel);
+
+            $this->fieldLocalCache[$className][$fieldName] = $fieldModel;
+            $result                                        = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Changes a mode of an entity
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @throws \InvalidArgumentException if $className or $mode is empty
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeEntityMode($className, $mode)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($mode)) {
+            throw new \InvalidArgumentException('$mode must not be empty');
+        }
+
+        $result      = false;
+        $entityModel = $this->findEntityModel($className);
+        if ($entityModel && $entityModel->getMode() !== $mode) {
+            $entityModel->setMode($mode);
+            $this->getEntityManager()->persist($entityModel);
+
+            $this->entityLocalCache[$className] = $entityModel;
+            $result                             = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string|null $className
      * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
      *

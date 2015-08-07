@@ -90,7 +90,7 @@ class SyncScheduler
         $qb = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('j');
         $qb->select('count(j.id)');
         $qb->andWhere('j.command = :command');
-        $qb->andWhere('j.args = :args');
+        $qb->andWhere('cast(j.args as text) = :args');
         $qb->andWhere($qb->expr()->in('j.state', [Job::STATE_PENDING, Job::STATE_NEW]));
         $qb->setParameter('command', self::JOB_NAME);
         $qb->setParameter('args', $args, Type::JSON_ARRAY);

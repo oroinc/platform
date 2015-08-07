@@ -6,10 +6,9 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -24,7 +23,7 @@ class AssociationManager
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EventDispatcher */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var DoctrineHelper */
@@ -34,14 +33,14 @@ class AssociationManager
     protected $entityNameResolver;
 
     /**
-     * @param ConfigManager      $configManager
-     * @param EventDispatcher    $eventDispatcher
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager            $configManager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper           $doctrineHelper
+     * @param EntityNameResolver       $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver
     ) {
@@ -141,6 +140,35 @@ class AssociationManager
      * Returns a query builder that could be used for fetching the list of entities
      * associated with $associationOwnerClass entities found by $filters and $joins
      *
+     * The resulting query would be something like this:
+     * <code>
+     * SELECT entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title FROM (
+     *      SELECT [DISTINCT]
+     *          e.id AS id,
+     *          target.id AS entityId,
+     *          {first_target_entity_class} AS entityClass,
+     *          {first_target_title} AS entityTitle
+     *      FROM {associationOwnerClass} AS e
+     *          INNER JOIN e.{first_target_field_name} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      SELECT [DISTINCT]
+     *          e.id AS id,
+     *          target.id AS entityId,
+     *          {second_target_entity_class} AS entityClass,
+     *          {second_target_title} AS entityTitle
+     *      FROM {associationOwnerClass} AS e
+     *          INNER JOIN e.{second_target_field_name} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      ... select statements for other targets
+     * ) entity
+     * ORDER BY {orderBy}
+     * LIMIT {limit} OFFSET {(page - 1) * limit}
+     * </code>
+     *
      * @param string      $associationOwnerClass The FQCN of the entity that is the owning side of the association
      * @param mixed|null  $filters               Criteria is used to filter entities which are association owners
      *                                           e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
@@ -186,11 +214,7 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-            // http://www.doctrine-project.org/jira/browse/DDC-2798
-            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-            QueryBuilderHelper::addCriteria($subQb, $subCriteria);
-            // $subQb->addCriteria($criteria);
+            $subQb->addCriteria($subCriteria);
 
             $subQuery = $subQb->getQuery();
 
@@ -230,10 +254,40 @@ class AssociationManager
     }
 
     /**
-     * Returns a query builder that could be used for fetching the list of entities
-     * associated with $associationOwnerClass entities found by $filters and $joins
+     * Returns a query builder that could be used for fetching the list of owner side entities
+     * the specified $associationTargetClass associated with.
+     * The $filters and $joins could be used to filter entities
      *
-     * @param string      $associationTargetClass The FQCN of the entity that is the owning side of the association
+     * The resulting query would be something like this:
+     * <code>
+     * SELECT entity.entityId AS id, entity.entityClass AS entity, entity.entityTitle AS title FROM (
+     *      SELECT [DISTINCT]
+     *          target.id AS id,
+     *          e.id AS entityId,
+     *          {first_owner_entity_class} AS entityClass,
+     *          {first_owner_title} AS entityTitle
+     *      FROM {first_owner_entity_class} AS e
+     *          INNER JOIN e.{target_field_name_for_first_owner} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      SELECT [DISTINCT]
+     *          target.id AS id,
+     *          e.id AS entityId,
+     *          {second_owner_entity_class} AS entityClass,
+     *          {second_owner_title} AS entityTitle
+     *      FROM {second_owner_entity_class} AS e
+     *          INNER JOIN e.{target_field_name_for_second_owner} AS target
+     *          {joins}
+     *      WHERE {filters}
+     *      UNION ALL
+     *      ... select statements for other owners
+     * ) entity
+     * ORDER BY {orderBy}
+     * LIMIT {limit} OFFSET {(page - 1) * limit}
+     * </code>
+     *
+     * @param string      $associationTargetClass The FQCN of the entity that is the target side of the association
      * @param mixed|null  $filters                Criteria is used to filter entities which are association owners
      *                                            e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
      * @param array|null  $joins                  Additional associations required to filter owning side entities
@@ -280,11 +334,7 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
-            // http://www.doctrine-project.org/jira/browse/DDC-2798
-            // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
-            QueryBuilderHelper::addCriteria($subQb, $subCriteria);
-            // $subQb->addCriteria($criteria);
+            $subQb->addCriteria($subCriteria);
 
             $subQuery = $subQb->getQuery();
 

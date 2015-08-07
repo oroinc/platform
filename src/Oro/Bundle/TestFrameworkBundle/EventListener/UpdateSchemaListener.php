@@ -40,7 +40,7 @@ class UpdateSchemaListener
                 $event->getOutput(),
                 $command->getApplication()
             );
-            $executor->runCommand('oro:test:schema:update');
+            $executor->runCommand('oro:test:schema:update', ['--process-isolation' => true]);
         }
     }
 }

@@ -149,10 +149,10 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
     ) {
         $loader = new FolderContentCumulativeLoader($path, $nestingLevel, true, $fileExtensions);
 
-        $bundle      = new TestBundle1();
-        $bundleClass = get_class($bundle);
-        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
-        $appRootDir     = realpath($bundleDir . '/../../app');
+        $bundle       = new TestBundle1();
+        $bundleClass  = get_class($bundle);
+        $bundleDir    = dirname((new \ReflectionClass($bundle))->getFileName());
+        $appRootDir   = realpath($bundleDir . '/../../app');
         $bundleAppDir = $appRootDir . '/Resources/TestBundle1';
 
         /** @var CumulativeResourceInfo $result */
@@ -254,11 +254,10 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new FolderContentCumulativeLoader('Resources/folder_to_track/', -1, false, ['yml', 'xml']);
 
-        $bundle      = new TestBundle1();
-        $bundleClass = get_class($bundle);
-        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
-
-        $rootDir     = realpath($bundleDir . '/../../app');
+        $bundle       = new TestBundle1();
+        $bundleClass  = get_class($bundle);
+        $bundleDir    = dirname((new \ReflectionClass($bundle))->getFileName());
+        $rootDir      = realpath($bundleDir . '/../../app');
         $bundleAppDir = $rootDir . '/Resources/TestBundle1';
 
         /** @var CumulativeResourceInfo $result */
@@ -331,10 +330,9 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new FolderContentCumulativeLoader('Resources/tmp/', -1, false);
 
-        $bundle      = new TestBundle1();
-        $bundleClass = get_class($bundle);
-        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
-
+        $bundle       = new TestBundle1();
+        $bundleClass  = get_class($bundle);
+        $bundleDir    = dirname((new \ReflectionClass($bundle))->getFileName());
         $appRootDir   = realpath($bundleDir . '/../../app');
         $bundleAppDir = $appRootDir . '/Resources/TestBundle1';
 
@@ -355,10 +353,9 @@ class FolderContentCumulativeLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new FolderContentCumulativeLoader('Resources/tmp/', -1, false);
 
-        $bundle      = new TestBundle1();
-        $bundleClass = get_class($bundle);
-        $bundleDir   = dirname((new \ReflectionClass($bundle))->getFileName());
-
+        $bundle       = new TestBundle1();
+        $bundleClass  = get_class($bundle);
+        $bundleDir    = dirname((new \ReflectionClass($bundle))->getFileName());
         $appRootDir   = realpath($bundleDir . '/../../app');
         $bundleAppDir = $appRootDir . '/Resources/TestBundle1';
 

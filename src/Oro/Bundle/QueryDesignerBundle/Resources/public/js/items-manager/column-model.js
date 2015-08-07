@@ -1,6 +1,4 @@
-/*global define*/
-/*jslint nomen: true*/
-define(['backbone'], function (Backbone) {
+define(['backbone'], function(Backbone) {
     'use strict';
 
     /**
@@ -9,7 +7,7 @@ define(['backbone'], function (Backbone) {
      */
     return Backbone.Model.extend({
         defaults: {
-            name : null,
+            name: null,
             label: null,
             func: null,
             sorting: null

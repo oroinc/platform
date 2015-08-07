@@ -14,18 +14,18 @@ class EmailControllerTest extends WebTestCase
 
     /** @var array */
     protected $email = [
-        'folders'    => [
+        'folders' => [
             ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
         ],
-        'subject'    => 'New email',
-        'messageId'  => 'test@email-bundle.func-test',
-        'from'       => '"Address 1" <1@example.com>',
-        'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
-        'cc'         => '2@example.com; "Address 3" <3@example.com>',
+        'subject' => 'New email',
+        'messageId' => 'test@email-bundle.func-test',
+        'from' => '"Address 1" <1@example.com>',
+        'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+        'cc' => '2@example.com; "Address 3" <3@example.com>',
         'importance' => 'low',
-        'body'       => 'Test body',
-        'bodyType'   => 'text',
-        'receivedAt' => '2015-06-19 12:17:51',
+        'body' => 'Test body',
+        'bodyType' => 'text',
+        'receivedAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -123,11 +123,29 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Subject cannot be changed for already existing email.'
-            . ' Existing value: "New email". New value: "New subject".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Subject cannot be changed for already existing email.'
+                . ' Existing value: "New email". New value: "New subject".'
+            );
+        }
+    }
+
+    public function testCreateEmailWithoutSubjectAndBody()
+    {
+        $email = $this->email;
+        $email['messageId'] = 'new.test@email-bundle.func-test';
+        unset($email['subject'], $email['body'], $email['bodyType']);
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertNotNull($email['subject'], "The Subject cannot be null. It should be empty string");
+        $this->assertNotNull($email['body'], "The Body cannot be null. It should be empty string");
     }
 
     /**
@@ -186,10 +204,13 @@ class EmailControllerTest extends WebTestCase
         );
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Head cannot be changed for already existing email.'
-            . ' Existing value: "true". New value: "false".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Head cannot be changed for already existing email.'
+                . ' Existing value: "true". New value: "false".'
+            );
+        }
     }
 }

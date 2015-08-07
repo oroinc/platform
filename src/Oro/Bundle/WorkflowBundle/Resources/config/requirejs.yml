@@ -1,4 +1,9 @@
 config:
+    map:
+        '*':
+            'jsplumb': 'oroworkflow/js/extend/jsplumb'
+        'oroworkflow/js/extend/jsplumb':
+            'jsplumb': 'jsplumb'
     paths:
         'jsplumb':                                                  'bundles/components/jsplumb/dom.jsPlumb.js'
         'oroworkflow/js/transition-handler':                        'bundles/oroworkflow/js/transition-handler.js'

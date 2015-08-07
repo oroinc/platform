@@ -574,6 +574,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($model));
         $metadata                        = new EntityMetadata(self::ENTITY_CLASS);
         $metadata->defaultValues['entity'] = ['translatable' => 'labelVal', 'other' => 'otherVal'];
+        $metadata->mode = ConfigModelManager::MODE_DEFAULT;
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
@@ -718,7 +719,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'translatable2' => 'labelVal2',
             'other2'        => 'otherVal2',
         ];
-        $this->metadataFactory->expects($this->once())
+        $this->modelManager->expects($this->once())
+            ->method('findEntityModel')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($this->createEntityConfigModel(self::ENTITY_CLASS)));
+        $this->metadataFactory->expects($this->any())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($metadata));
@@ -783,7 +788,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'translatable2' => 'labelVal2',
             'other2'        => 'otherVal2',
         ];
-        $this->metadataFactory->expects($this->once())
+        $this->modelManager->expects($this->once())
+            ->method('findEntityModel')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($this->createEntityConfigModel(self::ENTITY_CLASS)));
+        $this->metadataFactory->expects($this->any())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($metadata));
@@ -844,7 +853,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'translatable2' => 'labelVal2',
             'other2'        => 'otherVal2',
         ];
-        $this->metadataFactory->expects($this->once())
+        $this->modelManager->expects($this->once())
+            ->method('findEntityModel')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($this->createEntityConfigModel(self::ENTITY_CLASS)));
+        $this->metadataFactory->expects($this->any())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($metadata));
@@ -870,11 +883,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($config));
-
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(Events::UPDATE_ENTITY_CONFIG);
-
         $extendConfig = new Config(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -909,7 +920,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($extendPropertyConfigContainer));
         $extendConfigProvider->expects($this->never())
             ->method('persist');
-
         $expectedConfig = new Config($configId);
         $expectedConfig->set('translatable2', 'labelVal2_old');
         $expectedConfig->set('other2', 'otherVal2_old');

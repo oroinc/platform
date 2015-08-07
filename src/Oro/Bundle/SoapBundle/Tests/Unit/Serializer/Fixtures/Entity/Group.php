@@ -33,11 +33,12 @@ class Group
     protected $public = false;
 
     /**
-     * This field has no getter and setter and it is used to test that such fields are not serialized
+     * This field has getter and setter which not match the field name
+     * and it is used to test that such fields are serialized using direct property access
      *
-     * @ORM\Column(name="hidden", type="boolean")
+     * @ORM\Column(name="is_exception", type="boolean")
      */
-    protected $hidden;
+    protected $isException;
 
     /**
      * @param int|null $id
@@ -96,7 +97,7 @@ class Group
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function isPublic()
     {
@@ -111,6 +112,26 @@ class Group
     public function setPublic($public)
     {
         $this->public = $public;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isException()
+    {
+        return $this->isException;
+    }
+
+    /**
+     * @param boolean $exception
+     *
+     * @return self
+     */
+    public function setException($exception)
+    {
+        $this->isException = $exception;
 
         return $this;
     }

@@ -2,15 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
+use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -18,7 +24,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $userRepository;
 
@@ -33,7 +44,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
     protected $securityContext;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserManager
      */
     protected $userManager;
 
@@ -44,10 +55,10 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->setMethods(null)
-            ->getMock();
+        $this->securityContext = new SecurityContext(
+            new TokenStorage(),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface')
+        );
 
         $this->userRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $this->organizationRepository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
@@ -74,7 +85,25 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['doctrine', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $registry],
+                        [
+                            'security.context',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->securityContext,
+                        ],
+                        ['oro_user.manager', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->userManager],
+                    ]
+                )
+            );
+
         $this->listener = new ConsoleContextListener($registry, $this->securityContext, $this->userManager);
+        $this->listener->setContainer($this->container);
     }
 
     public function testNoOptions()
@@ -295,7 +324,7 @@ class ConsoleContextListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEvent()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $application */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|InputDefinition $definition */
         $definition = $this->getMockBuilder('Symfony\Component\Console\Input\InputDefinition')
             ->disableOriginalConstructor()
             ->setMethods(['addOption', 'getParameterOption'])
