@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailRecipientsHelper
 {
@@ -137,6 +138,40 @@ class EmailRecipientsHelper
             return !in_array($recipient->getEmail(), $args->getExcludedEmails()) &&
                 stripos($recipient->getName(), $args->getQuery()) !== false;
         });
+    }
+
+    /**
+     * @param object|null $object
+     * @param EmailRecipientsProviderArgs $args
+     *
+     * @return bool
+     */
+    public function isObjectAllowed($object = null, EmailRecipientsProviderArgs $args)
+    {
+        return $this->isObjectAllowedForOrganization($object, $args->getOrganization());
+    }
+
+    /**
+     * @param object|null $object
+     * @param Organization|null $organization
+     *
+     * @return bool
+     */
+    public function isObjectAllowedForOrganization($object = null, Organization $organization = null)
+    {
+        if (!$organization ||
+            !$object ||
+            !$this->getPropertyAccessor()->isReadable($object, 'organization')
+        ) {
+            return true;
+        }
+
+        $objectOrganization = $this->getPropertyAccessor()->getValue($object, 'organization');
+        if (!$organization) {
+            return true;
+        }
+
+        return $objectOrganization === $organization;
     }
 
     /**

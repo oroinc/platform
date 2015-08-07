@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class RelatedEmailsProvider
 {
@@ -68,11 +69,16 @@ class RelatedEmailsProvider
      * @param object $object
      * @param int $depth
      * @param bool $ignoreAcl
+     * @param Organization|null $organization
      *
      * @return Recipient[]
      */
-    public function getRecipients($object, $depth = 1, $ignoreAcl = false)
+    public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
     {
+        if (!$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization)) {
+            return [];
+        }
+
         $recipients = [];
         if (!$depth || ($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
             if ($depth && $this->securityFacade->getLoggedUser() === $object) {
@@ -91,8 +97,6 @@ class RelatedEmailsProvider
             $attributes[] = new EmailAttribute('email');
         }
 
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
         $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));
 
         foreach ($metadata->associationMappings as $name => $assoc) {
@@ -104,7 +108,7 @@ class RelatedEmailsProvider
                 $attributes[] = new EmailAttribute($name, true);
             } else {
                 if ($depth > 1) {
-                    $assocObject = $propertyAccessor->getValue($object, $name);
+                    $assocObject = $this->getPropertyAccessor()->getValue($object, $name);
                     if (!$assocObject instanceof \Traversable && !is_array($assocObject)) {
                         if ($assocObject) {
                             $assocObject = [$assocObject];
@@ -113,7 +117,7 @@ class RelatedEmailsProvider
                         }
                     }
                     foreach ($assocObject as $obj) {
-                        $recipients = array_merge($recipients, $this->getRecipients($obj, $depth - 1));
+                        $recipients = array_merge($recipients, $this->getRecipients($obj, $depth - 1, false, $organization));
                     }
                 }
             }

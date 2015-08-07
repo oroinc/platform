@@ -29,7 +29,7 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         return EmailRecipientsHelper::filterRecipients(
             $args,
-            $this->relatedEmailsProvider->getRecipients($args->getRelatedEntity(), 2)
+            $this->relatedEmailsProvider->getRecipients($args->getRelatedEntity(), 2, false, $args->getOrganization())
         );
     }
 

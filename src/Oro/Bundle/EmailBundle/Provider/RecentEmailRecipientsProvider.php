@@ -81,10 +81,15 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         foreach ($emails as $email => $name) {
+            $owner = $this->emailOwnerProvider->findEmailOwner($this->registry->getManager(), $email);
+            if (!$this->emailRecipientsHelper->isObjectAllowed($owner, $args)) {
+                continue;
+            }
+
             $result[] = new Recipient(
                 $email,
                 $name,
-                $this->createRecipientEntity($email)
+                $this->createRecipientEntity($owner)
             );
         }
 
@@ -92,13 +97,12 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     }
 
     /**
-     * @param string $email
+     * @param object|null $owner
      *
-     * @return RecipientEntity
+     * @return RecipientEntity|null
      */
-    protected function createRecipientEntity($email)
+    protected function createRecipientEntity($owner = null)
     {
-        $owner = $this->emailOwnerProvider->findEmailOwner($this->registry->getManager(), $email);
         if (!$owner) {
             return null;
         }

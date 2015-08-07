@@ -103,7 +103,7 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
                     $recipients,
                     EmailRecipientsHelper::filterRecipients(
                         $args,
-                        $this->relatedEmailsProvider->getRecipients($entity, 2)
+                        $this->relatedEmailsProvider->getRecipients($entity, 2, false, $args->getOrganization())
                     )
                 );
 
