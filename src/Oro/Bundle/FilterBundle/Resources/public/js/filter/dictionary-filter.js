@@ -51,13 +51,15 @@ define([
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name="dictionary_part"]'
+            type: 'select[name="enum_part"]'
         },
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            this.criteriaValueSelectors.type = 'select[name="' + this.name + '_part"]';
+
             this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },

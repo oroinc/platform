@@ -5,7 +5,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
     function loadEnumChoices(className, successCallback, errorCallback) {
         $.ajax({
             url: routing.generate(
-                'oro_api_get_dictionary_values',
+                 'oro_api_get_dictionary_values',
                 {dictionary: className.replace(/\\/g, '_'), limit: -1}
             ),
             success: function(data) {
@@ -42,18 +42,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'routing', 'orou
             var filterParams = {'class': className};
 
             // keep null value option if defined in options
-            if (filterOptions.nullValue) {
-                filterParams.null_value = filterOptions.nullValue;
-                nullValue = _.find(filterOptions.choices, function(choice) {
-                    return choice.value === filterOptions.nullValue;
-                });
-                if (nullValue) {
-                    choices.unshift(nullValue);
-                }
-            }
+            //if (filterOptions.nullValue) {
+            //    filterParams.null_value = filterOptions.nullValue;
+            //    nullValue = _.find(filterOptions.choices, function(choice) {
+            //        return choice.value === filterOptions.nullValue;
+            //    });
+                //if (nullValue) {
+                //    choices.unshift(nullValue);
+                //}
+            //}
 
             filterOptions.filterParams = filterParams;
-            filterOptions.choices = choices;
+            //filterOptions.choices = choices;
 
             // mark promise as resolved
             promise.resolveWith(filterOptions);
