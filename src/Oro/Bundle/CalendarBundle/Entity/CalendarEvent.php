@@ -36,10 +36,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          "security"={
  *              "type"="ACL",
  *              "permissions"="VIEW;CREATE;EDIT;DELETE",
- *              "group_name"="",
- *              "share_scopes"={
- *                  "user"
- *              }
+ *              "group_name"=""
  *          },
  *          "grouping"={
  *              "groups"={"activity"}
