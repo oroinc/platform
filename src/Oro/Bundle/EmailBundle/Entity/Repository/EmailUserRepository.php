@@ -44,7 +44,8 @@ class EmailUserRepository extends EntityRepository
             ->join('f.origin', 'o')
             ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
             ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
-            ->andWhere($qb->expr()->eq('o.isActive', true));
+            ->andWhere($qb->expr()->eq('o.isActive', ':active'))
+            ->setParameter('active', true);
 
         if ($folderTypes) {
             $qb->andWhere($qb->expr()->in('f.type', $folderTypes));
@@ -52,7 +53,7 @@ class EmailUserRepository extends EntityRepository
 
         if ($isSeen !== null) {
             $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
-            ->setParameters(['seen' => (bool)$isSeen]);
+            ->setParameter('seen', (bool)$isSeen);
         }
 
         return $qb->getQuery()->getResult();
