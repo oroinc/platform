@@ -6,8 +6,8 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 return array(
     'first_workflow' => array(
         'label' => 'First Workflow',
-        'entity' => 'First\Entity',
         'is_system' => true,
+        'entity' => 'First\Entity',
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
         'steps_display_ordered' => true,
@@ -20,6 +20,7 @@ return array(
                     'first_attribute' => array('update' => false, 'delete' => true)
                 ),
                 'allowed_transitions' => array('first_transition'),
+                '_is_start' => '',
                 'position' => []
             )
         ),
@@ -35,11 +36,11 @@ return array(
             'second_attribute' => array(
                 'label' => 'Second Attribute',
                 'type' => 'entity',
+                'property_path' => 'first_attribute.test',
                 'entity_acl' => array(
                     'update' => true,
                     'delete' => false,
                 ),
-                'property_path' => 'first_attribute.test',
                 'options' => array(
                     'class' => 'DateTime',
                 )
@@ -56,13 +57,13 @@ return array(
                 'acl_message' => 'Test ACL message',
                 'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
-                'display_type' => 'page',
                 'frontend_options' => array(
                     'class' => 'foo'
                 ),
+                'form_type' => 'custom_workflow_transition',
+                'display_type' => 'page',
                 'page_template' => 'Workflow:Test:pageTemplate.html.twig',
                 'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
-                'form_type' => 'custom_workflow_transition',
                 'form_options' => array(
                     'attribute_fields' => array(
                         'first_attribute' => array(
@@ -108,16 +109,14 @@ return array(
     'second_workflow' => array(
         'label' => 'Second Workflow',
         'entity' => 'Second\Entity',
-        'is_system' => false,
         'start_step' => 'second_step',
-        'entity_attribute' => 'entity',
-        'steps_display_ordered' => false,
         'steps' => array(
             'second_step' => array(
                 'label' => 'Second Step',
                 'order' => 1,
                 'is_final' => false,
                 'allowed_transitions' => array(),
+                '_is_start' => '',
                 'entity_acl' => array(),
                 'position' => []
             )
@@ -127,21 +126,21 @@ return array(
             'second_transition' => array(
                 'label' => 'Second Transition',
                 'step_to' => 'second_step',
+                'transition_definition' => 'second_transition_definition',
+                'frontend_options' => array(
+                    'icon' => 'bar'
+                ),
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_resource' => null,
                 'acl_message' => null,
                 'message' => null,
-                'transition_definition' => 'second_transition_definition',
+                'form_type' => WorkflowTransitionType::NAME,
                 'display_type' => 'dialog',
-                'frontend_options' => array(
-                    'icon' => 'bar'
-                ),
+                'form_options' => array(),
                 'page_template' => null,
                 'dialog_template' => null,
-                'form_type' => WorkflowTransitionType::NAME,
-                'form_options' => array(),
             )
         ),
         'transition_definitions' => array(
@@ -151,5 +150,8 @@ return array(
                 'post_actions' => array()
             )
         ),
+        'is_system' => false,
+        'entity_attribute' => 'entity',
+        'steps_display_ordered' => false,
     )
 );
