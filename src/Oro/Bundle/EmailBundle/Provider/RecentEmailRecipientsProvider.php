@@ -82,7 +82,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         $result = [];
         foreach ($emails as $email => $name) {
             $owner = $this->emailOwnerProvider->findEmailOwner($this->registry->getManager(), $email);
-            if (!$this->emailRecipientsHelper->isObjectAllowed($owner, $args)) {
+            if (!$this->emailRecipientsHelper->isObjectAllowed($args, $owner)) {
                 continue;
             }
 

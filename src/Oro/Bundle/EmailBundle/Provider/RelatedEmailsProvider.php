@@ -117,7 +117,10 @@ class RelatedEmailsProvider
                         }
                     }
                     foreach ($assocObject as $obj) {
-                        $recipients = array_merge($recipients, $this->getRecipients($obj, $depth - 1, false, $organization));
+                        $recipients = array_merge(
+                            $recipients,
+                            $this->getRecipients($obj, $depth - 1, false, $organization)
+                        );
                     }
                 }
             }
@@ -125,7 +128,11 @@ class RelatedEmailsProvider
 
         return array_merge(
             $recipients,
-            $this->createRecipientsFromEmails($this->createEmailsFromAttributes($attributes, $object), $object, $metadata)
+            $this->createRecipientsFromEmails(
+                $this->createEmailsFromAttributes($attributes, $object),
+                $object,
+                $metadata
+            )
         );
     }
 

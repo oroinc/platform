@@ -218,12 +218,12 @@ class EmailRecipientsHelper
     }
 
     /**
-     * @param object|null $object
      * @param EmailRecipientsProviderArgs $args
+     * @param object|null $object
      *
      * @return bool
      */
-    public function isObjectAllowed($object = null, EmailRecipientsProviderArgs $args)
+    public function isObjectAllowed(EmailRecipientsProviderArgs $args, $object = null)
     {
         return $this->isObjectAllowedForOrganization($object, $args->getOrganization());
     }
