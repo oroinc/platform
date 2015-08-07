@@ -66,21 +66,22 @@ class EmailRecipientsProvider
         $result = [];
         foreach ($emails as $section => $sectionEmails) {
             $items = array_map(function (Recipient $recipient) {
-                $id = ['key' => $recipient->getName()];
+                $data = ['key' => $recipient->getName()];
                 if ($recipientEntity = $recipient->getEntity()) {
-                    $id['contextText'] = $recipient->getEntity()->getLabel();
-                    $id['contextValue'] = [
+                    $data['contextText'] = $recipient->getEntity()->getLabel();
+                    $data['contextValue'] = [
                         'entityClass' => $recipient->getEntity()->getClass(),
                         'entityId' => $recipient->getEntity()->getId(),
                     ];
-                    $id['organization'] = $recipient->getEntity()->getOrganization();
+                    $data['organization'] = $recipient->getEntity()->getOrganization();
                 }
 
                 return [
-                    'id' => [
-                        json_encode($id),
-                    ],
+                    'id' => $recipient->getName(),
                     'text' => $recipient->getLabel(),
+                    'data' => [
+                        json_encode($data)
+                    ],
                 ];
             }, $sectionEmails);
 

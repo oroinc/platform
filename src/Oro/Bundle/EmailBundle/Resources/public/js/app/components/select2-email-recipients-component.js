@@ -27,7 +27,7 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                     return {
                         text: section.text,
                         children: _.map(section.children, function(item) {
-                            var parsedItem = JSON.parse(item.id);
+                            var parsedItem = JSON.parse(item.data);
                             if (parsedItem.contextText) {
                                 contexts[parsedItem.key] = {};
                                 contexts[parsedItem.key] = {
@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                             }
 
                             return {
-                                id: parsedItem.key,
+                                id: item.id,
                                 text: item.text
                             };
                         })
@@ -54,13 +54,15 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                         self.$contextEl.select2('data', data);
                     }
 
-                    if (e.removed && typeof contexts[e.removed.id] !== 'undefined') {
-                        var newData = _.reject(data, function(item) {
-                            return item.id === contexts[e.removed.id].id;
-                        });
-                        self.$contextEl.select2('data', newData);
+                    if (e.removed) {
+                        if (typeof contexts[e.removed.id] !== 'undefined') {
+                            var newData = _.reject(data, function(item) {
+                                return item.id === contexts[e.removed.id].id;
+                            });
+                            self.$contextEl.select2('data', newData);
+                        }
 
-                        if (_.isEmpty(newData)) {
+                        if (_.isEmpty(self.$el.select2('val'))) {
                             currentOrganization = null;
                         }
                     }
