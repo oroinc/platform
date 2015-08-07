@@ -183,12 +183,6 @@ class SyncCommand extends AbstractSyncCronCommand
      */
     protected function updateToken(Integration $integration)
     {
-        if (!$integration->getOrganization()) {
-            $token = new ConsoleToken();
-            $this->getSecurityContext()->setToken($token);
-            return;
-        }
-
         $securityContext = $this->getSecurityContext();
         $token = $securityContext->getToken();
         if (!$token) {
