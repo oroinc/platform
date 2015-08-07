@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
  * Strips html tags from string.
@@ -22,13 +24,26 @@ class StripHtmlTags extends AbstractAction
     protected $attribute;
     /** @var string */
     protected $html;
+    /** @var HtmlTagHelper */
+    protected $htmlTagHelper;
+
+    /**
+     * @param ContextAccessor $contextAccessor
+     * @param HtmlTagHelper   $htmlTagHelper
+     */
+    public function __construct(ContextAccessor $contextAccessor, HtmlTagHelper $htmlTagHelper)
+    {
+        parent::__construct($contextAccessor);
+        $this->htmlTagHelper = $htmlTagHelper;
+    }
 
     /**
      * {@inheritdoc}
      */
     protected function executeAction($context)
     {
-        $result = strip_tags($this->contextAccessor->getValue($context, $this->html));
+        $result = $this->htmlTagHelper->purify($this->contextAccessor->getValue($context, $this->html));
+        $result = $this->htmlTagHelper->stripTags($result);
 
         $this->contextAccessor->setValue($context, $this->attribute, $result);
     }
