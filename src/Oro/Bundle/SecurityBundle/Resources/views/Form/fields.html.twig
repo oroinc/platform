@@ -26,7 +26,7 @@
 
 {% block oro_acl_privilege_identity_widget %}
     {% set class = '' %}
-    {% if form.parent.vars.privileges_config.view_type != 'grid' %}
+    {% if form.parent.vars.privileges_config.view_type is defined and form.parent.vars.privileges_config.view_type != 'grid' %}
         {% set class = 'span8' %}
     {% endif %}
 
