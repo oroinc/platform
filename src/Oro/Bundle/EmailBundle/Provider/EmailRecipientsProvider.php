@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailRecipientsProvider
 {
@@ -27,12 +28,17 @@ class EmailRecipientsProvider
     /**
      * @param object|null $relatedEntity
      * @param string|null $query
+     * @param Organization|null $organization
      * @param int $limit
      *
      * @return array
      */
-    public function getEmailRecipients($relatedEntity = null, $query = null, $limit = 100)
-    {
+    public function getEmailRecipients(
+        $relatedEntity = null,
+        $query = null,
+        Organization $organization = null,
+        $limit = 100
+    ) {
         $emails = [];
         $excludeEmails = [];
         foreach ($this->providers as $provider) {
@@ -40,7 +46,7 @@ class EmailRecipientsProvider
                 break;
             }
 
-            $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails);
+            $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails, $organization);
             $recipients = $provider->getRecipients($args);
             if (!$recipients) {
                 continue;
@@ -67,6 +73,7 @@ class EmailRecipientsProvider
                         'entityClass' => $recipient->getEntity()->getClass(),
                         'entityId' => $recipient->getEntity()->getId(),
                     ];
+                    $id['organization'] = $recipient->getEntity()->getOrganization();
                 }
 
                 return [

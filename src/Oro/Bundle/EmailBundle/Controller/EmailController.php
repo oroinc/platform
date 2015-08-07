@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
@@ -518,6 +519,11 @@ class EmailController extends Controller
                 ],
             ];
         } else {
+            $organization = $request->query->get('organization');
+            if ($organization) {
+                $organization = $this->getOrganizationRepository()->findOneByName($organization);
+            }
+
             $relatedEntity = null;
             $entityClass = $request->query->get('entityClass');
             $entityId = $request->query->get('entityId');
@@ -530,10 +536,23 @@ class EmailController extends Controller
             }
 
             $limit = $request->query->get('per_page', 100);
-            $results = $this->getEmailRecipientsProvider()->getEmailRecipients($relatedEntity, $query, $limit);
+            $results = $this->getEmailRecipientsProvider()->getEmailRecipients(
+                $relatedEntity,
+                $query,
+                $organization,
+                $limit
+            );
         }
 
         return new JsonResponse(['results' => $results]);
+    }
+
+    /**
+     * @return EntityRepository
+     */
+    protected function getOrganizationRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization');
     }
 
     /**

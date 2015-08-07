@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -106,7 +107,7 @@ class EmailRecipientsHelper
             ->getPrimaryEmailsQb($fullNameQueryPart, $args->getExcludedEmails(), $args->getQuery())
             ->setMaxResults($args->getLimit());
 
-        $primaryEmailsResult = $this->aclHelper->apply($primaryEmailsQb)->getResult();
+        $primaryEmailsResult = $this->getRestrictedResult($primaryEmailsQb, $args);
         $emails = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
 
         $limit = $args->getLimit() - count($emails);
@@ -117,7 +118,7 @@ class EmailRecipientsHelper
                 ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
                 ->setMaxResults($limit);
 
-            $secondaryEmailsResult = $this->aclHelper->apply($secondaryEmailsQb)->getResult();
+            $secondaryEmailsResult = $this->getRestrictedResult($secondaryEmailsQb, $args);
             $emails = array_merge($emails, $this->recipientsFromResult($secondaryEmailsResult, $entityClass));
         }
 
@@ -136,6 +137,23 @@ class EmailRecipientsHelper
             return !in_array($recipient->getEmail(), $args->getExcludedEmails()) &&
                 stripos($recipient->getName(), $args->getQuery()) !== false;
         });
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param EmailRecipientsProviderArgs $args
+     *
+     * @return array
+     */
+    protected function getRestrictedResult(QueryBuilder $qb, EmailRecipientsProviderArgs $args)
+    {
+        if ($args->getOrganization()) {
+            $qb
+                ->andWhere('o.id = :organization')
+                ->setParameter('organization', $args->getOrganization());
+        }
+
+        return $this->aclHelper->apply($qb)->getResult();
     }
 
     /**

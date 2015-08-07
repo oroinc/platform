@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 class EmailRecipientsProviderArgs
 {
      /** @var object|null */
@@ -16,17 +18,28 @@ class EmailRecipientsProviderArgs
     /** @var array */
     protected $excludedEmails;
 
+    /** @var Organization|null */
+    protected $organization;
+
     /**
      * @param object|null $relatedEntity
      * @param string $query
      * @param int $limit
+     * @param string[] $excludedEmails
+     * @param Organization|null $organization
      */
-    public function __construct($relatedEntity, $query, $limit, array $excludedEmails = [])
-    {
+    public function __construct(
+        $relatedEntity,
+        $query,
+        $limit,
+        array $excludedEmails = [],
+        Organization $organization = null
+    ) {
         $this->relatedEntity = $relatedEntity;
         $this->query = $query;
         $this->limit = $limit;
         $this->excludedEmails = $excludedEmails;
+        $this->organization = $organization;
     }
 
     /**
@@ -59,5 +72,13 @@ class EmailRecipientsProviderArgs
     public function getExcludedEmails()
     {
         return $this->excludedEmails;
+    }
+
+    /**
+     * @return Organization|null
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }
