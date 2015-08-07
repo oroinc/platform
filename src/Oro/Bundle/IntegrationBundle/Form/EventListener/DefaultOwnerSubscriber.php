@@ -64,13 +64,12 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
     public function preSet(FormEvent $event)
     {
         $data = $event->getData();
-        $form = $event->getForm();
 
         if ($data === null) {
             return;
         }
 
-        $this->addDefaultOwnerField($form, $data->getType());
+        $this->setDefaultOwnerField($event->getForm(), $data->getType());
     }
 
     /**
@@ -79,13 +78,12 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
     public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
-        $form = $event->getForm();
 
         if ($data === null) {
             return;
         }
 
-        $this->addDefaultOwnerField($form, $data['type']);
+        $this->setDefaultOwnerField($event->getForm(), $data['type']);
     }
 
     /**
@@ -94,10 +92,8 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
      * @param FormInterface $form
      * @param string        $type
      */
-    protected function addDefaultOwnerField(
-        FormInterface $form,
-        $type = null
-    ) {
+    protected function setDefaultOwnerField(FormInterface $form, $type = null)
+    {
         $type = $this->typesRegistry->getDefaultOwnerType($type);
 
         if ($type === DefaultOwnerTypeAwareInterface::BUSINESS_UNIT) {
