@@ -17,7 +17,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
     /** @var SecurityFacade */
     protected $securityFacade;
     /** @var TypesRegistry */
-    private $typesRegistry;
+    protected $typesRegistry;
 
     /**
      * @param SecurityFacade $securityFacade
@@ -53,8 +53,7 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
 
         if ($data && !$data->getId() && !$data->getDefaultUserOwner() || null === $data) {
             if ($form->has('defaultUserOwner')) {
-                $form->get('defaultUserOwner')
-                    ->setData($this->securityFacade->getLoggedUser());
+                $form->get('defaultUserOwner')->setData($this->securityFacade->getLoggedUser());
             }
         }
     }
@@ -68,8 +67,6 @@ class DefaultOwnerSubscriber implements EventSubscriberInterface
         $form = $event->getForm();
 
         if ($data === null) {
-            $this->addDefaultOwnerField($form);
-
             return;
         }
 
