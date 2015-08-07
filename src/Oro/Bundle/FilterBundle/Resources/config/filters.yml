@@ -13,6 +13,7 @@ parameters:
     oro_filter.date_range_filter.class:           Oro\Bundle\FilterBundle\Filter\DateRangeFilter
     oro_filter.datetime_range_filter.class:       Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
     oro_filter.many_to_many_filter.class:         Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
+    oro_filter.dictionary_filter.class:           Oro\Bundle\FilterBundle\Filter\DictionaryFilter
 
 services:
     oro_filter.filter_utility:
@@ -120,3 +121,11 @@ services:
             - @oro_filter.filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: many-to-many }
+
+    oro_filter.dictionary_filter:
+        class: %oro_filter.dictionary_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: dictionary }
