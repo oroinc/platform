@@ -287,18 +287,14 @@ class ConfigManager
      * @param string|null $className
      * @param bool $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as mode="hidden"
-     * @param bool $regenerateCaches Regenerate local caches before getting results
      * @return array
      */
-    public function getIds($scope, $className = null, $withHidden = false, $regenerateCaches = false)
+    public function getIds($scope, $className = null, $withHidden = false)
     {
         if (!$this->modelManager->checkDatabase()) {
             return [];
         }
 
-        if ($regenerateCaches) {
-            $this->modelManager->clearCache();
-        }
         $models = $this->modelManager->getModels($className, $withHidden);
 
         return array_map(
@@ -402,6 +398,14 @@ class ConfigManager
 
         $this->modelManager->clearCache();
         $this->getEntityManager()->clear();
+    }
+
+    /**
+     * Clears entity config model cache.
+     */
+    public function clearModelCache()
+    {
+        $this->modelManager->clearCache();
     }
 
     public function flush()
