@@ -3,41 +3,32 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
-
-use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
-
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-
+use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -82,13 +73,6 @@ class ConfigManager
      *
      * @var ConfigInterface[]
      */
-    protected $localCache;
-
-    /**
-     * key = a string returned by $this->buildConfigKey
-     *
-     * @var ConfigInterface[]
-     */
     protected $persistConfigs;
 
     /**
@@ -126,7 +110,6 @@ class ConfigManager
         $this->eventDispatcher = $eventDispatcher;
 
         $this->providerBag      = $providerBagLink;
-        $this->localCache       = [];
         $this->persistConfigs   = [];
         $this->originalConfigs  = [];
         $this->configChangeSets = [];
@@ -220,7 +203,7 @@ class ConfigManager
                 : $this->modelManager->findEntityModel($className);
             $result = (null !== $model);
 
-            $this->cache->setConfigurable($result, $className, $fieldName);
+            $this->cache->saveConfigurable($result, $className, $fieldName);
         }
 
         return $result;
@@ -234,44 +217,39 @@ class ConfigManager
      */
     public function getConfig(ConfigIdInterface $configId)
     {
-        if ($configId instanceof EntityConfigId && !$configId->getClassName()) {
-            $config = new Config($configId);
-            $config->setValues(
+        $className = $configId->getClassName();
+        if ($configId instanceof EntityConfigId && !$className) {
+            return new Config(
+                $configId,
                 $this->getEntityDefaultValues($this->getProvider($configId->getScope()))
             );
-
-            return $config;
         }
 
-        $configKey = $this->buildConfigKey($configId);
-        if (isset($this->localCache[$configKey])) {
-            return $this->localCache[$configKey];
-        }
-
-        if (!$this->modelManager->checkDatabase()) {
-            throw $this->createDatabaseNotSyncedException();
-        }
-
-        if (!$this->hasConfig($configId->getClassName())) {
-            throw new RuntimeException(sprintf('Entity "%s" is not configurable', $configId->getClassName()));
-        }
-
-        $config = $this->cache->loadConfigFromCache($configId);
+        $config = $this->cache->getConfig($configId);
         if (!$config) {
-            $model = $configId instanceof FieldConfigId
-                ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
-                : $this->modelManager->getEntityModel($configId->getClassName());
+            if (!$this->modelManager->checkDatabase()) {
+                throw $this->createDatabaseNotSyncedException();
+            }
 
-            $config = new Config($configId);
-            $config->setValues($model->toArray($configId->getScope()));
+            $isConfigurableEntity = $this->cache->getConfigurable($className);
+            if (null === $isConfigurableEntity) {
+                $isConfigurableEntity = (null !== $this->modelManager->findEntityModel($className));
+                $this->cache->saveConfigurable($isConfigurableEntity, $className);
+            }
+            if (!$isConfigurableEntity) {
+                throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
+            }
 
-            $this->cache->putConfigInCache($config);
+            $config = new Config(
+                $configId,
+                $this->getModelByConfigId($configId)->toArray($configId->getScope())
+            );
+
+            // put to a cache
+            $this->cache->saveConfig($config);
+            // for calculate change set
+            $this->originalConfigs[$this->buildConfigKey($configId)] = clone $config;
         }
-
-        // local cache
-        $this->localCache[$configKey] = $config;
-        // for calculate change set
-        $this->originalConfigs[$configKey] = clone $config;
 
         return $config;
     }
@@ -342,32 +320,21 @@ class ConfigManager
     public function getId($scope, $className, $fieldName = null)
     {
         if ($fieldName) {
-            // at first try to find a model in the local cache
             $configId  = new FieldConfigId($scope, $className, $fieldName);
-            $configKey = $this->buildConfigKey($configId);
-            if (isset($this->localCache[$configKey])) {
-                // if found, use field config id from the local cache
-                $configId = $this->localCache[$configKey]->getId();
-            } else {
-                // next try to find a model in the cache
-                $config = $this->cache->loadConfigFromCache($configId);
-                if ($config) {
-                    // if found, use field config id from the cache
-                    $configId = $config->getId();
-                    $this->localCache[$configKey] = $config;
-                } else {
-                    // if a cached model was not found use the model manager to get field config id
-                    if (!$this->modelManager->checkDatabase()) {
-                        throw $this->createDatabaseNotSyncedException();
-                    }
-                    $fieldModel = $this->modelManager->getFieldModel($className, $fieldName);
-                    $configId   = new FieldConfigId(
-                        $scope,
-                        $className,
-                        $fieldModel->getFieldName(),
-                        $fieldModel->getType()
-                    );
+            // try to find a model in the cache
+            $config = $this->cache->getConfig($configId);
+            if (!$config) {
+                // if a cached model was not found use the model manager to get field config id
+                if (!$this->modelManager->checkDatabase()) {
+                    throw $this->createDatabaseNotSyncedException();
                 }
+                $fieldModel = $this->modelManager->getFieldModel($className, $fieldName);
+                $configId   = new FieldConfigId(
+                    $scope,
+                    $className,
+                    $fieldModel->getFieldName(),
+                    $fieldModel->getType()
+                );
             }
 
             return $configId;
@@ -384,11 +351,9 @@ class ConfigManager
     public function clearCache(ConfigIdInterface $configId = null)
     {
         if ($configId) {
-            $this->cache->removeConfigFromCache($configId);
-            unset($this->localCache[$this->buildConfigKey($configId)]);
+            $this->cache->deleteConfig($configId);
         } else {
-            $this->cache->removeAll();
-            $this->localCache = [];
+            $this->cache->deleteAllConfigs();
         }
     }
 
@@ -398,7 +363,7 @@ class ConfigManager
     public function clearConfigurableCache()
     {
         $this->modelManager->clearCheckDatabase();
-        $this->cache->removeAllConfigurable();
+        $this->cache->deleteAllConfigurable();
     }
 
     /**
@@ -459,7 +424,7 @@ class ConfigManager
         );
 
         if (!empty($models)) {
-            $this->cache->removeAllConfigurable();
+            $this->cache->deleteAllConfigurable();
         }
 
         $this->persistConfigs   = [];
@@ -478,14 +443,12 @@ class ConfigManager
 
             $configId = $config->getId();
             $configKey = $configId instanceof FieldConfigId
-                ? sprintf('%s_%s', $configId->getClassName(), $configId->getFieldName())
+                ? $configId->getClassName() . '_' . $configId->getFieldName()
                 : $configId->getClassName();
             if (isset($models[$configKey])) {
                 $model = $models[$configKey];
             } else {
-                $model = $configId instanceof FieldConfigId
-                    ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
-                    : $this->modelManager->getEntityModel($configId->getClassName());
+                $model = $this->getModelByConfigId($configId);
 
                 $models[$configKey] = $model;
             }
@@ -495,10 +458,10 @@ class ConfigManager
                 ->getIndexedValues($config->getId());
             $model->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
 
-            $this->cache->removeConfigFromCache($config->getId());
+            $this->cache->deleteConfig($config->getId());
         }
 
-        if (count($this->persistConfigs) != count($this->configChangeSets)) {
+        if (count($this->persistConfigs) !== count($this->configChangeSets)) {
             $this->prepareFlush($models);
         }
     }
@@ -639,17 +602,17 @@ class ConfigManager
                 $entityModel   = $this->modelManager->createEntityModel($className, $newEntityMode);
                 foreach ($this->getProviders() as $provider) {
                     $configId = new EntityConfigId($provider->getScope(), $className);
-                    $config   = $this->createConfig(
+                    $config   = new Config(
                         $configId,
                         $this->getEntityDefaultValues($provider, $className, $metadata)
                     );
-
-                    $configKey = $this->buildConfigKey($config->getId());
+                    $this->merge($config);
 
                     // local cache
-                    $this->localCache[$configKey] = $config;
+                    $this->cache->saveConfig($config, true);
+                    $this->cache->saveConfigurable(true, $className, null, true);
                     // for calculate change set
-                    $this->originalConfigs[$configKey] = clone $config;
+                    $this->originalConfigs[$this->buildConfigKey($configId)] = clone $config;
                 }
 
                 $this->eventDispatcher->dispatch(
@@ -681,17 +644,17 @@ class ConfigManager
             $metadata   = $this->getFieldMetadata($className, $fieldName);
             foreach ($this->getProviders() as $provider) {
                 $configId = new FieldConfigId($provider->getScope(), $className, $fieldName, $fieldType);
-                $config   = $this->createConfig(
+                $config   = new Config(
                     $configId,
                     $this->getFieldDefaultValues($provider, $className, $fieldName, $fieldType, $metadata)
                 );
-
-                $configKey = $this->buildConfigKey($config->getId());
+                $this->merge($config);
 
                 // local cache
-                $this->localCache[$configKey] = $config;
+                $this->cache->saveConfig($config, true);
+                $this->cache->saveConfigurable(true, $className, $fieldName, true);
                 // for calculate change set
-                $this->originalConfigs[$configKey] = clone $config;
+                $this->originalConfigs[$this->buildConfigKey($configId)] = clone $config;
             }
 
             $this->eventDispatcher->dispatch(
@@ -786,8 +749,7 @@ class ConfigManager
                 Events::RENAME_FIELD,
                 new RenameFieldEvent($className, $fieldName, $newFieldName, $this)
             );
-            $providers = $this->getProviders();
-            foreach ($providers as $provider) {
+            foreach ($this->getProviders() as $provider) {
                 /** @var FieldConfigId $newConfigId */
                 $newConfigId = $this->getId($provider->getScope(), $className, $newFieldName);
                 $newConfigKey = $this->buildConfigKey($newConfigId);
@@ -797,14 +759,14 @@ class ConfigManager
                     $fieldName,
                     $newConfigId->getFieldType()
                 );
-                $configKey = $this->buildConfigKey($configId);
-                if (isset($this->localCache[$configKey])) {
-                    $this->localCache[$newConfigKey] = $this->changeConfigFieldName(
-                        $this->localCache[$configKey],
-                        $newFieldName
-                    );
-                    unset($this->localCache[$configKey]);
+
+                $cachedConfig = $this->cache->getConfig($configId, true);
+                if ($cachedConfig) {
+                    $this->cache->saveConfig($this->changeConfigFieldName($cachedConfig, $newFieldName), true);
+                    $this->cache->deleteConfig($configId, true);
                 }
+
+                $configKey = $this->buildConfigKey($configId);
                 if (isset($this->persistConfigs[$configKey])) {
                     $this->persistConfigs[$newConfigKey] = $this->changeConfigFieldName(
                         $this->persistConfigs[$configKey],
@@ -889,6 +851,20 @@ class ConfigManager
     }
 
     /**
+     * Gets a model for the given config id
+     *
+     * @param ConfigIdInterface $configId
+     *
+     * @return EntityConfigModel|FieldConfigModel
+     */
+    protected function getModelByConfigId(ConfigIdInterface $configId)
+    {
+        return $configId instanceof FieldConfigId
+            ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
+            : $this->modelManager->getEntityModel($configId->getClassName());
+    }
+
+    /**
      * In case of FieldConfigId replaces OLD field name with given NEW one
      *
      * @param ConfigInterface $config
@@ -905,34 +881,9 @@ class ConfigManager
                 $newFieldName,
                 $configId->getFieldType()
             );
-            $newConfig = new Config($newConfigId);
-            $newConfig->setValues($config->all());
-            $config = $newConfig;
+
+            $config = new Config($newConfigId, $config->all());
         }
-
-        return $config;
-    }
-
-    /**
-     * Creates an instance if Config class which stores configuration data for an object
-     * which is represented by the given id.
-     * The returned object is initialized with data specified $values argument.
-     *
-     * @param  ConfigIdInterface $configId
-     * @param  array             $values An associative array contains configuration properties
-     *                                   key = property name
-     *                                   value = property value
-     * @return Config
-     */
-    protected function createConfig(ConfigIdInterface $configId, array $values)
-    {
-        $config = new Config($configId);
-
-        foreach ($values as $key => $value) {
-            $config->set($key, $value);
-        }
-
-        $this->merge($config);
 
         return $config;
     }
@@ -1052,8 +1003,8 @@ class ConfigManager
     protected function buildConfigKey(ConfigIdInterface $configId)
     {
         return $configId instanceof FieldConfigId
-            ? sprintf('%s_%s_%s', $configId->getScope(), $configId->getClassName(), $configId->getFieldName())
-            : sprintf('%s_%s', $configId->getScope(), $configId->getClassName());
+            ? $configId->getScope() . '_' . $configId->getClassName() . '_' . $configId->getFieldName()
+            : $configId->getScope() . '_' . $configId->getClassName();
     }
 
     /**

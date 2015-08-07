@@ -217,7 +217,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setFlushExpectations($em, $models)
     {
         $this->configCache->expects($this->once())
-            ->method('removeAllConfigurable');
+            ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())
             ->method('log');
 
