@@ -3,9 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 
 class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 {
+    protected $emailRecipientsHelper;
+
     protected $emailRecipientsProvider;
 
     public function setUp()
@@ -17,7 +20,19 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
                 return $id;
             }));
 
-        $this->emailRecipientsProvider = new EmailRecipientsProvider($translator);
+        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailRecipientsHelper->expects($this->any())
+            ->method('createRecipientData')
+            ->will($this->returnCallback(function (Recipient $recipient) {
+                return [
+                    'id'   => $recipient->getName(),
+                    'text' => $recipient->getName(),
+                ];
+            }));
+
+        $this->emailRecipientsProvider = new EmailRecipientsProvider($translator, $this->emailRecipientsHelper);
     }
 
     public function testGetEmailRecipientsShouldReturnEmptyArrayIfThereAreNoProviders()
@@ -32,7 +47,7 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->emailRecipientsProvider->setProviders($providers);
 
-        $actualRecipients = $this->emailRecipientsProvider->getEmailRecipients(null, null, $limit);
+        $actualRecipients = $this->emailRecipientsProvider->getEmailRecipients(null, null, null, $limit);
         $this->assertEquals($expectedRecipients, $actualRecipients);
     }
 
@@ -42,8 +57,8 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     $this->createProvider('section1', [
-                        'recipient@example.com'  => 'Recipient <recipient@example.com>',
-                        'recipient2@example.com' => 'Recipient2 <recipient2@example.com>',
+                        new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
+                        new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                     ]),
                 ],
                 [
@@ -65,11 +80,11 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     $this->createProvider('section1', [
-                        'recipient@example.com'  => 'Recipient <recipient@example.com>',
-                        'recipient2@example.com' => 'Recipient2 <recipient2@example.com>',
+                        new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
+                        new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                     ]),
                     $this->createProvider('section2', [
-                        'recipient3@example.com'  => 'Recipient3 <recipient3@example.com>',
+                        new Recipient('recipient3@example.com', 'Recipient3 <recipient3@example.com>'),
                     ]),
                 ],
                 [
@@ -100,11 +115,11 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     $this->createProvider('section1', [
-                        'recipient@example.com'  => 'Recipient <recipient@example.com>',
-                        'recipient2@example.com' => 'Recipient2 <recipient2@example.com>',
+                        new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
+                        new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                     ]),
                     $this->createProvider('section2', [
-                        'recipient3@example.com'  => 'Recipient3 <recipient3@example.com>',
+                        new Recipient('recipient3@example.com', 'Recipient3 <recipient3@example.com>'),
                     ]),
                 ],
                 [

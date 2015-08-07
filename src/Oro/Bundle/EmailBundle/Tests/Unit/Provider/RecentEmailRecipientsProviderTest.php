@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -12,6 +13,8 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
     protected $aclHelper;
     protected $relatedEmailsProvider;
     protected $registry;
+    protected $emailOwnerProvider;
+    protected $emailRecipientsHelper;
 
     private $emailRecipientsProvider;
 
@@ -29,7 +32,22 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->will($this->returnValue($em));
+
+        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -37,7 +55,9 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             $this->securityFacade,
             $this->relatedEmailsProvider,
             $this->aclHelper,
-            $this->registry
+            $this->registry,
+            $this->emailOwnerProvider,
+            $this->emailRecipientsHelper
         );
     }
 
@@ -112,6 +132,10 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:EmailRecipient')
             ->will($this->returnValue($emailRecipientRepository));
 
+        $this->emailRecipientsHelper->expects($this->any())
+            ->method('isObjectAllowed')
+            ->will($this->returnValue(true));
+
         $this->assertEquals($expectedResult, $this->emailRecipientsProvider->getRecipients($args));
     }
 
@@ -132,9 +156,9 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 [
-                    'recent1@example.com' => 'Recent1 <recent1@example.com>',
-                    'recent2@example.com' => 'Recent2 <recent2@example.com>',
-                ],
+                    new Recipient('recent1@example.com', 'Recent1 <recent1@example.com>'),
+                    new Recipient('recent2@example.com', 'Recent2 <recent2@example.com>'),
+                ]
             ],
         ];
     }

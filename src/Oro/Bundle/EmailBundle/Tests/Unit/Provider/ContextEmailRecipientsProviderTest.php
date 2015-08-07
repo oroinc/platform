@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -41,7 +42,7 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
         array $expectedRecipients
     ) {
         $this->relatedEmailsProvider->expects($this->once())
-            ->method('getEmails')
+            ->method('getRecipients')
             ->will($this->returnValue($relatedEmails));
 
         $this->assertEquals($expectedRecipients, $this->emailRecipientsProvider->getRecipients($args));
@@ -53,26 +54,26 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             [
                 new EmailRecipientsProviderArgs(new User(), 're', 100),
                 [
-                    'related@example.com' => 'Related <related@example.com>',
+                    new Recipient('related@example.com', 'Related <related@example.com>'),
                 ],
                 [
-                    'related@example.com' => 'Related <related@example.com>',
+                    new Recipient('related@example.com', 'Related <related@example.com>'),
                 ],
             ],
             [
                 new EmailRecipientsProviderArgs(new User(), 're', 100, ['related@example.com']),
                 [
-                    'related@example.com' => 'Related <related@example.com>',
-                    'related2@example.com' => 'Related2 <related2@example.com>',
+                    'related@example.com' => new Recipient('related@example.com', 'Related <related@example.com>'),
+                    'related2@example.com' => new Recipient('related2@example.com', 'Related2 <related2@example.com>'),
                 ],
                 [
-                    'related2@example.com' => 'Related2 <related2@example.com>',
+                    'related2@example.com' => new Recipient('related2@example.com', 'Related2 <related2@example.com>'),
                 ],
             ],
             [
                 new EmailRecipientsProviderArgs(new User(), 'res', 100),
                 [
-                    'related@example.com' => 'Related <related@example.com>',
+                    new Recipient('related@example.com', 'Related <related@example.com>'),
                 ],
                 [],
             ],

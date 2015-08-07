@@ -3,12 +3,19 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
+use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected $aclHelper;
+    protected $dqlNameFormatter;
     protected $nameFormatter;
+    protected $configManager;
+    protected $translator;
+    protected $emailOwnerProvider;
+    protected $registry;
+    protected $addressHelper;
 
     protected $emailRecipientsHelper;
 
@@ -18,11 +25,44 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
+        $this->dqlNameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->emailRecipientsHelper = new EmailRecipientsHelper($this->aclHelper, $this->nameFormatter);
+        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->addressHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailAddressHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->emailRecipientsHelper = new EmailRecipientsHelper(
+            $this->aclHelper,
+            $this->dqlNameFormatter,
+            $this->nameFormatter,
+            $this->configManager,
+            $this->translator,
+            $this->emailOwnerProvider,
+            $this->registry,
+            $this->addressHelper
+        );
     }
 
     /**
@@ -30,7 +70,7 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRecipients(EmailRecipientsProviderArgs $args, array $resultEmails)
     {
-        $this->nameFormatter->expects($this->once())
+        $this->dqlNameFormatter->expects($this->once())
             ->method('getFormattedNameDQL')
             ->with('u', 'Oro\Bundle\UserBundle\Entity\User')
             ->will($this->returnValue('u.name'));
@@ -73,6 +113,8 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
                     [
                         'name'  => 'Recipient <recipient@example.com>',
                         'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
                     ],
                 ],
             ],
@@ -93,27 +135,27 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             [
                 new EmailRecipientsProviderArgs(null, 're', 100),
                 [
-                    'recipient@example.com' => 'Recipient <recipient@example.com>',
+                    new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
                 ],
                 [
-                    'recipient@example.com' => 'Recipient <recipient@example.com>',
+                    new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
                 ],
             ],
             [
                 new EmailRecipientsProviderArgs(null, 'res', 100),
                 [
-                    'recipient@example.com' => 'Recipient <recipient@example.com>',
+                    new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
                 ],
                 [],
             ],
             [
                 new EmailRecipientsProviderArgs(null, 're', 100, ['recipient@example.com']),
                 [
-                    'recipient@example.com' => 'Recipient <recipient@example.com>',
-                    'recipient2@example.com' => 'Recipient2 <recipient2@example.com>',
+                    new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
+                    new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
                 ],
                 [
-                    'recipient2@example.com' => 'Recipient2 <recipient2@example.com>',
+                    new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                 ],
             ],
         ];
