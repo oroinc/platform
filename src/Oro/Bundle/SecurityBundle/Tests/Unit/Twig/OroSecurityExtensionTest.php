@@ -14,7 +14,22 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $manager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $aclCache;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $securityFacade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $nameFormatter;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -23,14 +38,29 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->aclCache = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AclCacheInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twigExtension = new OroSecurityExtension($this->securityFacade, $this->translator);
+        $this->twigExtension = new OroSecurityExtension(
+            $this->manager,
+            $this->aclCache,
+            $this->securityFacade,
+            $this->nameFormatter,
+            $this->translator
+        );
     }
 
     protected function tearDown()
@@ -49,6 +79,8 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedFunctions = array(
             'resource_granted' => 'checkResourceIsGranted',
             'format_share_scopes' => 'formatShareScopes',
+            'oro_share_count' => 'getShareCount',
+            'oro_shared_with_name' => 'getSharedWithName',
         );
 
         $actualFunctions = $this->twigExtension->getFunctions();

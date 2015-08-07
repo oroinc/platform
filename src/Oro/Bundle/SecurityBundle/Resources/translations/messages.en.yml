@@ -29,5 +29,5 @@ oro:
         action:
             share: Share
             shared: Record shared
-        status:
-            shared: Shared
+            shared_with: Shared with {{ name }}
+            shared_with_plural: Shared with {{ name }} and +{{ count }} more

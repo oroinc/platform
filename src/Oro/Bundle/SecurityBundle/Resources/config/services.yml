@@ -370,7 +370,10 @@ services:
     oro_security.twig.security_extension:
         class: %oro_security.twig.security_extension%
         arguments:
+            - @doctrine.orm.entity_manager
+            - @security.acl.cache.doctrine
             - @oro_security.security_facade
+            - @oro_locale.formatter.name
             - @translator
         tags:
             - { name: twig.extension }
@@ -635,7 +638,6 @@ services:
         arguments:
             - @oro_security.security_facade
             - @oro_entity_config.provider.security
-            - @doctrine.orm.entity_manager
 
     oro_security.ace.query.manager:
         class: %oro_security.ace.query.manager.class%
