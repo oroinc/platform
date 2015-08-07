@@ -27,6 +27,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "entity"={
  *              "icon"="icon-align-justify"
  *          },
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
  *          "note"={
  *              "immutable"=true
  *          },
@@ -35,6 +40,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
  *          }
  *      }
  * )
