@@ -902,25 +902,23 @@ class ConfigManager
      */
     protected function getEntityDefaultValues(ConfigProvider $provider, $className = null, $metadata = null)
     {
-        $defaultValues = [];
-
-        $scope = $provider->getScope();
+        $scope          = $provider->getScope();
+        $propertyConfig = $provider->getPropertyConfig();
 
         // try to get default values from an annotation
         if ($metadata && isset($metadata->defaultValues[$scope])) {
-            $defaultValues = $metadata->defaultValues[$scope];
+            // combine them with default values from a config file
+            $defaultValues = array_merge(
+                $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY),
+                $metadata->defaultValues[$scope]
+            );
+        } else {
+            $defaultValues = $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY);
         }
-
-        // combine them with default values from a config file
-        $defaultValues = array_merge(
-            $provider->getPropertyConfig()->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY),
-            $defaultValues
-        );
 
         // process translatable values
         if ($className) {
-            $translatablePropertyNames = $provider->getPropertyConfig()
-                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
+            $translatablePropertyNames = $propertyConfig->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
             foreach ($translatablePropertyNames as $propertyName) {
                 if (empty($defaultValues[$propertyName])) {
                     $defaultValues[$propertyName] =
@@ -949,24 +947,22 @@ class ConfigManager
         $fieldType,
         $metadata = null
     ) {
-        $defaultValues = [];
-
-        $scope = $provider->getScope();
+        $scope          = $provider->getScope();
+        $propertyConfig = $provider->getPropertyConfig();
 
         // try to get default values from an annotation
         if ($metadata && isset($metadata->defaultValues[$scope])) {
-            $defaultValues = $metadata->defaultValues[$scope];
+            // combine them with default values from a config file
+            $defaultValues = array_merge(
+                $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType),
+                $metadata->defaultValues[$scope]
+            );
+        } else {
+            $defaultValues = $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType);
         }
 
-        // combine them with default values from a config file
-        $defaultValues = array_merge(
-            $provider->getPropertyConfig()->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType),
-            $defaultValues
-        );
-
         // process translatable values
-        $translatablePropertyNames = $provider->getPropertyConfig()
-            ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
+        $translatablePropertyNames = $propertyConfig->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {
             if (empty($defaultValues[$propertyName])) {
                 $defaultValues[$propertyName] =
