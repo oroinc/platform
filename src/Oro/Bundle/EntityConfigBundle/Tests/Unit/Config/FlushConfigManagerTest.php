@@ -219,7 +219,9 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())
-            ->method('log');
+            ->method('buildLogEntry')
+            ->with($this->identicalTo($this->configManager))
+            ->willReturn(null);
 
         $em->expects($this->exactly(count($models)))
             ->method('persist')

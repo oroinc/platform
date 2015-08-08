@@ -413,14 +413,19 @@ class ConfigManager
         $models = [];
         $this->prepareFlush($models);
 
-        $this->auditManager->log();
+        $em = $this->getEntityManager();
+
+        $logEntry = $this->auditManager->buildLogEntry($this);
+        if (null !== $logEntry) {
+            $em->persist($logEntry);
+        }
 
         foreach ($models as $model) {
-            $this->getEntityManager()->persist($model);
+            $em->persist($model);
         }
 
         // @todo: need investigation if we can call this flush only if !empty($models)
-        $this->getEntityManager()->flush();
+        $em->flush();
 
         $this->eventDispatcher->dispatch(
             Events::POST_FLUSH_CONFIG,
@@ -457,12 +462,12 @@ class ConfigManager
                 $models[$configKey] = $model;
             }
 
-            $indexedValues = $this->getProvider($config->getId()->getScope())
+            $indexedValues = $this->getProvider($configId->getScope())
                 ->getPropertyConfig()
-                ->getIndexedValues($config->getId());
-            $model->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
+                ->getIndexedValues($configId);
+            $model->fromArray($configId->getScope(), $config->all(), $indexedValues);
 
-            $this->cache->deleteConfig($config->getId());
+            $this->cache->deleteConfig($configId);
         }
 
         if (count($this->persistConfigs) !== count($this->configChangeSets)) {
@@ -477,29 +482,30 @@ class ConfigManager
      */
     public function calculateConfigChangeSet(ConfigInterface $config)
     {
-        $originConfigValue = [];
-        $configKey         = $this->buildConfigKey($config->getId());
-        if (isset($this->originalConfigs[$configKey])) {
-            $originConfigValue = $this->originalConfigs[$configKey]->all();
-        }
+        $configKey = $this->buildConfigKey($config->getId());
 
-        foreach ($config->all() as $key => $value) {
-            if (!isset($originConfigValue[$key])) {
-                $originConfigValue[$key] = null;
+        $originConfigValues = isset($this->originalConfigs[$configKey])
+            ? $this->originalConfigs[$configKey]->all()
+            : [];
+        $configValues       = $config->all();
+
+        foreach ($configValues as $key => $value) {
+            if (!isset($originConfigValues[$key])) {
+                $originConfigValues[$key] = null;
             }
         }
 
         $diffNew = array_udiff_assoc(
-            $config->all(),
-            $originConfigValue,
+            $configValues,
+            $originConfigValues,
             function ($a, $b) {
                 return ($a == $b) ? 0 : 1;
             }
         );
 
         $diffOld = array_udiff_assoc(
-            $originConfigValue,
-            $config->all(),
+            $originConfigValues,
+            $configValues,
             function ($a, $b) {
                 return ($a == $b) ? 0 : 1;
             }
@@ -511,14 +517,12 @@ class ConfigManager
             $diff[$key] = [$oldValue, $value];
         }
 
-
-        if (!isset($this->configChangeSets[$configKey])) {
+        if (!empty($diff)) {
+            $this->configChangeSets[$configKey] = isset($this->configChangeSets[$configKey])
+                ? array_merge($this->configChangeSets[$configKey], $diff)
+                : $diff;
+        } elseif (!isset($this->configChangeSets[$configKey])) {
             $this->configChangeSets[$configKey] = [];
-        }
-
-        if (count($diff)) {
-            $changeSet                          = array_merge($this->configChangeSets[$configKey], $diff);
-            $this->configChangeSets[$configKey] = $changeSet;
         }
     }
 
@@ -532,7 +536,7 @@ class ConfigManager
 
     /**
      * @param ConfigInterface $config
-     * @return array
+     * @return array [old_value, new_value]
      */
     public function getConfigChangeSet(ConfigInterface $config)
     {
