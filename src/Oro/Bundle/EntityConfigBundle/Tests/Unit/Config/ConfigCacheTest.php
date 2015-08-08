@@ -5,17 +5,23 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
     const SCOPE = 'testScope';
+    const ENTITY_CLASS = 'Test\Entity';
+    const FIELD_NAME = 'testField';
+    const FIELD_TYPE = 'integer';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $cache;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $modelCache;
+
+    /** @var ConfigCache */
+    private $configCache;
 
     protected function setUp()
     {
@@ -28,151 +34,317 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(['fetch', 'save', 'delete', 'deleteAll', 'flushAll'])
             ->getMockForAbstractClass();
+
+        $this->configCache = new ConfigCache($this->cache, $this->modelCache);
     }
 
     protected function tearDown()
     {
-        unset($this->cache);
-        unset($this->modelCache);
+        unset($this->cache, $this->modelCache, $this->configCache);
     }
 
-    public function testSaveConfig()
+    public function testSaveEntityConfig()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $config      = new Config($configId);
-        $configCache = $this->getConfigCache();
+        $configId     = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $configValues = ['key1' => 'val1'];
+        $config       = new Config($configId, $configValues);
+        $cacheKey     = self::ENTITY_CLASS;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
+            ->with($cacheKey)
             ->willReturn(false);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(self::ENTITY_CLASS, [self::SCOPE => $config])
+            ->with($cacheKey, [self::SCOPE => $configValues])
             ->willReturn(true);
 
-        $this->assertTrue($configCache->saveConfig($config));
+        $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $configCache->getConfig($configId));
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
     }
 
-    public function testSaveConfigLocalOnly()
+    public function testSaveFieldConfig()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $config      = new Config($configId);
-        $configCache = $this->getConfigCache();
+        $configId     = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $configValues = ['key1' => 'val1'];
+        $config       = new Config($configId, $configValues);
+        $cacheKey     = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
+            ->with($cacheKey)
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                $cacheKey,
+                [
+                    ConfigCache::VALUES_KEY     => [self::SCOPE => $configValues],
+                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
+                ]
+            )
+            ->willReturn(true);
+
+        $this->assertTrue($this->configCache->saveConfig($config));
+        // test local cache
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+    }
+
+    public function testSaveEntityConfigLocalOnly()
+    {
+        $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $config   = new Config($configId);
+        $cacheKey = self::ENTITY_CLASS;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
             ->willReturn(false);
         $this->cache->expects($this->never())
             ->method('save');
 
-        $this->assertTrue($configCache->saveConfig($config, true));
+        $this->assertTrue($this->configCache->saveConfig($config, true));
         // test local cache
-        $this->assertEquals($config, $configCache->getConfig($configId));
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
     }
 
-    public function testSaveConfigWhenAnotherScopeIsAlreadyCached()
+    public function testSaveFieldConfigLocalOnly()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $config      = new Config($configId);
-        $otherConfig = new Config(new EntityConfigId('other_scope', self::ENTITY_CLASS));
-        $configCache = $this->getConfigCache();
+        $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $config   = new Config($configId);
+        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(['other_scope' => $otherConfig]);
+            ->with($cacheKey)
+            ->willReturn(false);
+        $this->cache->expects($this->never())
+            ->method('save');
+
+        $this->assertTrue($this->configCache->saveConfig($config, true));
+        // test local cache
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+    }
+
+    public function testSaveEntityConfigWhenAnotherScopeIsAlreadyCached()
+    {
+        $configId            = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $configValues        = ['key1' => 'val1'];
+        $config              = new Config($configId, $configValues);
+        $anotherConfigId     = new EntityConfigId('another', self::ENTITY_CLASS);
+        $anotherConfigValues = ['key2' => 'val2'];
+        $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
+        $cacheKey            = self::ENTITY_CLASS;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
+            ->willReturn(['another' => $anotherConfigValues]);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(self::ENTITY_CLASS, ['other_scope' => $otherConfig, self::SCOPE => $config])
+            ->with($cacheKey, ['another' => $anotherConfigValues, self::SCOPE => $configValues])
             ->willReturn(true);
 
-        $this->assertTrue($configCache->saveConfig($config));
+        $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $configCache->getConfig($configId));
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
     }
 
-    public function testGetConfig()
+    public function testSaveFieldConfigWhenAnotherScopeIsAlreadyCached()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $config      = new Config($configId);
-        $configCache = $this->getConfigCache();
+        $configId            = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $configValues        = ['key1' => 'val1'];
+        $config              = new Config($configId, $configValues);
+        $anotherConfigId     = new FieldConfigId('another', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $anotherConfigValues = ['key2' => 'val2'];
+        $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
+        $cacheKey            = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn([self::SCOPE => $config]);
+            ->with($cacheKey)
+            ->willReturn(
+                [
+                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues],
+                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
+                ]
+            );
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                $cacheKey,
+                [
+                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues, self::SCOPE => $configValues],
+                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
+                ]
+            )
+            ->willReturn(true);
 
-        $this->assertEquals($config, $configCache->getConfig($configId));
+        $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $configCache->getConfig($configId));
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
     }
 
-    public function testGetConfigNotCached()
+    public function testGetEntityConfig()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $configCache = $this->getConfigCache();
+        $configId     = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $configValues = ['key1' => 'val1'];
+        $config       = new Config($configId, $configValues);
+        $cacheKey     = self::ENTITY_CLASS;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
+            ->with($cacheKey)
+            ->willReturn([self::SCOPE => $configValues]);
+
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        // test local cache
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+    }
+
+    public function testGetFieldConfig()
+    {
+        $configId     = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME);
+        $configValues = ['key1' => 'val1'];
+        $config       = new Config(
+            new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE),
+            $configValues
+        );
+        $cacheKey     = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
+            ->willReturn(
+                [
+                    ConfigCache::VALUES_KEY     => [self::SCOPE => $configValues],
+                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
+                ]
+            );
+
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        // test local cache
+        $this->assertEquals($config, $this->configCache->getConfig($configId));
+    }
+
+    public function testGetEntityConfigNotCached()
+    {
+        $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $cacheKey = self::ENTITY_CLASS;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
             ->willReturn(false);
 
-        $this->assertNull($configCache->getConfig($configId));
+        $this->assertNull($this->configCache->getConfig($configId));
         // test local cache
-        $this->assertNull($configCache->getConfig($configId));
+        $this->assertNull($this->configCache->getConfig($configId));
     }
 
-    public function testGetConfigNotCachedScope()
+    public function testGetFieldConfigNotCached()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $configCache = $this->getConfigCache();
+        $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(['other_scope' => new Config(new EntityConfigId('other_scope', self::ENTITY_CLASS))]);
+            ->with($cacheKey)
+            ->willReturn(false);
 
-        $this->assertNull($configCache->getConfig($configId));
+        $this->assertNull($this->configCache->getConfig($configId));
         // test local cache
-        $this->assertNull($configCache->getConfig($configId));
+        $this->assertNull($this->configCache->getConfig($configId));
     }
 
-    public function testDeleteConfig()
+    public function testGetEntityConfigNotCachedScope()
     {
-        $configId    = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
-        $configCache = $this->getConfigCache();
+        $configId            = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $anotherConfigId     = new EntityConfigId('another', self::ENTITY_CLASS);
+        $anotherConfigValues = ['key2' => 'val2'];
+        $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
+        $cacheKey            = self::ENTITY_CLASS;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
+            ->willReturn(['another' => $anotherConfigValues]);
+
+        $this->assertNull($this->configCache->getConfig($configId));
+        // test local cache
+        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+    }
+
+    public function testGetFieldConfigNotCachedScope()
+    {
+        $configId            = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $anotherConfigId     = new FieldConfigId('another', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $anotherConfigValues = ['key2' => 'val2'];
+        $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
+        $cacheKey            = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with($cacheKey)
+            ->willReturn(
+                [
+                    ConfigCache::VALUES_KEY     => ['another' => $anotherConfigValues],
+                    ConfigCache::FIELD_TYPE_KEY => self::FIELD_TYPE
+                ]
+            );
+
+        $this->assertNull($this->configCache->getConfig($configId));
+        // test local cache
+        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+    }
+
+    public function testDeleteEntityConfig()
+    {
+        $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
+        $cacheKey = self::ENTITY_CLASS;
 
         $this->cache->expects($this->once())
             ->method('delete')
+            ->with($cacheKey)
             ->willReturn(true);
 
-        $this->assertTrue($configCache->deleteConfig($configId));
+        $this->assertTrue($this->configCache->deleteConfig($configId));
+    }
+
+    public function testDeleteFieldConfig()
+    {
+        $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
+        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+
+        $this->cache->expects($this->once())
+            ->method('delete')
+            ->with($cacheKey)
+            ->willReturn(true);
+
+        $this->assertTrue($this->configCache->deleteConfig($configId));
     }
 
     public function testDeleteAllConfigs()
     {
-        $configCache = $this->getConfigCache();
-
         $this->cache->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);
 
-        $this->assertTrue($configCache->deleteAllConfigs());
+        $this->assertTrue($this->configCache->deleteAllConfigs());
     }
 
     public function testFlushAllConfigs()
     {
-        $configCache = $this->getConfigCache();
-
         $this->cache->expects($this->once())
             ->method('flushAll')
             ->willReturn(true);
 
-        $this->assertTrue($configCache->flushAllConfigs());
+        $this->assertTrue($this->configCache->flushAllConfigs());
     }
 
     /**
@@ -180,8 +352,6 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testSaveConfigurable($fetchVal, $flag, $fieldName, $saveValue)
     {
-        $configCache = $this->getConfigCache();
-
         $this->modelCache->expects($this->once())
             ->method('fetch')
             ->with(self::ENTITY_CLASS)
@@ -191,9 +361,9 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS, $this->identicalTo($saveValue))
             ->willReturn(true);
 
-        $this->assertTrue($configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName));
+        $this->assertTrue($this->configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName));
         // test local cache
-        $this->assertTrue($configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName));
+        $this->assertTrue($this->configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName));
     }
 
     public function saveConfigurableProvider()
@@ -255,16 +425,14 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfigurable($fetchVal, $fieldName, $expectedFlag)
     {
-        $configCache = $this->getConfigCache();
-
         $this->modelCache->expects($this->once())
             ->method('fetch')
             ->with(self::ENTITY_CLASS)
             ->willReturn($fetchVal);
 
-        $this->assertSame($expectedFlag, $configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
+        $this->assertSame($expectedFlag, $this->configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
         // test local cache
-        $this->assertSame($expectedFlag, $configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
+        $this->assertSame($expectedFlag, $this->configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
     }
 
     public function getConfigurableProvider()
@@ -288,31 +456,19 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteAllConfigurable()
     {
-        $configCache = $this->getConfigCache();
-
         $this->modelCache->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);
 
-        $this->assertTrue($configCache->deleteAllConfigurable());
+        $this->assertTrue($this->configCache->deleteAllConfigurable());
     }
 
     public function testFlushAllConfigurable()
     {
-        $configCache = $this->getConfigCache();
-
         $this->modelCache->expects($this->once())
             ->method('flushAll')
             ->willReturn(true);
 
-        $this->assertTrue($configCache->flushAllConfigurable());
-    }
-
-    /**
-     * @return ConfigCache
-     */
-    protected function getConfigCache()
-    {
-        return new ConfigCache($this->cache, $this->modelCache);
+        $this->assertTrue($this->configCache->flushAllConfigurable());
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
@@ -14,6 +15,8 @@ class ConfigCache
 {
     const FLAG_KEY = 0;
     const FIELDS_KEY = 1;
+    const VALUES_KEY = 0;
+    const FIELD_TYPE_KEY = 1;
 
     /** @var CacheProvider */
     protected $cache;
@@ -24,9 +27,7 @@ class ConfigCache
     /** @var bool */
     protected $isDebug;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $localCache = [];
 
     /** @var array */
@@ -57,7 +58,7 @@ class ConfigCache
         if (isset($this->localCache[$cacheKey])) {
             $cacheEntry = $this->localCache[$cacheKey];
         } else {
-            $cacheEntry = !$localCacheOnly ? $this->fetchConfig($cacheKey) : [];
+            $cacheEntry = !$localCacheOnly ? $this->fetchConfig($cacheKey, $configId) : [];
         }
 
         $scope = $configId->getScope();
@@ -95,7 +96,7 @@ class ConfigCache
 
         $cacheEntry = isset($this->localCache[$cacheKey])
             ? $this->localCache[$cacheKey]
-            : $this->fetchConfig($cacheKey);
+            : $this->fetchConfig($cacheKey, $configId);
 
         $cacheEntry[$configId->getScope()] = $config;
 
@@ -103,7 +104,7 @@ class ConfigCache
 
         return $localCacheOnly
             ? true
-            : $this->cache->save($cacheKey, $cacheEntry);
+            : $this->pushConfig($cacheKey, $cacheEntry);
     }
 
     /**
@@ -227,20 +228,72 @@ class ConfigCache
     }
 
     /**
-     * @param string $cacheKey
+     * @param string            $cacheKey
+     * @param ConfigIdInterface $configId
      *
      * @return array
      */
-    protected function fetchConfig($cacheKey)
+    protected function fetchConfig($cacheKey, ConfigIdInterface $configId)
     {
+        /** @var array $cacheEntry */
         $cacheEntry = $this->cache->fetch($cacheKey);
         if (false === $cacheEntry) {
             $cacheEntry = [];
         }
 
+        if (!empty($cacheEntry)) {
+            $unpacked  = [];
+            $className = $configId->getClassName();
+            if ($configId instanceof FieldConfigId) {
+                $fieldName = $configId->getFieldName();
+                $fieldType = $cacheEntry[self::FIELD_TYPE_KEY];
+                foreach ($cacheEntry[self::VALUES_KEY] as $scope => $values) {
+                    $unpacked[$scope] = new Config(
+                        new FieldConfigId($scope, $className, $fieldName, $fieldType),
+                        $values
+                    );
+                }
+            } else {
+                foreach ($cacheEntry as $scope => $values) {
+                    $unpacked[$scope] = new Config(
+                        new EntityConfigId($scope, $className),
+                        $values
+                    );
+                }
+            }
+            $cacheEntry = $unpacked;
+        }
+
         $this->localCache[$cacheKey] = $cacheEntry;
 
         return $cacheEntry;
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param array  $cacheEntry
+     *
+     * @return bool
+     */
+    protected function pushConfig($cacheKey, $cacheEntry)
+    {
+        $packed    = [];
+        $fieldType = false;
+        /** @var Config $config */
+        foreach ($cacheEntry as $scope => $config) {
+            if (false === $fieldType) {
+                $configId  = $config->getId();
+                $fieldType = $configId instanceof FieldConfigId
+                    ? $configId->getFieldType()
+                    : null;
+            }
+            $packed[$scope] = $config->all();
+        }
+        if ($fieldType) {
+            $packed = [self::VALUES_KEY => $packed, self::FIELD_TYPE_KEY => $fieldType];
+        }
+
+        return $this->cache->save($cacheKey, $packed);
     }
 
     /**
