@@ -279,6 +279,12 @@ class FieldType extends AbstractType
             return false;
         }
 
+        if ($targetFieldId
+            && !$extendProvider->hasConfig($targetFieldId->getClassName(), $targetFieldId->getFieldName())
+        ) {
+            return false;
+        }
+
         return true;
     }
 }
