@@ -242,6 +242,8 @@ class FieldType extends AbstractType
      * @param string         $relationKey
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isAvailableRelation(
         ConfigProvider $extendProvider,
