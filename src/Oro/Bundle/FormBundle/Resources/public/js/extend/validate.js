@@ -21,11 +21,15 @@ define([
         var form = $el.parents('form').first();
         // instance of validator
         var validator = $(form).data('validator');
-        return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
-            var $el = $(el);
-            // is it current element or first in a group of elements
-            return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
-        });
+        if (validator instanceof $.validator) {
+            return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
+                var $el = $(el);
+                // is it current element or first in a group of elements
+                return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
+            });
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -120,7 +124,7 @@ define([
         $placement.next('.' + this.settings.errorClass).remove();
         this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
         return this;
-    }
+    };
 
     /**
      * Fetches descendant form elements which available for validation

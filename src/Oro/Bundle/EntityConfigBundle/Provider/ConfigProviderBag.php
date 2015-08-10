@@ -2,22 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 class ConfigProviderBag
 {
-    /**
-     * @var ArrayCollection
-     */
-    protected $providers;
-
-    public function __construct()
-    {
-        $this->providers = new ArrayCollection();
-    }
+    /** @var ConfigProvider[] */
+    protected $providers = [];
 
     /**
-     * @return ConfigProvider[]|ArrayCollection
+     * @return ConfigProvider[]
      */
     public function getProviders()
     {
@@ -26,30 +17,33 @@ class ConfigProviderBag
 
     /**
      * @param ConfigProvider $provider
+     *
      * @return $this
      */
     public function addProvider(ConfigProvider $provider)
     {
-        $this->providers->set($provider->getScope(), $provider);
+        $this->providers[$provider->getScope()] = $provider;
 
         return $this;
     }
 
     /**
      * @param $scope
+     *
      * @return ConfigProvider
      */
     public function getProvider($scope)
     {
-        return $this->providers->get($scope);
+        return isset($this->providers[$scope]) ? $this->providers[$scope] : null;
     }
 
     /**
      * @param $scope
+     *
      * @return bool
      */
     public function hasProvider($scope)
     {
-        return $this->providers->containsKey($scope);
+        return isset($this->providers[$scope]);
     }
 }

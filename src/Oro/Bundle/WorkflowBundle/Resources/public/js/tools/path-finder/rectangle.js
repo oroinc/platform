@@ -11,6 +11,9 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
      * @constructor
      */
     function Rectangle(left, top, width, height) {
+        if (width < 0 || height < 0) {
+            throw new RangeError('Rectangle shouldn\'t have negative dimensions');
+        }
         if (left === void 0) {
             left = 0;
         }
@@ -149,8 +152,10 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
      * @returns {Rectangle}
      */
     Rectangle.prototype.intersection = function(box) {
-        return new Rectangle(this.horizontalInterval.intersection(box.horizontalInterval),
-            this.verticalInterval.intersection(box.verticalInterval));
+        var horizontalInterval = this.horizontalInterval.intersection(box.horizontalInterval);
+        var verticalInterval = this.verticalInterval.intersection(box.verticalInterval);
+        return horizontalInterval === null || verticalInterval === null ? null :
+            new Rectangle(horizontalInterval, verticalInterval);
     };
 
     /**
@@ -163,18 +168,6 @@ define(['./interval1d', './interval2d', './point2d'], function(Interval1d, Inter
         return new Rectangle(this.horizontalInterval.union(box.horizontalInterval),
             this.verticalInterval.union(box.verticalInterval));
     };
-
-    /**
-     * True if rectangle has positive width and height
-     * @type {boolean}
-     */
-    Object.defineProperty(Rectangle.prototype, 'isValid', {
-        get: function() {
-            return this.horizontalInterval.isValid && this.verticalInterval.isValid;
-        },
-        enumerable: true,
-        configurable: true
-    });
 
     /**
      * Shifts rectangle on provided vector
