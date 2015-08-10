@@ -18,6 +18,10 @@ services:
         arguments:
             - @oro_security.owner.metadata_provider.chain
 
+    oro_security.owner.entity_owner_accessor.link:
+        tags:
+            - { name: oro_service_link, service: oro_security.owner.entity_owner_accessor }
+
     oro_security.owner.metadata_provider.chain:
         class: %oro_security.owner.metadata_provider.chain.class%
         calls:
