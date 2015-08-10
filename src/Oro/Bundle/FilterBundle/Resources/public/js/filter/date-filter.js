@@ -449,7 +449,7 @@ define(function(require) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
                 var foundChoice = _.find(this[property], function(choice) {
-                    return (choice.value === value.type);
+                    return (choice.value == value.type);
                 });
                 selectedChoiceLabel = foundChoice.label;
             }
