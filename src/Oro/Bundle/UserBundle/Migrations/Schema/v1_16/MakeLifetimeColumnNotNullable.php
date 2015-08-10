@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class MakeLifetimeColumnNotNullable implements Migration, OrderedMigrationInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -21,7 +21,7 @@ class MakeLifetimeColumnNotNullable implements Migration, OrderedMigrationInterf
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getOrder()
     {

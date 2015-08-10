@@ -22,14 +22,14 @@ class AddLifetimeColumnToSessions implements Migration, OrderedMigrationInterfac
         $queries->addPostQuery(
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_session SET sess_lifetime = :lifetime',
-                [':lifetime' => 3600],
-                [':lifetime' => TYPE::INTEGER]
+                ['lifetime' => 3600],
+                ['lifetime' => TYPE::INTEGER]
             )
         );
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getOrder()
     {
