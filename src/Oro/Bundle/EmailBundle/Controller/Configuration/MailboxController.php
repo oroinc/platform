@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
+use FOS\RestBundle\Controller\Annotations\Delete;
+
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -17,17 +20,18 @@ class MailboxController extends Controller
 
     /**
      * @Route(
-     *      "/system/platform/email_configuration/mailbox/update/{mailbox}",
+     *      "/system/platform/email_configuration/mailbox/update/{id}",
      *      name="oro_email_mailbox_update"
      * )
      * @Template
-     * @AclAncestor("oro_email_mailbox_edit")
+     * @AclAncestor("oro_email_mailbox_update")
+     * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
      *
      * @param $mailbox
      *
      * @return array
      */
-    public function editAction($mailbox)
+    public function updateAction(Mailbox $mailbox)
     {
         $mailboxRepository = $this->getDoctrine()->getRepository('OroEmailBundle:Mailbox');
         $data = $mailboxRepository->find($mailbox);
@@ -51,7 +55,6 @@ class MailboxController extends Controller
         $tree = $provider->getTree();
 
         $handler = $this->get('oro_email.form.handler.mailbox');
-        //$bc = $provider->getSubtree(self::ACTIVE_SUBGROUP)->toBlockConfig();
 
         if ($handler->process($mailbox)) {
             $this->get('session')->getFlashBag()->add(
@@ -65,7 +68,7 @@ class MailboxController extends Controller
             return $this->get('oro_ui.router')->redirectAfterSave(
                 [
                     'route' => 'oro_email_mailbox_update',
-                    'parameters' => ['mailbox' => $mailbox->getId()]
+                    'parameters' => ['id' => $mailbox->getId()]
                 ],
                 [
                     'route' => 'oro_config_configuration_system',
@@ -90,7 +93,7 @@ class MailboxController extends Controller
      *      "/system/platform/email_configuration/mailbox/create",
      *      name="oro_email_mailbox_create"
      * )
-     * @Template("OroEmailBundle:Configuration/Mailbox:edit.html.twig")
+     * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
      * @AclAncestor("oro_email_mailbox_create")
      *
      * @return array
@@ -100,5 +103,23 @@ class MailboxController extends Controller
         $data = new Mailbox();
 
         return $this->update($data);
+    }
+
+    /**
+     * @Delete("/system/platform/email_configuration/mailbox/delete/{id}", name="oro_email_mailbox_delete")
+     * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
+     * @AclAncestor("oro_email_mailbox_delete")
+     *
+     * @param Mailbox $mailbox
+     *
+     * @return Response
+     */
+    public function deleteAction(Mailbox $mailbox)
+    {
+        $mailboxManager = $this->getDoctrine()->getManagerForClass('OroEmailBundle:Mailbox');
+        $mailboxManager->remove($mailbox);
+        $mailboxManager->flush();
+
+        return new Response(Response::HTTP_OK);
     }
 }

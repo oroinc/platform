@@ -18,7 +18,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 /**
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
- * @UniqueEntity(fields={"email", "label"})
+ * @UniqueEntity(fields={"email"})
+ * @UniqueEntity(fields={"label"})
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -53,7 +54,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="label", type="string", length=255)
+     * @ORM\Column(name="label", type="string", length=255, unique=true)
      */
     protected $label;
 
@@ -96,7 +97,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * Collection of users authorized to view mailbox emails.
      *
-     * @var Collection<User>
+     * @var Collection|User[]
      *
      * @ORM\ManyToMany(
      *      targetEntity="Oro\Bundle\UserBundle\Entity\User",
@@ -112,7 +113,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * Collection of roles authorised to view mailbox emails.
      *
-     * @var Collection<Role>
+     * @var Collection|Role[]
      *
      * @ORM\ManyToMany(
      *      targetEntity="Oro\Bundle\UserBundle\Entity\Role",
@@ -191,7 +192,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return MailboxProcessSettings
+     * @return MailboxProcessSettings|null
      */
     public function getProcessSettings()
     {
@@ -203,7 +204,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @return $this
      */
-    public function setProcessSettings($processSettings)
+    public function setProcessSettings(MailboxProcessSettings $processSettings = null)
     {
         $this->processSettings = $processSettings;
 
@@ -251,7 +252,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @return $this
      */
-    public function setOrigin($origin)
+    public function setOrigin(UserEmailOrigin $origin)
     {
         $this->origin = $origin;
 
@@ -271,7 +272,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @return $this
      */
-    public function setOrganization($organization)
+    public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
 
@@ -295,7 +296,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return Collection<EmailUser>
+     * @return Collection|EmailUser[]
      */
     public function getEmailUsers()
     {
@@ -303,7 +304,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param Collection<EmailUser> $emailUsers
+     * @param Collection|EmailUser[] $emailUsers
      *
      * @return $this
      */
@@ -323,15 +324,12 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param User[]|Collection<User> $authorizedRoles
+     * @param Collection|Role[] $authorizedRoles
      *
      * @return $this
      */
     public function setAuthorizedRoles($authorizedRoles)
     {
-        if (!($authorizedRoles instanceof Collection) && is_array($authorizedRoles)) {
-            $authorizedRoles = new ArrayCollection($authorizedRoles);
-        }
         $this->authorizedRoles = $authorizedRoles;
 
         return $this;
@@ -342,19 +340,16 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function getAuthorizedUsers()
     {
-        return $this->authorizedUsers->toArray();
+        return $this->authorizedUsers;
     }
 
     /**
-     * @param User[]|Collection<User> $authorizedUsers
+     * @param Collection|User[] $authorizedUsers
      *
      * @return $this
      */
     public function setAuthorizedUsers($authorizedUsers)
     {
-        if (!($authorizedUsers instanceof Collection) && is_array($authorizedUsers)) {
-            $authorizedUsers = new ArrayCollection($authorizedUsers);
-        }
         $this->authorizedUsers = $authorizedUsers;
 
         return $this;

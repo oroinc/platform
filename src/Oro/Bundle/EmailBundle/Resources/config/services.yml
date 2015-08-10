@@ -769,6 +769,7 @@ services:
         class: %oro_email.workflow.action.strip_html_tags.class%
         arguments:
             - @oro_workflow.context_accessor
+            - @oro_ui.html_tag_helper
         tags:
             - { name: oro_workflow.action, alias: strip_html_tags }
 

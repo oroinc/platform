@@ -301,7 +301,7 @@ class EmailUser
     }
 
     /**
-     * @return Mailbox
+     * @return Mailbox|null
      */
     public function getMailboxOwner()
     {
@@ -309,11 +309,11 @@ class EmailUser
     }
 
     /**
-     * @param Mailbox $mailboxOwner
+     * @param Mailbox|null $mailboxOwner
      *
      * @return $this
      */
-    public function setMailboxOwner($mailboxOwner)
+    public function setMailboxOwner(Mailbox $mailboxOwner = null)
     {
         $this->mailboxOwner = $mailboxOwner;
 

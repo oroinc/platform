@@ -26,7 +26,7 @@
 {% if form.vars.data.id is not null %}
     {% set formAction = path(
         'oro_email_mailbox_update',
-        { mailbox: form.vars.data.id }
+        { id: form.vars.data.id }
     )
     %}
 {% else %}
@@ -50,7 +50,7 @@
     {% set html = '' %}
     {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
         {% set buttons = buttons ~ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_mailbox', {'id': form.vars.value.id}),
+            'dataUrl': path('oro_email_mailbox_delete', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_config_configuration_system', {
                 activeGroup: 'platform',
                 activeSubGroup: 'email_configuration'
@@ -67,14 +67,20 @@
     {% set html = html ~ UI.saveAndCloseButton() %}
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
+    {% set options = {
+        el: '#' ~ form.vars.id,
+    } %}
+
     <form
-            id="{{ form.vars.id }}"
-            name="{{ form.vars.name }}"
-            {{ form_enctype(form) }}
-            action="{{ formAction }}"
-            method="post"
-            data-collect="true"
-            >
+        id="{{ form.vars.id }}"
+        name="{{ form.vars.name }}"
+        {{ form_enctype(form) }}
+        action="{{ formAction }}"
+        method="post"
+        data-collect="true"
+        data-page-component-module="oroconfig/js/form/config-form"
+        data-page-component-options="{{ options|json_encode }}"
+    >
         {{ emailUI.renderMailboxConfigTitleAndButtons(pageTitle, buttons) }}
         <div class="system-configuration-container left-panel-container">
             <div class="placeholder">
@@ -147,36 +153,5 @@
         </div>
     </form>
     {{ oro_form_js_validation(form) }}
-
-    <script type="text/javascript">
-        /* jshint browser:true, devel:true */
-        /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/default', 'oroui/js/modal'],
-            function ($, __, Mediator, Messenger, FormDefault, Modal) {
-                'use strict';
-
-                $('#{{ form.vars.id }} :input[type=reset]').click(function (e) {
-                    var $form = $(this).closest('form'),
-                            $checkboxes = $form.find('.parent-scope-checkbox input'),
-                            confirm = new Modal({
-                                title: __('Confirmation'),
-                                okText: __('OK'),
-                                cancelText: __('Cancel'),
-                                content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
-                                className: 'modal modal-primary',
-                                okButtonClass: 'btn-primary btn-large'
-                            });
-
-                    confirm.on('ok', function () {
-                        $form.get(0).reset();
-                        $checkboxes.trigger('change');
-                    });
-                    confirm.open();
-                    e.preventDefault();
-                });
-
-                new FormDefault();
-            });
-    </script>
     {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
 {% endblock content %}
