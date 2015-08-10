@@ -62,3 +62,13 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.actions": "Options"
 "oro.datagrid.gridView.data_edited": "Edited"
 "oro.datagrid.gridView.save_name": "Save"
+
+oro:
+    datagrid:
+        column_manager:
+            title: "Table Settings"
+            tooltip: "Use drag and drop to sort items"
+            column:
+                name: "Name"
+                show: "Show"
+                sort: "Sort"

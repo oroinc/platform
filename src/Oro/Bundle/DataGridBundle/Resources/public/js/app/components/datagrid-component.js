@@ -214,7 +214,8 @@ define(function(require) {
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'];
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                    'order', 'manageable'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
                 var cellType = modules[helpers.cellType(cell.type)];

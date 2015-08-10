@@ -11,6 +11,7 @@ define(function(require) {
     var GridHeader = require('./header');
     var GridBody = require('./body');
     var GridFooter = require('./footer');
+    var GridColumns = require('./columns');
     var Toolbar = require('./toolbar');
     var ActionColumn = require('./column/action-column');
     var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
@@ -19,6 +20,7 @@ define(function(require) {
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var ColumnManagerComponent = require('orodatagrid/js/app/components/column-manager-component');
 
     /**
      * Basic grid class.
@@ -41,7 +43,7 @@ define(function(require) {
         requestsCount: 0,
 
         /** @property {String} */
-        className: 'clearfix',
+        className: 'oro-datagrid',
 
         /** @property */
         template: _.template(
@@ -97,7 +99,11 @@ define(function(require) {
         defaults: {
             rowClickActionClass:    'row-click-action',
             rowClassName:           '',
-            toolbarOptions:         {addResetAction: true, addRefreshAction: true},
+            toolbarOptions:         {
+                addResetAction: true,
+                addRefreshAction: true,
+                addColumnManager: true
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
@@ -128,6 +134,10 @@ define(function(require) {
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
                 this.pluginManager.enable(options.plugins);
+            }
+
+            if (this.className) {
+                this.$el.addClass(_.result(this, 'className'));
             }
 
             // Check required options
@@ -167,6 +177,9 @@ define(function(require) {
             if (opts.multiSelectRowEnabled) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
+
+            this.columns = opts.columns = new GridColumns(opts.columns);
+            this.columns.sort();
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
@@ -231,7 +244,8 @@ define(function(require) {
             column = new this.actionsColumn({
                 datagrid: this,
                 actions:  this.rowActions,
-                massActions: this.massActions
+                massActions: this.massActions,
+                manageable: false
             });
             return column;
         },
@@ -250,6 +264,7 @@ define(function(require) {
                 renderable: true,
                 sortable:   false,
                 editable:   false,
+                manageable: false,
                 cell:       SelectRowCell,
                 headerCell: SelectAllHeaderCell
             });
@@ -305,6 +320,9 @@ define(function(require) {
             }
             if (this.toolbarOptions.addResetAction) {
                 actions.push(this.getResetAction());
+            }
+            if (this.toolbarOptions.addColumnManager) {
+                actions.push(this.getColumnManager());
             }
             return actions;
         },
@@ -381,6 +399,17 @@ define(function(require) {
             }
 
             return this.resetAction;
+        },
+
+        /**
+         * Creates and returns component that implements ActionInterface
+         *
+         * @returns {ColumnManagerComponent}
+         */
+        getColumnManager: function() {
+            return new ColumnManagerComponent({
+                columns: this.columns
+            });
         },
 
         /**

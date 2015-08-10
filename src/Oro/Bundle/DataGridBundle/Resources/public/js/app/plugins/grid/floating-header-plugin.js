@@ -45,6 +45,8 @@ define(function(require) {
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
             this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
             this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
+            this.listenTo(this.grid.columns, 'change:renderable', this.onGridHeaderChange);
+            this.listenTo(this.grid.header.row, 'content:update', this.onGridHeaderChange);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
             FloatingHeaderPlugin.__super__.enable.call(this);
@@ -176,7 +178,6 @@ define(function(require) {
          */
         setFloatTheadMode: function(mode, visibleRect, tableRect) {
             var theadRect;
-            var sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
                 visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
@@ -190,11 +191,7 @@ define(function(require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
-                        if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.domCache.thead.clone().addClass('thead-sizing');
-                            sizingThead.find('th').attr('style', '');
-                            sizingThead.insertAfter(this.domCache.thead);
-                        }
+                        this._ensureTHeadSizing();
                     }
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
                     this.domCache.thead.css({
@@ -214,11 +211,7 @@ define(function(require) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
-                        if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.domCache.thead.clone().addClass('thead-sizing');
-                            sizingThead.find('th').attr('style', '');
-                            sizingThead.insertAfter(this.domCache.thead);
-                        }
+                        this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({
                         // show only visible part
@@ -249,6 +242,30 @@ define(function(require) {
                     break;
             }
             this.currentFloatTheadMode = mode;
+        },
+
+        /**
+         * Handles grid head changes
+         * (hiding/showing and sorting columns)
+         */
+        onGridHeaderChange: function() {
+            this.$grid.find('.thead-sizing').remove();
+            this._ensureTHeadSizing()
+            this.fixHeaderCellWidth();
+        },
+
+        /**
+         * Creates thead clone if it does not exist
+         *
+         * @protected
+         */
+        _ensureTHeadSizing: function() {
+            if (!this.$grid.find('.thead-sizing').length) {
+                var sizingThead = this.domCache.thead.clone();
+                sizingThead.addClass('thead-sizing');
+                sizingThead.find('th').attr('style', '');
+                sizingThead.insertAfter(this.domCache.thead);
+            }
         },
 
         /**

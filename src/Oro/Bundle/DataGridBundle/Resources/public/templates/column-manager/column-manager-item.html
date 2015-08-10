@@ -1,0 +1,11 @@
+<td>
+    <label for="column-<%= cid  %>"><%= label %></label>
+</td>
+<td>
+    <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
+        <% if (obj.required) {%>disabled<% } %>
+        <% if (obj.renderable) {%>checked<% } %>/>
+</td>
+<td>
+    <span title="Move column"><i class="icon-list handle"></i></span>
+</td>
