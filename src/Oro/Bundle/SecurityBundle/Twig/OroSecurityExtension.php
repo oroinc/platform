@@ -144,9 +144,14 @@ class OroSecurityExtension extends \Twig_Extension
         /** @var Acl $acl */
         $acl = $this->aclCache->getFromCacheByIdentity($oid);
         $name = '';
-        if ($acl && $acl->getObjectAces()) {
+        $objectAces = $acl->getObjectAces();
+        if ($acl && $objectAces) {
+            usort(
+                $objectAces,
+                [$this, 'compareEntries']
+            );
             /** @var Entry $entry */
-            $entry = $acl->getObjectAces()[0];
+            $entry = $objectAces[0];
             $sid = $entry->getSecurityIdentity();
             $name = $this->getFormattedName($sid);
         }
@@ -162,6 +167,34 @@ class OroSecurityExtension extends \Twig_Extension
     public function getName()
     {
         return 'oro_security_extension';
+    }
+
+    /**
+     * @param Entry $entryA
+     * @param Entry $entryB
+     *
+     * @return int
+     */
+    protected function compareEntries(Entry $entryA, Entry $entryB)
+    {
+        $sidA = $entryA->getSecurityIdentity();
+        $sidB = $entryB->getSecurityIdentity();
+        if ($sidA instanceof UserSecurityIdentity && $sidB instanceof UserSecurityIdentity) {
+            return strcmp($sidA->getUsername(), $sidB->getUsername());
+        } elseif (
+            $sidA instanceof BusinessUnitSecurityIdentity && $sidB instanceof BusinessUnitSecurityIdentity
+        ) {
+            $idA = (int) $sidA->getId();
+            $idB = (int) $sidB->getId();
+
+            return $idA < $idB ? -1 : 1;
+        } elseif ($sidA instanceof UserSecurityIdentity && $sidB instanceof BusinessUnitSecurityIdentity) {
+            return 1;
+        } elseif ($sidA instanceof BusinessUnitSecurityIdentity && $sidB instanceof UserSecurityIdentity) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
     /**

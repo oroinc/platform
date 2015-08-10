@@ -52,7 +52,8 @@ class UserRepository extends EntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('u')
             ->select('u');
-        $queryBuilder->where($queryBuilder->expr()->in('u.username', $usernames));
+        $queryBuilder->where($queryBuilder->expr()->in('u.username', $usernames))
+            ->orderBy('u.username');
 
         return $queryBuilder->getQuery()->getResult();
     }
