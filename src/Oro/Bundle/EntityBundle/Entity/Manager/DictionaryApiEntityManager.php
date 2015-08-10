@@ -9,7 +9,6 @@ use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
@@ -19,25 +18,19 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var DictionaryHelper */
     protected $dictionaryHelper;
 
-    /** @var  LocaleSettings */
-    protected $localeSettings;
-
     /**
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param DictionaryHelper $dictionaryHelper
-     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
-        DictionaryHelper $dictionaryHelper,
-        LocaleSettings $localeSettings
+        DictionaryHelper $dictionaryHelper
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
-        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -86,7 +79,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
         $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
 
-        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
             $qb->andWhere('e.' . $labelField . ' LIKE :translated_title')
                 ->setParameter('translated_title', '%' . $searchQuery . '%');
@@ -147,19 +140,5 @@ class DictionaryApiEntityManager extends ApiEntityManager
         }
 
         return $resultsData;
-    }
-
-    /**
-     * Get count items in dictionary
-     *
-     * @return integer
-     */
-    public function count()
-    {
-        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
-        $qb->select('COUNT(e)');
-        $result = $qb->getQuery()->getSingleScalarResult();
-
-        return $result;
     }
 }

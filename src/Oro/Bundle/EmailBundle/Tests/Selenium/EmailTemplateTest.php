@@ -26,7 +26,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
-            ->setType('Plain text')
+            ->setType('Html')
             ->setName($templateName)
             ->setSubject('Subject')
             ->setContent('Template content')
@@ -62,7 +62,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->getFields($fields);
         $this->assertEquals('User', $fields['entityname']);
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
-        $this->assertEquals('Plain Text ', $fields['type']);
+        $this->assertEquals('Html ', $fields['type']);
         $this->assertEquals('Subject', $fields['subject']);
         $this->assertEquals("<p>Template content</p>", $fields['content']);
 

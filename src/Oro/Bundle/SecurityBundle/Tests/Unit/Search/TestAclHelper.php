@@ -16,6 +16,9 @@ class TestAclHelper extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipDataBuilder;
 
+    /**
+     *  @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function setUp()
     {
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
