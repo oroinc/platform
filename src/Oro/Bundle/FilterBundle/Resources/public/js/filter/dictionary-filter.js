@@ -14,19 +14,15 @@ define([
     /**
      * Multiple select filter: filter values as multiple select options
      *
-     * @export  oro/filter/multiselect-filter
-     * @class   oro.filter.MultiSelectFilter
-     * @extends oro.filter.SelectFilter
+     * @export  oro/filter/dictionary-filter
+     * @class   oro.filter.DictionaryFilter
+     * @extends oro.filter.ChoiceFilter
      */
     DictionaryFilter = ChoiceFilter.extend({
         /**
-          * List available modes for filter
-         * @property
+         * select2 will apply to element with this selector
          */
-        mode: {
-            dropdown: 'select2',
-            autocomplete: 'select2autocomplate'
-        },
+        elementSelector: '.select-values-autocomplete',
 
         /**
          * Filter selector template
@@ -67,37 +63,12 @@ define([
         },
 
         render: function() {
-            var self = this;
-            this.getCountDeferred = $.Deferred();
-            $.ajax({
-                url: routing.generate(
-                    'oro_dictionary_count',
-                    {dictionary: this.dictionaryClass, limit: -1}
-                ),
-                success: function(response) {
-                    self.count = response.result;
-                    self.getCountDeferred.resolve();
-                },
-                error: function(jqXHR) {
-                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                }
-            });
-
-            this.getCountDeferred.done(_.bind(this.renderSelect2, this));
-        },
-
-        renderSelect2: function() {
-            if (this.count > this.maxCountForDropDownMode) {
-                this.setComponentMode(this.mode.autocomplete);
-            } else {
-                this.setComponentMode(this.mode.dropdown);
-            }
+            this.renderDeferred = $.Deferred();
             this.loadSelectedValue();
         },
 
         loadSelectedValue: function() {
             var self = this;
-            this.selecteValueDeferred = $.Deferred();
 
             $.ajax({
                 url: routing.generate(
@@ -111,22 +82,20 @@ define([
                 },
                 success: function(reposne) {
                     self.value.value = reposne.results;
-                    self.selecteValueDeferred.resolve();
+                    self._writeDOMValue(self.value);
+                    self.renderTemplate();
+                    self.applySelect2();
+
+                    self.renderDeferred.resolve();
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                 }
             });
-
-            this.selecteValueDeferred.done(function() {
-                self._writeDOMValue(self.value);
-                self.renderTemplate();
-                self.applySelect2();
-            });
         },
 
         renderTemplate: function() {
-            var parts = this.getParts();
+            var parts = this._getParts();
             var template = _.template($(this.templateSelector).html());
             this.$el.append(template({
                 parts: parts
@@ -136,102 +105,49 @@ define([
         applySelect2: function() {
             var self = this;
             var select2Config = this.getSelect2Config();
+            var select2element = this.$el.find(this.elementSelector);
+            var values = this.getDataForSelect2();
 
-            var select2element = this.$el.find(this.getElementClass());
-            if (this.componentMode === this.mode.autocomplete) {
-                var values = this.getDataForSelect2();
-                select2element.removeClass('hide')
-                    .attr('multiple', 'multiple')
-                    .select2(select2Config);
-                select2element.select2('data',  values);
-            }
+            select2element.removeClass('hide')
+                .attr('multiple', 'multiple')
+                .select2(select2Config)
+                .on('change', function() {
+                    self.applyValue();
+                });
+            select2element.select2('data',  values);
 
-            if (this.componentMode === this.mode.dropdown) {
-                $.ajax({
+            this._criteriaRenderd = true;
+        },
+
+        getSelect2Config: function() {
+            return {
+                multiple: true,
+                containerCssClass: 'dictionary-filter',
+                ajax: {
                     url: routing.generate(
                         'oro_dictionary_search',
                         {
                             dictionary: this.dictionaryClass
                         }
                     ),
-                    data: {
-                        'q': ''
+                    dataType: 'json',
+                    delay: 250,
+                    type: 'POST',
+                    data: function(params) {
+                        return {
+                            q: params // search term
+                        };
                     },
-                    success: function(reposne) {
-                        select2element.removeClass('hide');
-                        $.each(reposne.results, function(index, value) {
-                            var html = '<option value="' + value.id + '">' + value.text + '</option>';
-                            select2element.append(html);
-                        });
-                        select2element.attr('multiple', 'multiple').select2(select2Config).on('change', function(e) {
-                            self.applyValue();
-                        });
-
-                        var values = self.getDataForSelect2();
-                        select2element.select2('data', values);
-                    },
-                    error: function(jqXHR) {
-                        messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                    results: function(data) {
+                        return {
+                            results: data.results
+                        };
                     }
-                });
-            }
-
-            this._criteriaRenderd = true;
-        },
-
-        getSelect2Config: function() {
-            var config = {};
-
-            if (this.componentMode === this.mode.autocomplete) {
-                config = {
-                    multiple: true,
-                    containerCssClass: 'dictionary-filter',
-                    ajax: {
-                        url: routing.generate(
-                            'oro_dictionary_search',
-                            {
-                                dictionary: this.dictionaryClass
-                            }
-                        ),
-                        dataType: 'json',
-                        delay: 250,
-                        type: 'POST',
-                        data: function(params) {
-                            return {
-                                q: params // search term
-                            };
-                        },
-                        results: function(data, page) {
-                            return {
-                                results: data.results
-                            };
-                        },
-                        cache: true
-                    },
-                    dropdownAutoWidth: true,
-                    escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
-                    minimumInputLength: 1
-                };
-            } else {
-                config = {
-                    containerCssClass: 'dictionary-filter',
-                    dropdownAutoWidth: true
-                };
-            }
-
-            return config;
-        },
-
-        getElementClass: function() {
-            if (this.componentMode === this.mode.autocomplete) {
-                this.elementSelector = '.select-values-autocomplete';
-            }
-
-            if (this.componentMode === this.mode.dropdown) {
-                this.elementSelector = '.select-values';
-            }
-
-            return this.elementSelector;
+                },
+                dropdownAutoWidth: true,
+                escapeMarkup: function(markup) { return markup; }, // let our custom formatter work
+                minimumInputLength: 0
+            };
         },
 
         getDataForSelect2: function() {
@@ -250,7 +166,7 @@ define([
             return false;
         },
 
-        getParts: function() {
+        _getParts: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var dictionaryPartTemplate = this._getTemplate(this.fieldTemplateSelector);
             var parts = [];
@@ -272,23 +188,13 @@ define([
 
         _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
-
-            return this;
         },
 
         _readDOMValue: function() {
-            var value = {};
-            value.type = this._getInputValue(this.criteriaValueSelectors.type);
-
-            if (this.componentMode === this.mode.autocomplete) {
-                value.value = this.$el.find('.select-values-autocomplete').select2('val');
-            } else if (this.componentMode === this.mode.dropdown) {
-                value.value = this.$el.find('.select-values').select2('val');
-            } else {
-                value.value = this.value.value;
-            }
-
-            return value;
+            return {
+                type: this._getInputValue(this.criteriaValueSelectors.type),
+                value: this.$el.find('.select-values-autocomplete').select2('val')
+            };
         },
 
         _getSelectedChoiceLabel: function(property, value) {
@@ -301,12 +207,6 @@ define([
             }
 
             return selectedChoiceLabel;
-        },
-
-        setComponentMode: function(mode) {
-            this.componentMode = mode;
-
-            return this;
         }
     });
 

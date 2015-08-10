@@ -1,9 +1,23 @@
 define(['./point2d'], function(Point2d) {
     'use strict';
+    /**
+     * Creates line on 2d surface
+     *
+     * @param {number} slope
+     * @param {number} intercept
+     * @constructor
+     */
     function Line2d(slope, intercept) {
         this.slope = slope;
         this.intercept = intercept;
     }
+
+    /**
+     * Returns point of intersection of two lines
+     *
+     * @param {Line2d} line
+     * @returns {Point2d}
+     */
     Line2d.prototype.intersection = function(line) {
         if (this.slope === Infinity) {
             if (line.slope === Infinity) {

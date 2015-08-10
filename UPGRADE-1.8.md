@@ -118,12 +118,18 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 | orocrm_account.form.type.account.api | OroCRM\Bundle\AccountBundle\Form\Type\AccountApiType |
 | orocrm_case.view_factory | OroCRM\Bundle\CaseBundle\Model\ViewFactory |
 - Added [Query Hint Resolver](./src/Oro/Bundle/EntityBundle/Resources/doc/query_hint_resolver.md)
+- Removed `Oro\Bundle\EntityBundle\ORM\EntityConfigAwareRepositoryInterface` interface
+- Removed `Oro\Bundle\EntityBundle\ORM\Query\FilterCollection` class and `oro_entity.orm.sql_filter` DIC tag
 
 ####EntityConfigBundle
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
 - IMPORTANT: if you use the service method links in your `entity_config.yml` they should be replaced with the direct service method call. For example `my_service_method_link` should be replaced with `@my_service->method`.
 - Removed the method `initConfig` of the class `Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer`.
-- `Oro\Bundle\ConfigBundle\Config\UserScopeManager` is no longer depends on `security.context`. It is retreived from `service.container` directly inside
+- `Oro\Bundle\ConfigBundle\Config\UserScopeManager` is no longer depends on `security.context`. It is retrieved from `service.container` directly inside
+- Removed `$regenerateCaches` argument from `Oro\Bundle\EntityConfigBundle\Config\ConfigManager::getIds` method
+
+####ActivityListBundle
+- Removed `$regenerateCaches` argument from `Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider::getTargetEntityClasses` method
 
 ####ImportExportBundle
  - `Oro\Bundle\ImportExportBundle\Context\ContextInterface` added $incrementBy integer parameter for methods: incrementReadCount, incrementAddCount, incrementUpdateCount, incrementReplaceCount, incrementDeleteCount, incrementErrorEntriesCount
@@ -177,6 +183,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
 - `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager, added method `setManagerRegistry`, method `setEntityManager` marked as deprecated 
+- Changed a login form to be correspond Symfony standards. If you have overridden `login.html.twig`, please change `{{ error|trans }}` to `{{ error.messageKey|trans(error.messageData, 'security') }}` there.
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata` usage

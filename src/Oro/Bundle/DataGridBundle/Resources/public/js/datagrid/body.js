@@ -182,7 +182,7 @@ define([
             var comparator = this.makeComparator(column.get('name'), order, extractorDelegate);
 
             if (collection instanceof PageableCollection) {
-                collection.setSorting(order && column.get('name'), order, {sortValue: column.sortValue()});
+                collection.setSorting(column.get('name'), order, {sortValue: column.sortValue()});
 
                 if (collection.fullCollection) {
                     if (collection.fullCollection.comparator === null ||
