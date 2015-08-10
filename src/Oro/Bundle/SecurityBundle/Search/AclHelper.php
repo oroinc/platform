@@ -95,13 +95,7 @@ class AclHelper
         }
         $query->from($allowedAliases);
 
-        // add organization limitation
-        $organizationId = $this->getOrganizationId();
-        if ($organizationId) {
-            $query->getCriteria()->andWhere(
-                $expr->in('integer.organization', [$organizationId, SearchListener::EMPTY_ORGANIZATION_ID])
-            );
-        }
+        $this->addOrganizationLimits($query, $expr);
 
         return $query;
     }
@@ -112,5 +106,19 @@ class AclHelper
     protected function getOrganizationId()
     {
         return $this->securityFacade->getOrganizationId();
+    }
+
+    /**
+     * @param Query $query
+     * @param $expr
+     */
+    protected function addOrganizationLimits(Query $query, $expr)
+    {
+        $organizationId = $this->getOrganizationId();
+        if ($organizationId) {
+            $query->getCriteria()->andWhere(
+                $expr->in('integer.organization', [$organizationId, SearchListener::EMPTY_ORGANIZATION_ID])
+            );
+        }
     }
 }

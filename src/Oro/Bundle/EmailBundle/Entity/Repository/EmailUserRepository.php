@@ -41,18 +41,19 @@ class EmailUserRepository extends EntityRepository
         $qb = $this->createQueryBuilder('eu');
         $qb
             ->join('eu.folder', 'f')
+            ->join('f.origin', 'o')
             ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
-            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()));
+            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
+            ->andWhere($qb->expr()->eq('o.isActive', ':active'))
+            ->setParameter('active', true);
 
         if ($folderTypes) {
             $qb->andWhere($qb->expr()->in('f.type', $folderTypes));
         }
 
         if ($isSeen !== null) {
-            $qb->add(
-                'where',
-                $qb->expr()->andX($qb->expr()->eq('eu.seen', ':seen'))
-            )->setParameters(['seen' => (bool)$isSeen]);
+            $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
+            ->setParameter('seen', (bool)$isSeen);
         }
 
         return $qb->getQuery()->getResult();

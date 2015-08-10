@@ -1,7 +1,8 @@
 define([
         'underscore',
         'backbone',
-        'jquery.select2'
+        'jquery.select2',
+        'jquery.validate'
 ], function(_, Backbone) {
     'use strict';
 
@@ -54,6 +55,7 @@ define([
             } else {
                 this.target.select2('container').hide();
                 this.removeRequiredFlag(this.$simpleEl);
+                this.target.validate().hideElementErrors(this.target);
             }
         },
 
@@ -62,7 +64,7 @@ define([
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
-                    .append('<em>*</em>');
+                    .find('em').html('*');
             }
         },
 
@@ -71,7 +73,7 @@ define([
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
-                    .find('em').remove();
+                    .find('em').html('&nbsp;');
             }
         },
 
