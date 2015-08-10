@@ -1,14 +1,23 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_17;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_16;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class CreateAutoResponse implements Migration, OrderedMigrationInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 2;
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -141,7 +141,7 @@ class AutoResponseManager
     /**
      * @param EmailModel $emailModel
      * @param EmailTemplate $template
-     * @param Eamil $email
+     * @param Email $email
      */
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {

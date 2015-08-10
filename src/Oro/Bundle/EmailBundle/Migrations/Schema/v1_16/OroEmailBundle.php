@@ -5,10 +5,19 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_16;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class OroEmailBundle implements Migration, OrderedMigrationInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
+
     /**
      * {@inheritdoc}
      */
