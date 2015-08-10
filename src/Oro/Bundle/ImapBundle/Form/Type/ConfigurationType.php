@@ -17,6 +17,10 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ConfigurationType extends AbstractType
 {
     const NAME = 'oro_imap_configuration';
@@ -242,6 +246,7 @@ class ConfigurationType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
     {

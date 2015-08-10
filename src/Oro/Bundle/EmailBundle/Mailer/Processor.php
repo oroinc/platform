@@ -39,6 +39,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @package Oro\Bundle\EmailBundle\Mailer
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Processor
 {

@@ -21,6 +21,9 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $securityFacadeLink;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContextLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineRegistryLink;
 
     protected function setUp()
@@ -29,6 +32,11 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService', 'getRepository', 'findBy'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityContextLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->setMethods(['getService', 'getRepository', 'findBy'])
             ->disableOriginalConstructor()
@@ -61,9 +69,10 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $router,
             $configManager,
             $emailThreadProvider,
-            $htmlTagHelper
+            $htmlTagHelper,
+            $this->securityFacadeLink
         );
-        $this->emailActivityListProvider->setSecurityContextLink($this->securityFacadeLink);
+        $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }
 
     public function testGetActivityOwners()

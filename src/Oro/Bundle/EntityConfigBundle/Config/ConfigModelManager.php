@@ -404,7 +404,7 @@ class ConfigModelManager
      */
     public function createEntityModel($className = null, $mode = self::MODE_DEFAULT)
     {
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -432,7 +432,7 @@ class ConfigModelManager
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
         }
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 

@@ -11,7 +11,6 @@ oro.user.gender.female: Female
 Login: Login
 Logout: Logout
 Login page: Login page
-"Bad credentials": "Invalid user name or password."
 "Forgot Password": "Forgot Password"
 "Password Reset": "Password Reset"
 "Reset password": "Reset password"
@@ -78,6 +77,13 @@ oro:
         current_status.label:        Current status
         groups.label:                Groups
         email.label:                 Primary Email
+        email:
+            entity_label:            User Email
+            entity_plural_label:     User Emails
+            entity_description:      Represent user emails
+            email.label:             Email
+            id.label:                Id
+            user.label:              User
         phone.label:                 Phone
         email_origins.label:         Email Origins
         emails.label:                Emails

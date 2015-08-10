@@ -68,6 +68,9 @@ class EmailActivityListProvider implements
     /** @var  ServiceLink */
     protected $securityContextLink;
 
+    /** @var ServiceLink */
+    protected $securityFacadeLink;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
@@ -76,6 +79,7 @@ class EmailActivityListProvider implements
      * @param ConfigManager       $configManager
      * @param EmailThreadProvider $emailThreadProvider
      * @param HtmlTagHelper       $htmlTagHelper
+     * @param ServiceLink         $securityFacadeLink
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -84,7 +88,8 @@ class EmailActivityListProvider implements
         Router $router,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        ServiceLink $securityFacadeLink
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
@@ -93,6 +98,7 @@ class EmailActivityListProvider implements
         $this->configManager        = $configManager;
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
+        $this->securityFacadeLink   = $securityFacadeLink;
     }
 
     /**
@@ -259,7 +265,8 @@ class EmailActivityListProvider implements
             $data['headOwnerName'] = $data['ownerName'] = $this->entityNameResolver->getName($owner);
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
                 ->getRoute('view');
-            if (null !== $route) {
+            $securityFacade = $this->securityFacadeLink->getService();
+            if (null !== $route && $securityFacade->isGranted('VIEW', $owner)) {
                 $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
                 try {
                     $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
