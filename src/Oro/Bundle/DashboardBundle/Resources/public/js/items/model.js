@@ -1,7 +1,7 @@
 /*global define*/
 define([
     'backbone',
-], function (Backbone) {
+], function(Backbone) {
     'use strict';
 
     /**

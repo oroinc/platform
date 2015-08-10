@@ -2,14 +2,14 @@
 define([
     'backbone',
     './model',
-], function (Backbone, Model) {
+], function(Backbone, Model) {
     'use strict';
 
     /**
      * @class   orodashboard.items.Collection
      * @extends Backbone.Collection
      */
-    return  Backbone.Collection.extend({
+    return Backbone.Collection.extend({
         model: Model
     });
 });
