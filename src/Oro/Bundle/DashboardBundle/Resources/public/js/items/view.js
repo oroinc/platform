@@ -2,10 +2,11 @@
 define([
     'backbone',
     'underscore',
+    'jquery',
     './collection',
     'oroui/js/items-manager/table',
     'jquery.select2',
-], function(Backbone, _, ItemCollection) {
+], function(Backbone, _, $, ItemCollection) {
     'use strict';
 
     /**
@@ -70,7 +71,11 @@ define([
 
             items.on('change:show', function(model) {
                 var $option = this.itemSelect.find('option[value=' + model.id + ']');
-                model.get('show') ? $option.addClass('hide') : $option.removeClass('hide');
+                if (model.get('show')) {
+                    $option.addClass('hide');
+                } else {
+                    $option.removeClass('hide');
+                }
             }, this);
 
             var showedItems = items.where({show: true});
@@ -101,7 +106,11 @@ define([
             });
 
             items.on('change:show', function(model) {
-                model.get('show') ? filteredItems.add(model) : filteredItems.remove(model);
+                if (model.get('show')) {
+                    filteredItems.add(model);
+                } else {
+                    filteredItems.remove(model);
+                }
             });
 
             $itemContainer.on('change', function(e) {
