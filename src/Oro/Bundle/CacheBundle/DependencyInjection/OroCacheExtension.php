@@ -34,7 +34,7 @@ class OroCacheExtension extends Extension implements PrependExtensionInterface
     {
         $validationConfig = [
             'validation' => [
-                'cache' => 'oro_cache.validation_cache.doctrine'
+                'cache' => 'oro_cache.validation_cache'
             ]
         ];
 
