@@ -8,7 +8,10 @@ define(function(require) {
     WysiwygDialogView = BaseView.extend({
         autoRender: true,
 
-        minimalWysiwygEditorHeight: 150,
+        // PLEASE don't make this value less than 180px - IE will display editor with bugs
+        // (to adjust need to also change tinymce iframe stylesheet body{min-height:100px} style,
+        // see Oro\Bundle\FormBundle\Resources\public\css\wysiwyg-editor.css)
+        minimalWysiwygEditorHeight: 180,
 
         listen: {
             'component:parentResize': 'resizeEditor'
@@ -33,11 +36,13 @@ define(function(require) {
         },
 
         calcWysiwygHeight: function() {
-            var outerHeight = this.$el.closest('.ui-widget-content').innerHeight();
-            var innerHeight = this.$el.closest('.widget-content').height();
+            var content = this.$el.closest('.ui-widget-content');
             var editorHeight = this.getEditorView().getHeight();
-            var availableHeight = editorHeight + outerHeight - innerHeight;
-            return Math.max(availableHeight, this.minimalWysiwygEditorHeight);
+            var style = getComputedStyle(content[0]);
+            var availableHeight = editorHeight +
+                content[0].offsetHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) +
+                -this.$el.closest('.widget-content')[0].offsetHeight;
+            return Math.floor(Math.max(availableHeight, this.minimalWysiwygEditorHeight));
         },
 
         getEditorView: function() {

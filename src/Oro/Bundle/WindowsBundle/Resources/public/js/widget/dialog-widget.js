@@ -323,20 +323,10 @@ define(function(require) {
             }
         },
 
-        _fixBorderShifting: function() {
-            var dialogWidget = this.widget.dialog('widget');
-            var widthShift = parseInt(dialogWidget.css('border-left-width')) +
-                parseInt(dialogWidget.css('border-right-width'));
-            var heightShift = parseInt(dialogWidget.css('border-top-width')) +
-                parseInt(dialogWidget.css('border-bottom-width'));
-            this.widget.width(this.widget.width() - widthShift);
-            this.widget.height(this.widget.height() - heightShift);
-            this._fixScrollableHeight();
-        },
-
         _fixScrollableHeight: function() {
             var widget = this.widget;
             if (!tools.isMobile()) {
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
                 widget.find('.scrollable-container').each(_.bind(function(i, el) {
                     var $el = $(el);
                     var height = widget.height() - $el.position().top;
@@ -423,15 +413,43 @@ define(function(require) {
             });
         },
 
+        // by default css style = overflow: auto
+        hScrollVisible: true,
+        vScrollVisible: true,
+
         onResize: function(event) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResize', event, this);
             });
+
+            // fixes scroll jumps during window move using d'n'd
+            var content = this.$el.parent();
+            if (content[0].scrollHeight > content[0].clientHeight) {
+                if (this.vScrollVisible !== true) {
+                    this.vScrollVisible = true;
+                    content.css({overflowY: 'auto'});
+                }
+            } else {
+                if (this.vScrollVisible !== false) {
+                    this.vScrollVisible = false;
+                    content.css({overflowY: 'hidden'});
+                }
+            }
+            if (content[0].scrollWidth > content[0].clientWidth) {
+                if (this.hScrollVisible !== true) {
+                    this.hScrollVisible = true;
+                    content.css({overflowX: 'auto'});
+                }
+            } else {
+                if (this.hScrollVisible !== false) {
+                    this.hScrollVisible = false;
+                    content.css({overflowX: 'hidden'});
+                }
+            }
         },
 
         onResizeStop: function(event) {
             this.$el.css({overflow: ''});
-            this._fixBorderShifting();
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });
