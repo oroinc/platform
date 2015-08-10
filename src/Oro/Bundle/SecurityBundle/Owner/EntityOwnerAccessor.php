@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Owner;
 
 use Doctrine\Common\Util\Inflector;
+
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -88,10 +89,6 @@ class EntityOwnerAccessor
      */
     protected function getValue($object, $property)
     {
-        if (!$property) {
-            throw new \InvalidArgumentException('$property must be an string.');
-        }
-
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
@@ -108,8 +105,8 @@ class EntityOwnerAccessor
             } catch (\ReflectionException $ex) {
                 throw new InvalidEntityException(
                     sprintf(
-                        '$object must have either "get%s" method or "%s" property.',
-                        Inflector::camelize($property),
+                        '$object must have either "%s" method or "%s" property.',
+                        Inflector::camelize(sprintf('get_%s', $property)),
                         $property
                     ),
                     0,
