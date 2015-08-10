@@ -13,7 +13,9 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                 id: JSON.stringify(parsedItem.contextValue),
                 text: parsedItem.contextText,
             };
-            organizations[parsedItem.key] = parsedItem.organization;
+            if (parsedItem.organization) {
+                organizations[parsedItem.key] = parsedItem.organization;
+            }
         }
     }
 
