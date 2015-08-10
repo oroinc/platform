@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Event;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -11,11 +11,18 @@ use Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
     /** @var ConfigSubscriber */
     protected $subscriber;
 
     public function setUp()
     {
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->subscriber = new ConfigSubscriber();
     }
 
@@ -29,31 +36,6 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPrePersistEntityConfigWithNoConfig()
-    {
-        $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
-
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('ownership')
-            ->will($this->returnValue($ownershipConfigProvider));
-
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(false));
-        $ownershipConfigProvider->expects($this->never())
-            ->method('getConfig');
-
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
-    }
-
     public function testPrePersistEntityConfigForSystemEntityWithNotNoneOwnership()
     {
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
@@ -62,48 +44,25 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
 
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendConfigProvider    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['ownership', $ownershipConfigProvider],
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
 
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
-        $ownershipConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($config));
-
-        $extendConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
             ->will($this->returnValue($extendConfig));
 
-        $configManager->expects($this->never())->method('persist');
-        $configManager->expects($this->never())->method('calculateConfigChangeSet');
+        $this->configManager->expects($this->never())
+            ->method('persist');
+        $this->configManager->expects($this->never())
+            ->method('calculateConfigChangeSet');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
+        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
     }
 
     public function testPrePersistEntityConfigForCustomEntityDoesNotRequireUpdate()
@@ -115,40 +74,28 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $config->set('organization_field_name', 'organization');
         $config->set('organization_column_name', 'organization_id');
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendConfigProvider    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
+        $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
 
-        $configManager->expects($this->exactly(2))
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['ownership', $ownershipConfigProvider],
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
 
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
-        $ownershipConfigProvider->expects($this->once())
+        $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
-            ->will($this->returnValue($config));
+            ->will($this->returnValue($extendConfig));
 
-        $configManager->expects($this->never())->method('persist');
-        $configManager->expects($this->never())->method('calculateConfigChangeSet');
+        $this->configManager->expects($this->never())
+            ->method('persist');
+        $this->configManager->expects($this->never())
+            ->method('calculateConfigChangeSet');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
+        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
     }
 
     public function testPrePersistEntityConfigForCustomEntityWithNotNoneOwnership()
@@ -159,39 +106,14 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $extendConfig = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
 
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $extendConfigProvider    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->exactly(2))
+        $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['ownership', $ownershipConfigProvider],
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
 
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
-        $ownershipConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($config));
-
-        $extendConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
         $extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1')
@@ -203,14 +125,14 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $expectedConfig->set('organization_field_name', 'organization');
         $expectedConfig->set('organization_column_name', 'organization_id');
 
-        $configManager->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($expectedConfig);
-        $configManager->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('calculateConfigChangeSet')
             ->with($expectedConfig);
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
+        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
     }
 
     public function testPrePersistEntityConfigWithNoneOwnership()
@@ -218,65 +140,25 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
         $config->set('owner_type', 'NONE');
 
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('ownership')
-            ->will($this->returnValue($ownershipConfigProvider));
-
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
-        $ownershipConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($config));
-
         $expectedConfig = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
 
-        $configManager->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($expectedConfig);
-        $configManager->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('calculateConfigChangeSet')
             ->with($expectedConfig);
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
+        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
     }
 
-    public function testPrePersistEntityConfigWithoutOwnership()
+    public function testPrePersistEntityConfigNotOwnershipScope()
     {
-        $config = new Config(new EntityConfigId('ownership', 'Test\Entity1'));
+        $config = new Config(new EntityConfigId('test', 'Test\Entity1'));
 
-        $configManager           = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('ownership')
-            ->will($this->returnValue($ownershipConfigProvider));
-
-        $ownershipConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue(true));
-        $ownershipConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($config));
-
-        $configManager->expects($this->never())
+        $this->configManager->expects($this->never())
             ->method('persist');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $configManager));
+        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
     }
 }

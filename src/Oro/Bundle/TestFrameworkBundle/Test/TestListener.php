@@ -5,11 +5,17 @@ class TestListener implements \PHPUnit_Framework_TestListener
 {
     // @codingStandardsIgnoreEnd
     private $directory;
+    private $durationLimit;
 
-
-    public function __construct($directory)
+    /**
+     * @param string $directory     The log directory
+     * @param float  $durationLimit The max execution time in seconds
+     *                              after that a test duration time is logged
+     */
+    public function __construct($directory, $durationLimit = 0.1)
     {
         $this->directory = $directory;
+        $this->durationLimit = $durationLimit;
     }
 
     public function addError(\PHPUnit_Framework_Test $test, \Exception $e, $time)
@@ -25,6 +31,13 @@ class TestListener implements \PHPUnit_Framework_TestListener
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         //$this->storeAScreenshot($test);
+        if ($time > $this->durationLimit) {
+            @file_put_contents(
+                $this->directory . DIRECTORY_SEPARATOR . 'test_duration.log',
+                sprintf("%.2f sec: %s::%s\n", $time, get_class($test), $test->getName()),
+                FILE_APPEND
+            );
+        }
     }
 
     private function storeAScreenshot(\PHPUnit_Framework_Test $test)

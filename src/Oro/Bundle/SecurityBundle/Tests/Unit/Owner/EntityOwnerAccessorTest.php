@@ -23,6 +23,14 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
         $obj2 = new TestEntityWithOwnerFieldButWithoutGetOwnerMethod('testOwner2');
         $metadataProvider->setMetadata(get_class($obj2), new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id'));
         $this->assertEquals('testOwner2', $accessor->getOwner($obj2));
+
+        $obj1 = new TestEntity('testId3');
+        $obj1->setCustomOwner('testOwner3');
+        $metadataProvider->setMetadata(
+            get_class($obj1),
+            new OwnershipMetadata('ORGANIZATION', 'customOwner', 'custom_owner_id')
+        );
+        $this->assertEquals('testOwner3', $accessor->getOwner($obj1));
     }
 
     public function testGetOwnerNoMetadata()
