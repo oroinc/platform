@@ -843,25 +843,28 @@
         renderLabel - need render default label
 #}
 {% macro entityOwnerLink(entity, renderLabel = true) %}
-    {%- if entity.owner is defined and entity.owner %}
-        {% set ownerType = oro_get_owner_type(entity) %}
-        {% if (ownerType == 'USER') %}
-            {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
-            {% set ownerName = entity.owner|oro_format_name %}
-        {% elseif (ownerType == 'BUSINESS_UNIT') %}
-            {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
-            {% set ownerName = entity.owner.name %}
-        {% elseif (ownerType == 'ORGANIZATION') %}
-            {% set ownerName = entity.owner.name %}
-        {% endif %}
-        {% if ownerName is defined %}
-            {% if renderLabel %}
-                {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+    {% set ownerType = oro_get_owner_type(entity) %}
+    {%- if ownerType %}
+        {% set owner = oro_get_entity_owner(entity) %}
+        {% if owner %}
+            {% if (ownerType == 'USER') %}
+                {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
+                {% set ownerName = owner|oro_format_name %}
+            {% elseif (ownerType == 'BUSINESS_UNIT') %}
+                {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
+                {% set ownerName = owner.name %}
+            {% elseif (ownerType == 'ORGANIZATION') %}
+                {% set ownerName = owner.name %}
             {% endif %}
-            {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
-                <a href="{{ ownerPath }}">{{ ownerName }}</a>
-            {% else %}
-                {{ ownerName }}
+            {% if ownerName is defined %}
+                {% if renderLabel %}
+                    {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+                {% endif %}
+                {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
+                    <a href="{{ ownerPath }}">{{ ownerName }}</a>
+                {% else %}
+                    {{ ownerName }}
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif -%}

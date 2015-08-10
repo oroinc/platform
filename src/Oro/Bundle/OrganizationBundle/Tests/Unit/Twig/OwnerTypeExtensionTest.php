@@ -19,13 +19,30 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     private $configProvider;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityOwnerAccessor;
+
+    /**
      * Set up test environment
      */
     protected function setUp()
     {
+        $this->entityOwnerAccessor = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entityOwnerAccessor->expects($this->any())
+            ->method('getOwner')
+            ->willReturnCallback(
+                function ($entity) {
+                    return $entity->getOwner();
+                }
+            );
+
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
-        $this->extension = new OwnerTypeExtension($this->configProvider);
+        $this->extension = new OwnerTypeExtension($this->configProvider, $this->entityOwnerAccessor);
     }
 
     public function testName()
