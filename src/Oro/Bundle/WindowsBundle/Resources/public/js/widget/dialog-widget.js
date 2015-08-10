@@ -280,7 +280,6 @@ define(function(require) {
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             DialogWidget.__super__.show.apply(this);
-            this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
             this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
