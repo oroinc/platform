@@ -26,6 +26,7 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
         initialize: function(options) {
             this.$el = options._sourceElement;
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
+            this._initEditation();
             Select2EmailRecipientsComponent.__super__.initialize.apply(this, arguments);
         },
 
@@ -105,6 +106,24 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
             currentOrganization = _.result(organizations, id, null);
             data.push(contexts[id]);
             this.$contextEl.select2('data', data);
+        },
+
+        _initEditation: function() {
+            var $el = this.$el;
+            this.$el.parent('.controls').on('click', '.select2-search-choice', function(e) {
+                var $choice = $(this);
+                var $searchField = $(this).parent('.select2-choices').find('input');
+
+                var originalData = $el.select2('data');
+                var selectedIndex = $choice.index();
+                var removedItem = originalData[selectedIndex];
+                var newData = _.reject(originalData, function(item, index) {
+                    return index === selectedIndex;
+                });
+
+                $el.select2('data', newData);
+                $searchField.click().val(removedItem.text).trigger('paste');
+            });
         }
     });
 
