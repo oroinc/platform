@@ -12,6 +12,10 @@ define(function(require) {
     EmailEditorComponent = BaseComponent.extend({
         options: null,
 
+        listen: {
+            'parentResize': 'passResizeEvent'
+        },
+
         /**
          * @constructor
          * @param {Object} options
@@ -47,6 +51,13 @@ define(function(require) {
                 }),
                 bodyFooter: $el.find('[name$="[bodyFooter]"]').val()
             });
+        },
+
+        passResizeEvent: function () {
+            var component = this.view.pageComponent('wrap_oro_email_email_body');
+            var args = _.toArray(arguments);
+            args.push('parentResize');
+            component.trigger('parentResize');
         }
     });
     return EmailEditorComponent;
