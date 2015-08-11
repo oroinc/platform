@@ -545,7 +545,6 @@ define(function(require) {
          * @private
          */
         _renderActions: function() {
-            var counter = 0;
             var self = this;
             this._clearActionsContainer();
             var container = this.getActionsElement();
@@ -557,11 +556,9 @@ define(function(require) {
                         self._initActionEvents(action);
                         self._appendActionElement(sectionContainer, action);
                         self.trigger('widget:add:action:' + section + ':' + key, $(action));
-                        counter++;
                     });
                     container.append(sectionContainer);
                 });
-                container.toggleClass('has-few-actions', counter > 1);
             }
         },
 

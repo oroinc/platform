@@ -111,6 +111,7 @@
     }
 
     .widget-actions-container, .default-actions-container {
+      white-space: nowrap;
       .action-wrapper {
         border-right: 1px solid #ddd;
         padding: 3px 13px;
@@ -121,6 +122,10 @@
       .action-wrapper:last-child {
         border-right: none;
       }
+    }
+
+    .widget-actions-container {
+      margin: 10px -1px 0 0;
     }
 
     .move-action {
@@ -136,6 +141,8 @@
     .title {
       padding-left: 0;
       padding-right: 0;
+      max-width: ~"calc(100% - 120px)";
+      padding-bottom: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -143,6 +150,7 @@
 
     .row-fluid {
       border-top: 1px solid #ddd;
+      margin-top: 5px;
     }
 
     .dashboard-widget-content {
