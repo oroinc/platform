@@ -9,6 +9,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
               CenterLocationDirective, Rectangle, BaseAxis, Point2d, Path,
               Interval2d, Line2d, NodePoint) {
         'use strict';
+
+        /**
+         * Graph embeds logic about it's build and update procedures
+         *
+         * @constructor
+         */
         function Graph() {
             this.rectangles = [];
             this.baseAxises = [];
@@ -20,6 +26,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             this.axisesConnectedAtRight = [];
             this.centerLineMinimalRequiredWidth = 32;
         }
+
+        /**
+         * Main biuld function
+         */
         Graph.prototype.build = function() {
             this.outerRect = this.rectangles.reduce(function(prev, current) {
                 return current.union(prev);
@@ -59,9 +69,25 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             this.buildNodes();
             this.finalizeAxises();
         };
+
+        /**
+         * Returns outgoing path from initial rectangle found by cid
+         *
+         * @param {string} cid content id of initial rectangles passed into graph
+         * @param {Point2d} direction of outgoing connection
+         * @returns {Path}
+         */
         Graph.prototype.getPathFromCid = function(cid, direction) {
             return this.getPathFrom(this.getRectByCid(cid), direction);
         };
+
+        /**
+         * Returns outgoing path from rectangle
+         *
+         * @param {Rectangle} rect
+         * @param {Point2d} direction  direction of outgoing connection
+         * @returns {Path}
+         */
         Graph.prototype.getPathFrom = function(rect, direction) {
             var center = rect.center;
             var node;
@@ -83,6 +109,13 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return new Path(node.connections[direction.id], node, null);
         };
+
+        /**
+         * Finds and recturns one of initial rectangle by cid
+         *
+         * @param {string} cid
+         * @returns {Rectangle}
+         */
         Graph.prototype.getRectByCid = function(cid) {
             for (var i = 0; i < this.rectangles.length; i++) {
                 var rect = this.rectangles[i];
@@ -92,6 +125,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return null;
         };
+
+        /**
+         * Draws graph
+         */
         Graph.prototype.draw = function() {
             var i;
             this.outerRect.draw('red');
@@ -113,25 +150,26 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Divides all axises into horizontal and vertical ones
+         */
         Graph.prototype.createAxises = function() {
-            var newAxis;
             for (var i = 0; i < this.baseAxises.length; i++) {
                 var axis = this.baseAxises[i];
                 if (axis.isVertical) {
-                    newAxis = new BaseAxis(axis.a, axis.b, this, axis.costMultiplier, axis.leftConstraint,
-                        axis.rightConstraint, axis.locationDirective);
-                    newAxis.isVertical = axis.isVertical;
-                    this.verticalAxises.push(newAxis);
+                    this.verticalAxises.push(axis);
                 } else if (axis.a.y === axis.b.y) {
-                    newAxis = new BaseAxis(axis.a, axis.b, this, axis.costMultiplier, axis.leftConstraint,
-                        axis.rightConstraint, axis.locationDirective);
-                    newAxis.isVertical = axis.isVertical;
-                    this.horizontalAxises.push(newAxis);
-                } else {
-                    throw new Error('Not supported');
+                    this.horizontalAxises.push(axis);
                 }
             }
         };
+
+        /**
+         * Removes axis
+         *
+         * @param {Axis} axis
+         */
         Graph.prototype.removeAxis = function(axis) {
             var index;
             if ((index = this.horizontalAxises.indexOf(axis)) !== -1) {
@@ -142,6 +180,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 this.verticalAxises.splice(index, 1);
             }
         };
+
+        /**
+         * Processes merge axises queue
+         */
         Graph.prototype.mergeAxises = function() {
             var i;
             var j;
@@ -153,6 +195,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Performs final operations on graph for future usage.
+         * - connects and sorts nodes
+         * - sort axises
+         */
         Graph.prototype.finalizeAxises = function() {
             var i;
             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
@@ -169,8 +217,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             this.horizontalAxises.sort(function(a, b) {
                 return a.a.y - b.a.y;
             });
-            this.buildAxisConnectionInfo();
         };
+
+        /**
+         * Prepares information about axis connection between each other
+         */
         Graph.prototype.buildAxisConnectionInfo = function() {
             var i;
             var j;
@@ -214,6 +265,15 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Adds into keeper information about axis connections
+         *
+         * @private
+         * @param {Object} keeper
+         * @param {Axis} main
+         * @param {Axis} secondary
+         */
         Graph.prototype.addAxisConnectionInfo = function(keeper, main, secondary) {
             if (!keeper[main.uid]) {
                 keeper[main.uid] = [];
@@ -222,9 +282,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 keeper[main.uid].push(secondary);
             }
         };
-        Graph.prototype.hasAxis = function(axis) {
-            return this.horizontalAxises.indexOf(axis) !== -1 || this.verticalAxises.indexOf(axis) !== -1;
-        };
+
+        /**
+         * Adds axises around initial rectangles
+         */
         Graph.prototype.buildCornerAxises = function() {
             for (var i = this.rectangles.length - 1; i >= 0; i--) {
                 var rect = this.rectangles[i];
@@ -273,6 +334,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Adds axises which go through center of initial rectangle
+         */
         Graph.prototype.buildCenterAxises = function() {
             for (var i = this.rectangles.length - 1; i >= 0; i--) {
                 var rect = this.rectangles[i];
@@ -315,6 +380,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Iterator for all rectangle pairs
+         * @param {Function} fn
+         */
         Graph.prototype.eachRectanglePair = function(fn) {
             for (var i = this.rectangles.length - 1; i >= 0; i--) {
                 var rect1 = this.rectangles[i];
@@ -323,6 +393,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Adds axises between rectangles
+         */
         Graph.prototype.buildCenterLinesBetweenNodes = function() {
             var _this = this;
             this.eachRectanglePair(function(a, b) {
@@ -340,6 +414,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             });
         };
+
+        /**
+         * Adds single axis between rectangles
+         */
         Graph.prototype.buildSingleCenterLine = function(aRect, bRect, coordinate, a, b, min, max) {
             var aVector = new Vector2d(a.center.x, a.center.y, a.a.sub(a.b).rot270().unitVector);
             var bVector = new Vector2d(b.center.x, b.center.y, b.a.sub(b.b).rot90().unitVector);
@@ -392,12 +470,20 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             this.buildNodesAtEndPoints();
         };
+
+        /**
+         * Build nodes at endpoints
+         */
         Graph.prototype.buildNodesAtEndPoints = function() {
             var newVerticalAxises = this.buildNodesAtEndPointsVertical();
             var newHorizontalAxises = this.buildNodesAtEndPointsHorizontal();
             this.verticalAxises.push.apply(this.verticalAxises, newVerticalAxises);
             this.horizontalAxises.push.apply(this.horizontalAxises, newHorizontalAxises);
         };
+
+        /**
+         * Build nodes at endpoints on horizontal axises
+         */
         Graph.prototype.buildNodesAtEndPointsHorizontal = function() {
             var node;
             var newAxis;
@@ -431,6 +517,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return newVerticalAxises;
         };
+
+        /**
+         * Build nodes at endpoints on vertical axises
+         */
         Graph.prototype.buildNodesAtEndPointsVertical = function() {
             var node;
             var newAxis;
@@ -464,6 +554,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return newHorizontalAxises;
         };
+
+        /**
+         * Prepares merge axises requests
+         */
         Graph.prototype.buildMergeRequests = function() {
             for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
                 var hAxis = this.horizontalAxises[i];
@@ -487,6 +581,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Adds single merge axis request. Takes care about queue structure
+         */
         Graph.prototype.addMergeRequest = function(a, b) {
             var foundAQueue;
             var foundBQueue;
@@ -525,6 +623,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
             }
         };
+
+        /**
+         * Returns node at certain point at graph
+         * @param {Point2d} point
+         * @returns {NodePoint}
+         */
         Graph.prototype.getNodeAt = function(point) {
             var node = this.nodes[point.id];
             if (!node) {
@@ -533,6 +637,14 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return node;
         };
+
+        /**
+         * Finds closes initial rectangle (or outer rectangle) cross point by specified vector
+         *
+         * @param {Vector2d} vector
+         * @param {Rectangle} ignoreRect
+         * @returns {*}
+         */
         Graph.prototype.findClosestRectCross = function(vector, ignoreRect) {
             var closestDistance = Infinity;
             var closestPoint = null;
@@ -563,28 +675,31 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
             }
             return closestPoint;
         };
+
+        /**
+         * Returns true if specified rectangle intersects any initial rectangle on graph
+         *
+         * @param {Rectangle} rectangle
+         * @param {Rectangle} ignoreRect
+         * @returns {boolean}
+         */
         Graph.prototype.rectangleIntersectsAnyRectangle = function(rectangle, ignoreRect) {
             for (var i = this.rectangles.length - 1; i >= 0; i--) {
                 if (this.rectangles[i] === ignoreRect) {
                     continue;
                 }
-                if (rectangle.intersection(this.rectangles[i]).isValid) {
+                if (rectangle.intersection(this.rectangles[i]) !== null) {
                     return true;
                 }
             }
             return false;
         };
-        Graph.prototype.intervalIntersectsAnyRectangle = function(interval, ignoreRect) {
-            for (var i = this.rectangles.length - 1; i >= 0; i--) {
-                if (this.rectangles[i] === ignoreRect) {
-                    continue;
-                }
-                if (interval.crossesRect(this.rectangles[i])) {
-                    return true;
-                }
-            }
-            return false;
-        };
+
+        /**
+         * Updates graph with path. Ensures its traversability.
+         *
+         * @param {Path} path
+         */
         Graph.prototype.updateWithPath = function(path) {
             var connections = path.allConnections;
             var axises = [];
@@ -618,22 +733,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 }
                 prev = conn;
             }
-            this.relocateAxises();
         };
-        Graph.prototype.selfCheck = function() {
-            var i;
-            for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-                this.verticalAxises[i].allClones.forEach(function(axis) {
-                    return axis.selfCheck();
-                });
-            }
-            for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
-                this.horizontalAxises[i].allClones.forEach(function(axis) {
-                    return axis.selfCheck();
-                });
-            }
-        };
-        Graph.prototype.relocateAxises = function() {
+
+        /**
+         * Locates axises to be able get valid path points
+         */
+        Graph.prototype.locateAxises = function() {
             var i;
             var j;
             var axis;
@@ -666,48 +771,16 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                     }
                 }
             }
-            /*
-             var leftConstraints: number[] = [];
-             var rightConstraints: number[] = [];
-
-             // sum left constraints
-             for (i = 0; i < this.verticalAxises.length; i++) {
-             var axis = this.verticalAxises[i];
-             var atLeft = this.axisesConnectedAtLeft[axis.uid];
-             var minConstraint = axis.leftConstraint.recommendedStart;
-             if (atLeft) {
-             for (j = 0; j < atLeft.length; j++) {
-             var leftAxis = atLeft[j];
-             if (!minConstraint || leftAxis.leftConstraint.recommendedEnd > minConstraint) {
-             minConstraint = leftAxis.leftConstraint.recommendedEnd;
-             }
-             }
-             }
-             leftConstraints[axis.uid] = minConstraint;
-             }
-             console.log(leftConstraints);
-             // sum right constraints
-             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-             var axis = this.verticalAxises[i];
-             var atRight = this.axisesConnectedAtLeft[axis.uid];
-             var minConstraint = axis.rightConstraint.recommendedStart;
-             if (atRight) {
-             for (j = 0; j < atRight.length; j++) {
-             var rightAxis = atRight[j];
-             if (!minConstraint || rightAxis.rightConstraint.recommendedEnd > minConstraint) {
-             minConstraint = rightAxis.rightConstraint.recommendedEnd;
-             }
-             }
-             }
-             rightConstraints[axis.uid] = minConstraint;
-             }
-
-             // find intersected constraints
-             for (i = this.verticalAxises.length - 1; i >= 0; i--) {
-             //if ()
-             }
-             */
         };
+
+        /**
+         * Returns if this connection is under any rectangle
+         *
+         * @TODO optimize this!
+         *
+         * @param interval
+         * @returns {boolean}
+         */
         Graph.prototype.isConnectionUnderRect = function(interval) {
             for (var i = this.rectangles.length - 1; i >= 0; i--) {
                 var rect = this.rectangles[i];

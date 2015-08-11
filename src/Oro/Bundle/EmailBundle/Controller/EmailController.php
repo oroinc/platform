@@ -394,7 +394,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
+     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
      *
      * @param string $entityClass
      * @param string $activityId

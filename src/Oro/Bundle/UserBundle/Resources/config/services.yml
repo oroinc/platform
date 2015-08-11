@@ -254,6 +254,7 @@ services:
         arguments:
             - @security.context.link
             - @session.flash_bag
+            - @translator
 
     oro_email.listener.datagrid.context.user:
         class: %oro_email.listener.datagrid.context.class%

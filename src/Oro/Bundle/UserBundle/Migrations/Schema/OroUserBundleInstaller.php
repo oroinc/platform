@@ -43,7 +43,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_15';
+        return 'v1_16';
     }
 
     /**
@@ -294,6 +294,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('sess_data', 'text', ['precision' => 0]);
         $table->addColumn('sess_time', 'integer', ['precision' => 0]);
+        $table->addColumn('sess_lifetime', 'integer', ['nullable' => false]);
         $table->setPrimaryKey(['id']);
     }
 
