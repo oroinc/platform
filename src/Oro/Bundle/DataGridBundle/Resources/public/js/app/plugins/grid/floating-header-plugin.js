@@ -250,7 +250,7 @@ define(function(require) {
          */
         onGridHeaderChange: function() {
             this.$grid.find('.thead-sizing').remove();
-            this._ensureTHeadSizing()
+            this._ensureTHeadSizing();
             this.fixHeaderCellWidth();
         },
 

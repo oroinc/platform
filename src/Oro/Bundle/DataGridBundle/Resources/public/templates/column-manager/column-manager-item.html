@@ -3,7 +3,7 @@
 </td>
 <td>
     <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
-        <% if (obj.required) {%>disabled<% } %>
+        <% if (obj.disabledVisibilityChange) {%>disabled<% } %>
         <% if (obj.renderable) {%>checked<% } %>/>
 </td>
 <td>

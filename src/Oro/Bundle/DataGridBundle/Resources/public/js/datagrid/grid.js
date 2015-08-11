@@ -408,7 +408,9 @@ define(function(require) {
          */
         getColumnManager: function() {
             return new ColumnManagerComponent({
-                columns: this.columns
+                columns: this.columns,
+                grid: this,
+                minVisibleColumnsQuantity: 2
             });
         },
 

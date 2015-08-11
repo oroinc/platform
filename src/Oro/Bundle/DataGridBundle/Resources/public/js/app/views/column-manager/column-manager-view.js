@@ -18,34 +18,6 @@ define(function(require) {
             'click .dropdown-menu': 'onDropdownClick'
         },
 
-        listen: {
-            'change:renderable collection': 'updateColumnsList'
-        },
-
-        /**
-         * Min quantity of columns that can not be hidden
-         *
-         * @type {number}
-         */
-        minVisibleColumnsQuantity: 3,
-
-        /**
-         * Quantity of visible columns in coleection
-         *
-         * @type {number}
-         */
-        visibleColumnsQuantity: null,
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function(options) {
-            _.extend(this, _.pick(options, ['minVisibleColumnsQuantity', 'sortable']));
-            this.visibleColumnsQuantity = this.fetchVisibleColumns().length;
-
-            ColumnManagerView.__super__.initialize.apply(this, arguments);
-        },
-
         /**
          * @inheritDoc
          */
@@ -102,37 +74,6 @@ define(function(require) {
          */
         onDropdownClick: function(e) {
             e.stopPropagation();
-        },
-
-        /**
-         * Updates columns list
-         *  - disables/enables show/hide-functionality of a column
-         */
-        updateColumnsList: function() {
-            var visibleColumns = this.fetchVisibleColumns();
-            var wasDisabled = this.visibleColumnsQuantity <= this.minVisibleColumnsQuantity;
-
-            if (visibleColumns.length <= this.minVisibleColumnsQuantity) {
-                _.each(visibleColumns, function(column) {
-                    this.getItemView(column).disableVisibilityChange();
-                }, this);
-
-            } else if (wasDisabled && visibleColumns.length > this.minVisibleColumnsQuantity) {
-                _.each(visibleColumns, function(column) {
-                    this.getItemView(column).enableVisibilityChange();
-                }, this);
-            }
-
-            this.visibleColumnsQuantity = visibleColumns.length;
-        },
-
-        /**
-         * Retrieves array of visible columns
-         *
-         * @returns {Array.<Backgrid.Column>}
-         */
-        fetchVisibleColumns: function() {
-            return this.collection.where({renderable: true});
         },
 
         /**

@@ -227,7 +227,8 @@ define([
             model.save({
                 label: model.get('label'),
                 filters: this.collection.state.filters,
-                sorters: this.collection.state.sorters
+                sorters: this.collection.state.sorters,
+                columns: this.collection.state.columns
             }, {
                 wait: true,
                 success: function() {
@@ -250,6 +251,7 @@ define([
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
                     sorters: self.collection.state.sorters,
+                    columns: self.collection.state.columns,
                     editable: self.permissions.EDIT,
                     deletable: self.permissions.DELETE
                 });
@@ -660,7 +662,7 @@ define([
             }
 
             var title = currentView.label;
-            if (currentView.value === '__all__') {
+            if (currentView.value === this.DEFAULT_GRID_VIEW_ID) {
                 title = __('oro.datagrid.gridView.all');
             }
 

@@ -14,6 +14,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         pageSize: 'p',
         sorters: 's',
         filters: 'f',
+        columns: 'c',
         gridView: 'v',
         urlParams: 'g'
     };
@@ -77,7 +78,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             pageSize: 25,
             totals: null,
             filters: {},
-            sorters: {}
+            sorters: {},
+            columns: {}
         },
 
         /**

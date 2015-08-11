@@ -21,34 +21,9 @@ define(function(require) {
 
         listen: {
             // for some reason events delegated in view constructor does not work
-            addedToParent: 'delegateEvents'
-        },
-
-        /**
-         * Disable visibility change
-         */
-        disableVisibilityChange: function() {
-            this._toggleVisibilityChange(false);
-        },
-
-        /**
-         * Enable visibility change
-         *  - visibility change can be enabled only for not required columns
-         */
-        enableVisibilityChange: function() {
-            if (!this.model.get('required')) {
-                this._toggleVisibilityChange(true);
-            }
-        },
-
-        /**
-         * Disables/enables visibility change
-         *
-         * @param {boolean} flag
-         * @protected
-         */
-        _toggleVisibilityChange: function(flag) {
-            this.$('input[type=checkbox][data-role=renderable]').prop('disabled', !flag);
+            addedToParent: 'delegateEvents',
+            // update view on model change
+            'change:disabledVisibilityChange model': 'render'
         },
 
         /**
