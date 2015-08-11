@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class OwnerTypeExtension extends \Twig_Extension
@@ -15,28 +16,31 @@ class OwnerTypeExtension extends \Twig_Extension
      */
     protected $configProvider;
 
+    /** @var EntityOwnerAccessor */
+    protected $ownerAccessor;
+
     /**
      * @param ConfigProvider $configProvider
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigProvider $configProvider, EntityOwnerAccessor $entityOwnerAccessor)
     {
         $this->configProvider = $configProvider;
+        $this->ownerAccessor = $entityOwnerAccessor;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
             'oro_get_owner_type' => new \Twig_Function_Method($this, 'getOwnerType'),
+            'oro_get_entity_owner' => new \Twig_Function_Method($this, 'getEntityOwner')
         ];
     }
 
     /**
-     * @param $entity
+     * @param object $entity
      * @return string
      */
     public function getOwnerType($entity)
@@ -48,6 +52,16 @@ class OwnerTypeExtension extends \Twig_Extension
         $config = $this->configProvider->getConfig($ownerClassName);
 
         return $config->get('owner_type');
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return null|object
+     */
+    public function getEntityOwner($entity)
+    {
+        return $this->ownerAccessor->getOwner($entity);
     }
 
     /**
