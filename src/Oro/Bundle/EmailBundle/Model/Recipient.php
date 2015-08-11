@@ -51,7 +51,7 @@ class Recipient
             return $this->name;
         }
 
-        return sprintf('(%s) %s', $this->entity->getOrganization(), $this->name);
+        return sprintf('%s (%s)', $this->name, $this->entity->getOrganization());
     }
 
     /**
