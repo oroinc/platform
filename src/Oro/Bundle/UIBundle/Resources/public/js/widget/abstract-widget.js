@@ -612,7 +612,7 @@ define(function(require) {
         _clearActionsContainer: function() {
             var actionsEl = this.getActionsElement();
             if (actionsEl) {
-                actionsEl.removeClass('has-few-actions').empty();
+                actionsEl.empty();
             }
         },
 
