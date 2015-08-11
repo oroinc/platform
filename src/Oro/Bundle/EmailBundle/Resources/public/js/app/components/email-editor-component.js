@@ -53,7 +53,7 @@ define(function(require) {
             });
         },
 
-        passResizeEvent: function () {
+        passResizeEvent: function() {
             var component = this.view.pageComponent('wrap_oro_email_email_body');
             var args = _.toArray(arguments);
             args.push('parentResize');

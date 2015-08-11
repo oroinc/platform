@@ -107,7 +107,7 @@ define(function(require) {
         /**
          * Returns wysiwyg editor view
          */
-        getBodyEditorView: function () {
+        getBodyEditorView: function() {
             return this.pageComponent('wrap_oro_email_email_body').view.pageComponent('oro_email_email_body').view;
         },
 
