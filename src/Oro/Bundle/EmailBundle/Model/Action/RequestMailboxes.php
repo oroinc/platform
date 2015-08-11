@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
@@ -45,13 +44,13 @@ class RequestMailboxes extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $type = $this->contextAccessor->getValue($context, $this->processType);
-        $type = $this->processStorage->getProcess($type)->getSettingsEntityFQCN();
+        $settingsClass = $this->contextAccessor->getValue($context, $this->processType);
+        $settingsClass = $this->processStorage->getProcess($settingsClass)->getSettingsEntityFQCN();
 
         $email = $this->contextAccessor->getValue($context, $this->email);
 
         $results = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-            ->findMailboxesBySettingsTypeWhichContainEmail($type, $email);
+            ->findBySettingsClassAndEmail($settingsClass, $email);
 
         $this->contextAccessor->setValue($context, $this->attribute, $results);
     }
@@ -66,6 +65,10 @@ class RequestMailboxes extends AbstractAction
      */
     public function initialize(array $options)
     {
+        if (count($options) !== 3) {
+            throw new InvalidParameterException('Three options must be defined.');
+        }
+
         if (!isset($options['attribute']) && !isset($options[0])) {
             throw new InvalidParameterException('Attribute must be defined.');
         }

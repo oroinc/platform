@@ -91,23 +91,22 @@ class MailboxRepository extends EntityRepository
     }
 
     /**
-     * Finds all mailboxes containing provided email and with settings of type.
+     * Finds all mailboxes containing provided email and with settings of provided class.
      *
-     * @param string $type  Fully qualified class name of settings entity of mailbox.
-     * @param Email  $email Email entity
+     * @param string $settingsClass Fully qualified class name of settings entity of mailbox.
+     * @param Email  $email         Email which should be in mailbox.
      *
      * @return Collection|Mailbox[]
      */
-    public function findMailboxesBySettingsTypeWhichContainEmail($type, Email $email)
+    public function findBySettingsClassAndEmail($settingsClass, Email $email)
     {
-
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('mb')
            ->from('OroEmailBundle:Mailbox', 'mb')
            ->leftJoin('mb.emailUsers', 'eu')
            ->leftJoin('eu.folder', 'f')
            ->leftJoin('mb.processSettings', 'ps')
-           ->where($qb->expr()->isInstanceOf('ps', $type))
+           ->where($qb->expr()->isInstanceOf('ps', $settingsClass))
            ->andWhere('eu.email = :email')
            ->andWhere(
                $qb->expr()->orX(

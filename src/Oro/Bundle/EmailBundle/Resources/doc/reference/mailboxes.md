@@ -139,10 +139,21 @@ provided, it will use address as first name and domain as last name.
 Adds newly generated entity as an activity target for email.
 
 ```yaml
-- @add_email_activity_target:
+@add_email_activity_target:
     email:              $.email
     target_entity:      $.leadEntity
     attribute:          $.added         #true if record was added (optional)
+```
+
+#### Strip HTML Tags
+
+Removes content of invisible html tags and strips tags from provided html.
+Leaves only visible text.
+
+```yaml
+@strip_html_tags:
+    attribute: $.textOnly
+    html: $.html
 ```
 
 ### Process Registration
