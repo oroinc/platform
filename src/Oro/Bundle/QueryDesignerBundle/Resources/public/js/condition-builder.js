@@ -200,6 +200,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             var index = _.indexOf(ui.item[0].parentNode.children, ui.item[0]);
             if (index === 0) {
                 ui.item.parent().addClass('drag-start-from-first');
+                // second is placeholder
+                // third is element we need
+                if (ui.item[0].parentNode.children.length > 2) {
+                    $(ui.item[0].parentNode.children[2]).addClass('hide-operator');
+                }
             }
             if (index === ui.item[0].parentNode.children.length - 2 /* placeholder is already added into DOM*/) {
                 ui.item.parent().addClass('drag-start-from-last');
@@ -211,9 +216,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
         },
 
         _onConditionsGroupDrop: function(e, ui) {
+            // cleanup
             this.$rootCondition.removeClass('drag-start-from-first drag-start-from-last');
             this.$rootCondition.find('.drag-start-from-first').removeClass('drag-start-from-first');
             this.$rootCondition.find('.drag-start-from-last').removeClass('drag-start-from-last');
+            this.$rootCondition.find('.hide-operator').removeClass('hide-operator');
         },
 
         syncDropAreaOver: function() {
