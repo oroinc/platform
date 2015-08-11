@@ -44,7 +44,9 @@ define([
             this._initializeFilter(this.items);
             this._initializeItemGrid(this.items);
             this._toggleButtons();
-            this._fixScrollableContent();
+
+            this.$dialog = this.$el.closest('.ui-dialog');
+            this.$dialog.css('top', 0);
         },
 
         _initializeItems: function(itemsData, baseName) {
@@ -119,10 +121,6 @@ define([
                 var value = $target.is(':checkbox') ? $target.is(':checked') : $target.val();
                 item.set($target.data('name'), value);
             });
-        },
-
-        _fixScrollableContent: function() {
-            this.$('.scrollable-container').css('overflow-y', 'scroll');
         },
 
         _onAddClick: function() {
