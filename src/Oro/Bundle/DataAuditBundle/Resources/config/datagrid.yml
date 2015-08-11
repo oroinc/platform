@@ -44,6 +44,9 @@ datagrid:
         columns:
             action:
                 label: oro.dataaudit.datagrid.action
+                type: twig
+                template: OroDataAuditBundle:Datagrid:Property/action.html.twig
+                frontend_type: html
             version:
                 label: oro.dataaudit.datagrid.version
             objectClass:

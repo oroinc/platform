@@ -23,6 +23,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -73,6 +74,9 @@ class OwnerFormExtension extends AbstractTypeExtension
     /** @var int */
     protected $oldOwner;
 
+    /** @var EntityOwnerAccessor */
+    protected $entityOwnerAccessor;
+
     /**
      * @param ManagerRegistry           $managerRegistry
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
@@ -80,6 +84,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param SecurityFacade            $securityFacade
      * @param AclVoter                  $aclVoter
      * @param OwnerTreeProvider         $treeProvider
+     * @param EntityOwnerAccessor       $entityOwnerAccessor
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -87,7 +92,8 @@ class OwnerFormExtension extends AbstractTypeExtension
         BusinessUnitManager $businessUnitManager,
         SecurityFacade $securityFacade,
         AclVoter $aclVoter,
-        OwnerTreeProvider $treeProvider
+        OwnerTreeProvider $treeProvider,
+        EntityOwnerAccessor $entityOwnerAccessor
     ) {
         $this->managerRegistry           = $managerRegistry;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
@@ -95,6 +101,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         $this->securityFacade            = $securityFacade;
         $this->aclVoter                  = $aclVoter;
         $this->treeProvider              = $treeProvider;
+        $this->entityOwnerAccessor       = $entityOwnerAccessor;
     }
 
     /**
@@ -110,6 +117,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
+     *
      * @throws \LogicException when getOwner method isn't implemented for entity with ownership type
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -221,11 +229,11 @@ class OwnerFormExtension extends AbstractTypeExtension
         // Check if we have owner in data.
         // In case Business unit entity, owner(parent) is not required.
         // For other entities, form without owner will not be valid because owner is required.
-        if (!is_object($event->getData()->getOwner())) {
+        if (!is_object($this->entityOwnerAccessor->getOwner($event->getData()))) {
             return;
         }
 
-        $newOwner = $entity->getOwner();
+        $newOwner = $this->entityOwnerAccessor->getOwner($entity);
         //validate only if owner was changed or then we are on create page
         if (is_null($event->getData()->getId())
             || ($this->oldOwner && $newOwner->getId() && $this->oldOwner !== $newOwner->getId())
@@ -274,9 +282,9 @@ class OwnerFormExtension extends AbstractTypeExtension
         ) {
             $permission = 'ASSIGN';
             $this->checkIsGranted($permission, $entity);
-            $owner = $entity->getOwner();
+            $owner         = $this->entityOwnerAccessor->getOwner($entity);
             $dataClassName = ClassUtils::getClass($entity);
-            $metadata = $this->getMetadata($dataClassName);
+            $metadata      = $this->getMetadata($dataClassName);
 
             if ($metadata) {
                 if ($form->has($this->fieldName)) {
@@ -308,7 +316,7 @@ class OwnerFormExtension extends AbstractTypeExtension
          */
         if ($this->isAssignGranted || $permission == 'ASSIGN') {
             $formBuilder = $builder instanceof FormInterface ? $builder->getConfig() : $builder;
-            $isRequired = $formBuilder->getOption('required');
+            $isRequired  = $formBuilder->getOption('required');
 
             $options = [
                 'label'              => ConfigHelper::getTranslationKey(
@@ -347,6 +355,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * Check if current entity is BusinessUnit
      *
      * @param string $className
+     *
      * @return bool
      */
     protected function checkIsBusinessUnitEntity($className)
@@ -370,16 +379,16 @@ class OwnerFormExtension extends AbstractTypeExtension
          * Owner field is required for all entities except business unit
          */
         if (!$this->checkIsBusinessUnitEntity($className)) {
-            $validation = [
+            $validation      = [
                 'constraints' => [new NotBlank()],
-                'required' => true,
+                'required'    => true,
             ];
             $emptyValueLabel = 'oro.business_unit.form.choose_business_user';
         } else {
-            $validation = [
+            $validation       = [
                 'required' => false
             ];
-            $emptyValueLabel = 'oro.business_unit.form.none_business_user';
+            $emptyValueLabel  = 'oro.business_unit.form.none_business_user';
             $this->fieldLabel = 'oro.organization.businessunit.parent.label';
         }
 
@@ -392,15 +401,15 @@ class OwnerFormExtension extends AbstractTypeExtension
                 'oro_business_unit_tree_select',
                 array_merge(
                     [
-                        'empty_value'       => $emptyValueLabel,
-                        'mapped'            => true,
-                        'label'             => $this->fieldLabel,
-                        'business_unit_ids' => $this->getBusinessUnitIds(),
-                        'configs'           => [
+                        'empty_value'          => $emptyValueLabel,
+                        'mapped'               => true,
+                        'label'                => $this->fieldLabel,
+                        'business_unit_ids'    => $this->getBusinessUnitIds(),
+                        'configs'              => [
                             'is_safe' => true,
                         ],
                         'translatable_options' => false,
-                        'choices' => $this->businessUnitManager->getTreeOptions(
+                        'choices'              => $this->businessUnitManager->getTreeOptions(
                             $this->businessUnitManager->getBusinessUnitsTree(
                                 null,
                                 $this->getOrganizationContextId()
@@ -513,13 +522,14 @@ class OwnerFormExtension extends AbstractTypeExtension
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
-        $this->accessLevel = $observer->getAccessLevel();
+        $this->accessLevel     = $observer->getAccessLevel();
     }
 
     /**
      * Get metadata for entity
      *
      * @param object|string $entity
+     *
      * @return bool|OwnershipMetadataInterface
      * @throws \LogicException
      */
