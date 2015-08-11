@@ -8,8 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToModelTransformer;
-use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToViewTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 
 class ShareSelectType extends AbstractType
 {
@@ -33,12 +32,9 @@ class ShareSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(
-            new ContextsToModelTransformer($this->entityManager)
-        );
         $builder->resetViewTransformers();
         $builder->addViewTransformer(
-            new ContextsToViewTransformer($this->entityManager)
+            new EntitiesToJsonTransformer($this->entityManager)
         );
     }
 

@@ -1,19 +1,22 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
+namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-class ContextsToViewTransformer implements DataTransformerInterface
+class EntitiesToJsonTransformer implements DataTransformerInterface
 {
     /**
      * @var EntityManager
      */
     protected $entityManager;
 
+    /**
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -47,6 +50,18 @@ class ContextsToViewTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $value;
+        if (!$value) {
+            return [];
+        }
+
+        $targets = explode(';', $value);
+        $result = [];
+        foreach ($targets as $target) {
+            $target = json_decode($target, true);
+            $metadata = $this->entityManager->getClassMetadata($target['entityClass']);
+            $result[] = $this->entityManager->getRepository($metadata->getName())->find($target['entityId']);
+        }
+
+        return $result;
     }
 }

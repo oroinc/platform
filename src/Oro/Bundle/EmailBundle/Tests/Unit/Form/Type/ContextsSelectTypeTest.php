@@ -40,7 +40,7 @@ class ContextsSelectTypeTest extends TypeTestCase
     {
         $builder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
         $builder->expects($this->once())
-            ->method('addModelTransformer');
+            ->method('addViewTransformer');
         $type = new ContextsSelectType($this->em);
         $type->buildForm($builder, []);
     }
