@@ -201,7 +201,6 @@ class CalendarEventType extends AbstractType
                 'layout_template'       => false,
                 'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'             => 'calendar_event',
-                'cascade_validation'    => true,
             ]
         );
     }

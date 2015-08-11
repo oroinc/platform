@@ -20,7 +20,6 @@ class ReminderCollectionType extends AbstractType
                 'options'              => array(
                     'data_class' => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder'
                 ),
-                'cascade_validation'   => true,
             )
         );
     }
