@@ -26,6 +26,8 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailRecipientsHelper
 {
+    CONST ORGANIZATION_PROPERTY = 'organization';
+
      /** @var AclHelper */
     protected $aclHelper;
 
@@ -97,8 +99,8 @@ class EmailRecipientsHelper
         }
 
         $organizationName = null;
-        if ($this->getPropertyAccessor()->isReadable($object, 'organization')) {
-            $organization = $this->getPropertyAccessor()->getValue($object, 'organization');
+        if ($this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)) {
+            $organization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
             if ($organization) {
                 $organizationName = $organization->getName();
             }
@@ -238,12 +240,12 @@ class EmailRecipientsHelper
     {
         if (!$organization ||
             !$object ||
-            !$this->getPropertyAccessor()->isReadable($object, 'organization')
+            !$this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)
         ) {
             return true;
         }
 
-        $objectOrganization = $this->getPropertyAccessor()->getValue($object, 'organization');
+        $objectOrganization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
         if (!$organization) {
             return true;
         }
