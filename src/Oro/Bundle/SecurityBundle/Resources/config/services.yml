@@ -73,6 +73,7 @@ parameters:
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
     oro_security.form.type.share_scope.class:                  Oro\Bundle\SecurityBundle\Form\Type\ShareScopeType
+    oro_security.form.type.share_select.class:                 Oro\Bundle\SecurityBundle\Form\Type\ShareSelectType
     oro_security.form.type.share.class:                        Oro\Bundle\SecurityBundle\Form\Type\ShareType
     oro_security.form.handler.share.class:                     Oro\Bundle\SecurityBundle\Form\Handler\ShareHandler
     oro_security.form.model.factory.class:                     Oro\Bundle\SecurityBundle\Form\Model\Factory
@@ -599,6 +600,13 @@ services:
             - oro_share_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity}
+
+    oro_security.form.type.share_select:
+        class: %oro_security.form.type.share_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_share_select }
 
     oro_security.form.type.share:
         class: %oro_security.form.type.share.class%

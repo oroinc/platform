@@ -29,11 +29,7 @@ class ShareTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::ENTITY_ID, $this->model->getEntityId());
 
         $businessUnits = [2];
-        $this->model->setBusinessunits($businessUnits);
-        $this->assertEquals($businessUnits, $this->model->getBusinessunits());
-
-        $users = [3];
-        $this->model->setUsers($users);
-        $this->assertEquals($users, $this->model->getUsers());
+        $this->model->setEntities($businessUnits);
+        $this->assertEquals($businessUnits, $this->model->getEntities());
     }
 }

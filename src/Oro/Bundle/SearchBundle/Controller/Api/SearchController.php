@@ -89,4 +89,40 @@ class SearchController extends FOSRestController
 
         return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
     }
+
+    /**
+     * @ApiDoc(
+     *      description="Get search result for sharing entities",
+     *      resource=true,
+     *      filters={
+     *          {"name"="entityClass", "dataType"="string"},
+     *          {"name"="query", "dataType"="string"},
+     *          {"name"="offset", "dataType"="integer"},
+     *          {"name"="max_results", "dataType"="integer"}
+     *      }
+     * )
+     *
+     * @AclAncestor("oro_search")
+     */
+    public function getSharingEntitiesAction()
+    {
+        $user = $this->get('security.context')->getToken()->getUser();
+        if ($this->getRequest()->get('search_by_id')) {
+            $results = $this->get('oro_search.index')->searchSharingEntitiesById(
+                $user,
+                $this->getRequest()->get('entityClass'),
+                $this->getRequest()->get('query')
+            );
+        } else {
+            $results = $this->get('oro_search.index')->searchSharingEntities(
+                $user,
+                $this->getRequest()->get('entityClass'),
+                $this->getRequest()->get('query'),
+                (int) $this->getRequest()->get('offset'),
+                (int) $this->getRequest()->get('max_results')
+            );
+        }
+
+        return new Response(json_encode(['results' => $results]), Codes::HTTP_OK);
+    }
 }

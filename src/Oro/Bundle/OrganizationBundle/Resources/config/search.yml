@@ -1,5 +1,15 @@
 Oro\Bundle\OrganizationBundle\Entity\Organization:
-    alias:                          organization
+    alias:                          oro_organization
+    search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
+    title_fields:                   [name]
+    fields:
+        -
+            name:                   name
+            target_type:            text
+            target_fields:          [name]
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    alias:                          oro_business_unit
     search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
     title_fields:                   [name]
     fields:
