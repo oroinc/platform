@@ -441,10 +441,10 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             var firstPage = state.firstPage;
             var totalPages = state.totalPages;
 
-            if (totalRecords !== null && totalRecords !== undefined &&
-                pageSize !== null && pageSize !== undefined &&
-                currentPage !== null && currentPage !== undefined &&
-                firstPage !== null && firstPage !== null &&
+            if (totalRecords !== null && totalRecords !== void 0 &&
+                pageSize !== null && pageSize !== void 0 &&
+                currentPage !== null && currentPage !== void 0 &&
+                firstPage !== null && firstPage !== void 0 &&
                 (mode === 'infinite' ? links : true)) {
 
                 state.totalRecords = totalRecords = this.finiteInt(totalRecords, 'totalRecords');

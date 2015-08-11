@@ -37,7 +37,7 @@ class ConfigModelManager
      * {class name} => array of FieldConfigModel[]
      *      {field name} => FieldConfigModel
      */
-    protected $fieldLocalCache;
+    protected $fieldLocalCache = [];
 
     /**
      * @var bool
@@ -61,7 +61,6 @@ class ConfigModelManager
     public function __construct(ServiceLink $proxyEm)
     {
         $this->proxyEm = $proxyEm;
-        $this->clearCache();
     }
 
     /**
@@ -457,6 +456,10 @@ class ConfigModelManager
     {
         $this->entityLocalCache = null;
         $this->fieldLocalCache  = [];
+
+        $em = $this->getEntityManager();
+        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
+        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel');
     }
 
     /**
