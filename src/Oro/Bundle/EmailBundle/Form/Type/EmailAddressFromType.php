@@ -52,7 +52,7 @@ class EmailAddressFromType extends AbstractType
             return [];
         }
 
-        $emails = array_values($this->relatedEmailsProvider->getEmails($user));
+        $emails = array_values($this->relatedEmailsProvider->getEmails($user, 1, true));
 
         return array_combine($emails, $emails);
     }

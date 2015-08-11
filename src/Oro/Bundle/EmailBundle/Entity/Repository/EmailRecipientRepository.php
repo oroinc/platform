@@ -45,10 +45,6 @@ class EmailRecipientRepository extends EntityRepository
         array $excludedEmails = [],
         $query = null
     ) {
-        if (!$senderEmails) {
-            return [];
-        }
-
         $emailQb = $this->_em->getRepository('Oro\Bundle\EmailBundle\Entity\Email')->createQueryBuilder('e');
         $emailQb
             ->select('MAX(r.id) AS id')
@@ -56,8 +52,13 @@ class EmailRecipientRepository extends EntityRepository
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'a')
             ->andWhere('e.sentAt > :from')
-            ->andWhere($emailQb->expr()->in('fe.email', ':senders'))
             ->groupBy('a.email');
+
+        if ($senderEmails) {
+            $emailQb->andWhere($emailQb->expr()->in('fe.email', ':senders'));
+        } else {
+            $emailQb->andWhere('1 = 0');
+        }
 
         if ($excludedEmails) {
             $emailQb->andWhere($emailQb->expr()->notIn('a.email', ':excluded_emails'));
@@ -69,8 +70,11 @@ class EmailRecipientRepository extends EntityRepository
             ->orderBy('re.name')
             ->join('re.emailAddress', 'ea')
             ->where($recepientsQb->expr()->in('re.id', $emailQb->getDQL()))
-            ->setParameter('from', new \DateTime('-30 days'))
-            ->setParameter('senders', $senderEmails);
+            ->setParameter('from', new \DateTime('-30 days'));
+
+        if ($senderEmails) {
+            $recepientsQb->setParameter('senders', $senderEmails);
+        }
 
         if ($query) {
             $recepientsQb

@@ -158,7 +158,7 @@ class EmailRecipientsHelper
 
         return [
             'id' => $recipient->getName(),
-            'text' => $recipient->getLabel(),
+            'text' => $recipient->getName(),
             'data' => json_encode($data),
         ];
     }

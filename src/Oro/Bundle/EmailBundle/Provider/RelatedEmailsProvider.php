@@ -75,7 +75,7 @@ class RelatedEmailsProvider
      */
     public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
     {
-        if (!$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization)) {
+        if (!$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization)) {
             return [];
         }
 

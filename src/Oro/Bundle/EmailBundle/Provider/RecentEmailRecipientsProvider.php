@@ -67,7 +67,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
             return [];
         }
 
-        $userEmailAddresses = array_keys($this->relatedEmailsProvider->getEmails($user));
+        $userEmailAddresses = array_keys($this->relatedEmailsProvider->getEmails($user, 1, true));
 
         $recipientsQb = $this->getEmailRecipientRepository()
             ->getEmailsUsedInLast30DaysQb(
