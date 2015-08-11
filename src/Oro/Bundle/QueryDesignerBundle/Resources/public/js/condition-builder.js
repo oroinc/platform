@@ -181,19 +181,25 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
             this.$rootCondition.parent().prepend('<div class="drop-area-marker"><span>' +
                 __('Drop condition here') +
                 '</span></div>');
+            /**
+             * sum of heights of :before,:after condition group pseudo elements
+             */
+            var SPACERS_PSEUDO_ELEMENTS_HEIGHT = 20;
             this.$rootCondition
                 .parent()
                 .find('.drop-area-marker')
                 // please do not replace to $smth.height(value) call because of bugs
-                .css({height: this.$rootCondition.height()});
+                .css({
+                    height: this.$rootCondition.height() - SPACERS_PSEUDO_ELEMENTS_HEIGHT
+                });
         },
 
         _onCriteriaDrop: function(e, ui) {
             // put item back instead of it's clone
             var $origin = ui.item;
             var $clone = $origin.data('clone');
-            this.$rootCondition.parent().find('.drop-area-marker').remove();
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
+            this.$rootCondition.parent().find('.drop-area-marker').remove();
         },
 
         _onConditionsGroupGrab: function(e, ui) {
