@@ -6,6 +6,10 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
     var currentOrganization = null;
 
     function processData(data) {
+        if (typeof data === 'undefined') {
+            return;
+        }
+
         var parsedItem = JSON.parse(data);
         if (parsedItem.contextText) {
             contexts[parsedItem.key] = {};

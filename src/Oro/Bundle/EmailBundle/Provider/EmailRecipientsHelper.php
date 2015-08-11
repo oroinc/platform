@@ -99,7 +99,9 @@ class EmailRecipientsHelper
         $organizationName = null;
         if ($this->getPropertyAccessor()->isReadable($object, 'organization')) {
             $organization = $this->getPropertyAccessor()->getValue($object, 'organization');
-            $organizationName = $organization->getName();
+            if ($organization) {
+                $organizationName = $organization->getName();
+            }
         }
 
         return new RecipientEntity(
