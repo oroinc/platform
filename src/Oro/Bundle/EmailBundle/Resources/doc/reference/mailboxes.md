@@ -50,7 +50,8 @@ conditions for rules are matched.
    - authorizedUsers (list of users able to view mailbox emails)
    - authorizedRoles (list of roles able to view mailbox emails)
  - **MailboxProcessSettings** - Represents mailbox process settings. This is
- a mapped superclass which should be extended to represent any added process.
+an entity which should be extended to represent any added process and store
+its settings (This entity is using single table inheritance).
    - id
    - type
 
@@ -61,7 +62,8 @@ Mailbox processing is added using **processes** from OroWorkflowBundle.
 Process can look like following example and should be triggered on
 creation of EmailBody entity. In case you don't need email body for your
 process, feel free to use EmailUser entity. That one is created right when email
-is received, body is  synchronized later.
+is received, body is synchronized later, using a cron job or when user opens an
+email.
 
 ``` yaml
 definitions:
@@ -106,8 +108,8 @@ to help find mailboxes.
 This action searches for mailbox using provided email entity. It will set
 attribute value to empty array if no mailbox is found. Multiple mailboxes are
 found for example when email is addressed to multiple recipients and at least
-two of them are mailboxes with processing of same type. Use @traverse action to
-iterate over these mailboxes.
+two of them are mailboxes with processing of same type. Use *@traverse* action
+to iterate over these mailboxes.
 
 ```yaml
 @find_mailboxes:
@@ -148,7 +150,7 @@ Adds newly generated entity as an activity target for email.
 Implement **MailboxProcessProviderInterface** and register it as a service with
 tag **oro_email.mailbox_process**. Also provide type with this tag.
 
-LeadMailboxProcessProviderProvider as an example:
+LeadMailboxProcessProvider as an example:
 
 ``` php
 class LeadMailboxProcessProvider implements MailboxProcessProviderInterface
