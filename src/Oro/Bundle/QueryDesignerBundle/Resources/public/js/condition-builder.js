@@ -1,4 +1,5 @@
-define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdown-select'], function($, __) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery-ui',
+    'oroui/js/dropdown-select'], function($, _, __) {
     'use strict';
 
     /**
@@ -38,6 +39,8 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
             }
         },
 
+        currentDraggingElementHeight: 0,
+
         _create: function() {
             var modules;
             this.$criteriaList = $(this.options.criteriaListSelector);
@@ -74,16 +77,16 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
             opts.conditionsGroup.appendTo = opts.criteriaListSelector;
             opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
             opts.conditionsGroup.update = $.proxy(this._onHierarchyChange, this);
-            opts.conditionsGroup.over = $.proxy(this._onConditionsGroupOver, this);
-            opts.conditionsGroup.out = $.proxy(this._onConditionsGroupOut, this);
-            opts.conditionsGroup.start = $.proxy(this._onConditionsGroupGrab, this);
-            opts.conditionsGroup.stop = $.proxy(this._onConditionsGroupDrop, this);
-            opts.conditionsGroup.remove = function() {
-                $(this).trigger('changed');
-            };
+            opts.conditionsGroup.over = $.proxy(this.syncDropAreaOver, this);
+            opts.conditionsGroup.out = $.proxy(this.syncDropAreaOver, this);
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
+
+            opts.conditionsGroup.start = $.proxy(this._onConditionsGroupGrab, this);
+            opts.conditionsGroup.stop = $.proxy(this._onConditionsGroupDrop, this);
+            opts.criteriaList.over = $.proxy(this.syncDropAreaOver, this);
+            opts.criteriaList.out = $.proxy(this.syncDropAreaOver, this);
         },
 
         getValue: function() {
@@ -168,6 +171,13 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
             var $origin = ui.item;
             var $clone = $origin.clone();
             $origin.data('clone', $clone);
+            $clone
+                .data('origin', $origin)
+                .removeAttr('style')
+                .insertAfter($origin);
+            ui.helper.addClass(this.options.helperClass);
+
+            // createDropAreaMarker
             this.$rootCondition.parent().prepend('<div class="drop-area-marker"><span>' +
                 __('Drop condition here') +
                 '</span></div>');
@@ -176,11 +186,6 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
                 .find('.drop-area-marker')
                 // please do not replace to $smth.height(value) call because of bugs
                 .css({height: this.$rootCondition.height()});
-            $clone
-                .data('origin', $origin)
-                .removeAttr('style')
-                .insertAfter($origin);
-            ui.helper.addClass(this.options.helperClass);
         },
 
         _onCriteriaDrop: function(e, ui) {
@@ -191,26 +196,30 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
             $clone.removeData('origin').replaceWith($origin.removeData('clone'));
         },
 
-        _onConditionsGroupGrab: function (e, ui) {
+        _onConditionsGroupGrab: function(e, ui) {
             var index = _.indexOf(ui.item[0].parentNode.children, ui.item[0]);
             if (index === 0) {
-                this.$rootCondition.addClass('drag-start-from-first');
+                ui.item.parent().addClass('drag-start-from-first');
             }
             if (index === ui.item[0].parentNode.children.length - 2 /* placeholder is already added into DOM*/) {
-                this.$rootCondition.addClass('drag-start-from-last');
+                ui.item.parent().addClass('drag-start-from-last');
             }
+
+            this.$rootCondition.find('.sortable-placeholder').css({
+                'height': this.currentDraggingElementHeight
+            });
         },
 
-        _onConditionsGroupDrop: function (e, ui) {
+        _onConditionsGroupDrop: function(e, ui) {
             this.$rootCondition.removeClass('drag-start-from-first drag-start-from-last');
+            this.$rootCondition.find('.drag-start-from-first').removeClass('drag-start-from-first');
+            this.$rootCondition.find('.drag-start-from-last').removeClass('drag-start-from-last');
         },
 
-        _onConditionsGroupOver: function(e, ui) {
-            this.$rootCondition.parent().addClass('drop-area-over');
-        },
-
-        _onConditionsGroupOut: function(e, ui) {
-            this.$rootCondition.parent().removeClass('drop-area-over');
+        syncDropAreaOver: function() {
+            this.$rootCondition
+                .parent()
+                .toggleClass('drop-area-over', this.$rootCondition.find('.sortable-placeholder').length !== 0);
         },
 
         _getCriteriaOrigin: function(criteria) {
@@ -297,6 +306,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery-ui', 'oroui/js/dropdow
 
         _createHelper: function(e, $el) {
             var $criteria = this._getCriteriaOrigin($el.data('criteria'));
+            this.currentDraggingElementHeight = $el.find('.condition-item').outerHeight();
             return $criteria.clone()
                 .css({width: $criteria.outerWidth(), height: $criteria.outerHeight()})
                 .addClass(this.options.helperClass);
