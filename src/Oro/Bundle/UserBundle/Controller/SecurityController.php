@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\SecurityContext;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -17,38 +16,23 @@ class SecurityController extends Controller
      */
     public function loginAction()
     {
-        $request = $this->getRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
         // 302 redirect does not processed by Backbone.sync handler, but 401 error does.
         if ($request->isXmlHttpRequest()) {
             return new Response(null, 401);
         }
-        $session = $request->getSession();
 
-        // get the error if any (works with forward and redirect -- see below)
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
-        } elseif (null !== $session && $session->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
+        $helper           = $this->get('security.authentication_utils');
+        $csrfTokenManager = $this->get('security.csrf.token_manager');
 
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
-        } else {
-            $error = '';
-        }
-
-        if ($error) {
-            // TODO: this is a potential security risk (see http://trac.symfony-project.org/ticket/9523)
-            $error = $error->getMessage();
-        }
-
-        // last username entered by the user
-        $lastUsername = (null === $session) ? '' : $session->get(SecurityContext::LAST_USERNAME);
-        $csrfToken    = $this->get('form.csrf_provider')->generateCsrfToken('authenticate');
-
-        return array(
-            'last_username' => $lastUsername,
-            'csrf_token'    => $csrfToken,
-            'error'         => $error
-        );
+        return [
+            // last username entered by the user (if any)
+            'last_username' => $helper->getLastUsername(),
+            // last authentication error (if any)
+            'error'         => $helper->getLastAuthenticationError(),
+            // CSRF token for the login form
+            'csrf_token'    => $csrfTokenManager->getToken('authenticate')->getValue()
+        ];
     }
 
     /**

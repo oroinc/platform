@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
@@ -26,22 +27,28 @@ class ActivityListMigration implements Migration
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param ActivityListChainProvider       $provider
      * @param ActivityListExtension           $activityListExtension
      * @param EntityMetadataHelper            $metadataHelper
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param ConfigManager                   $configManager
      */
     public function __construct(
         ActivityListChainProvider $provider,
         ActivityListExtension $activityListExtension,
         EntityMetadataHelper $metadataHelper,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        ConfigManager $configManager
     ) {
         $this->provider              = $provider;
         $this->activityListExtension = $activityListExtension;
         $this->metadataHelper        = $metadataHelper;
         $this->nameGenerator         = $nameGenerator;
+        $this->configManager         = $configManager;
     }
 
     /**
@@ -56,7 +63,8 @@ class ActivityListMigration implements Migration
                     $this->provider,
                     $this->activityListExtension,
                     $this->metadataHelper,
-                    $this->nameGenerator
+                    $this->nameGenerator,
+                    $this->configManager
                 )
             );
         }

@@ -38,7 +38,7 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->filterBy('Name', $entityName)
+            ->filterBy('Name', $entityName, 'is equal to')
             ->open([$entityName])
             ->edit()
             ->enableNotes()
@@ -127,7 +127,7 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->filterBy('Name', $entityName)
+            ->filterBy('Name', $entityName, 'is equal to')
             ->open([$entityName])
             ->edit()
             ->enableNotes('No')

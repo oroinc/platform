@@ -31,6 +31,14 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike([])
                     ->prototype('scalar')->end()
                 ->end()
+                ->arrayNode('flash_notification')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('max_emails_display')
+                            ->defaultValue(4)
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ->end();
 

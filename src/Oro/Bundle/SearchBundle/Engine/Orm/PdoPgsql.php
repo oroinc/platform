@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
@@ -126,13 +127,8 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->select(
-            [
-                'search as item',
-                'TsRank(' . $joinAlias . '.value, :value' . $index . ') AS rankField'
-            ]
-        );
-        $qb->orderBy('rankField', 'DESC');
+        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
     }
 
     /**

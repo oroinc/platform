@@ -122,10 +122,12 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
             [
                 'first_route',
                 'some_route',
+                'override_after_auto_7', // statuses
                 'override_after', // statuses
-                'tested_route_auto_7', // priorities
+                'tested_route_auto_8', // priorities
+                'override_before_auto_9', // sources
                 'override_before', // sources
-                'tested_route_auto_8', // groups
+                'tested_route_auto_10', // groups
                 'tested_route',
                 'last_route'
             ],
@@ -138,11 +140,11 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
         );
         $this->assertEquals(
             'priorities',
-            $this->routeCollection->get('tested_route_auto_7')->getDefault('dictionary')
+            $this->routeCollection->get('tested_route_auto_8')->getDefault('dictionary')
         );
         $this->assertEquals(
             'groups',
-            $this->routeCollection->get('tested_route_auto_8')->getDefault('dictionary')
+            $this->routeCollection->get('tested_route_auto_10')->getDefault('dictionary')
         );
     }
 }
