@@ -7,7 +7,7 @@ define([
     'oroui/js/messenger',
     'oroconfig/js/form/default',
     'oroui/js/modal'
-], function ($, __, mediator, messenger, FormDefault, Modal) {
+], function($, __, mediator, messenger, FormDefault, Modal) {
     'use strict';
 
     /**
@@ -38,8 +38,8 @@ define([
          * @param event
          */
         resetHandler: function(event) {
-            var $checkboxes = this.$el.find('.parent-scope-checkbox input'),
-                confirm = new Modal({
+            var $checkboxes = this.$el.find('.parent-scope-checkbox input');
+            var confirm = new Modal({
                     title: __('Confirmation'),
                     okText: __('OK'),
                     cancelText: __('Cancel'),
@@ -48,7 +48,7 @@ define([
                     okButtonClass: 'btn-primary btn-large'
                 });
 
-            confirm.on('ok', _.bind(function () {
+            confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
                 $checkboxes.trigger('change');
             }, this));
