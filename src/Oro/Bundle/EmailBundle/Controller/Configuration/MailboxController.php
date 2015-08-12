@@ -25,7 +25,6 @@ class MailboxController extends Controller
      * )
      * @Template
      * @AclAncestor("oro_email_mailbox_update")
-     * @ParamConverter("mailbox", class="OroEmailBundle:Mailbox")
      *
      * @param $mailbox
      *
@@ -33,10 +32,7 @@ class MailboxController extends Controller
      */
     public function updateAction(Mailbox $mailbox)
     {
-        $mailboxRepository = $this->getDoctrine()->getRepository('OroEmailBundle:Mailbox');
-        $data = $mailboxRepository->find($mailbox);
-
-        return $this->update($data);
+        return $this->update($mailbox);
     }
 
     /**

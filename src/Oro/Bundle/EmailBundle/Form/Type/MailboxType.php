@@ -140,9 +140,10 @@ class MailboxType extends AbstractType
         $originalProcessType = $form->get('processType')->getData();
 
         if ($processType !== $originalProcessType) {
-            $form->getViewData()->setProcessSettings(null);
-            $data['processSettings'] = null;
-            $event->setData($data);
+            $mailbox = $form->getData();
+            if ($mailbox) {
+                $mailbox->setProcessSettings(null);
+            }
         }
 
         $this->addProcessField($form, $processType);
