@@ -381,17 +381,14 @@ class LoggableManager
      */
     protected function createLogEntity($action, $entity)
     {
-        if (!$this->username) {
-            return;
-        }
-
         $entityClassName = $this->getEntityClassName($entity);
         if (!$this->checkAuditable($entityClassName)) {
             return;
         }
 
         $user = $this->getLoadedUser();
-        if (!$user) {
+        $organization = $this->getOrganization();
+        if (!$organization) {
             return;
         }
 
@@ -407,7 +404,7 @@ class LoggableManager
         $logEntry->setObjectClass($meta->name);
         $logEntry->setLoggedAt();
         $logEntry->setUser($user);
-        $logEntry->setOrganization($this->getOrganization());
+        $logEntry->setOrganization($organization);
         $logEntry->setObjectName(method_exists($entity, '__toString') ? (string)$entity : $meta->name);
 
         $entityId = $this->getIdentifier($entity);
@@ -550,10 +547,14 @@ class LoggableManager
     }
 
     /**
-     * @return AbstractUser
+     * @return AbstractUser|null
      */
     protected function getLoadedUser()
     {
+        if (!$this->username) {
+            return null;
+        }
+
         $isInCache = array_key_exists($this->username, self::$userCache);
         if (!$isInCache
             || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
