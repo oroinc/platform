@@ -22,7 +22,7 @@ class Recipient
     public function __construct($email, $name, RecipientEntity $entity = null)
     {
         $this->email = $email;
-        $this->name = trim($name);
+        $this->name = $entity ? $entity->getLabel() : trim($name);
         $this->entity = $entity;
     }
 

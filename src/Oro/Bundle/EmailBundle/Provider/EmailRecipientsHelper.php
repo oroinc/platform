@@ -278,6 +278,7 @@ class EmailRecipientsHelper
      */
     protected function createRecipientEntityLabel($label, $entityClass)
     {
+        $label = trim($label);
         if ($classLabel = $this->getClassLabel($entityClass)) {
             $label .= ' (' . $classLabel . ')';
         }
