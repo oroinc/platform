@@ -33,6 +33,7 @@ define(function(require) {
             this.jsPlumbInstance.bind('connectionDrag', _.bind(this.onConnectionDragStart, this));
             this.jsPlumbInstance.bind('connectionDragStop', _.bind(this.onConnectionDragStop, this));
             this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
+            this.jsPlumbInstance.bind('beforeDetach', _.bind(this.onBeforeConnectionDetach, this));
         },
 
         onConnectionDragStart: function(connection) {
@@ -83,6 +84,25 @@ define(function(require) {
                 );
             }
             // never allow jsplumb just draw new connections, create connection model instead
+            return false;
+        },
+
+        isConnectionInDrag: function (jsPlumbConnection) {
+            return !jsPlumbConnection.endpoints[0].connections.length ||
+                !jsPlumbConnection.endpoints[1].connections.length;
+        },
+
+        willConnectionChange: function (jsPlumbConnection) {
+            return jsPlumbConnection[jsPlumbConnection.suspendedElementType] !== jsPlumbConnection.suspendedElement;
+        },
+
+        onBeforeConnectionDetach: function (jsPlumbConnection) {
+            if (!this.isConnectionInDrag(jsPlumbConnection)) {
+                return true;
+            }
+            if (this.willConnectionChange(jsPlumbConnection)) {
+                return true;
+            }
             return false;
         }
     });
