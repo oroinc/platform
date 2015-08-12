@@ -6,18 +6,18 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroInstallerBundle implements Installation
+class OroInstallerBundleInstaller implements Installation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return "v1_1";
+        return 'v1_1';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
