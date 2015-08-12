@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator'
-], function($, _, __) {
+define(['underscore', 'orotranslation/js/translator'
+], function(_, __) {
     'use strict';
 
     var defaultParam = {
