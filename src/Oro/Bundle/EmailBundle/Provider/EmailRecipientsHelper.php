@@ -183,8 +183,10 @@ class EmailRecipientsHelper
     ) {
         $fullNameQueryPart = $this->dqlNameFormatter->getFormattedNameDQL($alias, $entityClass);
 
+        $excludedEmails = $args->getExcludedEmailsForEntity($entityClass);
+
         $primaryEmailsQb = $repository
-            ->getPrimaryEmailsQb($fullNameQueryPart, $args->getExcludedEmails(), $args->getQuery())
+            ->getPrimaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
             ->setMaxResults($args->getLimit());
 
         $primaryEmailsResult = $this->getRestrictedResult($primaryEmailsQb, $args);
@@ -193,7 +195,7 @@ class EmailRecipientsHelper
         $limit = $args->getLimit() - count($emails);
 
         if ($limit > 0) {
-            $excludedEmails = array_merge($args->getExcludedEmails(), array_keys($emails));
+            $excludedEmails = array_merge($excludedEmails, array_keys($emails));
             $secondaryEmailsQb = $repository
                 ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
                 ->setMaxResults($limit);

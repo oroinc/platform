@@ -92,9 +92,13 @@ class EmailRecipientsProviderArgs
      */
     public function getExcludedEmailsForEntity($class)
     {
-        return array_filter($this->excludedRecipients, function (Recipient $recipient) use ($class) {
+        $filteredRecipients = array_filter($this->excludedRecipients, function (Recipient $recipient) use ($class) {
             return $recipient->getEntity() && $recipient->getEntity()->getClass() === $class;
         });
+
+        return array_map(function (Recipient $recipient) {
+            return $recipient->getEmail();
+        }, $filteredRecipients);
     }
 
     /**
