@@ -18,13 +18,13 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
-     * @param WidgetConfigs $widgetConfigs
+     * @param WidgetConfigs       $widgetConfigs
      * @param TranslatorInterface $translator
      */
     public function __construct(WidgetConfigs $widgetConfigs, TranslatorInterface $translator)
     {
         $this->widgetConfigs = $widgetConfigs;
-        $this->translator = $translator;
+        $this->translator    = $translator;
     }
 
     /**
@@ -42,12 +42,12 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
      */
     public function preSet(FormEvent $event)
     {
-        $widgetname = $event->getForm()->getConfig()->getOption('widget_name');
-        $attributes = $this->widgetConfigs->getWidgetAttributesForTwig($widgetname);
-        $dataItems = $attributes['widgetDataItems'];
+        $widgetName   = $event->getForm()->getConfig()->getOption('widget_name');
+        $attributes   = $this->widgetConfigs->getWidgetAttributesForTwig($widgetName);
+        $dataItems    = $attributes['widgetDataItems'];
         $originalData = $this->getIndexedData($event->getData());
 
-        $data = [];
+        $data  = [];
         $order = 1;
         foreach ($dataItems as $id => $item) {
             $oldItem = isset($originalData[$id]) ? $originalData[$id] : null;

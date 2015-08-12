@@ -1,6 +1,6 @@
 /*global define*/
 define([
-    'backbone',
+    'backbone'
 ], function(Backbone) {
     'use strict';
 
@@ -14,7 +14,7 @@ define([
             label: null,
             show: true,
             order: 1,
-            namePrefix: '',
+            namePrefix: ''
         }
     });
 });

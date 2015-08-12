@@ -1,7 +1,7 @@
 /*global define*/
 define([
     'backbone',
-    './model',
+    './model'
 ], function(Backbone, Model) {
     'use strict';
 

@@ -48,11 +48,11 @@ class WidgetDateRangeType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['datetime_range_metadata'] = [
-            'name'       => $view->vars['full_name'] . '[type]',
-            'label'      => $view->vars['label'],
-            'choices'    => $view->children['type']->vars['choices'],
-            'typeValues' => $view->vars['type_values'],
-            'dateParts'  => $view->vars['date_parts'],
+            'name'                   => $view->vars['full_name'] . '[type]',
+            'label'                  => $view->vars['label'],
+            'choices'                => $view->children['type']->vars['choices'],
+            'typeValues'             => $view->vars['type_values'],
+            'dateParts'              => $view->vars['date_parts'],
             'externalWidgetOptions'  => array_merge(
                 $view->vars['widget_options'],
                 ['dateVars' => $view->vars['date_vars']]

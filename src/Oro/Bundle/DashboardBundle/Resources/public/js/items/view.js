@@ -2,11 +2,10 @@
 define([
     'backbone',
     'underscore',
-    'jquery',
     './collection',
     'oroui/js/items-manager/table',
-    'jquery.select2',
-], function(Backbone, _, $, ItemCollection) {
+    'jquery.select2'
+], function(Backbone, _, ItemCollection) {
     'use strict';
 
     /**
@@ -18,15 +17,15 @@ define([
         events: {
             'change .item-select': '_toggleButtons',
             'click .add-button:not(.disabled)': '_onAddClick',
-            'click .add-all-button:not(.disabled)': '_onAddAllClick',
+            'click .add-all-button:not(.disabled)': '_onAddAllClick'
         },
 
         selectTplSelector: '#widget-items-item-select-template',
-        itemTplSelector: '#widget-items-item-template',
+        itemTplSelector:   '#widget-items-item-template',
 
         requiredOptions: [
             'itemsData',
-            'baseName',
+            'baseName'
         ],
 
         items: null,
@@ -59,16 +58,16 @@ define([
         },
 
         _initializeFilter: function(items) {
-            var selectTpl = _.template($(this.selectTplSelector).html());
+            var selectTpl = _.template(Backbone.$(this.selectTplSelector).html());
             var select = selectTpl({
-                items: items,
+                items: items
             });
 
             var $filterContainer = this.$('.controls');
             $filterContainer.prepend(select);
             this.itemSelect = $filterContainer.find('select');
             this.itemSelect.select2({
-                allowClear: true,
+                allowClear: true
             });
 
             items.on('change:show', function(model) {
@@ -89,17 +88,19 @@ define([
 
         _initializeItemGrid: function(items) {
             var $itemContainer = this.$('.item-container');
-            var showedItems = items.where({show: true});
-            var filteredItems = new ItemCollection(showedItems);
+            var showedItems    = items.where({show: true});
+            var filteredItems  = new ItemCollection(showedItems);
 
             $itemContainer.itemsManagerTable({
-                itemTemplate: $(this.itemTplSelector).html(),
-                collection: filteredItems,
+                itemTemplate: Backbone.$(this.itemTplSelector).html(),
+                collection: filteredItems
             });
 
             filteredItems.on('sort add', function() {
                 $itemContainer.find('input.order').each(function(index) {
-                    $(this).val(index).trigger('change');
+                    Backbone.$(this)
+                        .val(index)
+                        .trigger('change');
                 });
             });
 
@@ -116,7 +117,7 @@ define([
             });
 
             $itemContainer.on('change', function(e) {
-                var $target = $(e.target);
+                var $target = Backbone.$(e.target);
                 var item = items.get($target.closest('tr').data('cid'));
                 var value = $target.is(':checkbox') ? $target.is(':checked') : $target.val();
                 item.set($target.data('name'), value);
@@ -124,9 +125,11 @@ define([
         },
 
         _onAddClick: function() {
-            var item = this.itemSelect.select2('val');
+            var item  = this.itemSelect.select2('val');
             var model = this.items.get(item);
+
             model.set('show', true);
+
             this.itemSelect.select2('val', '').change();
         },
 
@@ -134,6 +137,7 @@ define([
             this.items.each(function(item) {
                 item.set('show', true);
             });
+
             this.itemSelect.select2('val', '').change();
         },
 

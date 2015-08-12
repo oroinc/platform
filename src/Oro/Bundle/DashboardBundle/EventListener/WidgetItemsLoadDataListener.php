@@ -20,8 +20,8 @@ class WidgetItemsLoadDataListener
             return;
         }
 
-        $visibleItems = $event->getWidgetOptions()->get('subWidgets') ?: [];
-        $items = $event->getItems();
+        $visibleItems = $event->getWidgetOptions()->get('subWidgets') ? : [];
+        $items        = $event->getItems();
         $event->setItems(array_intersect_key($items, array_flip($visibleItems)));
     }
 
@@ -36,13 +36,14 @@ class WidgetItemsLoadDataListener
         }
 
         $widgetOptions = $event->getWidgetOptions();
-        $config = $widgetOptions->get('subWidgets', []);
+        $config        = $widgetOptions->get('subWidgets', []);
         if (!isset($config['items'])) {
             return;
         }
 
         $configItems = $this->getSortedConfigItems($config);
-        $items = $this->sortItemsByConfigItems($event->getItems(), $configItems);
+        $items       = $this->sortItemsByConfigItems($event->getItems(), $configItems);
+
         $event->setItems($items);
     }
 
@@ -64,7 +65,7 @@ class WidgetItemsLoadDataListener
         uasort($items, function ($a, $b) {
             return $a['order'] - $b['order'];
         });
-        
+
         return $items;
     }
 
