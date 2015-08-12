@@ -120,6 +120,7 @@ class Processor
         $this->assertModel($model);
         $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
         $parentMessageId = $this->getParentMessageId($model);
+        $organization = null;
 
         /** @var \Swift_Message $message */
         $message = $this->mailer->createMessage();
@@ -140,7 +141,10 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        $origin = $this->getEmailOrigin($model->getFrom());
+        if ($model->getOrganization()) {
+            $organization = $model->getOrganization();
+        }
+        $origin = $this->getEmailOrigin($model->getFrom(), $organization);
         $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(
@@ -202,7 +206,7 @@ class Processor
             if (array_key_exists($originKey, $this->origins)) {
                 unset($this->origins[$originKey]);
             }
-            $origin = $this->getEmailOrigin($email, InternalEmailOrigin::BAP, false);
+            $origin = $this->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
             return $origin->getFolder(FolderType::SENT);
         }
 
@@ -356,17 +360,22 @@ class Processor
      * Find existing email origin entity by email string or create and persist new one.
      *
      * @param string $email
+     * @param OrganizationInterface $organization
      * @param string $originName
      * @param boolean $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $enableUseUserEmailOrigin = true)
-    {
+    public function getEmailOrigin(
+        $email,
+        $organization = null,
+        $originName = InternalEmailOrigin::BAP,
+        $enableUseUserEmailOrigin = true
+    ) {
         $originKey    = $originName . $email;
-        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
-            ? $this->securityFacade->getOrganization()
-            : null;
+        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
+            $organization = $this->securityFacade->getOrganization();
+        }
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwner = $this->emailOwnerProvider->findEmailOwner(
                 $this->getEntityManager(),
