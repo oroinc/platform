@@ -79,6 +79,10 @@ class MailboxProcessStorage
     {
         $choices = [];
         foreach ($this->processes as $type => $provider) {
+            if (!$provider->isEnabled()) {
+                continue;
+            }
+
             $choices[$type] = $provider->getLabel();
         }
 

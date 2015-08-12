@@ -144,6 +144,11 @@ class MailboxType extends AbstractType
             if ($mailbox) {
                 $mailbox->setProcessSettings(null);
             }
+
+            if (!$processType) {
+                $data['processSettings'] = null;
+                $event->setData($data);
+            }
         }
 
         $this->addProcessField($form, $processType);
@@ -158,21 +163,26 @@ class MailboxType extends AbstractType
     protected function addProcessField(FormInterface $form, $processType)
     {
         if (!empty($processType)) {
-            $form->add(
-                'processSettings',
-                $this->storage->getProcess($processType)->getSettingsFormType(),
-                [
-                    'required' => true,
-                ]
-            );
-        } else {
-            $form->add(
-                'processSettings',
-                'hidden',
-                [
-                    'data' => null,
-                ]
-            );
+            $process = $this->storage->getProcess($processType);
+            if ($process->isEnabled()) {
+                $form->add(
+                    'processSettings',
+                    $this->storage->getProcess($processType)->getSettingsFormType(),
+                    [
+                        'required' => true,
+                    ]
+                );
+
+                return;
+            }
         }
+
+        $form->add(
+            'processSettings',
+            'hidden',
+            [
+                'data' => null,
+            ]
+        );
     }
 }

@@ -24,4 +24,9 @@ interface MailboxProcessProviderInterface
      * @return string
      */
     public function getLabel();
+
+    /**
+     * @return bool
+     */
+    public function isEnabled();
 }
