@@ -1,13 +1,14 @@
 /*jslint nomen:true*/
 /*global define*/
 define([
-    'jquery',
+    'underscore',
+    'backbone',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oroui/js/messenger',
     'oroconfig/js/form/default',
     'oroui/js/modal'
-], function($, __, mediator, messenger, FormDefault, Modal) {
+], function(_, Backbone, __, mediator, messenger, formDefault, Modal) {
     'use strict';
 
     /**
@@ -29,7 +30,7 @@ define([
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.defaults, this.options);
-            new FormDefault();
+            formDefault();
         },
 
         /**
