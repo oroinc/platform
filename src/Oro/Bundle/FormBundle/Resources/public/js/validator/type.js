@@ -22,7 +22,7 @@ define(['underscore', 'orotranslation/js/translator'
         },
         function(param) {
             param = _.extend({}, defaultParam, param);
-            return __(param.message, { type: param.type });
+            return __(param.message, {type: param.type});
         }
     ];
 });
