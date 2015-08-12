@@ -24,10 +24,6 @@ class Recipient
         $this->email = $email;
         $this->name = trim($name);
         $this->entity = $entity;
-
-        if ($entity && false !== $start = strrpos($entity->getLabel(), '(')) {
-            $this->name .= ' ' . substr($entity->getLabel(), $start);
-        }
     }
 
     /**
@@ -41,8 +37,20 @@ class Recipient
     /**
      * @return string
      */
+    public function getId()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
     public function getName()
     {
+        if ($this->entity && false !== $start = strrpos($this->entity->getLabel(), '(')) {
+            return sprintf('%s %s', $this->name, substr($this->entity->getLabel(), $start));
+        }
+
         return $this->name;
     }
 
@@ -52,10 +60,10 @@ class Recipient
     public function getLabel()
     {
         if (!$this->entity || !$this->entity->getOrganization()) {
-            return $this->name;
+            return $this->getName();
         }
 
-        return sprintf('%s (%s)', $this->name, $this->entity->getOrganization());
+        return sprintf('%s (%s)', $this->getName(), $this->entity->getOrganization());
     }
 
     /**

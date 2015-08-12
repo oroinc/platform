@@ -145,7 +145,7 @@ class EmailRecipientsHelper
      */
     public function createRecipientData(Recipient $recipient)
     {
-        $data = ['key' => $recipient->getName()];
+        $data = ['key' => $recipient->getId()];
         if ($recipientEntity = $recipient->getEntity()) {
             $data = array_merge(
                 $data,
@@ -161,7 +161,7 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id' => $recipient->getName(),
+            'id' => $recipient->getId(),
             'text' => $recipient->getName(),
             'data' => json_encode($data),
         ];
