@@ -149,7 +149,7 @@ class RelatedEmailsProvider
 
         $emails = [];
         foreach ($recipients as $recipient) {
-            $emails[$recipient->getEmail()] = $recipient->getName();
+            $emails[$recipient->getEmail()] = $recipient->getId();
         }
 
         return $emails;
