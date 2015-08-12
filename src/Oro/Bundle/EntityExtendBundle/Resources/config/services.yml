@@ -98,7 +98,7 @@ services:
     oro_entity_extend.tools.dumper:
         class: %oro_entity_extend.tools.dumper.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity_config.provider.extend
             - @oro_entity_extend.db_id_name_generator
             - @oro_entity_extend.extend.field_type_helper
             - @oro_entity_extend.entity_generator

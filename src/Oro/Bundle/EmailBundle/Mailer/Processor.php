@@ -38,6 +38,7 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
  * @package Oro\Bundle\EmailBundle\Mailer
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Processor
 {

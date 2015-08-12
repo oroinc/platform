@@ -58,23 +58,24 @@ define(function(require) {
 
         getState: function() {
             var state = {
-                    rectangles: [],
+                    rectangles: {},
                     connections: []
                 };
             var hasRect = {};
-            _.each(this.jsPlumbInstance.sourceEndpointDefinitions, function(endPoint, id) {
-                var el = document.getElementById(id);
-                if (el) {
-                    hasRect[id] = true;
-                    state.rectangles.push([id, el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight]);
+            var endpoints = this.jsPlumbInstance.sourceEndpointDefinitions;
+            for (var id in endpoints) {
+                if (endpoints.hasOwnProperty(id)) {
+                    state.rectangles[id] = this.jsPlumbInstance.getCachedData(id);
                 }
-            });
+            }
 
-            _.each(this.jsPlumbInstance.getConnections(), function(conn) {
-                if (conn.sourceId in hasRect && conn.targetId in hasRect && conn.source && conn.target) {
+            var connections = this.jsPlumbInstance.getConnections();
+            for (var i = connections.length - 1; i >= 0; i--) {
+                var conn = connections[i];
+                if (conn.sourceId in hasRect && conn.targetId in hasRect) {
                     state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
-            }, this);
+            }
 
             return state;
         },
@@ -136,8 +137,11 @@ define(function(require) {
                 }
             });
 
+            graph.locateAxises();
+
             _.each(this.cache.connections, function(item) {
                 item.points = item.path.points.reverse();
+                delete item.path;
             });
 
             _.defer(_.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance));

@@ -17,13 +17,13 @@ class EmailFolderViewList extends AbstractViewsList
             new View(
                 'oro.email.datagrid.emailfolder.view.inbox',
                 [
-                    'folder' => ['value' => FolderType::INBOX]
+                    'folder' => ['value' => [FolderType::INBOX]]
                 ]
             ),
             new View(
                 'oro.email.datagrid.emailfolder.view.sent',
                 [
-                    'folder' => ['value' => FolderType::SENT]
+                    'folder' => ['value' => [FolderType::SENT]]
                 ]
             )
         ];
