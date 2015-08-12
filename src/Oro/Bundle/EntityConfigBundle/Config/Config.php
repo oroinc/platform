@@ -10,24 +10,20 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
  */
 class Config implements ConfigInterface
 {
-    /**
-     * @var ConfigIdInterface
-     */
+    /** @var ConfigIdInterface */
     protected $id;
 
-    /**
-     * @var array
-     */
-    protected $values = array();
+    /** @var array */
+    protected $values;
 
     /**
-     * Constructor.
-     *
      * @param ConfigIdInterface $id
+     * @param array             $values
      */
-    public function __construct(ConfigIdInterface $id)
+    public function __construct(ConfigIdInterface $id, array $values = [])
     {
-        $this->id = $id;
+        $this->id     = $id;
+        $this->values = $values;
     }
 
     /**
@@ -127,7 +123,7 @@ class Config implements ConfigInterface
      */
     public function serialize()
     {
-        return serialize(array($this->id, $this->values));
+        return serialize([$this->id, $this->values]);
     }
 
     /**
@@ -147,10 +143,7 @@ class Config implements ConfigInterface
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result         = new Config($data['id']);
-        $result->values = $data['values'];
-
-        return $result;
+        return new Config($data['id'], $data['values']);
     }
     // @codingStandardsIgnoreEnd
 

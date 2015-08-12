@@ -138,6 +138,7 @@ services:
             - @oro_activity_list.migration.extension.activity_list
             - @oro_entity_extend.migration.entity_metadata_helper
             - @oro_migration.db_id_name_generator
+            - @oro_entity_config.config_manager
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -110 }
 

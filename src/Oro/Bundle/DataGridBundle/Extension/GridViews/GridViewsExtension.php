@@ -58,7 +58,7 @@ class GridViewsExtension extends AbstractExtension
     {
         $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
-        $data->offsetAddToArray('initialState', ['gridView' => null]);
+        $data->offsetAddToArray('initialState', ['gridView' => '__all__']);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
         $allLabel = null;

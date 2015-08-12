@@ -247,6 +247,13 @@ class FieldTypeReverseRelationTest extends TypeTestCase
             ->method('getConfigById')
             ->with($config['targetFieldId'])
             ->will($this->returnValue($entityConfigMockTarget));
+        $configProviderMock->expects($this->any())
+            ->method('hasConfig')
+            ->with(
+                $config['targetFieldId']->getClassName(),
+                $config['targetFieldId']->getFieldName()
+            )
+            ->will($this->returnValue(true));
 
         $this->configManagerMock->expects($this->any())
             ->method('getProvider')
