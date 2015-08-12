@@ -14,9 +14,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orolocale/js/fo
         function(value, element, param) {
             switch (param.type) {
                 case 'integer':
-                    value = numberFormatter.unformat(value);
-                    return Math.floor(value) === value && $.isNumeric(value);
-                    break;
+                    var valueNumber = ~~Number(value);
+                    return String(valueNumber) === value;
                 default:
                     return true;
             }

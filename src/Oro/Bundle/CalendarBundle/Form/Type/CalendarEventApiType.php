@@ -81,7 +81,7 @@ class CalendarEventApiType extends CalendarEventType
                 'oro_calendar_event_invitees',
                 [
                     'required'      => false,
-                    'property_path' => 'childEvents',
+                    'property_path' => 'childEvents'
                 ]
             )
             ->add('notifyInvitedUsers', 'hidden', ['mapped' => false])

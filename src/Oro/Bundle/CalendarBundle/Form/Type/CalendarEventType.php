@@ -200,7 +200,7 @@ class CalendarEventType extends AbstractType
                 'allow_change_calendar' => false,
                 'layout_template'       => false,
                 'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'             => 'calendar_event',
+                'intention'             => 'calendar_event'
             ]
         );
     }
