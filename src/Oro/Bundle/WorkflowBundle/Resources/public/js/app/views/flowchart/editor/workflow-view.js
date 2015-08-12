@@ -87,16 +87,16 @@ define(function(require) {
             return false;
         },
 
-        isConnectionInDrag: function (jsPlumbConnection) {
+        isConnectionInDrag: function(jsPlumbConnection) {
             return !jsPlumbConnection.endpoints[0].connections.length ||
                 !jsPlumbConnection.endpoints[1].connections.length;
         },
 
-        willConnectionChange: function (jsPlumbConnection) {
+        willConnectionChange: function(jsPlumbConnection) {
             return jsPlumbConnection[jsPlumbConnection.suspendedElementType] !== jsPlumbConnection.suspendedElement;
         },
 
-        onBeforeConnectionDetach: function (jsPlumbConnection) {
+        onBeforeConnectionDetach: function(jsPlumbConnection) {
             if (!this.isConnectionInDrag(jsPlumbConnection)) {
                 return true;
             }

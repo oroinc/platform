@@ -4,7 +4,6 @@ define(function(require) {
     var FlowchartJsPlumbBoxView;
     var FlowchartJsPlumbBaseView = require('./base-view');
     var FlowchartJsPlumbAreaView = require('./area-view');
-    var _ = require('underscore');
 
     FlowchartJsPlumbBoxView = FlowchartJsPlumbBaseView.extend({
         areaView: null,
@@ -43,7 +42,6 @@ define(function(require) {
         },
 
         refreshPosition: function() {
-            var instance = this.areaView.jsPlumbInstance;
             this.$el.css({
                 top: this.model.get('position')[1],
                 left: this.model.get('position')[0]
