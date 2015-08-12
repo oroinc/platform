@@ -26,3 +26,4 @@ Table of content
 - Frontend
     - [Datagrid](./Resources/doc/frontend/datagrid.md)
     - [Datagrid Widget](./Resources/doc/frontend/datagrid_widget.md)
+    - [Column Manager](./Resources/doc/frontend/column_manager.md)
