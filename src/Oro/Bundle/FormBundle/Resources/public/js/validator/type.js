@@ -14,7 +14,7 @@ define(['underscore', 'orotranslation/js/translator'
         function(value, element, param) {
             switch (param.type) {
                 case 'integer':
-                    var valueNumber = ~~Number(value);
+                    var valueNumber = Number(value).toFixed();
                     return String(valueNumber) === value;
                 default:
                     return true;
