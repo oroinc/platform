@@ -1,5 +1,5 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/number'
-], function($, _, __, numberFormatter) {
+define(['jquery', 'underscore', 'orotranslation/js/translator'
+], function($, _, __) {
     'use strict';
 
     var defaultParam = {
