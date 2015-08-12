@@ -111,7 +111,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $emailRecipientRepository->expects($this->once())
             ->method('getEmailsUsedInLast30DaysQb')
-            ->with(array_keys($senderEmails), $args->getExcludedEmails(), $args->getQuery())
+            ->with(array_keys($senderEmails), [], $args->getQuery())
             ->will($this->returnValue($qb));
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')

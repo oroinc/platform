@@ -68,15 +68,6 @@ class EmailRecipientsProviderArgs
 
     /**
      * @return array
-     * @deprecated
-     */
-    public function getExcludedEmails()
-    {
-        return [];//$this->excludedEmails;
-    }
-
-    /**
-     * @return array
      */
     public function getExcludedRecipientIdentifiers()
     {

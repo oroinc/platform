@@ -61,7 +61,7 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
             [
-                new EmailRecipientsProviderArgs(new User(), 're', 100, ['related@example.com']),
+                new EmailRecipientsProviderArgs(new User(), 're', 100, [new Recipient('related@example.com', 'name')]),
                 [
                     'related@example.com' => new Recipient('related@example.com', 'Related <related@example.com>'),
                     'related2@example.com' => new Recipient('related2@example.com', 'Related2 <related2@example.com>'),

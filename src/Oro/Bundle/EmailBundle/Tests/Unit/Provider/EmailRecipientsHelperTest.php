@@ -149,7 +149,7 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
                 [],
             ],
             [
-                new EmailRecipientsProviderArgs(null, 're', 100, ['recipient@example.com']),
+                new EmailRecipientsProviderArgs(null, 're', 100, [new Recipient('recipient@example.com', 'name')]),
                 [
                     new Recipient('recipient2@example.com', 'Recipient2 <recipient2@example.com>'),
                     new Recipient('recipient@example.com', 'Recipient <recipient@example.com>'),
