@@ -15,8 +15,8 @@ class EmailRecipientsProviderArgs
     /** @var int */
     protected $limit;
 
-    /** @var array */
-    protected $excludedEmails;
+    /** @var Recipient[] */
+    private $excludedRecipients;
 
     /** @var Organization|null */
     protected $organization;
@@ -25,20 +25,20 @@ class EmailRecipientsProviderArgs
      * @param object|null $relatedEntity
      * @param string $query
      * @param int $limit
-     * @param string[] $excludedEmails
+     * @param Recipient[] $excludedRecipients
      * @param Organization|null $organization
      */
     public function __construct(
         $relatedEntity,
         $query,
         $limit,
-        array $excludedEmails = [],
+        array $excludedRecipients = [],
         Organization $organization = null
     ) {
         $this->relatedEntity = $relatedEntity;
         $this->query = $query;
         $this->limit = $limit;
-        $this->excludedEmails = $excludedEmails;
+        $this->excludedRecipients = $excludedRecipients;
         $this->organization = $organization;
     }
 
@@ -68,10 +68,33 @@ class EmailRecipientsProviderArgs
 
     /**
      * @return array
+     * @deprecated
      */
     public function getExcludedEmails()
     {
-        return $this->excludedEmails;
+        return [];//$this->excludedEmails;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludedRecipientIdentifiers()
+    {
+        return array_map(function(Recipient $recipient) {
+            return $recipient->getIdentifier();
+        }, $this->excludedRecipients);
+    }
+
+    /**
+     * @param string $class
+     *
+     * @return array
+     */
+    public function getExcludedEmailsForEntity($class)
+    {
+        return array_filter($this->excludedRecipients, function (Recipient $recipient) use ($class) {
+            return $recipient->getEntity() && $recipient->getEntity()->getClass() === $class;
+        });
     }
 
     /**

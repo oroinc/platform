@@ -46,22 +46,23 @@ class EmailRecipientsProvider
         $limit = 100
     ) {
         $emails = [];
-        $excludeEmails = [];
         foreach ($this->providers as $provider) {
             if ($limit <= 0) {
                 break;
             }
 
-            $args = new EmailRecipientsProviderArgs($relatedEntity, $query, $limit, $excludeEmails, $organization);
+            $args = new EmailRecipientsProviderArgs(
+                $relatedEntity,
+                $query,
+                $limit,
+                array_reduce($emails, 'array_merge', []),
+                $organization
+            );
             $recipients = $provider->getRecipients($args);
             if (!$recipients) {
                 continue;
             }
 
-            $recipientEmails = array_map(function (Recipient $recipient) {
-                return $recipient->getEmail();
-            }, $recipients);
-            $excludeEmails = array_merge($excludeEmails, $recipientEmails);
             $limit = max([0, $limit - count($recipients)]);
             if (!array_key_exists($provider->getSection(), $emails)) {
                 $emails[$provider->getSection()] = [];

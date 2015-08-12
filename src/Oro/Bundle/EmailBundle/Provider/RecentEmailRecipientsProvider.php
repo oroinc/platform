@@ -72,7 +72,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         $recipientsQb = $this->getEmailRecipientRepository()
             ->getEmailsUsedInLast30DaysQb(
                 $userEmailAddresses,
-                $args->getExcludedEmails(),
+                [],
                 $args->getQuery()
             )
             ->setMaxResults($args->getLimit());

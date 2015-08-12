@@ -214,7 +214,7 @@ class EmailRecipientsHelper
     public static function filterRecipients(EmailRecipientsProviderArgs $args, array $recipients)
     {
         return array_filter($recipients, function (Recipient $recipient) use ($args) {
-            return !in_array($recipient->getEmail(), $args->getExcludedEmails()) &&
+            return !in_array($recipient->getIdentifier(), $args->getExcludedRecipientIdentifiers()) &&
                 stripos($recipient->getName(), $args->getQuery()) !== false;
         });
     }

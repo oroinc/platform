@@ -196,7 +196,8 @@ class RelatedEmailsProvider
 
         $recipients = [];
         foreach ($emails as $email => $name) {
-            $recipients[$email] = new Recipient($email, $name, $recipientEntity);
+            $recipient = new Recipient($email, $name, $recipientEntity);
+            $recipients[$recipient->getIdentifier()] = $recipient;
         }
 
         return $recipients;

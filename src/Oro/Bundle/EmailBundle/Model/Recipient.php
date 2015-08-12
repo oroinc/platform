@@ -61,4 +61,16 @@ class Recipient
     {
         return $this->entity;
     }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        if (!$this->entity) {
+            return $this->email;
+        }
+
+        return sprintf('%s|%s', $this->email, $this->entity->getClass());
+    }
 }
