@@ -14,6 +14,7 @@ class RelatedEntityTest extends Selenium2TestCase
      */
     public function testCreateRelatedEntity()
     {
+        $this->markTestSkipped('Due to BAP-6827');
         $entityData = array(
             'entityName' => 'onetomany'.mt_rand(),
             'stringField' => 'string_field',

@@ -277,6 +277,10 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function getPropertyValue($propertyPath, $item)
     {
+        if (!(is_object($item) || is_array($item))) {
+            return null;
+        }
+
         if (is_array($item)) {
             $keys = array_map(
                 function ($key) {

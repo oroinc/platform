@@ -121,6 +121,11 @@ services:
         arguments:
             - targets
             - 'oro_related_entity_standalone_collection_api'
+            - ~
+            - constraints:
+                - Count:
+                    min: 1
+                    minMessage: "The 'targets' collection should contain at least one element"
 
     oro_activity.manager.activity_target.api:
         class: %oro_activity.manager.activity_target.api.class%
