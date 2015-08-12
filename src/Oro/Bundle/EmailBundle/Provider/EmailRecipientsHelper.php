@@ -26,7 +26,7 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class EmailRecipientsHelper
 {
-    CONST ORGANIZATION_PROPERTY = 'organization';
+    const ORGANIZATION_PROPERTY = 'organization';
 
      /** @var AclHelper */
     protected $aclHelper;
