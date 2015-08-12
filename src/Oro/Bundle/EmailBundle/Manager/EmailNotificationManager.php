@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -61,9 +62,13 @@ class EmailNotificationManager
      *
      * @return array
      */
-    public function getEmails(User $user, $maxEmailsDisplay)
+    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay)
     {
-        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails($user, $maxEmailsDisplay);
+        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
+            $user,
+            $organization,
+            $maxEmailsDisplay
+        );
 
         $emailsData = [];
         /** @var $email Email */
@@ -97,6 +102,18 @@ class EmailNotificationManager
     }
 
     /**
+     * Get count new emails
+     *
+     * @param User $user
+     *
+     * @return integer
+     */
+    public function getCountNewEmails(User $user, Organization $organization)
+    {
+        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization);
+    }
+
+    /**
      * @param Email $email
      *
      * @return bool|string
@@ -111,17 +128,5 @@ class EmailNotificationManager
         }
 
         return $path;
-    }
-
-    /**
-     * Get count new emails
-     *
-     * @param User $user
-     *
-     * @return integer
-     */
-    public function getCountNewEmails(User $user)
-    {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user);
     }
 }
