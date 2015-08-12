@@ -88,7 +88,7 @@ class Audit extends AbstractAudit
      * @var AbstractUser[] $user
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      * @Type("string")
      * @SerializedName("username")
      */

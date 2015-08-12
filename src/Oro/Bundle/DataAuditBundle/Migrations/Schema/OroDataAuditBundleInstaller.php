@@ -33,7 +33,7 @@ class OroDataAuditBundleInstaller implements Installation
     {
         $auditTable = $schema->createTable('oro_audit');
         $auditTable->addColumn('id', 'integer', ['autoincrement' => true]);
-        $auditTable->addColumn('user_id', 'integer', []);
+        $auditTable->addColumn('user_id', 'integer', ['notnull' => false]);
         $auditTable->addColumn('action', 'string', ['length' => 8]);
         $auditTable->addColumn('logged_at', 'datetime', []);
         $auditTable->addColumn('object_id', 'integer', ['notnull' => false]);
