@@ -88,6 +88,13 @@ class GridView
     protected $sortersData = [];
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    protected $columnsData = [];
+
+    /**
      * @var string
      *
      * @ORM\Column(type="string")
@@ -226,6 +233,22 @@ class GridView
         $this->sortersData = $sortersData;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getColumnsData()
+    {
+        return $this->columnsData;
+    }
+
+    /**
+     * @param array $columnsData
+     */
+    public function setColumnsData(array $columnsData = [])
+    {
+        $this->columnsData = $columnsData;
     }
 
     /**
