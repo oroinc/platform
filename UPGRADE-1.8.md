@@ -176,7 +176,8 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `Oro\Bundle\UserBundle\Mailer\Processor` is now based on `Oro\Bundle\UserBundle\Mailer\BaseProcessor`
 - `Oro\Bundle\UserBundle\Mailer\Processor` - first argument `$user` of `sendChangePasswordEmail`, `sendResetPasswordEmail` and `sendResetPasswordAsAdminEmail` methods must implement `Oro\Bundle\UserBundle\Entity\UserInterface`
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
-- `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager, added method `setManagerRegistry`, method `setEntityManager` marked as deprecated 
+- `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager, added method `setManagerRegistry`, method `setEntityManager` marked as deprecated
+- `Oro\Bundle\UserBundle\Security\WsseTokenFactoryInterface` and its implementation `Oro\Bundle\UserBundle\Security\WsseTokenFactory` were introduced to encapsulate creation of `WsseToken` in `Oro\Bundle\UserBundle\Security\WsseAuthProvider`
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata` usage
@@ -229,6 +230,8 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
     * `oro_security.ownership_tree.cache.warmer`
     * `oro_security.orm.ownership_sql_walker_builder`
 - Service `@oro_security.link.ownership_tree_provider` is deprecated, please use `Symfony\Component\DependencyInjection\ContainerInterface` directly
+- `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory` were introduced to encapsulate creation of `UsernamePasswordOrganizationToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider` and `Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener`
+- `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory` were introduced to encapsulate creation of `OrganizationRememberMeToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider`
 
 ####AddressBundle
 - `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimaryAndTypesSubscriber` marked deprecated. Use `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesPrimarySubscriber` and `Oro\Bundle\AddressBundle\Form\EventListener\FixAddressesTypesSubscriber` instead.
@@ -238,3 +241,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` `logEntityClass` and `logEntityFieldClass` parameters replaced by `oro_dataaudit.loggable.audit_entity_mapper` service `getAuditEntryClass` and `getAuditEntryFieldClass` methods
+
+####SSOBundle
+- `Oro\Bundle\SSOBundle\Security\OAuthTokenFactoryInterface` and its implementation `Oro\Bundle\SSOBundle\Security\OAuthTokenFactory` were introduced to encapsulate creation of `OAuthToken` in `Oro\Bundle\SSOBundle\Security\OAuthProvider`
