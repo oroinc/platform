@@ -18,3 +18,7 @@ div.disabled-choice div.selector span:after {
 .unique-keys {
     width: 500px;
 }
+
+.filter-criteria .choice-filter .value-field-frame .dictionary-filter {
+    width: 200px;
+}

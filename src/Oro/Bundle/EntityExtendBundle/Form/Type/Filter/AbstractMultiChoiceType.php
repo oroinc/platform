@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Form\Type;
+namespace Oro\Bundle\EntityExtendBundle\Form\Type\Filter;
 
 use Symfony\Component\Translation\TranslatorInterface;
 

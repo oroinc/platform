@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -60,7 +60,7 @@ class EnumFilterTypeTest extends TypeTestCase
 
         $this->translator->expects($this->any())
             ->method('trans')
-            ->with('oro.entity_extend.datagrid.enum.filter.empty')
+//            ->with('oro.filter.form.label_type_not_in')
             ->will($this->returnValue('None'));
 
         $resolver = $this->getOptionsResolver();
@@ -98,6 +98,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 =>  'None'
+                    ],
                     'class'         => ExtendHelper::buildEnumValueClassName('test_enum'),
                     'null_value'    => null,
                     'field_options' => [
@@ -105,7 +109,7 @@ class EnumFilterTypeTest extends TypeTestCase
                         'choices'  => [
                             'val1' => 'Value1'
                         ]
-                    ]
+                    ],
                 ]
             ],
             [
@@ -115,6 +119,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => 'test_enum',
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 =>  'None'
+                    ],
                     'class'         => ExtendHelper::buildEnumValueClassName('test_enum'),
                     'null_value'    => ':empty:',
                     'field_options' => [
@@ -132,6 +140,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 'nullValue'       => null,
                 'fieldOptions'    => null,
                 'expectedOptions' => [
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 =>  'None'
+                    ],
                     'enum_code'     => null,
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => null,
@@ -150,6 +162,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 'fieldOptions'    => null,
                 'expectedOptions' => [
                     'enum_code'     => null,
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 =>  'None'
+                    ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => ':empty:',
                     'field_options' => [
@@ -170,6 +186,10 @@ class EnumFilterTypeTest extends TypeTestCase
                 ],
                 'expectedOptions' => [
                     'enum_code'     => null,
+                    'operator_choices' => [
+                        1 => 'None',
+                        2 => 'None'
+                    ],
                     'class'         => 'Extend\Entity\EV_Test_Enum',
                     'null_value'    => null,
                     'field_options' => [

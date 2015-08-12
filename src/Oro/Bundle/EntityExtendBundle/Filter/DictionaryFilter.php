@@ -2,38 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Filter;
 
-use Symfony\Component\Form\FormFactoryInterface;
+use LogicException;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
-class DictionaryFilter extends AbstractMultiChoiceFilter
+class DictionaryFilter extends BaseMultiChoiceFilter
 {
     /**
-     * Constructor
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManyRelationBuilder  $manyRelationBuilder
-     */
-    public function __construct(
-        FormFactoryInterface $factory,
-        FilterUtility $util,
-        ManyRelationBuilder $manyRelationBuilder
-    ) {
-        parent::__construct($factory, $util);
-        $this->manyRelationBuilder = $manyRelationBuilder;
-    }
-
-    /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function init($name, array $params)
     {
-        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
+        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
         if (isset($params['class'])) {
             $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
             unset($params['class']);
@@ -46,57 +29,83 @@ class DictionaryFilter extends AbstractMultiChoiceFilter
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function buildComparisonExpr(
-        FilterDatasourceAdapterInterface $ds,
-        $comparisonType,
-        $fieldName,
-        $parameterName
-    ) {
-        return $this->manyRelationBuilder->buildComparisonExpr(
-            $ds,
-            $fieldName,
-            $parameterName,
-            $this->getName(),
-            $comparisonType === ChoiceFilterType::TYPE_NOT_CONTAINS
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata()
+    public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $metadata = parent::getMetadata();
-
-        if ($metadata[FilterUtility::TYPE_KEY] === 'multichoice') {
-            $metadata[FilterUtility::TYPE_KEY] = 'dictionary';
+        $data = $this->parseData($data);
+        if (!$data) {
+            return false;
         }
-        return $metadata;
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildNullValueExpr(
-        FilterDatasourceAdapterInterface $ds,
-        $comparisonType,
-        $fieldName
-    ) {
-        return $this->manyRelationBuilder->buildNullValueExpr(
+        $type = $data['type'];
+        $parameterName = $ds->generateParameterName($this->getName());
+
+        $this->applyFilterToClause(
             $ds,
-            $fieldName,
-            $this->getName(),
-            $comparisonType === ChoiceFilterType::TYPE_NOT_CONTAINS
+            $this->buildComparisonExpr(
+                $ds,
+                $type,
+                $this->getFilteredFieldName($ds),
+                $parameterName
+            )
         );
+
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            $ds->setParameter($parameterName, $data['value']);
+        }
+
+        return true;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getFormType()
     {
         return DictionaryFilterType::NAME;
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
+    {
+        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     *
+     * @return string
+     *
+     * @throws LogicException
+     */
+    protected function getFilteredFieldName(FilterDatasourceAdapterInterface $ds)
+    {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            throw new LogicException(
+                sprintf(
+                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
+                    get_class($ds)
+                )
+            );
+        }
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        list($joinAlias) = explode('.', $fieldName);
+        $qb = $ds->getQueryBuilder();
+        $em = $qb->getEntityManager();
+        $class = $this->get('class');
+        $metadata = $em->getClassMetadata($class);
+        $fieldNames = $metadata->getIdentifierFieldNames();
+        if ($count = count($fieldNames) !== 1) {
+            throw new LogicException('Class needs to have exactly 1 identifier, but it has "%d"', $count);
+        }
+        $field = sprintf('%s.%s', $joinAlias, $fieldNames[0]);
+
+        return $field;
     }
 }

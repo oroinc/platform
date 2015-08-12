@@ -26,5 +26,6 @@ class OroEntityExtendExtension extends Extension
         $loader->load('services.yml');
         $loader->load('orm.yml');
         $loader->load('form_type.yml');
+        $loader->load('filters.yml');
     }
 }

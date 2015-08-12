@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\EntityExtendBundle\Filter\EnumFilter;
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 class EnumFilterTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +27,7 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice'
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary'
             ],
             'params',
             $this->filter
@@ -42,11 +42,8 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
-                'null_value'                     => ':empty:',
-                'options'                        => [
-                    'null_value' => ':empty:'
-                ]
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
+                'null_value'                     => ':empty:'
             ],
             'params',
             $this->filter
@@ -61,7 +58,7 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options'                        => [
                     'class' => 'Test\EnumValue'
                 ]
@@ -79,7 +76,7 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options'                        => [
                     'enum_code' => 'test_enum'
                 ]

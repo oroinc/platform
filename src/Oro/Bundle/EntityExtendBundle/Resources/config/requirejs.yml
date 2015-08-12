@@ -3,3 +3,4 @@ config:
         'oroentityextend/js/init-entity-extend-apply': 'bundles/oroentityextend/js/init-entity-extend-apply.js'
         'oroentityextend/js/init-entity-extend-relation': 'bundles/oroentityextend/js/init-entity-extend-relation.js'
         'oro/datagrid/action/ajaxdeletefield-action': 'bundles/oroentityextend/js/datagrid/action/ajaxdeletefield-action.js'
+        'oro/filter/dictionary-filter': 'bundles/oroentityextend/js/filter/dictionary-filter.js'

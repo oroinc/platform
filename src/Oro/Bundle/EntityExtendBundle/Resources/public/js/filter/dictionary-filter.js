@@ -4,8 +4,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/tools',
-    './choice-filter',
-    'oroui/js/messenger'
+    'oro/filter/choice-filter',
+    'oroui/js/messenger',
+    'jquery.select2'
 ], function($, routing, _, __, tools, ChoiceFilter, messenger) {
     'use strict';
 
@@ -24,6 +25,7 @@ define([
          */
         elementSelector: '.select-values-autocomplete',
 
+        wrapperTemplateSelector: '#dictionary-filter-template',
         /**
          * Filter selector template
          *
@@ -51,25 +53,30 @@ define([
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name="enum_part"]'
+            type: 'input[type="hidden"]:last'
         },
+
+        nullLink: '#',
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            this.criteriaValueSelectors.type = 'select[name="' + this.name + '_part"]';
+            if (this.filterParams) {
+                this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
+            } else {
+                this.dictionaryClass = this.class.replace(/\\/g, '_');
+            }
 
-            this.dictionaryClass = this.filterParams.class.replace(/\\/g, '_');
             DictionaryFilter.__super__.initialize.apply(this, arguments);
         },
 
         render: function() {
             this.renderDeferred = $.Deferred();
-            this.loadSelectedValue();
+            this._renderCriteria();
         },
 
-        loadSelectedValue: function() {
+        _renderCriteria: function() {
             var self = this;
 
             $.ajax({
@@ -86,8 +93,8 @@ define([
                     self.value.value = reposne.results;
                     self._writeDOMValue(self.value);
                     self.renderTemplate();
-                    self.applySelect2();
 
+                    self.applySelect2();
                     self.renderDeferred.resolve();
                 },
                 error: function(jqXHR) {
@@ -97,10 +104,28 @@ define([
         },
 
         renderTemplate: function() {
+            var value = _.extend({}, this.emptyValue, this.value);
+            var selectedChoiceLabel = '';
+            if (!_.isEmpty(this.choices)) {
+                var foundChoice = _.find(this.choices, function(choice) {
+                    return (choice.value === value.type);
+                });
+                selectedChoiceLabel = foundChoice.label;
+            }
             var parts = this._getParts();
-            var template = _.template($(this.templateSelector).html());
-            this.$el.append(template({
-                parts: parts
+
+            this.$el.addClass('filter-item oro-drop');
+            this.$el.append(this.template({
+                parts: parts,
+                nullLink: this.nullLink,
+                isEmpty: false,
+                showLabel: this.showLabel,
+                criteriaHint: 'All',
+                label: this.label,
+                selectedChoiceLabel: selectedChoiceLabel,
+                selectedChoice: value.type,
+                choices: this.choices,
+                name: this.name
             }));
         },
 
@@ -110,12 +135,14 @@ define([
             var select2element = this.$el.find(this.elementSelector);
             var values = this.getDataForSelect2();
 
-            select2element.removeClass('hide')
-                .attr('multiple', 'multiple')
-                .select2(select2Config)
-                .on('change', function() {
+            select2element.removeClass('hide');
+            select2element.attr('multiple', 'multiple');
+            select2element.select2(select2Config);
+            if (this.templateTheme) {
+                select2element.on('change', function () {
                     self.applyValue();
                 });
+            }
             select2element.select2('data',  values);
 
             this._criteriaRenderd = true;

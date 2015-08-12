@@ -2,18 +2,32 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Filter;
 
-use Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType;
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\EntityExtendBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 
-class EnumFilter extends ChoiceFilter
+class EnumFilter extends BaseMultiChoiceFilter
 {
+    /**
+     * Constructor
+     *
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     */
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util
+    ) {
+        parent::__construct($factory, $util);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function init($name, array $params)
     {
-        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'choice';
+        $params[FilterUtility::FRONTEND_TYPE_KEY] = 'dictionary';
         if (isset($params['class'])) {
             $params[FilterUtility::FORM_OPTIONS_KEY]['class'] = $params['class'];
             unset($params['class']);
@@ -23,6 +37,37 @@ class EnumFilter extends ChoiceFilter
             unset($params['enum_code']);
         }
         parent::init($name, $params);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function apply(FilterDatasourceAdapterInterface $ds, $data)
+    {
+        $data = $this->parseData($data);
+        if (!$data) {
+            return false;
+        }
+
+        $type =  $data['type'];
+        $parameterName = $ds->generateParameterName($this->getName());
+
+
+        $this->applyFilterToClause(
+            $ds,
+            $this->buildComparisonExpr(
+                $ds,
+                $type,
+                $this->get(FilterUtility::DATA_NAME_KEY),
+                $parameterName
+            )
+        );
+
+        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            $ds->setParameter($parameterName, $data['value']);
+        }
+
+        return true;
     }
 
     /**
