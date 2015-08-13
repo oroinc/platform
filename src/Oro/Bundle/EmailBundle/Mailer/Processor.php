@@ -84,6 +84,7 @@ class Processor
      * @param EmailActivityManager     $emailActivityManager
      * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
+     * @param Mcrypt                   $encryptor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -212,8 +213,8 @@ class Processor
     /**
      * Process send email message. In case exist custom smtp host/port use it
      *
-     * @param object $message
-     * @param object $emailOrigin
+     * @param \Swift_Message $message
+     * @param object         $emailOrigin
      * @throws \Swift_SwiftException
      */
     public function processSend($message, $emailOrigin)
@@ -234,17 +235,15 @@ class Processor
      */
     protected function modifySmtpSettings(UserEmailOrigin $userEmailOrigin)
     {
-        $transport = $this->mailer->getTransport();
-
-        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
-            $transport->setHost($userEmailOrigin->getSmtpHost());
-            $transport->setPort($userEmailOrigin->getSmtpPort());
-            $transport->setUsername($userEmailOrigin->getUser());
-            $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
-            if ($userEmailOrigin->getSmtpEncryption()) {
-                $transport->setEncryption($userEmailOrigin->getSmtpEncryption());
-            }
-        }
+        $username = $userEmailOrigin->getUser();
+        $password = $this->encryptor->decryptData($userEmailOrigin->getPassword());
+        $this->mailer->prepareSmtpTransport(
+            $userEmailOrigin->getSmtpHost(),
+            $userEmailOrigin->getSmtpPort(),
+            $userEmailOrigin->getSmtpEncryption(),
+            $username,
+            $password
+        );
     }
 
     /**

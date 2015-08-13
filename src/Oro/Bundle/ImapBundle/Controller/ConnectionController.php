@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
 
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -85,13 +86,17 @@ class ConnectionController extends Controller
                 $response['smtp'] = [];
 
                 try {
+                    /** @var DirectMailer $mailer */
                     $mailer = $this->get('oro_email.direct_mailer');
-                    $transport = $mailer->getTransport();
-                    $transport->setHost($origin->getSmtpHost());
-                    $transport->setPort($origin->getSmtpPort());
-                    $transport->setEncryption($origin->getSmtpEncryption());
-                    $transport->setUsername($origin->getUser());
-                    $transport->setPassword($password);
+
+                    // Prepare Smtp Transport
+                    $transport = $mailer->prepareSmtpTransport(
+                        $origin->getSmtpHost(),
+                        $origin->getSmtpPort(),
+                        $origin->getSmtpEncryption(),
+                        $origin->getUser(),
+                        $password
+                    );
 
                     $transport->start();
                 } catch (\Exception $e) {

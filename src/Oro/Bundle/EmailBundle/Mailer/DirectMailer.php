@@ -18,6 +18,11 @@ class DirectMailer extends \Swift_Mailer
     protected $baseMailer;
 
     /**
+     * @var \Swift_SmtpTransport
+     */
+    protected $smtpTransport;
+
+    /**
      * @var ContainerInterface
      */
     protected $container;
@@ -41,6 +46,59 @@ class DirectMailer extends \Swift_Mailer
             }
         }
         parent::__construct($transport);
+    }
+
+    /**
+     * Get SmtpTransport instance or create a new if default mailer transport is not smtp
+     *
+     * @param string $host
+     * @param int    $port
+     * @param string $security
+     * @param string $username
+     * @param string $password
+     *
+     * @return \Swift_SmtpTransport|\Swift_Transport_EsmtpTransport
+     */
+    public function prepareSmtpTransport(
+        $host = 'localhost',
+        $port = 25,
+        $security = null,
+        $username = null,
+        $password = null
+    ) {
+        $transport = false;
+        if (!$this->smtpTransport) {
+            $transport = $this->getTransport();
+            if ($transport instanceof \Swift_SmtpTransport
+                || $transport instanceof \Swift_Transport_EsmtpTransport) {
+                $transport->setHost($host);
+                $transport->setPort($port);
+                $transport->setEncryption($security);
+            } else {
+                $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
+            }
+        }
+
+        if ($transport) {
+            $transport->setUsername($username);
+            $transport->setPassword($password);
+            $this->smtpTransport = $transport;
+        }
+
+        return $this->smtpTransport;
+    }
+
+    /**
+     * The Transport used to send messages.
+     *
+     * @return Swift_Transport|Swift_SmtpTransport
+     */
+    public function getTransport()
+    {
+        if ($this->smtpTransport) {
+            return $this->smtpTransport;
+        }
+        return parent::getTransport();
     }
 
     /**
@@ -78,7 +136,11 @@ class DirectMailer extends \Swift_Mailer
         // send a mail
         $sendException = null;
         try {
-            $result = parent::send($message, $failedRecipients);
+            if ($this->smtpTransport) {
+                $result = $this->smtpTransport->send($message, $failedRecipients);
+            } else {
+                $result = parent::send($message, $failedRecipients);
+            }
         } catch (\Exception $unexpectedEx) {
             $sendException = $unexpectedEx;
         }
