@@ -104,7 +104,26 @@ class EmailTypeTest extends TypeTestCase
         $em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
-        $contextsSelectType = new ContextsSelectType($em);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $contextsSelectType = new ContextsSelectType(
+            $em,
+            $configManager,
+            $translator,
+            $mapper,
+            $securityFacade
+        );
 
         return [
             new PreloadedExtension(

@@ -8,10 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class EmailTemplates
  *
  * @package Oro\Bundle\EmailBundle\Tests\Selenium\Pages
- * @method EmailTemplates openEmailTemplates() openEmailTemplates()
- * @method EmailTemplates assertTitle() assertTitle($title, $message = '')
- * @method EmailTemplate add() add()
- * @method EmailTemplate open() open(array)
+ * @method EmailTemplates openEmailTemplates(string $bundlePath)
+ * @method EmailTemplates assertTitle($title, $message = '')
+ * @method EmailTemplate add()
+ * @method EmailTemplate open(array)
  */
 class EmailTemplates extends AbstractPageFilteredGrid
 {

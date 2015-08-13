@@ -17,6 +17,10 @@ class GridTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle');
+        //check count of users, continue only for BAP
+        if ($login->getPagesCount() == 1) {
+            $this->markTestSkipped("Test skipped for current environment");
+        }
         $userData = $login->getRandomEntity();
         static::assertTrue($login->entityExists($userData));
         $login = $login->changePage(2);

@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  * Class AclCheck
  *
  * @package Oro\Bundle\SecurityBundle\Tests\Selenium\Pages
- * @method AclCheck openAclCheck() openAclCheck(string)
+ * @method AclCheck openAclCheck(string $bundlePath)
   */
 class AclCheck extends AbstractPage
 {

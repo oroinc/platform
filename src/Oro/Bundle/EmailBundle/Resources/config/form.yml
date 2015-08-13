@@ -146,6 +146,10 @@ services:
         class: %oro_email.form.type.contexts_select.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_search.mapper
+            - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_email_contexts_select }
 

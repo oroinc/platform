@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Reports
  *
  * @package Oro\Bundle\ReportBundle\Tests\Selenium\Pages
- * @method Reports openReports openReports(string)
- * @method Report add add()
+ * @method Reports openReports($bundlePath)
+ * @method Report add()
  * {@inheritdoc}
  */
 class Reports extends AbstractPageFilteredGrid

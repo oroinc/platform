@@ -16,10 +16,38 @@ class ContextsSelectTypeTest extends TypeTestCase
      */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $mapper;
+
+    /* @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     protected function setUp()
     {
         parent::setUp();
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -40,8 +68,14 @@ class ContextsSelectTypeTest extends TypeTestCase
     {
         $builder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
         $builder->expects($this->once())
-            ->method('addModelTransformer');
-        $type = new ContextsSelectType($this->em);
+            ->method('addViewTransformer');
+        $type = new ContextsSelectType(
+            $this->em,
+            $this->configManager,
+            $this->translator,
+            $this->mapper,
+            $this->securityFacade
+        );
         $type->buildForm($builder, []);
     }
 
@@ -59,26 +93,45 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'multiple'           => true,
                         'route_name'         => 'oro_api_get_search_autocomplete',
                         'separator'          => ';',
+                        'forceSelectedData'  => true,
                         'containerCssClass'  => 'taggable-email',
                         'minimumInputLength' => 1,
                     ]
                 ]
             );
 
-        $type = new ContextsSelectType($this->em);
+        $type = new ContextsSelectType(
+            $this->em,
+            $this->configManager,
+            $this->translator,
+            $this->mapper,
+            $this->securityFacade
+        );
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetParent()
     {
-        $type = new ContextsSelectType($this->em);
+        $type = new ContextsSelectType(
+            $this->em,
+            $this->configManager,
+            $this->translator,
+            $this->mapper,
+            $this->securityFacade
+        );
         $this->assertEquals('genemu_jqueryselect2_hidden', $type->getParent());
 
     }
 
     public function testGetName()
     {
-        $type = new ContextsSelectType($this->em);
+        $type = new ContextsSelectType(
+            $this->em,
+            $this->configManager,
+            $this->translator,
+            $this->mapper,
+            $this->securityFacade
+        );
         $this->assertEquals('oro_email_contexts_select', $type->getName());
     }
 }

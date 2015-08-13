@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class DataAudit
  *
  * @package Oro\Bundle\DataAuditBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\DataAuditBundle\Tests\Selenium\Pages\DataAudit openDataAudit() openDataAudit()
- * @method \Oro\Bundle\DataAuditBundle\Tests\Selenium\Pages\DataAudit assertTitle() assertTitle($title, $message = '')
+ * @method DataAudit openDataAudit() openDataAudit(string $bundlePath)
+ * @method assertTitle($title, $message = '')
  */
 class DataAudit extends AbstractPageFilteredGrid
 {
