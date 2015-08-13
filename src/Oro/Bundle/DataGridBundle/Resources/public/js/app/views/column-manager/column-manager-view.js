@@ -32,13 +32,13 @@ define(function(require) {
          *  - allows to reorder columns
          */
         initSorting: function() {
-            this.$el.sortable({
+            this.$('tbody').sortable({
                 cursor: 'move',
                 delay: 25,
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',
-                containment: this.$el,
+                containment: this.$('tbody'),
                 items: 'tr',
                 tolerance: 'pointer',
                 helper: function(e, ui) {
