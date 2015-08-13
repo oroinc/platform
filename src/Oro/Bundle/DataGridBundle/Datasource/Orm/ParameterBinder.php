@@ -161,7 +161,7 @@ class ParameterBinder implements ParameterBinderInterface
             }
             $result = $propertyAccessor->getValue($source, $path);
         } catch (NoSuchPropertyException $exception) {
-            if (isset($config['default'])) {
+            if (array_key_exists('default', $config)) {
                 $result = $config['default'];
             } else {
                 throw new InvalidArgumentException(
@@ -175,9 +175,7 @@ class ParameterBinder implements ParameterBinderInterface
                 );
             }
         }
-        if ((null === $result || $result === [] || $result === ['']) && isset($config['default'])) {
-            $result = $config['default'];
-        }
+
         return $result;
     }
 
