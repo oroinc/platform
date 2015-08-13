@@ -41,7 +41,7 @@ class SoapClient extends BasicSoapClient
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
-        $parameters = ['HTTP_SOAPACTION' => $action, 'CONTENT_TYPE' => 'application/soap+xml'];
+        $parameters = ['HTTP_SOAPACTION' => $action, 'HTTP_CONTENT_TYPE' => 'application/soap+xml'];
         //make POST request
         $this->client->request(
             'POST',
