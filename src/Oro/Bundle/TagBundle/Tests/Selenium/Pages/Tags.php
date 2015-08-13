@@ -9,44 +9,22 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
  * @method Tags openTags() openTags(string)
+ * @method Tag open() open()
+ * @method Tag add() add()
  * {@inheritdoc}
  */
 class Tags extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Tag']";
     const URL = 'tag';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
+        return new Tag($this->test);
     }
 
-    /**
-     * @param bool $new
-     *
-     * @return Tag
-     */
-    public function add($new = true)
+    public function entityView()
     {
-        $this->test->byXPath("//a[@title='Create Tag']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-        $tag = new Tag($this->test);
-        return $tag->init($new);
-    }
-
-    /**
-     * @param array $entityData
-     *
-     * @return Tag
-     */
-    public function open($entityData = array())
-    {
-        $contact = $this->getEntity($entityData);
-        $contact->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new Tag($this->test);
     }
 
@@ -60,9 +38,8 @@ class Tags extends AbstractPageFilteredGrid
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
-        $tag = new Tag($this->test);
 
-        return $tag->init();
+        return new Tag($this->test);
     }
 
     public function delete()

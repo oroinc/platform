@@ -9,37 +9,22 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
  * @method ConfigEntities openConfigEntities() openConfigEntities(string)
+ * @method ConfigEntity add() add()
+ * @method ConfigEntity open() open()
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create entity']";
     const URL = 'entity/config/';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
-     * @return ConfigEntity
-     */
-    public function add()
-    {
-        $this->test->byXPath("//a[@title='Create entity']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         $entity = new ConfigEntity($this->test);
         return $entity->init(true);
     }
 
-    public function open($entityData = array())
+    public function entityView()
     {
-        $contact = $this->getEntity($entityData);
-        $contact->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new ConfigEntity($this->test);
     }
 

@@ -12,11 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
   */
 class AclCheck extends AbstractPage
 {
-    public function __construct($testCase)
-    {
-        parent::__construct($testCase);
-    }
-
     public function assertAcl($url, $title = '403 - Forbidden')
     {
         $this->test->url($url);

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles;
 
 class TransactionEmailsAcl extends Selenium2TestCase
 {
@@ -10,6 +11,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
     {
         $randomPrefix = mt_rand();
         $login = $this->login();
+        /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
@@ -31,6 +33,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $username = 'User_'.mt_rand();
 
         $login = $this->login();
+        /** @var Roles $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')

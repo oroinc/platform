@@ -8,8 +8,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPageFilteredGrid
+abstract class AbstractPageEntity extends AbstractPage
 {
+    use FilteredGridTrait;
+
     /** @var string */
     protected $owner;
 
