@@ -112,11 +112,12 @@ class Processor
      * Process email model sending.
      *
      * @param EmailModel $model
+     * @param EmailOrigin $origin Origin to send email with
      *
      * @return EmailUser
      * @throws \Swift_SwiftException
      */
-    public function process(EmailModel $model)
+    public function process(EmailModel $model, $origin = null)
     {
         $this->assertModel($model);
         $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -141,7 +142,9 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        $origin = $this->getEmailOrigin($model->getFrom());
+        if ($origin === null) {
+            $origin = $this->getEmailOrigin($model->getFrom());
+        }
         $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(

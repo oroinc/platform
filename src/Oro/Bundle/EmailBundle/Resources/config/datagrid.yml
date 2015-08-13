@@ -159,6 +159,7 @@ datagrid:
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
+            skip_acl_check: true
 
     simplified-email-grid:
         extends: base-email-grid

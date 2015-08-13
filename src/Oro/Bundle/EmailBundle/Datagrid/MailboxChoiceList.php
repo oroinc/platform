@@ -35,7 +35,10 @@ class MailboxChoiceList
         $repo = $this->doctrine->getRepository('OroEmailBundle:Mailbox');
 
         /** @var Mailbox[] $results */
-        $results = $repo->findAvailableMailboxes($this->securityFacade->getLoggedUser());
+        $results = $repo->findAvailableMailboxes(
+            $this->securityFacade->getLoggedUser(),
+            $this->securityFacade->getOrganization()
+        );
 
         $choiceList = [];
         foreach ($results as $mailbox) {

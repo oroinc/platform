@@ -12,19 +12,26 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
-use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
-use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Class AutoResponseManager
+ *
+ * @package Oro\Bundle\EmailBundle\Manager
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class AutoResponseManager
 {
     const INDEX_PLACEHOLDER = '__index__';
@@ -104,16 +111,19 @@ class AutoResponseManager
     {
         $rules = $this->getApplicableRules($mailbox, $email);
         $emailModels = $this->createReplyEmailModels($email, $rules);
-        array_map([$this, 'sendEmailModel'], $emailModels->toArray());
+        foreach ($emailModels as $emailModel) {
+            $this->sendEmailModel($emailModel, $mailbox->getOrigin());
+        }
     }
 
     /**
      * @param EmailModel $email
+     * @param EmailOrigin $origin
      */
-    protected function sendEmailModel(EmailModel $email)
+    protected function sendEmailModel(EmailModel $email, EmailOrigin $origin = null)
     {
         try {
-            $this->emailProcessor->process($email);
+            $this->emailProcessor->process($email, $origin);
         } catch (Exception $ex) {
             $this->logger->error('Email sending failed.', ['exception' => $ex]);
         }
