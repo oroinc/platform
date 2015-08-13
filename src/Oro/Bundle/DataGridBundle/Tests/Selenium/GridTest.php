@@ -14,63 +14,70 @@ class GridTest extends Selenium2TestCase
 {
     public function testSelectPage()
     {
-        $this->markTestIncomplete('Exception is occurred during test');
-        $this->login();
-        $users = new Users($this);
-        $userData = $users->getRandomEntity();
-        $this->assertTrue($users->entityExists($userData));
-        $users->changePage(2);
-        $this->assertFalse($users->entityExists($userData));
-        $users->changePage(1);
-        $this->assertTrue($users->entityExists($userData));
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
+        $userData = $login->getRandomEntity();
+        static::assertTrue($login->entityExists($userData));
+        $login = $login->changePage(2);
+        static::assertFalse($login->entityExists($userData));
+        $login = $login->changePage(1);
+        static::assertTrue($login->entityExists($userData));
     }
 
     public function testNextPage()
     {
-        $this->login();
-        $users = new Users($this);
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
+
         //check count of users, continue only for BAP
-        if ($users->getPagesCount() == 1) {
-            $this->markTestSkipped("Test skipped for current environment");
+        if ($login->getPagesCount() === 1) {
+            static::markTestSkipped("Test skipped for current environment");
         }
-        $userData = $users->getRandomEntity();
-        $this->assertTrue($users->entityExists($userData));
-        $users->nextPage();
-        $this->assertFalse($users->entityExists($userData));
-        $users->previousPage();
-        $this->assertTrue($users->entityExists($userData));
+        $userData = $login->getRandomEntity();
+        static::assertTrue($login->entityExists($userData));
+        $login = $login->nextPage();
+        static::assertFalse($login->entityExists($userData));
+        $login = $login->previousPage();
+        static::assertTrue($login->entityExists($userData));
     }
 
     public function testPrevPage()
     {
-        $this->login();
-        $users = new Users($this);
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
         //check count of users, continue only for BAP
-        if ($users->getPagesCount() == 1) {
-            $this->markTestSkipped("Test skipped for current environment");
+        if ($login->getPagesCount() === 1) {
+            static::markTestSkipped("Test skipped for current environment");
         }
-        $userData = $users->getRandomEntity();
-        $this->assertTrue($users->entityExists($userData));
-        $users->nextPage();
-        $this->assertFalse($users->entityExists($userData));
-        $users->previousPage();
-        $this->assertTrue($users->entityExists($userData));
+        $userData = $login->getRandomEntity();
+        static::assertTrue($login->entityExists($userData));
+        $login = $login->nextPage();
+        static::assertFalse($login->entityExists($userData));
+        $login = $login->previousPage();
+        static::assertTrue($login->entityExists($userData));
     }
 
     /**
+     * @param $filterName
+     * @param $condition
+     *
      * @dataProvider filterData
      */
     public function testFilterBy($filterName, $condition)
     {
-        $this->login();
-        $users = new Users($this);
-        $userData = $users->getRandomEntity();
-        $this->assertTrue(
-            $users->filterBy($filterName, $userData[strtoupper($filterName)], $condition)
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
+        $userData = $login->getRandomEntity();
+        static::assertTrue(
+            $login->filterBy($filterName, $userData[strtoupper($filterName)], $condition)
                 ->entityExists($userData)
         );
-        $this->assertEquals(1, $users->getRowsCount());
-        $users->clearFilter($filterName);
+        static::assertEquals(1, $login->getRowsCount());
+        $login->clearFilter($filterName);
     }
 
     /**
@@ -91,19 +98,21 @@ class GridTest extends Selenium2TestCase
 
     public function testAddFilter()
     {
-        $this->login();
-        $users = new Users($this);
-        $userData = $users->getRandomEntity();
-        $this->assertTrue($users->entityExists($userData));
-        $countOfRecords = $users->getRowsCount();
-        $this->assertEquals(
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
+
+        $userData = $login ->getRandomEntity();
+        static::assertTrue($login ->entityExists($userData));
+        $countOfRecords = $login ->getRowsCount();
+        static::assertEquals(
             $countOfRecords,
-            $users->getRowsCount()
+            $login->getRowsCount()
         );
 
-        $this->assertEquals(
+        static::assertEquals(
             1,
-            $users->addFilter('Primary Email')
+            $login->addFilter('Primary Email')
                 ->filterBy('Primary Email', $userData[strtoupper('Primary Email')], 'is equal to')
                 ->getRowsCount()
         );
@@ -117,19 +126,20 @@ class GridTest extends Selenium2TestCase
      */
     public function testSorting($columnName)
     {
-        $this->login();
-        $users = new Users($this);
+        $login = $this->login();
+        /** @var Users $login */
+        $login = $login->openUsers('Oro\Bundle\UserBundle');
         //check count of users, continue only for BAP
-        if ($users->getPagesCount() == 1) {
-            $this->markTestSkipped("Test skipped for current environment");
+        if ($login->getPagesCount() === 1) {
+            static::markTestSkipped("Test skipped for current environment");
         }
-        $users->changePageSize('last');
-        $columnId = $users->getColumnNumber($columnName);
+        $login->changePageSize('last');
+        $columnId = $login->getColumnNumber($columnName);
 
         //test descending order
-        $columnOrder = $users->sortBy($columnName, 'desc')->getColumn($columnId);
+        $columnOrder = $login->sortBy($columnName, 'desc')->getColumn($columnId);
 
-        if ($columnName == 'Birthday') {
+        if ($columnName === 'Birthday') {
             $dateArray = array();
             foreach ($columnOrder as $value) {
                 $date = strtotime($value);
@@ -141,25 +151,25 @@ class GridTest extends Selenium2TestCase
         sort($sortedColumnOrder);
         $sortedColumnOrder = array_reverse($sortedColumnOrder);
 
-        $this->assertEquals(
+        static::assertEquals(
             $sortedColumnOrder,
             $columnOrder,
             print_r(array('expected' => $sortedColumnOrder, 'actual' => $columnOrder), true)
         );
         //change page size to 10 and refresh grid
-        $users->changePageSize('first');
-        $users->sortBy($columnName, 'asc');
-        $columnOrder = $users->sortBy($columnName, 'desc')->getColumn($columnId);
-        $this->assertTrue(
+        $login = $login->changePageSize('first');
+        $login = $login->sortBy($columnName, 'asc');
+        $columnOrder = $login->sortBy($columnName, 'desc')->getColumn($columnId);
+        static::assertTrue(
             $columnOrder === array_slice($sortedColumnOrder, 0, 10),
             print_r(array('expected' => $sortedColumnOrder, 'actual' => $columnOrder), true)
         );
 
         //test ascending order
-        $users->changePageSize('last');
-        $columnOrder = $users->sortBy($columnName, 'asc')->getColumn($columnId);
+        $login = $login->changePageSize('last');
+        $columnOrder = $login->sortBy($columnName, 'asc')->getColumn($columnId);
 
-        if ($columnName == 'Birthday') {
+        if ($columnName === 'Birthday') {
             $dateArray = array();
             foreach ($columnOrder as $value) {
                 $date = strtotime($value);
@@ -170,15 +180,15 @@ class GridTest extends Selenium2TestCase
         $sortedColumnOrder = $columnOrder;
         natcasesort($sortedColumnOrder);
 
-        $this->assertTrue(
+        static::assertTrue(
             $columnOrder === $sortedColumnOrder,
             print_r(array('expected' => $sortedColumnOrder, 'actual' => $columnOrder), true)
         );
         //change page size to 10 and refresh grid
-        $users->changePageSize('first');
-        $users->sortBy($columnName, 'desc');
-        $columnOrder = $users->sortBy($columnName, 'asc')->getColumn($columnId);
-        $this->assertTrue(
+        $login = $login->changePageSize('first');
+        $login = $login->sortBy($columnName, 'desc');
+        $columnOrder = $login->sortBy($columnName, 'asc')->getColumn($columnId);
+        static::assertTrue(
             $columnOrder === array_slice($sortedColumnOrder, 0, 10),
             print_r(array('expected' => $sortedColumnOrder, 'actual' => $columnOrder), true)
         );

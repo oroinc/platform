@@ -11,63 +11,28 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  */
 class Dashboard extends AbstractPageEntity
 {
-    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element */
-    protected $label;
-    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element_Select  */
-    protected $owner;
+    /** @var string */
+    protected $owner = "//div[starts-with(@id,'s2id_oro_dashboard_owner')]/a";
 
-    /** @var \PHPUnit_Extensions_Selenium2TestCase_Element_Select  */
-    protected $clone;
-
-    public function __construct($testCase, $redirect = true)
+    public function setLabel($value)
     {
-        parent::__construct($testCase, $redirect);
-        $this->label = $this->test->byXpath("//*[@data-ftid='oro_dashboard_label']");
-        $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_dashboard_owner')]/a");
-    }
+        $label = $this->test->byXpath("//*[@data-ftid='oro_dashboard_label']");
+        $label->clear();
+        $label->value($value);
 
-    public function init()
-    {
-        $this->clone = $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_dashboard_startDashboard']"));
-        return $this;
-    }
-
-    public function setLabel($label)
-    {
-        $this->label->clear();
-        $this->label->value($label);
         return $this;
     }
 
     public function getLabel()
     {
-        return $this->label->value();
+        return $this->test->byXpath("//*[@data-ftid='oro_dashboard_label']")->value();
     }
 
-    public function setOwner($owner)
+    public function setClone($value)
     {
-        $this->owner->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
-            "Owner autocomplete doesn't return search value"
-        );
-        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
-
-        return $this;
-    }
-
-    public function getOwner()
-    {
-        return ;
-    }
-
-    public function setClone($clone)
-    {
-        $this->clone->selectOptionByLabel($clone);
+        $clone = $this->test
+            ->select($this->test->byXpath("//*[@data-ftid='oro_dashboard_startDashboard']"));
+        $clone->selectOptionByLabel($value);
 
         return $this;
     }

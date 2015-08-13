@@ -50,13 +50,13 @@ class TrackingWebsiteTest extends Selenium2TestCase
         $login->openTrackingWebsites('Oro\Bundle\TrackingBundle')
             ->filterBy('Identifier', $identifier)
             ->open(array($identifier))
-            ->assertTitles("{$identifier}", "{$identifier} - Tracking Websites - Marketing")
+            ->assertTitle("{$identifier}", "{$identifier} - Tracking Websites - Marketing")
             ->edit()
-            ->assertTitles("{$identifier} - Edit", "{$identifier} - Edit - Tracking Websites - Marketing")
+            ->assertTitle("{$identifier} - Edit", "{$identifier} - Edit - Tracking Websites - Marketing")
             ->setName($newName)
             ->save()
             ->assertMessage('Tracking Website saved')
-            ->assertTitles("{$newName}", "{$newName} - Tracking Websites - Marketing")
+            ->assertTitle("{$newName}", "{$newName} - Tracking Websites - Marketing")
             ->close();
 
         return $newName;

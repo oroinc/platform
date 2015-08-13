@@ -97,9 +97,10 @@ define([
                                 '</a>' +
                             '</span>' +
                         '</div>' +
-                        '<div class="pull-left widget-actions-container"></div>' +
                     '</div>' +
-                    '<div class="title sortable widget-title" title="<%- title %>"><%- title %></div>' +
+                    '<div class="title sortable widget-title pull-left" title="<%- title %>"><%- title %></div>' +
+                    '<div class="pull-right widget-actions-container"></div>' +
+                    '<div class="new-line"></div>' +
                     '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
                 '</div>'
             )

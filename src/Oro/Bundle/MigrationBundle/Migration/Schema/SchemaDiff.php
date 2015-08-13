@@ -7,12 +7,10 @@
 // for existing database and require a lot of effort from developers
 // to prepare proper migrations as well.
 // For details see _toSql and disableIndicesRenaming methods.
-// IMPORTANT: the FQCN of this class must be the same as original Doctrine class because
-// spl_autoload_register is used to substitute.
 // {@see \Oro\Bundle\MigrationBundle\EventListener\ConsoleCommandListener::onConsoleCommand}
 // @todo because of this change we have to watch changes in Doctrine\DBAL\Schema\SchemaDiff
 
-namespace Doctrine\DBAL\Schema;
+namespace Oro\Bundle\MigrationBundle\Migration\Schema;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 

@@ -13,10 +13,14 @@ use PHPUnit_Framework_Assert;
 abstract class AbstractPageGrid extends AbstractPage
 {
 
+    const NEW_ENTITY_BUTTON = '';
+
     protected $gridPath = '';
 
     protected $filtersPath = '';
 
+    abstract public function entityNew();
+    abstract public function entityView();
 
     /**
      * @param array $entityData
@@ -25,13 +29,20 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function open($entityData = array())
     {
-        $task = $this->getEntity($entityData, 1);
-        $task->click();
-        $this->waitPageToLoad();
+        $entity = $this->getEntity($entityData);
+        $entity->click();
         sleep(1);
+        $this->waitPageToLoad();
         $this->waitForAjax();
+        return $this->entityView();
+    }
 
-        return $this;
+    public function add()
+    {
+        $this->test->byXPath(static::NEW_ENTITY_BUTTON)->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+        return $this->entityNew();
     }
 
     /**
@@ -86,8 +97,7 @@ abstract class AbstractPageGrid extends AbstractPage
         //simulate lost focus
         $this->test->keysSpecial('enter');
         $this->waitForAjax();
-        $pagerLabel->click();
-        $this->waitForAjax();
+
         return $this;
     }
 
@@ -112,6 +122,7 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $this->test->byXPath("{$this->gridPath}//div[contains(@class,'pagination')]//a[contains(.,'Prev')]")->click();
         $this->waitForAjax();
+        return $this;
     }
 
     /**
@@ -240,13 +251,18 @@ abstract class AbstractPageGrid extends AbstractPage
     /**
      * Verify entity exist on the current page
      *
-     * @param array $entityData
+     * @param array|string $entityData
      * @param null|int $column
      * @return \PHPUnit_Extensions_Selenium2TestCase_Element
      */
     public function getEntity($entityData, $column = null)
     {
         $xpath = '';
+
+        if (is_string($entityData)) {
+            $entityData = array($entityData);
+        }
+
         foreach ($entityData as $entityField) {
             if ($xpath != '') {
                 $xpath .= " and ";
@@ -265,25 +281,25 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
-     * @param array  $entityData
+     * @param array|string  $entityData
      * @param string $actionName Default is Delete
      * @param bool   $confirmation
      *
      * @return $this
      */
-    public function deleteEntity($entityData = array(), $actionName = 'Delete', $confirmation = true)
+    public function delete($entityData, $actionName = 'Delete', $confirmation = true)
     {
         return $this->action($entityData, $actionName, $confirmation);
     }
 
     /**
-     * @param array  $entityData
+     * @param array|string  $entityData
      * @param string $actionName Default is Delete
      * @param bool   $confirmation
      *
      * @return $this
      */
-    public function action($entityData = array(), $actionName = 'Update', $confirmation = false)
+    public function action($entityData, $actionName = 'Update', $confirmation = false)
     {
         $entity = $this->getEntity($entityData);
         $element = $entity->element(
@@ -403,8 +419,11 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function changePageSize($pageSize)
     {
-        $this->test->byXPath("{$this->gridPath}//div[@class='page-size pull-right form-horizontal']//button")->click();
-        if (is_integer($pageSize)) {
+        $element = $this->test
+            ->byXPath("{$this->gridPath}//div[@class='page-size pull-right form-horizontal']//button");
+        $this->test->moveto($element);
+        $element->click();
+        if (is_int($pageSize)) {
             $this->test->byXPath(
                 "{$this->gridPath}//div[@class='page-size pull-right form-horizontal']" .
                 "//ul[contains(@class,'dropdown-menu')]/li/a[text() = '{$pageSize}']"
