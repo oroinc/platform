@@ -20,6 +20,7 @@ config:
         'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
         'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
         'oroemail/js/app/views/email-notification-view': 'bundles/oroemail/js/app/views/email-notification-view.js'
+        'oroemail/js/app/views/email-notification-collection-view': 'bundles/oroemail/js/app/views/email-notification-collection-view.js'
 
         'oroemail/js/app/components/email-context-component': 'bundles/oroemail/js/app/components/email-context-component.js'
         'oroemail/js/app/components/email-context-activity-component': 'bundles/oroemail/js/app/components/email-context-activity-component.js'

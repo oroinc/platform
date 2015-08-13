@@ -1,13 +1,21 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-<script type="text/template" id="email-notification-item">
-    <li class="new" id="<%= entity.cid %>">
+<script type="text/template" id="email-notification-item-template">
+    <% if (entity.get('seen')) {  %>
+        <li class="" id="<%= entity.cid %>">
+    <% } else { %>
+        <li class="new" id="<%= entity.cid %>">
+    <% }  %>
         <div class="info" data-id="<%= entity.get('id') %>">
             <div class="body">
                 <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
                 <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>
             </div>
-            <i class="icon-envelope new"></i>
+            <% if (entity.get('seen')) {  %>
+                <i class="icon-envelope"></i>
+            <% } else { %>
+                <i class="icon-envelope new"></i>
+            <% }  %>
         </div>
         <div class="footer row-fluid">
             <span class="pull-left fromName">
@@ -66,9 +74,7 @@
             <span>
                 {% if (count > 10) %}
                     10+
-                {% elseif (count == 0 ) %}
-
-                {% else %}
+                {% elseif (count > 0 ) %}
                     {{ count }}
                 {% endif %}
             </span>
