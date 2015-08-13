@@ -36,6 +36,7 @@ oro:
             remote_wins.label: Remote wins
             local_wins.label: Local wins
             default_user_owner.label: Default owner
+            default_business_unit_owner.label: Default Business Unit Owner
             organization.label: Organization
             enabled:
                 label:           Status
@@ -56,6 +57,7 @@ oro:
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
             default_user_owner.label:       Default owner
+            default_business_unit_owner.label: Default Business Unit Owner
             edit_mode.label:                Edit mode
         integration_status:
             competed.label:  Completed

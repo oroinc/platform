@@ -8,7 +8,8 @@ define(function() {
             single_choice: 'select',
             selectrow:   'select-row',
             multichoice: 'multiselect',
-            boolean:     'select'
+            boolean:     'select',
+            dictionary:  'dictionary'
         };
 
     return function(type) {

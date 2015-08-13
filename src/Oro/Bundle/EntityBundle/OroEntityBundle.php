@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -23,7 +22,6 @@ class OroEntityBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
         $container->addCompilerPass(new EntityAliasProviderPass());
         $container->addCompilerPass(new EntityNameProviderPass());
         $container->addCompilerPass(new EntityClassNameProviderPass());

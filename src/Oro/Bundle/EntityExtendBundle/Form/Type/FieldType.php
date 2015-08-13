@@ -242,6 +242,8 @@ class FieldType extends AbstractType
      * @param string         $relationKey
      *
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isAvailableRelation(
         ConfigProvider $extendProvider,
@@ -275,6 +277,12 @@ class FieldType extends AbstractType
         if ($fieldId
             && $extendProvider->hasConfigById($fieldId)
             && $extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
+        ) {
+            return false;
+        }
+
+        if ($targetFieldId
+            && !$extendProvider->hasConfig($targetFieldId->getClassName(), $targetFieldId->getFieldName())
         ) {
             return false;
         }

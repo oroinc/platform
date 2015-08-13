@@ -119,10 +119,9 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             new ServiceLink($this->container, 'ConfigProviderBag'),
             $this->modelManager,
-            $this->auditManager
+            $this->auditManager,
+            $this->configCache
         );
-
-        $this->configManager->setCache($this->configCache);
     }
 
     public function testFlush()
@@ -218,9 +217,11 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setFlushExpectations($em, $models)
     {
         $this->configCache->expects($this->once())
-            ->method('removeAllConfigurable');
+            ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())
-            ->method('log');
+            ->method('buildLogEntry')
+            ->with($this->identicalTo($this->configManager))
+            ->willReturn(null);
 
         $em->expects($this->exactly(count($models)))
             ->method('persist')

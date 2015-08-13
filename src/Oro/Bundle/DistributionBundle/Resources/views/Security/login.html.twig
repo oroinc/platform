@@ -12,7 +12,7 @@
         <fieldset>
             {% if error %}
                 <div class="alert alert-error">
-                    <div>{{ error.message|trans }}</div>
+                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 </div>
             {% endif %}
             {%- set usernameLabel = 'oro.distribution.security.username'|trans %}

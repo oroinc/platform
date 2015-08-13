@@ -7,9 +7,19 @@
 }) %}
 
 {% block navButtons %}
-    {% if resource_granted('EDIT', 'entity:'~entity_class) %}
+    {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_entity_update', {entityName: entity_name, id: entity.id}),
+            'entity_label': entity_config.get('label')|default('N/A')|trans
+        }) }}
+    {% endif %}
+    {% if resource_granted('DELETE', entity) %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_entity_delete', {'entityName': entity_class, 'id': entity.id}),
+            'dataRedirect': path('oro_entity_index', {'entityName': entity_class}),
+            'aCss': 'no-hash remove-button',
+            'dataId': entity.id,
+            'id': 'btn-remove-account',
             'entity_label': entity_config.get('label')|default('N/A')|trans
         }) }}
     {% endif %}

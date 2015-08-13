@@ -7,6 +7,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\User;
 
 class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,13 +21,30 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     private $configProvider;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityOwnerAccessor;
+
+    /**
      * Set up test environment
      */
     protected function setUp()
     {
+        $this->entityOwnerAccessor = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entityOwnerAccessor->expects($this->any())
+            ->method('getOwner')
+            ->willReturnCallback(
+                function ($entity) {
+                    return $entity->getOwner();
+                }
+            );
+
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
-        $this->extension = new OwnerTypeExtension($this->configProvider);
+        $this->extension = new OwnerTypeExtension($this->configProvider, $this->entityOwnerAccessor);
     }
 
     public function testName()
@@ -69,5 +88,14 @@ class OwnerTypeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $this->assertArrayHasKey('oro_get_owner_type', $this->extension->getFunctions());
+        $this->assertArrayHasKey('oro_get_entity_owner', $this->extension->getFunctions());
+    }
+
+    public function testGetEntityOwner()
+    {
+        $owner = new User();
+        $entity = new Entity();
+        $entity->setOwner($owner);
+        $this->assertSame($owner, $this->extension->getEntityOwner($entity));
     }
 }

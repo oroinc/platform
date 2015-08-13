@@ -21,11 +21,15 @@ define([
         var form = $el.parents('form').first();
         // instance of validator
         var validator = $(form).data('validator');
-        return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
-            var $el = $(el);
-            // is it current element or first in a group of elements
-            return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
-        });
+        if (validator instanceof $.validator) {
+            return _.filter($el.add($el.parentsUntil(form)).add(form).toArray(), function(el) {
+                var $el = $(el);
+                // is it current element or first in a group of elements
+                return $el.data('validation') && ($el.is(element) || validator.elementsOf($el).first().is(element));
+            });
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -70,6 +74,18 @@ define([
         return $target;
     }
 
+    /**
+     * Gets element after which it needs insert error message
+     *
+     * @param {Element} element
+     * @returns {jQuery}
+     */
+    function getErrorPlacement(element) {
+        var $targetElem = getErrorTarget(element);
+        var $errorHolder = $targetElem.parent();
+        return $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+    }
+
     // turn off adding rules from attributes
     $.validator.attributeRules = function() { return {}; };
 
@@ -96,6 +112,18 @@ define([
             }
         });
         return rules;
+    };
+
+    /**
+     * Removes error message from an element
+     *
+     * @param {Element|jQuery} element
+     */
+    $.validator.prototype.hideElementErrors = function(element) {
+        var $placement = getErrorPlacement(element);
+        $placement.next('.' + this.settings.errorClass).remove();
+        this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
+        return this;
     };
 
     /**
@@ -234,12 +262,10 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function(label, $el) {
-            var $targetElem = getErrorTarget($el);
-            var $errorHolder = $targetElem.parent();
-            var $sibling = $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+            var $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
-            $sibling.next('.' + this.errorClass).remove();
-            label.insertAfter($sibling);
+            $placement.next('.' + this.errorClass).remove();
+            label.insertAfter($placement);
         },
         highlight: function(element) {
             this.settings.unhighlight.call(this, element);
@@ -271,7 +297,8 @@ define([
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',
-        'oroform/js/validator/url'
+        'oroform/js/validator/url',
+        'oroform/js/validator/type'
     ];
     $.validator.loadMethod(methods);
 

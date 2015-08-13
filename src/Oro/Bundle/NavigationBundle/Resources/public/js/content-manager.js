@@ -358,7 +358,9 @@ define([
             var route;
             var query = Chaplin.utils.queryParams.parse(current.query);
             if (query[param] === value || (
-                (query[param] === null || query[param] === void 0) && (value === null || query[param] === void 0))) {
+                (query[param] === null || query[param] === void 0) &&
+                (value === null || value === void 0)
+            )) {
                 // there's nothing to change in query, skip query update and redirect
                 return;
             }

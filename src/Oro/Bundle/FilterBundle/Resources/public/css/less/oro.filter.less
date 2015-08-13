@@ -1,3 +1,4 @@
+@import "../../../oroui/css/less/mixins";
 .ui-multiselect-checkboxes{
     overflow-x: visible;
 }
@@ -68,7 +69,7 @@
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
     display: none;
-    z-index: 10000;
+    z-index: @zindexPopover;
     margin-top: 7px;
     top: auto;
 }
@@ -113,7 +114,7 @@
 
 .ui-multiselect-menu.select-filter-widget {
     padding: 2px;
-    z-index: 10000;
+    z-index: @zindexPopover;
 }
 
 .ui-multiselect-menu.select-filter-widget ul {
@@ -316,5 +317,24 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         top: 0;
       }
     }
+  }
+}
+
+.condition-item .select2-container.dictionary-filter{
+  display: block;
+  max-width: none;
+}
+.dictionary-filter {
+
+  ul {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #555555;
+    font-size: 13px;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    padding: 4px 6px;
+    vertical-align: middle;
   }
 }

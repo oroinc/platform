@@ -35,6 +35,9 @@ abstract class AbstractPhone implements PrimaryItem, EmptyItem
      *      defaultValues={
      *          "importexport"={
      *              "identity"=true
+     *          },
+     *          "dataaudit"={
+     *              "auditable"=true
      *          }
      *      }
      * )
