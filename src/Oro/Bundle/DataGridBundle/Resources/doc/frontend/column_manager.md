@@ -10,4 +10,4 @@ Column Manager operates with columns' attributes:
 - `renderable` show/hide the column (if is not defined the column is shown)
 - `order` is used to sort columns in a row
 - `required` if `true` the column can not be hidden (but can be ordered)
-- `manageable` if `true` the column does not appear in Column Manage (generally is used for system columns such as `actions` or `selectRow`)
+- `manageable` if `false` the column does not appear in Column Manage (generally is used for system columns such as `actions` or `selectRow`)

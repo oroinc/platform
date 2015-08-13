@@ -13,7 +13,7 @@ define(function(require) {
          *
          * @type {number}
          */
-        minVisibleColumnsQuantity: 3,
+        minVisibleColumnsQuantity: 1,
 
         /**
          * @inheritDoc
