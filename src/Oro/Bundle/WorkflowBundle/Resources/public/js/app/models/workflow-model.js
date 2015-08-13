@@ -21,12 +21,12 @@ define(function(require) {
             name: '',
             label: '',
             entity: '',
-            entity_attribute: 'entity',
-            start_step: null,
-            steps_display_ordered: false,
+            'entity_attribute': 'entity',
+            'start_step': null,
+            'steps_display_ordered': false,
             steps: null,
             transitions: null,
-            transition_definitions: null,
+            'transition_definitions': null,
             attributes: null
         },
 
@@ -204,6 +204,10 @@ define(function(require) {
 
         getStepByName: function(name) {
             return this._getByName('steps', name);
+        },
+
+        getStartStep: function() {
+            return this.get('steps').where({'_is_start': true});
         },
 
         getTransitionByName: function(name) {

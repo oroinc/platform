@@ -4,7 +4,6 @@ define(function(require) {
     var FlowchartJsPlumbBoxView;
     var FlowchartJsPlumbBaseView = require('./base-view');
     var FlowchartJsPlumbAreaView = require('./area-view');
-    var _ = require('underscore');
 
     FlowchartJsPlumbBoxView = FlowchartJsPlumbBaseView.extend({
         areaView: null,
@@ -43,14 +42,11 @@ define(function(require) {
         },
 
         refreshPosition: function() {
-            var instance = this.areaView.jsPlumbInstance;
-            instance.batch(_.bind(function() {
-                this.$el.css({
-                    top: this.model.get('position')[1],
-                    left: this.model.get('position')[0]
-                });
-            }, this));
-            this.areaView.jsPlumbInstance.repaintEverything();
+            this.$el.css({
+                top: this.model.get('position')[1],
+                left: this.model.get('position')[0]
+            });
+            this.areaView.debouncedRepaintEverything();
         },
 
         cleanup: function() {

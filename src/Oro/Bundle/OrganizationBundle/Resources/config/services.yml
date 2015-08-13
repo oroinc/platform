@@ -91,6 +91,7 @@ services:
         class: %oro_organization.twig.get_owner.class%
         arguments:
             - @oro_entity_config.provider.ownership
+            - @oro_security.owner.entity_owner_accessor
         tags:
             - { name: twig.extension }
 

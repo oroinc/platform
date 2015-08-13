@@ -68,7 +68,7 @@ abstract class AbstractAudit extends AbstractLogEntry
     /**
      * Get user
      *
-     * @return AbstractUser
+     * @return AbstractUser|null
      */
     abstract public function getUser();
 

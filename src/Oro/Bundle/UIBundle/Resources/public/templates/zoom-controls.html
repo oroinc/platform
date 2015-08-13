@@ -1,0 +1,17 @@
+<button type="button" class="btn btn-default btn-zoom-in"><i class="icon-search-plus"></i></button>
+<!--<span class="zoom-level"><%= Math.round(zoom * 100) %>%</span>-->
+<div class="btn-group">
+    <button data-toggle="dropdown" class="btn dropdown-toggle ">
+        <%= Math.round(zoom * 100) %>%<span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu pull-right">
+        <li><a href="#" class="btn-set-zoom" data-size="50">50%</a></li>
+        <li><a href="#" class="btn-set-zoom" data-size="75">75%</a></li>
+        <li><a href="#" class="btn-set-zoom" data-size="100">100%</a></li>
+        <li><a href="#" class="btn-set-zoom" data-size="150">150%</a></li>
+        <li><a href="#" class="btn-set-zoom" data-size="200">200%</a></li>
+    </ul>
+</div>
+<button type="button" class="btn btn-default btn-zoom-out"><i class="icon-search-minus"></i></button>
+<button type="button" class="btn btn-default btn-auto-zoom"><i class="icon-resize-full"></i></button>
+

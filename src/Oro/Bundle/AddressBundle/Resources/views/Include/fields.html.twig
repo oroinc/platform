@@ -16,7 +16,7 @@
     {% endif %}
     {% set region_text_field = form.parent[region_text_field] %}
 
-    {{ form_widget(form) }}
+    {{ form_widget(form, {'attr': {'data-validation': { NotBlank: null}|json_encode} }) }}
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
 
     <script type="text/javascript">

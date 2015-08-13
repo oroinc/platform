@@ -38,7 +38,11 @@ parameters:
     oro_entity.entity_class_name_provider.default.class:     Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
     oro_entity.dictionary_value_list_provider.default.class: Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider
 
+    # managers
     oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
+
+    # halpers
+    oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
 
 services:
     oro_entity.listener.navigation_listener:
@@ -321,3 +325,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_entity.dictionary_value_list_provider
+            - @oro_entity.helper.dictionary
+
+    oro_entity.helper.dictionary:
+        class: %oro_entity.helper.dictionary.class%

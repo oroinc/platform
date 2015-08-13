@@ -45,6 +45,7 @@ define([
                     this.$containerEmails.append($view);
                 }
             }
+            this.initLayout();
         },
 
         getView: function(model) {

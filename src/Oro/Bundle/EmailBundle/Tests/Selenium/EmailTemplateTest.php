@@ -17,7 +17,7 @@ class EmailTemplateTest extends Selenium2TestCase
      */
     public function testCreateEmailTemplate()
     {
-        $templateName = 'EmailTemplate_' . mt_rand();
+        $templateName = 'EmailTemplate_'.mt_rand();
 
         $login = $this->login();
         /* @var EmailTemplates $login */
@@ -26,7 +26,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
-            ->setType('Plain text')
+            ->setType('Html')
             ->setName($templateName)
             ->setSubject('Subject')
             ->setContent('Template content')
@@ -60,11 +60,11 @@ class EmailTemplateTest extends Selenium2TestCase
             ->open(array($newTemplateName))
             ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
             ->getFields($fields);
-        static::assertEquals('User', $fields['entityname']);
+        $this->assertEquals('User', $fields['entityname']);
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
-        static::assertEquals('Plain Text ', $fields['type']);
-        static::assertEquals('Subject', $fields['subject']);
-        static::assertEquals('Template content', $fields['content']);
+        $this->assertEquals('Html ', $fields['type']);
+        $this->assertEquals('Subject', $fields['subject']);
+        $this->assertEquals("<p>Template content</p>", $fields['content']);
 
         return $newTemplateName;
     }
@@ -100,10 +100,8 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->filterBy('Template name', $templateName)
-            ->delete($templateName)
-            ->assertMessage('Item deleted')
+            ->delete('Template name', $templateName)
             ->assertTitle('All - Templates - Emails - System')
-            ->assertNoDataMessage('');
+            ->assertMessage('Item deleted');
     }
 }
