@@ -189,7 +189,9 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected function isFilePathEquals($bundleAppPath, $bundlePath, $bundleAppDir, $bundleDir)
     {
         $a = str_replace($bundleDir . DIRECTORY_SEPARATOR . 'Resources', '', $bundlePath);
-        $b = str_replace($bundleAppDir, '', $bundleAppPath);
+        $b = DIRECTORY_SEPARATOR !== '/'
+            ? str_replace(str_replace('/', DIRECTORY_SEPARATOR, $bundleAppDir), '', $bundleAppPath)
+            : str_replace($bundleAppDir, '', $bundleAppPath);
 
         return $a === $b;
     }

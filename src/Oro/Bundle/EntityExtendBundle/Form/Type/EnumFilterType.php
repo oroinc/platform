@@ -10,10 +10,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
+use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractMultiChoiceType;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
-class EnumFilterType extends AbstractChoiceType
+class EnumFilterType extends AbstractMultiChoiceType
 {
     const NAME = 'oro_enum_filter';
 

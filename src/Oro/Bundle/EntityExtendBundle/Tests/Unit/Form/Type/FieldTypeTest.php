@@ -273,6 +273,13 @@ class FieldTypeTest extends TypeTestCase
             ->method('getConfigById')
             ->with($config['relationTargetConfigFieldId'])
             ->will($this->returnValue($entityConfigMock));
+        $configProviderMock->expects($this->any())
+            ->method('hasConfig')
+            ->with(
+                $config['relationTargetConfigFieldId']->getClassName(),
+                $config['relationTargetConfigFieldId']->getFieldName()
+            )
+            ->will($this->returnValue(true));
 
         $this->configManagerMock->expects($this->any())
             ->method('getProvider')

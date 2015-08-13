@@ -146,7 +146,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
         },
 
         _createFilter: function(filterOptions, fieldId) {
-
             var moduleName = mapFilterModuleName(filterOptions.type);
             var requires = [moduleName];
 

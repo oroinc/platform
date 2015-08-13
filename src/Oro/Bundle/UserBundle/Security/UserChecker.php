@@ -9,23 +9,32 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class UserChecker extends BaseUserChecker
 {
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityContextLink;
 
-    /**
-     * @var FlashBagInterface
-     */
+    /** @var FlashBagInterface */
     protected $flashBag;
 
-    public function __construct(ServiceLink $securityContextLink, FlashBagInterface $flashBag)
-    {
-        $this->flashBag = $flashBag;
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /**
+     * @param ServiceLink         $securityContextLink
+     * @param FlashBagInterface   $flashBag
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        ServiceLink $securityContextLink,
+        FlashBagInterface $flashBag,
+        TranslatorInterface $translator
+    ) {
         $this->securityContextLink = $securityContextLink;
+        $this->flashBag            = $flashBag;
+        $this->translator          = $translator;
     }
 
     /**
@@ -35,16 +44,21 @@ class UserChecker extends BaseUserChecker
     {
         parent::checkPreAuth($user);
 
-        if ($user instanceof User && !is_null($this->securityContextLink->getService()->getToken())) {
-            if ($user->getPasswordChangedAt() != null
-                && $user->getLastLogin() != null
-                && $user->getPasswordChangedAt() > $user->getLastLogin()
-            ) {
-                $this->flashBag->add('error', 'oro.user.security.password_changed.message');
-                $exception = new PasswordChangedException('oro.user.security.password_changed.message');
-                $exception->setUser($user);
-                throw $exception;
-            }
+        if ($user instanceof User
+            && null !== $this->securityContextLink->getService()->getToken()
+            && null !== $user->getPasswordChangedAt()
+            && null !== $user->getLastLogin()
+            && $user->getPasswordChangedAt() > $user->getLastLogin()
+        ) {
+            $this->flashBag->add(
+                'error',
+                $this->translator->trans('oro.user.security.password_changed.message')
+            );
+
+            $exception = new PasswordChangedException('Invalid password.');
+            $exception->setUser($user);
+
+            throw $exception;
         }
     }
 }

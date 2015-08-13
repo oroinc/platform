@@ -25,7 +25,6 @@
   border-top: 1px solid #f1f1f1;
   .workflow-table-container {
     padding-top: 20px;
-    margin-right: -10px;
   }
   .workflow-flowchart-container {
     background-color: #fafafa;
@@ -35,8 +34,12 @@
 }
 .workflow-flowchart-controls {
   padding: 10px 10px 0;
+  min-height: 32px;
+  position: absolute;
+  z-index: 600;
   .checkbox-group {
-    vertical-align: middle;
+    background: rgba(251,251,251,0.7);
+    padding: 5px 7px 2px 7px;
     input[type=checkbox] {
       margin-top: -2px;
       margin-right: 6px;
@@ -44,13 +47,13 @@
   }
 }
 .workflow-flowchart-wrapper {
-  overflow: auto;
+  overflow: hidden;
   height: 700px;
 }
 .workflow-flowchart {
   position: relative;
-  min-height: 650px;
-  margin: 10px 10px 20px;
+  min-height: 610px;
+  margin: 0;
   ._jsPlumb_endpoint {
     z-index: 100;
   }
@@ -61,12 +64,12 @@
   .workflow-step {
     z-index: 100;
     position: absolute;
-    cursor: move;
     border-radius: 3px;
     padding: 8px 18px;
     height: 38px;
     color: #fff;
     border: 1px solid @step-border-color;
+    max-width: 180px;
     #gradient > .vertical(@step-gradient-start-color, @step-gradient-end-color);
     .box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.3));
     text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.3);
@@ -74,7 +77,11 @@
       text-align: center;
       font-size: 14px;
       font-weight: bold;
-      max-width: @step-label-max-width;
+      width: 100%;
+      cursor: default;
+      > .dropdown-menu {
+        text-align: left;
+      }
     }
     .jsplumb-source {
       @source-radius: 8px;
@@ -118,7 +125,7 @@
     }
   }
   .workflow-step.start-step {
-    border-radius: 50%;
+    border-radius: 42.5px;
     height: 85px;
     width: 85px;
     border: 1px solid @start-step-border-color;
@@ -140,7 +147,7 @@
       left: 2px;
     }
     .step-label {
-      margin-top: 50%;
+      margin-top: 22.5px;
       width: 100%;
     }
   }
@@ -151,7 +158,7 @@
 
   /* transition */
   .workflow-transition-overlay {
-    padding: 3px 10px;
+    padding: 3px 11px;
     border-radius: 3px;
     height: 28px;
     border: 1px solid @transition-overlay-border-color;
@@ -164,6 +171,7 @@
     .transition-label {
       max-width: @transition-label-max-width;
       margin-top: 1px;
+      cursor: default;
     }
   }
 
@@ -190,11 +198,20 @@
       #workflow > .hover-block();
       color: #fff;
     }
-    &.dropdown .dropdown-toggle {
-      margin-left: 2px;
+    &.dropdown {
+      .dropdown-toggle {
+        margin-left: 2px;
+      }
+      &:hover {
+        .dropdown-toggle {
+          position: absolute;
+          right: 4px;
+        }
+      }
     }
   }
   .workflow-transition-overlay {
+    opacity: 0.7;
     &._jsPlumb_hover,
     &._jsPlumb_source_hover,
     &._jsPlumb_target_hover,
@@ -203,9 +220,11 @@
       border: 1px solid #b68e65;
       background: #fff3e6;
       color: #7c6248;
+      opacity: 1;
+      display: block !important;
     }
     &.dropdown .dropdown-toggle {
-      margin: 0 -5px 0 -1px;
+      margin: 0 -5px;
     }
   }
   .workflow-step,
@@ -246,5 +265,20 @@
   }
   .workflow-transition-endpoint-hover {
     opacity: 1;
+  }
+  &.workflow-flowchart-editor {
+    .workflow-step {
+      cursor: move;
+    }
+    .step-label{
+      cursor: move;
+    }
+    .workflow-transition-overlay {
+      padding-right: 16px;
+      &:hover, &.open {
+        padding-left: 11px;
+        padding-right: 8px;
+      }
+    }
   }
 }
