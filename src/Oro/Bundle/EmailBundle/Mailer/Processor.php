@@ -120,7 +120,6 @@ class Processor
         $this->assertModel($model);
         $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
         $parentMessageId = $this->getParentMessageId($model);
-        $organization = null;
 
         /** @var \Swift_Message $message */
         $message = $this->mailer->createMessage();
@@ -141,10 +140,7 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if ($model->getOrganization()) {
-            $organization = $model->getOrganization();
-        }
-        $origin = $this->getEmailOrigin($model->getFrom(), $organization);
+        $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         $this->processSend($message, $origin);
 
         $emailUser = $this->emailEntityBuilder->emailUser(
