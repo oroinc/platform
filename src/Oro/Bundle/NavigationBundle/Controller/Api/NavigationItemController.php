@@ -36,7 +36,7 @@ class NavigationItemController extends FOSRestController
     public function getAction($type)
     {
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->createItem($type, array());
+        $entity = $this->createNavigationItem($type);
 
         /** @var $repo NavigationRepositoryInterface */
         $repo = $this->getDoctrine()->getRepository(ClassUtils::getClass($entity));
@@ -77,7 +77,7 @@ class NavigationItemController extends FOSRestController
         $params['organization'] = $this->container->get('security.context')->getToken()->getOrganizationContext();
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->createItem($type, $params);
+        $entity = $this->createNavigationItem($type, $params);
 
         if (!$entity) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
@@ -119,7 +119,7 @@ class NavigationItemController extends FOSRestController
         }
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->findItem($type, (int) $itemId);
+        $entity = $this->findNavigationItem($type, $itemId);
 
         if (!$entity) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
@@ -158,7 +158,7 @@ class NavigationItemController extends FOSRestController
     public function deleteIdAction($type, $itemId)
     {
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
-        $entity = $this->getFactory()->findItem($type, (int) $itemId);
+        $entity = $this->findNavigationItem($type, $itemId);
         if (!$entity) {
             return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
         }
@@ -171,6 +171,26 @@ class NavigationItemController extends FOSRestController
         $em->flush();
 
         return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+    }
+
+    /**
+     * @param string $type
+     * @param array $params
+     * @return null|object
+     */
+    protected function createNavigationItem($type, array $params = [])
+    {
+        return $this->getFactory()->createItem($type, $params);
+    }
+
+    /**
+     * @param string $type
+     * @param int $itemId
+     * @return null|object
+     */
+    protected function findNavigationItem($type, $itemId)
+    {
+        return $this->getFactory()->findItem($type, (int) $itemId);
     }
 
     /**
