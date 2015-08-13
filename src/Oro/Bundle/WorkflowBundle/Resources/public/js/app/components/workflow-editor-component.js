@@ -68,9 +68,13 @@ define(function(require) {
             'saveWorkflow model': 'saveConfiguration'
         },
 
+        /**
+         * Automatically organizes steps on flowchart. Fits flowchart to screen.
+         */
         refreshChart: function() {
             if (this.flowchartEnabled) {
                 this.flowchartView.jsPlumbManager.organizeBlocks();
+                this.flowchartView.$el.trigger('autozoom');
             }
         },
 

@@ -16,12 +16,6 @@ class Calendars extends AbstractPage
 {
     const URL = 'calendar/default';
 
-    public function __construct($testCase, $redirect = true)
-    {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @return Calendar
      */

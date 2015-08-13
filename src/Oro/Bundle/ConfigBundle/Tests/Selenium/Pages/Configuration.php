@@ -13,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  */
 class Configuration extends AbstractPage
 {
-    protected $redirectUrl = 'config/system';
+    const URL = 'config/system';
 
     /**
      * @param bool $directLoad

@@ -18,6 +18,8 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
+            var intValue;
+            var maxValue = 0;
             var $chart = this.$chart;
             var data = this.data;
             var options = this.options;
@@ -33,7 +35,9 @@ define(function(require) {
                 if (!data.hasOwnProperty(i)) {
                     continue;
                 }
-                chartData.push([xNumber++, parseInt(data[i].value)]);
+                intValue = parseInt(data[i].value);
+                maxValue = Math.max(intValue, maxValue);
+                chartData.push([xNumber++, intValue]);
                 xLabels.push(data[i].label);
             }
 
@@ -83,6 +87,7 @@ define(function(require) {
                     },
                     yaxis: {
                         min: 0,
+                        max: maxValue * 1.2, // to make visible label above the highest bar
                         tickFormatter: function(y) {
                             if (formatter) {
                                 return numberFormatter.formatCurrency(y);

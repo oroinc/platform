@@ -13,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  */
 class LanguageSettings extends AbstractPage
 {
-    protected $redirectUrl = '/config/system/platform/language_settings';
+    const URL = '/config/system/platform/language_settings';
 
     /**
      * @param $language string
