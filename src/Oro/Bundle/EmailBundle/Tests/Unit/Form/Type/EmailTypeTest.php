@@ -10,6 +10,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
@@ -55,6 +56,7 @@ class EmailTypeTest extends TypeTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
         $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
+        $resizableRichTextType = new OroResizeableRichTextType($configManager, $htmlTagProvider);
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -74,19 +76,39 @@ class EmailTypeTest extends TypeTestCase
         $em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
-        $contextsSelectType = new ContextsSelectType($em);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $contextsSelectType = new ContextsSelectType(
+            $em,
+            $configManager,
+            $translator,
+            $mapper,
+            $securityFacade
+        );
 
         return [
             new PreloadedExtension(
                 [
-                    TranslatableEntityType::NAME  => $translatableType,
-                    $select2ChoiceType->getName() => $select2ChoiceType,
-                    $emailTemplateList->getName() => $emailTemplateList,
-                    $emailAddressType->getName()  => $emailAddressType,
-                    $richTextType->getName()      => $richTextType,
-                    $attachmentsType->getName()   => $attachmentsType,
-                    ContextsSelectType::NAME      => $contextsSelectType,
-                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden'),
+                    TranslatableEntityType::NAME      => $translatableType,
+                    $select2ChoiceType->getName()     => $select2ChoiceType,
+                    $emailTemplateList->getName()     => $emailTemplateList,
+                    $emailAddressType->getName()      => $emailAddressType,
+                    $richTextType->getName()          => $richTextType,
+                    $resizableRichTextType->getName() => $resizableRichTextType,
+                    $attachmentsType->getName()       => $attachmentsType,
+                    ContextsSelectType::NAME          => $contextsSelectType,
+                    'genemu_jqueryselect2_hidden'     => new Select2Type('hidden'),
                 ],
                 []
             )

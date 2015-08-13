@@ -43,6 +43,11 @@
 .ui-dialog-content{
     overflow: auto;
 }
+.ui-dialog-content .dropdown-menu {
+    position: fixed;
+    top: initial;
+    left: initial;
+}
 .ui-dialog .ui-dialog-titlebar{
     position: relative;
     padding-right: 30px;

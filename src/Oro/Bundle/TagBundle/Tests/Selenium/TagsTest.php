@@ -12,7 +12,7 @@ class TagsTest extends Selenium2TestCase
      */
     public function testCreateTag()
     {
-        $tagName = 'Tag_'.mt_rand();
+        $tagName = 'Tag_' . mt_rand();
 
         $login = $this->login();
         /** @var Tags $login */
@@ -23,8 +23,7 @@ class TagsTest extends Selenium2TestCase
             ->setOwner('admin')
             ->save()
             ->assertMessage('Tag saved')
-            ->assertTitle('All - Tags - System')
-            ->close();
+            ->assertTitle('All - Tags - System');
 
         return $tagName;
     }
