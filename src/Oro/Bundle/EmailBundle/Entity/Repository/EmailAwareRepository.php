@@ -8,19 +8,19 @@ interface EmailAwareRepository
 {
     /**
      * @param string $fullNameQueryPart
-     * @param array $excludedEmails
+     * @param array $excludedEmailNames
      * @param string|null $query
      *
      * @return QueryBuilder With preselected: email, name, entityId, organization
      */
-    public function getPrimaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null);
+    public function getPrimaryEmailsQb($fullNameQueryPart, array $excludedEmailNames = [], $query = null);
 
     /**
      * @param string $fullNameQueryPart
-     * @param array $excludedEmails
+     * @param array $excludedEmailNames
      * @param string|null $query
      *
      * @return QueryBuilder With preselected: email, name, entityId, organization
      */
-    public function getSecondaryEmailsQb($fullNameQueryPart, array $excludedEmails = [], $query = null);
+    public function getSecondaryEmailsQb($fullNameQueryPart, array $excludedEmailNames = [], $query = null);
 }

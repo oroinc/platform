@@ -93,6 +93,22 @@ class EmailRecipientsProviderArgs
     }
 
     /**
+     * @param string $class
+     *
+     * @return array
+     */
+    public function getExcludedEmailNamesForEntity($class)
+    {
+        $filteredRecipients = array_filter($this->excludedRecipients, function (Recipient $recipient) use ($class) {
+            return $recipient->getEntity() && $recipient->getEntity()->getClass() === $class;
+        });
+
+        return array_map(function (Recipient $recipient) {
+            return $recipient->getBasicName();
+        }, $filteredRecipients);
+    }
+
+    /**
      * @return Organization|null
      */
     public function getOrganization()

@@ -173,7 +173,7 @@ class EmailRecipientsHelper
      * @param string $alias
      * @param string $entityClass
      *
-     * @return array
+     * @return Recipient[]
      */
     public function getRecipients(
         EmailRecipientsProviderArgs $args,
@@ -183,28 +183,33 @@ class EmailRecipientsHelper
     ) {
         $fullNameQueryPart = $this->dqlNameFormatter->getFormattedNameDQL($alias, $entityClass);
 
-        $excludedEmails = $args->getExcludedEmailsForEntity($entityClass);
+        $excludedEmailNames = $args->getExcludedEmailNamesForEntity($entityClass);
 
         $primaryEmailsQb = $repository
-            ->getPrimaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
+            ->getPrimaryEmailsQb($fullNameQueryPart, $excludedEmailNames, $args->getQuery())
             ->setMaxResults($args->getLimit());
 
         $primaryEmailsResult = $this->getRestrictedResult($primaryEmailsQb, $args);
-        $emails = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
+        $recipients = $this->recipientsFromResult($primaryEmailsResult, $entityClass);
 
-        $limit = $args->getLimit() - count($emails);
+        $limit = $args->getLimit() - count($recipients);
 
         if ($limit > 0) {
-            $excludedEmails = array_merge($excludedEmails, array_keys($emails));
+            $excludedEmailNames = array_merge(
+                    $excludedEmailNames,
+                    array_map(function (Recipient $recipient) {
+                        return $recipient->getBasicName();
+                    }, $recipients)
+            );
             $secondaryEmailsQb = $repository
-                ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmails, $args->getQuery())
+                ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmailNames, $args->getQuery())
                 ->setMaxResults($limit);
 
             $secondaryEmailsResult = $this->getRestrictedResult($secondaryEmailsQb, $args);
-            $emails = array_merge($emails, $this->recipientsFromResult($secondaryEmailsResult, $entityClass));
+            $recipients = array_merge($recipients, $this->recipientsFromResult($secondaryEmailsResult, $entityClass));
         }
 
-        return $emails;
+        return $recipients;
     }
 
     /**
@@ -313,7 +318,7 @@ class EmailRecipientsHelper
     {
         $emails = [];
         foreach ($result as $row) {
-            $emails[$row['email']] = new Recipient(
+            $recipient = new Recipient(
                 $row['email'],
                 sprintf('%s <%s>', $row['name'], $row['email']),
                 new RecipientEntity(
@@ -323,6 +328,8 @@ class EmailRecipientsHelper
                     $row['organization']
                 )
             );
+
+            $emails[$recipient->getIdentifier()] = $recipient;
         }
 
         return $emails;
