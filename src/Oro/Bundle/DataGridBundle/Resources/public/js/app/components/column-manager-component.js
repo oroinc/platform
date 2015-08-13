@@ -39,8 +39,7 @@ define(function(require) {
         _initialState: null,
 
         listen: {
-            'change:renderable collection': '_pushState',
-            'updateState collection': '_applyState'
+            'change:renderable collection': '_pushState'
         },
 
         /**
@@ -68,6 +67,7 @@ define(function(require) {
 
             this._initialState = this._createState();
             this._applyState(this.grid.collection, this.grid.collection.state);
+            this.listenTo(this.grid.collection, 'updateState', this._applyState);
 
             ColumnManagerComponent.__super__.initialize.apply(this, arguments);
         },

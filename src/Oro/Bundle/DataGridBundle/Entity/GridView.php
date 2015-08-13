@@ -280,7 +280,7 @@ class GridView
      */
     public function createView()
     {
-        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type);
+        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type, $this->columnsData);
         $view->setLabel($this->name);
 
         return $view;

@@ -42,6 +42,8 @@ define(function(require) {
 
     DataGridComponent = BaseComponent.extend({
         initialize: function(options) {
+            debugger;
+            console.log(options);
             if (!options.enableFilters) {
                 options.builders = _.reject(options.builders, function(module) {
                     return module === 'orofilter/js/datafilter-builder';
