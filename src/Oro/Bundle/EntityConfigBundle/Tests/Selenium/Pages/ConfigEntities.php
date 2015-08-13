@@ -28,12 +28,8 @@ class ConfigEntities extends AbstractPageFilteredGrid
         return new ConfigEntity($this->test);
     }
 
-    public function delete()
+    public function delete($entityData, $actionName = 'Remove', $confirmation = true)
     {
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Remove']")->click();
-        $this->waitPageToLoad();
-        return $this;
+        return parent::delete($entityData, $actionName, $confirmation);
     }
 }
