@@ -5,10 +5,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
