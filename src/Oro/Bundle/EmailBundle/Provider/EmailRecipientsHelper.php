@@ -198,7 +198,7 @@ class EmailRecipientsHelper
             $excludedEmailNames = array_merge(
                     $excludedEmailNames,
                     array_map(function (Recipient $recipient) {
-                        return $recipient->getBasicName();
+                        return $recipient->getBasicNameWithOrganization();
                     }, $recipients)
             );
             $secondaryEmailsQb = $repository

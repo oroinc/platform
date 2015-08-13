@@ -70,7 +70,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
         if ($excludedEmailNames) {
             $qb
                 ->andWhere($qb->expr()->notIn(
-                    sprintf('TRIM(CONCAT(%s, \' <\', u.email, \'>\'))', $fullNameQueryPart),
+                    sprintf('TRIM(CONCAT(%s, \' <\', u.email, \'>|\', o.name))', $fullNameQueryPart),
                     ':excluded_emails'
                 ))
                 ->setParameter('excluded_emails', $excludedEmailNames);
@@ -106,7 +106,7 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
         if ($excludedEmailNames) {
             $qb
                 ->andWhere($qb->expr()->notIn(
-                    sprintf('TRIM(CONCAT(%s, \' <\', e.email, \'>\'))', $fullNameQueryPart),
+                    sprintf('TRIM(CONCAT(%s, \' <\', e.email, \'>|\', o.name))', $fullNameQueryPart),
                     ':excluded_emails'
                 ))
                 ->setParameter('excluded_emails', $excludedEmailNames);

@@ -104,7 +104,7 @@ class EmailRecipientsProviderArgs
         });
 
         return array_map(function (Recipient $recipient) {
-            return $recipient->getBasicName();
+            return $recipient->getBasicNameWithOrganization();
         }, $filteredRecipients);
     }
 

@@ -57,9 +57,14 @@ class Recipient
     /**
      * @return string
      */
-    public function getBasicName()
+    public function getBasicNameWithOrganization()
     {
-        return $this->name;
+        $name = sprintf('%s|', $this->name);
+        if (!$this->entity) {
+            return $name;
+        }
+
+        return sprintf('%s%s', $name, $this->entity->getOrganization());
     }
 
     /**
@@ -91,6 +96,6 @@ class Recipient
             return $this->email;
         }
 
-        return sprintf('%s|%s', $this->name, $this->entity->getClass());
+        return sprintf('%s|%s|%s', $this->name, $this->entity->getClass(), $this->entity->getOrganization());
     }
 }
