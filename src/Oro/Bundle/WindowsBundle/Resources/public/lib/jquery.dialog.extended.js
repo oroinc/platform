@@ -66,7 +66,6 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
 
             // Handle window resize
             $(window).bind('resize.dialog', this._windowResizeHandler);
-            $(window).bind('resize.dialog', this._windowResizeHandler);
         },
 
         _limitTo: function() {
