@@ -175,6 +175,9 @@ class ParameterBinder implements ParameterBinderInterface
                 );
             }
         }
+        if ((null === $result || $result === [] || $result === ['']) && isset($config['default'])) {
+            $result = $config['default'];
+        }
 
         return $result;
     }
