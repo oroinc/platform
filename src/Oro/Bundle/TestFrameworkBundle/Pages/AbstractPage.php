@@ -9,9 +9,11 @@ use PHPUnit_Framework_Assert;
  * Class AbstractPage
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages
+ *
  */
 abstract class AbstractPage
 {
+    const URL = null;
     protected $redirectUrl = null;
 
     /** @var \PHPUnit_Extensions_Selenium2TestCase */
@@ -27,8 +29,8 @@ abstract class AbstractPage
         // @codingStandardsIgnoreStart
         $this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
         // @codingStandardsIgnoreEnd
-        if (!is_null($this->redirectUrl) && $redirect) {
-            $this->test->url($this->redirectUrl);
+        if (!is_null(static::URL) && $redirect) {
+            $this->test->url(static::URL);
             $this->waitPageToLoad();
             $this->waitForAjax();
         }

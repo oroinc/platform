@@ -360,6 +360,10 @@ define([
                 });
             }
 
+            if (!data.hasOwnProperty('reminders')) {
+                data.reminders = {};
+            }
+
             return data;
         },
 

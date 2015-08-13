@@ -111,6 +111,7 @@
     }
 
     .widget-actions-container, .default-actions-container {
+      white-space: nowrap;
       .action-wrapper {
         border-right: 1px solid #ddd;
         padding: 3px 13px;
@@ -121,6 +122,10 @@
       .action-wrapper:last-child {
         border-right: none;
       }
+    }
+
+    .widget-actions-container {
+      margin: 10px -1px 0 0;
     }
 
     .move-action {
@@ -136,6 +141,8 @@
     .title {
       padding-left: 0;
       padding-right: 0;
+      max-width: ~"calc(100% - 120px)";
+      padding-bottom: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -143,6 +150,7 @@
 
     .row-fluid {
       border-top: 1px solid #ddd;
+      margin-top: 5px;
     }
 
     .dashboard-widget-content {
@@ -355,6 +363,11 @@
       position: absolute;
       padding-bottom: .5em;
     }
+    .flotr-grid-label-x {
+      line-height: 14px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 .chart-legend table {
@@ -513,6 +526,9 @@
   .controls > input[type=checkbox]:only-child{
     margin-top: 8px;
   }
+  .items-selector-widget {
+    margin-right: 20px;
+  }
   .widget_title_widget{
     float: left;
     margin-right: 20px;
@@ -532,5 +548,31 @@
   }
   .controls .horizontal{
     padding: 0;
+  }
+  table {
+    .action-column, .action-cell {
+      width: 86px;
+    }
+    &.scrollable {
+      tbody {
+        display: block;
+        height: 120px;
+        border-left: 1px solid #ddd;
+      }
+      thead, tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      &.table-bordered td:first-child {
+        border-left: none;
+      }
+    }
+  }
+}
+
+.widget-content.widget-configuration {
+  .table input[type="checkbox"] {
+    margin: 0 0 1px 0;
   }
 }

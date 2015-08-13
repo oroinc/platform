@@ -8,42 +8,22 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class EmbeddedForms
  * @package Oro\Bundle\EmbeddedFormBundle\Tests\Selenium\Pages
  * @method EmbeddedForms openEmbeddedForms openEmbeddedForms(string)
+ * @method EmbeddedForm add add()
+ * @method EmbeddedForm open open()
  * {@inheritdoc}
  */
 class EmbeddedForms extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Embedded Form']";
     const URL = 'embedded-form';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
-     * @return EmbeddedForm
-     */
-    public function add()
-    {
-        $this->test->byXPath("//a[@title='Create Embedded Form']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new EmbeddedForm($this->test);
     }
 
-    /**
-     * @param array $entityData
-     * @return EmbeddedForm
-     */
-    public function open($entityData = array())
+    public function entityView()
     {
-        $form = $this->getEntity($entityData, 1);
-        $form->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new EmbeddedForm($this->test);
     }
 }

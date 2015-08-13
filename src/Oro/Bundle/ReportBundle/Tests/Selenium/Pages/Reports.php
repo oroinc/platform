@@ -9,26 +9,21 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  *
  * @package Oro\Bundle\ReportBundle\Tests\Selenium\Pages
  * @method Reports openReports openReports(string)
+ * @method Report add add()
  * {@inheritdoc}
  */
 class Reports extends AbstractPageFilteredGrid
 {
     const URL = 'report';
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Report']";
 
-    public function __construct($testCase, $redirect = true)
+    public function entityView()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
+        return new ReportData($this->test);
     }
 
-    public function open($entityData = array())
+    public function entityNew()
     {
-        $contact = $this->getEntity($entityData);
-        $contact->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return new ReportData($this->test);
+        return new Report($this->test);
     }
 }
