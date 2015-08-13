@@ -71,7 +71,7 @@ class EmailRecipientsProviderArgs
      */
     public function getExcludedRecipientIdentifiers()
     {
-        return array_map(function(Recipient $recipient) {
+        return array_map(function (Recipient $recipient) {
             return $recipient->getIdentifier();
         }, $this->excludedRecipients);
     }

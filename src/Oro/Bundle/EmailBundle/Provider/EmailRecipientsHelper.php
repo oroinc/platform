@@ -197,10 +197,10 @@ class EmailRecipientsHelper
 
         if ($limit > 0) {
             $excludedEmailNames = array_merge(
-                    $excludedEmailNames,
-                    array_map(function (Recipient $recipient) {
-                        return $recipient->getBasicNameWithOrganization();
-                    }, $recipients)
+                $excludedEmailNames,
+                array_map(function (Recipient $recipient) {
+                    return $recipient->getBasicNameWithOrganization();
+                }, $recipients)
             );
             $secondaryEmailsQb = $repository
                 ->getSecondaryEmailsQb($fullNameQueryPart, $excludedEmailNames, $args->getQuery())
