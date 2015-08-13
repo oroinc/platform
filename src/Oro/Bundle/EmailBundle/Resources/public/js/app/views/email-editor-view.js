@@ -54,8 +54,8 @@ define(function(require) {
             var message;
             var signature = this.model.get('signature');
             if (signature) {
-                if (this.pageComponent('bodyEditor').view.tinymceConnected) {
-                    tinyMCE = this.pageComponent('bodyEditor').view.tinymceInstance;
+                if (this.getBodyEditorView().tinymceConnected) {
+                    tinyMCE = this.getBodyEditorView().tinymceInstance;
                     tinyMCE.execCommand('mceInsertContent', false, signature);
                 } else {
                     signature = signature.replace(/(<([^>]+)>)/ig, '');
@@ -101,7 +101,14 @@ define(function(require) {
         },
 
         onTypeChange: function(e) {
-            this.pageComponent('bodyEditor').view.setEnabled($(e.target).val() === 'html');
+            this.getBodyEditorView().setEnabled($(e.target).val() === 'html');
+        },
+
+        /**
+         * Returns wysiwyg editor view
+         */
+        getBodyEditorView: function() {
+            return this.pageComponent('wrap_oro_email_email_body').view.pageComponent('oro_email_email_body').view;
         },
 
         initFields: function() {
