@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailQueryFactory
 {
@@ -20,21 +21,27 @@ class EmailQueryFactory
     protected $fromEmailExpression;
 
     /** @var Registry */
-    private $doctrine;
+    protected $doctrine;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /**
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
      * @param Registry                  $doctrine
+     * @param SecurityFacade            $securityFacade
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         EntityNameResolver $entityNameResolver,
-        Registry $doctrine
+        Registry $doctrine,
+        SecurityFacade $securityFacade
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityNameResolver        = $entityNameResolver;
         $this->doctrine                  = $doctrine;
+        $this->securityFacade            = $securityFacade;
     }
 
     /**
@@ -52,30 +59,35 @@ class EmailQueryFactory
     }
 
     /**
-     * Filters to leave only emails available to user with provided id.
+     * Apply custom ACL checks
      *
      * @param QueryBuilder $qb
-     * @param string $userId
      */
-    public function filterQueryByUserId(QueryBuilder $qb, $userId)
+    public function applyAcl(QueryBuilder $qb)
     {
-        if ($userId) {
-            $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
-                 ->findAvailableMailboxIds($userId);
-            if (!empty($mailboxIds)) {
-                $qb->andWhere(
-                    $qb->expr()->orX(
-                        'eu.owner = :owner',
-                        $qb->expr()->in('eu.mailboxOwner', $mailboxIds)
-                    )
-                );
-            } else {
-                $qb->andWhere(
-                    'eu.owner = :owner'
-                );
-            }
-            $qb->setParameter('owner', $userId);
+        $user = $this->securityFacade->getLoggedUser();
+        $organization = $this->securityFacade->getOrganization();
+
+        $mailboxIds = $this->doctrine->getRepository('OroEmailBundle:Mailbox')
+             ->findAvailableMailboxIds($user, $organization);
+        $uoCheck = $qb->expr()->andX(
+            $qb->expr()->eq('eu.owner', ':owner'),
+            $qb->expr()->eq('eu.organization ', ':organization')
+        );
+
+        if (!empty($mailboxIds)) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $uoCheck,
+                    $qb->expr()->in('eu.mailboxOwner', ':mailboxIds')
+                )
+            );
+            $qb->setParameter('mailboxIds', $mailboxIds);
+        } else {
+            $qb->andWhere($uoCheck);
         }
+        $qb->setParameter('owner', $user->getId());
+        $qb->setParameter('organization', $organization->getId());
     }
 
     /**

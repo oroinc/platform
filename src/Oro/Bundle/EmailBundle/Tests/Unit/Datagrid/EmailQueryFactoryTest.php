@@ -127,7 +127,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         $qb->select('eu')
             ->from('EmailUser', 'eu');
 
-        $this->factory->filterQueryByUserId($qb, 1);
+        $this->factory->applyAcl($qb, 1);
 
         $this->assertEquals(
             "SELECT eu FROM EmailUser eu WHERE eu.owner = :owner OR eu.mailboxOwner IN(1, 3, 5)",
@@ -148,7 +148,7 @@ class EmailQueryFactoryTest extends OrmTestCase
         $qb->select('eu')
             ->from('EmailUser', 'eu');
 
-        $this->factory->filterQueryByUserId($qb, 1);
+        $this->factory->applyAcl($qb, 1);
 
         $this->assertEquals(
             "SELECT eu FROM EmailUser eu WHERE eu.owner = :owner",
