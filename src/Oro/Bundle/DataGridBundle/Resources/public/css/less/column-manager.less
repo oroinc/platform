@@ -1,10 +1,62 @@
 .column-manager {
+  a.dropdown-toggle {
+    display: block;
+    margin: 0 -5px;
+    padding: 0 5px;
+  }
+  .dropdown-menu {
+    cursor: default;
+    text-align: left;
+    font-weight: normal;
+    top: 10px;
+    right: 58px;
+    left: auto;
+    padding: 20px;
+    border-color: #ccc;
+    &:before, &:after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+    }
+    &:before {
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 7px solid rgba(0,0,0,0.2);
+      top: 6px;
+      right: -7px;
+    }
+    &:after {
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 6px solid #fff;
+      top: 7px;
+      right: -6px;
+    }
+  }
+  .title {
+    font-size: @fontSizeLarge;
+    line-height: @fontSizeLarge;
+    font-weight: bold;
+    margin-bottom: -3px;
+  }
+  .hint {
+    font-size: @fontSizeSmall;
+  }
   th, td {
     display: table-cell;
   }
-  .table-bordered {
-    td:not(:first-child), th:not(:first-child) {
-      border-left: 0;
+  .table-wrapper {
+    border: 1px solid #ddd;
+    .border-radius(3px);
+    margin-top: 10px;
+  }
+  .table {
+    margin-bottom: 0;
+    label {
+      margin-bottom: 0;
+    }
+    input[type=checkbox] {
+      margin-bottom: 3px;
     }
   }
 }

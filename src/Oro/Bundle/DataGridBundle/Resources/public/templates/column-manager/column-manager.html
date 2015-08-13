@@ -1,17 +1,19 @@
-<div class="dropdown-toggle" data-toggle="dropdown">
-    <i class="icon-cog"></i>
-</div>
-<div class="dropdown-menu pull-right">
-    <h3><%= _.__('oro.datagrid.column_manager.title') %></h3>
-    <i><%= _.__('oro.datagrid.column_manager.tooltip') %></i>
-    <table class="grid table-hover table table-bordered table-condensed">
-        <thead>
+<a href="#" class="dropdown-toggle" data-toggle="dropdown" title="<%= _.__('oro.datagrid.column_manager.title') %>">
+    <i class="icon-cog hide-text"><%= _.__('oro.datagrid.column_manager.title') %></i>
+</a>
+<div class="dropdown-menu">
+    <div class="title"><%= _.__('oro.datagrid.column_manager.title') %></div>
+    <span class="hint"><%= _.__('oro.datagrid.column_manager.tooltip') %></span>
+    <div class="table-wrapper">
+        <table class="grid table-hover table table-condensed">
+            <thead>
             <tr>
                 <th><span><%= _.__('oro.datagrid.column_manager.column.name') %></span></th>
                 <th><span><%= _.__('oro.datagrid.column_manager.column.show') %></span></th>
                 <th><span><%= _.__('oro.datagrid.column_manager.column.sort') %></span></th>
             </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
