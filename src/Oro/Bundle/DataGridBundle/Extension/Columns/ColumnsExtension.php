@@ -67,6 +67,7 @@ class ColumnsExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $newGridView = new View('__all__');
+        $newGridView->setColumnsData($config->offsetGet('columns'));
         $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
 
         $currentUser = $this->getCurrentUser();

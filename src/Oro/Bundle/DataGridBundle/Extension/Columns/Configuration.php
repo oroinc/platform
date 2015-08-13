@@ -24,6 +24,10 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('frontend_type')->end()
                     ->booleanNode('translatable')->end()
                     ->booleanNode('editable')->end()
+                    ->booleanNode('renderable')->end()
+                    ->booleanNode('manageable')->end()
+                    ->scalarNode('order')->end()
+                    ->booleanNode('required')->end()
                 ->end()
             ->end();
 
