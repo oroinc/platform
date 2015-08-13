@@ -32,6 +32,11 @@ define([
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
 
+            var route = $(this._options.buttonOptions.el).data('navigation-items-route');
+            if (!_.isEmpty(route)) {
+                this.collection.model.prototype.route = route;
+            }
+
             this.collection.reset(data);
             this._createSubViews();
         },

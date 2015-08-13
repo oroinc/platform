@@ -59,7 +59,11 @@ class MenuBuilderChainPass implements CompilerPassInterface
                 $builderDefinition = $container->getDefinition($id);
                 $builderDefinition->addArgument($attributes['alias']);
 
-                $addBuilderArgs = array(new Reference($id));
+                $addBuilderArgs = [new Reference($id)];
+                if (!empty($attributes['groupName'])) {
+                    $addBuilderArgs[] = $attributes['groupName'];
+                }
+
                 $definition->addMethodCall('addBuilder', $addBuilderArgs);
             }
         }

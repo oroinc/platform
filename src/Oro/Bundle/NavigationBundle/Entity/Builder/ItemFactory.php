@@ -11,16 +11,17 @@ class ItemFactory
      *
      * @var array
      */
-    protected $builders = array();
+    protected $builders = [];
 
     /**
      * Add builder
      *
      * @param AbstractBuilder $builder
+     * @param string $groupName
      */
-    public function addBuilder(AbstractBuilder $builder)
+    public function addBuilder(AbstractBuilder $builder, $groupName = '')
     {
-        $this->builders[$builder->getType()] = $builder;
+        $this->builders[$groupName][$builder->getType()] = $builder;
     }
 
     /**
@@ -28,18 +29,19 @@ class ItemFactory
      *
      * @param  string      $type
      * @param  array       $params
+     * @param  string      $groupName
      * @return null|object
      */
-    public function createItem($type, $params)
+    public function createItem($type, $params, $groupName = '')
     {
-        if (!array_key_exists($type, $this->builders)) {
-            return null;
+        $item = null;
+
+        try {
+            $item = $this->getBuilder($type, $groupName)->buildItem($params);
+        } catch (\Exception $e) {
         }
 
-        /** @var $builder AbstractBuilder */
-        $builder = $this->builders[$type];
-
-        return $builder->buildItem($params);
+        return $item;
     }
 
     /**
@@ -47,17 +49,34 @@ class ItemFactory
      *
      * @param  string      $type
      * @param  int         $itemId
+     * @param  string      $groupName
      * @return null|object
      */
-    public function findItem($type, $itemId)
+    public function findItem($type, $itemId, $groupName = '')
     {
-        if (!array_key_exists($type, $this->builders)) {
-            return null;
+        $item = null;
+
+        try {
+            $item = $this->getBuilder($type, $groupName)->findItem($itemId);
+        } catch (\Exception $e) {
         }
 
-        /** @var $builder AbstractBuilder */
-        $builder = $this->builders[$type];
+        return $item;
+    }
 
-        return $builder->findItem($itemId);
+    /**
+     * @param string $type
+     * @param string $groupName
+     * @return AbstractBuilder
+     */
+    protected function getBuilder($type, $groupName = '')
+    {
+        if (!isset($this->builders[$groupName][$type])) {
+            throw new \UnexpectedValueException(
+                sprintf('Builder with groupName `%s` and type `%s` not registered', $groupName, $type)
+            );
+        }
+
+        return $this->builders[$groupName][$type];
     }
 }
