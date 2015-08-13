@@ -11,6 +11,8 @@ use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroRequirements;
 
 class InstallTest extends Selenium2TestCase
 {
+    const URL = '/install.php';
+
     protected function setUp()
     {
         parent::setUp();

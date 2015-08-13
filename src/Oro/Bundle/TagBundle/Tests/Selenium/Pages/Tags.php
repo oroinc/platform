@@ -42,18 +42,6 @@ class Tags extends AbstractPageFilteredGrid
         return new Tag($this->test);
     }
 
-    public function delete()
-    {
-        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($menu);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
-    }
-
     public function checkContextMenu($tagName, $contextName)
     {
         $this->filterBy('Tag', $tagName);
