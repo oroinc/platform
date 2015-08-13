@@ -202,7 +202,7 @@ define(function(require) {
 
     function formatFabric(config, jsTemplate) {
         // pre-compile template if it exists
-        if (jsTemplate) {
+        if (jsTemplate && !_.isFunction(jsTemplate)) {
             jsTemplate = _.template(jsTemplate);
         }
 
