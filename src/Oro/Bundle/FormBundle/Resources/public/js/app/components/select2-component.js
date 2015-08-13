@@ -153,6 +153,18 @@ define(function(require) {
         var dataIds;
         var currentValue = tools.ensureArray(element.select2('val'));
 
+        if (config.forceSelectedData && element.data('selected-data')) {
+            var data = element.data('selected-data');
+            var result = [];
+            if (!_.isObject(data)) {
+                _.each(data.split(config.separator), function(item) {
+                    result.push(JSON.parse(item));
+                });
+            }
+            handleResults(result.length > 0 ? result : data);
+            return;
+        }
+
         selectedData = _.filter(
             tools.ensureArray(element.data('selected-data')),
             function(item) {
