@@ -9,7 +9,7 @@ define(function(require) {
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
-        TINYMCE_UI_HEIGHT: 15,
+        TINYMCE_UI_HEIGHT: 3,
         TEXTAREA_UI_HEIGHT: 22,
 
         autoRender: true,
@@ -130,7 +130,7 @@ define(function(require) {
         },
 
         getHeight: function() {
-            return this.$el.parent().height();
+            return this.$el.parent().innerHeight();
         },
 
         setHeight: function(newHeight) {

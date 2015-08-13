@@ -86,14 +86,10 @@ define([
                 modules.push($elem.data('pageComponentModule'));
 
                 // find nearest marked container with separate layout
-                var $separateLayout = $elem.closest('[data-layout="separate"]');
+                var $separateLayout = $elem.parents('[data-layout="separate"]:first');
 
                 // collects container elements from current layout
-                if (
-                    !$separateLayout.length ||
-                        !_.contains($separateLayout.parents(), el) ||
-                        this === $separateLayout[0]
-                ) {
+                if (!$separateLayout.length || !_.contains($separateLayout.parents(), el)) {
                     elements.push($elem);
                 }
             });
