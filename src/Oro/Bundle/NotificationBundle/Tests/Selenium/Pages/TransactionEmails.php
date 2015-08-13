@@ -8,10 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class TransactionEmails
  *
  * @package Oro\Bundle\TranslationBundle\Tests\Selenium\Pages
- * @method TransactionEmails openTransactionEmails() openTransactionEmails()
- * @method TransactionEmails assertTitle() assertTitle($title, $message = '')
- * @method TransactionEmail add add()
- * @method TransactionEmail open open()
+ * @method TransactionEmails openTransactionEmails(string $bundlePath)
+ * @method TransactionEmails assertTitle($title, $message = '')
+ * @method TransactionEmail add()
+ * @method TransactionEmail open(array $filter)
  */
 class TransactionEmails extends AbstractPageFilteredGrid
 {

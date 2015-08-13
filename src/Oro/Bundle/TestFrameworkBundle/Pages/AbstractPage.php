@@ -27,7 +27,7 @@ abstract class AbstractPage
     {
         $this->test = $testCase;
         // @codingStandardsIgnoreStart
-        $this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
+        //$this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
         // @codingStandardsIgnoreEnd
         if (!is_null(static::URL) && $redirect) {
             $this->test->url(static::URL);

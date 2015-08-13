@@ -25,6 +25,9 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
     public function setUpPage()
     {
         $this->url('/');
+        // @codingStandardsIgnoreStart
+        $this->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
+        // @codingStandardsIgnoreEnd
     }
 
     protected function tearDown()

@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class BusinessUnits
  *
  * @package Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages
- * @method BusinessUnits openBusinessUnits openBusinessUnits(string)
- * @method BusinessUnit add add()
- * @method BusinessUnit open open()
+ * @method BusinessUnits openBusinessUnits(string $bundlePath)
+ * @method BusinessUnit add()
+ * @method BusinessUnit open(array $filter)
  */
 class BusinessUnits extends AbstractPageFilteredGrid
 {
