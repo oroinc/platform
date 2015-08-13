@@ -12,6 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
+use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Model\RecipientEntity;
@@ -318,7 +319,7 @@ class EmailRecipientsHelper
     {
         $emails = [];
         foreach ($result as $row) {
-            $recipient = new Recipient(
+            $recipient = new CategorizedRecipient(
                 $row['email'],
                 sprintf('%s <%s>', $row['name'], $row['email']),
                 new RecipientEntity(
