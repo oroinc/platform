@@ -102,7 +102,8 @@ define(function(require) {
             toolbarOptions:         {
                 addResetAction: true,
                 addRefreshAction: true,
-                addColumnManager: true
+                addColumnManager: true,
+                columnManager: {}
             },
             rowClickAction:         undefined,
             multipleSorting:        true,
@@ -407,11 +408,11 @@ define(function(require) {
          * @returns {ColumnManagerComponent}
          */
         getColumnManager: function() {
-            return new ColumnManagerComponent({
+            var options = _.extend({
                 columns: this.columns,
-                grid: this,
-                minVisibleColumnsQuantity: 2
-            });
+                grid: this
+            }, this.toolbarOptions.columnManager);
+            return new ColumnManagerComponent(options);
         },
 
         /**
