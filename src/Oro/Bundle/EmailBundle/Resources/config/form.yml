@@ -221,6 +221,7 @@ services:
             - @request
             - @doctrine
             - @oro_email.mailbox.process_storage
+            - @event_dispatcher
 
     oro_email.form.factory:
         class: %oro_email.form.factory.class%
