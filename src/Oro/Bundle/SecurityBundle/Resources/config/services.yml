@@ -47,6 +47,8 @@ parameters:
 
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
+    oro_security.provider.share_grid_provider.class:           Oro\Bundle\SecurityBundle\Provider\ShareGridProvider
+
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
 
@@ -378,6 +380,14 @@ services:
             - @translator
         tags:
             - { name: twig.extension }
+
+    oro_security.provider.share_grid_provider:
+        class: %oro_security.provider.share_grid_provider.class%
+        arguments:
+            - @oro_entity.routing_helper
+            - @oro_entity_config.config_manager
+            - @oro_security.search.acl_helper
+            - @translator
 
     oro_security.twig.security_organization_extension:
         class: %oro_security.twig.security_organization_extension%

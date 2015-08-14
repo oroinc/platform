@@ -6,14 +6,14 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 
 class ShareSelectType extends AbstractType
 {
-    const NAME = 'oro_share_select';
-
     /**
      * @var EntityManager
      */
@@ -33,9 +33,7 @@ class ShareSelectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->resetViewTransformers();
-        $builder->addViewTransformer(
-            new EntitiesToJsonTransformer($this->entityManager)
-        );
+        $builder->addViewTransformer(new EntitiesToJsonTransformer($this->entityManager));
     }
 
     /**
@@ -52,7 +50,7 @@ class ShareSelectType extends AbstractType
                     'route_name' => 'oro_api_get_search_sharing_entities',
                     'separator' => ';',
                     'minimumInputLength' => 1,
-                ]
+                ],
             ]
         );
     }
@@ -70,6 +68,14 @@ class ShareSelectType extends AbstractType
      */
     public function getName()
     {
-        return self::NAME;
+        return 'oro_share_select';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['entityClass'] = $form->getParent()->get('entityClass')->getData();
     }
 }

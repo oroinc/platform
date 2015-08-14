@@ -22,7 +22,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-building"
+ *              "icon"="icon-building",
+ *              "share-grid"="business-unit-grid"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

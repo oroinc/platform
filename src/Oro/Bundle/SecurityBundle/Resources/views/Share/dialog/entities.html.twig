@@ -1,0 +1,45 @@
+{% block page_container %}
+    <div class="widget-content">
+        {% set gridWidgetName = 'sharing-entities-grid' %}
+        {% set options = {
+            items: supportedGridsInfo,
+            params: params,
+            gridWidgetName: gridWidgetName,
+            dialogWidgetName: 'sharing-entities-dialog'
+        } %}
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/widget-manager'], function($, widgetManager) {
+                $(function () {
+                    $('.btn.btn-primary.sharing-entities').on('click', function() {
+                        widgetManager.getWidgetInstanceByAlias('{{ gridWidgetName }}', function(widget) {
+                            widget.trigger('sharing-grid-submitted');
+                        });
+                    });
+                });
+            });
+        </script>
+        <script type="text/template" id="sharing-entities-dropdown-item">
+            <li id="<%= entity.get('entityAlias') %>" class="sharing-entities-item" data-cid="<%= entity.cid %>">
+                <%= entity.get('label') %>
+            </li>
+        </script>
+        <div data-page-component-module="orosecurity/js/app/components/share-component"
+             data-page-component-options="{{ options|json_encode }}" class="btn-group">
+            <button class="sharing-entities-current-block dropdown-toggle" data-toggle="dropdown">
+                <span class="sharing-entities-current-item"></span>
+                <span class="icon-caret-down"></span>
+            </button>
+            <ul class="sharing-entities-dropdown dropdown-menu"></ul>
+        </div>
+
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_share_entities_grid', {entityClass: entityClass}),
+            'alias': gridWidgetName,
+        }) }}
+        <div class="widget-actions form-actions" style="display: none;">
+            <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+            <button class="btn btn-primary sharing-entities" type="button">{{ 'Add'|trans }}</button>
+        </div>
+    </div>
+{% endblock %}
