@@ -77,7 +77,7 @@ class RelatedEmailsProvider
     {
         $recipients = [];
 
-        if (!$this->isAllowForOrganization($object, $ignoreAcl, $organization)) {
+        if ($this->isAccessDenyForOrganization($object, $ignoreAcl, $organization)) {
             return $recipients;
         }
 
@@ -285,8 +285,8 @@ class RelatedEmailsProvider
      * @param Organization $organization
      * @return bool
      */
-    protected function isAllowForOrganization($object, $ignoreAcl, Organization $organization)
+    protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization)
     {
-        return $ignoreAcl || $this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization);
+        return !$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization);
     }
 }
