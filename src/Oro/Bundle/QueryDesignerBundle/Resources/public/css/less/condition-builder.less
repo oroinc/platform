@@ -173,8 +173,11 @@
   }
   .select2-container {
     width: auto;
+    max-width: none;
     vertical-align: initial;
-    display: inline;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
     .select2-choice {
       box-shadow: none;
       border: none;
