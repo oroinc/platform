@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class User
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method Users openUsers() openUsers(string)
- * @method User openUser() openUser(string)
+ * @method Users openUsers(string $bundlePath)
+ * @method User openUser(string $bundlePath)
  */
 class User extends AbstractPageEntity
 {

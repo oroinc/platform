@@ -143,7 +143,7 @@ class Processor
         $messageId = '<' . $message->generateId() . '>';
 
         if ($origin === null) {
-            $origin = $this->getEmailOrigin($model->getFrom());
+            $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
         $this->processSend($message, $origin);
 
@@ -225,7 +225,7 @@ class Processor
             if (array_key_exists($originKey, $this->origins)) {
                 unset($this->origins[$originKey]);
             }
-            $origin = $this->getEmailOrigin($email, InternalEmailOrigin::BAP, false);
+            $origin = $this->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
             return $origin->getFolder(FolderType::SENT);
         }
 
@@ -379,17 +379,22 @@ class Processor
      * Find existing email origin entity by email string or create and persist new one.
      *
      * @param string $email
+     * @param OrganizationInterface $organization
      * @param string $originName
      * @param boolean $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP, $enableUseUserEmailOrigin = true)
-    {
+    public function getEmailOrigin(
+        $email,
+        $organization = null,
+        $originName = InternalEmailOrigin::BAP,
+        $enableUseUserEmailOrigin = true
+    ) {
         $originKey    = $originName . $email;
-        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
-            ? $this->securityFacade->getOrganization()
-            : null;
+        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
+            $organization = $this->securityFacade->getOrganization();
+        }
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwner = $this->emailOwnerProvider->findEmailOwner(
                 $this->getEntityManager(),
