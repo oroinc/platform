@@ -4,7 +4,7 @@ namespace Oro\Bundle\SidebarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-use Oro\Bundle\SidebarBundle\Entity\SidebarState;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SidebarStateRepository extends EntityRepository

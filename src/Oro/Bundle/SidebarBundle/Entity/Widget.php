@@ -4,6 +4,7 @@ namespace Oro\Bundle\SidebarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Exclude;
+
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
