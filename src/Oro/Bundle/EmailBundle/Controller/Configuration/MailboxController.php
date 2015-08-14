@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -26,23 +27,25 @@ class MailboxController extends Controller
      * @Template
      * @AclAncestor("oro_email_mailbox_update")
      *
-     * @param $mailbox
+     * @param Mailbox $mailbox
+     * @param Request $request
      *
      * @return array
      */
-    public function updateAction(Mailbox $mailbox)
+    public function updateAction(Mailbox $mailbox, Request $request)
     {
-        return $this->update($mailbox);
+        return $this->update($mailbox, $request);
     }
 
     /**
      * Prepares and handles data of Mailbox update/create form.
      *
      * @param Mailbox $mailbox
+     * @param Request $request
      *
      * @return array
      */
-    private function update(Mailbox $mailbox)
+    private function update(Mailbox $mailbox, Request $request)
     {
         $provider = $this->get('oro_config.provider.system_configuration.form_provider');
 
@@ -66,13 +69,7 @@ class MailboxController extends Controller
                     'route' => 'oro_email_mailbox_update',
                     'parameters' => ['id' => $mailbox->getId()]
                 ],
-                [
-                    'route' => 'oro_config_configuration_system',
-                    'parameters' => [
-                        'activeGroup' => self::ACTIVE_GROUP,
-                        'activeSubGroup' => self::ACTIVE_SUBGROUP,
-                    ]
-                ]
+                $this->getRedirectData($request)
             );
         }
 
@@ -81,6 +78,7 @@ class MailboxController extends Controller
             'form'           => $handler->getForm()->createView(),
             'activeGroup'    => $activeGroup,
             'activeSubGroup' => $activeSubGroup,
+            'redirectData'   => $this->getRedirectData($request),
         ];
     }
 
@@ -92,13 +90,15 @@ class MailboxController extends Controller
      * @Template("OroEmailBundle:Configuration/Mailbox:update.html.twig")
      * @AclAncestor("oro_email_mailbox_create")
      *
+     * @param Request $request
+     *
      * @return array
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
         $data = new Mailbox();
 
-        return $this->update($data);
+        return $this->update($data, $request);
     }
 
     /**
@@ -117,5 +117,24 @@ class MailboxController extends Controller
         $mailboxManager->flush();
 
         return new Response(Response::HTTP_OK);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    protected function getRedirectData(Request $request)
+    {
+        return $request->query->get(
+            'redirectData',
+            [
+                'route' => 'oro_config_configuration_system',
+                'parameters' => [
+                    'activeGroup' => self::ACTIVE_GROUP,
+                    'activeSubGroup' => self::ACTIVE_SUBGROUP,
+                ]
+            ]
+        );
     }
 }

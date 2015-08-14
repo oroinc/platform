@@ -259,18 +259,22 @@
 {% block oro_email_mailbox_grid_row %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params'),
+    } %}
     <div class="row" style="margin-top: -42px;">
         <div class="pull-right">
             <div class="btn-group">
                 {{ UI.addButton({
-                'path': path('oro_email_mailbox_create'),
-                'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                    'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                    'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
                 }) }}
             </div>
         </div>
     </div>
     <div class="row" style="margin-right: -20px;">
-        {{ dataGrid.renderGrid('base-mailboxes-grid') }}
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {redirectData: redirectData}) }}
     </div>
 {% endblock %}
 

@@ -23,15 +23,11 @@
     mailboxTitle
 ] %}
 
-{% if form.vars.data.id is not null %}
-    {% set formAction = path(
-        'oro_email_mailbox_update',
-        { id: form.vars.data.id }
-    )
-    %}
-{% else %}
-    {% set formAction = path('oro_email_mailbox_create') %}
-{% endif %}
+{% set formAction = path(
+    app.request.attributes.get('_route'),
+    app.request.attributes.get('_route_params')|merge({redirectData: redirectData})
+) %}
+
 {% set routeName = 'oro_config_configuration_system' %}
 {% set routeParameters = {} %}
 
