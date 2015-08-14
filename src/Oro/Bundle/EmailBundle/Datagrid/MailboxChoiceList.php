@@ -46,7 +46,7 @@ class MailboxChoiceList
         foreach ($origins as $origin) {
             $mailbox = $origin->getMailboxName();
             if (count($origin->getFolders()) > 0) {
-                $choiceList[$origin->getId()] = $mailbox;
+                $choiceList[$origin->getId()] = str_replace('@', '\@', $mailbox);
             }
         }
         foreach ($systemMailboxes as $mailbox) {

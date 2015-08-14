@@ -993,6 +993,7 @@ class User extends ExtendUser implements
                 return
                     $item instanceof UserEmailOrigin
                     && $item->isActive()
+                    && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );

@@ -98,7 +98,7 @@ class SystemAwareResolver implements ContainerAwareInterface
 
         if (strpos($val, '::') !== false) {
             $val = $this->resolveStatic($datagridName, $key, $val);
-        } elseif (strpos($val, '@') === 0) {
+        } elseif (strpos($val, '@') !== false) {
             $val = $this->resolveService($datagridName, $key, $val);
         }
 
@@ -180,6 +180,10 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveService($datagridName, $key, $val)
     {
+        if (strpos($val, '\@') !== false) {
+            return str_replace('\@', '@', $val);
+        }
+
         $serviceRegex = '@(?P<service>[\w\.]+)';
         $methodRegex = '(?P<method>\w+)';
         $argumentsRegex = '(?P<arguments>\(.*?\))';
