@@ -412,39 +412,10 @@ define(function(require) {
             });
         },
 
-        // by default css style = overflow: auto
-        hScrollVisible: true,
-        vScrollVisible: true,
-
         onResize: function(event) {
             this.forEachComponent(function(component) {
                 component.trigger('parentResize', event, this);
             });
-
-            // fixes scroll jumps during window move using d'n'd
-            var content = this.$el.parent();
-            if (content[0].scrollHeight > content[0].clientHeight) {
-                if (this.vScrollVisible !== true) {
-                    this.vScrollVisible = true;
-                    content.css({overflowY: 'auto'});
-                }
-            } else {
-                if (this.vScrollVisible !== false) {
-                    this.vScrollVisible = false;
-                    content.css({overflowY: 'hidden'});
-                }
-            }
-            if (content[0].scrollWidth > content[0].clientWidth) {
-                if (this.hScrollVisible !== true) {
-                    this.hScrollVisible = true;
-                    content.css({overflowX: 'auto'});
-                }
-            } else {
-                if (this.hScrollVisible !== false) {
-                    this.hScrollVisible = false;
-                    content.css({overflowX: 'hidden'});
-                }
-            }
         },
 
         onResizeStop: function(event) {
