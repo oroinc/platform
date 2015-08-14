@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * @method EmailTemplates openEmailTemplates(string $bundlePath)
  * @method EmailTemplates assertTitle($title, $message = '')
  * @method EmailTemplate add()
- * @method EmailTemplate open(array)
+ * @method EmailTemplate open(array $filter)
  */
 class EmailTemplates extends AbstractPageFilteredGrid
 {
