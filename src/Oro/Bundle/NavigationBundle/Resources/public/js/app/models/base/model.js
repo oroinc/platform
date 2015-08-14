@@ -9,7 +9,6 @@ define([
 
     Model = BaseModel.extend({
         route: 'oro_api_get_navigationitems',
-        typePrefix: '',
 
         defaults: {
             title: '',
@@ -24,7 +23,7 @@ define([
             if (base && base.indexOf(this.get('type')) === -1) {
                 base += (base.charAt(base.length - 1) === '/' ? '' : '/') + this.get('type');
             } else if (!base) {
-                base = routing.generate(this.route, {type: this.typePrefix + this.get('type')});
+                base = routing.generate(this.route, {type: this.get('type')});
             }
             if (this.isNew()) {
                 return base;

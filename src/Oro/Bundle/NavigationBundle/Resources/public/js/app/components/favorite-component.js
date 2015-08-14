@@ -54,7 +54,7 @@ define([
         },
 
         actualizeAttributes: function(model) {
-            model.set('type', 'favorite');
+            model.set('type', this.typePrefix + 'favorite');
             model.set('position', this.collection.length);
 
             var url = model.get('url');

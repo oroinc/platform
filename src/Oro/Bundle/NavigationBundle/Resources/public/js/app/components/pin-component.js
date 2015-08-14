@@ -97,7 +97,7 @@ define([
         },
 
         actualizeAttributes: function(model) {
-            model.set('type', 'pinbar');
+            model.set('type', this.typePrefix + 'pinbar');
             model.set('position', 0);
         },
 

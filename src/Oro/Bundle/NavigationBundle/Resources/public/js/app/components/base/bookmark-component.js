@@ -16,6 +16,8 @@ define([
          */
         _options: {},
 
+        typePrefix: '',
+
         listen: {
             'toAdd collection': 'toAdd',
             'toRemove collection': 'toRemove'
@@ -40,7 +42,7 @@ define([
 
             var typePrefix = $button.data('type-prefix');
             if (!_.isEmpty(typePrefix)) {
-                this.collection.model.prototype.typePrefix = typePrefix;
+                this.typePrefix = typePrefix;
             }
 
             this.collection.reset(data);
