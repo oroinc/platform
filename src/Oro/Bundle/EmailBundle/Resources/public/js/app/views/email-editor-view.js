@@ -48,14 +48,16 @@ define(function(require) {
         },
 
         onAddSignatureButtonClick: function() {
-            var tinyMCE;
             var url;
             var message;
+            var quoteNode;
             var signature = this.model.get('signature');
+            var tinyMCE = this.getBodyEditorView().tinymceInstance;
             if (signature) {
-                if (this.getBodyEditorView().tinymceConnected) {
-                    tinyMCE = this.getBodyEditorView().tinymceInstance;
-                    tinyMCE.execCommand('mceInsertContent', false, signature);
+                if (tinyMCE) {
+                    quoteNode = tinyMCE.getBody().querySelector('.quote');
+                    tinyMCE.getBody().insertBefore(tinyMCE.dom.create('p', {}, signature), quoteNode);
+                    tinyMCE.execCommand('mceFocus',false);
                 } else {
                     signature = signature.replace(/(<([^>]+)>)/ig, '');
                     this.domCache.body.insertAtCursor(signature).focus();
