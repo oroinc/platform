@@ -1,12 +1,12 @@
 CHANGELOG for 1.7.6
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.6 versions.
 * 1.7.6 (2015-08-14)
  * Improved handling of nonexistent template fixtures
 
 CHANGELOG for 1.7.5
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.5 versions.
 * 1.7.5 (2015-07-29)
  * Role entity is now extendable
  * Data types for Data Audit may now be added by developers
@@ -14,14 +14,14 @@ This changelog references the relevant changes (new features, changes and bugs) 
 
 CHANGELOG for 1.7.4
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.4 versions.
 * 1.7.4 (2015-07-08)
 This release fixes a major security issue - a so-called Open Redirect that might be exploited to redirect users to third-party servers in an underhand way, and may potentially lead to steal of user's login and password.
 Also fixed minor security issues.
 
 CHANGELOG for 1.7.3
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.3 versions.
 * 1.7.3 (2015-07-03)
  * Added ability to create reports with filters based on data audit changes of entity fields
  * Fixed mobile-view experience at dashboard screen
@@ -29,14 +29,14 @@ This changelog references the relevant changes (new features, changes and bugs) 
 
 CHANGELOG for 1.7.2
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.2 versions.
 * 1.7.2 (2015-06-17)
  * Fixed email html code visibility
  * Other minor fixes
 
 CHANGELOG for 1.7.1
 ===================
-This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.1 versions.
 * 1.7.1 (2015-06-12)
  * Added description to activity list item
  * Added check for email address in search query
