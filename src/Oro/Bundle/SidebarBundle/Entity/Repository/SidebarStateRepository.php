@@ -12,7 +12,7 @@ class SidebarStateRepository extends EntityRepository
     /**
      * @param UserInterface $user
      * @param string $position
-     * @return SidebarState
+     * @return array
      */
     public function getState($user, $position)
     {
