@@ -254,16 +254,16 @@ class FieldType extends AbstractType
         /** @var FieldConfigId $targetFieldId */
         $targetFieldId = $relation['target_field_id'];
 
-        if (!$relation['assign'] || !$targetFieldId) {
-            if (!$targetFieldId) {
-                return false;
-            }
+        if (!$targetFieldId) {
+            return false;
+        }
 
-            // additional check for revers relation of manyToOne field type
-            $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
-            if (false === (!$relation['assign']
+        // additional check for reverse relation of manyToOne field type
+        $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
+        if (!$relation['assign']) {
+            if (false === (
+                    !$relation['assign']
                     && !$fieldId
-                    && $targetFieldId
                     && $targetFieldId->getFieldType() == RelationTypeBase::MANY_TO_ONE
                     && $targetEntityConfig->get('relation')
                     && $targetEntityConfig->get('relation')[$relationKey]['assign']
@@ -271,6 +271,16 @@ class FieldType extends AbstractType
             ) {
                 return false;
             }
+        }
+
+        // case when entity A (e.g. Contact) has one-to-many
+        // (reverse many-to-one) relation
+        // from entity B (e.g. ContactAddress) but that relation has no FieldModel by design
+        if ($fieldId
+                && false == $relation['owner']
+                && $targetFieldId->getFieldType() == RelationTypeBase::MANY_TO_ONE
+        ) {
+            return false;
         }
 
         if ($fieldId
