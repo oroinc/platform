@@ -43,7 +43,6 @@ items:
         template: OroNavigationBundle:Js:dot.menu.js.twig
    pinbar_js:
         template: OroNavigationBundle:Js:pinbar.js.twig
-        applicable: @oro_user.placeholder.filter->isUserApplicable()
    routing_requirejs_config:
         template: OroNavigationBundle:Js:requirejs.config.js.twig
    shortcuts:
