@@ -12,6 +12,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
@@ -176,12 +177,12 @@ class NavigationItemController extends FOSRestController
     /**
      * Validate permissions on pinbar
      *
-     * @param  User $user
+     * @param  AbstractUser $user
      * @return bool
      */
-    protected function validatePermissions(User $user)
+    protected function validatePermissions(AbstractUser $user)
     {
-        return $user->getId() == ($this->getUser() ? $this->getUser()->getId() : 0);
+        return $user instanceof User && ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
     }
 
     /**
