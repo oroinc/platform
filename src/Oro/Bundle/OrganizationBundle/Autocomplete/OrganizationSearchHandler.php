@@ -60,7 +60,7 @@ class OrganizationSearchHandler implements SearchHandlerInterface
         $user = $this->securityContextLink->getService()->getToken()->getUser();
         $repository = $this->managerRegistry->getRepository($this->className);
         if (!$searchById) {
-            $items = $repository->getEnabledUserOrganizationsByName($user, $query);
+            $items = $repository->getEnabledByUserAndName($user, $query);
         } else {
             $items = $repository->getEnabledUserOrganizationById($user, $query);
         }
