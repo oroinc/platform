@@ -346,16 +346,18 @@ class ExtendConfigDumper
                 continue;
             }
 
-            $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
-                $fieldName = $relation['field_id']->getFieldName();
+            /** @var FieldConfigId $relationFieldId */
+            $relationFieldId = $relation['field_id'];
+            if ($relationFieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
+                $fieldName = $relationFieldId->getFieldName();
 
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
                 if ($relation['target_field_id']) {
+                    /** @var FieldConfigId $targetFieldId */
                     $addRemoveMethods[$fieldName]['target']              =
                         $relation['target_field_id']->getFieldName();
                     $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() === RelationType::MANY_TO_MANY;
+                        $relationFieldId->getFieldType() === RelationType::MANY_TO_MANY;
                 }
             }
 
@@ -454,10 +456,6 @@ class ExtendConfigDumper
 
         foreach ($relations as &$relation) {
             if ($relation['target_field_id'] == $fieldId) {
-                if ($relation['owner']) {
-                    $relation['assign'] = true;
-                }
-
                 /** @var FieldConfigId $relationFieldId */
                 $relationFieldId = $relation['field_id'];
                 if ($relationFieldId) {

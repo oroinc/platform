@@ -13,12 +13,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 
 class FieldTypeTest extends TypeTestCase
@@ -26,17 +26,17 @@ class FieldTypeTest extends TypeTestCase
     const FIELDS_GROUP    = 'oro.entity_extend.form.data_type_group.fields';
     const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
 
-    /** @var  FieldType $type */
+    /** @var FieldType $type */
     protected $type;
 
-    /** @var  \ReflectionClass */
+    /** @var \ReflectionClass */
     protected $typeReflection;
 
-    /** @var  ConfigManager */
-    protected $configManagerMock;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
 
-    /** @var  Translator */
-    protected $translatorMock;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
 
     protected $defaultFieldTypeChoices = [
         self::FIELDS_GROUP    => [
@@ -73,14 +73,14 @@ class FieldTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->configManagerMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translatorMock = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translatorMock->expects($this->any())
+        $this->translator->expects($this->any())
             ->method('trans')
             ->will(
                 $this->returnCallback(
@@ -91,8 +91,8 @@ class FieldTypeTest extends TypeTestCase
             );
 
         $this->type           = new FieldType(
-            $this->configManagerMock,
-            $this->translatorMock,
+            $this->configManager,
+            $this->translator,
             new ExtendDbIdentifierNameGenerator()
         );
         $this->typeReflection = new \ReflectionClass($this->type);
@@ -133,28 +133,30 @@ class FieldTypeTest extends TypeTestCase
 
     public function testType()
     {
-        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityConfigMock->expects($this->once())
-            ->method('is')
-            ->with('relation')
-            ->will($this->returnValue(false));
+        $extendConfig = $this->createEntityConfig('extend', $this->formOptions['class_name']);
 
-        $entityConfigMock->expects($this->never())
-            ->method('get');
-
-        $this->configManagerMock->expects($this->any())
+        $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will($this->returnValue($configProviderMock));
+            ->willReturnMap(
+                [
+                    ['extend', $extendConfigProvider],
+                    ['entity', $entityConfigProvider]
+                ]
+            );
 
-        $configProviderMock->expects($this->once())
+        $extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($entityConfigMock));
+            ->with($this->formOptions['class_name'])
+            ->will($this->returnValue($extendConfig));
+        $entityConfigProvider->expects($this->never())
+            ->method('getConfig');
 
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
@@ -167,7 +169,7 @@ class FieldTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testTypeWithAssignedRelations()
+    public function testTypeWithReverseRelations()
     {
         $this->prepareTestTypeWithRelations($this->prepareRelationsConfig());
 
@@ -190,14 +192,9 @@ class FieldTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testTypeWithUnAssignedRelations()
+    public function testTypeWithoutReverseRelations()
     {
-        $config    = $this->prepareRelationsConfig();
-        $configKey = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1';
-
-        $config['relationConfig'][$configKey]['assign'] = false;
-
-        $this->prepareTestTypeWithRelations($config, false);
+        $this->prepareTestTypeWithRelations($this->prepareRelationsConfig(), false);
 
         $form = $this->factory->create($this->type, null, $this->formOptions);
 
@@ -227,7 +224,6 @@ class FieldTypeTest extends TypeTestCase
 
         $relationConfig = [
             'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1' => [
-                'assign'          => 1,
                 'field_id'        => $relationConfigFieldId,
                 'owner'           => 1,
                 'target_entity'   => 'Extend\Entity\testEntity1',
@@ -241,48 +237,106 @@ class FieldTypeTest extends TypeTestCase
         ];
     }
 
-    protected function prepareTestTypeWithRelations($config = [], $withAssigned = true)
+    protected function prepareTestTypeWithRelations($config = [], $hasReverseRelation = true)
     {
-        $entityConfigMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+        $extendConfig = $this->createEntityConfig(
+            'extend',
+            $this->formOptions['class_name'],
+            ['relation' => $config['relationConfig']]
+        );
+
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityConfigMock->expects($this->at(0))
-            ->method('is')
-            ->with('relation')
-            ->will($this->returnValue(true));
-        $entityConfigMock->expects($this->at(1))
-            ->method('get')
-            ->with('relation')
-            ->will($this->returnValue($config['relationConfig']));
-
-        if ($withAssigned) {
-            $entityConfigMock->expects($this->at(2))
-                ->method('get')
-                ->with('label')
-                ->will($this->returnValue('labelValue'));
-        }
-
-        $configProviderMock = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configProviderMock->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($entityConfigMock));
-        $configProviderMock->expects($this->any())
-            ->method('getConfigById')
-            ->with($config['relationTargetConfigFieldId'])
-            ->will($this->returnValue($entityConfigMock));
-        $configProviderMock->expects($this->any())
+        $extendConfigProvider->expects($this->any())
             ->method('hasConfig')
             ->with(
                 $config['relationTargetConfigFieldId']->getClassName(),
                 $config['relationTargetConfigFieldId']->getFieldName()
             )
-            ->will($this->returnValue(true));
+            ->will($this->returnValue($hasReverseRelation));
+        $extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(
+                function ($className, $fieldName) use ($extendConfig) {
+                    if ($fieldName) {
+                        return $this->createFieldConfig('entity', $className, $fieldName, 'string');
+                    } elseif ($className === $this->formOptions['class_name']) {
+                        return $extendConfig;
+                    } else {
+                        return $this->createEntityConfig('entity', $className);
+                    }
+                }
+            );
 
-        $this->configManagerMock->expects($this->any())
+        $entityConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->willReturnCallback(
+                function ($className, $fieldName) {
+                    if ($fieldName) {
+                        return $this->createFieldConfig('entity', $className, $fieldName, 'string');
+                    } else {
+                        return $this->createEntityConfig('entity', $className);
+                    }
+                }
+            );
+        $entityConfigProvider->expects($this->any())
+            ->method('getConfigById')
+            ->with($config['relationTargetConfigFieldId'])
+            ->willReturnCallback(
+                function (FieldConfigId $fieldConfigId) use ($hasReverseRelation) {
+                    $fieldConfig = new Config($fieldConfigId);
+                    if ($hasReverseRelation) {
+                        $fieldConfig->set('label', 'labelValue');
+                    }
+
+                    return $fieldConfig;
+                }
+            );
+
+        $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will($this->returnValue($configProviderMock));
+            ->willReturnMap(
+                [
+                    ['extend', $extendConfigProvider],
+                    ['entity', $entityConfigProvider]
+                ]
+            );
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function createEntityConfig($scope, $className, $values = [])
+    {
+        $config = new Config(new EntityConfigId($scope, $className));
+        $config->setValues($values);
+
+        return $config;
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function createFieldConfig($scope, $className, $fieldName, $fieldType, $values = [])
+    {
+        $config = new Config(new FieldConfigId($scope, $className, $fieldName, $fieldType));
+        $config->setValues($values);
+
+        return $config;
     }
 }

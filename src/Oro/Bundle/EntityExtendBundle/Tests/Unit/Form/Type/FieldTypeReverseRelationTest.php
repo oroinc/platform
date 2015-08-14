@@ -254,9 +254,30 @@ class FieldTypeReverseRelationTest extends TypeTestCase
                 $config['targetFieldId']->getFieldName()
             )
             ->will($this->returnValue(true));
+        $configProviderMock->expects($this->any())
+            ->method('getConfigs')
+            ->with($this->formOptions['class_name'])
+            ->willReturn([]);
 
         $this->configManagerMock->expects($this->any())
             ->method('getProvider')
             ->will($this->returnValue($configProviderMock));
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param array  $values
+     *
+     * @return Config
+     */
+    protected function createFieldConfig($scope, $className, $fieldName, $fieldType, $values = [])
+    {
+        $config = new Config(new FieldConfigId($scope, $className, $fieldName, $fieldType));
+        $config->setValues($values);
+
+        return $config;
     }
 }

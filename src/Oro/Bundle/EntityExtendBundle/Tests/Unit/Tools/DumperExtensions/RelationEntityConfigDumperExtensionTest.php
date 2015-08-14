@@ -80,7 +80,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $relation   = [
             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                'assign'        => true,
                 'owner'         => true,
                 'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field_id'      => new FieldConfigId(
@@ -166,7 +165,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'Oro\Bundle\UserBundle\Entity\User',
@@ -189,7 +187,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -258,7 +255,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'Oro\Bundle\UserBundle\Entity\User',
@@ -281,7 +277,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -350,7 +345,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => false,
                     'owner'           => false,
                     'target_entity'   => 'TestClass',
@@ -368,7 +362,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -432,7 +425,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => false,
                     'owner'           => false,
                     'target_entity'   => 'TestClass',
@@ -450,7 +442,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -513,7 +504,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'owner'           => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
@@ -536,7 +526,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -604,7 +593,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'owner'           => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
@@ -627,7 +615,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals(
             [
                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId(
                         'extend',
                         'TestClass',
@@ -672,7 +659,6 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
 
         $relation = [
             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
-                'assign'        => true,
                 'owner'         => true,
                 'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                 'field_id'      => new FieldConfigId(
