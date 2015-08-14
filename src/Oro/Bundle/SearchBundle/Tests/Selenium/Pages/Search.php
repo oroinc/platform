@@ -9,8 +9,8 @@ use PHPUnit_Framework_Assert;
  * Class Search
  *
  * @package Oro\Bundle\SearchBundle\Tests\Selenium\Pages
- * @method Search openSearch() openSearch()
- * @method Search assertTitle() assertTitle($title, $message = '')
+ * @method Search openSearch()
+ * @method Search assertTitle($title, $message = '')
  */
 class Search extends AbstractPage
 {

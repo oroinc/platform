@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class ConfigEntities
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
- * @method ConfigEntities openConfigEntities() openConfigEntities(string)
- * @method ConfigEntity add() add()
- * @method ConfigEntity open() open()
+ * @method ConfigEntities openConfigEntities(string $bundlePath)
+ * @method ConfigEntity add()
+ * @method ConfigEntity open(array $filter)
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {
