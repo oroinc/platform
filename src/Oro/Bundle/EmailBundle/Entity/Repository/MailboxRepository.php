@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class MailboxRepository extends EntityRepository
@@ -36,58 +37,73 @@ class MailboxRepository extends EntityRepository
      * Returns a list of mailboxes available to user.
      *
      * @param User|integer $user User or user id
+     * @param Organization $organization
      *
      * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
-    public function findAvailableMailboxes($user)
+    public function findAvailableMailboxes($user, $organization)
     {
-        if (!$user instanceof User) {
-            $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
-        }
+        $qb = $this->createAvailableMailboxesQuery($user, $organization);
 
-        $roles = $this->getUserRoleIds($user);
-
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('mb')
-           ->from('OroEmailBundle:Mailbox', 'mb')
-           ->leftJoin('mb.authorizedUsers', 'au')
-           ->leftJoin('mb.authorizedRoles', 'ar')
-           ->where('au = :user')
-           ->orWhere(
-               $qb->expr()->in('ar', $roles)
-           );
-        $qb->setParameter('user', $user);
-
-        return $qb->getQuery()->execute();
+        return $qb->getQuery()->getResult();
     }
 
     /**
      * Returns a list of ids of mailboxes available to user.
      *
      * @param User|integer $user User or user id
+     * @param Organization $organization
      *
      * @return array Array of ids
      */
-    public function findAvailableMailboxIds($user)
+    public function findAvailableMailboxIds($user, $organization)
+    {
+        $mailboxes = $this->findAvailableMailboxes($user, $organization);
+
+        $ids = [];
+        foreach ($mailboxes as $mailbox) {
+            $ids[] = $mailbox->getId();
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param User|integer $user User or user id
+     * @param Organization $organization
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    protected function createAvailableMailboxesQuery($user, $organization)
     {
         if (!$user instanceof User) {
             $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
+        }
+        if (!$organization instanceof Organization) {
+            $organization = $this->getEntityManager()
+                ->getRepository('OroOrganizationBundle:Organization')
+                ->find($organization);
         }
 
         $roles = $this->getUserRoleIds($user);
 
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('mb.id')
+        $qb->select('mb')
             ->from('OroEmailBundle:Mailbox', 'mb')
             ->leftJoin('mb.authorizedUsers', 'au')
             ->leftJoin('mb.authorizedRoles', 'ar')
-            ->where('au = :user')
-            ->orWhere(
-                $qb->expr()->in('ar', $roles)
+            ->andWhere('mb.organization = :organization')
+            ->andWhere(
+                $qb->expr()->orX(
+                    'au = :user',
+                    $qb->expr()->in('ar', ':roles')
+                )
             );
         $qb->setParameter('user', $user);
+        $qb->setParameter('roles', $roles);
+        $qb->setParameter('organization', $organization);
 
-        return array_map('current', $qb->getQuery()->getScalarResult());
+        return $qb;
     }
 
     /**

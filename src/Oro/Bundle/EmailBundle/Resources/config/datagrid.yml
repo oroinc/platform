@@ -159,6 +159,7 @@ datagrid:
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
+            skip_acl_check: true
 
     simplified-email-grid:
         extends: base-email-grid
@@ -213,12 +214,12 @@ datagrid:
                     data_name: eu.seen
                 mailbox:
                     label: oro.email.mailbox.entity_label
+                    data_name: f.origin
                     type: choice
                     options:
                         field_options:
                             required: false
-                            choices: @oro_email.mailbox_choice_list->getChoiceList()
-                    data_name: eu.mailboxOwner
+                            choices: @oro_email.mailbox_choice_list->getChoiceList
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:

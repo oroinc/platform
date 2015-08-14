@@ -112,11 +112,12 @@ class Processor
      * Process email model sending.
      *
      * @param EmailModel $model
+     * @param EmailOrigin $origin Origin to send email with
      *
      * @return EmailUser
      * @throws \Swift_SwiftException
      */
-    public function process(EmailModel $model)
+    public function process(EmailModel $model, $origin = null)
     {
         $this->assertModel($model);
         $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -141,22 +142,12 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        $origin = $this->getEmailOrigin($model->getFrom());
+        if ($origin === null) {
+            $origin = $this->getEmailOrigin($model->getFrom());
+        }
         $this->processSend($message, $origin);
 
-        $emailUser = $this->emailEntityBuilder->emailUser(
-            $model->getSubject(),
-            $model->getFrom(),
-            $model->getTo(),
-            $messageDate,
-            $messageDate,
-            $messageDate,
-            Email::NORMAL_IMPORTANCE,
-            $model->getCc(),
-            $model->getBcc(),
-            $origin->getOwner(),
-            $origin->getOrganization()
-        );
+        $emailUser = $this->createEmailUser($model, $messageDate, $origin);
         $emailUser->setFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
@@ -182,6 +173,37 @@ class Processor
 
         $event = new EmailBodyAdded($emailUser->getEmail());
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+
+        return $emailUser;
+    }
+
+    /**
+     * @param EmailModel  $model
+     * @param \DateTime   $messageDate
+     * @param EmailOrigin $origin
+     *
+     * @return EmailUser
+     */
+    protected function createEmailUser(EmailModel $model, $messageDate, EmailOrigin $origin)
+    {
+        $emailUser = $this->emailEntityBuilder->emailUser(
+            $model->getSubject(),
+            $model->getFrom(),
+            $model->getTo(),
+            $messageDate,
+            $messageDate,
+            $messageDate,
+            Email::NORMAL_IMPORTANCE,
+            $model->getCc(),
+            $model->getBcc(),
+            $origin->getOwner(),
+            $origin->getOrganization()
+        );
+
+        if ($origin instanceof UserEmailOrigin && $origin->getMailbox() !== null) {
+            $emailUser->setOwner(null);
+            $emailUser->setMailboxOwner($origin->getMailbox());
+        }
 
         return $emailUser;
     }

@@ -41,6 +41,14 @@
     {% oro_title_set({params : {"%label%": form.vars.value.label} }) %}
 {% endif %}
 
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        { label: 'oro.config.menu.system_configuration.label'|trans },
+        { label: 'oro.email.system_configuration.email_configuration'|trans }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
+
 {% block content %}
     {% set buttons = '' %}
     {% set html = '' %}

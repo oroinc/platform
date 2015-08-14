@@ -15,6 +15,10 @@ class EmailFolderViewList extends AbstractViewsList
      */
     private $mailboxChoiceList;
 
+    /**
+     * @param TranslatorInterface $translator
+     * @param MailboxChoiceList   $mailboxChoiceList
+     */
     public function __construct(TranslatorInterface $translator, MailboxChoiceList $mailboxChoiceList)
     {
         parent::__construct($translator);

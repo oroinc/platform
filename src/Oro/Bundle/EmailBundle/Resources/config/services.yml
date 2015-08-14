@@ -99,6 +99,7 @@ parameters:
     oro_email.manager.email_attachment_manager.class: Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
+    oro_email.acl.voter.email_user_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailUserVoter
     oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
     # Email DataGrid
@@ -197,7 +198,7 @@ services:
             - @oro_entity.routing_helper
             - @oro_email.email.address.helper
             - @oro_entity.entity_name_resolver
-            - @security.context
+            - @oro_security.security_facade
             - @oro_email.email.address.manager
             - @doctrine.orm.entity_manager
             - @oro_email.email.cache.manager
@@ -424,6 +425,7 @@ services:
             - @oro_email.email.owner.provider.storage
             - @oro_entity.entity_name_resolver
             - @doctrine
+            - @oro_security.security_facade
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
