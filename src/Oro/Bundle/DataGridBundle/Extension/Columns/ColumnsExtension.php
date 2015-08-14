@@ -66,18 +66,21 @@ class ColumnsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $newGridView = new View('__all__');
-        $newGridView->setColumnsData($config->offsetGet('columns'));
-        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
+        $newGridView  = new View('__all__');
+        $currentUser  = $this->getCurrentUser();
+        $columns      = $config->offsetGet('columns');
+        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
+        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
 
-        $currentUser = $this->getCurrentUser();
+        $newGridView->setColumnsData($columns);
+        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
 
         if (!$currentUser) {
             return;
         }
+
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
-
 
         if (!$gridViews) {
             return;
@@ -97,6 +100,80 @@ class ColumnsExtension extends AbstractExtension
         } else {
             $data->offsetAddToArray('state', ['columns' => $newGridView->getColumnsData()]);
         }
+    }
+
+    /**
+     * @param array $columns
+     *
+     * @return array
+     */
+    protected function buildColumnsOrder(array $columns = [])
+    {
+        $orders = [];
+
+        foreach ($columns as $name => $column) {
+            if (array_key_exists('order', $column)) {
+                $orders[$name] = (int)$column['order'];
+            } else {
+                $orders[$name] = 0;
+            }
+        }
+
+        $iteration  = 1;
+        $ignoreList = [];
+
+        foreach ($orders as $name => &$order) {
+            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
+
+            if (0 === $order) {
+                $order = $iteration;
+                $iteration++;
+            } else {
+                array_push($ignoreList, $order);
+            }
+        }
+
+        unset($order);
+
+        return $orders;
+    }
+
+    /**
+     * @param array $columns
+     * @param array $columnsOrder
+     *
+     * @return array
+     */
+    protected function applyColumnsOrder(array $columns, array $columnsOrder)
+    {
+        foreach ($columns as $name => &$column) {
+            if (array_key_exists($name, $columnsOrder)) {
+                $column['order'] = $columnsOrder[$name];
+            }
+        }
+
+        unset($column);
+
+        return $columns;
+    }
+
+    /**
+     * Get first number which is not in ignore list
+     *
+     * @param int   $iteration
+     * @param array $ignoreList
+     *
+     * @return int
+     */
+    protected function getFirstFreeOrder($iteration, array $ignoreList = [])
+    {
+        if (in_array($iteration, $ignoreList, true)) {
+            ++$iteration;
+
+            return $this->getFirstFreeOrder($iteration, $ignoreList);
+        }
+
+        return $iteration;
     }
 
     /**

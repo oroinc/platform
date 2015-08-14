@@ -49,6 +49,10 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('hide')->defaultFalse()->end()
                     ->end()
                 ->end()
+                ->arrayNode('columnManager')
+                    ->children()
+                    ->scalarNode('minVisibleColumnsQuantity')->end()
+                ->end()
             ->end();
 
         return $builder;

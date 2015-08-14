@@ -28,6 +28,8 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('manageable')->end()
                     ->scalarNode('order')->end()
                     ->booleanNode('required')->end()
+                    ->scalarNode('template')->end()
+                    ->scalarNode('data_name')->end()
                 ->end()
             ->end();
 
