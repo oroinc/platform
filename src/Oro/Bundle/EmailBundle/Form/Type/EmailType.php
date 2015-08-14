@@ -41,7 +41,7 @@ class EmailType extends AbstractType
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
                 'from',
-                'oro_email_email_address',
+                'oro_email_email_address_from',
                 [
                     'required' => true,
                     'label' => 'oro.email.from_email_address.label',
@@ -50,22 +50,21 @@ class EmailType extends AbstractType
             )
             ->add(
                 'to',
-                'oro_email_email_address',
+                'oro_email_email_address_recipients',
                 [
                     'required' => false,
-                    'multiple' => true,
                     'attr' => ['class' => 'taggable-field forged-required']
                 ]
             )
             ->add(
                 'cc',
-                'oro_email_email_address',
-                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+                'oro_email_email_address_recipients',
+                ['required' => false, 'attr' => ['class' => 'taggable-field']]
             )
             ->add(
                 'bcc',
-                'oro_email_email_address',
-                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+                'oro_email_email_address_recipients',
+                ['required' => false, 'attr' => ['class' => 'taggable-field']]
             )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
             ->add('body', 'oro_resizeable_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])

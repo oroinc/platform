@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Tags
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
- * @method Tags openTags($bundlePath)
+ * @method Tags openTags(string $bundlePath)
  * @method Tag open(array $filter)
  * @method Tag add()
  * {@inheritdoc}
