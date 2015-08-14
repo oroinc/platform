@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class Segment
  *
  * @package Oro\Bundle\SegmentBundle\Tests\Selenium\Pages
- * @method Segments openSegments() openSegments(string)
- * @method Segment openSegment() openSegment(string)
+ * @method Segments openSegments(string $bundlePath)
+ * @method Segment openSegment(string $bundlePath)
  */
 class Segment extends AbstractPageEntity
 {

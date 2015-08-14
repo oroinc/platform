@@ -61,7 +61,6 @@ define(function(require) {
                     rectangles: {},
                     connections: []
                 };
-            var hasRect = {};
             var endpoints = this.jsPlumbInstance.sourceEndpointDefinitions;
             for (var id in endpoints) {
                 if (endpoints.hasOwnProperty(id)) {
@@ -72,7 +71,7 @@ define(function(require) {
             var connections = this.jsPlumbInstance.getConnections();
             for (var i = connections.length - 1; i >= 0; i--) {
                 var conn = connections[i];
-                if (conn.sourceId in hasRect && conn.targetId in hasRect) {
+                if (conn.sourceId in state.rectangles && conn.targetId in state.rectangles) {
                     state.connections.push([conn.connector.getId(), conn.sourceId, conn.targetId]);
                 }
             }
