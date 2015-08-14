@@ -303,6 +303,7 @@ define(function(require) {
                 otherScroll.css({
                     display: val ? 'block' : 'none'
                 });
+                scrollContainer.toggleClass('scrollbar-is-visible', Boolean(val));
                 this.fixHeaderCellWidth();
             }, this);
             scrollStateModel.on('change:clientHeight', function(model, val) {
@@ -364,7 +365,7 @@ define(function(require) {
             this.domCache.gridScrollableContainer.off('scroll', this.rescrollCb);
             this.domCache.otherScroll.off('scroll');
             this.domCache.otherScroll.css({display: 'none'});
-            this.domCache.gridScrollableContainer.css({width: ''});
+            this.domCache.gridScrollableContainer.css({width: ''}).removeClass('scrollbar-is-visible');
             this.scrollStateModel.destroy();
             delete this.scrollStateModel;
             delete this.rescrollCb;
