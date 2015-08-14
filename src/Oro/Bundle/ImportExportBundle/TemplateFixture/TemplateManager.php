@@ -79,9 +79,10 @@ class TemplateManager
     public function getEntityRepository($entityClass)
     {
         if (!$this->hasEntityRepository($entityClass)) {
-            throw new InvalidConfigurationException(
-                sprintf('The template repository for "%s" was not registered.', $entityClass)
-            );
+            // use a fixture which returns an empty entity if more concrete fixture is not registered
+            $fixture = new EmptyFixture($entityClass);
+            $fixture->setTemplateManager($this);
+            $this->repositories[$entityClass] = $fixture;
         }
 
         return $this->repositories[$entityClass];
@@ -109,9 +110,10 @@ class TemplateManager
     public function getEntityFixture($entityClass)
     {
         if (!$this->hasEntityFixture($entityClass)) {
-            throw new InvalidConfigurationException(
-                sprintf('The template fixture for "%s" was not registered.', $entityClass)
-            );
+            // use a fixture which returns an empty entity if more concrete fixture is not registered
+            $fixture = new EmptyFixture($entityClass);
+            $fixture->setTemplateManager($this);
+            $this->repositories[$entityClass] = $fixture;
         }
 
         return $this->repositories[$entityClass];
