@@ -1,4 +1,7 @@
 parameters:
+    oro_sidebar.entity.sidebar_state.class: Oro\Bundle\SidebarBundle\Entity\SidebarState
+    oro_sidebar.entity.widget.class: Oro\Bundle\SidebarBundle\Entity\Widget
+
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
     oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
     oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
