@@ -8,10 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class TransactionEmails
  *
  * @package Oro\Bundle\TranslationBundle\Tests\Selenium\Pages
- * @method TransactionEmails openTransactionEmails() openTransactionEmails()
- * @method TransactionEmails assertTitle() assertTitle($title, $message = '')
- * @method TransactionEmail add add()
- * @method TransactionEmail open open()
+ * @method TransactionEmails openTransactionEmails(string $bundlePath)
+ * @method TransactionEmails assertTitle($title, $message = '')
+ * @method TransactionEmail add()
+ * @method TransactionEmail open(array $filter)
  */
 class TransactionEmails extends AbstractPageFilteredGrid
 {
@@ -26,20 +26,6 @@ class TransactionEmails extends AbstractPageFilteredGrid
     public function entityView()
     {
         return new TransactionEmail($this->test);
-    }
-
-    public function delete($filterBy, $entityName)
-    {
-        $this->filterBy($filterBy, $entityName);
-        $this->waitForAjax();
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($action);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
     }
 
     /**

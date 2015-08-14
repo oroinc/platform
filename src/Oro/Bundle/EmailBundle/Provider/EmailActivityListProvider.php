@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -354,9 +355,18 @@ class EmailActivityListProvider implements
     {
         $entity = $this->getEmailEntity($entity);
         $filter = ['email' => $entity];
-        $organization = $this->getOrganization($entity);
-        if ($organization) {
-            $filter['organization'] = $organization;
+        $targetEntities = $this->getTargetEntities($entity);
+        $organizations = [$this->getOrganization($entity)];
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($targetEntities as $target) {
+            try {
+                $organizations[] = $propertyAccessor->getValue($target, 'organization');
+            } catch (\Exception $e) {
+                // skipp target
+            }
+        }
+        if (count($organizations) > 0) {
+            $filter['organization'] = $organizations;
         }
 
         $activityArray = [];

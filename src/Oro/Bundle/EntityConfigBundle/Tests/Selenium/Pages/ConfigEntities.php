@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class ConfigEntities
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
- * @method ConfigEntities openConfigEntities() openConfigEntities(string)
- * @method ConfigEntity add() add()
- * @method ConfigEntity open() open()
+ * @method ConfigEntities openConfigEntities(string $bundlePath)
+ * @method ConfigEntity add()
+ * @method ConfigEntity open(array $filter)
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {
@@ -28,12 +28,8 @@ class ConfigEntities extends AbstractPageFilteredGrid
         return new ConfigEntity($this->test);
     }
 
-    public function delete()
+    public function delete($entityData, $actionName = 'Remove', $confirmation = true)
     {
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Remove']")->click();
-        $this->waitPageToLoad();
-        return $this;
+        return parent::delete($entityData, $actionName, $confirmation);
     }
 }

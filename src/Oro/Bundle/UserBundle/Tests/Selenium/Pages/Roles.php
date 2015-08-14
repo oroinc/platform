@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Roles
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method Roles openRoles() openRoles(string)
- * @method Role add add()
- * @method Role open open()
+ * @method Roles openRoles(string $bundlePath)
+ * @method Role add()
+ * @method Role open(array $filter)
  * {@inheritdoc}
  */
 class Roles extends AbstractPageFilteredGrid
