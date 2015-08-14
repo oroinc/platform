@@ -13,9 +13,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
@@ -23,14 +23,11 @@ use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 
 class FieldTypeTest extends TypeTestCase
 {
-    const FIELDS_GROUP    = 'oro.entity_extend.form.data_type_group.fields';
+    const FIELDS_GROUP = 'oro.entity_extend.form.data_type_group.fields';
     const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
 
     /** @var FieldType $type */
     protected $type;
-
-    /** @var \ReflectionClass */
-    protected $typeReflection;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -65,10 +62,6 @@ class FieldTypeTest extends TypeTestCase
         ],
     ];
 
-    protected $formOptions = array(
-        'class_name' => 'Oro\Bundle\UserBundle\Entity\User'
-    );
-
     protected function setUp()
     {
         parent::setUp();
@@ -82,20 +75,21 @@ class FieldTypeTest extends TypeTestCase
             ->getMock();
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($param) {
-                        return $param;
+            ->willReturnCallback(
+                function ($id, $parameters) {
+                    if ($id === 'oro.entity_extend.form.data_type.inverse_relation') {
+                        return strtr('Reuse "%field_name%" of %entity_name%', $parameters);
                     }
-                )
+
+                    return $id;
+                }
             );
 
-        $this->type           = new FieldType(
+        $this->type = new FieldType(
             $this->configManager,
             $this->translator,
             new ExtendDbIdentifierNameGenerator()
         );
-        $this->typeReflection = new \ReflectionClass($this->type);
     }
 
     protected function getExtensions()
@@ -108,13 +102,13 @@ class FieldTypeTest extends TypeTestCase
 
         $select2ChoiceType = new Select2Type('choice');
 
-        return array(
+        return [
             new PreloadedExtension(
                 [
                     $select2ChoiceType->getName() => $select2ChoiceType,
                 ],
                 [
-                    'form' => [
+                    'form'   => [
                         new DataBlockExtension(),
                         new FormTypeValidatorExtension($validator)
                     ],
@@ -123,7 +117,7 @@ class FieldTypeTest extends TypeTestCase
                     ]
                 ]
             )
-        );
+        ];
     }
 
     public function testName()
@@ -133,15 +127,8 @@ class FieldTypeTest extends TypeTestCase
 
     public function testType()
     {
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $extendConfig = $this->createEntityConfig('extend', $this->formOptions['class_name']);
-
+        $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->willReturnMap(
@@ -151,14 +138,9 @@ class FieldTypeTest extends TypeTestCase
                 ]
             );
 
-        $extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($this->formOptions['class_name'])
-            ->will($this->returnValue($extendConfig));
-        $entityConfigProvider->expects($this->never())
-            ->method('getConfig');
+        $extendConfigProvider->addEntityConfig('Test\SourceEntity');
 
-        $form = $this->factory->create($this->type, null, $this->formOptions);
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
 
         $this->assertSame(
             $this->defaultFieldTypeChoices,
@@ -169,135 +151,56 @@ class FieldTypeTest extends TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testTypeWithReverseRelations()
+    public function testTypeForSourceEntity()
     {
-        $this->prepareTestTypeWithRelations($this->prepareRelationsConfig());
+        $this->prepareRelations();
 
-        $form = $this->factory->create($this->type, null, $this->formOptions);
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+
+        $this->assertSame(
+            $this->defaultFieldTypeChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
+        );
+
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
+    }
+
+    public function testTypeForTargetEntity()
+    {
+        $this->prepareRelations();
+
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
 
         $expectedChoices = $this->defaultFieldTypeChoices;
-        $typeName        = 'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1'
-            . '||testentity1_rel1';
 
         $expectedChoices[self::RELATIONS_GROUP] = array_merge(
             $expectedChoices[self::RELATIONS_GROUP],
-            [$typeName => 'oro.entity_extend.form.data_type.inverse_relation']
+            [
+                'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m||sourceentity_rel_m_t_m' =>
+                    'Reuse "Rel Many-To-Many" of Source Entity',
+                'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o||'                        =>
+                    'Reuse "Rel Many-To-One" of Source Entity',
+                'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m||sourceentity_rel_o_t_m'  =>
+                    'Reuse "Rel One-To-Many" of Source Entity',
+            ]
         );
         $this->assertSame(
             $expectedChoices,
             $form->offsetGet('type')->getConfig()->getOption('choices')
         );
 
-        $form->submit(['fieldName' => 'name', 'type' => 'string']);
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testTypeWithoutReverseRelations()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    protected function prepareRelations()
     {
-        $this->prepareTestTypeWithRelations($this->prepareRelationsConfig(), false);
-
-        $form = $this->factory->create($this->type, null, $this->formOptions);
-
-        $this->assertSame(
-            $this->defaultFieldTypeChoices,
-            $form->offsetGet('type')->getConfig()->getOption('choices')
-        );
-
-        $form->submit(['fieldName' => 'name', 'type' => 'string']);
-        $this->assertTrue($form->isSynchronized());
-    }
-
-    protected function prepareRelationsConfig()
-    {
-        $relationConfigFieldId       = new FieldConfigId(
-            'extend',
-            'Oro\Bundle\UserBundle\Entity\User',
-            'testentity1_rel1',
-            'manyToOne'
-        );
-        $relationTargetConfigFieldId = new FieldConfigId(
-            'extend',
-            'Extend\Entity\testEntity1',
-            'rel1',
-            'oneToMany'
-        );
-
-        $relationConfig = [
-            'oneToMany|Extend\Entity\testEntity1|Oro\Bundle\UserBundle\Entity\User|rel1' => [
-                'field_id'        => $relationConfigFieldId,
-                'owner'           => 1,
-                'target_entity'   => 'Extend\Entity\testEntity1',
-                'target_field_id' => $relationTargetConfigFieldId
-            ]
-        ];
-
-        return [
-            'relationTargetConfigFieldId' => $relationTargetConfigFieldId,
-            'relationConfig'              => $relationConfig
-        ];
-    }
-
-    protected function prepareTestTypeWithRelations($config = [], $hasReverseRelation = true)
-    {
-        $extendConfig = $this->createEntityConfig(
-            'extend',
-            $this->formOptions['class_name'],
-            ['relation' => $config['relationConfig']]
-        );
-
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $extendConfigProvider->expects($this->any())
-            ->method('hasConfig')
-            ->with(
-                $config['relationTargetConfigFieldId']->getClassName(),
-                $config['relationTargetConfigFieldId']->getFieldName()
-            )
-            ->will($this->returnValue($hasReverseRelation));
-        $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(
-                function ($className, $fieldName) use ($extendConfig) {
-                    if ($fieldName) {
-                        return $this->createFieldConfig('entity', $className, $fieldName, 'string');
-                    } elseif ($className === $this->formOptions['class_name']) {
-                        return $extendConfig;
-                    } else {
-                        return $this->createEntityConfig('entity', $className);
-                    }
-                }
-            );
-
-        $entityConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->willReturnCallback(
-                function ($className, $fieldName) {
-                    if ($fieldName) {
-                        return $this->createFieldConfig('entity', $className, $fieldName, 'string');
-                    } else {
-                        return $this->createEntityConfig('entity', $className);
-                    }
-                }
-            );
-        $entityConfigProvider->expects($this->any())
-            ->method('getConfigById')
-            ->with($config['relationTargetConfigFieldId'])
-            ->willReturnCallback(
-                function (FieldConfigId $fieldConfigId) use ($hasReverseRelation) {
-                    $fieldConfig = new Config($fieldConfigId);
-                    if ($hasReverseRelation) {
-                        $fieldConfig->set('label', 'labelValue');
-                    }
-
-                    return $fieldConfig;
-                }
-            );
-
+        $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->willReturnMap(
@@ -306,37 +209,606 @@ class FieldTypeTest extends TypeTestCase
                     ['entity', $entityConfigProvider]
                 ]
             );
+
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => false
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $targetRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => false,
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                )
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $extendConfigProvider->addEntityConfig('Test\SourceEntity', ['relation' => $selfRelations]);
+        $entityConfigProvider->addEntityConfig('Test\SourceEntity', ['label' => 'Source Entity']);
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['label' => 'Rel Many-To-One']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['label' => 'Rel One-To-Many']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['label' => 'Rel Many-To-Many']
+        );
+
+        $extendConfigProvider->addEntityConfig('Test\TargetEntity', ['relation' => $targetRelations]);
+        $entityConfigProvider->addEntityConfig('Test\TargetEntity', ['label' => 'Target Entity']);
+    }
+
+    public function testTypeForSourceEntityWithAlreadyCreatedReverseRelations()
+    {
+        $this->prepareRelationsWithReverseRelations();
+
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+
+        $this->assertSame(
+            $this->defaultFieldTypeChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
+        );
+
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
+    }
+
+    public function testTypeForTargetEntityWithAlreadyCreatedReverseRelations()
+    {
+        $this->prepareRelationsWithReverseRelations();
+
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+
+        $this->assertSame(
+            $this->defaultFieldTypeChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
+        );
+
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
     }
 
     /**
-     * @param string $scope
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function createEntityConfig($scope, $className, $values = [])
+    protected function prepareRelationsWithReverseRelations()
     {
-        $config = new Config(new EntityConfigId($scope, $className));
-        $config->setValues($values);
+        $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturnMap(
+                [
+                    ['extend', $extendConfigProvider],
+                    ['entity', $entityConfigProvider]
+                ]
+            );
 
-        return $config;
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'rev_rel_m_t_o',
+                    'oneToMany'
+                )
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $targetRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'rev_rel_m_t_o',
+                    'oneToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                )
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $extendConfigProvider->addEntityConfig('Test\SourceEntity', ['relation' => $selfRelations]);
+        $entityConfigProvider->addEntityConfig('Test\SourceEntity', ['label' => 'Source Entity']);
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['label' => 'Rel Many-To-One']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['label' => 'Rel One-To-Many']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['label' => 'Rel Many-To-Many']
+        );
+
+        $extendConfigProvider->addEntityConfig('Test\TargetEntity', ['relation' => $targetRelations]);
+        $entityConfigProvider->addEntityConfig('Test\TargetEntity', ['label' => 'Target Entity']);
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'rev_rel_m_t_o',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'rev_rel_m_t_o',
+            'oneToMany',
+            ['label' => 'Reverse Rel Many-To-One']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_o_t_m',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_o_t_m',
+            'oneToMany',
+            ['label' => 'Rel One-To-Many']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_m_t_m',
+            'manyToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_m_t_m',
+            'manyToMany',
+            ['label' => 'Rel Many-To-Many']
+        );
+    }
+
+    public function testTypeForSourceEntityWithAlreadyCreatedReverseRelationsMarkedAsToBeDeleted()
+    {
+        $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
+
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\SourceEntity']);
+
+        $this->assertSame(
+            $this->defaultFieldTypeChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
+        );
+
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
+    }
+
+    public function testTypeForTargetEntityWithAlreadyCreatedReverseRelationsMarkedAsToBeDeleted()
+    {
+        $this->prepareRelationsWithReverseRelationsMarkedAsToBeDeleted();
+
+        $form = $this->factory->create($this->type, null, ['class_name' => 'Test\TargetEntity']);
+
+        $expectedChoices = $this->defaultFieldTypeChoices;
+
+        $expectedChoices[self::RELATIONS_GROUP] = array_merge(
+            $expectedChoices[self::RELATIONS_GROUP],
+            [
+                'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m||sourceentity_rel_m_t_m' =>
+                    'Reuse "Rel Many-To-Many" of Source Entity',
+                'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o||rev_rel_m_t_o'           =>
+                    'Reuse "Rel Many-To-One" of Source Entity',
+                'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m||sourceentity_rel_o_t_m'  =>
+                    'Reuse "Rel One-To-Many" of Source Entity',
+            ]
+        );
+        $this->assertSame(
+            $expectedChoices,
+            $form->offsetGet('type')->getConfig()->getOption('choices')
+        );
+
+        $form->submit(['fieldName' => 'field1', 'type' => 'string']);
+        $this->assertTrue($form->isSynchronized());
     }
 
     /**
-     * @param string $scope
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array  $values
-     *
-     * @return Config
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function createFieldConfig($scope, $className, $fieldName, $fieldType, $values = [])
+    protected function prepareRelationsWithReverseRelationsMarkedAsToBeDeleted()
     {
-        $config = new Config(new FieldConfigId($scope, $className, $fieldName, $fieldType));
-        $config->setValues($values);
+        $extendConfigProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $entityConfigProvider = new ConfigProviderMock($this->configManager, 'entity');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturnMap(
+                [
+                    ['extend', $extendConfigProvider],
+                    ['entity', $entityConfigProvider]
+                ]
+            );
 
-        return $config;
+        $selfRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'rev_rel_m_t_o',
+                    'oneToMany'
+                )
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\TargetEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $targetRelations = [
+            'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_m_t_o'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'rev_rel_m_t_o',
+                    'oneToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_o',
+                    'manyToOne'
+                )
+            ],
+            'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_o_t_m'  => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_o_t_m',
+                    'manyToOne'
+                ),
+                'owner'           => true,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_o_t_m',
+                    'oneToMany'
+                )
+            ],
+            'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_m_t_m' => [
+                'field_id'        => new FieldConfigId(
+                    'extend',
+                    'Test\TargetEntity',
+                    'sourceentity_rel_m_t_m',
+                    'manyToMany'
+                ),
+                'owner'           => false,
+                'target_entity'   => 'Test\SourceEntity',
+                'target_field_id' => new FieldConfigId(
+                    'extend',
+                    'Test\SourceEntity',
+                    'rel_m_t_m',
+                    'manyToMany'
+                )
+            ]
+        ];
+
+        $extendConfigProvider->addEntityConfig('Test\SourceEntity', ['relation' => $selfRelations]);
+        $entityConfigProvider->addEntityConfig('Test\SourceEntity', ['label' => 'Source Entity']);
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_o',
+            'manyToOne',
+            ['label' => 'Rel Many-To-One']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_o_t_m',
+            'oneToMany',
+            ['label' => 'Rel One-To-Many']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\SourceEntity',
+            'rel_m_t_m',
+            'manyToMany',
+            ['label' => 'Rel Many-To-Many']
+        );
+
+        $extendConfigProvider->addEntityConfig('Test\TargetEntity', ['relation' => $targetRelations]);
+        $entityConfigProvider->addEntityConfig('Test\TargetEntity', ['label' => 'Target Entity']);
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'rev_rel_m_t_o',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_DELETE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'rev_rel_m_t_o',
+            'oneToMany',
+            ['label' => 'Reverse Rel Many-To-One']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_o_t_m',
+            'oneToMany',
+            ['state' => ExtendScope::STATE_DELETE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_o_t_m',
+            'oneToMany',
+            ['label' => 'Rel One-To-Many']
+        );
+        $extendConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_m_t_m',
+            'manyToMany',
+            ['state' => ExtendScope::STATE_DELETE]
+        );
+        $entityConfigProvider->addFieldConfig(
+            'Test\TargetEntity',
+            'sourceentity_rel_m_t_m',
+            'manyToMany',
+            ['label' => 'Rel Many-To-Many']
+        );
     }
 }
