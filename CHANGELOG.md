@@ -12,7 +12,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Data types for Data Audit may now be added by developers
  * Fixed issues with date & time queries in Reports
 
-CHANGELOG for 1.7.5
+CHANGELOG for 1.7.4
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
 * 1.7.4 (2015-07-08)
