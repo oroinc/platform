@@ -32,9 +32,15 @@ define([
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
 
-            var route = $(this._options.buttonOptions.el).data('navigation-items-route');
+            var $button = $(this._options.buttonOptions.el);
+            var route = $button.data('navigation-items-route');
             if (!_.isEmpty(route)) {
                 this.collection.model.prototype.route = route;
+            }
+
+            var typePrefix = $button.data('type-prefix');
+            if (!_.isEmpty(typePrefix)) {
+                this.collection.model.prototype.typePrefix = typePrefix;
             }
 
             this.collection.reset(data);
