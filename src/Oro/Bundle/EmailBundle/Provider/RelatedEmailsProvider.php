@@ -282,10 +282,10 @@ class RelatedEmailsProvider
     /**
      * @param $object
      * @param $ignoreAcl
-     * @param Organization $organization
+     * @param Organization|null $organization
      * @return bool
      */
-    protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization)
+    protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization = null)
     {
         return !$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization);
     }
