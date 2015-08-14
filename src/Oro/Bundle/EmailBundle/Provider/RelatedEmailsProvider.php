@@ -282,7 +282,7 @@ class RelatedEmailsProvider
     /**
      * @param $object
      * @param $ignoreAcl
-     * @param Organization $organization|null
+     * @param Organization|null $organization
      * @return bool
      */
     protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization = null)
