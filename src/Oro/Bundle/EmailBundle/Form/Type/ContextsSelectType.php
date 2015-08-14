@@ -54,7 +54,7 @@ class ContextsSelectType extends AbstractType
                     'route_name'         => 'oro_api_get_search_autocomplete',
                     'separator'          => ';',
                     'containerCssClass'  => 'taggable-email',
-                    'minimumInputLength' => 1,
+                    'minimumInputLength' => 2,
                 ]
             ]
         );

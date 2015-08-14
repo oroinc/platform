@@ -57,7 +57,9 @@ define(function(require) {
             var that = this;
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
-                config.minimumInputLength = 0;
+                if (!config.minimumInputLength) {
+                    config.minimumInputLength = 0;
+                }
                 config.initSelection = _.result(config, 'initSelection') || _.partial(initSelection, config);
                 if (that.excluded) {
                     config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
