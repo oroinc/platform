@@ -20,6 +20,8 @@ parameters:
     oro_email.form.type.email_folder.class:               Oro\Bundle\EmailBundle\Form\Type\EmailFolderType
     oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
     oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
+    oro_email.form.type.email_address_from.class:         Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType
+    oro_email.form.type.email_address_recipients.class:   Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType
 
 services:
     oro_email.form.subscriber.emailtemplate:
@@ -174,3 +176,18 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_originfolder_filter }
+
+    oro_email.form.type.email_address_from:
+        class: %oro_email.form.type.email_address_from.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_email.related_emails.provider
+        tags:
+            - { name: form.type, alias: oro_email_email_address_from }
+
+    oro_email.form.type.email_address_recipients:
+        class: %oro_email.form.type.email_address_recipients.class%
+        arguments:
+            - @oro_config.global
+        tags:
+            - { name: form.type, alias: oro_email_email_address_recipients }

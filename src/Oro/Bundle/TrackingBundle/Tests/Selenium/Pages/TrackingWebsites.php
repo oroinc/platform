@@ -9,9 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
 /**
  * Class TrackingWebsites
  * @package Oro\Bundle\TrackingBundle\Tests\Selenium\Pages
- * @method TrackingWebsites openTrackingWebsites openTrackingWebsites(string)
- * @method TrackingWebsite add add()
- * @method TrackingWebsite open open()
+ * @method TrackingWebsites openTrackingWebsites(string $bundlePath)
+ * @method TrackingWebsite add()
+ * @method TrackingWebsite open(array $filter)
  * {@inheritdoc}
  */
 class TrackingWebsites extends AbstractPageFilteredGrid

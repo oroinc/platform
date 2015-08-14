@@ -10,6 +10,7 @@ parameters:
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
     oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+    oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
     oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
     oro_activity_list.event_listener.segment_condition_builder_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentConditionBuilderOptionsListener
 
@@ -87,6 +88,17 @@ services:
             - @translator
             - @oro_entity.routing_helper
             - @oro_ui.html_tag_helper
+
+    oro_activity_list.provider.email_recipients:
+        class: %oro_activity_list.provider.email_recipients.class%
+        arguments:
+            - @doctrine
+            - @oro_activity.manager
+            - @oro_email.related_emails.provider
+            - @oro_activity_list.helper.acl_criteria
+            - @oro_activity_list.provider.chain
+        tags:
+            - { name: oro_email.recipients_provider, priority: 10 }
 
     oro_activity_list.event_listener.segment_widget_options_listener:
         class: %oro_activity_list.event_listener.segment_widget_options_listener.class%

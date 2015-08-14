@@ -19,7 +19,7 @@ class Group extends AbstractPageEntity
 
     public function getName()
     {
-        return $this->name->value();
+        return $this->test->byXpath("//*[@data-ftid='oro_user_group_form_name']")->value();
     }
 
     public function setOwner($owner)

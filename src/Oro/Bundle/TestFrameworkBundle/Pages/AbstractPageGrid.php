@@ -9,6 +9,7 @@ use PHPUnit_Framework_Assert;
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractPageGrid extends AbstractPage
 {

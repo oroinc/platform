@@ -7,9 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
 /**
  * Class Integrations
  * @package Oro\Bundle\IntegrationBundle\Tests\Selenium\Pages
- * @method Integrations openIntegrations openIntegrations(string)
- * @method Integration add add()
- * @method Integration open open()
+ * @method Integrations openIntegrations(string $bundlePath)
+ * @method Integration add()
+ * @method Integration open(array $filter)
  * {@inheritdoc}
  */
 class Integrations extends AbstractPageFilteredGrid
