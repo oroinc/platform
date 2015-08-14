@@ -74,7 +74,7 @@ define(function(require) {
                 var connectionOptions = _.extend({}, this.defaultConnectionOptions);
                 var StepView = this.stepView;
                 var TransitionView = this.transitionView;
-                var that = this;
+                var _this = this;
                 var steps = this.model.get('steps');
                 this.stepCollectionView = stepCollectionView = new BaseCollectionView({
                     el: this.$el,
@@ -83,7 +83,7 @@ define(function(require) {
                     // pass areaView to each model
                     itemView: function(options) {
                         options = _.extend({
-                            areaView: that
+                            areaView: _this
                         }, options);
                         return new StepView(options);
                     },
@@ -96,7 +96,7 @@ define(function(require) {
                     // pass areaView to each model
                     itemView: function(options) {
                         options = _.extend({
-                            areaView: that,
+                            areaView: _this,
                             stepCollection: steps,
                             stepCollectionView: stepCollectionView,
                             transitionOverlayView: transitionOverlayView,

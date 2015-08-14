@@ -34,7 +34,7 @@ define([
                     loadingMaskEnabled: true,
                     dialogOptions: {
                         modal: true,
-                        resizable: false,
+                        resizable: true,
                         width: 475,
                         autoResize: true
                     }
