@@ -25,6 +25,13 @@ class NavigationItem extends AbstractNavigationItem
     protected $user;
 
     /**
+     * @var string $type
+     *
+     * @ORM\Column(name="type", type="string", length=10, nullable=false)
+     */
+    protected $type;
+
+    /**
      * {@inheritdoc}
      */
     public function setUser(AbstractUser $user = null)

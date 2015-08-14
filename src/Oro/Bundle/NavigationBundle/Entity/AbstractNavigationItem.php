@@ -23,8 +23,6 @@ abstract class AbstractNavigationItem implements NavigationItemInterface
 
     /**
      * @var string $type
-     *
-     * @ORM\Column(name="type", type="string", length=10, nullable=false)
      */
     protected $type;
 

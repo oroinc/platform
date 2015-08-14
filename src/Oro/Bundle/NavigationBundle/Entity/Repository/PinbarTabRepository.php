@@ -33,7 +33,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
                 )
             )
         )
-        ->add('from', new Expr\From('Oro\Bundle\NavigationBundle\Entity\PinbarTab', 'pt'))
+        ->add('from', new Expr\From($this->_entityName, 'pt'))
         ->innerJoin('pt.item', 'ni', Expr\Join::WITH)
         ->add(
             'where',
