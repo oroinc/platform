@@ -176,7 +176,9 @@ class MailboxRepository extends EntityRepository
         return $qb
             ->select('m')
             ->andWhere($qb->expr()->exists($emailUsersDql))
+            ->andWhere('m.email != :email_address')
             ->setParameter('email', $email)
+            ->setParameter('email_address', $email->getFromEmailAddress()->getEmail())
             ->getQuery()->getResult();
     }
 }
