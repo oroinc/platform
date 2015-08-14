@@ -30,8 +30,12 @@ class AutoResponseRuleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('active', 'checkbox', [
-                'label' => 'oro.email.autoresponserule.active.label',
+            ->add('active', 'choice', [
+                'label' => 'oro.email.autoresponserule.status.label',
+                'choices' => [
+                    true  => 'oro.email.autoresponserule.status.active',
+                    false => 'oro.email.autoresponserule.status.inactive',
+                ]
             ])
             ->add('name', 'text', [
                 'label' => 'oro.email.autoresponserule.name.label',

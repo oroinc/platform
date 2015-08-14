@@ -22,7 +22,8 @@
                     </div>
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                        <button class="btn btn-primary" type="submit">{{ 'Add'|trans }}</button>
+                        {% set label = form.vars.data.id ? 'Update' : 'Add' %}
+                        <button class="btn btn-primary" type="submit">{{ label|trans }}</button>
                     </div>
                 </fieldset>
             {{ form_end(form) }}

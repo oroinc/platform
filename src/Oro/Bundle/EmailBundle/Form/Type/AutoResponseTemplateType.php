@@ -89,6 +89,7 @@ class AutoResponseTemplateType extends AbstractType
             ])
             ->add('visible', 'checkbox', [
                 'label' => 'oro.email.autoresponserule.form.template.visible.label',
+                'required' => false,
             ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
