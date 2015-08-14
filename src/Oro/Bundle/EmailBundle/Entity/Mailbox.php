@@ -61,7 +61,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var MailboxProcessSettings
      *
-     * @ORM\OneToOne(targetEntity="MailboxProcessSettings", inversedBy="mailbox",
+     * @ORM\OneToOne(targetEntity="MailboxProcessSettings",
      *     cascade={"all"}, orphanRemoval=true
      * )
      * @ORM\JoinColumn(name="process_settings_id", referencedColumnName="id", nullable=true)
