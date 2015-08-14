@@ -25,6 +25,9 @@ class View
     /** @var bool */
     protected $deletable = false;
 
+    /** @var array */
+    protected $columnsData;
+
     /**
      * @param string $name
      * @param array  $filtersData
