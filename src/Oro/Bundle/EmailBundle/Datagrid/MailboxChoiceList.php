@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -34,17 +35,37 @@ class MailboxChoiceList
     {
         $repo = $this->doctrine->getRepository('OroEmailBundle:Mailbox');
 
-        /** @var Mailbox[] $results */
-        $results = $repo->findAvailableMailboxes(
+        /** @var Mailbox[] $systemMailboxes */
+        $systemMailboxes = $repo->findAvailableMailboxes(
             $this->securityFacade->getLoggedUser(),
             $this->securityFacade->getOrganization()
         );
+        $origins = $this->getOriginsList();
 
         $choiceList = [];
-        foreach ($results as $mailbox) {
-            $choiceList[$mailbox->getId()] = $mailbox->getLabel();
+        foreach ($origins as $origin) {
+            $mailbox = $origin->getMailboxName();
+            if (count($origin->getFolders()) > 0) {
+                $choiceList[$origin->getId()] = $mailbox;
+            }
+        }
+        foreach ($systemMailboxes as $mailbox) {
+            $choiceList[$mailbox->getOrigin()->getId()] = $mailbox->getLabel();
         }
 
         return $choiceList;
+    }
+
+    /**
+     * @return EmailOrigin[]
+     */
+    protected function getOriginsList()
+    {
+        $criteria = [
+            'owner' => $this->securityFacade->getLoggedUser(),
+            'isActive' => true,
+        ];
+
+        return $this->doctrine->getRepository('OroEmailBundle:EmailOrigin')->findBy($criteria);
     }
 }
