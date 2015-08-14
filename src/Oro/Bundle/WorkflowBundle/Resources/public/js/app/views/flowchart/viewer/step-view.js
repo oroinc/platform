@@ -28,13 +28,11 @@ define(function(require) {
 
         targetDefaults: {
             dropOptions: {hoverClass: 'dragHover'},
-            anchor: ['Continuous', {faces: ['Top']}],
             allowLoopback: true
         },
 
         sourceDefaults: {
             filter: '.jsplumb-source',
-            anchor: ['Continuous', {faces: ['Bottom']}],
             connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
             maxConnections: 100
         },
@@ -66,6 +64,10 @@ define(function(require) {
             FlowchartViewerStepView.__super__.connect.apply(this, arguments);
             this.makeTarget();
             this.makeSource();
+
+            // must update offsets after first render
+            // fixes endpoint location calculation for step without connections
+            this.areaView.jsPlumbInstance.updateOffset({elId: this.id(), recalc: true});
         },
 
         makeTarget: function() {

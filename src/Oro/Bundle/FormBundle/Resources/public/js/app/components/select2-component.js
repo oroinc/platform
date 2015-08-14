@@ -50,6 +50,21 @@ define(function(require) {
                     }
                 };
             }
+
+            if (!config.hasOwnProperty('createSearchChoice') &&
+                config.hasOwnProperty('ajax') &&
+                config.hasOwnProperty('tags')
+            ) {
+                config.createSearchChoice = function(term, data) {
+                    if (!dataHasText(data, term)) {
+                        return {
+                            id: term,
+                            text: term
+                        };
+                    }
+                };
+            }
+
             return config;
         },
 
@@ -57,9 +72,7 @@ define(function(require) {
             var that = this;
             // configure AJAX object if it exists
             if (config.ajax !== undefined) {
-                if (!config.minimumInputLength) {
-                    config.minimumInputLength = 0;
-                }
+                config.minimumInputLength = _.result(config, 'minimumInputLength', 0);
                 config.initSelection = _.result(config, 'initSelection') || _.partial(initSelection, config);
                 if (that.excluded) {
                     config.ajax.results = _.wrap(config.ajax.results, function(func, data, page) {
@@ -155,6 +168,18 @@ define(function(require) {
         var dataIds;
         var currentValue = tools.ensureArray(element.select2('val'));
 
+        if (config.forceSelectedData && element.data('selected-data')) {
+            var data = element.data('selected-data');
+            var result = [];
+            if (!_.isObject(data)) {
+                _.each(data.split(config.separator), function(item) {
+                    result.push(JSON.parse(item));
+                });
+            }
+            handleResults(result.length > 0 ? result : data);
+            return;
+        }
+
         selectedData = _.filter(
             tools.ensureArray(element.data('selected-data')),
             function(item) {
@@ -230,6 +255,16 @@ define(function(require) {
             }
             return result;
         };
+    }
+
+    function dataHasText(data, text) {
+        return _.some(data, function(row) {
+            if (!row.hasOwnProperty('children')) {
+                return row.text.localeCompare(text) === 0;
+            }
+
+            return dataHasText(row.children, text);
+        });
     }
 
     return Select2Component;

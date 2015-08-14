@@ -10,6 +10,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
@@ -18,6 +19,9 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailTypeTest extends TypeTestCase
 {
@@ -43,9 +47,34 @@ class EmailTypeTest extends TypeTestCase
             ->method('getName')
             ->will($this->returnValue(TranslatableEntityType::NAME));
 
+        $user = new User();
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $relatedEmailsProvider->expects($this->any())
+            ->method('getEmails')
+            ->with($user)
+            ->will($this->returnValue([
+                'john@example.com' => 'John Smith <john@example.com>',
+            ]));
+
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
+        $genemuChoiceType  = new Select2Type('choice');
         $emailTemplateList = new EmailTemplateSelectType();
         $attachmentsType   = new EmailAttachmentsType();
+        $emailAddressFromType       = new EmailAddressFromType($securityFacade, $relatedEmailsProvider);
+        $emailAddressRecipientsType = new EmailAddressRecipientsType($configManager);
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -55,6 +84,7 @@ class EmailTypeTest extends TypeTestCase
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
         $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
+        $resizableRichTextType = new OroResizeableRichTextType($configManager, $htmlTagProvider);
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -74,19 +104,42 @@ class EmailTypeTest extends TypeTestCase
         $em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
-        $contextsSelectType = new ContextsSelectType($em);
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $contextsSelectType = new ContextsSelectType(
+            $em,
+            $configManager,
+            $translator,
+            $mapper,
+            $securityFacade
+        );
 
         return [
             new PreloadedExtension(
                 [
-                    TranslatableEntityType::NAME  => $translatableType,
-                    $select2ChoiceType->getName() => $select2ChoiceType,
-                    $emailTemplateList->getName() => $emailTemplateList,
-                    $emailAddressType->getName()  => $emailAddressType,
-                    $richTextType->getName()      => $richTextType,
-                    $attachmentsType->getName()   => $attachmentsType,
-                    ContextsSelectType::NAME      => $contextsSelectType,
-                    'genemu_jqueryselect2_hidden' => new Select2Type('hidden'),
+                    TranslatableEntityType::NAME      => $translatableType,
+                    $select2ChoiceType->getName()     => $select2ChoiceType,
+                    $emailTemplateList->getName()     => $emailTemplateList,
+                    $emailAddressType->getName()      => $emailAddressType,
+                    $richTextType->getName()          => $richTextType,
+                    $resizableRichTextType->getName() => $resizableRichTextType,
+                    $attachmentsType->getName()       => $attachmentsType,
+                    ContextsSelectType::NAME          => $contextsSelectType,
+                    'genemu_jqueryselect2_hidden'     => new Select2Type('hidden'),
+                     $genemuChoiceType->getName()     => $genemuChoiceType,
+                    $emailAddressFromType->getName()       => $emailAddressFromType,
+                    $emailAddressRecipientsType->getName() => $emailAddressRecipientsType,
                 ],
                 []
             )
@@ -155,7 +208,11 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'from' => 'John Smith <john@example.com>',
-                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
+                    'to' => [
+                        'John Smith 1 <john1@example.com>',
+                        '"John Smith 2" <john2@example.com>',
+                        'john3@example.com',
+                    ],
                     'subject' => 'Test subject',
                     'type' => 'text',
                     'attachments' => new ArrayCollection(),
@@ -169,9 +226,21 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'from' => 'John Smith <john@example.com>',
-                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
-                    'cc' => 'John Smith 4 <john4@example.com>; "John Smith 5" <john5@example.com>; john6@example.com',
-                    'bcc' => 'John Smith 7 <john7@example.com>; "John Smith 8" <john8@example.com>; john9@example.com',
+                    'to' => [
+                        'John Smith 1 <john1@example.com>',
+                        '"John Smith 2" <john2@example.com>',
+                        'john3@example.com',
+                    ],
+                    'cc' => [
+                        'John Smith 4 <john4@example.com>',
+                        '"John Smith 5" <john5@example.com>',
+                        'john6@example.com',
+                    ],
+                    'bcc' => [
+                        'John Smith 7 <john7@example.com>',
+                        '"John Smith 8" <john8@example.com>',
+                        'john9@example.com',
+                    ],
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                     'type' => 'text',

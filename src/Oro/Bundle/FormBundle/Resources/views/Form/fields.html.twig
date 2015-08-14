@@ -626,3 +626,19 @@
     {% set type = 'hidden' %}
     {{ block('form_widget_simple') }}
 {% endblock %}
+
+{% block oro_resizeable_rich_text_widget %}
+    {% set options = {
+        'view': 'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view',
+        'editorComponentName': form.vars.attr['data-page-component-name'] is defined ?
+        form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid']
+    } %}
+
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-name="wrap_{{ form.vars.attr['data-page-component-name'] is defined ?
+            form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid'] }}"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate" >
+        {{ form_widget(form) }}
+    </div>
+{% endblock %}

@@ -846,12 +846,24 @@ footer {
   cursor: auto;
 }
 .ui-dialog-content {
-  margin: @verticalPadding/2 @horizontalPadding/2;
+  padding: @verticalPadding/2 @horizontalPadding/2 0 @verticalPadding/2;
+  margin: 0 auto;
   position: relative;
   min-width: 250px;
+  width: 100% !important;
+  height: calc(~"100% - 81px") !important;
   .ui-resizable-handle {
     cursor: move;
   }
+}
+.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 32px") !important;
+  border-radius: 0 0 3px 3px;
+}
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 50px") !important;
+  border-radius: 0 0 3px 3px;
+  border-bottom: 1px solid #e5e5e5;
 }
 .ui-dialog .widget-actions-section .btn,
 .ui-dialog .widget-actions-section a.action {
@@ -1732,6 +1744,7 @@ footer {
 }
 .ui-dialog.ui-widget-content {
   border: 1px solid #bbb;
+  background-color: #fafafa;
 }
 .user-info-state {
   clear: right;

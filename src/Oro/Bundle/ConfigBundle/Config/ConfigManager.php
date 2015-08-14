@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
 class ConfigManager
 {
@@ -15,7 +16,7 @@ class ConfigManager
     /** @var array Settings array, initiated with global application settings */
     protected $settings;
 
-    /** @var array */
+    /** @var array|AbstractScopeManager[] */
     protected $managers;
 
     /** @var string */
@@ -91,7 +92,12 @@ class ConfigManager
         list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
         if (is_null($value) && !empty($this->settings[$section][$key])) {
             $setting = $this->settings[$section][$key];
-            return is_array($setting) && array_key_exists('value', $setting) && !$full ? $setting['value'] : $setting;
+
+            if (is_array($setting) && array_key_exists('value', $setting) && !$full) {
+                return $setting['value'];
+            } else {
+                return $setting;
+            }
         }
 
         return $value;
@@ -122,6 +128,7 @@ class ConfigManager
      */
     public function getInfo($name)
     {
+        /** @var AbstractScopeManager[] $managers */
         $managers = array_reverse($this->managers);
 
         $createdValues = [];
@@ -194,7 +201,10 @@ class ConfigManager
      */
     public function save($newSettings)
     {
-        list($updated, $removed) = $this->getScopeManager()->save($newSettings);
+        $event = new ConfigSettingsUpdateEvent($this, $newSettings);
+        $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::BEFORE_SAVE, $event);
+
+        list($updated, $removed) = $this->getScopeManager()->save($event->getSettings());
 
         $event = new ConfigUpdateEvent($this, $updated, $removed);
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
@@ -252,13 +262,15 @@ class ConfigManager
             );
             $settings[$child->getName()] = $this->get($key, false, true);
 
-            $settings[$child->getName()]['use_parent_scope_value']
-                = !isset($settings[$child->getName()]['use_parent_scope_value'])
-                ? true : $settings[$child->getName()]['use_parent_scope_value'];
-
+            if (!isset($settings[$child->getName()]['use_parent_scope_value'])) {
+                $settings[$child->getName()]['use_parent_scope_value'] = true;
+            }
         }
 
-        return $settings;
+        $event = new ConfigSettingsUpdateEvent($this, $settings);
+        $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::FORM_PRESET, $event);
+
+        return $event->getSettings();
     }
 
     /**

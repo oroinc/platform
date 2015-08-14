@@ -23,6 +23,7 @@ define(function(require) {
             var $chart = this.$chart;
             var xFormat = options.data_schema.label.type;
             var yFormat = options.data_schema.value.type;
+            var narrowScreen = screen.width <= 480;
             if (!$chart.get(0).clientWidth) {
                 return;
             }
@@ -124,7 +125,7 @@ define(function(require) {
                 {
                     colors: colors,
                     fontColor: options.settings.chartFontColor,
-                    fontSize: options.settings.chartFontSize,
+                    fontSize: options.settings.chartFontSize * (narrowScreen ? 0.7 : 1),
                     lines: {
                         show: connectDots
                     },
@@ -143,7 +144,7 @@ define(function(require) {
                         tickFormatter: function(y) {
                             return getYLabel(y);
                         },
-                        title: options.data_schema.value.label
+                        title: options.data_schema.value.label + '  '
                     },
                     xaxis: {
                         autoscale: true,
@@ -151,9 +152,11 @@ define(function(require) {
                         tickFormatter: function(x) {
                             return getXLabel(x);
                         },
-                        title:   options.data_schema.label.label,
+                        title: narrowScreen ? void 0 : options.data_schema.label.label,
                         mode:    options.xaxis.mode,
-                        noTicks: options.xaxis.noTicks
+                        noTicks: options.xaxis.noTicks,
+                        labelsAngle: narrowScreen ? 45 : 0,
+                        margin: true
                     },
                     HtmlText: false,
                     grid: {
