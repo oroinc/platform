@@ -192,6 +192,10 @@ services:
             - @security.context
             - @doctrine
             - @oro_navigation.title_service
+        calls:
+            - [ setHistoryItemEntityFQCN, ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']]
+            - [ setUserEntityFQCN, ['Oro\Bundle\UserBundle\Entity\User']]
+            - [ setNavigationHistoryItemType, ['history']]
 
     oro_navigation.event.doctrine_tag_listener:
         class: %oro_navigation.event.doctrine_tag_listener.class%
