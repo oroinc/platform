@@ -75,29 +75,21 @@ class RelatedEmailsProvider
      */
     public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
     {
-        if (!$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization)) {
-            return [];
+        $recipients = [];
+
+        if ($this->isAccessDenyForOrganization($object, $ignoreAcl, $organization)) {
+            return $recipients;
         }
 
-        $recipients = [];
         if (!$depth || ($ignoreAcl || !$this->securityFacade->isGranted('VIEW', $object))) {
-            if ($depth && $this->securityFacade->getLoggedUser() === $object) {
-                $ignoreAcl = true;
-            } else {
+            if (!$depth || $this->securityFacade->getLoggedUser() !== $object) {
                 return $recipients;
             }
         }
 
         $className = ClassUtils::getClass($object);
-
-        $attributes = [];
         $metadata = $this->getMetadata($className);
-
-        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className), true)) {
-            $attributes[] = new EmailAttribute('email');
-        }
-
-        $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));
+        $attributes = $this->initAttributes($className, $metadata);
 
         foreach ($metadata->associationMappings as $name => $assoc) {
             if (in_array(
@@ -269,5 +261,32 @@ class RelatedEmailsProvider
         $em = $this->registry->getManagerForClass($className);
 
         return $em->getClassMetadata($className);
+    }
+
+    /**
+     * @param string $className
+     * @param ClassMetadata $metadata
+     * @return array
+     */
+    protected function initAttributes($className, $metadata)
+    {
+        $attributes = [];
+        if (in_array('Oro\Bundle\EmailBundle\Model\EmailHolderInterface', class_implements($className), true)) {
+            $attributes[] = new EmailAttribute('email');
+        }
+        $attributes = array_merge($attributes, $this->getFieldAttributes($metadata));
+
+        return $attributes;
+    }
+
+    /**
+     * @param $object
+     * @param $ignoreAcl
+     * @param Organization $organization
+     * @return bool
+     */
+    protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization)
+    {
+        return !$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization);
     }
 }
