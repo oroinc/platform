@@ -28,20 +28,6 @@ class TransactionEmails extends AbstractPageFilteredGrid
         return new TransactionEmail($this->test);
     }
 
-    public function delete($filterBy, $entityName)
-    {
-        $this->filterBy($filterBy, $entityName);
-        $this->waitForAjax();
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($action);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
-    }
-
     /**
      * @param $entityName
      * @param $contextName
