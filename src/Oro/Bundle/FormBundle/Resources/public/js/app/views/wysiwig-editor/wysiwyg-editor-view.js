@@ -24,7 +24,8 @@ define(function(require) {
             plugins: ['textcolor', 'code', 'bdesk_photo'],
             menubar: false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | bdesk_photo'],
-            statusbar: false
+            statusbar: false,
+            browser_spellcheck: true
         },
 
         events: {
