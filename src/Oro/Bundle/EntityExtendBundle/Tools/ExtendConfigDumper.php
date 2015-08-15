@@ -348,9 +348,11 @@ class ExtendConfigDumper
                 continue;
             }
 
+            $fieldName = $fieldId->getFieldName();
+            if (!isset($relationProperties[$fieldName])) {
+                $relationProperties[$fieldName] = $fieldName;
+            }
             if ($fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
-                $fieldName = $fieldId->getFieldName();
-
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
 
                 /** @var FieldConfigId $targetFieldId */
@@ -362,8 +364,6 @@ class ExtendConfigDumper
                     $addRemoveMethods[$fieldName]['is_target_addremove'] = $fieldType === RelationType::MANY_TO_MANY;
                 }
             }
-
-            $this->updateRelationValues($relation['target_entity'], $fieldId);
         }
         $extendConfig->set('relation', $relations);
 
@@ -444,31 +444,6 @@ class ExtendConfigDumper
         if ($hasChanges) {
             $this->configProvider->flush();
         }
-    }
-
-    /**
-     * @param string        $targetClass
-     * @param FieldConfigId $fieldId
-     */
-    protected function updateRelationValues($targetClass, FieldConfigId $fieldId)
-    {
-        $targetConfig = $this->configProvider->getConfig($targetClass);
-        $relations    = $targetConfig->get('relation', false, []);
-        $schema       = $targetConfig->get('schema', false, []);
-
-        foreach ($relations as $relation) {
-            if ($relation['target_field_id'] == $fieldId) {
-                /** @var FieldConfigId $relationFieldId */
-                $relationFieldId = $relation['field_id'];
-                if ($relationFieldId) {
-                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
-                }
-            }
-        }
-
-        $targetConfig->set('schema', $schema);
-
-        $this->configProvider->persist($targetConfig);
     }
 
     /**
