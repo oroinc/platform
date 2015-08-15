@@ -48,7 +48,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         foreach ($relations as $relation) {
             /** @var FieldConfigId $fieldId */
             $fieldId = $relation['field_id'];
-            if ($fieldId && $this->extendConfigProvider->hasConfigById($fieldId)) {
+            if ($fieldId) {
                 $targetEntity = $relation['target_entity'];
                 /** @var FieldConfigId|null $targetFieldId */
                 $targetFieldId = !empty($relation['target_field_id']) ? $relation['target_field_id'] : null;
