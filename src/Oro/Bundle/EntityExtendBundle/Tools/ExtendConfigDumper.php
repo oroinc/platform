@@ -365,7 +365,6 @@ class ExtendConfigDumper
                 }
             }
         }
-        $extendConfig->set('relation', $relations);
 
         $schema = [
             'class'     => $className,
