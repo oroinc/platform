@@ -29,4 +29,11 @@ class Session
      * @ORM\Column(name="sess_time", type="integer", nullable=false)
      */
     protected $time;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="sess_lifetime", type="integer", nullable=false)
+     */
+    protected $lifetime;
 }

@@ -62,6 +62,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailerTransport;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -258,6 +261,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcess($data, $expectedMessageData, $needConverting = false)
     {
         $message = new \Swift_Message();
+
+        $this->userEmailOrigin->expects($this->once())
+            ->method('isSmtpConfigured')
+            ->will($this->returnValue(true));
 
         $this->mailer->expects($this->once())
             ->method('createMessage')

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 
 use FOS\RestBundle\Util\Codes;
@@ -25,11 +27,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
  * Class EmailController
@@ -399,7 +404,7 @@ class EmailController extends Controller
 
     /**
      * @Route("/context/grid/{activityId}/{entityClass}", name="oro_email_context_grid")
-     * @Template("OroDataGridBundle:Grid:widget/widget.html.twig")
+     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
      *
      * @param string $entityClass
      * @param string $activityId
@@ -501,6 +506,91 @@ class EmailController extends Controller
         ];
 
         return new JsonResponse(array_merge($data, $response->getOptions()));
+    }
+
+    /**
+     * @Route("/autocomplete-recipient", name="oro_email_autocomplete_recipient")
+     * @AclAncestor("oro_email_email_create")
+     *
+     * @return Response
+     */
+    public function autocompleteRecipientAction(Request $request)
+    {
+        $query = $request->query->get('query');
+        if ($request->query->get('search_by_id', false)) {
+            $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($query);
+
+            if ($recipient) {
+                $results = [$this->getEmailRecipientsHelper()->createRecipientData($recipient)];
+            } else {
+                $results = [
+                    [
+                        'id'   => $query,
+                        'text' => $query,
+                    ],
+                ];
+            }
+        } else {
+            $organization = $request->query->get('organization');
+            if ($organization) {
+                $organization = $this->getOrganizationRepository()->findOneByName($organization);
+            }
+
+            $relatedEntity = null;
+            $entityClass = $request->query->get('entityClass');
+            $entityId = $request->query->get('entityId');
+            if ($entityClass && $entityId) {
+                $em = $this->getEntityManagerForClass($entityClass);
+                $relatedEntity = $em->getReference($entityClass, $entityId);
+                if ($relatedEntity === $this->getUser()) {
+                    $relatedEntity = null;
+                }
+            }
+
+            $limit = $request->query->get('per_page', 100);
+            $results = $this->getEmailRecipientsProvider()->getEmailRecipients(
+                $relatedEntity,
+                $query,
+                $organization,
+                $limit
+            );
+        }
+
+        return new JsonResponse(['results' => $results]);
+    }
+
+    /**
+     * @return EmailRecipientsHelper
+     */
+    protected function getEmailRecipientsHelper()
+    {
+        return $this->get('oro_email.provider.email_recipients.helper');
+    }
+
+    /**
+     * @return EntityRepository
+     */
+    protected function getOrganizationRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization');
+    }
+
+    /**
+     * @return EmailRecipientsProvider
+     */
+    protected function getEmailRecipientsProvider()
+    {
+        return $this->get('oro_email.email_recipients.provider');
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return EntityManager
+     */
+    protected function getEntityManagerForClass($className)
+    {
+        return $this->getDoctrine()->getManagerForClass($className);
     }
 
     /**

@@ -167,7 +167,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
              * If transport type changed we have to modify ViewData(it's already saved entity)
              * due to it's not matched the 'data_class' option of newly added form type
              */
-            if ($transport = $originalData->getTransport()) {
+            if (($originalData !== null) && $transport = $originalData->getTransport()) {
                 $transportType = $this->registry->getTransportTypeBySettingEntity(
                     $transport,
                     $originalData->getType(),

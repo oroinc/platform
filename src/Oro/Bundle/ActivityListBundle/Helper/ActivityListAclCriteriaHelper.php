@@ -85,7 +85,7 @@ class ActivityListAclCriteriaHelper
             $mapFields
         );
         $isGranted = $this->securityContextLink->getService()
-            ->isGranted('VIEW', 'entity:' . $activityClass);
+            ->isGranted('VIEW', 'entity:' . $aclClass);
         if ($isGranted) {
             $appliedCriteria->andWhere(Criteria::expr()->eq('relatedActivityClass', $activityClass));
         }

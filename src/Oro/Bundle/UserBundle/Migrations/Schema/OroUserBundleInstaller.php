@@ -22,6 +22,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChang
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\UpdateEmailOriginRelation as EmailOrigin;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_17\AddRelationToMailbox;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -43,7 +44,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_15';
+        return 'v1_17';
     }
 
     /**
@@ -112,6 +113,10 @@ class OroUserBundleInstaller implements
         EmailOrigin::addOwnerAndOrganizationColumns($schema);
         SetOwnerForEmail::addOwnerToOroEmail($schema);
         RemoveOldSchema::execute($schema);
+
+        AddRelationToMailbox::createOroEmailMailboxUsersTable($schema);
+        AddRelationToMailbox::createOroEmailMailboxRolesTable($schema);
+        AddRelationToMailbox::addOroEmailMailboxUsersAndRolesForeignKeys($schema);
     }
 
     /**
@@ -294,6 +299,7 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('sess_data', 'text', ['precision' => 0]);
         $table->addColumn('sess_time', 'integer', ['precision' => 0]);
+        $table->addColumn('sess_lifetime', 'integer', ['nullable' => false]);
         $table->setPrimaryKey(['id']);
     }
 

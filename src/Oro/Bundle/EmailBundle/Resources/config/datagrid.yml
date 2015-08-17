@@ -1,4 +1,87 @@
 datagrid:
+    email-auto-response-rules:
+        source:
+            type: orm
+            acl_resource: oro_email_autoresponserule_view
+            query:
+                select:
+                    - r.id
+                    - r.name
+                    - r.active
+                from:
+                    - { table: OroEmailBundle:AutoResponseRule, alias: r }
+                where:
+                    or:
+                        - r.mailbox = :mailbox
+                        - r.id IN (:ids)
+            bind_parameters:
+                mailbox:
+                    default: 0
+                ids:
+                    default: []
+        columns:
+            name:
+                label: oro.email.autoresponserule.name.label
+            active:
+                label: oro.email.autoresponserule.status.label
+                type: twig
+                frontend_type: html
+                template: OroEmailBundle:AutoResponseRule:Datagrid/Property/active.html.twig
+        properties:
+            id: ~
+            update_link:
+                type: url
+                route: oro_email_autoresponserule_update
+                params: [ id ]
+            delete_link:
+                type: url
+                route: oro_api_delete_autoresponserule
+                params: [ id ]
+        sorters:
+            columns:
+                name:
+                    data_name: r.name
+                active:
+                    data_name: r.active
+        actions:
+            update:
+                type:         dialog
+                acl_resource: oro_email_autoresponserule_update
+                label:        oro.grid.action.update
+                icon:         edit
+                link:         update_link
+                rowAction:    true
+                widgetOptions:
+                    reload-grid-name: email-auto-response-rules
+                    options:
+                        dialogOptions:
+                            title:         @translator->trans(oro.email.autoresponserule.action.update.title)
+                            allowMaximize: false
+                            allowMinimize: false
+                            modal:         true
+                            dblclick:      maximize
+                            maximizedHeightDecreaseBy: minimize-bar
+                            width: 700
+            delete:
+                type:         delete
+                acl_resource: oro_email_autoresponserule_delete
+                label:        oro.grid.action.delete
+                icon:         trash
+                link:         delete_link
+        mass_actions:
+            delete:
+                type: delete
+                entity_name: %oro_email.autoresponserule.entity.class%
+                data_identifier: r.id
+                acl_resource: oro_email_autoresponserule_update
+                label: oro.grid.action.delete
+                icon: trash
+        options:
+            toolbarOptions:
+                hide: true
+            requireJSModules:
+                - oroemail/js/datagrid/auto-response-rules-extension
+
     base-email-grid:
         source:
             type: orm
@@ -13,6 +96,9 @@ datagrid:
                         -
                             join: eu.email
                             alias: e
+                        -
+                            join: eu.mailboxOwner
+                            alias: mb
                         -
                             join: e.thread
                             alias: thread
@@ -73,6 +159,7 @@ datagrid:
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
+            skip_acl_check: true
 
     simplified-email-grid:
         extends: base-email-grid
@@ -125,6 +212,14 @@ datagrid:
                                 false: oro.email.status.unread.label
                                 true: oro.email.status.read.label
                     data_name: eu.seen
+                mailbox:
+                    label: oro.email.mailbox.entity_label
+                    data_name: f.origin
+                    type: choice
+                    options:
+                        field_options:
+                            required: false
+                            choices: @oro_email.mailbox_choice_list->getChoiceList
         views_list : @oro_email.emailfolder.datagrid_view_list
 
     activity-email-grid:
@@ -292,7 +387,6 @@ datagrid:
                 where:
                     and:
                         - eu.seen = false
-                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
         columns:
             receivedAt:
                 type: twig
@@ -330,6 +424,9 @@ datagrid:
                     - t.isSystem
                 from:
                     - { table: %oro_email.emailtemplate.entity.class%, alias: t }
+                where:
+                    and:
+                        - t.visible = true
 
         columns:
             entityName:
@@ -419,3 +516,68 @@ datagrid:
         action_configuration: @oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure
         views_list : @oro_email.emailtemplate.datagrid_view_list
         options: { entityHint: email template }
+
+    base-mailboxes-grid:
+        source:
+            acl_resource: oro_email_mailbox_view
+            type: orm
+            query:
+                select:
+                    - m
+                from:
+                    - { table: OroEmailBundle:Mailbox, alias: m }
+                join:
+                    left:
+                        - { join: m.processSettings, alias: process }
+        columns:
+            email:
+                label: oro.email.mailbox.email.label
+            label:
+                label: oro.email.mailbox.label.label
+            imap:
+                label: oro.imap.configuration.use_imap.label
+                type: twig
+                frontend_type: html
+                data_name: origin
+                template: OroEmailBundle:Mailbox:Datagrid/Property/origin.html.twig
+            smtp:
+                label: oro.imap.configuration.use_smtp.label
+                type: twig
+                frontend_type: html
+                data_name: origin
+                template: OroEmailBundle:Mailbox:Datagrid/Property/originSmtp.html.twig
+            processing:
+                data_name: processSettings
+                type: twig
+                label: oro.email.mailbox.process.label
+                frontend_type: html
+                template: OroEmailBundle:Mailbox:Datagrid/Property/processSettings.html.twig
+        properties:
+            id: ~
+            update_link:
+                type: url
+                route: oro_email_mailbox_update
+                params:
+                    id: id
+            delete_link:
+                type: url
+                route: oro_email_mailbox_delete
+                params:
+                    id: id
+        options:
+            toolbarOptions:
+                hide: true
+        actions:
+            update:
+                type:         navigate
+                acl_resource: oro_email_mailbox_update
+                label:        oro.grid.action.update
+                link:         update_link
+                icon:         edit
+                rowAction:    true
+            delete:
+                type:         delete
+                acl_resource: oro_email_mailbox_delete
+                label:        oro.grid.action.delete
+                icon:         trash
+                link:         delete_link
