@@ -73,8 +73,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->mailer = $this->getMockBuilder('\Swift_Mailer')
-            ->disableOriginalConstructor()
+        $this->mailer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\DirectMailer')
+             ->disableOriginalConstructor()
             ->getMock();
         $this->mailerTransport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()
@@ -315,16 +315,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $email->expects($this->any())
             ->method('getEmailBody')
             ->willReturn($body);
-
-        $this->mailerTransport
-            ->expects($this->exactly(1))
-            ->method('setHost')
-            ->with($this->userEmailOrigin->getSmtpHost());
-
-        $this->mailerTransport
-            ->expects($this->exactly(1))
-            ->method('setPort')
-            ->with($this->userEmailOrigin->getSmtpPort());
 
         if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
             $targetEntity = new TestUser();

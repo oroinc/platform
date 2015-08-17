@@ -90,13 +90,7 @@ class ConnectionController extends Controller
                     $mailer = $this->get('oro_email.direct_mailer');
 
                     // Prepare Smtp Transport
-                    $transport = $mailer->prepareSmtpTransport(
-                        $origin->getSmtpHost(),
-                        $origin->getSmtpPort(),
-                        $origin->getSmtpEncryption(),
-                        $origin->getUser(),
-                        $password
-                    );
+                    $transport = $mailer->prepareSmtpTransport($origin);
 
                     $transport->start();
                 } catch (\Exception $e) {
