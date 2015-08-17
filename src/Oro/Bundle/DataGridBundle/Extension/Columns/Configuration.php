@@ -26,12 +26,13 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('editable')->end()
                     ->booleanNode('renderable')->end()
                     ->booleanNode('manageable')->end()
-                    ->scalarNode('order')->end()
+                    ->integerNode('order')->end()
                     ->booleanNode('required')->end()
                     ->scalarNode('template')->end()
                     ->scalarNode('data_name')->end()
-                    ->scalarNode('context_resolver')->end()
+                    ->variableNode('context_resolver')->end()
                     ->scalarNode('method')->end()
+                    ->scalarNode('align')->end()
                 ->end()
             ->end();
 
