@@ -4,7 +4,6 @@ define(function(require) {
     var ColumnManagerComponent;
     var _ = require('underscore');
     var Backgrid = require('backgrid');
-    var tools = require('oroui/js/tools');
     var ColumnsCollection = require('orodatagrid/js/app/models/column-manager/columns-collection');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
@@ -32,15 +31,8 @@ define(function(require) {
          */
         grid: null,
 
-        /**
-         * Preserved initial state of columns
-         * @type {Object}
-         */
-        _initialState: null,
-
         listen: {
-            'change:renderable collection': '_pushState',
-            'updateState collection': '_applyState'
+            'change:renderable collection': '_pushState'
         },
 
         /**
@@ -66,7 +58,6 @@ define(function(require) {
                 _.pick(options, ['minVisibleColumnsQuantity'])
             );
 
-            this._initialState = this._createState();
             this._applyState(this.grid.collection, this.grid.collection.state);
 
             ColumnManagerComponent.__super__.initialize.apply(this, arguments);
@@ -85,6 +76,15 @@ define(function(require) {
             delete this.grid;
 
             ColumnManagerComponent.__super__.dispose.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        delegateListeners: function() {
+            this.listenTo(this.grid.collection, 'updateState', this._applyState);
+
+            return ColumnManagerComponent.__super__.delegateListeners.apply(this, arguments);
         },
 
         /**
@@ -111,11 +111,11 @@ define(function(require) {
          * @protected
          */
         _pushState: function() {
-            var columnsState = this._createState();
-
-            if (tools.isEqualsLoosely(columnsState, this._initialState)) {
-                columnsState = {};
+            if (this._applyingState) {
+                return;
             }
+
+            var columnsState = this._createState();
 
             this.grid.collection.updateState({
                 columns: columnsState
@@ -129,16 +129,27 @@ define(function(require) {
          */
         _applyState: function(collection, state) {
             var columnsState = state.columns;
+            var attrs;
+
+            this._applyingState = true;
 
             this.collection.each(function(column) {
                 var name = column.get('name');
                 if (columnsState[name]) {
-                    column.set(columnsState[name]);
+                    attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
+                    column.set(attrs);
+                } else {
+                    column.set({
+                        renderable: true,
+                        order: void 0
+                    });
                 }
             });
             this.collection.sort();
 
             this.columns.sort();
+
+            this._applyingState = false;
         },
 
         /**

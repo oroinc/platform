@@ -23,7 +23,8 @@ define(function(require) {
             // for some reason events delegated in view constructor does not work
             addedToParent: 'delegateEvents',
             // update view on model change
-            'change:disabledVisibilityChange model': 'render'
+            'change:disabledVisibilityChange model': 'render',
+            'change:renderable model': 'render'
         },
 
         /**

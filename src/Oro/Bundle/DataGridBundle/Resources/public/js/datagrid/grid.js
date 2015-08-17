@@ -354,7 +354,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
-                        iconClassName: 'icon-refresh'
+                        iconClassName: 'icon-repeat'
                     }
                 });
 
@@ -384,7 +384,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn',
-                        iconClassName: 'icon-repeat'
+                        iconClassName: 'icon-refresh'
                     }
                 });
 
