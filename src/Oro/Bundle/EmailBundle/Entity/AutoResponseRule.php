@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
-use DateTime;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -65,7 +63,7 @@ class AutoResponseRule
     protected $mailbox;
 
     /**
-     * @var Datetime
+     * @var \Datetime
      *
      * @ORM\Column(type="datetime")
      */
@@ -74,7 +72,7 @@ class AutoResponseRule
     public function __construct()
     {
         $this->conditions = new ArrayCollection();
-        $this->createdAt = new DateTime();
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -211,10 +209,22 @@ class AutoResponseRule
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @param $createdAt \DateTime
+     *
+     * @return $this
+     */
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
     }
 }
