@@ -23,6 +23,7 @@ class IsInstanceOf extends AbstractCondition implements ContextAccessorAwareInte
 
     /** @var string */
     protected $object;
+
     /** @var string */
     protected $class;
 

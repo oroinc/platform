@@ -24,14 +24,19 @@ class AddActivityTarget extends AbstractAction
 {
     /** @var ActivityManager */
     protected $activityManager;
+
     /** @var string */
     protected $activityEntity;
+
     /** @var string */
     protected $targetEntity;
+
     /** @var string */
-    protected $attribute = null;
+    protected $attribute;
+
     /** @var ActivityListChainProvider */
     private $chainProvider;
+
     /** @var EntityManager */
     private $entityManager;
 

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class EntityRelationGridListener
@@ -65,13 +66,13 @@ class EntityRelationGridListener
             $relation           = $relations[$extendFieldConfig->get('relation_key')];
             $targetFieldName    = $relation['target_field_id']->getFieldName();
             $fieldType          = $extendFieldConfig->getId()->getFieldType();
-            $operator           = $fieldType == 'oneToMany' ? '=' : 'MEMBER OF';
+            $operator           = $fieldType === RelationType::ONE_TO_MANY ? '=' : 'MEMBER OF';
             $whenExpr           = '(:relation ' . $operator . ' o.' . $targetFieldName . ' OR o.id IN (:data_in))'
                 . ' AND o.id NOT IN (:data_not_in)';
         } else {
             $whenExpr = 'o.id IN (:data_in) AND o.id NOT IN (:data_not_in)';
         }
-        $assignedExpr = "CASE WHEN " . $whenExpr . " THEN true ELSE false END";
+        $assignedExpr = 'CASE WHEN ' . $whenExpr . ' THEN true ELSE false END';
 
         // build a query skeleton
         $query = [

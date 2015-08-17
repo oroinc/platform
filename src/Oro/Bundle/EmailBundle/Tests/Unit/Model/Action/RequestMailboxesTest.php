@@ -15,12 +15,16 @@ class RequestMailboxesTest extends \PHPUnit_Framework_TestCase
 {
     /** @var RequestMailboxes */
     protected $action;
+
     /** @var ContextAccessor */
     protected $contextAccessor;
+
     /** @var Registry */
     protected $registry;
+
     /** @var MailboxProcessStorage */
     protected $mailboxProcessStorage;
+
     /** @var MailboxRepository */
     protected $repository;
 

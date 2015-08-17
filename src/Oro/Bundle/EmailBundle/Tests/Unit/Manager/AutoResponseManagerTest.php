@@ -3,6 +3,7 @@
 namespace Oro\src\Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRuleCondition;
@@ -15,9 +16,16 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
 class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var Registry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailBuilder;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $emailProcessor;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
     /** @var AutoResponseManager */

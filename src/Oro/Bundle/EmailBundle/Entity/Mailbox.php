@@ -138,7 +138,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var \Datetime $created
      *
-     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
      *      defaultValues={
      *          "entity"={
