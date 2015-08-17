@@ -196,7 +196,9 @@ class AutoResponseManager
     public function getApplicableRules(Mailbox $mailbox, Email $email)
     {
         return $mailbox->getAutoResponseRules()->filter(function (AutoResponseRule $rule) use ($email) {
-            return $rule->isActive() && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email));
+            return $rule->isActive()
+                && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email))
+                && $rule->getCreatedAt() < $email->getSentAt();
         });
     }
 

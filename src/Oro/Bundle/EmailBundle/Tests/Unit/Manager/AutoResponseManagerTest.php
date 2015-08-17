@@ -101,6 +101,7 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 
             $email = new Email();
             $email->setEmailBody($body);
+            $email->setSentAt(new \DateTime('now', new \DateTimeZone('UTC')));
 
             return [$email];
         }, $applicableBodies);
@@ -110,13 +111,17 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 
     public function inapplicableEmailsProvider()
     {
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $oldEmailDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $oldEmailDate->sub(\DateInterval::createFromDateString('2 day'));
         $applicableSubjectsAndBodies = [
-            ['not empty subject', 'This is email body with offer, sale and won words.'],
-            [null, 'This email has nothing.']
+            ['not empty subject', 'This is email body with offer, sale and won words.', $date],
+            [null, 'This email has nothing.', $date],
+            [null, 'This is email body with sale and won words.', $oldEmailDate],
         ];
 
         $data = array_map(function ($subjectAndBody) {
-            list($subject, $bodyContent) = $subjectAndBody;
+            list($subject, $bodyContent, $sentAt) = $subjectAndBody;
 
             $body = new EmailBody();
             $body->setBodyContent($bodyContent);
@@ -124,6 +129,7 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             $email = new Email();
             $email->setSubject($subject);
             $email->setEmailBody($body);
+            $email->setSentAt($sentAt);
 
             return [$email];
         }, $applicableSubjectsAndBodies);
@@ -163,6 +169,9 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             $saleCondition,
             $wonCondition,
         ]);
+        $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $createdAt->sub(\DateInterval::createFromDateString('1 day'));
+        $autoResponseRule->setCreatedAt($createdAt);
 
         return $autoResponseRule;
     }

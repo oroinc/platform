@@ -45,6 +45,8 @@ class OroEmailBundle implements Migration, OrderedMigrationInterface
         $table->addColumn('origin_id', 'integer', ['notnull' => false]);
         $table->addColumn('email', 'string', ['length' => 255]);
         $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['email'], 'UNIQ_574C364FE7927C74');
         $table->addUniqueIndex(['label'], 'UNIQ_574C364FEA750E8');
