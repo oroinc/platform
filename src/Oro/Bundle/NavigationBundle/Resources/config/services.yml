@@ -106,6 +106,7 @@ services:
             - @doctrine.orm.entity_manager
         calls:
             - [ setClassName, [ %oro_navigation.entity.pinbar_tab.class% ]]
+            - [ setNavigationItemClassName, [ %oro_navigation.entity.navigation_item.class% ]]
         tags:
             - { name: oro_navigation.item.builder, alias: pinbar }
 

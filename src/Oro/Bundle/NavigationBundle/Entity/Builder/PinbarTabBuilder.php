@@ -3,7 +3,6 @@
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
-use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 
 class PinbarTabBuilder extends AbstractBuilder
 {
@@ -20,7 +19,7 @@ class PinbarTabBuilder extends AbstractBuilder
      */
     public function buildItem($params)
     {
-        $navigationItem = new NavigationItem($params);
+        $navigationItem = new $this->navigationItemClassName($params);
         $navigationItem->setType($this->getType());
 
         $pinbarTabItem = new $this->className();
@@ -42,7 +41,7 @@ class PinbarTabBuilder extends AbstractBuilder
     }
 
     /**
-     * @param $navigationItemClassName
+     * @param string $navigationItemClassName
      *
      * @return PinbarTabBuilder
      */
