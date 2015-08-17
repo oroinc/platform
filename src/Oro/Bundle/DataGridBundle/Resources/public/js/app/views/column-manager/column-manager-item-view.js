@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         events: {
-            'change input[type=checkbox][data-role=renderable]': 'onChangeVisibility'
+            'change input[type=checkbox][data-role=renderable]': 'updateModel'
         },
 
         listen: {
@@ -24,7 +24,7 @@ define(function(require) {
             addedToParent: 'delegateEvents',
             // update view on model change
             'change:disabledVisibilityChange model': 'render',
-            'change:renderable model': 'render'
+            'change:renderable model': 'updateView'
         },
 
         /**
@@ -41,9 +41,17 @@ define(function(require) {
          *
          * @param {jQuery.Event} e
          */
-        onChangeVisibility: function(e) {
+        updateModel: function(e) {
             var renderable = $(e.target).prop('checked');
             this.model.set('renderable', renderable);
+        },
+
+        /**
+         * Handles model event and updates the view
+         */
+        updateView: function() {
+            var renderable = this.model.get('renderable');
+            this.$('input[type=checkbox][data-role=renderable]').prop('checked', renderable);
         }
     });
 
