@@ -159,7 +159,7 @@ class ExtendConfigDumper
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
-                $schemas[$className]['relationData'] = $extendConfig->get('relation');
+                $schemas[$className]['relationData'] = $extendConfig->get('relation', false, []);
             }
         }
 
