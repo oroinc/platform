@@ -79,7 +79,7 @@ class AssociationManager
 
         $relations = $this->configManager->getProvider('extend')
             ->getConfig($associationOwnerClass)
-            ->get('relation');
+            ->get('relation', false, []);
         foreach ($relations as $relation) {
             if ($this->isSupportedRelation($relation, $associationType, $associationKind)) {
                 $targetClass = $relation['target_entity'];
