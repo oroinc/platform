@@ -66,15 +66,7 @@ class ColumnsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $newGridView  = new View('__all__');
-        $currentUser  = $this->getCurrentUser();
-        $columns      = $config->offsetGet('columns');
-        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
-        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
-
-        $newGridView->setColumnsData($columns);
-        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
-
+        $currentUser = $this->getCurrentUser();
         if (!$currentUser) {
             return;
         }
@@ -86,17 +78,25 @@ class ColumnsExtension extends AbstractExtension
             return;
         }
 
-        $columns      = [];
+        $newGridView  = new View('__all__');
+        $columns      = $config->offsetGet('columns');
+        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
+        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
+
+        $newGridView->setColumnsData($columns);
+        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
+
+        $columnsData  = [];
         $currentState = $data->offsetGet('state');
 
         foreach ($gridViews as $gridView) {
             if ((int)$currentState['gridView'] === $gridView->getId()) {
-                $columns = $gridView->getColumnsData();
+                $columnsData = $gridView->getColumnsData();
             }
         }
 
-        if (count($columns) > 0) {
-            $data->offsetAddToArray('state', ['columns' => $columns]);
+        if (count($columnsData) > 0) {
+            $data->offsetAddToArray('state', ['columns' => $columnsData]);
         } else {
             $data->offsetAddToArray('state', ['columns' => $newGridView->getColumnsData()]);
         }
