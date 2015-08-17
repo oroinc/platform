@@ -5,20 +5,22 @@ namespace Oro\Bundle\EmailBundle\Builder\Helper;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
 
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -41,9 +43,9 @@ class EmailModelBuilderHelper
     protected $entityNameResolver;
 
     /**
-     * @var SecurityContext
+     * @var SecurityFacade
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * @var EmailAddressManager
@@ -69,7 +71,7 @@ class EmailModelBuilderHelper
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param EmailAddressHelper  $emailAddressHelper
      * @param EntityNameResolver  $entityNameResolver
-     * @param SecurityContext     $securityContext
+     * @param SecurityFacade      $securityFacade
      * @param EmailAddressManager $emailAddressManager
      * @param EntityManager       $entityManager
      * @param EmailCacheManager   $emailCacheManager
@@ -79,7 +81,7 @@ class EmailModelBuilderHelper
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
         EntityNameResolver $entityNameResolver,
-        SecurityContext $securityContext,
+        SecurityFacade $securityFacade,
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
@@ -88,7 +90,7 @@ class EmailModelBuilderHelper
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->emailAddressHelper  = $emailAddressHelper;
         $this->entityNameResolver  = $entityNameResolver;
-        $this->securityContext     = $securityContext;
+        $this->securityFacade      = $securityFacade;
         $this->emailAddressManager = $emailAddressManager;
         $this->entityManager       = $entityManager;
         $this->emailCacheManager   = $emailCacheManager;
@@ -167,15 +169,17 @@ class EmailModelBuilderHelper
      */
     public function getUser()
     {
-        $token = $this->securityContext->getToken();
-        if ($token) {
-            $user = $token->getUser();
-            if ($this->isFullQualifiedUser($user)) {
-                return $user;
-            }
-        }
+        return $this->securityFacade->getLoggedUser();
+    }
 
-        return null;
+    /**
+     * Get current organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**
@@ -249,6 +253,21 @@ class EmailModelBuilderHelper
     public function getTargetEntity($entityClass, $entityId)
     {
         return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
+    }
+
+    /**
+     * Returns mailboxes available to currently logged in user.
+     *
+     * @return Mailbox[]
+     */
+    public function getMailboxes()
+    {
+        $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')->findAvailableMailboxes(
+            $this->getUser(),
+            $this->getOrganization()
+        );
+
+        return $mailboxes;
     }
 
     /**

@@ -10,6 +10,7 @@ oro:
         choose_date: Choose a date
         choose_time: time
         click_here_to_select: Click here to select...
+        custom_value: Custom
         tooltip.read_more: Read more
         collection:
             add: Add

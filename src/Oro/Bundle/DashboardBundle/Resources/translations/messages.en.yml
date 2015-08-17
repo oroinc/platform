@@ -72,3 +72,11 @@ oro:
             time.label: Hour
         date_range.label: Date range
         previous_date_range.label: Compare with previous period
+        datagrid:
+            columns:
+                actions: Actions
+            actions:
+                move_column.label: Move column
+                add.label: Add
+                add_all.label: Add all
+                delete.label: Delete column

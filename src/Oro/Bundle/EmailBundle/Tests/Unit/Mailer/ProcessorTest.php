@@ -262,6 +262,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $message = new \Swift_Message();
 
+        $this->userEmailOrigin->expects($this->once())
+            ->method('isSmtpConfigured')
+            ->will($this->returnValue(true));
+
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));

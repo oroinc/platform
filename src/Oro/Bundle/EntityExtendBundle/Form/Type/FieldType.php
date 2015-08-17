@@ -192,43 +192,39 @@ class FieldType extends AbstractType
     protected function getReverseRelationTypes($className, array &$originalFieldNames)
     {
         $extendProvider = $this->configManager->getProvider('extend');
-        $entityConfig   = $extendProvider->getConfig($className);
-
         $entityProvider = $this->configManager->getProvider('entity');
 
         $result = [];
-        if ($entityConfig->is('relation')) {
-            $relations = $entityConfig->get('relation');
-            foreach ($relations as $relationKey => $relation) {
-                if (!$this->isAvailableRelation($extendProvider, $relation, $relationKey)) {
-                    continue;
-                }
-
-                /** @var FieldConfigId $fieldId */
-                $fieldId = $relation['field_id'];
-                /** @var FieldConfigId $targetFieldId */
-                $targetFieldId = $relation['target_field_id'];
-
-                $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
-                $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
-                $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
-
-                $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
-                if (strlen($fieldName) > $maxFieldNameLength) {
-                    $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
-                    $originalFieldNames[$cutFieldName] = $fieldName;
-                    $fieldName                         = $cutFieldName;
-                }
-
-                $key          = $relationKey . '||' . $fieldName;
-                $result[$key] = $this->translator->trans(
-                    self::TYPE_LABEL_PREFIX . 'inverse_relation',
-                    [
-                        '%entity_name%' => $this->translator->trans($entityLabel),
-                        '%field_name%'  => $this->translator->trans($fieldLabel)
-                    ]
-                );
+        $relations = $extendProvider->getConfig($className)->get('relation', false, []);
+        foreach ($relations as $relationKey => $relation) {
+            if (!$this->isReverseRelationAllowed($extendProvider, $className, $relation, $relationKey)) {
+                continue;
             }
+
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $relation['field_id'];
+            /** @var FieldConfigId $targetFieldId */
+            $targetFieldId = $relation['target_field_id'];
+
+            $entityLabel = $entityProvider->getConfig($targetFieldId->getClassName())->get('label');
+            $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
+            $fieldName   = $fieldId ? $fieldId->getFieldName() : '';
+
+            $maxFieldNameLength = $this->nameGenerator->getMaxCustomEntityFieldNameSize();
+            if (strlen($fieldName) > $maxFieldNameLength) {
+                $cutFieldName                      = substr($fieldName, 0, $maxFieldNameLength);
+                $originalFieldNames[$cutFieldName] = $fieldName;
+                $fieldName                         = $cutFieldName;
+            }
+
+            $key          = $relationKey . '||' . $fieldName;
+            $result[$key] = $this->translator->trans(
+                self::TYPE_LABEL_PREFIX . 'inverse_relation',
+                [
+                    '%entity_name%' => $this->translator->trans($entityLabel),
+                    '%field_name%'  => $this->translator->trans($fieldLabel)
+                ]
+            );
         }
 
         return $result;
@@ -238,55 +234,68 @@ class FieldType extends AbstractType
      * Check if reverse relation can be created
      *
      * @param ConfigProvider $extendProvider
+     * @param string         $className
      * @param array          $relation
      * @param string         $relationKey
      *
      * @return bool
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function isAvailableRelation(
+    protected function isReverseRelationAllowed(
         ConfigProvider $extendProvider,
+        $className,
         array $relation,
         $relationKey
     ) {
-        /** @var FieldConfigId|false $fieldId */
+        /** @var FieldConfigId $fieldId */
         $fieldId = $relation['field_id'];
-        /** @var FieldConfigId $targetFieldId */
-        $targetFieldId = $relation['target_field_id'];
-
-        if (!$relation['assign'] || !$targetFieldId) {
+        if (!$fieldId) {
+            /** @var FieldConfigId $targetFieldId */
+            $targetFieldId = $relation['target_field_id'];
             if (!$targetFieldId) {
                 return false;
             }
 
-            // additional check for revers relation of manyToOne field type
-            $targetEntityConfig = $extendProvider->getConfig($targetFieldId->getClassName());
-            if (false === (!$relation['assign']
-                    && !$fieldId
-                    && $targetFieldId
-                    && $targetFieldId->getFieldType() == RelationTypeBase::MANY_TO_ONE
-                    && $targetEntityConfig->get('relation')
-                    && $targetEntityConfig->get('relation')[$relationKey]['assign']
-                )
+            return !$this->hasReverseRelation($extendProvider, $className, $relationKey);
+        } else {
+            if ($extendProvider->hasConfigById($fieldId)
+                && !$extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
             ) {
                 return false;
             }
+
+            /** @var FieldConfigId $targetFieldId */
+            $targetFieldId = $relation['target_field_id'];
+            if (!$targetFieldId) {
+                return false;
+            }
+            if (!$extendProvider->hasConfig($targetFieldId->getClassName(), $targetFieldId->getFieldName())) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * @param ConfigProvider $extendProvider
+     * @param string         $className
+     * @param string         $relationKey
+     *
+     * @return bool
+     */
+    protected function hasReverseRelation(ConfigProvider $extendProvider, $className, $relationKey)
+    {
+        $fieldConfigs = $extendProvider->getConfigs($className);
+        foreach ($fieldConfigs as $fieldConfig) {
+            /** @var FieldConfigId $fieldConfigId */
+            $fieldConfigId = $fieldConfig->getId();
+            if (in_array($fieldConfigId->getFieldType(), RelationTypeBase::$anyToAnyRelations, true)
+                && $fieldConfig->is('relation_key', $relationKey)
+                && !$fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+                return true;
+            }
         }
 
-        if ($fieldId
-            && $extendProvider->hasConfigById($fieldId)
-            && $extendProvider->getConfigById($fieldId)->is('state', ExtendScope::STATE_DELETE)
-        ) {
-            return false;
-        }
-
-        if ($targetFieldId
-            && !$extendProvider->hasConfig($targetFieldId->getClassName(), $targetFieldId->getFieldName())
-        ) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }

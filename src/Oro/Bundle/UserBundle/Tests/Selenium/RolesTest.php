@@ -58,7 +58,7 @@ class RolesTest extends Selenium2TestCase
         foreach ($headers as $header) {
             /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element $header */
             $content = $header->text();
-            $this->assertArrayHasKey($content, $this->defaultRoles['header']);
+            static::assertArrayHasKey($content, $this->defaultRoles['header']);
         }
 
         $checks = 0;
@@ -73,12 +73,12 @@ class RolesTest extends Selenium2TestCase
                     $id = trim($content);
                 }
                 if (array_key_exists($id, $this->defaultRoles)) {
-                    $this->assertArrayHasKey($content, $this->defaultRoles[$id]);
+                    static::assertArrayHasKey($content, $this->defaultRoles[$id]);
                 }
             }
-            $checks = $checks + 1;
+            $checks++;
         }
-        $this->assertGreaterThanOrEqual(count($this->defaultRoles)-1, $checks);
+        static::assertGreaterThanOrEqual(count($this->defaultRoles)-1, $checks);
     }
 
     public function testRolesAdd()
@@ -99,7 +99,7 @@ class RolesTest extends Selenium2TestCase
         //verify new Role
         $roles->refresh();
 
-        $this->assertTrue($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
+        static::assertTrue($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
 
         return $randomPrefix;
     }
@@ -113,7 +113,7 @@ class RolesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle');
-        $roles->deleteEntity(array('name' => $this->newRole['LABEL'] . $randomPrefix));
-        $this->assertFalse($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
+        $roles->delete(array('name' => $this->newRole['LABEL'] . $randomPrefix));
+        static::assertFalse($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
     }
 }

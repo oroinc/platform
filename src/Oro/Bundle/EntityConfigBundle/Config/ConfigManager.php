@@ -247,8 +247,12 @@ class ConfigManager
 
             // put to a cache
             $this->cache->saveConfig($config);
-            // for calculate change set
-            $this->originalConfigs[$this->buildConfigKey($configId)] = clone $config;
+        }
+
+        // for calculate change set
+        $cacheKey = $this->buildConfigKey($configId);
+        if (!isset($this->originalConfigs[$cacheKey])) {
+            $this->originalConfigs[$cacheKey] = clone $config;
         }
 
         return $config;
