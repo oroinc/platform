@@ -40,6 +40,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setEnabled(true)
             ->addRole($role);
         $folder = new EmailFolder();
