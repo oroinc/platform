@@ -30,6 +30,8 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('required')->end()
                     ->scalarNode('template')->end()
                     ->scalarNode('data_name')->end()
+                    ->scalarNode('context_resolver')->end()
+                    ->scalarNode('method')->end()
                 ->end()
             ->end();
 
