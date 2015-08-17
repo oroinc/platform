@@ -10,6 +10,8 @@ define([
     var FavoriteComponent;
 
     FavoriteComponent = BaseBookmarkComponent.extend({
+        typeName: 'favorite',
+
         _createSubViews: function() {
             this._createButtonView();
             this._createTabView();
@@ -54,7 +56,7 @@ define([
         },
 
         actualizeAttributes: function(model) {
-            model.set('type', this.typePrefix + 'favorite');
+            model.set('type', this.typeName);
             model.set('position', this.collection.length);
 
             var url = model.get('url');

@@ -12,6 +12,8 @@ define([
     var PinComponent;
 
     PinComponent = BaseBookmarkComponent.extend({
+        typeName: 'pinbar',
+
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove',
@@ -97,7 +99,7 @@ define([
         },
 
         actualizeAttributes: function(model) {
-            model.set('type', this.typePrefix + 'pinbar');
+            model.set('type', this.typeName);
             model.set('position', 0);
         },
 

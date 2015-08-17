@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
-use Oro\Bundle\NavigationBundle\Entity\Builder\AbstractBuilder;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 
 class PinbarTabBuilder extends AbstractBuilder
 {
+    /**
+     * @var string
+     */
+    protected $navigationItemClassName;
+
     /**
      * Build navigation item
      *
@@ -19,7 +23,7 @@ class PinbarTabBuilder extends AbstractBuilder
         $navigationItem = new NavigationItem($params);
         $navigationItem->setType($this->getType());
 
-        $pinbarTabItem = new PinbarTab();
+        $pinbarTabItem = new $this->className();
         $pinbarTabItem->setItem($navigationItem);
         $pinbarTabItem->setMaximized(!empty($params['maximized']));
 
@@ -34,6 +38,18 @@ class PinbarTabBuilder extends AbstractBuilder
      */
     public function findItem($itemId)
     {
-        return $this->getEntityManager()->find('OroNavigationBundle:PinbarTab', $itemId);
+        return $this->getEntityManager()->find($this->className, $itemId);
+    }
+
+    /**
+     * @param $navigationItemClassName
+     *
+     * @return PinbarTabBuilder
+     */
+    public function setNavigationItemClassName($navigationItemClassName)
+    {
+        $this->navigationItemClassName = $navigationItemClassName;
+
+        return $this;
     }
 }
