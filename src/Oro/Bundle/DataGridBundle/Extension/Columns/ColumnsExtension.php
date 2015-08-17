@@ -146,15 +146,20 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function applyColumnsOrder(array $columns, array $columnsOrder)
     {
-        foreach ($columns as $name => &$column) {
+        $result = [];
+        foreach ($columns as $name => $column) {
             if (array_key_exists($name, $columnsOrder)) {
-                $column['order'] = $columnsOrder[$name];
+                $column['order']        = $columnsOrder[$name];
+                $result[$name]          = [];
+                $result[$name]['order'] = $columnsOrder[$name];
+
+                if (array_key_exists('renderable', $column) && true === $column['renderable']) {
+                    $result[$name]['renderable'] = $column['renderable'];
+                }
             }
         }
 
-        unset($column);
-
-        return $columns;
+        return $result;
     }
 
     /**

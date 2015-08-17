@@ -221,9 +221,9 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
-                        'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],
-                        'some'  => ['label' => 'label', 'type' => 'string', 'order' => 3]
+                        'name'  => ['order' => 2],
+                        'label' => ['order' => 1],
+                        'some'  => ['order' => 3]
                     ]
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
@@ -259,9 +259,9 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
-                        'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],
-                        'some'  => ['label' => 'label', 'type' => 'string', 'order' => 3]
+                        'name'  => ['order' => 2],
+                        'label' => ['order' => 1],
+                        'some'  => ['order' => 3]
                     ]
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
