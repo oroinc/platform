@@ -141,7 +141,7 @@ class AutoResponseManager
             $emailModel = $this->emailBuilder->createReplyEmailModel($email, true);
             $emailModel->setFrom($rule->getMailbox()->getEmail());
             $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
-            $emailModel->setContexts([$email]);
+            $emailModel->setContexts(array_merge([$email], $emailModel->getContexts()));
             $this->applyTemplate($emailModel, $rule->getTemplate(), $email);
 
             return $emailModel;

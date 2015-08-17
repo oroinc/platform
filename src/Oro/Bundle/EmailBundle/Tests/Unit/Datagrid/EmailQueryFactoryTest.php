@@ -8,7 +8,10 @@ use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailQueryFactoryTest extends OrmTestCase
 {
@@ -27,6 +30,9 @@ class EmailQueryFactoryTest extends OrmTestCase
 
     /** @var Registry */
     protected $doctrine;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /** @var MailboxRepository */
     protected $mailboxRepository;
@@ -51,10 +57,15 @@ class EmailQueryFactoryTest extends OrmTestCase
             ->with($this->equalTo('OroEmailBundle:Mailbox'))
             ->will($this->returnValue($this->mailboxRepository));
 
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->factory = new EmailQueryFactory(
             $this->providerStorage,
             $this->entityNameResolver,
-            $this->doctrine
+            $this->doctrine,
+            $this->securityFacade
         );
     }
 
@@ -116,12 +127,23 @@ class EmailQueryFactoryTest extends OrmTestCase
 
     public function testFilterQueryByUserIdWhenMailboxesAreFound()
     {
+        $user = new User();
+        $organization = new Organization();
+
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
 
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $this->securityFacade->expects($this->once())
+            ->method('getOrganization')
+            ->will($this->returnValue($organization));
+
         $this->mailboxRepository->expects($this->any())
             ->method('findAvailableMailboxIds')
-            ->with(1)
+            ->with($user, $organization)
             ->will($this->returnValue([1, 3, 5]));
 
         $qb->select('eu')
@@ -130,20 +152,32 @@ class EmailQueryFactoryTest extends OrmTestCase
         $this->factory->applyAcl($qb, 1);
 
         $this->assertEquals(
-            "SELECT eu FROM EmailUser eu WHERE eu.owner = :owner OR eu.mailboxOwner IN(1, 3, 5)",
+            "SELECT eu FROM EmailUser eu" .
+            " WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)",
             $qb->getQuery()->getDQL()
         );
     }
 
     public function testFilterQueryByUserIdWhenNoMailboxesFound()
     {
+        $user = new User();
+        $organization = new Organization();
+
         $em = $this->getTestEntityManager();
         $qb = $em->createQueryBuilder();
 
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
+
+        $this->securityFacade->expects($this->once())
+            ->method('getOrganization')
+            ->will($this->returnValue($organization));
+
         $this->mailboxRepository->expects($this->any())
             ->method('findAvailableMailboxIds')
-            ->with(1)
-            ->will($this->returnValue([]));
+            ->with($user, $organization)
+            ->will($this->returnValue([1, 3, 5]));
 
         $qb->select('eu')
             ->from('EmailUser', 'eu');
@@ -151,7 +185,8 @@ class EmailQueryFactoryTest extends OrmTestCase
         $this->factory->applyAcl($qb, 1);
 
         $this->assertEquals(
-            "SELECT eu FROM EmailUser eu WHERE eu.owner = :owner",
+            "SELECT eu FROM EmailUser eu" .
+            " WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)",
             $qb->getQuery()->getDQL()
         );
     }
