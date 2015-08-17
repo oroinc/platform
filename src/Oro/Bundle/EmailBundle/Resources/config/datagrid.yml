@@ -426,7 +426,7 @@ datagrid:
                     - { table: %oro_email.emailtemplate.entity.class%, alias: t }
                 where:
                     and:
-                        - t.visible = 1
+                        - t.visible = true
 
         columns:
             entityName:
