@@ -37,4 +37,12 @@ abstract class MailboxProcessSettings extends ExtendMailboxProcessSettings
      * @return string
      */
     abstract public function getType();
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }
