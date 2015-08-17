@@ -294,8 +294,10 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.renderDeferred) {
+                this.renderDeferred.resolve();
+                delete this.renderDeferred;
+            }
         },
 
         _initAdjustHeight: function(content) {
