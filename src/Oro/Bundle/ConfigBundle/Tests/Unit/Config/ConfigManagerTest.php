@@ -4,6 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -105,10 +107,25 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with($data)
             ->willReturn([[], []]);
-        $this->dispatcher->expects($this->once())
+        $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch');
+        $this->dispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->with(
+                ConfigSettingsUpdateEvent::BEFORE_SAVE,
+                $this->isInstanceOf('Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent')
+            );
+        $this->dispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with(
+                ConfigUpdateEvent::EVENT_NAME,
+                $this->isInstanceOf('Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent')
+            );
         $this->userScopeManager->expects($this->once())
             ->method('reload');
+        $this->userScopeManager->expects($this->once())
+            ->method('save')
+            ->with($data);
 
         $this->manager->save($data);
     }

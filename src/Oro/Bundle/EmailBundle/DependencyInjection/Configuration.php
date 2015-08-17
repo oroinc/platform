@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface
                 'append_signature' => ['value' => true],
                 'default_button_reply' => ['value' => true],
                 'use_threads_in_emails' => ['value' => true],
+                'minimum_input_length' => ['value' => 2],
             ]
         );
 

@@ -9,6 +9,9 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        autocomplete:
+            recently_used: Recently used
+            contexts: Contexts
         filter.inactive: inactive
         controller.emailtemplate.saved.message: "Template saved"
         form:
@@ -50,6 +53,11 @@ oro:
             reply_configuration:
                 label: Reply
                 default_button.label: Default Reply Button
+
+            email_autocomplete_configuration:
+                label: Autocomplete
+                minimum_input_length:
+                    label: Minumum number of characters for autocomplete
 
         emailtemplate:
             entity_label:        Template
