@@ -307,7 +307,7 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
 
         _size: function() {
             this.uiDialog.css({
-                width: this.options.width,
+                width: Math.max(this.options.width, this.options.minWidth),
                 height: this.options.height
             });
             if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
