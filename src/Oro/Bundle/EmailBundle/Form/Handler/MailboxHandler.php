@@ -22,14 +22,19 @@ class MailboxHandler implements FormAwareInterface
 
     /** @var Registry */
     protected $doctrine;
+
     /** @var FormInterface */
     protected $form;
+
     /** @var MailboxProcessStorage */
     protected $mailboxProcessStorage;
+
     /** @var Request */
     protected $request;
+
     /** @var FormFactoryInterface */
     private $formFactory;
+
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 

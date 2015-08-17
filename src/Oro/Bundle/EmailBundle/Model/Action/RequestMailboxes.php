@@ -15,12 +15,16 @@ class RequestMailboxes extends AbstractAction
 {
     /** @var string */
     protected $attribute;
+
     /** @var string */
     protected $processType;
+
     /** @var string */
     protected $email;
+
     /** @var Registry */
     private $doctrine;
+
     /** @var MailboxProcessStorage */
     private $processStorage;
 

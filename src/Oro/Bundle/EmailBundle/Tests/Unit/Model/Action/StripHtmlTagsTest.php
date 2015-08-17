@@ -10,8 +10,10 @@ class StripHtmlTagsTest extends \PHPUnit_Framework_TestCase
 {
     /** @var StripHtmlTags */
     protected $action;
+
     /** @var ContextAccessor */
     protected $contextAccessor;
+
     /** @var HtmlTagHelper */
     protected $helper;
 

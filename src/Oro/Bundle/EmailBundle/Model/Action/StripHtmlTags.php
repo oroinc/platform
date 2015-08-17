@@ -22,8 +22,10 @@ class StripHtmlTags extends AbstractAction
 {
     /** @var string */
     protected $attribute;
+
     /** @var string */
     protected $html;
+
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
