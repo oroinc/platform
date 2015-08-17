@@ -149,6 +149,14 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         $data->offsetSet('columns', $columnsDataArray);
         $data->offsetSet('state', $dataState);
         $data->offsetSet('initialState', $dataInitialState);
+        $data->offsetSet(
+            'gridViews',
+            [
+                'views' => [
+                    ['name' => '__all__', 'label' => 'label', 'columns' => []]
+                ]
+            ]
+        );
 
         $repository = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
             ->setMethods(['findGridViews'])
@@ -185,12 +193,21 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         static::assertEquals($data->offsetGet('state'), $stateResult);
 
         static::assertEquals($data->offsetGet('initialState'), $initialStateResult);
+
+        $gridViews = $data->offsetGet('gridViews');
+
+        foreach ($gridViews['views'] as $gridView) {
+            if ('__all__' === $gridView['name']) {
+                static::assertEquals($gridView['columns'], $initialStateResult['columns']);
+                break;
+            }
+        }
     }
 
     public function configDataProvider()
     {
         return [
-            'same state'      => [
+            'same state'         => [
                 'columnsConfigArray'  => [
                     'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
                     'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],

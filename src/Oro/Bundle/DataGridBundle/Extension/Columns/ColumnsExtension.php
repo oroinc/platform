@@ -78,14 +78,7 @@ class ColumnsExtension extends AbstractExtension
             return;
         }
 
-        $newGridView  = new View('__all__');
-        $columns      = $config->offsetGet('columns');
-        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
-        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
-
-        $newGridView->setColumnsData($columns);
-        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
-
+        $newGridView  = $this->createNewGridView($config, $data);
         $columnsData  = [];
         $currentState = $data->offsetGet('state');
 
@@ -95,11 +88,60 @@ class ColumnsExtension extends AbstractExtension
             }
         }
 
+        $this->setState($data, $columnsData, $newGridView);
+        $this->setGridViewDefaultOrder($data, $newGridView);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject        $data
+     *
+     * @return View
+     */
+    protected function createNewGridView(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $newGridView  = new View('__all__');
+        $columns      = $config->offsetGet('columns');
+        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
+        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
+
+        $newGridView->setColumnsData($columns);
+        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
+
+        return $newGridView;
+    }
+
+    /**
+     * @param MetadataObject $data
+     * @param array          $columnsData
+     * @param View           $newGridView
+     */
+    protected function setState(MetadataObject $data, array $columnsData, View $newGridView)
+    {
         if (count($columnsData) > 0) {
             $data->offsetAddToArray('state', ['columns' => $columnsData]);
         } else {
             $data->offsetAddToArray('state', ['columns' => $newGridView->getColumnsData()]);
         }
+    }
+
+    /**
+     * @param MetadataObject $data
+     * @param View           $newGridView
+     */
+    protected function setGridViewDefaultOrder(MetadataObject $data, View $newGridView)
+    {
+        $gridViews = $data->offsetGet('gridViews');
+
+        foreach ($gridViews['views'] as &$gridView) {
+            if ('__all__' === $gridView['name']) {
+                $gridView['columns'] = $newGridView->getColumnsData();
+            }
+        }
+
+        unset($gridView);
+
+        $data->offsetSet('gridViews', $gridViews);
     }
 
     /**
