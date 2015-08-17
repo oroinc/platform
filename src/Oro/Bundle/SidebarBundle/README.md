@@ -49,7 +49,7 @@ Example:
 
 ```yml
 title:     "Task list"
-iconClass: "icon-list-alt"
+iconClass: "icon-tasks"
 module:    "orocrm/sidebar/widget/assigned_tasks"
 placement: "both"
 cssClass:  "sidebar-widget-assigned-tasks"

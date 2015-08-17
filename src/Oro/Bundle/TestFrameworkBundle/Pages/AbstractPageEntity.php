@@ -8,8 +8,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPageFilteredGrid
+abstract class AbstractPageEntity extends AbstractPage
 {
+    use FilteredGridTrait;
+
     /** @var string */
     protected $owner;
 
@@ -274,7 +276,8 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
         $this->filterBy($filterName, $entityName);
         $this->assertElementPresent(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
-            "//preceding-sibling::td/input"
+            "//preceding-sibling::td/input",
+            "{$entityName} is not found in embedded grid"
         );
         $this->test->byXPath(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".

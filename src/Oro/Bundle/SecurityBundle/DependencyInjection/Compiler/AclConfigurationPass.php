@@ -32,7 +32,7 @@ class AclConfigurationPass implements CompilerPassInterface
     const DOCTRINE_CONVERTER_CLASS = 'Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter';
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
 
-    const OWNERSHIP_CONFIG_PROVIDER = 'oro_entity_config.provider.ownership';
+    const ENTITY_OWNER_ACCESSOR = 'oro_security.owner.entity_owner_accessor';
     const ACL_GROUP_PROVIDER_CHAIN_PROVIDER = 'oro_security.acl.group_provider.chain';
 
     /**
@@ -141,10 +141,10 @@ class AclConfigurationPass implements CompilerPassInterface
                     );
                 }
 
-                //set owner config provider in voter
+                //set entity owner accessor in voter
                 $voterDef->addMethodCall(
-                    'setConfigProvider',
-                    array(new Reference(self::OWNERSHIP_CONFIG_PROVIDER))
+                    'setEntityOwnerAccessor',
+                    array(new Reference(self::ENTITY_OWNER_ACCESSOR))
                 );
 
                 if ($container->hasDefinition(self::ACL_GROUP_PROVIDER_CHAIN_PROVIDER)) {
