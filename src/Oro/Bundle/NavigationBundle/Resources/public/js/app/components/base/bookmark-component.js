@@ -16,7 +16,7 @@ define([
          */
         _options: {},
 
-        typePrefix: '',
+        typeName: null,
 
         listen: {
             'toAdd collection': 'toAdd',
@@ -40,9 +40,9 @@ define([
                 this.collection.model.prototype.route = route;
             }
 
-            var typePrefix = $button.data('type-prefix');
-            if (!_.isEmpty(typePrefix)) {
-                this.typePrefix = typePrefix;
+            var typeName = $button.data('type-name');
+            if (!_.isEmpty(typeName)) {
+                this.typeName = typeName;
             }
 
             this.collection.reset(data);

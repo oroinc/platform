@@ -29,22 +29,4 @@ class NavigationHistoryItem extends AbstractNavigationHistoryItem
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $user;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUser(AbstractUser $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
 }

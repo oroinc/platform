@@ -40,6 +40,7 @@ class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildItem()
     {
         $itemBuilder = $this->builder;
+        $itemBuilder->setClassName('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
 
         //$user = $this->securityContext->getToken()->getUser();
         $user = $this->getMock('\Oro\Bundle\UserBundle\Entity\User');
@@ -61,12 +62,13 @@ class HistoryItemBuilderTest extends \PHPUnit_Framework_TestCase
     public function testFindItem()
     {
         $itemBuilder = $this->builder;
+        $itemBuilder->setClassName('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
 
         $itemId = 1;
         $this->em
             ->expects($this->once())
             ->method('find')
-            ->with($this->equalTo('OroNavigationBundle:NavigationHistoryItem'), $this->equalTo($itemId))
+            ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'), $this->equalTo($itemId))
             ->will($this->returnValue(new NavigationHistoryItem()));
 
         $item = $itemBuilder->findItem($itemId);

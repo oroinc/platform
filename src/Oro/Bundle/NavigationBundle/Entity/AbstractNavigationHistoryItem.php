@@ -83,6 +83,11 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
     protected $entityId;
 
     /**
+     * @var AbstractUser $user
+     */
+    protected $user;
+
+    /**
      * Constructor
      * @param array $values
      */
@@ -265,14 +270,22 @@ abstract class AbstractNavigationHistoryItem implements NavigationItemInterface
      * @param  AbstractUser $user
      * @return NavigationHistoryItem
      */
-    abstract public function setUser(AbstractUser $user = null);
+    public function setUser(AbstractUser $user = null)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 
     /**
      * Get user
      *
      * @return AbstractUser
      */
-    abstract public function getUser();
+    public function getUser()
+    {
+        return $this->user;
+    }
 
     /**
      * Set entity properties

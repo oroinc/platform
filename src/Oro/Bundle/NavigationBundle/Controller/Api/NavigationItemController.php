@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -213,13 +214,18 @@ class NavigationItemController extends FOSRestController
      */
     protected function getStateUrl($url)
     {
-        $state = $this
-            ->getDoctrine()
-            ->getRepository('OroNavigationBundle:PageState')
-            ->findOneByPageId(base64_encode($url));
+        $state = $this->getPageStateRepository()->findOneByPageId(base64_encode($url));
 
         return is_null($state)
             ? $url
             : $url . (strpos($url, '?') ? '&restore=1' : '?restore=1');
+    }
+
+    /**
+     * @return ObjectRepository
+     */
+    protected function getPageStateRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroNavigationBundle:PageState');
     }
 }

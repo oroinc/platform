@@ -30,22 +30,4 @@ class NavigationItem extends AbstractNavigationItem
      * @ORM\Column(name="type", type="string", length=10, nullable=false)
      */
     protected $type;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUser(AbstractUser $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
 }
