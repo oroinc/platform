@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class Report
  *
  * @package Oro\Bundle\ReportBundle\Tests\Selenium\Pages
- * @method Reports openReports() openReports(string)
- * @method Report openReport() openReport(string)
+ * @method Reports openReports(string $bundlePath)
+ * @method Report openReport(string $bundlePath)
  */
 class Report extends AbstractPageEntity
 {

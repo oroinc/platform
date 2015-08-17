@@ -8,10 +8,10 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Users
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method Users openUsers() openUsers(string)
- * @method User open() open()
- * @method User add() add()
- * @method Users changePage() changePage(integer)
+ * @method Users openUsers(string $bundlePath)
+ * @method User open(array $filter)
+ * @method User add()
+ * @method Users changePage(integer $page)
  * {@inheritdoc}
  */
 class Users extends AbstractPageFilteredGrid

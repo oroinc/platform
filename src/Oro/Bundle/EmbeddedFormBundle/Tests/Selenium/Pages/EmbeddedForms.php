@@ -7,9 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
 /**
  * Class EmbeddedForms
  * @package Oro\Bundle\EmbeddedFormBundle\Tests\Selenium\Pages
- * @method EmbeddedForms openEmbeddedForms openEmbeddedForms(string)
- * @method EmbeddedForm add add()
- * @method EmbeddedForm open open()
+ * @method EmbeddedForms openEmbeddedForms(string $bundlePath)
+ * @method EmbeddedForm add()
+ * @method EmbeddedForm open(array $filter)
  * {@inheritdoc}
  */
 class EmbeddedForms extends AbstractPageFilteredGrid

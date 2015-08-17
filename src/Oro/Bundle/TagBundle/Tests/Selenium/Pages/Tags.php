@@ -8,9 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Tags
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
- * @method Tags openTags() openTags(string)
- * @method Tag open() open()
- * @method Tag add() add()
+ * @method Tags openTags(string $bundlePath)
+ * @method Tag open(array $filter)
+ * @method Tag add()
  * {@inheritdoc}
  */
 class Tags extends AbstractPageFilteredGrid
@@ -40,18 +40,6 @@ class Tags extends AbstractPageFilteredGrid
         $this->waitForAjax();
 
         return new Tag($this->test);
-    }
-
-    public function delete()
-    {
-        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($menu);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
     }
 
     public function checkContextMenu($tagName, $contextName)

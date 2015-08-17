@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Dashboard Management
  *
  * @package Oro\Bundle\DashboardBundle\Tests\Selenium\Pages
- * @method Dashboards openDashboards() openDashboards(string)
+ * @method Dashboards openDashboards(string $bundlePath)
  * @method Dashboard add() add()
  * {@inheritdoc}
  */
