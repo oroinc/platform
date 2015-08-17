@@ -15,29 +15,25 @@
         }
     } %}
     <div class="condition-builder left-panel-container">
-        <div class="panel-placeholder">
-            <div>
-                <div class="row-fluid">
-                    <div class="span3 filter-criteria">
-                        <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
-                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
-                            <li class="option" data-criteria="condition-item"
-                                data-module="oroquerydesigner/js/field-condition"
-                                data-widget="fieldCondition"
-                                data-options="{{ fieldConditionOptions|json_encode }}">
-                                {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
-                            </li>
-                            <li class="option" data-criteria="conditions-group">
-                                {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="span9">
-                        <div class="condition-builder" id="{{ params.id }}"
-                             data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
-                             data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
-                    </div>
-                </div>
+        <div class="row-fluid">
+            <div class="left-area filter-criteria">
+                <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+                <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                    <li class="option" data-criteria="condition-item"
+                        data-module="oroquerydesigner/js/field-condition"
+                        data-widget="fieldCondition"
+                        data-options="{{ fieldConditionOptions|json_encode }}">
+                        {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
+                    </li>
+                    <li class="option" data-criteria="conditions-group">
+                        {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
+                    </li>
+                </ul>
+            </div>
+            <div class="right-area">
+                <div id="{{ params.id }}"
+                     data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
+                     data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
             </div>
         </div>
     </div>

@@ -280,7 +280,6 @@ define(function(require) {
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             DialogWidget.__super__.show.apply(this);
-            this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
             this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
@@ -295,8 +294,10 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.renderDeferred) {
+                this.renderDeferred.resolve();
+                delete this.renderDeferred;
+            }
         },
 
         _initAdjustHeight: function(content) {
@@ -323,20 +324,10 @@ define(function(require) {
             }
         },
 
-        _fixBorderShifting: function() {
-            var dialogWidget = this.widget.dialog('widget');
-            var widthShift = parseInt(dialogWidget.css('border-left-width')) +
-                parseInt(dialogWidget.css('border-right-width'));
-            var heightShift = parseInt(dialogWidget.css('border-top-width')) +
-                parseInt(dialogWidget.css('border-bottom-width'));
-            this.widget.width(this.widget.width() - widthShift);
-            this.widget.height(this.widget.height() - heightShift);
-            this._fixScrollableHeight();
-        },
-
         _fixScrollableHeight: function() {
             var widget = this.widget;
             if (!tools.isMobile()) {
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
                 widget.find('.scrollable-container').each(_.bind(function(i, el) {
                     var $el = $(el);
                     var height = widget.height() - $el.position().top;
@@ -431,7 +422,6 @@ define(function(require) {
 
         onResizeStop: function(event) {
             this.$el.css({overflow: ''});
-            this._fixBorderShifting();
             this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
             });

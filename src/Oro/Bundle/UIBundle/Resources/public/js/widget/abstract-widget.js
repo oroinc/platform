@@ -620,6 +620,7 @@ define(function(require) {
          * Render widget
          */
         render: function() {
+            this.renderDeferred = $.Deferred();
             var loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
@@ -751,7 +752,6 @@ define(function(require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
-            this.renderDeferred = $.Deferred();
             this.initLayout()
                 .done(_.bind(function() {
                     if (this.disposed) {
@@ -763,8 +763,10 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.renderDeferred) {
+                this.renderDeferred.resolve();
+                delete this.renderDeferred;
+            }
         },
 
         /**

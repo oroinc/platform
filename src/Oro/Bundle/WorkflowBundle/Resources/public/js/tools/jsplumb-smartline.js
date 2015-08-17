@@ -221,7 +221,7 @@ define(function(require) {
             var correction;
             var ENDPOINT_SPACE_TO_LINE = 4;
 
-            // adjust source anf target points
+            // adjust source and target points
             sourcePoint.y += getAdjustment(params.sourceEndpoint.element, sourcePoint, 'bottom');
             targetPoint.y -= getAdjustment(params.targetEndpoint.element, targetPoint, 'top');
 
@@ -321,7 +321,6 @@ define(function(require) {
         };
 
         this._flowchartConnectorCompute = function(paintInfo, params) {
-
             if (params.clearEdits) {
                 userSuppliedSegments = null;
             }

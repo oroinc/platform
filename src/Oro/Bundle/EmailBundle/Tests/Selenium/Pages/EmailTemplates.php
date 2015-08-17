@@ -8,65 +8,24 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class EmailTemplates
  *
  * @package Oro\Bundle\EmailBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates openEmailTemplates() openEmailTemplates()
- * @method \Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates assertTitle() assertTitle($title, $message = '')
+ * @method EmailTemplates openEmailTemplates(string $bundlePath)
+ * @method EmailTemplates assertTitle($title, $message = '')
+ * @method EmailTemplate add()
+ * @method EmailTemplate open(array $filter)
  */
 class EmailTemplates extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Template']";
     const URL = 'email/emailtemplate';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
-     * @return EmailTemplate
-     */
-    public function add()
-    {
-        $this->test->byXPath("//a[@title='Create Template']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new EmailTemplate($this->test);
     }
 
-    /**
-     * @param array $entityData
-     * @return EmailTemplate
-     */
-    public function open($entityData = array())
+    public function entityView()
     {
-        $emailTemplate = $this->getEntity($entityData);
-        $emailTemplate->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         return new EmailTemplate($this->test);
-    }
-
-    /**
-     * @param $filterBy
-     * @param $entityName
-     * @return $this
-     */
-    public function delete($filterBy, $entityName)
-    {
-        $this->filterBy($filterBy, $entityName);
-        $this->waitForAjax();
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($action);
-
-        $this->waitForAjax();
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
     }
 
     public function cloneEntity($filterBy, $entityName)
