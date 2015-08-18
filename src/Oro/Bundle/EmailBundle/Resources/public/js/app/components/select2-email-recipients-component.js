@@ -36,6 +36,8 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
 
         preConfig: function() {
             var config = Select2EmailRecipientsComponent.__super__.preConfig.apply(this, arguments);
+            var emptyData = {id: '', text: ''};
+            var searchChoice = {data: emptyData};
 
             var self = this;
             config.ajax.results = function(data) {
@@ -63,7 +65,8 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                     };
                 });
 
-                self.$el.on('change', function(e) {
+                self.$el.one('change', function(e) {
+                    searchChoice.data = _.clone(emptyData);
                     var data = self.$contextEl.select2('data');
 
                     if (e.added) {
@@ -98,6 +101,43 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
                 return params;
             };
 
+            config.createSearchChoice = function(term, data) {
+                if (!dataHasText(data, term)) {
+                    searchChoice.data = _.clone(emptyData);
+                    searchChoice.data.id = term;
+                    searchChoice.data.text = term;
+
+                    return searchChoice.data;
+                }
+            };
+
+            this.$el.on('select2-init', function() {
+                var select2 = $(this).data('select2');
+
+                select2.search.on('keyup', function() {
+                    var val = $(this).val();
+                    if (!val) {
+                        return;
+                    }
+
+                    searchChoice.data.text = val;
+                    searchChoice.data.id = val;
+                });
+
+                var originalSelectHighlighted = select2.selectHighlighted;
+                select2.selectHighlighted = function() {
+                    if (!this.results.find('.select2-highlighted').length) {
+                        var val = this.search.val();
+                        this.onSelect({
+                            id: val,
+                            text: val
+                        });
+                    }
+
+                    originalSelectHighlighted.apply(this, arguments);
+                };
+            });
+
             return config;
         },
 
@@ -130,6 +170,16 @@ define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2
             });
         }
     });
+
+    function dataHasText(data, text) {
+        return _.some(data, function(row) {
+            if (!row.hasOwnProperty('children')) {
+                return row.text.localeCompare(text) === 0;
+            }
+
+            return dataHasText(row.children, text);
+        });
+    }
 
     return Select2EmailRecipientsComponent;
 });
