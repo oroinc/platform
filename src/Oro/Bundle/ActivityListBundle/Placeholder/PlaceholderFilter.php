@@ -51,11 +51,11 @@ class PlaceholderFilter
      */
     public function isApplicable($entity = null, $pageType = null)
     {
-        if ($pageType === null || !is_object($entity) || $this->doctrineHelper->isNewEntity($entity) === true) {
+        if ($pageType === null || !is_object($entity) || $this->doctrineHelper->isNewEntity($entity)) {
             return false;
         }
 
-        $pageType         = intval($pageType);
+        $pageType         = (int) $pageType;
         $id               = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         $entityClass      = $this->doctrineHelper->getEntityClass($entity);
         $activityListRepo = $this->doctrine->getRepository('OroActivityListBundle:ActivityList');
@@ -78,27 +78,18 @@ class PlaceholderFilter
         }
 
         $config = $this->configProvider->getConfig($entity);
-
         if (!$config->has(ActivityScope::SHOW_ON_PAGE)) {
             return false;
         }
 
         $configValue = $config->get(ActivityScope::SHOW_ON_PAGE);
-
-        $configValueIsConst = defined($configValue);
-        $configValueIsInt   = strval(intval($configValue)) == $configValue;
-
-        if (!$configValueIsInt && !$configValueIsConst) {
+        if (!defined($configValue)) {
             throw new \InvalidArgumentException(sprintf('Constant %s is not defined', $configValue));
         }
 
-        if ($configValueIsConst) {
-            $configValue = constant($configValue);
-        } else {
-            $configValue = intval($configValue);
-        }
+        $configValue = constant($configValue);
 
-        return $configValue != ActivityScope::NONE_PAGE && ($configValue & $pageType) === $pageType;
+        return $configValue !== ActivityScope::NONE_PAGE && ($configValue & $pageType) === $pageType;
     }
 
     /**
