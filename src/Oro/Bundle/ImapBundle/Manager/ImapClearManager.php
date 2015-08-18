@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -98,31 +99,23 @@ class ImapClearManager implements LoggerAwareInterface
 
         foreach ($folders as $folder) {
             $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
-
             if (!$origin->isActive()) {
-                $this->removeFolder($imapFolder);
+                $this->clearFolder($imapFolder);
+                $this->em->remove($imapFolder);
             } elseif (!$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
         }
+        foreach ($folders as $folder) {
+            if (!$origin->isActive()) {
+                $this->em->remove($folder);
+            }
+        }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
-            $this->em->flush();
         }
-    }
-
-    /**
-     * @param ImapEmailFolder $imapFolder
-     */
-    protected function removeFolder(ImapEmailFolder $imapFolder)
-    {
-        $this->clearFolder($imapFolder);
-
-        $folder = $imapFolder->getFolder();
-        $this->em->remove($imapFolder);
-        $this->em->remove($folder);
 
         $this->em->flush();
     }
