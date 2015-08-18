@@ -144,15 +144,19 @@ define(function(require) {
         styleForm: function($container) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
+                var notUniformFilter = function(i, el) {
+                    return $(el).parent('.selector, .uploader').length === 0;
+                };
+
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.no-uniform,.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
                 }
 
                 // bind uniform plugin to input:file elements
-                $elements = $container.find('input:file');
+                $elements = $container.find('input:file').filter(notUniformFilter);
                 $elements.uniform({
                     fileDefaultHtml: __('Please select a file...'),
                     fileButtonHtml: __('Choose File')
@@ -161,6 +165,8 @@ define(function(require) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }
             }
+
+            $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
         /**

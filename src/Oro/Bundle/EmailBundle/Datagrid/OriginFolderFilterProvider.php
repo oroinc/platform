@@ -54,7 +54,7 @@ class OriginFolderFilterProvider
         foreach ($origins as $origin) {
             $folders = $origin->getFolders();
             $mailbox = $origin->getMailboxName();
-            if (count($folders)>0) {
+            if (count($folders) > 0) {
                 $results[$mailbox]= [];
                 $results[$mailbox]['active'] = $origin->isActive();
                 foreach ($folders as $folder) {

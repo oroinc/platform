@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
@@ -107,7 +108,15 @@ class EmailNotificationManager
         if ($email->getFromEmailAddress() && $email->getFromEmailAddress()->getOwner()) {
             $className = $email->getFromEmailAddress()->getOwner()->getClass();
             $routeName = $this->configManager->getEntityMetadata($className)->getRoute('view', false);
-            $path = $this->router->generate($routeName, ['id' => $email->getFromEmailAddress()->getOwner()->getId()]);
+            $path = null;
+            try {
+                $path = $this->router->generate(
+                    $routeName,
+                    ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
+                );
+            } catch (RouteNotFoundException $e) {
+                return false;
+            }
         }
 
         return $path;

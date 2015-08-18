@@ -182,7 +182,8 @@ class ImapEmailManager
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
                 ->setMessageId($this->getMessageId($headers, 'Message-ID'))
-                ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'));
+                ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
+                ->setAcceptLanguageHeader($this->getString($headers, 'Accept-Language'));
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);

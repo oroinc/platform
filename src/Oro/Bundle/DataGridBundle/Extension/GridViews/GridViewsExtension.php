@@ -18,6 +18,7 @@ class GridViewsExtension extends AbstractExtension
     const VIEWS_LIST_KEY           = 'views_list';
     const VIEWS_PARAM_KEY          = 'view';
     const MINIFIED_VIEWS_PARAM_KEY = 'v';
+    const DEFAULT_VIEW_ID = '__all__';
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
@@ -57,8 +58,8 @@ class GridViewsExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $params      = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
-        $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : null;
-        $data->offsetAddToArray('initialState', ['gridView' => '__all__']);
+        $currentView = isset($params[self::VIEWS_PARAM_KEY]) ? $params[self::VIEWS_PARAM_KEY] : self::DEFAULT_VIEW_ID;
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
         $data->offsetAddToArray('state', ['gridView' => $currentView]);
 
         $allLabel = null;
@@ -75,11 +76,11 @@ class GridViewsExtension extends AbstractExtension
             'choices' => [
                 [
                     'label' => $allLabel,
-                    'value' => '__all__',
+                    'value' => self::DEFAULT_VIEW_ID,
                 ],
             ],
             'views' => [
-                (new View('__all__'))->getMetadata(),
+                (new View(self::DEFAULT_VIEW_ID))->getMetadata(),
             ],
         ];
         if ($list !== false) {
