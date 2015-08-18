@@ -151,8 +151,8 @@ class ExtendConfigDumper
 
     public function dump()
     {
-        $schemas        = [];
-        $extendConfigs  = $this->configProvider->getConfigs(null, true);
+        $schemas       = [];
+        $extendConfigs = $this->configProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
@@ -175,6 +175,57 @@ class ExtendConfigDumper
                 $this->entityGenerator->setCacheDir($cacheDir);
                 throw $e;
             }
+        }
+    }
+
+    /**
+     * Makes sure that extended entity configs are ready to be processing by other config related commands
+     */
+    public function checkConfig()
+    {
+        $hasAliases = file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+        if ($hasAliases) {
+            return;
+        }
+
+        $hasChanges    = false;
+        $extendConfigs = $this->configProvider->getConfigs(null, true);
+        foreach ($extendConfigs as $extendConfig) {
+            $schema = $extendConfig->get('schema', false, []);
+
+            // make sure that inheritance definition for extended entities is up-to-date
+            // this check is required to avoid doctrine mapping exceptions during the platform update
+            // in case if a parent class is changed in a new version of a code
+            if (!$hasAliases
+                && isset($schema['type'], $schema['class'], $schema['entity'])
+                && $schema['type'] === 'Extend'
+            ) {
+                $entityClassName = $schema['entity'];
+                $parentClassName = get_parent_class($schema['class']);
+                if ($parentClassName !== $entityClassName) {
+                    $inheritClassName = get_parent_class($parentClassName);
+
+                    $hasSchemaChanges = false;
+                    if (!isset($schema['parent']) || $schema['parent'] !== $parentClassName) {
+                        $hasSchemaChanges = true;
+                        $schema['parent'] = $parentClassName;
+                    }
+                    if (!isset($schema['inherit']) || $schema['inherit'] !== $inheritClassName) {
+                        $hasSchemaChanges  = true;
+                        $schema['inherit'] = $inheritClassName;
+                    }
+
+                    if ($hasSchemaChanges) {
+                        $hasChanges = true;
+                        $extendConfig->set('schema', $schema);
+                        $this->configProvider->persist($extendConfig);
+                    }
+                }
+            }
+        }
+
+        if ($hasChanges) {
+            $this->configProvider->flush();
         }
     }
 
@@ -249,7 +300,7 @@ class ExtendConfigDumper
             $fieldType     = $fieldConfigId->getFieldType();
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
+            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
                 $relationProperties[$fieldName] = $fieldName;
                 if ($underlyingFieldType !== RelationType::MANY_TO_ONE && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldName;
