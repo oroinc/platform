@@ -196,10 +196,7 @@ class ExtendConfigDumper
             // make sure that inheritance definition for extended entities is up-to-date
             // this check is required to avoid doctrine mapping exceptions during the platform update
             // in case if a parent class is changed in a new version of a code
-            if (!$hasAliases
-                && isset($schema['type'], $schema['class'], $schema['entity'])
-                && $schema['type'] === 'Extend'
-            ) {
+            if (isset($schema['type'], $schema['class'], $schema['entity']) && $schema['type'] === 'Extend') {
                 $entityClassName = $schema['entity'];
                 $parentClassName = get_parent_class($schema['class']);
                 if ($parentClassName !== $entityClassName) {
