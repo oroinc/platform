@@ -77,11 +77,9 @@ class DirectMailer extends \Swift_Mailer
                 $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
             }
 
-            if ($transport) {
-                $transport->setUsername($username);
-                $transport->setPassword($password);
-                $this->smtpTransport = $transport;
-            }
+            $transport->setUsername($username);
+            $transport->setPassword($password);
+            $this->smtpTransport = $transport;
         }
     }
 
