@@ -125,14 +125,10 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
-
-        $q = $this->em->createQueryBuilder()
-            ->select('eu')
-            ->from('OroEmailBundle:EmailUser', 'eu')
-            ->andWhere('eu.folder = :folder')
-            ->setParameter('folder', $folder)
+        $query = $this->em->getRepository('OroEmailBundle:EmailUser')
+            ->getEmailUserByFolder($folder)
             ->getQuery();
-        $iterableResult = $q->iterate();
+        $iterableResult = $query->iterate();
 
         $i = 0;
         while (($row = $iterableResult->next()) !== false) {
