@@ -47,7 +47,7 @@ class ImapEmailFolderRepository extends EntityRepository
 
         if ($syncEnabled !== EmailFolder::SYNC_ENABLED_IGNORE) {
             $qb->andWhere('folder.syncEnabled = :syncEnabled')
-            ->setParameter('syncEnabled', (bool)$syncEnabled);
+                ->setParameter('syncEnabled', (bool)$syncEnabled);
         }
 
         return $qb->getQuery()->getResult();
