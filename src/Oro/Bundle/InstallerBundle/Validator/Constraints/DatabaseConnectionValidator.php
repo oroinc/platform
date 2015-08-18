@@ -24,12 +24,10 @@ class DatabaseConnectionValidator extends ConstraintValidator
 
         try {
             DriverManager::getConnection($params)->connect();
-        } catch (\Exception $e) {
-            if (($e instanceof DBALException) || ($e instanceof \PDOException)) {
-                $this->context->addViolation($constraint->message, array('%name%' => $params['dbname']));
-            } else {
-                throw $e;
-            }
+        } catch (\PDOException $e) {
+            $this->context->addViolation($constraint->message, array('%name%' => $params['dbname']));
+        } catch (DBALException $e) {
+            $this->context->addViolation($constraint->message, array('%name%' => $params['dbname']));
         }
     }
 }
