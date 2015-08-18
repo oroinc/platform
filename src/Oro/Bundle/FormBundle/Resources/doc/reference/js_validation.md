@@ -121,7 +121,7 @@ After that, validation for sub-entinty works only if some of fields is not blank
 | Size         |    √    |  √  |                               |         |
 | Time         |    √    |     |                               |         |
 | True         |    √    |     |                               |   (2)   |
-| Type         |    √    |     |                               |   (2)   |
+| Type         |    √    |     | oroform/js/validator/type     |   (4)   |
 | UniqueEntity |    √    |     |                               |         |
 | Url          |    √    |     | oroform/js/validator/url      |         |
 +--------------+---------+-----+-------------------------------+---------+
@@ -130,3 +130,4 @@ After that, validation for sub-entinty works only if some of fields is not blank
  1. supports only group of checkboxes with same name (like `user[role][]`)
  2. can't be supported on client side
  3. alias for `required` validator (standard jQuery.validate)
+ 4. supports only integer type

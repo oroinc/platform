@@ -971,7 +971,7 @@ class User extends ExtendUser implements
             (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration)
         ) {
             // deactivate current IMAP configuration and remove a reference to it
-            $currentImapConfiguration->setIsActive(false);
+            $currentImapConfiguration->setActive(false);
             $this->removeEmailOrigin($currentImapConfiguration);
         }
         if (null !== $imapConfiguration) {
@@ -993,6 +993,7 @@ class User extends ExtendUser implements
                 return
                     $item instanceof UserEmailOrigin
                     && $item->isActive()
+                    && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );

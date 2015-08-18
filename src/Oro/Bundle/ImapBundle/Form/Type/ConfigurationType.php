@@ -123,11 +123,13 @@ class ConfigurationType extends AbstractType
             ->add('password', 'password', [
                 'label' => 'oro.imap.configuration.password.label', 'required' => true,
                 'attr' => ['class' => 'check-connection']
-            ])
-            ->add('check_connection', new CheckButtonType(), [
+            ]);
+        if ($options['add_check_button']) {
+            $builder->add('check_connection', new CheckButtonType(), [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
-            ])
-            ->add('folders', 'oro_email_email_folder_tree', [
+            ]);
+        }
+        $builder->add('folders', 'oro_email_email_folder_tree', [
                 'label'   => $this->translator->trans('oro.email.folders.label'),
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
@@ -163,6 +165,10 @@ class ConfigurationType extends AbstractType
             function (FormEvent $event) {
                 $data = $event->getData();
                 $form = $event->getForm();
+
+                if ($data === null) {
+                    return;
+                }
 
                 if (array_key_exists('folders', $data)) {
                     /** @var UserEmailOrigin $origin */
@@ -387,6 +393,7 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'add_check_button'  => true,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 

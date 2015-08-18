@@ -8,12 +8,12 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  * Class Configuration
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method LanguageSettings openLanguageSettings() openLanguageSettings(string $bundlePath,  boolean $directLoad)
+ * @method LanguageSettings openLanguageSettings(string $bundlePath,  boolean $directLoad)
  * {@inheritdoc}
  */
 class LanguageSettings extends AbstractPage
 {
-    protected $redirectUrl = '/config/system/platform/language_settings';
+    const URL = '/config/system/platform/language_settings';
 
     /**
      * @param $language string

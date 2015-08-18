@@ -1,5 +1,105 @@
 @import "../../../oroui/css/less/mixins";
 
+.auto-response-rules {
+  .select-all-header-cell .all-visible {
+    display: none;
+  }
+}
+
+.auto-response-rule-header {
+  height: 28px;
+  line-height: 28px;
+
+  h5 {
+    display: inline-block;
+    margin: 0;
+  }
+}
+
+.ui-dialog [data-ftid=oro_email_autoresponserule] .form-horizontal .control-group .controls {
+  input[type=text] {
+    width: 456px;
+  }
+
+  select {
+    width: 458px;
+    max-width: 458px;
+  }
+
+  .select2-container {
+    width: 468px;
+    max-width: 468px;
+  }
+
+  .create-select-entity-choice-container {
+    margin-left: -142px;
+
+    label {
+       width: 130px;
+    }
+
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:last-of-type {
+      text-align: right;
+
+      label {
+        width: auto;
+        margin-right: 6px;
+        float: none;
+        display: inline-block;
+      }
+
+      input {
+        margin-top: 0;
+      }
+
+      .controls {
+        margin: 0;
+        display: inline-block;
+      }
+    }
+  }
+
+  .emailtemplate-translatation {
+    .control-label {
+      width: 70px;
+    }
+
+    .controls {
+      margin-left: 85px;
+    }
+
+    .tab-content {
+      margin-left: -85px;
+      border-top: 1px solid #ddd;
+      margin-top: -1px;
+    }
+
+    .mce-tinymce {
+      width: 468px;
+    }
+  }
+
+  [data-ftid=oro_email_autoresponserule_conditions] {
+    .selector {
+      margin: 0 5px 0 0;
+    }
+
+    select {
+      width: 85px;
+
+      &.type {
+        width: 105px;
+      }
+    }
+
+    input {
+      width: 190px;
+    }
+  }
+}
+
+
+
 .emailtemplate-translatation {
   .tab-content {
     padding: 20px 16px 10px 0;
@@ -78,6 +178,9 @@
 .ui-dialog {
   .email-form {
     padding-bottom: 14px;
+    .select2-container-disabled .select2-arrow {
+      display: none;
+    }
     .mce-tinymce {
       width: calc(~"97% + 12px");
     }

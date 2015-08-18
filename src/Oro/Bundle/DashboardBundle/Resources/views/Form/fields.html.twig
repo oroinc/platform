@@ -31,7 +31,8 @@
                     dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
-                    $('div.widget-configuration').parent().css('overflow', 'inherit');
+                    $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
+                    $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
                 });
             }
         )
@@ -63,3 +64,56 @@
         })
     </script>
 {% endblock oro_type_widget_title_widget %}
+
+{% block oro_type_widget_items_row %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set rowId = form.vars.id ~ 'Row' %}
+
+    <div id="{{ rowId }}" class="dashboard-widget-items">
+        <div class="control-group">
+            <label class="control-label">{{ label|trans }}</label>
+            <div class="controls">
+                <div class="">
+                    {{ UI.clientButton({
+                        'aCss': 'no-hash add-button',
+                        'label': 'oro.dashboard.datagrid.actions.add.label'|trans
+                    }) }}
+                    {{ UI.clientButton({
+                        'aCss': 'no-hash btn-primary add-all-button',
+                        'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
+                    }) }}
+                </div>
+            </div>
+        </div>
+        <div class="grid-container">
+            <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
+                <thead>
+                    <tr>
+                        <th><span>{{ form.vars.item_label|trans }}</span></th>
+                        <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
+    </div>
+    {{ form_javascript(form) }}
+{% endblock %}
+
+{% block oro_type_widget_items_javascript %}
+    {% set options = {
+        itemsData: form.children.items.vars.value,
+        baseName: form.children.items.vars.full_name,
+        el: '#' ~ form.vars.id ~ 'Row'
+    } %}
+
+    <script>
+        require([
+            'orodashboard/js/items/view'
+        ], function (ItemsView) {
+            'use strict';
+
+            new ItemsView({{ options|json_encode|raw }});
+        });
+    </script>
+{% endblock %}

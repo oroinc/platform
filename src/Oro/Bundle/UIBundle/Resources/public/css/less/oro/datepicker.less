@@ -238,9 +238,12 @@ body {
 }
 .dropdown-menu-calendar{
   padding: 0;
-  margin-top: -11px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
+  .border-radius(0 0 3px 3px);
+}
+.ui-dialog-content .dropdown-menu-calendar {
+  position: fixed;
+  top: initial;
+  left: initial;
 }
 body .ui-datepicker{
   &.ui-widget.ui-widget-content{

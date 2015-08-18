@@ -10,16 +10,11 @@ define(function(require) {
     var EmailModel = require('../models/email-model');
 
     EmailEditorComponent = BaseComponent.extend({
-        /**
-         * Height fix for body editor calculation
-         */
-        HEIGHT_FIX: 4,
+        options: null,
 
         listen: {
-            'parentResize': 'autosizeBodyEditor'
+            'parentResize': 'passResizeEvent'
         },
-
-        options: null,
 
         /**
          * @constructor
@@ -35,9 +30,7 @@ define(function(require) {
             });
             this.view.render();
             this.view.renderPromise.done(_.bind(function() {
-                this.autosizeBodyEditor();
                 this._resolveDeferredInit();
-                this.listenTo(this.view.pageComponent('bodyEditor').view, 'resize', this.onResize, this);
             }, this));
         },
 
@@ -60,13 +53,9 @@ define(function(require) {
             });
         },
 
-        autosizeBodyEditor: function() {
-            var component = this.view.pageComponent('bodyEditor');
-            var outerHeight = this.view.$el.closest('.ui-widget-content').height();
-            var innerHeight = this.view.$el.height();
-            var editorHeight = component.view.getHeight();
-            var availableHeight = outerHeight - innerHeight + editorHeight - this.HEIGHT_FIX;
-            component.view.setHeight(Math.max(availableHeight, this.options.minimalWysiwygEditorHeight));
+        passResizeEvent: function() {
+            var component = this.view.pageComponent('wrap_oro_email_email_body');
+            component.trigger('parentResize');
         }
     });
     return EmailEditorComponent;
