@@ -72,7 +72,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
      */
     public function testCreateTrackingWebsite()
     {
-        $identifier = 'Website' . mt_rand(10, 99);
+        $identifier = 'Website' . mt_rand();
 
         $login = $this->login();
         /** @var TrackingWebsites $login */
@@ -117,7 +117,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
                 $this->createAcl($login, $roleName, $username);
                 break;
             case 'view':
-                $this->viewAcl($login, $username, $roleName, $identifier);
+                $this->viewAcl($login, $username, $roleName);
                 break;
         }
     }
