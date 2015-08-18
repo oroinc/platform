@@ -165,21 +165,21 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $widgets = ['array' => 'of widgets'];
         $entity  = new TestTarget(1);
         return [
-            'entity with "update" activity entity config and "view" event'                       => [
+            'entity with "update" activity entity config and "view" event' => [
                 'groupType'             => ActivityScope::VIEW_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
                 'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE',
                 'expected'              => []
             ],
-            'entity with "view/update" activity entity config and "view" event'                  => [
+            'entity with "view/update" activity entity config and "view" event' => [
                 'groupType'             => ActivityScope::VIEW_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
                 'configProviderSetting' => '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_UPDATE_PAGES',
                 'expected'              => $widgets
             ],
-            'entity with "view/update" activity entity config and "update" event'                  => [
+            'entity with "view/update" activity entity config and "update" event' => [
                 'groupType'             => ActivityScope::UPDATE_PAGE,
                 'widgets'               => $widgets,
                 'entity'                => $entity,
