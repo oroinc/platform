@@ -23,12 +23,10 @@ class AttachmentConfig
      * @param ConfigProvider $attachmentConfigProvider
      * @param ConfigProvider $entityConfigProvider
      */
-    public function __construct(
-        ConfigProvider $attachmentConfigProvider,
-        ConfigProvider $entityConfigProvider
-    ) {
+    public function __construct(ConfigProvider $attachmentConfigProvider, ConfigProvider $entityConfigProvider)
+    {
         $this->attachmentConfigProvider = $attachmentConfigProvider;
-        $this->entityConfigProvider     = $entityConfigProvider;
+        $this->entityConfigProvider = $entityConfigProvider;
     }
 
     /**

@@ -54,13 +54,12 @@ class DoctrineHelper
     /**
      * Check entity is new
      *
-     * @param $entity
+     * @param object $entity
      * @return bool
      */
     public function isNewEntity($entity)
     {
-        $identifierValues = $this->getEntityMetadata($entity)
-            ->getIdentifierValues($entity);
+        $identifierValues = $this->getEntityMetadata($entity)->getIdentifierValues($entity);
 
         return count($identifierValues) === 0;
     }

@@ -30,8 +30,13 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter = new PlaceholderFilter($this->attachmentConfig, $this->doctrineHelper);
     }
 
+    protected function tearDown()
+    {
+        unset($this->attachmentConfig, $this->doctrineHelper, $this->filter);
+    }
+
     /**
-     * @param      $entity
+     * @param null|object $entity
      * @param bool $attachmentConfigReturn
      * @param bool $isNewRecord
      * @param bool $expected
@@ -58,13 +63,13 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     public function configResultProvider()
     {
         return [
-            'null entity'                         => [
+            'null entity' => [
                 'entity'                 => null,
                 'attachmentConfigReturn' => true,
                 'isNewRecord'            => true,
                 'expected'               => false
             ],
-            'existing entity with association'    => [
+            'existing entity with association' => [
                 'entity'                 => $this->getMock('\stdClass'),
                 'attachmentConfigReturn' => true,
                 'isNewRecord'            => false,
@@ -76,7 +81,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 'isNewRecord'            => false,
                 'expected'               => false
             ],
-            'new entity without association'      => [
+            'new entity without association' => [
                 'entity'                 => $this->getMock('\stdClass'),
                 'attachmentConfigReturn' => false,
                 'isNewRecord'            => true,

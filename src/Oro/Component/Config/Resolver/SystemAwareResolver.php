@@ -210,7 +210,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /**
      * Replace %parameter% with it's value.
      *
-     * @param $val
+     * @param string $val
      * @return mixed
      */
     protected function resolveParameter($val)
@@ -229,14 +229,13 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /**
      * Resolve static call class:method or class::const
      *
-     * @param $val
+     * @param sting $val
      * @return mixed
      */
     protected function resolveStatic($val)
     {
         if (preg_match_all('#([^\(\'"%:\s]+)::([\w\._]+)(\([^\)]*\))?#', $val, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-
                 if (!is_scalar($val)) {
                     break;
                 }
@@ -246,10 +245,10 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 
                 $classMethod = [$class, $method];
                 if (is_callable($classMethod)) {
-                    $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
+                    $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];
                     $val    = $this->replaceValue($val, $this->callStaticMethod($class, $method, $params), $match[0]);
                 } elseif (defined(implode('::', $classMethod))) {
-                    $val =  $this->replaceValue(
+                    $val = $this->replaceValue(
                         $val,
                         constant(implode('::', $classMethod)),
                         $match[0]
@@ -264,7 +263,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /**
      * Resolve service or service->method call.
      *
-     * @param $val
+     * @param string $val
      * @return mixed
      */
     protected function resolveService($val)

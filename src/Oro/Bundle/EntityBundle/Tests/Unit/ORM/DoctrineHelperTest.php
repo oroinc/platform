@@ -54,10 +54,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->registry);
-        unset($this->em);
-        unset($this->classMetadata);
-        unset($this->doctrineHelper);
+        unset($this->registry, $this->em, $this->classMetadata, $this->doctrineHelper);
     }
 
     /**
@@ -114,18 +111,18 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $entity
-     * @param $class
-     * @param $identifiers
-     * @param $expected
+     * @param object $entity
+     * @param string $class
+     * @param array $identifiers
+     * @param bool $expected
      * @dataProvider testIsNewEntityDataProvider
      */
-    public function testIsNewEntity($entity, $class, $identifiers, $expected)
+    public function testIsNewEntity($entity, $class, array $identifiers, $expected)
     {
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnCallback(function($entity) use ($identifiers) {
+            ->will($this->returnCallback(function ($entity) use ($identifiers) {
                 $res = [];
                 foreach ($identifiers as $identifier) {
                     if (isset($entity->$identifier)) {

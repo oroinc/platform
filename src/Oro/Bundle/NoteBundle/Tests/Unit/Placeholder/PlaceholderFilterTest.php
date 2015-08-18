@@ -42,7 +42,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('isNewEntity')
-            ->willReturnCallback(function($entity) {
+            ->willReturnCallback(function ($entity) {
                 if (method_exists($entity, 'getId')) {
                     return !(bool)$entity->getId();
                 }
@@ -55,6 +55,11 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->doctrineHelper
         );
+    }
+
+    protected function tearDown()
+    {
+        unset($this->noteConfigProvider, $this->entityConfigProvider, $this->doctrineHelper, $this->filter);
     }
 
     public function testIsNoteAssociationEnabledWithNull()
@@ -72,9 +77,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
         $this->noteConfigProvider->expects($this->never())
             ->method('hasConfig');
 
-        $this->assertFalse(
-            $this->filter->isNoteAssociationEnabled('test')
-        );
+        $this->assertFalse($this->filter->isNoteAssociationEnabled('test'));
     }
 
     public function testIsNoteAssociationEnabledWithoutFilledId()
@@ -91,9 +94,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             ->with(static::TEST_ENTITY_REFERENCE)
             ->will($this->returnValue(false));
 
-        $this->assertFalse(
-            $this->filter->isNoteAssociationEnabled(new TestEntity(1))
-        );
+        $this->assertFalse($this->filter->isNoteAssociationEnabled(new TestEntity(1)));
     }
 
     public function testIsNoteAssociationEnabledWithNotUpdatedSchema()
