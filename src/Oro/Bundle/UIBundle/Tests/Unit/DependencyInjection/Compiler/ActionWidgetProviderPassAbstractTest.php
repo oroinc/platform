@@ -16,6 +16,11 @@ abstract class ActionWidgetProviderPassAbstractTest extends \PHPUnit_Framework_T
         $this->widgetProvider = $this->createTestInstance();
     }
 
+    public function tearDown()
+    {
+        unset($this->widgetProvider);
+    }
+
     public function testGetChainProviderServiceId()
     {
         /** @var ContainerBuilder|\PHPUnit_Framework_MockObject_MockObject $container */
