@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Builder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -65,7 +66,6 @@ class EmailModelBuilder
 
     /**
      * @param EmailModelBuilderHelper   $emailModelBuilderHelper
-     * @param Request                   $request
      * @param EntityManager             $entityManager
      * @param ConfigManager             $configManager
      * @param EmailActivityListProvider $activityListProvider
@@ -74,7 +74,6 @@ class EmailModelBuilder
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
-        Request $request,
         EntityManager $entityManager,
         ConfigManager $configManager,
         EmailActivityListProvider $activityListProvider,
@@ -82,7 +81,6 @@ class EmailModelBuilder
         Factory $factory
     ) {
         $this->helper               = $emailModelBuilderHelper;
-        $this->request              = $request;
         $this->entityManager        = $entityManager;
         $this->configManager        = $configManager;
         $this->activityListProvider = $activityListProvider;
@@ -102,7 +100,7 @@ class EmailModelBuilder
             $emailModel->setMailType(EmailModel::MAIL_TYPE_DIRECT);
         }
 
-        if ($this->request->getMethod() === 'GET') {
+        if ($this->request && $this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
             if (!$emailModel->getContexts()) {
                 $entityClass = $this->request->get('entityClass');
@@ -213,12 +211,30 @@ class EmailModelBuilder
     }
 
     /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * @param EmailModel  $emailModel
      * @param EmailEntity $parentEmailEntity
      */
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
-        $userEmails = $this->helper->getUser()->getEmails();
+        $user = $this->helper->getUser();
+        if (!$user) {
+            return;
+        }
+
+        $userEmails = $user->getEmails();
+        if ($userEmails instanceof Collection) {
+            $userEmails = $userEmails->toArray();
+        }
+        $mailboxes = $this->helper->getMailboxes();
+        $userEmails = array_merge((array)$mailboxes, (array)$userEmails);
         $toEmails = [];
         $emailRecipients = $parentEmailEntity->getTo();
         /** @var EmailRecipient $emailRecipient */

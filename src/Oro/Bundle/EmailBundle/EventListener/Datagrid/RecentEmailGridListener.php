@@ -37,7 +37,7 @@ class RecentEmailGridListener
             $userId = $parameters->get('userId');
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $this->emailQueryFactory->filterQueryByUserId($queryBuilder, $parameters->get('userId'));
+            $this->emailQueryFactory->applyAcl($queryBuilder);
             $this->emailQueryFactory->prepareQuery($queryBuilder);
 
             // bind 'origin_ids' parameter

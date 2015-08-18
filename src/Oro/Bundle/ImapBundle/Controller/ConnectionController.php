@@ -7,11 +7,12 @@ use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
@@ -69,14 +70,28 @@ class ConnectionController extends Controller
                     $emailFolders = $this->manager->getFolders();
                     $origin->setFolders($emailFolders);
 
-                    $user = new User();
-                    $user->setImapConfiguration($origin);
-                    $userForm = $this->get('oro_user.form.user');
-                    $userForm->setData($user);
+                    if ($request->get('for_entity', 'user') === 'user') {
+                        $user = new User();
+                        $user->setImapConfiguration($origin);
+                        $userForm = $this->get('oro_user.form.user');
+                        $userForm->setData($user);
 
-                    $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
-                        'form' => $userForm->createView(),
-                    ]);
+                        $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
+                            'form' => $userForm->createView(),
+                        ]);
+                    } elseif ($request->get('for_entity', 'user') === 'mailbox') {
+                        $mailbox = new Mailbox();
+                        $mailbox->setOrigin($origin);
+                        $mailboxForm = $this->createForm('oro_email_mailbox');
+                        $mailboxForm->setData($mailbox);
+
+                        $response['imap']['folders'] = $this->renderView(
+                            'OroImapBundle:Connection:checkMailbox.html.twig',
+                            [
+                                'form' => $mailboxForm->createView(),
+                            ]
+                        );
+                    }
                 } catch (\Exception $e) {
                     $response['imap']['error'] = $e->getMessage();
                 }
@@ -88,10 +103,9 @@ class ConnectionController extends Controller
                 try {
                     /** @var DirectMailer $mailer */
                     $mailer = $this->get('oro_email.direct_mailer');
-
                     // Prepare Smtp Transport
-                    $transport = $mailer->prepareSmtpTransport($origin);
-
+                    $mailer->prepareSmtpTransport($origin);
+                    $transport = $mailer->getTransport();
                     $transport->start();
                 } catch (\Exception $e) {
                     $response['smtp']['error'] = $e->getMessage();

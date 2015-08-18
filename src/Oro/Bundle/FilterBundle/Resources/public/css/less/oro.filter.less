@@ -91,6 +91,20 @@
 .filter-box .filter-item .filter-criteria input[type="color"],
 .filter-box .filter-item .filter-criteria .uneditable-input {
     margin-bottom: 10px;
+
+}
+.filter-box {
+  .filter-item {
+    .filter-criteria {
+      input[type="text"],
+      input[type="datetime"],
+      input[type="date"] {
+        & + .dropdown-menu-calendar {
+          margin-top: -11px;
+        }
+      }
+    }
+  }
 }
 .filter-box .filter-item .filter-criteria .input-append input,
 .filter-box .filter-item .filter-criteria .input-prepend input,

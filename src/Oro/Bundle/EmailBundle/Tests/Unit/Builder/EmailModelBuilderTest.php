@@ -122,13 +122,14 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
-            $this->request,
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
             $this->factory
         );
+
+        $this->emailModelBuilder->setRequest($this->request);
     }
 
     /**
@@ -179,13 +180,14 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
-            $this->request,
             $this->entityManager,
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
             $this->factory
         );
+
+        $this->emailModelBuilder->setRequest($this->request);
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
             ->method('decodeClassName')

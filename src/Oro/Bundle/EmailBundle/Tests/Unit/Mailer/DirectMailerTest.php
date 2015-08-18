@@ -212,7 +212,9 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->never())->method('setHost');
         $transport->expects($this->never())->method('setPort');
 
-        $smtpTransport = $mailer->prepareSmtpTransport($this->userEmailOrigin);
+        $mailer->prepareSmtpTransport($this->userEmailOrigin);
+        $smtpTransport = $mailer->getTransport();
+
         $this->assertInstanceOf('\Swift_SmtpTransport', $smtpTransport);
     }
 

@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -50,15 +51,13 @@ class DirectMailer extends \Swift_Mailer
     }
 
     /**
-     * Get SmtpTransport instance or create a new if default mailer transport is not smtp
+     * Set SmtpTransport instance or create a new if default mailer transport is not smtp
      *
      * @param UserEmailOrigin $userEmailOrigin
      *
-     * @return \Swift_SmtpTransport|\Swift_Transport_EsmtpTransport
      */
     public function prepareSmtpTransport($userEmailOrigin)
     {
-        $transport = false;
         if (!$this->smtpTransport) {
             $username = $userEmailOrigin->getUser();
             /** @var Mcrypt $encoder */
@@ -77,21 +76,19 @@ class DirectMailer extends \Swift_Mailer
             } else {
                 $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
             }
-        }
 
-        if ($transport) {
-            $transport->setUsername($username);
-            $transport->setPassword($password);
-            $this->smtpTransport = $transport;
+            if ($transport) {
+                $transport->setUsername($username);
+                $transport->setPassword($password);
+                $this->smtpTransport = $transport;
+            }
         }
-
-        return $this->smtpTransport;
     }
 
     /**
      * The Transport used to send messages.
      *
-     * @return Swift_Transport|Swift_SmtpTransport
+     * @return \Swift_Transport|\Swift_SmtpTransport
      */
     public function getTransport()
     {
