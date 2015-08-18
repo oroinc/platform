@@ -14,6 +14,7 @@ define(function(require) {
 
         autoRender: true,
         firstRender: true,
+        firstQuoteLine: false,
 
         tinymceConnected: false,
         height: false,
@@ -66,6 +67,8 @@ define(function(require) {
         },
 
         connectTinyMCE: function() {
+            var $quote;
+            var lines;
             var loadingMaskContainer;
             var self = this;
             loadingMaskContainer = this.$el.parents('.ui-dialog');
@@ -114,6 +117,14 @@ define(function(require) {
                 }
             }, options));
             this.tinymceConnected = true;
+            this.firstQuoteLine = false;
+            $quote = $('<div>').html(this.$el.val()).find('.quote');
+            if ($quote.length > 0) {
+                lines = txtHtmlTransformer.html2multiline($quote.html());
+                if (lines.length > 0) {
+                    this.firstQuoteLine = lines[0];
+                }
+            }
         },
 
         setEnabled: function(enabled) {
@@ -132,6 +143,10 @@ define(function(require) {
 
         getHeight: function() {
             return this.$el.parent().innerHeight();
+        },
+
+        getFirstQuoteLine: function() {
+            return this.firstQuoteLine;
         },
 
         setHeight: function(newHeight) {

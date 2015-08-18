@@ -50,17 +50,45 @@ define(function(require) {
         onAddSignatureButtonClick: function() {
             var url;
             var message;
+            var value;
+            var signatureNode;
             var quoteNode;
+            var quoteIndex;
+            var cursorPosition;
+            var firstQuoteLine;
+            var EOL = '\n';
             var signature = this.model.get('signature');
-            var tinyMCE = this.getBodyEditorView().tinymceInstance;
+            var bodyEditorView = this.getBodyEditorView();
+            var tinyMCE = bodyEditorView.tinymceInstance;
             if (signature) {
                 if (tinyMCE) {
                     quoteNode = tinyMCE.getBody().querySelector('.quote');
-                    tinyMCE.getBody().insertBefore(tinyMCE.dom.create('p', {}, signature), quoteNode);
+                    signatureNode = tinyMCE.dom.create('p', {}, signature);
+                    tinyMCE.getBody().insertBefore(signatureNode, quoteNode);
+                    tinyMCE.selection.setCursorLocation(signatureNode);
+                    signatureNode.scrollIntoView();
                     tinyMCE.execCommand('mceFocus',false);
                 } else {
                     signature = signature.replace(/(<([^>]+)>)/ig, '');
-                    this.domCache.body.insertAtCursor(signature).focus();
+                    value = this.domCache.body.val();
+                    firstQuoteLine = bodyEditorView.getFirstQuoteLine();
+                    if (firstQuoteLine) {
+                        value = this.domCache.body.val();
+                        quoteIndex = value.indexOf(firstQuoteLine);
+                        if (quoteIndex !== -1) {
+                            value = value.substr(0, quoteIndex) + signature + EOL + value.substr(quoteIndex);
+                            cursorPosition = quoteIndex + signature.length;
+                        } else {
+                            value += EOL + signature;
+                            cursorPosition = value.length;
+                        }
+                    } else {
+                        value += EOL + signature;
+                        cursorPosition = value.length;
+                    }
+                    this.domCache.body.val(value)
+                        .setCursorPosition(cursorPosition)
+                        .focus();
                 }
             } else {
                 url = routing.generate('oro_user_profile_update');
