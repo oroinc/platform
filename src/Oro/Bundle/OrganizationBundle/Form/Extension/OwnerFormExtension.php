@@ -151,7 +151,7 @@ class OwnerFormExtension extends AbstractTypeExtension
 
         $this->fieldName = $metadata->getOwnerFieldName();
 
-        $this->checkIsGranted('CREATE', 'entity:' . $dataClassName);
+        $this->checkIsGranted('ASSIGN', 'entity:' . $dataClassName);
         $defaultOwner = null;
 
         if ($metadata->isBasicLevelOwned() && $this->isAssignGranted) {
