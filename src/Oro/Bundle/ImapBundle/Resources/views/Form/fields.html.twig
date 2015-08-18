@@ -1,5 +1,5 @@
 {% block oro_imap_configuration_check_row %}
-    {% if form.parent.vars.value and form.parent.vars.value.username is defined %}
+    {% if form.parent.parent.vars.value and form.parent.parent.vars.value.username is defined %}
         {% set forEntity = 'user' %}
     {% else %}
         {% set forEntity = 'mailbox' %}
