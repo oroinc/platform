@@ -99,9 +99,11 @@ class EmailManager
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
-            $emailUser = $this->getCurrentEmailUser($email);
-            if ($emailUser) {
-                $this->setEmailUserSeen($emailUser, false, true);
+            $emailUsers = $this->getCurrentEmailUser($email);
+            if ($emailUsers) {
+                foreach ($emailUsers as $emailUser) {
+                    $this->setEmailUserSeen($emailUser, false, true);
+                }
             }
         }
     }
