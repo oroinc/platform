@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
@@ -54,7 +55,6 @@ class DirectMailer extends \Swift_Mailer
      * Set SmtpTransport instance or create a new if default mailer transport is not smtp
      *
      * @param UserEmailOrigin $userEmailOrigin
-     *
      */
     public function prepareSmtpTransport($userEmailOrigin)
     {
