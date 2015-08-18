@@ -14,10 +14,7 @@ class Share
     protected $entityId;
 
     /** @var array */
-    protected $businessunits = [];
-
-    /** @var array */
-    protected $users = [];
+    protected $entities = [];
 
     /**
      * Get class name of the target entity
@@ -68,49 +65,25 @@ class Share
     }
 
     /**
-     * Returns array of businessUnits
+     * Returns array of sharing entities
      *
      * @return array
      */
-    public function getBusinessunits()
+    public function getEntities()
     {
-        return $this->businessunits;
+        return $this->entities;
     }
 
     /**
-     * Sets array of businessUnits
+     * Sets array of sharing entities
      *
-     * @param array $businessunits
+     * @param array $entities
      *
      * @return self
      */
-    public function setBusinessunits(array $businessunits)
+    public function setEntities(array $entities)
     {
-        $this->businessunits = $businessunits;
-
-        return $this;
-    }
-
-    /**
-     * Returns array of users
-     *
-     * @return array
-     */
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    /**
-     * Sets array of users
-     *
-     * @param array $users
-     *
-     * @return self
-     */
-    public function setUsers(array $users)
-    {
-        $this->users = $users;
+        $this->entities = $entities;
 
         return $this;
     }

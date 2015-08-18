@@ -21,6 +21,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Form\Model\Share;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class ShareHandler
@@ -74,7 +75,13 @@ class ShareHandler
      */
     public function process(Share $model, $entity)
     {
-        $this->prepareForm($entity);
+        $entityName = ClassUtils::getClass($entity);
+        $this->shareScopes = $this->configProvider->hasConfig($entityName)
+            ? $this->configProvider->getConfig($entityName)->get('share_scopes')
+            : null;
+        if (!$this->shareScopes) {
+            throw new \LogicException('Sharing scopes are disabled');
+        }
         if (in_array($this->request->getMethod(), ['POST', 'PUT'], true)) {
             $this->form->setData($model);
             $this->form->submit($this->request);
@@ -93,6 +100,8 @@ class ShareHandler
             }
             $this->applyEntities($model, $acl);
         }
+        $this->form->get('entityClass')->setData($entityName);
+        $this->form->get('entityId')->setData($entity->getId());
 
         return false;
     }
@@ -129,28 +138,6 @@ class ShareHandler
     }
 
     /**
-     * @param object $entity
-     */
-    protected function prepareForm($entity)
-    {
-        $entityName = ClassUtils::getClass($entity);
-        $this->shareScopes = $this->configProvider->hasConfig($entityName)
-            ? $this->configProvider->getConfig($entityName)->get('share_scopes')
-            : null;
-        if (!$this->shareScopes) {
-            throw new \LogicException('Sharing scopes are disabled');
-        }
-
-        if (!in_array(Share::SHARE_SCOPE_USER, $this->shareScopes, true)) {
-            $this->form->remove('users');
-        }
-
-        if (!in_array(Share::SHARE_SCOPE_BUSINESS_UNIT, $this->shareScopes, true)) {
-            $this->form->remove('businessunits');
-        }
-    }
-
-    /**
      * Extracts entities from SecurityIdentities and apply them to form model
      *
      * @param Share $model
@@ -177,13 +164,13 @@ class ShareHandler
             /** @var $repo UserRepository */
             $repo = $this->manager->getRepository('OroUserBundle:User');
             $users = $repo->findUsersByUsernames($usernames);
-            $model->setUsers($users);
+            $model->setEntities($users);
         }
         if ($buIds) {
             /** @var $repo BusinessUnitRepository */
             $repo = $this->manager->getRepository('OroOrganizationBundle:BusinessUnit');
             $businessUnits = $repo->getBusinessUnits($buIds);
-            $model->setBusinessunits($businessUnits);
+            $model->setEntities(array_merge($model->getEntities(), $businessUnits));
         }
         $this->form->setData($model);
     }
@@ -220,13 +207,11 @@ class ShareHandler
     protected function isSidApplicable(SecurityIdentityInterface $sid)
     {
         return (
-            $this->form->has('users') &&
             $sid instanceof UserSecurityIdentity &&
             in_array(Share::SHARE_SCOPE_USER, $this->shareScopes, true)
         )
         ||
         (
-            $this->form->has('businessunits') &&
             $sid instanceof BusinessUnitSecurityIdentity &&
             in_array(Share::SHARE_SCOPE_BUSINESS_UNIT, $this->shareScopes, true)
         );
@@ -242,13 +227,12 @@ class ShareHandler
     protected function generateSids(Share $model)
     {
         $newSids = [];
-        $users = $model->getUsers();
-        foreach ($users as $user) {
-            $newSids[] = UserSecurityIdentity::fromAccount($user);
-        }
-        $businessUnits = $model->getBusinessunits();
-        foreach ($businessUnits as $businessUnit) {
-            $newSids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($businessUnit);
+        foreach ($model->getEntities() as $entity) {
+            if ($entity instanceof User) {
+                $newSids[] = UserSecurityIdentity::fromAccount($entity);
+            } elseif ($entity instanceof BusinessUnit) {
+                $newSids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($entity);
+            }
         }
 
         return $newSids;

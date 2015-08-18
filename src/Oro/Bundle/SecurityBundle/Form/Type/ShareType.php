@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ShareType extends AbstractType
@@ -17,17 +19,10 @@ class ShareType extends AbstractType
             ->add('entityClass', 'hidden', ['required' => false])
             ->add('entityId', 'hidden', ['required' => false])
             ->add(
-                'users',
-                'oro_user_organization_acl_multiselect',
+                'entities',
+                'oro_share_select',
                 [
-                    'label' => 'oro.user.entity_plural_label',
-                ]
-            )
-            ->add(
-                'businessunits',
-                'oro_business_unit_multiselect',
-                [
-                    'label' => 'oro.organization.businessunit.entity_plural_label',
+                    'label' => 'oro.security.action.share_with',
                 ]
             );
     }
@@ -40,7 +35,7 @@ class ShareType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\Bundle\SecurityBundle\Form\Model\Share',
-                'intention'          => 'users',
+                'intention'          => 'entities',
                 'csrf_protection'    => true,
                 'cascade_validation' => true,
             ]
@@ -53,5 +48,18 @@ class ShareType extends AbstractType
     public function getName()
     {
         return 'oro_share';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $routeParameters = isset($view->children['entities']->vars['configs']['route_parameters'])
+            ? $view->children['entities']->vars['configs']['route_parameters']
+            : [];
+        $routeParameters['entityClass'] = $form->get('entityClass')->getData();
+
+        $view->children['entities']->vars['configs']['route_parameters'] = $routeParameters;
     }
 }

@@ -256,6 +256,69 @@ class Indexer
     }
 
     /**
+     * @param User $user
+     * @param string $entityClass
+     * @param string $searchString
+     * @param int $offset
+     * @param int $maxResults
+     *
+     * @return array
+     */
+    public function searchSharingEntities(User $user, $entityClass, $searchString, $offset = 0, $maxResults = 0)
+    {
+        $results = [];
+        if (!$this->configManager->hasConfig($entityClass)) {
+            return $results;
+        }
+        $entityConfig = new EntityConfigId('security', $entityClass);
+        $shareScopes = $this->configManager->getConfig($entityConfig)->get('share_scopes');
+        if (!$shareScopes) {
+            return $results;
+        }
+        $entityClassNames = $this->searchAclHelper->getClassNamesBySharingScopes($shareScopes);
+        $tables = [];
+        foreach ($entityClassNames as $entityClassName) {
+            $metadata = $this->em->getClassMetadata($entityClassName);
+            $tables[] = $metadata->getTableName();
+        }
+
+        $searchResults = $this->simpleSearch($searchString, $offset, $maxResults, $tables);
+        foreach ($searchResults->getElements() as $item) {
+            $className = $item->getEntityName();
+            if (ClassUtils::getClass($user) === $className && $user->getId() === $item->getRecordId()) {
+                continue;
+            }
+            $results[] = [
+                'entityClass' => $className,
+                'text' => $item->getRecordTitle(),
+                'id' => json_encode([
+                    'entityId' => $item->getRecordId(),
+                    'entityClass' => $className,
+                ]),
+            ];
+        }
+        $groupedResult = [];
+        foreach ($entityClassNames as $entityClassName) {
+            $children = [];
+            foreach ($results as $result) {
+                if ($result['entityClass'] === $entityClassName) {
+                    $child = $result;
+                    unset($child['entityClass']);
+                    $children[] = $child;
+                }
+            }
+            if ($children) {
+                $groupedResult[] = [
+                    'text' => $this->getClassLabel($entityClassName),
+                    'children' => $children,
+                ];
+            }
+        }
+
+        return $groupedResult;
+    }
+
+    /**
      * @param User   $user
      * @param string $searchString
      * @return array
@@ -293,6 +356,65 @@ class Indexer
                 }
                 $results[] = [
                     'text' => $text,
+                    'id'   => json_encode([
+                        'entityClass' => $target['entityClass'],
+                        'entityId'    => $target['entityId'],
+                    ]),
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param User $user
+     * @param string $entityClass
+     * @param string $searchString
+     *
+     * @return array
+     */
+    public function searchSharingEntitiesById(User $user, $entityClass, $searchString)
+    {
+        $results = [];
+        if (!$this->configManager->hasConfig($entityClass)) {
+            return $results;
+        }
+        $entityConfig = new EntityConfigId('security', $entityClass);
+        $shareScopes = $this->configManager->getConfig($entityConfig)->get('share_scopes');
+        if (!$shareScopes) {
+            return $results;
+        }
+        $entityClassNames = $this->searchAclHelper->getClassNamesBySharingScopes($shareScopes);
+        if ($searchString) {
+            $targets = explode(';', $searchString);
+            foreach ($targets as $target) {
+                if (!$target) {
+                    continue;
+                }
+                $target = json_decode($target, true);
+                if (!isset($target['entityClass'], $target['entityId']) || !$target['entityClass']
+                    || !$target['entityId']
+                ) {
+                    continue;
+                }
+                if (ClassUtils::getClass($user) === $target['entityClass'] && $user->getId() === $target['entityId']) {
+                    continue;
+                }
+                if (!in_array($target['entityClass'], $entityClassNames, true)) {
+                    continue;
+                }
+                $entity = $this->em->getRepository($target['entityClass'])->find($target['entityId']);
+                if ($fields = $this->mapper->getEntityMapParameter($target['entityClass'], 'title_fields')) {
+                    $text = [];
+                    foreach ($fields as $field) {
+                        $text[] = $this->mapper->getFieldValue($entity, $field);
+                    }
+                } else {
+                    $text = [(string) $entity];
+                }
+                $results[] = [
+                    'text' => implode(' ', $text),
                     'id'   => json_encode([
                         'entityClass' => $target['entityClass'],
                         'entityId'    => $target['entityId'],
