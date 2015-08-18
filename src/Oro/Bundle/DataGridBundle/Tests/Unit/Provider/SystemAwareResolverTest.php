@@ -183,4 +183,22 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
         $gridDefinition = $this->resolver->resolve('test', $definition);
         $this->assertEquals($definition, $gridDefinition);
     }
+
+    /**
+     * Assert definition escaped
+     */
+    public function testResolveEscaped()
+    {
+        $gridName = 'test';
+        $gridDefinition = [
+            'filters' => [
+                'entityName' => [
+                    'choices_builder' => 'test\@email.com'
+                ]
+            ]
+        ];
+        $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
+
+        $this->assertEquals('test@email.com', $gridDefinition['filters']['entityName']['choices_builder']);
+    }
 }

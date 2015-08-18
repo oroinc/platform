@@ -61,9 +61,7 @@ class EmailTypeTest extends TypeTestCase
         $relatedEmailsProvider->expects($this->any())
             ->method('getEmails')
             ->with($user)
-            ->will($this->returnValue([
-                'john@example.com' => 'John Smith <john@example.com>',
-            ]));
+            ->will($this->returnValue(['john@example.com' => 'John Smith <john@example.com>']));
 
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -116,14 +114,7 @@ class EmailTypeTest extends TypeTestCase
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $contextsSelectType = new ContextsSelectType(
-            $em,
-            $configManager,
-            $translator,
-            $mapper,
-            $securityFacade
-        );
+        $contextsSelectType = new ContextsSelectType($em, $configManager, $translator, $mapper, $securityFacade);
 
         return [
             new PreloadedExtension(

@@ -69,3 +69,5 @@ oro_titles:
     oro_email_emailtemplate_clone: "Clone Email Template"
     oro_email_user_emails: "My Emails - %%username%%"
     oro_email_thread_view: "%%subject%% - My Emails"
+    oro_email_mailbox_update: "Mailbox %%label%% - Edit"
+    oro_email_mailbox_create: "Create Mailbox"

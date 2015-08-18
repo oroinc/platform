@@ -178,6 +178,12 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     protected $organization;
 
     /**
+     * @ORM\Column(type="boolean", options={"default"=true})
+     * @var bool
+     */
+    protected $visible = true;
+
+    /**
      * @param        $name
      * @param string $content
      * @param string $type
@@ -507,6 +513,26 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param bool $visible
+     *
+     * @return $this
+     */
+    public function setVisible($visible = true)
+    {
+        $this->visible = $visible;
+
+        return $this;
     }
 
     /**

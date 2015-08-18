@@ -44,11 +44,11 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      */
     public function build(ClassMetadataBuilder $metadataBuilder, ConfigInterface $extendConfig)
     {
-        $relations = $extendConfig->get('relation');
+        $relations = $extendConfig->get('relation', false, []);
         foreach ($relations as $relation) {
             /** @var FieldConfigId $fieldId */
             $fieldId = $relation['field_id'];
-            if ($relation['assign'] && $fieldId) {
+            if ($fieldId) {
                 $targetEntity = $relation['target_entity'];
                 /** @var FieldConfigId|null $targetFieldId */
                 $targetFieldId = !empty($relation['target_field_id']) ? $relation['target_field_id'] : null;

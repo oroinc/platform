@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Grid;
 
 use Oro\Bundle\DataGridBundle\Tests\Functional\AbstractDatagridTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
+use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
  * @outputBuffering enabled
@@ -11,6 +13,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailGridTest extends AbstractDatagridTestCase
 {
+    const AUTH_USER = 'simple_user';
+    const AUTH_PW = 'simple_password';
+
     /**
      * @var User
      */
@@ -34,8 +39,6 @@ class EmailGridTest extends AbstractDatagridTestCase
      */
     public function testGrid($requestData)
     {
-        $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['userId'] =
-            $this->getReference('simple_user')->getId();
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
 
         parent::testGrid($requestData);
@@ -82,5 +85,20 @@ class EmailGridTest extends AbstractDatagridTestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function generateBasicAuthHeader(
+        $userName = null,
+        $userPassword = null,
+        $userOrganization = null
+    ) {
+        $userName = $userName ?: static::AUTH_USER;
+        $userPassword = $userPassword ?: static::AUTH_PW;
+        $userOrganization = $userOrganization ?: static::AUTH_ORGANIZATION;
+
+        return parent::generateBasicAuthHeader($userName, $userPassword, $userOrganization);
     }
 }
