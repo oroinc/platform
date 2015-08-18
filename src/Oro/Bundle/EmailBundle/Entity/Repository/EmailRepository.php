@@ -90,4 +90,27 @@ class EmailRepository extends EntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * Get email entities by owner entity
+     *
+     * @param object $entity
+     * @param string $ownerColumnName
+     * @return array
+     */
+    public function getEmailsByOwnerEntity($entity, $ownerColumnName)
+    {
+        $queryBuilder = $this
+            ->getEntityManager()
+            ->getRepository(Email::ENTITY_CLASS)
+            ->createQueryBuilder('e')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'ea')
+            ->andWhere("ea.$ownerColumnName = :contactId")
+            ->andWhere('ea.hasOwner = :hasOwner')
+            ->setParameter('contactId', $entity->getId())
+            ->setParameter('hasOwner', true);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
