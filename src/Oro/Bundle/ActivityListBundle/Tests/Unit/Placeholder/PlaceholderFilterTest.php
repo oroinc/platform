@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -57,7 +58,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper->expects($this->any())
             ->method('isNewEntity')
-            ->will($this->returnCallback(function($entity) {
+            ->will($this->returnCallback(function ($entity) {
                 if (method_exists($entity, 'getId')) {
                     return !(bool)$entity->getId();
                 }
@@ -78,8 +79,10 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     public function testIsApplicable()
     {
         $testTarget = new TestTarget(1);
-        $this->setConfigProviderEntitySupport($testTarget,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $this->setConfigProviderEntitySupport(
+            $testTarget,
+            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+        );
 
         $this->assertTrue($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
         $this->assertFalse($this->filter->isApplicable(null, ActivityScope::VIEW_PAGE));
@@ -89,8 +92,10 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new TestTarget(1);
 
-        $this->setConfigProviderEntitySupport($entity,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE');
+        $this->setConfigProviderEntitySupport(
+            $entity,
+            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE'
+        );
         $this->assertFalse($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
 
         $this->setConfigProviderEntitySupport(
@@ -114,9 +119,11 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget', 123)
             ->willReturn(true);
 
-        $entity = new TestTarget(123);
-        $this->setConfigProviderEntitySupport($entity,
-            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE');
+        $entity = new TestNonActiveTarget(123);
+        $this->setConfigProviderEntitySupport(
+            $entity,
+            '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+        );
 
         $this->assertTrue($this->filter->isApplicable($entity, ActivityScope::VIEW_PAGE));
     }
