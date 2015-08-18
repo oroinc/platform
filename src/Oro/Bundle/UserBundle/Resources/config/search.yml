@@ -51,3 +51,14 @@ Oro\Bundle\UserBundle\Entity\User:
                     name: email
                     target_type: text
                     target_fields: [email]
+Oro\Bundle\UserBundle\Entity\Role:
+    alias:                          oro_access_role
+    title_fields:                   [label]
+    search_template:                OroUserBundle:Role:Search\result.html.twig
+    route:
+        name:                       oro_user_role_index
+    fields:
+        -
+            name:                   label
+            target_type:            text
+            target_fields:          [label]

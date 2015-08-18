@@ -6,6 +6,29 @@ use Oro\Component\PhpUtils\ArrayUtil;
 
 class ArrayUtilTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreateOrderedComparator()
+    {
+        $order = array_flip(['a', 'z', 'd', 'e']);
+        $array = [
+            'b' => 'val b',
+            'd' => 'val d',
+            'z' => 'val z',
+            'c' => 'val c',
+            'e' => 'val e',
+        ];
+        $expectedResult = [
+            'z' => 'val z',
+            'd' => 'val d',
+            'e' => 'val e',
+            'b' => 'val b',
+            'c' => 'val c',
+        ];
+
+        uksort($array, ArrayUtil::createOrderedComparator($order));
+        $this->assertEquals(array_keys($expectedResult), array_keys($array));
+        $this->assertEquals(array_values($expectedResult), array_values($array));
+    }
+
     /**
      * @dataProvider isAssocDataProvider
      */
