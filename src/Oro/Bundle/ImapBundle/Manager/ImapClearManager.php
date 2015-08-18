@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -92,7 +91,7 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param UserEmailOrigin $origin
      */
-    protected function clearOrigin(UserEmailOrigin $origin)
+    protected function clearOrigin($origin)
     {
         $folders = $origin->getFolders();
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
@@ -123,7 +122,7 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param ImapEmailFolder $imapFolder
      */
-    protected function clearFolder(ImapEmailFolder $imapFolder)
+    protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
 
