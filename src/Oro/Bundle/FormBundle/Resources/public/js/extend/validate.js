@@ -297,7 +297,8 @@ define([
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',
-        'oroform/js/validator/url'
+        'oroform/js/validator/url',
+        'oroform/js/validator/type'
     ];
     $.validator.loadMethod(methods);
 

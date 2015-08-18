@@ -305,6 +305,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expectedConfig, $config);
+        $this->assertAttributeEmpty('originalConfigs', $this->configManager);
     }
 
     /**
@@ -327,7 +328,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldModel');
 
         $result = $this->configManager->getConfig($configId);
+
         $this->assertSame($cachedConfig, $result);
+        $this->assertArrayHasKey(
+            $this->buildConfigKey($configId),
+            $this->readAttribute($this->configManager, 'originalConfigs')
+        );
     }
 
     public function getConfigCacheProvider()
@@ -380,7 +386,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $result = $this->configManager->getConfig($configId);
+
         $this->assertEquals($expectedConfig, $result);
+        $this->assertArrayHasKey(
+            $this->buildConfigKey($configId),
+            $this->readAttribute($this->configManager, 'originalConfigs')
+        );
     }
 
     public function getConfigNotCachedProvider()
@@ -1465,5 +1476,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             [null],
             [''],
         ];
+    }
+
+    /**
+     * @param ConfigIdInterface $configId
+     * @return string
+     */
+    protected function buildConfigKey(ConfigIdInterface $configId)
+    {
+        return $configId instanceof FieldConfigId
+            ? $configId->getScope() . '_' . $configId->getClassName() . '_' . $configId->getFieldName()
+            : $configId->getScope() . '_' . $configId->getClassName();
     }
 }

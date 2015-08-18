@@ -9,7 +9,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
 {
     public function testVote()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $ownerAccessor = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $selector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
@@ -23,7 +23,7 @@ class AclVoterTest extends \PHPUnit_Framework_TestCase
             $permissionMap
         );
         $voter->setAclExtensionSelector($selector);
-        $voter->setConfigProvider($configProvider);
+        $voter->setEntityOwnerAccessor($ownerAccessor);
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $object = new \stdClass();

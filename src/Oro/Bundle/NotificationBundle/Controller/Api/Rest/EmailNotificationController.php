@@ -57,7 +57,7 @@ class EmailNotificationController extends RestController
      */
     public function getForm()
     {
-        return $this->get('oro_notification.form.type.email_notification.api');
+        return $this->get('oro_notification.form.email_notification.api');
     }
 
     /**

@@ -51,6 +51,14 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # this attribute can be used to change page,
+                # which will display "activity list" and activity buttons.
+                # Possible values in \Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope
+                # Can be used as bitmask
+                show_on_page: # string
+                    options:
+                        default_value:      '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+
                 # the widget name of the activity action that is used for render a link in dropdown menu
                 # this widget should be defined in placeholders.yml
                 # this attribute can be defined for activity entity

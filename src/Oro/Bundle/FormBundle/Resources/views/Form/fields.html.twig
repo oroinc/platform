@@ -303,17 +303,22 @@
         {% set name = widget.vars.prototype.vars.name %}
         {% set disabled = widget.vars.disabled %}
         {% set allow_delete = widget.vars.allow_delete %}
+        {% set allow_add_after = widget.vars.allow_add_after %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
         {% set disabled = widget.parent.vars.disabled %}
         {% set allow_delete = widget.parent.vars.allow_delete %}
+        {% set allow_add_after = widget.parent.vars.allow_add_after %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
+            {% if allow_add_after %}
+            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
             {% endif %}
         </div>
     </div>
@@ -493,6 +498,25 @@
     </script>
 {% endblock %}
 
+{% block oro_entity_create_or_select_choice_widget %}
+    <div class="create-select-entity-choice-container"
+         data-page-component-module="oroform/js/app/components/create-or-select-choice-component"
+         data-page-component-options="{{ {
+            modeSelector: '#' ~ form.mode.vars.id,
+            newEntitySelector: '.new-entity',
+            existingEntitySelector: '.existing-entity',
+            existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
+         }|json_encode }}">
+        <div class="existing-entity">
+            {{ form_widget(form.existing_entity) }}
+        </div>
+        <div class="new-entity">
+            {{ form_widget(form.new_entity) }}
+        </div>
+        {{ form_widget(form.mode) }}
+    </div>
+{% endblock %}
+
 {% block oro_entity_create_or_select_inline_widget %}
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"
@@ -625,4 +649,20 @@
     }|merge(attr) %}
     {% set type = 'hidden' %}
     {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block oro_resizeable_rich_text_widget %}
+    {% set options = {
+        'view': 'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view',
+        'editorComponentName': form.vars.attr['data-page-component-name'] is defined ?
+        form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid']
+    } %}
+
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-name="wrap_{{ form.vars.attr['data-page-component-name'] is defined ?
+            form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid'] }}"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate" >
+        {{ form_widget(form) }}
+    </div>
 {% endblock %}
