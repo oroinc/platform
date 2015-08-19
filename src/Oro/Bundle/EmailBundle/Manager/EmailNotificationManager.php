@@ -73,9 +73,9 @@ class EmailNotificationManager
 
         $emailsData = [];
         /** @var $email Email */
-        foreach ($emails as $email) {
-            $isSeen = $email['seen'];
-            $email = $email[0];
+        foreach ($emails as $element) {
+            $isSeen = $element['seen'];
+            $email = $element[0];
             $bodyContent = '';
             try {
                 $this->emailCacheManager->ensureEmailBodyCached($email);
