@@ -39,6 +39,7 @@ class EmailOwnersProvider
         foreach ($this->emailOwnerStorage->getProviders() as $provider) {
             if ($provider->enabledEmailSync() && $provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
                 $ownerColumnName = $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
+                break;
             }
         }
 
