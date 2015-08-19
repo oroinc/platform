@@ -110,7 +110,6 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
     protected function createEmailBody($emailId)
     {
         $email = new Email();
-        $email;
 
         $emailRef = new ReflectionClass(get_class($email));
         $id = $emailRef->getProperty('id');
