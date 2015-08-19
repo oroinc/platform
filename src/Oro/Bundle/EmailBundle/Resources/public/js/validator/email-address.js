@@ -41,7 +41,9 @@ define([
             // @TODO add support of MX check action
             // original email validator is too slow for some values
             // return $.validator.methods.email.apply(this, arguments);
-            return this.optional(element) || _.every(value.split(','), function (val) {
+            var $el = $(element);
+            var values = $el.data('select2') ? $el.select2('val') : [value];
+            return this.optional(element) || _.every(values, function (val) {
                 return emailRegExp.test(extractPureEmailAddress(val));
             });
         },
