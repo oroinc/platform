@@ -147,6 +147,46 @@
       }
     }
   }
+  .filter-select-oro-wrapper {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 10px;
+    #gradient > .vertical(#fdfdfd, #efefef);
+    .border-radius(@baseBtnBorderRadius);
+    &:before {
+      content:'';
+      position: absolute;
+      display: block;
+      #gradient > .vertical(#fdfdfd, #efefef);
+      border-top-right-radius: @baseBtnBorderRadius;
+      border-bottom-right-radius: @baseBtnBorderRadius;
+      width: 20px;
+      top: 1px;
+      bottom: 1px;
+      right: 1px;
+      pointer-events:none;
+    }
+    &:after {
+      content:'';
+      position: absolute;
+      display: block;
+      top: 50%;
+      margin-top: -2px;
+      right: 8px;
+      height: 0;
+      width: 0;
+      border-top: 4px solid #000;
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+      pointer-events:none;
+    }
+    select.filter-select-oro {
+      background-color: transparent;
+      border-color: #ccc;
+      margin-bottom: 0 !important;
+      height: 20px
+    }
+  }
 }
 
 .form-horizontal .filter-box {
