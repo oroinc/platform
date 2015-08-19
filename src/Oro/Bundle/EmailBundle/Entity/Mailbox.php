@@ -102,8 +102,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @var Collection|User[]
      *
      * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\User",
-     *      cascade={"persist", "remove"}
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
      * )
      * @ORM\JoinTable(name="oro_email_mailbox_users",
      *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -118,8 +117,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @var Collection|Role[]
      *
      * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role",
-     *      cascade={"persist", "remove"}
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role"
      * )
      * @ORM\JoinTable(name="oro_email_mailbox_roles",
      *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
