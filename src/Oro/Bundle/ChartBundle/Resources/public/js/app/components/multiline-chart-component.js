@@ -3,6 +3,7 @@ define(function(require) {
 
     var MultilineChartComponent;
     var _ = require('underscore');
+    var $ = require('jquery');
     var Flotr = require('flotr2');
     var dataFormatter = require('orochart/js/data_formatter');
     var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
@@ -16,13 +17,6 @@ define(function(require) {
 
         narrowScreen: false,
 
-        initialize: function(options) {
-            this.narrowScreen = screen.width <= 480;
-            if (this.narrowScreen) {
-                this.aspectRatio = 0.55;
-            }
-            MultilineChartComponent.__super__.initialize.call(this, options);
-        },
         /**
          * Draw chart
          *
@@ -179,6 +173,16 @@ define(function(require) {
                     }
                 }
             );
+        },
+
+        update: function() {
+            this.narrowScreen = $('html').width() < 520;
+            if (this.narrowScreen) {
+                this.aspectRatio = 0.55;
+            } else {
+                this.aspectRatio = MultilineChartComponent.__super__.aspectRatio;
+            }
+            MultilineChartComponent.__super__.update.apply(this, arguments);
         }
     });
 
