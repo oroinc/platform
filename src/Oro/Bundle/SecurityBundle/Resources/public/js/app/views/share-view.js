@@ -4,6 +4,7 @@ define(function(require) {
     var ShareView;
     var _ = require('underscore');
     var $ = require('jquery');
+    var Routing = require('routing');
     var ShareCollection = require('orosecurity/js/app/models/share-collection');
     var BaseView = require('oroui/js/app/views/base/view');
     var WidgetManager = require('oroui/js/widget-manager');
@@ -37,7 +38,12 @@ define(function(require) {
             var dropdown = this.$('.sharing-entities-dropdown');
             var firstItem = this.$('.sharing-entities-current-item');
             this.collection.on('add', function(model) {
-                var gridUrl = self.options.params.grid_path + '/' + encodeURIComponent(model.attributes.className);
+                var gridUrl = Routing.generate(
+                    'oro_share_entities_grid',
+                    {
+                        entityClass: model.attributes.className
+                    }
+                );
                 var view = self.template({
                     entity: model
                 });

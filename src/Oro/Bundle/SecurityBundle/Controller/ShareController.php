@@ -38,11 +38,12 @@ class ShareController extends Controller
     }
 
     /**
-     * @Route("/entities/{entityClass}", name="oro_share_entities")
+     * @Route("/entities", name="oro_share_entities")
      * @Template("OroSecurityBundle:Share:entities.html.twig")
      */
-    public function entitiesAction($entityClass)
+    public function entitiesAction()
     {
+        $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
         $supportedGridsInfo = $this->get('oro_security.provider.share_grid_provider')
             ->getSupportedGridsInfo($entityClass);
         $gridEntityClass = '';
@@ -64,11 +65,12 @@ class ShareController extends Controller
     }
 
     /**
-     * @Route("/entities/grid/{entityClass}", name="oro_share_entities_grid")
+     * @Route("/entities/grid", name="oro_share_entities_grid")
      * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
      */
-    public function entitiesGridAction($entityClass = null)
+    public function entitiesGridAction()
     {
+        $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
         return [
             'params' => [],
             'renderParams' => [],
