@@ -75,7 +75,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @ORM\OneToOne(
      *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
-     *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
+     *     cascade={"persist"}, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
      */
@@ -464,5 +464,18 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Deactivate email origin if mailbox is deleted.
+     *
+     * @ORM\PreRemove
+     */
+    public function preRemove()
+    {
+        if ($this->origin !== null) {
+            $this->origin->setActive(false);
+            $this->origin->setMailbox(null);
+        }
     }
 }
