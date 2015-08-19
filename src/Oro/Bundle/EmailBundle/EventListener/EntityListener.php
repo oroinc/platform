@@ -11,7 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
-use Oro\Bundle\EmailBundle\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 
 class EntityListener
 {
@@ -30,8 +30,8 @@ class EntityListener
     /** @var array */
     protected $entitiesOwnedByEmail = [];
 
-    /** @var EmailOwnerProvider */
-    protected $emailOwnerProvider;
+    /** @var EmailOwnersProvider */
+    protected $emailOwnersProvider;
 
     /**
      * @param EmailOwnerManager $emailOwnerManager
@@ -43,12 +43,12 @@ class EntityListener
         EmailOwnerManager    $emailOwnerManager,
         EmailActivityManager $emailActivityManager,
         EmailThreadManager   $emailThreadManager,
-        EmailOwnerProvider   $emailOwnerProvider
+        EmailOwnersProvider   $emailOwnersProvider
     ) {
         $this->emailOwnerManager    = $emailOwnerManager;
         $this->emailActivityManager = $emailActivityManager;
         $this->emailThreadManager   = $emailThreadManager;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->emailOwnersProvider   = $emailOwnersProvider;
     }
 
     /**
@@ -92,7 +92,7 @@ class EntityListener
     {
         if ($entities) {
             foreach ($entities as $entity) {
-                if ($this->emailOwnerProvider->supportOwnerProvider($entity)) {
+                if ($this->emailOwnersProvider->supportOwnerProvider($entity)) {
                     $this->entitiesOwnedByEmail[] = $entity;
                 }
             }
@@ -107,7 +107,7 @@ class EntityListener
         if ($this->entitiesOwnedByEmail) {
             $em = $event->getEntityManager();
             foreach ($this->entitiesOwnedByEmail as $entity) {
-                $emails = $this->emailOwnerProvider->getEmailsByOwnerEntity($entity);
+                $emails = $this->emailOwnersProvider->getEmailsByOwnerEntity($entity);
                 foreach ($emails as $email) {
                     $this->emailActivityManager->addAssociation($email, $entity);
                 }

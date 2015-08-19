@@ -25,4 +25,11 @@ interface EmailOwnerProviderInterface
      * @return EmailOwnerInterface
      */
     public function findEmailOwner(EntityManager $em, $email);
+
+    /**
+     * Entity can be synced or not
+     *
+     * @return bool
+     */
+    public function enabledEmailSync();
 }

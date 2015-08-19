@@ -7,7 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
-class EmailOwnerProvider
+class EmailOwnersProvider
 {
     /**
      * @var EmailOwnerProviderStorage
@@ -37,7 +37,7 @@ class EmailOwnerProvider
     {
         $ownerColumnName = null;
         foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
+            if ($provider->enabledEmailSync() && $provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
                 $ownerColumnName = $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
             }
         }
@@ -59,7 +59,7 @@ class EmailOwnerProvider
     public function supportOwnerProvider($entity)
     {
         foreach ($this->emailOwnerStorage->getProviders() as $provider) {
-            if ($provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
+            if ($provider->enabledEmailSync() && $provider->getEmailOwnerClass() === ClassUtils::getClass($entity)) {
                 return true;
             }
         }
