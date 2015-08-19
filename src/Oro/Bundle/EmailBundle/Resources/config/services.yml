@@ -65,6 +65,7 @@ parameters:
     oro_email.recent_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider
     oro_email.context_email_recipients.provider.class: Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider
     oro_email.provider.email_recipients.helper.class: Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper
+    oro_email.provider.emailowners.provider.class: Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider
 
     # Managers
     oro_email.manager.notification.class: Oro\Bundle\EmailBundle\Manager\EmailNotificationManager
@@ -263,6 +264,7 @@ services:
             - @oro_email.email.owner.manager
             - @oro_email.email.activity.manager
             - @oro_email.email.thread.manager
+            - @oro_email.provider.emailowners.provider
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -654,6 +656,13 @@ services:
             - @oro_email.related_emails.provider
         tags:
             - { name: oro_email.recipients_provider, priority: 10 }
+
+    oro_email.provider.emailowners.provider:
+        class: %oro_email.provider.emailowners.provider.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @oro_email.email.owner.provider.storage
+            - @doctrine
 
     oro_email.provider.email_recipients.helper:
         class: %oro_email.provider.email_recipients.helper.class%
