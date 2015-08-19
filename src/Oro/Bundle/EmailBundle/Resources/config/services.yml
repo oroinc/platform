@@ -18,6 +18,7 @@ parameters:
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
     oro_email.email_flag_manager_loader_selector.class: Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
+    oro_email.listener.auto_response_listener.class: Oro\Bundle\EmailBundle\EventListener\AutoResponseListener
     oro_email.manager.autoresponserule.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
@@ -121,7 +122,6 @@ parameters:
     # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
     oro_email.workflow.condition.has_count.class:       Oro\Bundle\EmailBundle\Model\Condition\HasCount
-    oro_email.workflow.condition.auto_response_rules_exists.class:       Oro\Bundle\EmailBundle\Model\Condition\AutoResponseRulesExists
 
     # Workflow actions
     oro_email.workflow.action.parse_first_name.class:   Oro\Bundle\EmailBundle\Model\Action\ParseFirstNameFromEmailAddress
@@ -267,6 +267,12 @@ services:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
             - { name: doctrine.event_listener, event: postRemove }
+
+    oro_email.listener.auto_response_listener:
+        class: %oro_email.listener.auto_response_listener.class%
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_email.manager.autoresponserule.api:
         class: %oro_email.manager.autoresponserule.api.class%
@@ -806,13 +812,6 @@ services:
         class: %oro_email.workflow.condition.has_count.class%
         tags:
             - { name: oro_workflow.condition, alias: has_count }
-
-    oro_email.workflow.condition.auto_response_rules_exists:
-        class: %oro_email.workflow.condition.auto_response_rules_exists.class%
-        arguments:
-            - @doctrine
-        tags:
-            - { name: oro_workflow.condition, alias: auto_response_rules_exists }
 
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%

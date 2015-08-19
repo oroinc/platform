@@ -15,6 +15,8 @@ use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 
 class AutoResponseCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:email:autoresponse';
+
     const OPTION_ID = 'id';
 
     /**
@@ -23,12 +25,12 @@ class AutoResponseCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('oro:email:autoresponse')
+            ->setName(static::NAME)
             ->setDescription('Responds to email')
             ->addOption(
                 static::OPTION_ID,
                 null,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'The identifier of email system will respond.'
             );
     }
@@ -38,11 +40,13 @@ class AutoResponseCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $emailId = $input->getOption(static::OPTION_ID);
-        $email = $this->getEmailRepository()->find($emailId);
-        $this->getAutoResponseManager()->sendAutoResponses($email);
+        $emailIds = $input->getOption(static::OPTION_ID);
+        foreach ($emailIds as $emailId) {
+            $email = $this->getEmailRepository()->find($emailId);
+            $this->getAutoResponseManager()->sendAutoResponses($email);
 
-        $output->writeln(sprintf('<info>Auto responses sent for email - %s</info>', $emailId));
+            $output->writeln(sprintf('<info>Auto responses sent for email - %s</info>', $emailId));
+        }
     }
 
     /**
