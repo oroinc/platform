@@ -24,10 +24,10 @@ class ResponseHistoryListener
     /** @var string */
     protected $historyItemFQCN;
 
-    /** @var  string */
+    /** @var string */
     protected $userFQCN;
 
-    /** @var  string */
+    /** @var string */
     protected $navigationHistoryItemType;
 
     /** var ItemFactory */
@@ -158,15 +158,15 @@ class ResponseHistoryListener
     {
         $userFQCN = $this->userFQCN;
         $result = ($user instanceof $userFQCN)
-            && $response->getStatusCode() == 200
-            && $request->getRequestFormat() == 'html'
-            && $request->getMethod() == 'GET'
+            && $response->getStatusCode() === 200
+            && $request->getRequestFormat() === 'html'
+            && $request->getMethod() === 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER));
 
         if ($result) {
             $route  = $request->get('_route');
-            $result = $route[0] != '_' && $route != 'oro_default';
+            $result = $route[0] !== '_' && $route !== 'oro_default';
         }
 
         if ($result && $response->headers->has('Content-Disposition')) {
