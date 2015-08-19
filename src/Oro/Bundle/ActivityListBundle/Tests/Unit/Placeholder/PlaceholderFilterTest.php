@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonActiveTarget;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonManagedTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -52,7 +53,7 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper = $this
             ->getMockBuilder('\Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->setMethods(['isNewEntity'])
+            ->setMethods(['isNewEntity', 'isManageableEntity'])
             ->setConstructorArgs([$this->doctrine])
             ->getMock();
 
@@ -65,6 +66,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
                 throw new \RuntimeException('Something wrong');
             }));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntity')
+            ->willReturnCallback(function ($entity) {
+                return !$entity instanceof TestNonManagedTarget;
+            });
 
         $this->configureConfigProvider();
 
@@ -86,6 +93,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
         $this->assertFalse($this->filter->isApplicable(null, ActivityScope::VIEW_PAGE));
+    }
+
+    public function testIsApplicableWithNonManagedEntity()
+    {
+        $testTarget = new TestNonManagedTarget(1);
+        $this->assertFalse($this->filter->isApplicable($testTarget, ActivityScope::VIEW_PAGE));
     }
 
     public function testIsApplicableWithShowOnPageConfiguration()
