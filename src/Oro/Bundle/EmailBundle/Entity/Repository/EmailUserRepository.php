@@ -169,6 +169,20 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * @param EmailFolder $folder
+     *
+     * @return QueryBuilder
+     */
+    public function getEmailUserByFolder($folder)
+    {
+        $queryBuilder = $this->createQueryBuilder('eu')
+            ->andWhere('eu.folder = :folder')
+            ->setParameter('folder', $folder);
+
+        return $queryBuilder;
+    }
+
+    /**
      * @param QueryBuilder $queryBuilder
      * @param User $user
      * @return $this
