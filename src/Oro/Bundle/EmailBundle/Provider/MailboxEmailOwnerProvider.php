@@ -24,12 +24,4 @@ class MailboxEmailOwnerProvider implements EmailOwnerProviderInterface
     {
         return $em->getRepository('OroEmailBundle:Mailbox')->findOneByEmail($email);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enabledEmailSync()
-    {
-        return false;
-    }
 }

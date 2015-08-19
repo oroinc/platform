@@ -150,6 +150,18 @@ class ActivityListChainProvider
     }
 
     /**
+     * Check if given target entity supports by target classes list
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function isSupportedTargetEntity($entity)
+    {
+        return in_array($this->doctrineHelper->getEntityClass($entity), $this->getTargetEntityClasses());
+    }
+
+    /**
      * Check if given owner activity entity supports by activity list providers
      *
      * @param $entity

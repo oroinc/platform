@@ -35,6 +35,9 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $userEmailOwnerProvider;
 
+    /** @var ActivityListChainProvider */
+    private $chainProvider;
+
     protected function setUp()
     {
         $this->emailOwnerManager    =
@@ -57,12 +60,15 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->chainProvider =
+            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
+                ->disableOriginalConstructor()->getMock();
 
         $this->emailOwnerStorage = new EmailOwnerProviderStorage();
         $this->emailOwnerStorage->addProvider($this->userEmailOwnerProvider);
 
         $this->emailOwnersProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider')
-            ->setConstructorArgs([$this->emailOwnerStorage, $this->registry])
+            ->setConstructorArgs([$this->chainProvider, $this->emailOwnerStorage, $this->registry])
             ->setMethods(['supportOwnerProvider'])
             ->getMock();
 
@@ -127,9 +133,9 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(3))
             ->method('supportOwnerProvider')
             ->will($this->returnValue(true));
-        $this->userEmailOwnerProvider
+        $this->chainProvider
             ->expects($this->exactly(3))
-            ->method('enabledEmailSync')
+            ->method('isSupportedTargetEntity')
             ->will($this->returnValue(true));
         $this->userEmailOwnerProvider
             ->expects($this->exactly(3))
@@ -143,6 +149,79 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('flush');
         
+        $this->listener->onFlush($onFlushEventArgs);
+        $this->listener->postFlush($postFlushEventArgs);
+    }
+
+    public function testOnFlushNotSupported()
+    {
+        $contactsArray = [new User(), new User(), new User()];
+        $emailsArray = [new Email(), new Email(), new Email()];
+
+        $onFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
+            ->setMethods(['getEntityManager', 'getUnitOfWork', 'getScheduledEntityInsertions'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($onFlushEventArgs));
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($onFlushEventArgs));
+        $onFlushEventArgs
+            ->expects($this->once())
+            ->method('getScheduledEntityInsertions')
+            ->will($this->returnValue($contactsArray));
+
+        $this->emailOwnerManager->expects($this->once())
+            ->method('handleOnFlush')
+            ->with($this->identicalTo($onFlushEventArgs));
+        $this->emailActivityManager->expects($this->once())
+            ->method('handleOnFlush')
+            ->with($this->identicalTo($onFlushEventArgs));
+        $this->emailThreadManager->expects($this->once())
+            ->method('handleOnFlush')
+            ->with($this->identicalTo($onFlushEventArgs));
+
+        $postFlushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
+            ->setMethods(['getEntityManager', 'flush'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $postFlushEventArgs
+            ->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($postFlushEventArgs));
+
+        $this->registry
+            ->expects($this->never())
+            ->method('getRepository')
+            ->will($this->returnValue($this->registry));
+        $this->registry
+            ->expects($this->never())
+            ->method('getEmailsByOwnerEntity')
+            ->will($this->returnValue($emailsArray));
+        $this->emailOwnersProvider
+            ->expects($this->exactly(3))
+            ->method('supportOwnerProvider')
+            ->will($this->returnValue(true));
+        $this->chainProvider
+            ->expects($this->exactly(3))
+            ->method('isSupportedTargetEntity')
+            ->will($this->returnValue(false));
+        $this->userEmailOwnerProvider
+            ->expects($this->never())
+            ->method('getEmailOwnerClass')
+            ->will($this->returnValue(ClassUtils::getClass(new User)));
+
+        $this->emailActivityManager
+            ->expects($this->never())
+            ->method('addAssociation');
+        $postFlushEventArgs
+            ->expects($this->once())
+            ->method('flush');
+
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
     }

@@ -653,6 +653,7 @@ services:
     oro_email.provider.emailowners.provider:
         class: %oro_email.provider.emailowners.provider.class%
         arguments:
+            - @oro_activity_list.provider.chain
             - @oro_email.email.owner.provider.storage
             - @doctrine
 

@@ -104,8 +104,6 @@ class EmailRepository extends EntityRepository
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)
     {
         $queryBuilder = $this
-            ->getEntityManager()
-            ->getRepository(Email::ENTITY_CLASS)
             ->createQueryBuilder('e')
             ->join('e.recipients', 'r')
             ->join('r.emailAddress', 'ea')

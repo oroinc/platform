@@ -36,12 +36,4 @@ class EmailOwnerProvider implements EmailOwnerProviderInterface
 
         return $user;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enabledEmailSync()
-    {
-        return false;
-    }
 }
