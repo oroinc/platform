@@ -29,3 +29,8 @@ services:
         class:                Oro\Bundle\CacheBundle\Provider\PhpFileCache
         arguments:            [%kernel.cache_dir%/oro_data]
 ```
+
+Validation Caching
+------------------
+
+For validation caching there is a private service defined that uses public `oro_cache.provider.validation` which is a descendant of `oro.cache.abstract` by default. One can redefine that service to make validation caching suit some custom requirements (e.g. to use Memcache instead of default file caching).
