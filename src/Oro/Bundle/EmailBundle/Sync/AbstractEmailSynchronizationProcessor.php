@@ -9,12 +9,16 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
@@ -38,8 +42,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var int Timestamp when last batch was saved. */
     protected $dbBatchSaveTimestamp = 0;
 
-    /** @var array */
-    private $emailOriginUsers = [];
+    /** @var User|Mailbox */
+    protected $currentUser;
+
+    /** @var OrganizationInterface */
+    protected $currentOrganization;
 
     /**
      * Constructor
@@ -67,59 +74,73 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * Returns the id of a user the given email origin belongs to.
+     * @param EmailHeader           $email
+     * @param string                $folderType
+     * @param User|null             $user
+     * @param OrganizationInterface $organization
      *
-     * @param EmailOrigin $origin
-     *
-     * @return int|null
+     * @return bool
      */
-    protected function getUserId(EmailOrigin $origin)
+    protected function isApplicableEmail(EmailHeader $email, $folderType, $user = null, $organization = null)
     {
-        if (isset($this->emailOriginUsers[$origin->getId()])
-            || array_key_exists($origin->getId(), $this->emailOriginUsers)
-        ) {
-            return $this->emailOriginUsers[$origin->getId()];
+        if ($user === null) {
+            return $this->isKnownSender($email) && $this->isKnownRecipient($email);
+        }
+        if ($user instanceof User) {
+            if ($organization && !$this->checkOrganization($email, $folderType, $organization)) {
+                return false;
+            }
+            if ($folderType === FolderType::SENT) {
+                return $this->isUserSender($user->getId(), $email) && $this->isKnownRecipient($email);
+            } else {
+                return $this->isKnownSender($email) && $this->isUserRecipient($user->getId(), $email);
+            }
+        } elseif ($user instanceof Mailbox) {
+            if ($folderType === FolderType::SENT) {
+                return $this->isMailboxSender($user->getId(), $email);
+            } else {
+                return $this->isMailboxRecipient($user->getId(), $email);
+            }
         }
 
-        $this->logger->notice(sprintf('Finding an user for email origin "%s" ...', (string)$origin));
-        $qb = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')
-            ->createQueryBuilder('u')
-            ->select('u.id')
-            ->innerJoin('u.emailOrigins', 'o')
-            ->where('o.id = :originId')
-            ->setParameter('originId', $origin->getId())
-            ->setMaxResults(1);
-
-        $result = $qb->getQuery()->getArrayResult();
-        $userId = !empty($result) ? $result[0]['id'] : null;
-        if ($userId === null) {
-            $this->logger->notice('The user was not found.');
-        } else {
-            $this->logger->notice(sprintf('The user id: %s.', $userId));
-        }
-        $this->emailOriginUsers[$origin->getId()] = $userId;
-
-        return $userId;
+        return false;
     }
 
     /**
      * @param EmailHeader $email
-     * @param string      $folderType
-     * @param int|null    $userId
+     * @param             $folderType
+     * @param             $organization
      *
      * @return bool
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * todo CRM-2480 temporary solution for determination of emails` organization
      */
-    protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null)
+    protected function checkOrganization(EmailHeader $email, $folderType, $organization)
     {
-        if ($userId === null) {
-            return $this->isKnownSender($email) && $this->isKnownRecipient($email);
-        }
+        $helper = new EmailAddressHelper();
+        $repo = $this->em->getRepository('OroCRMContactBundle:ContactEmail');
+        $qb = $repo->createQueryBuilder('ce');
 
         if ($folderType === FolderType::SENT) {
-            return $this->isUserSender($userId, $email) && $this->isKnownRecipient($email);
+            $emailList = array_merge($email->getToRecipients(), $email->getCcRecipients(), $email->getBccRecipients());
         } else {
-            return $this->isKnownSender($email) && $this->isUserRecipient($userId, $email);
+            $emailList = [$email->getFrom()];
         }
+        foreach ($emailList as &$emailAddress) {
+            $emailAddress = strtolower($helper->extractPureEmailAddress($emailAddress));
+        }
+        $query = $qb->where($qb->expr()->in('ce.email', $emailList))->getQuery();
+        $result = $query->getResult();
+
+        if ($result) {
+            foreach ($result as $contactEmail) {
+                if ($contactEmail->getOwner()->getOrganization()->getId() === $organization->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -222,15 +243,22 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /**
      * Creates email entity and register it in the email entity batch processor
      *
-     * @param EmailHeader $email
-     * @param EmailFolder $folder
-     * @param bool        $isSeen
+     * @param EmailHeader           $email
+     * @param EmailFolder           $folder
+     * @param bool                  $isSeen
+     * @param User|Mailbox          $owner
+     * @param OrganizationInterface $organization
      *
-     * @return EmailEntity
+     * @return EmailUser
      */
-    protected function addEmail(EmailHeader $email, EmailFolder $folder, $isSeen = false)
-    {
-        $emailEntity = $this->emailEntityBuilder->email(
+    protected function addEmailUser(
+        EmailHeader $email,
+        EmailFolder $folder,
+        $isSeen = false,
+        $owner = null,
+        OrganizationInterface $organization = null
+    ) {
+        $emailUser = $this->emailEntityBuilder->emailUser(
             $email->getSubject(),
             $email->getFrom(),
             $email->getToRecipients(),
@@ -239,17 +267,23 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             $email->getInternalDate(),
             $email->getImportance(),
             $email->getCcRecipients(),
-            $email->getBccRecipients()
+            $email->getBccRecipients(),
+            $owner,
+            $organization
         );
-        $emailEntity
-            ->addFolder($folder)
-            ->setMessageId($email->getMessageId())
-            ->setRefs($email->getRefs())
-            ->setXMessageId($email->getXMessageId())
-            ->setXThreadId($email->getXThreadId())
-            ->setSeen($isSeen);
 
-        return $emailEntity;
+        $emailUser
+            ->setFolder($folder)
+            ->setSeen($isSeen)
+            ->getEmail()
+                ->setMessageId($email->getMessageId())
+                ->setMultiMessageId($email->getMultiMessageId())
+                ->setRefs($email->getRefs())
+                ->setXMessageId($email->getXMessageId())
+                ->setXThreadId($email->getXThreadId())
+                ->setAcceptLanguageHeader($email->getAcceptLanguageHeader());
+
+        return $emailUser;
     }
 
     /**
@@ -278,18 +312,31 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * Returns entity classes which should NOT be cleared from entity manager.
-     * Used by cleanUp method.
-     *
+     * @param EmailOrigin $emailOrigin
+     */
+    protected function initEnv(EmailOrigin $emailOrigin)
+    {
+        $this->currentUser = $this->em->getRepository('OroEmailBundle:Mailbox')->findOneByOrigin($emailOrigin);
+        if ($this->currentUser === null) {
+            $this->currentUser = $emailOrigin->getOwner() ? $this->em->getReference(
+                'Oro\Bundle\UserBundle\Entity\User',
+                $emailOrigin->getOwner()->getId()
+            ) : null;
+        }
+        $this->currentOrganization = $this->em->getReference(
+            'Oro\Bundle\OrganizationBundle\Entity\Organization',
+            $emailOrigin->getOrganization()->getId()
+        );
+    }
+
+    /**
      * @return array
      */
-    protected function getDoNotCleanableEntityClasses()
+    protected function entitiesToClear()
     {
         return [
-            'Oro\Bundle\ConfigBundle\Entity\Config',
-            'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
-            'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
-            'Oro\Bundle\EmailBundle\Entity\EmailFolder'
+            'Oro\Bundle\EmailBundle\Entity\EmailUser',
+            'Oro\Bundle\ImapBundle\Entity\ImapEmail',
         ];
     }
 
@@ -305,19 +352,14 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
      */
     protected function cleanUp($isFolderSyncComplete = false, $folder = null)
     {
-        /**
-         * Entities which should NOT be cleared.
-         */
-        $doNotClear = $this->getDoNotCleanableEntityClasses();
+        $this->emailEntityBuilder->getBatch()->clear();
 
         /**
          * Clear entity manager.
          */
-        $map = array_keys($this->em->getUnitOfWork()->getIdentityMap());
+        $map = $this->entitiesToClear();
         foreach ($map as $entityClass) {
-            if (!in_array($entityClass, $doNotClear)) {
-                $this->em->clear($entityClass);
-            }
+            $this->em->clear($entityClass);
         }
 
         /**
@@ -345,5 +387,39 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             }
         }
         $this->dbBatchSaveTimestamp = time();
+    }
+
+    /**
+     * Checks if recipient is a system-wide mailbox.
+     *
+     * @param integer     $mailboxId
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    private function isMailboxRecipient($mailboxId, $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneMailboxEmailAddress(
+            $mailboxId,
+            $email->getToRecipients(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+    }
+
+    /**
+     * Checks if sender is a system-wide mailbox.
+     *
+     * @param integer     $mailboxId
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    private function isMailboxSender($mailboxId, $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneMailboxEmailAddress(
+            $mailboxId,
+            $email->getFrom()
+        );
     }
 }

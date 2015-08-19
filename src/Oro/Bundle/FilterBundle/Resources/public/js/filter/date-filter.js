@@ -1,18 +1,16 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DateFilter,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        tools = require('oroui/js/tools'),
-        __ = require('orotranslation/js/translator'),
-        ChoiceFilter = require('./choice-filter'),
-        VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view'),
-        DateVariableHelper = require('orofilter/js/date-variable-helper'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings = require('orolocale/js/locale-settings');
+    var DateFilter;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var __ = require('orotranslation/js/translator');
+    var ChoiceFilter = require('./choice-filter');
+    var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
+    var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var localeSettings = require('orolocale/js/locale-settings');
     require('orofilter/js/datevariables-widget');
 
     /**
@@ -120,13 +118,13 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function () {
+        initialize: function() {
             // make own copy of options
             this.dateWidgetOptions = $.extend(true, {}, this.dateWidgetOptions, this.externalWidgetOptions);
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
 
             //parts rendered only if theme exist
-            this.hasPartsElement = (this.templateTheme != "");
+            this.hasPartsElement = (this.templateTheme !== '');
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -145,7 +143,7 @@ define(function (require) {
             }
             // temp code to keep backward compatible
             if ($.isPlainObject(this.dateParts)) {
-                this.dateParts = _.map(this.dateParts, function (option, i) {
+                this.dateParts = _.map(this.dateParts, function(option, i) {
                     return {value: i.toString(), label: option};
                 });
             }
@@ -164,7 +162,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -174,17 +172,17 @@ define(function (require) {
             DateFilter.__super__.dispose.call(this);
         },
 
-        onChangeFilterType: function (e) {
-            var select = this.$el.find(e.currentTarget),
-                value = select.val();
+        onChangeFilterType: function(e) {
+            var select = this.$el.find(e.currentTarget);
+            var value = select.val();
             this.changeFilterType(value);
         },
 
-        changeFilterType: function (value) {
+        changeFilterType: function(value) {
             var type = parseInt(value, 10);
             if (!isNaN(type)) {
                 // it's type
-                this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display','');
+                this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display', '');
                 if (this.typeValues.moreThan === type) {
                     this.$('.filter-separator, .filter-end-date').hide();
                     this.subview('end').setValue('');
@@ -204,19 +202,19 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function () {
+        _renderCriteria: function() {
             var value = _.extend({}, this.emptyValue, this.getValue());
-            var part  = {value: value.part, type: value.part};
+            var part = {value: value.part, type: value.part};
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
-            var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
+            var selectedPartLabel = this._getSelectedChoiceLabel('dateParts', part);
             this.dateWidgetOptions.part = part.type;
 
             var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
             var parts = [];
 
             // add date parts only if embed template used
-            if (this.templateTheme !== "") {
+            if (this.templateTheme !== '') {
                 parts.push(
                     datePartTemplate({
                         name: this.name + '_part',
@@ -259,12 +257,15 @@ define(function (require) {
          *
          * @protected
          */
-        _renderSubViews: function () {
-            var name, selector, pickerView, options,
-                value = this.criteriaValueSelectors.value;
+        _renderSubViews: function() {
+            var name;
+            var selector;
+            var pickerView;
+            var options;
+            var value = this.criteriaValueSelectors.value;
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
-                    return;
+                    continue;
                 }
                 selector = value[name];
                 options = this._getPickerConfigurationOptions({
@@ -275,7 +276,7 @@ define(function (require) {
             }
         },
 
-        _updateValueField: function () {
+        _updateValueField: function() {
             // nothing to do
         },
 
@@ -286,7 +287,7 @@ define(function (require) {
          * @returns {Object}
          * @protected
          */
-        _getPickerConfigurationOptions: function (options) {
+        _getPickerConfigurationOptions: function(options) {
             _.extend(options, {
                 nativeMode: tools.isMobile(),
                 dateInputAttrs: {
@@ -303,14 +304,14 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function () {
-            var hint = '',
-                option, start, end, type,
-                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+        _getCriteriaHint: function() {
+            var hint = '';
+            var option;
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             if (value.value) {
-                start = value.value.start;
-                end   = value.value.end;
-                type  = value.type ? value.type.toString() : '';
+                var start = value.value.start;
+                var end = value.value.end;
+                var type = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
@@ -329,7 +330,6 @@ define(function (require) {
                             hint += [__('after'), end].join(' ');
                         }
                         break;
-                    case this.typeValues.between.toString():
                     default:
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.between);
@@ -352,7 +352,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _formatDisplayValue: function (value) {
+        _formatDisplayValue: function(value) {
             if (value.value && value.value.start) {
                 value.value.start = this._toDisplayValue(value.value.start);
             }
@@ -365,7 +365,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _formatRawValue: function (value) {
+        _formatRawValue: function(value) {
             if (value.value && value.value.start) {
                 value.value.start = this._toRawValue(value.value.start);
             }
@@ -382,7 +382,7 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _toDisplayValue: function (value) {
+        _toDisplayValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isBackendDateValid(value)) {
@@ -397,7 +397,7 @@ define(function (require) {
          * @returns {string}
          * @protected
          */
-        _toRawValue: function (value) {
+        _toRawValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateValid(value)) {
@@ -409,7 +409,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
@@ -426,7 +426,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
                 //empty default parts value if parts not exist
@@ -441,15 +441,15 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _focusCriteria: function () {
+        _focusCriteria: function() {
             this.$(this.criteriaSelector).focus();
         },
 
-        _getSelectedChoiceLabel: function (property, value) {
+        _getSelectedChoiceLabel: function(property, value) {
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
-                var foundChoice = _.find(this[property], function (choice) {
-                    return (choice.value == value.type);
+                var foundChoice = _.find(this[property], function(choice) {
+                    return (String(choice.value) === String(value.type));
                 });
                 selectedChoiceLabel = foundChoice.label;
             }

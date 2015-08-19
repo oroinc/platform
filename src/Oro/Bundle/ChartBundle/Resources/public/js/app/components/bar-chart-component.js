@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var BarChartComponent,
-        Flotr = require('flotr2'),
-        numberFormatter = require('orolocale/js/formatter/number'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var BarChartComponent;
+    var Flotr = require('flotr2');
+    var numberFormatter = require('orolocale/js/formatter/number');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.BarChartComponent
@@ -18,6 +18,8 @@ define(function(require) {
          * @overrides
          */
         draw: function() {
+            var intValue;
+            var maxValue = 0;
             var $chart = this.$chart;
             var data = this.data;
             var options = this.options;
@@ -29,9 +31,14 @@ define(function(require) {
             var xLabels = [];
             var chartOptions;
 
-            for(var i in data) {
-                chartData.push([xNumber++, parseInt(data[i]['value'])]);
-                xLabels.push(data[i]['label']);
+            for (var i in data) {
+                if (!data.hasOwnProperty(i)) {
+                    continue;
+                }
+                intValue = parseInt(data[i].value);
+                maxValue = Math.max(intValue, maxValue);
+                chartData.push([xNumber++, intValue]);
+                xLabels.push(data[i].label);
             }
 
             chartOptions = {
@@ -40,8 +47,8 @@ define(function(require) {
                 markers: {
                     show: true,
                     position: 'ct',
-                    labelFormatter: function (data) {
-                        if(formatter) {
+                    labelFormatter: function(data) {
+                        if (formatter) {
                             return numberFormatter[formatter](data.y);
                         } else {
                             return data.y;
@@ -56,19 +63,19 @@ define(function(require) {
                     colors: settings.chartColors,
                     fontColor: settings.chartFontColor,
                     fontSize: settings.chartFontSize,
-                    bars : {
+                    bars: {
                         show: true,
                         horizontal: false,
                         shadowSize: 0,
                         barWidth: 0.5
                     },
-                    mouse : {
-                        track : true,
-                        relative : true,
-                        trackFormatter: function (data) {
+                    mouse: {
+                        track: true,
+                        relative: true,
+                        trackFormatter: function(data) {
                             var yValue;
 
-                            if(formatter) {
+                            if (formatter) {
                                 yValue = numberFormatter[formatter](data.y);
                                 return numberFormatter[formatter](data.y);
                             } else {
@@ -80,8 +87,9 @@ define(function(require) {
                     },
                     yaxis: {
                         min: 0,
-                        tickFormatter: function (y) {
-                            if(formatter) {
+                        max: maxValue * 1.2, // to make visible label above the highest bar
+                        tickFormatter: function(y) {
+                            if (formatter) {
                                 return numberFormatter.formatCurrency(y);
                             } else {
                                 return y;
@@ -90,12 +98,12 @@ define(function(require) {
                     },
                     xaxis: {
                         noTicks: settings.xNoTicks,
-                        tickFormatter: function (x) {
+                        tickFormatter: function(x) {
                             return xLabels[parseInt(x)];
                         }
                     },
                     grid: {
-                        verticalLines : false
+                        verticalLines: false
                     }
                 }
             );

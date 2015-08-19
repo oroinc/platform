@@ -1,36 +1,38 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var WorkflowModel,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        BaseModel = require('oroui/js/app/models/base/model'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        StepCollection = require('./step-collection'),
-        TransitionCollection = require('./transition-collection'),
-        TransitionDefinitionCollection = require('./transition-definition-collection'),
-        AttributeCollection = require('./attribute-collection'),
-        StepModel = require('./step-model'),
-        TransitionModel = require('./transition-model'),
-        TransitionDefinitionModel = require('./transition-definition-model'),
-        AttributeModel = require('./attribute-model'),
-        EntityFieldsUtil = require('oroentity/js/entity-fields-util');
+    var WorkflowModel;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var StatefulModel = require('oroui/js/app/models/base/stateful-model');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var StepCollection = require('./step-collection');
+    var TransitionCollection = require('./transition-collection');
+    var TransitionDefinitionCollection = require('./transition-definition-collection');
+    var AttributeCollection = require('./attribute-collection');
+    var StepModel = require('./step-model');
+    var TransitionModel = require('./transition-model');
+    var TransitionDefinitionModel = require('./transition-definition-model');
+    var AttributeModel = require('./attribute-model');
+    var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
-    WorkflowModel = BaseModel.extend({
+    WorkflowModel = StatefulModel.extend({
         defaults: {
             name: '',
             label: '',
             entity: '',
-            entity_attribute: 'entity',
-            start_step: null,
-            steps_display_ordered: false,
+            'entity_attribute': 'entity',
+            'start_step': null,
+            'steps_display_ordered': false,
             steps: null,
             transitions: null,
-            transition_definitions: null,
+            'transition_definitions': null,
             attributes: null
         },
 
+        MAX_HISTORY_LENGTH: 50,
+
+        observedAttributes: ['steps', 'transitions'],
         entityFieldUtil: null,
         entityFieldsInitialized: false,
 
@@ -49,15 +51,25 @@ define(function(require) {
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
-
-            _.each(this.get('steps').models, this.setWorkflow, this);
-            _.each(this.get('transitions').models, this.setWorkflow, this);
-            this.listenTo(this.get('steps'), 'add', this.setWorkflow);
-            this.listenTo(this.get('transitions'), 'add', this.setWorkflow);
+            var steps = this.get('steps');
+            var transitions = this.get('transitions');
+            this.setWorkflowToCollection(steps);
+            this.setWorkflowToCollection(transitions);
+            this.listenTo(steps, 'add', this.setWorkflow);
+            this.listenTo(transitions, 'add', this.setWorkflow);
+            this.listenTo(steps, 'reset', this.setWorkflowToCollection);
+            this.listenTo(transitions, 'reset', this.setWorkflowToCollection);
+            WorkflowModel.__super__.initialize.apply(this, arguments);
         },
 
-        setWorkflow: function (item) {
+        setWorkflow: function(item) {
             item.setWorkflow(this);
+        },
+
+        setWorkflowToCollection: function(collection) {
+            collection.each(function(item) {
+                item.setWorkflow(this);
+            }, this);
         },
 
         cloneTransitionDefinition: function(definition) {
@@ -120,7 +132,7 @@ define(function(require) {
                 cloned.position = [
                     cloned.position[0] + this.positionIncrementPx,
                     cloned.position[1] + this.positionIncrementPx
-                ]
+                ];
             }
 
             var clonedModel = new StepModel(cloned);
@@ -149,7 +161,7 @@ define(function(require) {
         getFieldIdByPropertyPath: function(propertyPath) {
             var pathData = propertyPath.split('.');
 
-            if (pathData.length > 1 && pathData[0] == this.get('entity_attribute')) {
+            if (pathData.length > 1 && pathData[0] === this.get('entity_attribute')) {
                 pathData.splice(0, 1);
                 return this.entityFieldUtil.getPathByPropertyPath(pathData);
             } else {
@@ -194,6 +206,10 @@ define(function(require) {
             return this._getByName('steps', name);
         },
 
+        getStartStep: function() {
+            return this.get('steps').where({'_is_start': true});
+        },
+
         getTransitionByName: function(name) {
             return this._getByName('transitions', name);
         },
@@ -208,6 +224,19 @@ define(function(require) {
 
         _getByName: function(item, name) {
             return _.first(this.get(item).where({'name': name}));
+        },
+
+        getState: function() {
+            return {
+                steps: this.get('steps').toJSON(),
+                transitions: this.get('transitions').toJSON()
+            };
+        },
+        setState: function(data) {
+            if (data.steps && data.transitions) {
+                this.get('steps').reset(data.steps);
+                this.get('transitions').reset(data.transitions);
+            }
         }
     });
 

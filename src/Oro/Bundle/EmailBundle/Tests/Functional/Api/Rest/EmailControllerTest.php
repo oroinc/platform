@@ -14,17 +14,18 @@ class EmailControllerTest extends WebTestCase
 
     /** @var array */
     protected $email = [
-        'folders'    => [
+        'folders' => [
             ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
         ],
-        'subject'    => 'New email',
-        'messageId'  => 'test@email-bundle.func-test',
-        'from'       => '"Address 1" <1@example.com>',
-        'to'         => ['"Address 2" <2@example.com>', '3@example.com'],
-        'cc'         => '2@example.com; "Address 3" <3@example.com>',
+        'subject' => 'New email',
+        'messageId' => 'test@email-bundle.func-test',
+        'from' => '"Address 1" <1@example.com>',
+        'to' => ['"Address 2" <2@example.com>', '3@example.com'],
+        'cc' => '2@example.com; "Address 3" <3@example.com>',
         'importance' => 'low',
-        'body'       => 'Test body',
-        'bodyType'   => 'text'
+        'body' => 'Test body',
+        'bodyType' => 'text',
+        'receivedAt' => '2015-06-19 12:17:51'
     ];
 
     protected function setUp()
@@ -77,103 +78,15 @@ class EmailControllerTest extends WebTestCase
         return $result['id'];
     }
 
-    public function testGetAssociation()
-    {
-        $this->getAssociation(self::INCORRECT_ID);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id = $this->getReference('email_1')->getId();
-        $this->getAssociation($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
-    }
-
-    public function testDeleteAssociation()
-    {
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->deleteAssociation(self::INCORRECT_ID, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id     = $this->getReference('email_1')->getId();
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->deleteAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 200);
-    }
-
-    public function testPostAssociation()
-    {
-        $userId = $this->getReference('simple_user2')->getId();
-        $this->postAssociation(self::INCORRECT_ID, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 404);
-
-        $id     = $this->getReference('email_1')->getId();
-        $userId = $this->getReference('simple_user2')->getId();
-
-        $this->getAssociation($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertCount(1, $result);
-
-        $this->postAssociation($id, 'Oro\Bundle\UserBundle\Entity\User', $userId);
-        $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->getAssociation($id);
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
-    }
-
-
-    protected function getAssociationData($id)
+    public function testGetEmailContext()
     {
         $this->client->request(
             'GET',
-            $this->getUrl('oro_api_get_email_associations_data', ['entityId' => $id])
+            $this->getUrl('oro_api_get_email_context', ['id' => $this->getReference('email_1')->getId()])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        return $result;
-    }
-
-
-    protected function getAssociation($id)
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_api_get_email_association', ['entityId' => $id])
-        );
-    }
-
-    protected function deleteAssociation($entityId, $targetClassName, $targetId)
-    {
-        $param = [
-            'entityId'        => $entityId,
-            'targetClassName' => $targetClassName,
-            'targetId'        => $targetId
-        ];
-
-        $this->client->request(
-            'DELETE',
-            $this->getUrl('oro_api_delete_email_association', $param)
-        );
-    }
-
-    protected function postAssociation($entityId, $targetClassName, $targetId)
-    {
-        $param = [
-            'entityId'        => $entityId,
-            'targetClassName' => $targetClassName,
-            'targetId'        => $targetId
-        ];
-
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_api_post_email_associations', $param)
-        );
+        $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(2, $entities);
     }
 
     public function testCreateEmail()
@@ -184,7 +97,6 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
         $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertTrue($email['head']);
-        $this->assertFalse($email['seen']);
 
         return $response['id'];
     }
@@ -211,11 +123,29 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('POST', $this->getUrl('oro_api_post_email'), $newEmail);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Subject cannot be changed for already existing email.'
-            . ' Existing value: "New email". New value: "New subject".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Subject cannot be changed for already existing email.'
+                . ' Existing value: "New email". New value: "New subject".'
+            );
+        }
+    }
+
+    public function testCreateEmailWithoutSubjectAndBody()
+    {
+        $email = $this->email;
+        $email['messageId'] = 'new.test@email-bundle.func-test';
+        unset($email['subject'], $email['body'], $email['bodyType']);
+
+        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $response['id']]));
+        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertNotNull($email['subject'], "The Subject cannot be null. It should be empty string");
+        $this->assertNotNull($email['body'], "The Body cannot be null. It should be empty string");
     }
 
     /**
@@ -227,18 +157,13 @@ class EmailControllerTest extends WebTestCase
      */
     public function testUpdateEmail($id)
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertFalse($email['seen']);
-
-        $folders   = $email['folders'];
+        $folders   = [];
         $folders[] = [
             'fullName' => 'INBOX \ Folder1',
             'name'     => 'Folder1',
             'type'     => 'inbox'
         ];
         $folders[] = [
-            'origin'   => $folders[0]['origin'],
             'fullName' => 'INBOX \ Folder2',
             'name'     => 'Folder2',
             'type'     => 'inbox'
@@ -250,6 +175,7 @@ class EmailControllerTest extends WebTestCase
             $this->getUrl('oro_api_put_email', ['id' => $id]),
             [
                 'seen'    => 1,
+                'receivedAt' => '2015-06-19 12:17:51',
                 'folders' => $folders
             ]
         );
@@ -257,10 +183,7 @@ class EmailControllerTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_api_get_email', ['id' => $id]));
-        $email = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertCount(3, $email['folders']);
-        $this->assertTrue($email['seen']);
+        $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         return $id;
     }
@@ -281,10 +204,13 @@ class EmailControllerTest extends WebTestCase
         );
         $response = $this->getJsonResponseContent($this->client->getResponse(), 500);
 
-        $this->assertEquals(
-            $response['message'],
-            'The Head cannot be changed for already existing email.'
-            . ' Existing value: "true". New value: "false".'
-        );
+        // The original exception message is returned only if functional tests are running in debug mode
+        if ($this->client->getKernel()->isDebug()) {
+            $this->assertEquals(
+                $response['message'],
+                'The Head cannot be changed for already existing email.'
+                . ' Existing value: "true". New value: "false".'
+            );
+        }
     }
 }

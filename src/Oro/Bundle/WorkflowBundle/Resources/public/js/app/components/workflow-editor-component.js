@@ -1,26 +1,27 @@
-/* global define */
 /** @exports WorkflowEditorComponent */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var WorkflowEditorComponent,
-        WorkflowViewerComponent = require('./workflow-viewer-component'),
-        FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view'),
-        flowchartTools = require('oroworkflow/js/tools/flowchart-tools'),
-        mediator = require('oroui/js/mediator'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
-        tools = require('oroui/js/tools'),
-        routing = require('routing'),
-        helper = require('oroworkflow/js/tools/workflow-helper'),
-        WorkflowManagementView = require('../views/workflow-management-view'),
-        TransitionModel = require('../models/transition-model'),
-        TransitionEditFormView = require('../views/transition/transition-edit-view'),
-        StepEditView = require('../views/step/step-edit-view'),
-        StepModel = require('../models/step-model'),
-        workflowModelFactory = require('../../tools/workflow-model-factory'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var WorkflowEditorComponent;
+    var WorkflowViewerComponent = require('./workflow-viewer-component');
+    var HistoryNavigationComponent = require('oroui/js/app/components/history-navigation-component');
+    var FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view');
+    var mediator = require('oroui/js/mediator');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var messenger = require('oroui/js/messenger');
+    var tools = require('oroui/js/tools');
+    var routing = require('routing');
+    var helper = require('oroworkflow/js/tools/workflow-helper');
+    var WorkflowManagementView = require('../views/workflow-management-view');
+    var TransitionModel = require('../models/transition-model');
+    var TransitionEditFormView = require('../views/transition/transition-edit-view');
+    var StepEditView = require('../views/step/step-edit-view');
+    var StepModel = require('../models/step-model');
+    var workflowModelFactory = require('../../tools/workflow-model-factory');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var console = window.console;
 
     /**
      * Builds workflow editor UI.
@@ -28,26 +29,26 @@ define(function (require) {
      * @class WorkflowEditorComponent
      * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = WorkflowViewerComponent.extend(
-        /** @lends WorkflowEditorComponent.prototype */{
+    WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
 
-        initViews: function () {
-            flowchartTools.checkPositions(this.model);
-
+        /**
+         * @inheritDoc
+         */
+        initViews: function($el, flowchartOptions) {
             this.workflowManagementView = new WorkflowManagementView({
-                el: this._sourceElement,
+                el: $el,
                 stepsEl: '.workflow-definition-steps-list-container',
                 model: this.model
             });
-
-            this.workflowManagementView.render();
-
-            this.flowchartView = new FlowchartEditorWorkflowView({
-                el: this._sourceElement.find('.workflow-flowchart'),
-                model: this.model
+            this.historyManager = new HistoryNavigationComponent({
+                observedModel: this.model,
+                _sourceElement: $el.find('.workflow-history-container')
             });
-
-            this.flowchartView.render();
+            this.workflowManagementView.render();
+            if (this.flowchartEnabled) {
+                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
+            }
+            WorkflowEditorComponent.__super__.initViews.apply(this, arguments);
         },
 
         /**
@@ -56,6 +57,7 @@ define(function (require) {
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
             'requestAddStep model': 'addNewStep',
+            'requestRefreshChart model': 'refreshChart',
             'requestEditStep model': 'openManageStepForm',
             'requestCloneStep model': 'cloneStep',
             'requestRemoveStep model': 'removeStep',
@@ -67,12 +69,22 @@ define(function (require) {
         },
 
         /**
+         * Automatically organizes steps on flowchart. Fits flowchart to screen.
+         */
+        refreshChart: function() {
+            if (this.flowchartEnabled) {
+                this.flowchartView.jsPlumbManager.organizeBlocks();
+                this.flowchartView.$el.trigger('autozoom');
+            }
+        },
+
+        /**
          * Opens a "Add transition" dialog
          *
          * @param {StepModel} stepFrom
          * @param {StepModel=} stepTo
          */
-        addNewStepTransition: function (stepFrom, stepTo) {
+        addNewStepTransition: function(stepFrom, stepTo) {
             var transition = new TransitionModel();
             this.openManageTransitionForm(transition, stepFrom, stepTo);
         },
@@ -84,7 +96,7 @@ define(function (require) {
          * @param {StepModel=} stepFrom
          * @param {StepModel=} stepTo
          */
-        openManageTransitionForm: function (transition, stepFrom, stepTo) {
+        openManageTransitionForm: function(transition, stepFrom, stepTo) {
             if (this.model.get('steps').length === 1) {
                 this._showModalMessage(__('At least one step should be added to add transition.'), __('Warning'));
                 return;
@@ -111,7 +123,7 @@ define(function (require) {
          *
          * @param {StepModel} step
          */
-        openManageStepForm: function (step) {
+        openManageStepForm: function(step) {
             if (!this.workflowManagementView.isEntitySelected()) {
                 this._showModalMessage(__('Related entity must be selected to add step.'), __('Warning'));
                 return;
@@ -131,7 +143,7 @@ define(function (require) {
          *
          * @param {StepModel} step
          */
-        addStep: function (step) {
+        addStep: function(step) {
             if (!this.model.get('steps').get(step.cid)) {
                 this.model.get('steps').add(step);
             }
@@ -142,7 +154,7 @@ define(function (require) {
          *
          * @param {StepModel} step - step to clone
          */
-        cloneStep: function (step) {
+        cloneStep: function(step) {
             var clonedStep = this.model.cloneStep(step, true);
             this.openManageStepForm(clonedStep);
         },
@@ -152,7 +164,7 @@ define(function (require) {
          *
          * @param {StepModel} step - step to clone
          */
-        removeStep: function (step) {
+        removeStep: function(step) {
             this._removeHandler(step, __('Are you sure you want to delete this step?'));
         },
 
@@ -164,7 +176,7 @@ define(function (require) {
          * @param {string} okText
          * @private
          */
-        _showModalMessage: function (message, title, okText) {
+        _showModalMessage: function(message, title, okText) {
             var confirm = new DeleteConfirmation({
                 title: title || '',
                 content: message,
@@ -181,11 +193,11 @@ define(function (require) {
          * @param {string} message - Message to show in confirmation dialog
          * @private
          */
-        _removeHandler: function (model, message) {
+        _removeHandler: function(model, message) {
             var confirm = new DeleteConfirmation({
                 content: message
             });
-            confirm.on('ok', function () {
+            confirm.on('ok', function() {
                 model.destroy();
             });
             confirm.open();
@@ -194,9 +206,9 @@ define(function (require) {
         /**
          * Clean ups workflow model
          */
-        resetWorkflow: function () {
+        resetWorkflow: function() {
             //Need to manually destroy collection elements to trigger all appropriate events
-            var resetCollection = function (collection) {
+            var resetCollection = function(collection) {
                 if (collection.length) {
                     for (var i = collection.length - 1; i > -1; i--) {
                         collection.at(i).destroy();
@@ -219,7 +231,7 @@ define(function (require) {
          * @returns {StepModel}
          * @private
          */
-        _getStartingStep: function () {
+        _getStartingStep: function() {
             return this.model.getStepByName('step:starting_point');
         },
 
@@ -228,7 +240,7 @@ define(function (require) {
          *
          * @param e
          */
-        saveConfiguration: function (e) {
+        saveConfiguration: function(e) {
             e.preventDefault();
             if (!this.workflowManagementView.valid()) {
                 return;
@@ -251,25 +263,25 @@ define(function (require) {
 
             mediator.execute('showLoading');
             this.model.save(null, {
-                'success': _.bind(function () {
+                'success': _.bind(function() {
                     mediator.execute('hideLoading');
 
-                    var redirectUrl = '',
-                        modelName = this.model.get('name'),
-                        saveAndClose = this.workflowManagementView.submitActor &&
+                    var redirectUrl = '';
+                    var modelName = this.model.get('name');
+                    var saveAndClose = this.workflowManagementView.submitActor &&
                             !$(this.workflowManagementView.submitActor).is('[data-action="save_and_stay"]');
                     if (saveAndClose) {
-                        redirectUrl = routing.generate('oro_workflow_definition_view', { name: modelName });
+                        redirectUrl = routing.generate('oro_workflow_definition_view', {name: modelName});
                     } else {
-                        redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
+                        redirectUrl = routing.generate('oro_workflow_definition_update', {name: modelName});
                     }
 
-                    mediator.once('page:afterChange', function () {
+                    mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
-                    mediator.execute('redirectTo', {url: redirectUrl});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
                 }, this),
-                'error': function (model, response) {
+                'error': function(model, response) {
                     mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
 
@@ -286,7 +298,7 @@ define(function (require) {
          *
          * @returns {boolean} validation result
          */
-        validateWorkflow: function () {
+        validateWorkflow: function() {
             // workflow label should be defined
             if (!this.model.get('label')) {
                 messenger.notificationFlashMessage('error', __('Could not save workflow. Please set workflow name.'));
@@ -326,7 +338,7 @@ define(function (require) {
          * @param {TransitionModel} transition
          * @param {StepModel} stepFrom
          */
-        cloneTransition: function (transition, stepFrom) {
+        cloneTransition: function(transition, stepFrom) {
             var clonedTransition = this.model.cloneTransition(transition, true);
             this.openManageTransitionForm(clonedTransition, stepFrom);
         },
@@ -337,7 +349,7 @@ define(function (require) {
          * @param {TransitionModel} transition
          * @param {StepModel} stepFrom
          */
-        addTransition: function (transition, stepFrom) {
+        addTransition: function(transition, stepFrom) {
             if (!this.model.get('transitions').get(transition.cid)) {
                 if (_.isString(stepFrom)) {
                     stepFrom = this.model.getStepByName(stepFrom);
@@ -358,7 +370,7 @@ define(function (require) {
         /**
          * Opens "Add step" dialog
          */
-        addNewStep: function () {
+        addNewStep: function() {
             var step = new StepModel();
             this.openManageStepForm(step);
         },
@@ -368,7 +380,7 @@ define(function (require) {
          *
          * @param {TransitionModel} transition
          */
-        removeTransition: function (transition) {
+        removeTransition: function(transition) {
             this._removeHandler(transition, __('Are you sure you want to delete this transition?'));
         }
     });

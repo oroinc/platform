@@ -21,7 +21,8 @@ class ImapEmailRepository extends EntityRepository
     {
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.folders', 'folder')
+            ->innerJoin('email.emailUsers', 'email_users')
+            ->innerJoin('email_users.folder', 'folder')
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
             ->setParameter('uids', $uids);
@@ -59,7 +60,8 @@ class ImapEmailRepository extends EntityRepository
         return $this->createQueryBuilder('imap_email')
             ->innerJoin('imap_email.imapFolder', 'imap_folder')
             ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.folders', 'folder')
+            ->innerJoin('email.emailUsers', 'email_users')
+            ->innerJoin('email_users.folder', 'folder')
             ->where('folder.origin = :origin AND email.messageId IN (:messageIds)')
             ->setParameter('origin', $origin)
             ->setParameter('messageIds', $messageIds);
@@ -74,7 +76,7 @@ class ImapEmailRepository extends EntityRepository
     public function getEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, imap_folder, folder')
+            ->select('imap_email, email, email_users, imap_folder, folder')
             ->getQuery()
             ->getResult();
 
@@ -90,11 +92,57 @@ class ImapEmailRepository extends EntityRepository
     public function getOutdatedEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, imap_folder, folder')
+            ->select('imap_email, email, email_users, imap_folder, folder')
             ->andWhere('folder.outdatedAt IS NOT NULL')
             ->getQuery()
             ->getResult();
 
         return $rows;
+    }
+
+    /**
+     * @param integer $folder - id of Folder
+     * @param integer $email  - id of Email
+     *
+     * @return integer|false
+     */
+    public function getUid($folder, $email)
+    {
+        $query = $this->createQueryBuilder('e')
+            ->select('e.uid')
+            ->innerJoin('e.imapFolder', 'if')
+            ->where('e.email = :email AND if.folder = :folder')
+            ->setParameter('email', $email)
+            ->setParameter('folder', $folder)
+            ->getQuery();
+
+        return $query->getSingleScalarResult();
+    }
+
+    /**
+     * @param             $uids
+     * @param EmailFolder $folder
+     *
+     * @return array
+     */
+    public function getEmailUserIdsByUIDs($uids, EmailFolder $folder)
+    {
+        $qb = $this->createQueryBuilder('ie');
+
+        $emailUserIds = $qb->select('email_user.id')
+            ->leftJoin('ie.email', 'email')
+            ->leftJoin('email.emailUsers', 'email_user')
+            ->andWhere('email_user.folder = :folder')
+            ->andWhere($qb->expr()->in('ie.uid', ':uids'))
+            ->setParameter('uids', $uids)
+            ->setParameter('folder', $folder)
+            ->getQuery()->getArrayResult();
+
+        $ids = [];
+        foreach ($emailUserIds as $emailUserId) {
+            $ids[] = $emailUserId['id'];
+        }
+
+        return $ids;
     }
 }

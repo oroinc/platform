@@ -70,9 +70,11 @@ class ActivityListRepository extends EntityRepository
     ) {
         $queryBuilder = $this->createQueryBuilder('activity')
             ->join('activity.' . $this->getAssociationName($entityClass), 'r')
+            ->leftJoin('activity.activityOwners', 'ao')
             ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
-            ->orderBy('activity.' . $orderField, $orderDirection);
+            ->orderBy('activity.' . $orderField, $orderDirection)
+            ->groupBy('activity.id');
 
         if ($grouping) {
             $queryBuilder->andWhere('activity.head = true');
@@ -116,6 +118,29 @@ class ActivityListRepository extends EntityRepository
                 ->join('list.' . $this->getAssociationName($className), 'r')
                 ->where('r.id = :entityId')
                 ->setParameter('entityId', $entityId)
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (\Exception $e) {
+            $result = 0;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return count of activity list records for current target class name
+     *
+     * @param string $className Target entity class name
+     *
+     * @return int Number of activity list records
+     */
+    public function getRecordsCountForTargetClass($className)
+    {
+        // we need try/catch here to avoid crash on non exist entity relation
+        try {
+            $result = $this->createQueryBuilder('list')
+                ->select('COUNT(list.id)')
+                ->join('list.' . $this->getAssociationName($className), 'r')
                 ->getQuery()
                 ->getSingleScalarResult();
         } catch (\Exception $e) {

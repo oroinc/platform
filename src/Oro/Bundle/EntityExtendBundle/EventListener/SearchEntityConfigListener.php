@@ -34,23 +34,24 @@ class SearchEntityConfigListener
      */
     public function persistConfig(PersistConfigEvent $event)
     {
-        $eventConfig   = $event->getConfig();
-        $eventConfigId = $event->getConfigId();
+        $config   = $event->getConfig();
+        $configId = $config->getId();
 
-        if ($eventConfigId->getScope() !== 'search') {
+        if ($configId->getScope() !== 'search') {
             return;
         }
+
         $configManager = $event->getConfigManager();
-        $configManager->calculateConfigChangeSet($eventConfig);
-        $change = $configManager->getConfigChangeSet($eventConfig);
-        if (empty($change) || !array_key_exists('searchable', $change)) {
+        $change = $configManager->getConfigChangeSet($config);
+        if (!isset($change['searchable'])) {
             return;
         }
-        $class = $eventConfigId->getClassName();
-        if ($configManager->getProvider('extend')->getConfig($class)->get('state') === ExtendScope::STATE_ACTIVE) {
-            $this->addReindexJob($eventConfigId->getClassName());
+
+        $extendConfig = $configManager->getProvider('extend')->getConfig($configId->getClassName());
+        if ($extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
+            $this->addReindexJob($configId->getClassName());
         } else {
-            $this->addPostponeJob($eventConfigId->getClassName());
+            $this->addPostponeJob($configId->getClassName());
         }
     }
 
@@ -77,7 +78,7 @@ class SearchEntityConfigListener
         $job = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('job')
             ->select('job')
             ->where('job.command = :command')
-            ->andWhere('job.args = :args')
+            ->andWhere('cast(job.args as text) = :args')
             ->andWhere('job.state in (\'pending\', \'running\')')
             ->setParameter('command', ReindexCommand::COMMAND_NAME)
             ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)

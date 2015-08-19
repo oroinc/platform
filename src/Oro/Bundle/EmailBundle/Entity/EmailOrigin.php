@@ -7,10 +7,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
  * Email Origin
  *
- * @ORM\Table(name="oro_email_origin")
+ * @ORM\Table(name="oro_email_origin",
+ *      indexes={
+ *          @ORM\Index(name="IDX_mailbox_name", columns={"mailbox_name"})
+ *      }
+ * )
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
@@ -28,6 +35,13 @@ abstract class EmailOrigin
      * @JMS\Expose
      */
     protected $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="mailbox_name", type="string", length=64, nullable=false, options={"default" = ""})
+     */
+    protected $mailboxName;
 
     /**
      * @var ArrayCollection
@@ -71,6 +85,28 @@ abstract class EmailOrigin
      */
     protected $syncCount;
 
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
+     */
+    protected $owner;
+
+    /**
+     * @var OrganizationInterface
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $organization;
+
+    /**
+     * @var Mailbox
+     * @ORM\OneToOne(targetEntity="Mailbox", mappedBy="origin")
+     */
+    protected $mailbox;
+
     public function __construct()
     {
         $this->folders   = new ArrayCollection();
@@ -110,11 +146,41 @@ abstract class EmailOrigin
     /**
      * Get email folders
      *
-     * @return EmailFolder[]
+     * @return ArrayCollection|EmailFolder[]
      */
     public function getFolders()
     {
         return $this->folders;
+    }
+
+    /**
+     * Get root folders (where parent_folder_id is null)
+     *
+     * @return ArrayCollection|EmailFolder[]
+     */
+    public function getRootFolders()
+    {
+        return $this->folders->filter(function (EmailFolder $emailFolder) {
+            return $emailFolder->getParentFolder() === null;
+        });
+    }
+
+    /**
+     * Replace existing folders by new ones
+     *
+     * @param EmailFolder[]|ArrayCollection $folders
+     *
+     * @return $this
+     */
+    public function setFolders($folders)
+    {
+        $this->folders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addFolder($folder);
+        }
+
+        return $this;
     }
 
     /**
@@ -129,6 +195,22 @@ abstract class EmailOrigin
         $this->folders[] = $folder;
 
         $folder->setOrigin($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove folder
+     *
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        if ($this->folders->contains($folder)) {
+            $this->folders->removeElement($folder);
+        }
 
         return $this;
     }
@@ -150,7 +232,7 @@ abstract class EmailOrigin
      *
      * @return EmailOrigin
      */
-    public function setIsActive($isActive)
+    public function setActive($isActive)
     {
         $this->isActive = $isActive;
 
@@ -231,5 +313,87 @@ abstract class EmailOrigin
     public function __toString()
     {
         return (string)$this->id;
+    }
+
+    /**
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * @param OrganizationInterface $organization
+     *
+     * @return $this
+     */
+    public function setOrganization(OrganizationInterface $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function setOwner($user)
+    {
+        $this->owner = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get mailbox name
+     */
+    public function getMailboxName()
+    {
+        return $this->mailboxName;
+    }
+
+    /**
+     * Set mailbox name
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setMailboxName($name)
+    {
+        $this->mailboxName = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Mailbox
+     */
+    public function getMailbox()
+    {
+        return $this->mailbox;
+    }
+
+    /**
+     * @param Mailbox $mailbox
+     *
+     * @return $this
+     */
+    public function setMailbox($mailbox)
+    {
+        $this->mailbox = $mailbox;
+
+        return $this;
     }
 }

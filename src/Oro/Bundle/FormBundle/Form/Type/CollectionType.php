@@ -36,7 +36,8 @@ class CollectionType extends AbstractType
                 'handle_primary'       => $options['handle_primary'],
                 'show_form_when_empty' => $options['show_form_when_empty'],
                 'prototype_name'       => $options['prototype_name'],
-                'add_label'            => $options['add_label']
+                'add_label'            => $options['add_label'],
+                'allow_add_after'      => $options['allow_add_after'],
             ]
         );
     }
@@ -49,6 +50,7 @@ class CollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
+                'allow_add_after'      => false,
                 'allow_delete'         => true,
                 'by_reference'         => false,
                 'prototype'            => true,

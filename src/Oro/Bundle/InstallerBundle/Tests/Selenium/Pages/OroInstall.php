@@ -11,14 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  */
 class OroInstall extends AbstractPage
 {
-    public function __construct($testCase, $args = array('url' => '/install.php'))
-    {
-        if (array_key_exists('url', $args)) {
-            $this->redirectUrl = $args['url'];
-        }
-        parent::__construct($testCase);
-    }
-
     public function beginInstallation()
     {
         if ($this->isElementPresent("//button['Begin Installation'=normalize-space(.)]") &&

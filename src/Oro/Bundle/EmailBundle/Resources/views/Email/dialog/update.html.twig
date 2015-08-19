@@ -34,17 +34,15 @@
         <div class="form-container">
             <form id="{{ form.vars.id}}" name="{{ form.vars.name }}"
                   method="post" action="{{ app.request.uri }}" enctype="multipart/form-data">
-                {%
-                    set emailEditorOptions = {
-                        entityId: entity.entityId,
-                        to: entity.to,
-                        cc: entity.cc,
-                        bcc: entity.bcc,
-                        appendSignature: appendSignature,
-                        minimalWysiwygEditorHeight: 150,
-                        isSignatureEditable: resource_granted('oro_user_user_update')
-                    }
-                %}
+                {% set emailEditorOptions = {
+                    entityId: entity.entityId,
+                    to: entity.to,
+                    cc: entity.cc,
+                    bcc: entity.bcc,
+                    appendSignature: appendSignature,
+                    minimalWysiwygEditorHeight: 150,
+                    isSignatureEditable: resource_granted('oro_user_user_update')
+                } %}
                 <fieldset class="form-horizontal"
                           data-page-component-module="oroemail/js/app/components/email-editor-component"
                           data-page-component-options="{{ emailEditorOptions | json_encode }}"
@@ -58,7 +56,7 @@
                     {{ form_row(form.subject) }}
                     {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
                     {{ form_row(form.type) }}
-                    {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
+                    {{ form_row(form.body) }}
 
                     <div class="control-group email-body-actions">
                         <div class="controls">

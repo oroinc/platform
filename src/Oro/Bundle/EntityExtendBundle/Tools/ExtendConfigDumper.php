@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Cache\ClearableCache;
+
 use Symfony\Component\Filesystem\Filesystem;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -29,8 +30,8 @@ class ExtendConfigDumper
     /** @var string */
     protected $cacheDir;
 
-    /** @var OroEntityManager */
-    protected $em;
+    /** @var ConfigProvider */
+    protected $configProvider;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
@@ -45,27 +46,47 @@ class ExtendConfigDumper
     protected $extensions = [];
 
     /** @var AbstractEntityConfigDumperExtension[]|null */
-    protected $sortedExtensions = null;
+    protected $sortedExtensions;
 
     /**
-     * @param OroEntityManager                $em
+     * @param ConfigProvider                  $configProvider
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param FieldTypeHelper                 $fieldTypeHelper
-     * @param string                          $cacheDir
      * @param EntityGenerator                 $entityGenerator
+     * @param string                          $cacheDir
      */
     public function __construct(
-        OroEntityManager $em,
+        ConfigProvider $configProvider,
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
-        $this->em              = $em;
+        $this->configProvider  = $configProvider;
         $this->nameGenerator   = $nameGenerator;
         $this->fieldTypeHelper = $fieldTypeHelper;
         $this->entityGenerator = $entityGenerator;
         $this->cacheDir        = $cacheDir;
+    }
+
+    /**
+     * Gets the cache directory
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Sets the cache directory
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -99,8 +120,7 @@ class ExtendConfigDumper
             }
         }
 
-        $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->filter($this->createOriginFilterCallback($originsToSkip), null, true);
+        $extendConfigs  = $this->configProvider->filter($this->createOriginFilterCallback($originsToSkip), null, true);
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
@@ -110,7 +130,9 @@ class ExtendConfigDumper
                 // some bundles can change configs in pre persist events,
                 // and other bundles can produce more changes depending on already made, it's a bit hacky,
                 // but it's a service operation so called inevitable evil
-                $extendProvider->flush();
+                $this->configProvider->flush();
+                // the clearing of an entity manager gives a performance gain of 4 times
+                $this->configProvider->getConfigManager()->getEntityManager()->clear();
 
                 $this->updateStateValues($extendConfig);
             }
@@ -122,7 +144,7 @@ class ExtendConfigDumper
             }
         }
         // do one more flush to make sure changes made by post update extensions are saved
-        $extendProvider->flush();
+        $this->configProvider->flush();
 
         $this->clear();
     }
@@ -130,19 +152,30 @@ class ExtendConfigDumper
     public function dump()
     {
         $schemas        = [];
-        $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs(null, true);
+        $extendConfigs  = $this->configProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
-                $schemas[$className]['relationData'] = $extendConfig->get('relation');
+                $schemas[$className]['relationData'] = $extendConfig->get('relation', false, []);
             }
         }
 
-        $this->entityGenerator->generate($schemas);
+        $cacheDir = $this->entityGenerator->getCacheDir();
+        if ($cacheDir === $this->cacheDir) {
+            $this->entityGenerator->generate($schemas);
+        } else {
+            $this->entityGenerator->setCacheDir($this->cacheDir);
+            try {
+                $this->entityGenerator->generate($schemas);
+                $this->entityGenerator->setCacheDir($cacheDir);
+            } catch (\Exception $e) {
+                $this->entityGenerator->setCacheDir($cacheDir);
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -167,9 +200,14 @@ class ExtendConfigDumper
             $filesystem->mkdir(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
         }
 
-        /** @var ExtendClassMetadataFactory $metadataFactory */
-        $metadataFactory = $this->em->getMetadataFactory();
-        $metadataFactory->clearCache();
+        $metadataCacheDriver = $this->configProvider
+            ->getConfigManager()
+            ->getEntityManager()
+            ->getMetadataFactory()
+            ->getCacheDriver();
+        if ($metadataCacheDriver instanceof ClearableCache) {
+            $metadataCacheDriver->deleteAll();
+        }
     }
 
     /**
@@ -249,10 +287,9 @@ class ExtendConfigDumper
      */
     protected function checkSchema(ConfigInterface $extendConfig, $aliases, array $skippedOrigins = null)
     {
-        $extendProvider = $this->em->getExtendConfigProvider();
-        $className      = $extendConfig->getId()->getClassName();
-        $doctrine       = [];
-        $entityName     = $className;
+        $className  = $extendConfig->getId()->getClassName();
+        $doctrine   = [];
+        $entityName = $className;
 
         if (ExtendHelper::isCustomEntity($className)) {
             $type      = 'Custom';
@@ -285,7 +322,11 @@ class ExtendConfigDumper
         $defaultProperties  = [];
         $addRemoveMethods   = [];
 
-        $fieldConfigs = $extendProvider->filter($this->createOriginFilterCallback($skippedOrigins), $className, true);
+        $fieldConfigs = $this->configProvider->filter(
+            $this->createOriginFilterCallback($skippedOrigins),
+            $className,
+            true
+        );
         foreach ($fieldConfigs as $fieldConfig) {
             $this->checkFields(
                 $entityName,
@@ -296,31 +337,34 @@ class ExtendConfigDumper
                 $doctrine
             );
 
-            $extendProvider->persist($fieldConfig);
+            $this->configProvider->persist($fieldConfig);
         }
 
         $relations = $extendConfig->get('relation', false, []);
-        foreach ($relations as &$relation) {
-            if (!$relation['field_id']) {
+        foreach ($relations as $relation) {
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $relation['field_id'];
+            if (!$fieldId) {
                 continue;
             }
 
-            $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
-                $fieldName = $relation['field_id']->getFieldName();
-
+            $fieldName = $fieldId->getFieldName();
+            if (!isset($relationProperties[$fieldName])) {
+                $relationProperties[$fieldName] = $fieldName;
+            }
+            if ($fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
-                if ($relation['target_field_id']) {
-                    $addRemoveMethods[$fieldName]['target']              =
-                        $relation['target_field_id']->getFieldName();
-                    $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() === RelationType::MANY_TO_MANY;
+
+                /** @var FieldConfigId $targetFieldId */
+                $targetFieldId = $relation['target_field_id'];
+                if ($targetFieldId) {
+                    $fieldType = $fieldId->getFieldType();
+
+                    $addRemoveMethods[$fieldName]['target']              = $targetFieldId->getFieldName();
+                    $addRemoveMethods[$fieldName]['is_target_addremove'] = $fieldType === RelationType::MANY_TO_MANY;
                 }
             }
-
-            $this->updateRelationValues($relation['target_entity'], $relation['field_id']);
         }
-        $extendConfig->set('relation', $relations);
 
         $schema = [
             'class'     => $className,
@@ -333,9 +377,9 @@ class ExtendConfigDumper
             'doctrine'  => $doctrine,
         ];
 
-        if ($type == 'Extend') {
+        if ($type === 'Extend') {
             $parentClassName = get_parent_class($className);
-            if ($parentClassName == $entityName) {
+            if ($parentClassName === $entityName) {
                 $parentClassName = $aliases[$entityName];
             }
             $schema['parent']  = $parentClassName;
@@ -346,7 +390,7 @@ class ExtendConfigDumper
 
         $extendConfig->set('schema', $schema);
 
-        $extendProvider->persist($extendConfig);
+        $this->configProvider->persist($extendConfig);
     }
 
     /**
@@ -356,16 +400,15 @@ class ExtendConfigDumper
      */
     protected function updateStateValues(ConfigInterface $extendConfig)
     {
-        $hasChanges     = false;
-        $extendProvider = $this->em->getExtendConfigProvider();
-        $className      = $extendConfig->getId()->getClassName();
-        $fieldConfigs   = $extendProvider->getConfigs($className, true);
+        $hasChanges   = false;
+        $className    = $extendConfig->getId()->getClassName();
+        $fieldConfigs = $this->configProvider->getConfigs($className, true);
 
         if ($extendConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
             if (!$extendConfig->is('is_deleted')) {
                 $extendConfig->set('is_deleted', true);
-                $extendProvider->persist($extendConfig);
+                $this->configProvider->persist($extendConfig);
                 $hasChanges = true;
             }
 
@@ -373,7 +416,7 @@ class ExtendConfigDumper
             foreach ($fieldConfigs as $fieldConfig) {
                 if (!$fieldConfig->is('is_deleted')) {
                     $fieldConfig->set('is_deleted', true);
-                    $extendProvider->persist($fieldConfig);
+                    $this->configProvider->persist($fieldConfig);
                     $hasChanges = true;
                 }
             }
@@ -391,47 +434,15 @@ class ExtendConfigDumper
             // Set entity state to active if all fields are active or deleted
             if (!$hasNotActiveFields) {
                 $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-                $extendProvider->persist($extendConfig);
+                $this->configProvider->persist($extendConfig);
             }
 
             $hasChanges = true;
         }
 
         if ($hasChanges) {
-            $extendProvider->flush();
+            $this->configProvider->flush();
         }
-    }
-
-    /**
-     * @param string        $targetClass
-     * @param FieldConfigId $fieldId
-     */
-    protected function updateRelationValues($targetClass, FieldConfigId $fieldId)
-    {
-        $extendProvider = $this->em->getExtendConfigProvider();
-        $targetConfig   = $extendProvider->getConfig($targetClass);
-
-        $relations = $targetConfig->get('relation', false, []);
-        $schema    = $targetConfig->get('schema', false, []);
-
-        foreach ($relations as &$relation) {
-            if ($relation['target_field_id'] == $fieldId) {
-                if ($relation['owner']) {
-                    $relation['assign'] = true;
-                }
-
-                /** @var FieldConfigId $relationFieldId */
-                $relationFieldId = $relation['field_id'];
-                if ($relationFieldId) {
-                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
-                }
-            }
-        }
-
-        $targetConfig->set('relation', $relations);
-        $targetConfig->set('schema', $schema);
-
-        $extendProvider->persist($targetConfig);
     }
 
     /**

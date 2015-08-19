@@ -7,13 +7,13 @@ datagrid:
             type: orm
             query:
                 select:
+                    - a
                     - a.id
                     - a.action
                     - a.version
                     - a.objectClass
                     - a.objectName
                     - a.objectId
-                    - a.data
                     - a.loggedAt
                     - >
                       CONCAT(
@@ -34,12 +34,19 @@ datagrid:
                         organization:
                             join: a.organization
                             alias: o
+                        fields:
+                            join: a.fields
+                            alias: f
+
                 where:
                     and:
                         - o.id = @oro_security.security_facade->getOrganizationId
         columns:
             action:
                 label: oro.dataaudit.datagrid.action
+                type: twig
+                template: OroDataAuditBundle:Datagrid:Property/action.html.twig
+                frontend_type: html
             version:
                 label: oro.dataaudit.datagrid.version
             objectClass:
@@ -76,8 +83,6 @@ datagrid:
                     data_name: a.objectName
                 objectId:
                     data_name: a.objectId
-                data:
-                    data_name: a.data
                 author:
                     data_name: author
                 loggedAt:
@@ -92,9 +97,9 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                update: oro.ui.updated_at
-                                create: oro.ui.created_at
-                                remove: Deleted At
+                                create: oro.dataaudit.action.create
+                                update: oro.dataaudit.action.update
+                                remove: oro.dataaudit.action.remove
                 version:
                     type: number
                     data_name: a.version
@@ -111,9 +116,6 @@ datagrid:
                 objectId:
                     type: number
                     data_name: a.objectId
-                data:
-                    type: string
-                    data_name: a.data
                 author:
                     type: string
                     data_name: author
@@ -128,8 +130,8 @@ datagrid:
             type: orm
             query:
                 select:
+                    - a
                     - a.id
-                    - a.data as data
                     - a.loggedAt
                     - >
                       CONCAT(
@@ -146,6 +148,9 @@ datagrid:
                         user:
                             join: a.user
                             alias: u
+                        fields:
+                            join: a.fields
+                            alias: f
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId

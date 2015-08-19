@@ -1,16 +1,15 @@
-/* global define */
 /** @exports WorkflowEditorComponent */
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        AttributeCollection = require('oroworkflow/js/app/models/attribute-collection'),
-        StepCollection = require('oroworkflow/js/app/models/step-collection'),
-        StepModel = require('oroworkflow/js/app/models/step-model'),
-        TransitionCollection = require('oroworkflow/js/app/models/transition-collection'),
-        TransitionDefinitionCollection = require('oroworkflow/js/app/models/transition-definition-collection'),
-        WorkflowModel = require('oroworkflow/js/app/models/workflow-model');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var AttributeCollection = require('oroworkflow/js/app/models/attribute-collection');
+    var StepCollection = require('oroworkflow/js/app/models/step-collection');
+    var StepModel = require('oroworkflow/js/app/models/step-model');
+    var TransitionCollection = require('oroworkflow/js/app/models/transition-collection');
+    var TransitionDefinitionCollection = require('oroworkflow/js/app/models/transition-definition-collection');
+    var WorkflowModel = require('oroworkflow/js/app/models/workflow-model');
 
     /**
      * Builds workflow model.
@@ -22,7 +21,7 @@ define(function (require) {
          * @param {Object} options
          * @returns {WorkflowModel}
          */
-        createWorkflowModel: function (options) {
+        createWorkflowModel: function(options) {
             var model = this._createWorkflowModel(options);
             this.addStartingStep(model);
             return model;
@@ -35,10 +34,8 @@ define(function (require) {
          * @returns {WorkflowModel}
          * @private
          */
-        _createWorkflowModel: function (options) {
-            var workflowModel, configuration;
-
-            configuration = options.entity.configuration;
+        _createWorkflowModel: function(options) {
+            var configuration = options.entity.configuration;
             configuration.steps = new StepCollection(_.map(configuration.steps, this._mergeName));
             configuration.transitions = new TransitionCollection(_.map(configuration.transitions, this._mergeName));
             configuration.transition_definitions = new TransitionDefinitionCollection(
@@ -52,7 +49,7 @@ define(function (require) {
             configuration.start_step = options.entity.startStep;
             configuration.steps_display_ordered = options.entity.stepsDisplayOrdered;
 
-            workflowModel = new WorkflowModel(configuration);
+            var workflowModel = new WorkflowModel(configuration);
             workflowModel.setSystemEntities(options.system_entities);
 
             workflowModel.url = options._sourceElement.attr('action');
@@ -64,8 +61,11 @@ define(function (require) {
          * Adds a starting step to workflow model
          * @param {WorkflowModel} model
          */
-        addStartingStep: function (model) {
-            model.get('steps').add(this._createStartingStep(model));
+        addStartingStep: function(model) {
+            //if start step doesn't exist in database, create it
+            if (model.getStartStep().length === 0) {
+                model.get('steps').add(this._createStartingStep(model));
+            }
         },
 
         /**
@@ -75,7 +75,7 @@ define(function (require) {
          * @returns {StepModel}
          * @private
          */
-        _createStartingStep: function (model) {
+        _createStartingStep: function(model) {
             var startStepModel = new StepModel({
                 name: 'step:starting_point',
                 label: __('(Start)'),
@@ -98,7 +98,7 @@ define(function (require) {
          * @returns {Object}
          * @private
          */
-        _mergeName: function (config, name) {
+        _mergeName: function(config, name) {
             config.name = name;
             return config;
         }

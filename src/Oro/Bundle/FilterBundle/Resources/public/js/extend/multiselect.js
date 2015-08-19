@@ -1,11 +1,9 @@
-/*global define*/
-/*jslint nomen:true, browser:true*/
 define([
     'jquery',
     'oroui/js/dropdown-mask',
     'jquery-ui',
     'jquery.multiselect'
-], function ($, mask) {
+], function($, mask) {
     'use strict';
 
     $.widget('orofilter.multiselect', $.ech.multiselect, {
@@ -14,7 +12,7 @@ define([
          * Bind update position method after menu is opened
          * @override
          */
-        open: function () {
+        open: function() {
             this._superApply(arguments);
             mask.show().onhide($.proxy(this.close, this));
         },
@@ -23,7 +21,7 @@ define([
          * Remove all handlers before closing menu
          * @override
          */
-        close: function () {
+        close: function() {
             mask.hide();
             this._superApply(arguments);
         },
@@ -31,7 +29,7 @@ define([
         /**
          * Process position update for menu element
          */
-        updatePos: function () {
+        updatePos: function() {
             var isShown = this.menu.is(':visible');
             this.position();
             if (isShown) {
@@ -41,5 +39,5 @@ define([
     });
 
     // replace original ech.multiselect widget to make ech.multiselectfilter work
-    $.widget("ech.multiselect", $.orofilter.multiselect, {});
+    $.widget('ech.multiselect', $.orofilter.multiselect, {});
 });

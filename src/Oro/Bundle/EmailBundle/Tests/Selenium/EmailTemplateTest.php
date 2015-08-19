@@ -64,7 +64,7 @@ class EmailTemplateTest extends Selenium2TestCase
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
         $this->assertEquals('Html ', $fields['type']);
         $this->assertEquals('Subject', $fields['subject']);
-        $this->assertEquals('Template content', $fields['content']);
+        $this->assertEquals("<p>Template content</p>", $fields['content']);
 
         return $newTemplateName;
     }
@@ -100,7 +100,8 @@ class EmailTemplateTest extends Selenium2TestCase
         $login = $this->login();
         /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
-            ->delete('Template name', $templateName)
+            ->filterBy('Template name', $templateName)
+            ->delete([$templateName])
             ->assertTitle('All - Templates - Emails - System')
             ->assertMessage('Item deleted');
     }

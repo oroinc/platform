@@ -3,8 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 
 class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -56,57 +54,93 @@ class EmailAddressHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($isFull, $this->helper->isFullEmailAddress($emailAddress));
     }
 
+    /**
+     * @dataProvider extractEmailAddressFirstNameProvider
+     */
+    public function testExtractEmailAddressFirstName($emailAddress, $expected)
+    {
+        $this->assertEquals($expected, $this->helper->extractEmailAddressFirstName($emailAddress));
+    }
+
+    /**
+     * @dataProvider extractEmailAddressLastNameProvider
+     */
+    public function testExtractEmailAddressLastName($emailAddress, $expected)
+    {
+        $this->assertEquals($expected, $this->helper->extractEmailAddressLastName($emailAddress));
+    }
+
     public static function emailAddressProvider()
     {
-        return array(
-            array('john@example.com', 'john@example.com', ''),
-            array('<john@example.com>', 'john@example.com', ''),
-            array('John Smith <john@example.com>', 'john@example.com', 'John Smith'),
-            array('"John Smith" <john@example.com>', 'john@example.com', 'John Smith'),
-            array('\'John Smith\' <john@example.com>', 'john@example.com', 'John Smith'),
-            array('John Smith on behaf <john@example.com>', 'john@example.com', 'John Smith on behaf'),
-            array('"john@example.com" <john@example.com>', 'john@example.com', 'john@example.com'),
-        );
+        return [
+            ['john@example.com', 'john@example.com', ''],
+            ['<john@example.com>', 'john@example.com', ''],
+            ['John Smith <john@example.com>', 'john@example.com', 'John Smith'],
+            ['"John Smith" <john@example.com>', 'john@example.com', 'John Smith'],
+            ['\'John Smith\' <john@example.com>', 'john@example.com', 'John Smith'],
+            ['John Smith on behaf <john@example.com>', 'john@example.com', 'John Smith on behaf'],
+            ['"john@example.com" <john@example.com>', 'john@example.com', 'john@example.com'],
+        ];
     }
 
     public static function buildFullEmailAddressProvider()
     {
-        return array(
-            array(null, null, ''),
-            array('', '', ''),
-            array('john@example.com', null, 'john@example.com'),
-            array('john@example.com', '', 'john@example.com'),
-            array('john@example.com', null, 'john@example.com'),
-            array('john@example.com', 'John Smith', 'John Smith <john@example.com>'),
-            array(' john@example.com ', ' John Smith ', 'John Smith <john@example.com>'),
-        );
+        return [
+            [null, null, ''],
+            ['', '', ''],
+            ['john@example.com', null, 'john@example.com'],
+            ['john@example.com', '', 'john@example.com'],
+            ['john@example.com', null, 'john@example.com'],
+            ['john@example.com', 'John Smith', 'John Smith <john@example.com>'],
+            [' john@example.com ', ' John Smith ', 'John Smith <john@example.com>'],
+        ];
     }
 
     public static function isFullEmailAddressProvider()
     {
-        return array(
-            array(null, false),
-            array('', false),
-            array('john@example.com', false),
-            array('<john@example.com>', true),
-            array('John Smith <john@example.com>', true),
-            array('"John Smith" <john@example.com>', true),
-        );
+        return [
+            [null, false],
+            ['', false],
+            ['john@example.com', false],
+            ['<john@example.com>', true],
+            ['John Smith <john@example.com>', true],
+            ['"John Smith" <john@example.com>', true],
+        ];
     }
 
     public function emailAddressesProvider()
     {
         $emailObj = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailInterface');
-        $emailObj->expects($this->any())
-            ->method('getEmail')
-            ->will($this->returnValue('john@example.com'));
+        $emailObj->expects($this->any())->method('getEmail')->will($this->returnValue('john@example.com'));
 
-        return array(
-            array('', array()),
-            array(array(), array()),
-            array('john@example.com', array('john@example.com')),
-            array(array('john@example.com'), array('john@example.com')),
-            array(array($emailObj), array('john@example.com')),
-        );
+        return [
+            ['', []],
+            [[], []],
+            ['john@example.com', ['john@example.com']],
+            [['john@example.com'], ['john@example.com']],
+            [[$emailObj], ['john@example.com']],
+        ];
+    }
+
+    public static function extractEmailAddressFirstNameProvider()
+    {
+        return [
+            ['John Smith IV. <john@example.com>',   'John'],
+            ['John Smith <john@example.com>',       'John'],
+            ['John <john@example.com>',             'John'],
+            ['john.smith@example.com',              'john'],
+            ['john@example.com',                    'john'],
+        ];
+    }
+
+    public static function extractEmailAddressLastNameProvider()
+    {
+        return [
+            ['John Smith IV. <john@example.com>',   'Smith IV.'],
+            ['John Smith <john@example.com>',       'Smith'],
+            ['John <john@example.com>',             'example.com'],
+            ['john.smith@example.com',              'smith'],
+            ['john@example.com',                    'example.com'],
+        ];
     }
 }

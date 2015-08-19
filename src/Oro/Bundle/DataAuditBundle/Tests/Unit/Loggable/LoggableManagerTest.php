@@ -1,9 +1,6 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Loggable;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
@@ -69,8 +66,10 @@ class LoggableManagerTest extends AbstractMetadataTest
 
         $this->loggableManager = new LoggableManager(
             'Oro\Bundle\DataAuditBundle\Entity\Audit',
+            'Oro\Bundle\DataAuditBundle\Entity\AuditField',
             $provider,
-            $securityContextLink
+            $securityContextLink,
+            $this->getMock('Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper')
         );
         $this->loggableManager->addConfig($this->config);
 

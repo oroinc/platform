@@ -6,7 +6,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
  * Class ConfigEntity
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
- * @method ConfigEntity openConfigEntity() openConfigEntity(string)
+ * @method ConfigEntity openConfigEntity(string $bundlePath)
  */
 class ConfigEntity extends CustomEntity
 {
@@ -181,7 +181,7 @@ class ConfigEntity extends CustomEntity
     {
         $this->assertElementPresent(
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]",
-            'Custom entity field not found'
+            "Custom entity field not found : {$fieldName}"
         );
 
         return $this;

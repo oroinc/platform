@@ -3,27 +3,26 @@
 namespace Oro\Bundle\SecurityBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
 class OwnershipMetadataCacheWarmer implements CacheWarmerInterface
 {
     /**
-     * @var OwnershipMetadataProvider
+     * @var MetadataProviderInterface
      */
     private $provider;
 
     /**
-     * Constructor
-     *
-     * @param OwnershipMetadataProvider $provider
+     * @param MetadataProviderInterface $provider
      */
-    public function __construct(OwnershipMetadataProvider $provider)
+    public function __construct(MetadataProviderInterface $provider)
     {
         $this->provider = $provider;
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function warmUp($cacheDir)
     {

@@ -105,7 +105,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptySubject()
     {
-        $testEntity = new TestTarget();
+        $testEntity = new TestTarget(1);
         $this->assertNull($this->provider->getSubject($testEntity));
     }
 
@@ -150,7 +150,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $entityConfig->set('label', 'test_label');
         $entityConfigProvider->expects($this->once())->method('getConfig')->willReturn($entityConfig);
         $this->translator->expects($this->once())->method('trans')->with('test_label')->willReturn('test_label');
-        $this->routeHelper->expects($this->once())->method('encodeClassName')
+        $this->routeHelper->expects($this->once())->method('getUrlSafeClassName')
             ->willReturn('Test_Entity');
         $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
 
@@ -201,5 +201,48 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getUpdatedActivityList($testEntity, $em);
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
+    }
+
+    public function testGetSupportedOwnerActivities()
+    {
+        $ownerClasses = $this->provider->getSupportedOwnerActivities();
+        $this->assertCount(1, $ownerClasses);
+        $this->assertEquals([TestActivityProvider::ACL_CLASS], $ownerClasses);
+    }
+
+    public function testIsSupportedOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->with($testEntity)
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertTrue($this->provider->isSupportedEntity($testEntity));
+    }
+
+    public function testGetProviderForOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderForOwnerEntity($testEntity)
+        );
+    }
+
+    public function testGetProviderByOwnerClass()
+    {
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderByOwnerClass(TestActivityProvider::ACTIVITY_CLASS_NAME)
+        );
     }
 }

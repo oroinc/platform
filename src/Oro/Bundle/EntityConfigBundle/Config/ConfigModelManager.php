@@ -37,7 +37,7 @@ class ConfigModelManager
      * {class name} => array of FieldConfigModel[]
      *      {field name} => FieldConfigModel
      */
-    protected $fieldLocalCache;
+    protected $fieldLocalCache = [];
 
     /**
      * @var bool
@@ -61,7 +61,6 @@ class ConfigModelManager
     public function __construct(ServiceLink $proxyEm)
     {
         $this->proxyEm = $proxyEm;
-        $this->clearCache();
     }
 
     /**
@@ -300,6 +299,72 @@ class ConfigModelManager
     }
 
     /**
+     * Changes a mode of a field
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeFieldMode($className, $fieldName, $mode)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+        if (empty($mode)) {
+            throw new \InvalidArgumentException('$mode must not be empty');
+        }
+
+        $result     = false;
+        $fieldModel = $this->findFieldModel($className, $fieldName);
+        if ($fieldModel && $fieldModel->getMode() !== $mode) {
+            $fieldModel->setMode($mode);
+            $this->getEntityManager()->persist($fieldModel);
+
+            $this->fieldLocalCache[$className][$fieldName] = $fieldModel;
+            $result                                        = true;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Changes a mode of an entity
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @throws \InvalidArgumentException if $className or $mode is empty
+     * @return bool TRUE if the type was changed; otherwise, FALSE
+     */
+    public function changeEntityMode($className, $mode)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($mode)) {
+            throw new \InvalidArgumentException('$mode must not be empty');
+        }
+
+        $result      = false;
+        $entityModel = $this->findEntityModel($className);
+        if ($entityModel && $entityModel->getMode() !== $mode) {
+            $entityModel->setMode($mode);
+            $this->getEntityManager()->persist($entityModel);
+
+            $this->entityLocalCache[$className] = $entityModel;
+            $result                             = true;
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string|null $className
      * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
      *
@@ -338,7 +403,7 @@ class ConfigModelManager
      */
     public function createEntityModel($className = null, $mode = self::MODE_DEFAULT)
     {
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -366,7 +431,7 @@ class ConfigModelManager
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
         }
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -391,6 +456,10 @@ class ConfigModelManager
     {
         $this->entityLocalCache = null;
         $this->fieldLocalCache  = [];
+
+        $em = $this->getEntityManager();
+        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
+        $em->clear('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel');
     }
 
     /**

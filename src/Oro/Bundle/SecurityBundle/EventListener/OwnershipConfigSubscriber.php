@@ -3,21 +3,23 @@
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 
 class OwnershipConfigSubscriber implements EventSubscriberInterface
 {
-    /** @var OwnershipMetadataProvider */
+    /** @var MetadataProviderInterface */
     protected $provider;
 
     /**
      * Constructor
      *
-     * @param OwnershipMetadataProvider $provider
+     * @param MetadataProviderInterface $provider
      */
-    public function __construct(OwnershipMetadataProvider $provider)
+    public function __construct(MetadataProviderInterface $provider)
     {
         $this->provider = $provider;
     }
@@ -27,9 +29,9 @@ class OwnershipConfigSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             Events::PRE_PERSIST_CONFIG => 'prePersistEntityConfig'
-        );
+        ];
     }
 
     /**
@@ -37,23 +39,20 @@ class OwnershipConfigSubscriber implements EventSubscriberInterface
      */
     public function prePersistEntityConfig(PersistConfigEvent $event)
     {
-        $event->getConfigManager()->calculateConfigChangeSet($event->getConfig());
-        $changes = $event->getConfigManager()->getConfigChangeSet($event->getConfig());
+        $config   = $event->getConfig();
+        $configId = $config->getId();
 
-        $isDeleted = false;
-        // Now if you press delete entity button, in state variable, in 1st position will be "Deleted" string.
-        // If you press restore entity, then "Deleted" string will be at 0 position.
-        if (isset($changes['state']) && $changes['state'][1] === 'Deleted') {
-            $isDeleted = true;
+        if ($configId->getScope() !== 'extend') {
+            return;
         }
 
-        $cp = $event->getConfigManager()->getProvider('ownership');
-        $className = $event->getConfig()->getId()->getClassName();
-        if ($cp->hasConfig($className)) {
-            $this->provider->clearCache($className);
-            if (!$isDeleted) {
-                $this->provider->warmUpCache($className);
-            }
+        $className = $configId->getClassName();
+        $this->provider->clearCache($className);
+
+        $change    = $event->getConfigManager()->getConfigChangeSet($config);
+        $isDeleted = isset($change['state']) && $change['state'][1] === ExtendScope::STATE_DELETE;
+        if (!$isDeleted) {
+            $this->provider->warmUpCache($className);
         }
     }
 }

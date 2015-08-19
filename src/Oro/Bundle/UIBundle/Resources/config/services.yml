@@ -11,6 +11,7 @@ parameters:
     oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
     oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
     oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+    oro_ui.widget_provider.update_actions.class:           Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
     oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
 
     oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
@@ -18,6 +19,10 @@ parameters:
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+
+    ## Formatters
+    oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
+    oro_ui.twig.extension.formatter.class:                 Oro\Bundle\UIBundle\Twig\FormatExtension
 
 services:
     # Placeholder services
@@ -60,6 +65,7 @@ services:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
             - @oro_locale.formatter.date_time
+            - @translator
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
 
@@ -84,6 +90,15 @@ services:
         class: %oro_ui.widget_provider.view_actions.class%
         arguments:
             - @oro_ui.label_provider.action_button_group
+            - @event_dispatcher
+            - %oro_ui.widget_provider.view_actions.page_type%
+
+    oro_ui.widget_provider.update_actions:
+        class: %oro_ui.widget_provider.update_actions.class%
+        arguments:
+            - @oro_ui.label_provider.action_button_group
+            - @event_dispatcher
+            - %oro_ui.widget_provider.update_actions.page_type%
 
     oro_ui.content_provider.manager:
         class: %oro_ui.content_provider.manager.class%
@@ -98,3 +113,14 @@ services:
         arguments:
             - @oro_form.provider.html_tag_provider
             - %kernel.cache_dir%
+
+    ## Formatters
+    oro_ui.formatter:
+        class: %oro_ui.formatter.class%
+
+    oro_ui.twig.extension.formatter:
+        class: %oro_ui.twig.extension.formatter.class%
+        arguments:
+            - @oro_ui.formatter
+        tags:
+            - { name: twig.extension }

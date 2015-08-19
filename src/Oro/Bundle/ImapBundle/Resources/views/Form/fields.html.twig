@@ -1,7 +1,13 @@
 {% block oro_imap_configuration_check_row %}
+    {% if form.parent.parent.vars.value and form.parent.parent.vars.value.username is defined %}
+        {% set forEntity = 'user' %}
+    {% else %}
+        {% set forEntity = 'mailbox' %}
+    {% endif %}
     {% set options = {
         elementNamePrototype: full_name,
-        id: form.parent.vars.value ? form.parent.vars.value.id : null
+        id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
+        forEntity: forEntity
     } %}
     {% set attr = attr|merge({
         'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',
@@ -12,11 +18,11 @@
     <div class="control-group" id="{{ wrapperId }}">
         <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
     </div>
-
+    <div class="container-config-group"
+         data-page-component-module="oroimap/js/app/components/check-config-settings"
+         data-page-component-options="">
+    </div>
     <style type="text/css">
-        {{ '#' ~ wrapperId }} {
-            max-width: 465px;
-        }
         {{ '#' ~ wrapperId }} .alert {
             margin-top: 10px;
         }

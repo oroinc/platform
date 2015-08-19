@@ -6,6 +6,7 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Login;
 
 abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
 {
+    const URL = '/';
     protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
 
     protected function setUp()
@@ -24,7 +25,10 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
 
     public function setUpPage()
     {
-        $this->url('/');
+        $this->url(static::URL);
+        // @codingStandardsIgnoreStart
+        $this->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
+        // @codingStandardsIgnoreEnd
     }
 
     protected function tearDown()
@@ -52,10 +56,10 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
      *
      * @return Login
      */
-    public function login($userName = null, $password = null)
+    public function login($userName = null, $password = null, $args = [])
     {
         /** @var Login $login */
-        $login = new Login($this, array());
+        $login = new Login($this, $args);
         $login->setUsername(($userName) ? $userName : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(($password) ? $password : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
             ->submit();

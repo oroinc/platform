@@ -11,11 +11,11 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Templating\EngineInterface;
 
 class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
@@ -36,14 +36,14 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     protected $emailAddressHelper;
 
     /**
-     * @var NameFormatter|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityNameResolver|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
-     * @var SecurityContext|\PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * @var EmailAddressManager|\PHPUnit_Framework_MockObject_MockObject
@@ -73,11 +73,11 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->emailAddressHelper = new EmailAddressHelper();
 
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -98,8 +98,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $this->helper = new EmailModelBuilderHelper(
             $this->entityRoutingHelper,
             $this->emailAddressHelper,
-            $this->nameFormatter,
-            $this->securityContext,
+            $this->entityNameResolver,
+            $this->securityFacade,
             $this->emailAddressManager,
             $this->entityManager,
             $this->emailCacheManager,
@@ -114,8 +114,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $this->entityRoutingHelper->expects($this->never())
             ->method('getEntity');
 
-        $this->nameFormatter->expects($this->never())
-            ->method('format');
+        $this->entityNameResolver->expects($this->never())
+            ->method('getName');
 
         $this->emailAddressManager->expects($this->never())
             ->method('getEmailAddressRepository');
@@ -138,8 +138,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->with($ownerClass, $ownerId)
             ->willReturn($owner);
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($owner)
             ->willReturn($ownerName);
 
@@ -167,17 +167,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($owner);
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
         $this->assertEquals($expected, $emailAddress);
@@ -212,8 +204,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($otherOwner)
             ->willReturn($ownerName);
 
@@ -251,17 +243,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($otherOwner);
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
         $this->assertEquals($expected, $emailAddress);
@@ -293,8 +277,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($this->entityManager))
             ->will($this->returnValue($emailAddressRepository));
 
-        $this->nameFormatter->expects($this->any())
-            ->method('format')
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
             ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser'))
             ->will(
                 $this->returnCallback(
@@ -363,8 +347,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $this->nameFormatter->expects($this->never())
-            ->method('format');
+        $this->entityNameResolver->expects($this->never())
+            ->method('getName');
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
         $this->assertEquals($emailAddress, $expected);
@@ -372,8 +356,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUserTokenIsNull()
     {
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn(null);
 
         $result = $this->helper->getUser();
@@ -386,41 +370,20 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider getUserProvider
      */
-    public function testGetUserTokenIsNotNull($user, $expected)
+    public function testGetUser($user)
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($user);
 
         $result = $this->helper->getUser();
-        $this->assertEquals($expected, $result);
+        $this->assertSame($user, $result);
     }
 
     public function getUserProvider()
     {
-        $user = $result = new User();
-        $positive = [
-            $user,
-            $result,
-        ];
-
-        $user = new \stdClass();
-        $result = null;
-
-        $negative = [
-            $user,
-            $result,
-        ];
-
         return [
-            $positive,
-            $negative,
+            [new User()],
         ];
     }
 
@@ -429,7 +392,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Class';
 
         $this->entityRoutingHelper->expects($this->once())
-            ->method('decodeClassName')
+            ->method('resolveEntityClass')
             ->with($className)
             ->willReturn($className);
 
@@ -448,8 +411,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getEmail')
             ->willReturn($email);
 
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
+        $this->entityNameResolver->expects($this->once())
+            ->method('getName')
             ->with($user)
             ->willReturn($format);
 

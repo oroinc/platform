@@ -5,3 +5,6 @@ config:
         'oroentity/js/entity-field-choice-util': 'bundles/oroentity/js/entity-field-choice-util.js'
         'oroentity/js/entity-field-select-util': 'bundles/oroentity/js/entity-field-select-util.js'
         'oroentity/js/entity-field-view': 'bundles/oroentity/js/entity-field-view.js'
+        'oro/select2-entity-field-component': 'bundles/oroentity/js/components/select2-entity-field-component.js'
+        'oro/select2-entity-field-choice-component': 'bundles/oroentity/js/components/select2-entity-field-choice-component.js'
+        'oro/select2-entity-field-select-component': 'bundles/oroentity/js/components/select2-entity-field-select-component.js'

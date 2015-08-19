@@ -47,6 +47,7 @@ class ConfigApiManager
      * Gets all configuration data of the specified section
      *
      * @param string $path The path to API section. For example: look-and-feel/grid
+     * @param string $scope The configuration scope
      *
      * @return array
      */

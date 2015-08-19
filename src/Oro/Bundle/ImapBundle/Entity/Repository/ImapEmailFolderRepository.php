@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailFolderRepository extends EntityRepository
@@ -32,15 +33,24 @@ class ImapEmailFolderRepository extends EntityRepository
     /**
      * @param EmailOrigin $origin
      * @param bool        $withOutdated
+     * @param bool|null   $syncEnabled
      *
      * @return ImapEmailFolder[]
      */
-    public function getFoldersByOrigin(EmailOrigin $origin, $withOutdated = false)
-    {
-        return $this->getFoldersByOriginQueryBuilder($origin, $withOutdated)
-            ->select('imap_folder, folder')
-            ->getQuery()
-            ->getResult();
+    public function getFoldersByOrigin(
+        EmailOrigin $origin,
+        $withOutdated = false,
+        $syncEnabled = EmailFolder::SYNC_ENABLED_IGNORE
+    ) {
+        $qb = $this->getFoldersByOriginQueryBuilder($origin, $withOutdated)
+            ->select('imap_folder, folder');
+
+        if ($syncEnabled !== EmailFolder::SYNC_ENABLED_IGNORE) {
+            $qb->andWhere('folder.syncEnabled = :syncEnabled')
+                ->setParameter('syncEnabled', (bool)$syncEnabled);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -52,8 +62,8 @@ class ImapEmailFolderRepository extends EntityRepository
     {
         return $this->createQueryBuilder('imap_folder')
             ->innerJoin('imap_folder.folder', 'folder')
-            ->leftJoin('folder.emails', 'emails')
-            ->where('folder.outdatedAt IS NOT NULL AND emails.id IS NULL')
+            ->leftJoin('folder.emailUsers', 'emailUsers')
+            ->where('folder.outdatedAt IS NOT NULL AND emailUsers.id IS NULL')
             ->andWhere('folder.origin = :origin')
             ->setParameter('origin', $origin);
     }

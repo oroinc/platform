@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -53,10 +54,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->registry);
-        unset($this->em);
-        unset($this->classMetadata);
-        unset($this->doctrineHelper);
+        unset($this->registry, $this->em, $this->classMetadata, $this->doctrineHelper);
     }
 
     /**
@@ -110,6 +108,73 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             $identifiers,
             $this->doctrineHelper->getEntityIdentifier($entity)
         );
+    }
+
+    /**
+     * @param object $entity
+     * @param string $class
+     * @param array $identifiers
+     * @param bool $expected
+     * @dataProvider testIsNewEntityDataProvider
+     */
+    public function testIsNewEntity($entity, $class, array $identifiers, $expected)
+    {
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->will($this->returnCallback(function ($entity) use ($identifiers) {
+                $res = [];
+                foreach ($identifiers as $identifier) {
+                    if (isset($entity->$identifier)) {
+                        $res[$identifier] = $entity->$identifier;
+                    }
+                }
+
+                return $res;
+            }));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertEquals(
+            $expected,
+            $this->doctrineHelper->isNewEntity($entity)
+        );
+    }
+
+    public function testIsNewEntityDataProvider()
+    {
+        $entityWithTwoId = new ItemStub();
+        $entityWithTwoId->id = 1;
+        $entityWithTwoId->id2 = 2;
+
+        $entityWithoutId = new ItemStub();
+
+        return [
+            'existing entity with 2 id fields' => [
+                'entity' => $entityWithTwoId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id', 'id2'],
+                'expected' => false
+            ],
+            'existing entity with 1 id fields' => [
+                'entity' => $entityWithTwoId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id'],
+                'expected' => false
+            ],
+            'existing entity without id fields' => [
+                'entity' => $entityWithoutId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id'],
+                'expected' => true
+            ],
+        ];
     }
 
     /**
@@ -747,5 +812,205 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ['ItemStubProxy', 'ItemStubProxy'],
             [new ItemStubProxy(), 'ItemStubProxy']
         ];
+    }
+
+    public function testGetSingleRootAlias()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn(['root_alias']);
+
+        $this->assertEquals(
+            'root_alias',
+            $this->doctrineHelper->getSingleRootAlias($qb)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases. "root_alias1, root_alias1".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn(['root_alias1', 'root_alias1']);
+
+        $this->doctrineHelper->getSingleRootAlias($qb);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has no any root aliases.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn([]);
+
+        $this->doctrineHelper->getSingleRootAlias($qb);
+    }
+
+    public function testGetSingleRootAliasWhenQueryHasNoRootAliasAndNoExceptionRequested()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn([]);
+
+        $this->assertNull($this->doctrineHelper->getSingleRootAlias($qb, false));
+    }
+
+    /**
+     * @dataProvider getPageOffsetProvider
+     */
+    public function testGetPageOffset($expectedOffset, $page, $limit)
+    {
+        $this->assertSame($expectedOffset, $this->doctrineHelper->getPageOffset($page, $limit));
+    }
+
+    public function getPageOffsetProvider()
+    {
+        return [
+            [0, null, null],
+            [0, null, 5],
+            [0, 2, null],
+            [0, 1, 5],
+            [5, 2, 5],
+            [0, '2', null],
+            [0, '1', '5'],
+            [5, '2', '5']
+        ];
+    }
+
+    public function testApplyEmptyJoins()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->never())
+            ->method('distinct');
+        $qb->expects($this->never())
+            ->method('getRootAliases');
+
+        $this->doctrineHelper->applyJoins($qb, []);
+    }
+
+    public function testApplyJoins()
+    {
+        $joins = [
+            'emails'   => null,
+            'phones',
+            'contacts' => [],
+            'accounts' => [
+                'join' => 'accounts_field'
+            ],
+            'users'    => [
+                'join'          => 'accounts.users_field',
+                'condition'     => 'users.active = true',
+                'conditionType' => 'WITH'
+            ],
+            'products'    => [
+                'condition' => 'products.active = true'
+            ]
+        ];
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('distinct')
+            ->with(true);
+        $qb->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn(['root_alias']);
+        $qb->expects($this->at(2))
+            ->method('leftJoin')
+            ->with('root_alias.emails', 'emails');
+        $qb->expects($this->at(3))
+            ->method('leftJoin')
+            ->with('root_alias.phones', 'phones');
+        $qb->expects($this->at(4))
+            ->method('leftJoin')
+            ->with('root_alias.contacts', 'contacts');
+        $qb->expects($this->at(5))
+            ->method('leftJoin')
+            ->with('root_alias.accounts_field', 'accounts');
+        $qb->expects($this->at(6))
+            ->method('leftJoin')
+            ->with(
+                'accounts.users_field',
+                'users',
+                'WITH',
+                'users.active = true'
+            );
+        $qb->expects($this->at(7))
+            ->method('leftJoin')
+            ->with(
+                'root_alias.products',
+                'products',
+                'WITH',
+                'products.active = true'
+            );
+
+        $this->doctrineHelper->applyJoins($qb, $joins);
+    }
+
+    public function testNormalizeNullCriteria()
+    {
+        $this->assertEquals(
+            new Criteria(),
+            $this->doctrineHelper->normalizeCriteria(null)
+        );
+    }
+
+    public function testNormalizeEmptyCriteria()
+    {
+        $this->assertEquals(
+            new Criteria(),
+            $this->doctrineHelper->normalizeCriteria([])
+        );
+    }
+
+    public function testNormalizeCriteriaObject()
+    {
+        $criteria = new Criteria();
+        $this->assertSame(
+            $criteria,
+            $this->doctrineHelper->normalizeCriteria($criteria)
+        );
+    }
+
+    public function testNormalizeCriteriaArray()
+    {
+        $expectedCriteria = new Criteria();
+        $expectedCriteria->andWhere(Criteria::expr()->eq('field', 'value'));
+
+        $this->assertEquals(
+            $expectedCriteria,
+            $this->doctrineHelper->normalizeCriteria(['field' => 'value'])
+        );
     }
 }

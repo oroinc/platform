@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
+use Doctrine\ORM\QueryBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -18,6 +20,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
+use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
@@ -34,18 +38,47 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [], $joins = [])
     {
-        $manager = $this->getManager();
-        $qb      = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+        $manager    = $this->getManager();
+        $qb         = $manager->getListQueryBuilder($limit, $page, $filters, null, $joins);
+        $totalCount = null;
 
-        if ($manager->isSerializerConfigured()) {
-            $result = $manager->serialize($qb);
-        } elseif ($qb instanceof SqlQueryBuilder) {
-            $result = $this->getPreparedItems($qb->getQuery()->getResult());
+        if (null !== $qb) {
+            if ($manager->isSerializerConfigured()) {
+                $result = $manager->serialize($qb);
+            } elseif ($qb instanceof QueryBuilder) {
+                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            } elseif ($qb instanceof SqlQueryBuilder) {
+                $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            } elseif ($qb instanceof SearchQuery) {
+                $searchResult = $this->container->get('oro_search.index')->query($qb);
+
+                $dispatcher = $this->get('event_dispatcher');
+                foreach ($searchResult->getElements() as $item) {
+                    $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+                }
+
+                $result       = $this->getPreparedItems($searchResult->toArray());
+                $totalCount   = function () use ($searchResult) {
+                    return $searchResult->getRecordsCount();
+                };
+            } else {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Unsupported query type: %s.',
+                        is_object($qb) ? get_class($qb) : gettype($qb)
+                    )
+                );
+            }
         } else {
-            $result = $this->getPreparedItems($qb->getQuery()->getResult());
+            $result = [];
         }
 
-        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
+        $responseContext = ['result' => $result, 'query' => $qb];
+        if (null !== $totalCount) {
+            $responseContext['totalCount'] = $totalCount;
+        }
+
+        return $this->buildResponse($result, self::ACTION_LIST, $responseContext);
     }
 
     /**
@@ -146,6 +179,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                     $this->transformEntityField($field, $value);
                     $result[$field] = $value;
                 }
+            } elseif ($entity instanceof SearchResultItem) {
+                return [
+                    'id'     => $entity->getRecordId(),
+                    'entity' => $entity->getEntityName(),
+                    'title'  => $entity->getRecordTitle()
+                ];
             } else {
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
@@ -172,61 +211,68 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     }
 
     /**
-     * @param array $supportedApiParams valid parameters that can be passed
-     * @param array $filterParameters   assoc array with filter params, like closure
-     *                                  [filterName => [closure => \Closure(...), ...]]
-     *                                  or [filterName => ParameterFilterInterface]
-     * @param array $filterMap          assoc array with map of filter query params to path that for doctrine criteria
-     *                                  For example: 2 filters by relation field - user_id and username.
-     *                                  Both should be applied to criteria as 'user' relation.
-     *                                  ['user_id' => 'user', 'user_name' => 'user']
+     * @param array $parameters  The allowed query parameters
+     * @param array $normalisers The normalizers of the filter values.
+     *                           [filterName => normalizer, ...]
+     *                           Each normalizer can be:
+     *                             * instance of ParameterFilterInterface
+     *                             * [closure => \Closure(...), ...]
+     * @param array $fieldMap    The map between filters and entity fields
+     *                           [filterName => fieldName or alias.fieldName, ...]
+     *                           For example: 2 filters by relation field - user_id and user_name.
+     *                           Both should be applied to 'user' relation.
+     *                           ['user_id' => 'user', 'user_name' => 'user']
      *
-     * @return array
-     * @throws \Exception
+     * @return Criteria
      */
-    protected function getFilterCriteria($supportedApiParams, $filterParameters = [], $filterMap = [])
+    protected function getFilterCriteria($parameters, $normalisers = [], $fieldMap = [])
     {
         return $this->buildFilterCriteria(
-            $this->filterQueryParameters($supportedApiParams),
-            $filterParameters,
-            $filterMap
+            $this->filterQueryParameters($parameters),
+            $normalisers,
+            $fieldMap
         );
     }
 
     /**
-     * @param array $filters           filter values. [filterName => [operator, value], ...]
-     * @param array $filterParameters  assoc array with filter params, like closure
-     *                                 [filterName => [closure => \Closure(...), ...]]
-     *                                 or [filterName => ParameterFilterInterface]
-     * @param array $filterMap         assoc array with map of filter query params to path that for doctrine criteria
-     *                                 For example: 2 filters by relation field - user_id and username.
-     *                                 Both should be applied to criteria as 'user' relation.
-     *                                 ['user_id' => 'user', 'user_name' => 'user']
+     * Builds the Criteria object based on the given filters
      *
-     * @return array
-     * @throws \Exception
+     * @param array $filters     The filter criteria.
+     *                           [filterName => [operator, value], ...]
+     * @param array $normalisers The normalizers of the filter values.
+     *                           [filterName => normalizer, ...]
+     *                           Each normalizer can be:
+     *                             * instance of ParameterFilterInterface
+     *                             * [closure => \Closure(...), ...]
+     * @param array $fieldMap    The map between filters and entity fields
+     *                           [filterName => fieldName or alias.fieldName, ...]
+     *                           For example: 2 filters by relation field - user_id and user_name.
+     *                           Both should be applied to 'user' relation.
+     *                           ['user_id' => 'user', 'user_name' => 'user']
+     *
+     * @return Criteria
      */
-    protected function buildFilterCriteria($filters, $filterParameters = [], $filterMap = [])
+    protected function buildFilterCriteria($filters, $normalisers = [], $fieldMap = [])
     {
         $criteria = Criteria::create();
 
-        foreach ($filters as $filterName => $filterData) {
-            list ($operator, $value) = $filterData;
+        foreach ($filters as $filterName => $data) {
+            list ($operator, $value) = $data;
 
-            $filter = isset($filterParameters[$filterName]) ? $filterParameters[$filterName] : false;
-            if ($filter) {
+            $normaliser = isset($normalisers[$filterName]) ? $normalisers[$filterName] : false;
+            if ($normaliser) {
                 switch (true) {
-                    case $filter instanceof ParameterFilterInterface:
-                        $value = $filter->filter($value, $operator);
+                    case $normaliser instanceof ParameterFilterInterface:
+                        $value = $normaliser->filter($value, $operator);
                         break;
-                    case is_array($filter) && isset($filter['closure']) && is_callable($filter['closure']):
-                        $value = call_user_func($filter['closure'], $value, $operator);
+                    case is_array($normaliser) && isset($normaliser['closure']) && is_callable($normaliser['closure']):
+                        $value = call_user_func($normaliser['closure'], $value, $operator);
                         break;
                 }
             }
 
-            $filterName = isset($filterMap[$filterName]) ? $filterMap[$filterName] : $filterName;
-            $this->addCriteria($criteria, $filterName, $operator, $value);
+            $fieldName = isset($fieldMap[$filterName]) ? $fieldMap[$filterName] : $filterName;
+            $this->addCriteria($criteria, $fieldName, $operator, $value);
         }
 
         return $criteria;
@@ -344,5 +390,13 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $includeHandler->handle(new Context($this, $this->get('request'), $response, $action, $contextValues));
 
         return $response;
+    }
+
+    /**
+     * @return Response
+     */
+    protected function buildNotFoundResponse()
+    {
+        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
     }
 }

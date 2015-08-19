@@ -5,31 +5,31 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class UserCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
-     * @param NameFormatter                   $nameFormatter
+     * @param EntityNameResolver              $entityNameResolver
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
         $this->doctrineHelper          = $doctrineHelper;
-        $this->nameFormatter           = $nameFormatter;
+        $this->entityNameResolver      = $entityNameResolver;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
     }
 
@@ -111,7 +111,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     {
         $name = $calendar->getName();
         if (!$name) {
-            $name = $this->nameFormatter->format($calendar->getOwner());
+            $name = $this->entityNameResolver->getName($calendar->getOwner());
         }
 
         return $name;

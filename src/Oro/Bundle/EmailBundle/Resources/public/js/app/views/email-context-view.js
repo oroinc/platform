@@ -1,13 +1,12 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailContextView,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        EmailContextCollection = require('oroemail/js/app/models/email-context-collection'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        WidgetManager = require('oroui/js/widget-manager');
+    var EmailContextView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var EmailContextCollection = require('oroemail/js/app/models/email-context-collection');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var WidgetManager = require('oroui/js/widget-manager');
 
     EmailContextView = BaseView.extend({
         initialize: function(options) {
@@ -34,15 +33,15 @@ define(function (require) {
         },
 
         initEvents: function() {
-            var self = this,
-                dropdown = this.$('.context-items-dropdown'),
-                firstItem = this.$('.email-context-current-item');
+            var self = this;
+            var dropdown = this.$('.context-items-dropdown');
+            var firstItem = this.$('.email-context-current-item');
             this.collection.on('add', function(model) {
-                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className,
-                    view = self.template({
+                var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
+                var view = self.template({
                         entity: model
-                    }),
-                    $view = $(view);
+                    });
+                var $view = $(view);
 
                 if (model.attributes.first) {
                     firstItem.html(model.attributes.label);
@@ -72,7 +71,7 @@ define(function (require) {
          *
          * @param {string=} value
          */
-        currentTargetClass: function (value) {
+        currentTargetClass: function(value) {
             if (_.isUndefined(value)) {
                 value = this._currentTargetClass;
             } else {

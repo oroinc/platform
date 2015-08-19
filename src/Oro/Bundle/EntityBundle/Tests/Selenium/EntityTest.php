@@ -108,7 +108,7 @@ class EntityTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $entityExist = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', $entityName)
-            ->deleteEntity(array($entityName), 'Remove')
+            ->delete(array($entityName), 'Remove')
             ->assertMessage('Item deleted')
             ->open(array($entityName))
             ->assertTitle($entityUpdateName . ' - Entity Management - Entities - System')

@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class FormatName extends AbstractAction
 {
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $formatter;
+    protected $entityNameResolver;
 
     /**
      * @var array
@@ -20,13 +20,13 @@ class FormatName extends AbstractAction
 
     /**
      * @param ContextAccessor $contextAccessor
-     * @param NameFormatter $formatter
+     * @param EntityNameResolver $entityNameResolver
      */
-    public function __construct(ContextAccessor $contextAccessor, NameFormatter $formatter)
+    public function __construct(ContextAccessor $contextAccessor, EntityNameResolver $entityNameResolver)
     {
         parent::__construct($contextAccessor);
 
-        $this->formatter = $formatter;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -54,7 +54,7 @@ class FormatName extends AbstractAction
         $this->contextAccessor->setValue(
             $context,
             $this->options['attribute'],
-            $this->formatter->format(
+            $this->entityNameResolver->getName(
                 $this->contextAccessor->getValue($context, $this->options['object'])
             )
         );

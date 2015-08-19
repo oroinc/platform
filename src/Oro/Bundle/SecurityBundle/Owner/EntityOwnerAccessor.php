@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
+use Doctrine\Common\Util\Inflector;
+
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Doctrine\Common\Util\ClassUtils;
-
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
@@ -15,16 +18,21 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 class EntityOwnerAccessor
 {
     /**
-     * @var OwnershipMetadataProvider
+     * @var MetadataProviderInterface
      */
     protected $metadataProvider;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * Constructor
      *
-     * @param OwnershipMetadataProvider $metadataProvider
+     * @param MetadataProviderInterface $metadataProvider
      */
-    public function __construct(OwnershipMetadataProvider $metadataProvider)
+    public function __construct(MetadataProviderInterface $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
@@ -32,9 +40,10 @@ class EntityOwnerAccessor
     /**
      * Gets owner of the given entity
      *
-     * @param object $object
-     * @return object
-     * @throws \RuntimeException
+     * @param mixed $object
+     * @return mixed
+     * @throws InvalidEntityException     If entity is not an object
+     * @throws \InvalidArgumentException  If owner property path is not defined
      */
     public function getOwner($object)
     {
@@ -42,43 +51,21 @@ class EntityOwnerAccessor
             throw new InvalidEntityException('$object must be an object.');
         }
 
-        $result = null;
-        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
-        if ($metadata->hasOwner()) {
-            // at first try to use getOwner method to get the owner
-            if (method_exists($object, 'getOwner')) {
-                $result = $object->getOwner();
-            } else {
-                // if getOwner method does not exist try to get owner directly from field
-                try {
-                    $cls = new \ReflectionClass($object);
-                    $ownerProp = $cls->getProperty($metadata->getOwnerFieldName());
-                    if (!$ownerProp->isPublic()) {
-                        $ownerProp->setAccessible(true);
-                    }
-                    $result = $ownerProp->getValue($object);
-                } catch (\ReflectionException $ex) {
-                    throw new InvalidEntityException(
-                        sprintf(
-                            '$object must have either "getOwner" method or "%s" property.',
-                            $metadata->getOwnerFieldName()
-                        ),
-                        0,
-                        $ex
-                    );
-                }
-            }
+        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getRealClass($object));
+        if ($metadata->hasOwner() && $metadata->getOwnerFieldName()) {
+            return $this->getValue($object, $metadata->getOwnerFieldName());
         }
 
-        return $result;
+        return null;
     }
 
     /**
      * Gets organization of the given entity
      *
-     * @param $object
-     * @return object|null
-     * @throws InvalidEntityException
+     * @param mixed $object
+     * @return mixed
+     * @throws InvalidEntityException     If entity is not an object
+     * @throws \InvalidArgumentException  If owner property path is not defined
      */
     public function getOrganization($object)
     {
@@ -86,13 +73,46 @@ class EntityOwnerAccessor
             throw new InvalidEntityException('$object must be an object.');
         }
 
-        $result = null;
-        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
-        if ($metadata->getOrganizationFieldName()) {
-            $accessor = PropertyAccess::createPropertyAccessor();
-            $result = $accessor->getValue($object, $metadata->getOrganizationFieldName());
+        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getRealClass($object));
+        if ($metadata->getGlobalOwnerFieldName()) {
+            return $this->getValue($object, $metadata->getGlobalOwnerFieldName());
         }
 
-        return $result;
+        return null;
+    }
+
+    /**
+     * @param object $object
+     * @param string $property
+     *
+     * @return mixed
+     */
+    protected function getValue($object, $property)
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        try {
+            return $this->propertyAccessor->getValue($object, $property);
+        } catch (NoSuchPropertyException $e) {
+            try {
+                $reflectionClass = new \ReflectionClass($object);
+                $reflectionProperty = $reflectionClass->getProperty($property);
+                $reflectionProperty->setAccessible(true);
+
+                return $reflectionProperty->getValue($object);
+            } catch (\ReflectionException $ex) {
+                throw new InvalidEntityException(
+                    sprintf(
+                        '$object must have either "%s" method or "%s" property.',
+                        Inflector::camelize(sprintf('get_%s', $property)),
+                        $property
+                    ),
+                    0,
+                    $ex
+                );
+            }
+        }
     }
 }
