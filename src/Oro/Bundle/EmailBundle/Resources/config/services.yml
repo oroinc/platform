@@ -121,6 +121,7 @@ parameters:
     # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
     oro_email.workflow.condition.has_count.class:       Oro\Bundle\EmailBundle\Model\Condition\HasCount
+    oro_email.workflow.condition.auto_response_rules_exists.class:       Oro\Bundle\EmailBundle\Model\Condition\AutoResponseRulesExists
 
     # Workflow actions
     oro_email.workflow.action.parse_first_name.class:   Oro\Bundle\EmailBundle\Model\Action\ParseFirstNameFromEmailAddress
@@ -805,6 +806,13 @@ services:
         class: %oro_email.workflow.condition.has_count.class%
         tags:
             - { name: oro_workflow.condition, alias: has_count }
+
+    oro_email.workflow.condition.auto_response_rules_exists:
+        class: %oro_email.workflow.condition.auto_response_rules_exists.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: oro_workflow.condition, alias: auto_response_rules_exists }
 
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%

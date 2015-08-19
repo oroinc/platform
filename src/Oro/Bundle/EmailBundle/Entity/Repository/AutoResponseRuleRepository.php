@@ -23,4 +23,15 @@ class AutoResponseRuleRepository extends EntityRepository
         array_map([$this->_em, 'remove'], $rules);
         $this->_em->flush();
     }
+
+    /**
+     * @return bool
+     */
+    public function rulesExists()
+    {
+        return (bool) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

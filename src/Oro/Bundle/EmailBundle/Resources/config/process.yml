@@ -6,7 +6,9 @@ definitions:
         actions_configuration:
             - @tree:
                 conditions:
-                    @not_blank: [$emailBody]
+                    @and:
+                        - @not_blank: [$emailBody]
+                        - @auto_response_rules_exists: ~
                 actions:
                     - @format_string:
                         attribute: $.arguments
