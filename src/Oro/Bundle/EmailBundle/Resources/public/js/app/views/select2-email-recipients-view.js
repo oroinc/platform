@@ -35,6 +35,7 @@ define([
         },
 
         _onchange: function(e) {
+            this.$el.valid();
             this.$el.data('search-choice', {id: '', text: ''});
 
             var data = this.$contextEl.select2('data');

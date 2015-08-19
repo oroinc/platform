@@ -33,9 +33,13 @@ config:
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
 
         'oroemail/js/app/modules/views-module': 'bundles/oroemail/js/app/modules/views-module.js'
+        'oroemail/js/app/modules/email-module': 'bundles/oroemail/js/app/modules/email-module.js'
+
+        'oroemail/js/validator/email-address': 'bundles/oroemail/js/validator/email-address.js'
 
         'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'
 
         'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'
     appmodules:
         - oroemail/js/app/modules/views-module
+        - oroemail/js/app/modules/email-module
