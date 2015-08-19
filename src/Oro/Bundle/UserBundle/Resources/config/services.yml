@@ -260,6 +260,7 @@ services:
             - oro_user_password_change_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 100 }
+            - { name: oro_ui.update_action_provider, group: activity, priority: 100 }
 
     oro_user.password_reset.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -268,6 +269,7 @@ services:
             - oro_user_password_reset_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 110 }
+            - { name: oro_ui.update_action_provider, group: activity, priority: 110 }
 
     security.user_checker:
         class: %oro_user.security.user_checker.class%

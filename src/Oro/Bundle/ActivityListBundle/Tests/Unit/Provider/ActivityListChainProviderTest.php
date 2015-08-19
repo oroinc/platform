@@ -105,7 +105,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptySubject()
     {
-        $testEntity = new TestTarget();
+        $testEntity = new TestTarget(1);
         $this->assertNull($this->provider->getSubject($testEntity));
     }
 

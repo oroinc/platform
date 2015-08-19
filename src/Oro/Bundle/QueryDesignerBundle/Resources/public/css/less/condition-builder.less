@@ -173,13 +173,16 @@
   }
   .select2-container {
     width: auto;
+    max-width: none;
     vertical-align: initial;
-    display: inline;
+    display: block;
+    margin-bottom: 4px;
     .select2-choice {
       box-shadow: none;
       border: none;
       padding: 0;
       color: @linkColor;
+      height: auto;
       &:hover, &:focus {
         color: @linkColorHover;
       }
@@ -189,10 +192,16 @@
     }
     .select2-choice,
     .select2-chosen {
-      line-height: 28px;
+      line-height: 20px;
       display: inline;
+      white-space: normal;
       span {
         display: inline;
+        white-space: normal;
+      }
+      .entity-field-path > span:after {
+        content: ' ';
+        font-size: 0;
       }
     }
   }
