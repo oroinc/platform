@@ -43,8 +43,13 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
      * @param bool        $expected
      * @dataProvider configResultProvider
      */
-    public function testIsAttachmentAssociationEnabled($entity, $attachmentConfigReturn, $isNewRecord, $isManaged, $expected)
-    {
+    public function testIsAttachmentAssociationEnabled(
+        $entity,
+        $attachmentConfigReturn,
+        $isNewRecord,
+        $isManaged,
+        $expected
+    ) {
         $this->attachmentConfig->expects(is_object($entity) && !$isNewRecord ? $this->once() : $this->never())
             ->method('isAttachmentAssociationEnabled')
             ->with($entity)
