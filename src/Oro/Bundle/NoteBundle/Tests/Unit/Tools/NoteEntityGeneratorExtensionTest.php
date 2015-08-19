@@ -4,11 +4,10 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Tools;
 
 use CG\Core\DefaultGeneratorStrategy;
-
 use CG\Generator\PhpClass;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension;
 
 class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
@@ -37,17 +36,16 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\NoteBundle\Entity\Note',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    Note::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity'),
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\NoteBundle\Entity\Note',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity'),
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -56,17 +54,16 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\NoteBundle\Entity\Note',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    Note::ENTITY_NAME,
-                                    'testField',
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\NoteBundle\Entity\Note',
+                                'testField',
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -75,17 +72,16 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class'        => Note::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\NoteBundle\Entity\Note',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    Note::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity'),
-                                    'manyToMany'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\NoteBundle\Entity\Note',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity'),
+                                'manyToMany'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -93,7 +89,7 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false,
             ],
             [
-                ['class' => Note::ENTITY_NAME],
+                ['class' => 'Oro\Bundle\NoteBundle\Entity\Note'],
                 false,
             ],
             [
@@ -108,43 +104,39 @@ class NoteEntityGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1'),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity1'),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity1',
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2'),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity2'),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity2',
                 ],
                 [ // should be ignored because field type is not manyToOne
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            Note::ENTITY_NAME,
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3'),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\NoteBundle\Entity\Note',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity3'),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [ // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            Note::ENTITY_NAME,
-                            'testField',
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\NoteBundle\Entity\Note',
+                        'testField',
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ],
             ],

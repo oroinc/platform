@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
@@ -28,31 +30,42 @@ class EmailBodyAddListener
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var ActivityListChainProvider */
+    protected $chainProvider;
+
+    /** @var EntityManager */
+    protected $entityManager;
+
     /**
      * @param EmailAttachmentManager $attachmentManager
      * @param ConfigProvider $configProvider
      * @param EmailActivityListProvider $activityListProvider
      * @param ServiceLink $securityFacadeLink
+     * @param ActivityListChainProvider $chainProvider
+     * @param EntityManager $entityManager
      */
     public function __construct(
         EmailAttachmentManager $attachmentManager,
         ConfigProvider $configProvider,
         EmailActivityListProvider $activityListProvider,
-        ServiceLink $securityFacadeLink
+        ServiceLink $securityFacadeLink,
+        ActivityListChainProvider $chainProvider,
+        EntityManager $entityManager
     ) {
         $this->attachmentManager = $attachmentManager;
         $this->configProvider = $configProvider;
         $this->activityListProvider = $activityListProvider;
         $this->securityFacade = $securityFacadeLink->getService();
+        $this->chainProvider = $chainProvider;
+        $this->entityManager = $entityManager;
     }
 
     /**
      * @param EmailBodyAdded $event
      */
-    public function linkToScopeEvent(EmailBodyAdded $event)
+    public function linkToScope(EmailBodyAdded $event)
     {
-        if (
-            $this->securityFacade->getToken() !== null
+        if ($this->securityFacade->getToken() !== null
             && !$this->securityFacade->isGranted('CREATE', 'entity:' . AttachmentScope::ATTACHMENT)
         ) {
             return;
@@ -65,6 +78,18 @@ class EmailBodyAddListener
                     $this->attachmentManager->linkEmailAttachmentToTargetEntity($attachment, $entity);
                 }
             }
+        }
+    }
+
+    /**
+     * @param EmailBodyAdded $event
+     */
+    public function updateActivityDescription(EmailBodyAdded $event)
+    {
+        $email = $event->getEmail();
+        $activityList = $this->chainProvider->getUpdatedActivityList($email, $this->entityManager);
+        if ($activityList) {
+            $this->entityManager->persist($activityList);
         }
     }
 }

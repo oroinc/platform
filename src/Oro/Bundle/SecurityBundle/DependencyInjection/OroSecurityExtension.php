@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
-class OroSecurityExtension extends Extension
+class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
+    const DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID = 'oro_security.wsse_nonce_cache';
+    const DEFAULT_WSSE_NONCE_CACHE_CLASS = 'Oro\Bundle\SecurityBundle\Cache\WsseNoncePhpFileCache';
+    const DEFAULT_WSSE_NONCE_CACHE_PATH = '%kernel.cache_dir%/security/nonces';
+
     /**
      * {@inheritDoc}
      */
@@ -33,6 +35,16 @@ class OroSecurityExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('ownership.yml');
         $loader->load('services.yml');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        if ($container instanceof OroContainerBuilder) {
+            $this->setupWsseNonceCache($container);
+        }
     }
 
     /**
@@ -55,5 +67,40 @@ class OroSecurityExtension extends Extension
             'oro_acl_annotation',
             new AclAnnotationCumulativeResourceLoader(['Controller'])
         );
+    }
+
+    /**
+     * Sets default implementation of the cache for WSSE nonces if a custom implementation is not specified
+     *
+     * @param OroContainerBuilder $container
+     */
+    protected function setupWsseNonceCache(OroContainerBuilder $container)
+    {
+        $securityConfig = $container->getExtensionConfig('security');
+        if (isset($securityConfig[0]['firewalls']['wsse_secured'])
+            && !isset($securityConfig[0]['firewalls']['wsse_secured']['wsse']['nonce_cache_service_id'])
+        ) {
+            $securityConfig[0]['firewalls']['wsse_secured']['wsse']['nonce_cache_service_id'] =
+                self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID;
+            $container->setExtensionConfig('security', $securityConfig);
+
+            if (!$container->hasDefinition(self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID)) {
+                $wsseLifetime = 0;
+                if (isset($securityConfig[0]['firewalls']['wsse_secured']['wsse']['lifetime'])) {
+                    $wsseLifetime = $securityConfig[0]['firewalls']['wsse_secured']['wsse']['lifetime'];
+                }
+                $cacheServiceDef = new Definition(
+                    self::DEFAULT_WSSE_NONCE_CACHE_CLASS,
+                    [self::DEFAULT_WSSE_NONCE_CACHE_PATH]
+                );
+                if ($wsseLifetime) {
+                    $cacheServiceDef->addMethodCall('setNonceLifeTime', [$wsseLifetime]);
+                }
+                $container->setDefinition(
+                    self::DEFAULT_WSSE_NONCE_CACHE_SERVICE_ID,
+                    $cacheServiceDef
+                );
+            }
+        }
     }
 }

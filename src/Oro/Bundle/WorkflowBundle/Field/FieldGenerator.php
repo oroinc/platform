@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Field;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -98,17 +99,15 @@ class FieldGenerator
         // update database
         $this->entityProcessor->updateDatabase();
 
-        // make fields hidden
+        // make workflowItem field hidden
         // TODO: Fields can be hidden only after schema update due to a bug in DoctrineSubscriber
-        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
+        // TODO: I'm not sure that the bug in DoctrineSubscriber. It seems that the bug in
+        // TODO: Doctrine\ORM\Tools\SchemaTool::getSchemaFromMetadata. See fix made in BAP-3621
         // TODO: If make fields hidden then these fields will be created only for the first extended entity
         // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3632
         /*
         if (!$hasWorkflowItemField) {
             $this->hideRelationField($entityClass, self::PROPERTY_WORKFLOW_ITEM);
-        }
-        if (!$hasWorkflowStepField) {
-            $this->hideRelationField($entityClass, self::PROPERTY_WORKFLOW_STEP);
         }
         $this->configManager->flush();
         */
@@ -124,7 +123,7 @@ class FieldGenerator
      */
     protected function addRelationField($entityClass, $fieldName, $label, $description, $targetEntity, $targetField)
     {
-        $this->configManager->createConfigFieldModel($entityClass, $fieldName, 'manyToOne');
+        $this->configManager->createConfigFieldModel($entityClass, $fieldName, RelationType::MANY_TO_ONE);
 
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $entityFieldConfig = $entityConfigProvider->getConfig($entityClass, $fieldName);
@@ -140,7 +139,7 @@ class FieldGenerator
         $extendFieldConfig->set('target_field', $targetField);
         $extendFieldConfig->set(
             'relation_key',
-            ExtendHelper::buildRelationKey($entityClass, $targetField, 'manyToOne', $targetEntity)
+            ExtendHelper::buildRelationKey($entityClass, $targetField, RelationType::MANY_TO_ONE, $targetEntity)
         );
 
         $formConfigProvider = $this->configManager->getProvider('form');

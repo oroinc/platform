@@ -10,7 +10,12 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * Class Transport
  *
  * @package Oro\Bundle\IntegrationBundle\Entity
- * @ORM\Table(name="oro_integration_transport")
+ * @ORM\Table(
+ *      name="oro_integration_transport",
+ *      indexes={
+ *          @ORM\Index(name="oro_int_trans_type_idx", columns={"type"})
+ *      }
+ * )
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string", length=30)

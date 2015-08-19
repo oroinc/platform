@@ -1,45 +1,61 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backbone',
-    'underscore'
-], function (Backbone, _) {
+    'underscore',
+    'routing'
+], function(Backbone, _, routing) {
     'use strict';
 
     var GridViewsModel;
 
     GridViewsModel = Backbone.Model.extend({
+        route: 'oro_datagrid_api_rest_gridview_post',
+        urlRoot: null,
+
         /** @property */
         idAttribute: 'name',
 
         /** @property */
         defaults: {
             filters: [],
-            sorters: []
+            sorters: [],
+            deletable: false,
+            editable:  false
         },
 
         /** @property */
         directions: {
-            "ASC": "-1",
-            "DESC": "1"
+            ASC: '-1',
+            DESC: '1'
         },
 
         /**
          * Initializer.
          *
          * @param {Object} data
-         * @param {String} data.name required
+         * @param {String} data.name
+         * @param {String} data.label
+         * @param {String} data.type
          * @param {Array}  data.sorters
          * @param {Array}  data.filters
          */
-        initialize: function (data) {
-            if (!data.name) {
-                throw new TypeError("'name' is required");
+        initialize: function(data) {
+            this.urlRoot = routing.generate(this.route);
+
+            if (_.isArray(data.filters) && _.isEmpty(data.filters)) {
+                this.set('filters', {});
             }
 
-            _.each(data.sorters, _.bind(function (direction, key) {
-                data.sorters[key] = this.directions[direction];
-            }, this));
+            if (_.isArray(data.sorters) && _.isEmpty(data.sorters)) {
+                this.set('sorters', {});
+            }
+
+            _.each(data.sorters, function(direction, key) {
+                if (typeof this.directions[direction] !== 'undefined') {
+                    data.sorters[key] = this.directions[direction];
+                } else {
+                    data.sorters[key] = String(direction);
+                }
+            }, this);
         },
 
         /**
@@ -47,12 +63,19 @@ define([
          *
          * @returns {}
          */
-        toGridState: function () {
+        toGridState: function() {
             return {
                 filters:  this.get('filters'),
                 sorters:  this.get('sorters'),
                 gridView: this.get('name')
             };
+        },
+
+        /**
+         * @returns {Array}
+         */
+        toJSON: function() {
+            return _.omit(this.attributes, ['editable', 'deletable']);
         }
     });
 

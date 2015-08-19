@@ -1,6 +1,4 @@
-/*global define*/
-/*jslint nomen: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery');
@@ -10,7 +8,6 @@ define(function (require) {
     var Util = require('oroentity/js/entity-fields-util');
     require('oroentity/js/fields-loader');
     require('jquery.select2');
-
 
     /**
      * @export ororeport/js/chart-options
@@ -24,7 +21,7 @@ define(function (require) {
         options: {
             childTemplate: '[id^=<%= id %>_]',
             optionsTemplate: '<%= field %>(<%= group %>,<%= name %>,<%= type %>)',
-            fieldsLoaderSelector: '#oro_report_form_entity',
+            fieldsLoaderSelector: '[data-ftid=oro_report_form_entityoro_api_querydesigner_fields_entity]',
             fieldsTableIdentifier: 'item-container'
         },
 
@@ -32,19 +29,19 @@ define(function (require) {
          * @param {String} id
          * @param {Array} options
          */
-        initialize: function (id, options) {
+        initialize: function(id, options) {
             var self = this;
             this.options = _.extend({}, this.options, options);
             this.childSelectorTemplate = _.template(this.options.childTemplate);
             this.optionsTemplate = _.template(this.options.optionsTemplate);
             this.items = [];
 
-            mediator.on('items-manager:table:reset:' + self.options.fieldsTableIdentifier, function (collection) {
+            mediator.on('items-manager:table:reset:' + self.options.fieldsTableIdentifier, function(collection) {
                 self.updateCollection(collection);
                 self.validateSelect2(id);
             });
 
-            mediator.once('items-manager:table:reset:' + self.options.fieldsTableIdentifier, function () {
+            mediator.once('items-manager:table:reset:' + self.options.fieldsTableIdentifier, function() {
                 self.initSelect2(id);
                 self.initializeListeners(id);
             });
@@ -53,18 +50,18 @@ define(function (require) {
         /**
          * @param {String} id
          */
-        initializeListeners: function (id) {
+        initializeListeners: function(id) {
             var self = this;
-            mediator.on('items-manager:table:add:' + self.options.fieldsTableIdentifier, function (collection) {
+            mediator.on('items-manager:table:add:' + self.options.fieldsTableIdentifier, function(collection) {
                 self.updateCollection(collection);
             });
 
-            mediator.on('items-manager:table:change:' + self.options.fieldsTableIdentifier, function (collection) {
+            mediator.on('items-manager:table:change:' + self.options.fieldsTableIdentifier, function(collection) {
                 self.updateCollection(collection);
                 self.validateSelect2(id);
             });
 
-            mediator.on('items-manager:table:remove:' + self.options.fieldsTableIdentifier, function (collection) {
+            mediator.on('items-manager:table:remove:' + self.options.fieldsTableIdentifier, function(collection) {
                 self.updateCollection(collection);
                 self.validateSelect2(id);
             });
@@ -73,7 +70,7 @@ define(function (require) {
         /**
          * @param {Array} collection
          */
-        updateCollection: function (collection) {
+        updateCollection: function(collection) {
             var entity = $(this.options.fieldsLoaderSelector).fieldsLoader('getEntityName');
             var data = $(this.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
             this.util = new Util(entity, data);
@@ -83,10 +80,11 @@ define(function (require) {
         /**
          * @param {String} id
          */
-        validateSelect2: function (id) {
+        validateSelect2: function(id) {
             var self = this;
-            var childSelector = this.childSelectorTemplate({id: id});
-            $('#' + id).find(childSelector).each(function () {
+            var $element = $('#' + id);
+            var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            $element.find(childSelector).each(function() {
                 var value = $(this).val();
                 if (value) {
                     var name = _.first(value.split('('));
@@ -100,18 +98,19 @@ define(function (require) {
         /**
          * @param {String} id
          */
-        initSelect2: function (id) {
-            var childSelector = this.childSelectorTemplate({id: id});
+        initSelect2: function(id) {
             var self = this;
-            $('#' + id).find(childSelector).each(function () {
+            var $element = $('#' + id);
+            var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
+            $element.find(childSelector).each(function() {
                 var exclude = $(this).data('type-filter');
                 $(this).select2({
                     collapsibleResults: true,
                     placeholder: __('oro.entity.form.choose_entity_field'),
-                    data: function () {
+                    data: function() {
                         return self.data(exclude);
                     },
-                    initSelection: function (element, callback) {
+                    initSelection: function(element, callback) {
                         var value = element.val().split('(');
                         var node = _.last(self.util.pathToEntityChain(value[0]));
                         callback({
@@ -126,10 +125,9 @@ define(function (require) {
         /**
          * @param {Array} exclude
          */
-        data: function (exclude) {
-            var data, util, optionsTemplate;
-            util = this.util;
-            data = {
+        data: function(exclude) {
+            var util = this.util;
+            var data = {
                 more: false,
                 results: []
             };
@@ -138,19 +136,19 @@ define(function (require) {
                 return data;
             }
 
-            optionsTemplate = this.optionsTemplate;
+            var optionsTemplate = this.optionsTemplate;
 
-            $.each(this.items, function () {
-                var options, chain, entity, items;
-                options = this.func;
-                chain = util.pathToEntityChain(this.name).slice(1);
-                entity = chain[chain.length - 1];
-                items = data.results;
+            $.each(this.items, function() {
+                var options = this.func;
+                var chain = util.pathToEntityChain(this.name).slice(1);
+                var entity = chain[chain.length - 1];
+                var items = data.results;
                 if (!entity || !Util.filterFields([entity.field], exclude).length) {
                     return;
                 }
-                $.each(chain, function () {
-                    var item, id;
+                $.each(chain, function() {
+                    var item;
+                    var id;
                     if (this.entity) {
                         item = _.findWhere(items, {path: this.path});
                         if (!item) {
@@ -183,5 +181,5 @@ define(function (require) {
 
             return data;
         }
-    }
+    };
 });

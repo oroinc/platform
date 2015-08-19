@@ -11,6 +11,8 @@ parameters:
     oro_soap.entity_accessor.class:               Oro\Bundle\SoapBundle\Serializer\EntityDataAccessor
     oro_soap.entity_data_transformer.class:       Oro\Bundle\SoapBundle\Serializer\EntityDataTransformer
 
+    oro_soap.locale_listener.class:               Oro\Bundle\SoapBundle\EventListener\LocaleListener
+
 services:
     oro_soap.loader:
         class: %oro_soap.loader.class%
@@ -34,6 +36,9 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+            - [setDoctrineHelper, [@oro_entity.doctrine_helper]]
+            - [setEntityClassNameHelper, [@oro_entity.entity_class_name_helper]]
+            - [setEntitySerializer, [@oro_soap.entity_serializer]]
 
     oro_soap.handler.include_delegate:
         class: %oro_soap.handler.include_delegate.class%
@@ -68,11 +73,35 @@ services:
         class: %oro_soap.entity_serializer.class%
         arguments:
             - @doctrine
+            - @oro_entity_config.config_manager
             - @oro_soap.entity_accessor
             - @oro_soap.entity_data_transformer
+            - @oro_entity.query_hint_resolver
 
     oro_soap.entity_accessor:
         class: %oro_soap.entity_accessor.class%
 
     oro_soap.entity_data_transformer:
         class: %oro_soap.entity_data_transformer.class%
+        arguments:
+            - @service_container
+
+    # event listeners
+    oro_soap.locale_listener:
+        class: %oro_soap.locale_listener.class%
+        arguments:
+            - @stof_doctrine_extensions.listener.translatable
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_soap.routing.options_resolver.old_options:
+        class: Oro\Bundle\SoapBundle\Routing\OldOptionsRouteOptionsResolver
+        public: false
+        tags:
+            - { name: routing.options_resolver }
+
+    oro_soap.api_doc_handler.old_options:
+        class: Oro\Bundle\SoapBundle\Routing\OldOptionsApiDocHandler
+        public: false
+        tags:
+            - { name: nelmio_api_doc.extractor.handler }

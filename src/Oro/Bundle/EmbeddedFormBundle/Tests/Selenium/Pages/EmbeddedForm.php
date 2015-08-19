@@ -11,18 +11,13 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  */
 class EmbeddedForm extends AbstractPageEntity
 {
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @param string $title
      * @return $this
      */
     public function setTitle($title)
     {
-        $field = $this->test->byId('embedded_form_title');
+        $field = $this->test->byXpath("//*[@data-ftid='embedded_form_title']");
         $field->clear();
         $field->value($title);
 
@@ -70,7 +65,7 @@ class EmbeddedForm extends AbstractPageEntity
     public function setFirstName($name)
     {
         $this->test->frame('frameId');
-        $field = $this->test->byXpath("//input[@id='orocrm_magento_contactus_contact_request_firstName']");
+        $field = $this->test->byXpath("//input[@data-ftid='orocrm_magento_contactus_contact_request_firstName']");
         $field->clear();
         $field->value($name);
 
@@ -83,7 +78,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setLastName($name)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_lastName');
+        $field = $this->test->byXpath("//*[@data-ftid='orocrm_contactus_contact_request_lastName']");
         $field->clear();
         $field->value($name);
 
@@ -96,7 +91,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setEmail($email)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_emailAddress');
+        $field = $this->test->byXpath("//*[@data-ftid='orocrm_contactus_contact_request_emailAddress']");
         $field->clear();
         $field->value($email);
 
@@ -109,7 +104,7 @@ class EmbeddedForm extends AbstractPageEntity
      */
     public function setComment($comment)
     {
-        $field = $this->test->byId('orocrm_contactus_contact_request_comment');
+        $field = $this->test->byXpath("//*[@data-ftid='orocrm_contactus_contact_request_comment']");
         $field->clear();
         $field->value($comment);
 

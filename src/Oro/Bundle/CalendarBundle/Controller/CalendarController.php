@@ -24,6 +24,7 @@ class CalendarController extends Controller
      * View user's default calendar
      *
      * @Route("/default", name="oro_calendar_view_default")
+     * @Template
      * @AclAncestor("oro_calendar_view")
      */
     public function viewDefaultAction()
@@ -40,10 +41,7 @@ class CalendarController extends Controller
 
         $calendar = $repo->findDefaultCalendar($user->getId(), $organization->getId());
 
-        return $this->forward(
-            'OroCalendarBundle:Calendar:view',
-            array('calendar' => $calendar)
-        );
+        return $this->viewAction($calendar);
     }
 
     /**
@@ -83,7 +81,7 @@ class CalendarController extends Controller
                             'entity_id'               => $calendar->getId(),
                             'entity_name'             => 'OroCalendarBundle:Calendar',
                             'excludeCurrent'          => true,
-                            'extra_config'            => 'acl_user_autocomplete',
+                            'component'               => 'acl-user-autocomplete',
                             'permission'              => 'VIEW',
                             'placeholder'             => 'oro.calendar.form.choose_user_to_add_calendar',
                             'result_template_twig'    => 'OroCalendarBundle:Calendar:Autocomplete/result.html.twig',

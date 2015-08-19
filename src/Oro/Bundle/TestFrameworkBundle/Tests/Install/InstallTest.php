@@ -11,6 +11,8 @@ use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroRequirements;
 
 class InstallTest extends Selenium2TestCase
 {
+    const URL = '/install.php';
+
     protected function setUp()
     {
         parent::setUp();
@@ -40,7 +42,7 @@ class InstallTest extends Selenium2TestCase
                     ->setPasswordSecond('admin')
                     ->setEmail('admin@example.com')
                     ->setFirstName('John')
-                    ->setlastName('Doe')
+                    ->setLastName('Doe')
                     ->setLoadFixtures();
 
         /** @var OroFinish $finish */

@@ -46,13 +46,12 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      */
     public function __construct($folderPlaceholder, $folderPattern, $fileResourceLoader)
     {
-        $this->folderPlaceholder = $folderPlaceholder;
-        $this->folderPattern     = $folderPattern;
-        if (is_array($fileResourceLoader)) {
-            $this->fileResourceLoaders = $fileResourceLoader;
-        } else {
-            $this->fileResourceLoaders = [$fileResourceLoader];
-        }
+        $this->folderPlaceholder   = $folderPlaceholder;
+        $this->folderPattern       = $folderPattern;
+        $this->fileResourceLoaders = is_array($fileResourceLoader)
+            ? $fileResourceLoader
+            : [$fileResourceLoader];
+
         $this->initialize();
     }
 
@@ -67,14 +66,14 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function load($bundleClass, $bundleDir)
+    public function load($bundleClass, $bundleDir, $bundleAppDir = '')
     {
         $result = [];
 
         foreach ($this->fileResourceLoaders as $loader) {
             $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
             if (!$split['folder']) {
-                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir));
+                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir, $bundleAppDir));
             } else {
                 $dir = $bundleDir . $split['baseDir'];
                 if (is_dir($dir)) {
@@ -88,7 +87,10 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                                 $split['baseDir'] . DIRECTORY_SEPARATOR . $file->getFilename() . $split['relPath'];
                             try {
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
-                                $this->addLoadedResource($result, $loader->load($bundleClass, $bundleDir));
+                                $this->addLoadedResource(
+                                    $result,
+                                    $loader->load($bundleClass, $bundleDir, $bundleAppDir)
+                                );
                             } catch (\Exception $e) {
                                 $loader->setRelativeFilePath($originalRelativeFilePath);
                                 throw $e;
@@ -110,12 +112,12 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function registerFoundResource($bundleClass, $bundleDir, CumulativeResource $resource)
+    public function registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource)
     {
         foreach ($this->fileResourceLoaders as $loader) {
             $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
             if (!$split['folder']) {
-                $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+                $loader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             } else {
                 $dir = $bundleDir . $split['baseDir'];
                 if (is_dir($dir)) {
@@ -129,7 +131,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                                 $split['baseDir'] . DIRECTORY_SEPARATOR . $file->getFilename() . $split['relPath'];
                             try {
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
-                                $loader->registerFoundResource($bundleClass, $bundleDir, $resource);
+                                $loader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
                             } catch (\Exception $e) {
                                 $loader->setRelativeFilePath($originalRelativeFilePath);
                                 throw $e;
@@ -145,7 +147,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
     /**
      * {@inheritdoc}
      */
-    public function isResourceFresh($bundleClass, $bundleDir, CumulativeResource $resource, $timestamp)
+    public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
         $checked = [];
         // check exist and new resources
@@ -153,7 +155,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
             $split = $this->preparedRelativeFilePaths[(string)$loader->getResource()];
             if (!$split['folder']) {
                 $checked[$bundleDir . $loader->getRelativeFilePath()] = true;
-                if (!$loader->isResourceFresh($bundleClass, $bundleDir, $resource, $timestamp)) {
+                if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
                     return false;
                 }
             } else {
@@ -171,7 +173,14 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
                             $checked[$bundleDir . $currentRelativeFilePath] = true;
                             try {
                                 $loader->setRelativeFilePath($currentRelativeFilePath);
-                                if (!$loader->isResourceFresh($bundleClass, $bundleDir, $resource, $timestamp)) {
+                                if (!$loader->isResourceFresh(
+                                    $bundleClass,
+                                    $bundleDir,
+                                    $bundleAppDir,
+                                    $resource,
+                                    $timestamp
+                                )
+                                ) {
                                     $loader->setRelativeFilePath($originalRelativeFilePath);
 
                                     return false;
@@ -233,6 +242,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * @param string $relativeFilePath
+     *
      * @return array
      */
     protected function splitRelativeFilePath($relativeFilePath)
@@ -280,6 +290,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      *
      * @param \DirectoryIterator $file
      * @param string             $folderPattern
+     *
      * @return bool
      */
     protected function isApplicableFolder(\DirectoryIterator $file, $folderPattern)
@@ -294,6 +305,7 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
      * Returns a regular expression pattern which can be used to check if a folder can contain a resource
      *
      * @param string $folder
+     *
      * @return string
      */
     protected function getFolderPattern($folder)

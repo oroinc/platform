@@ -76,7 +76,12 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
                 ->getByStepExecution($this->stepExecution)
                 ->getConfiguration();
 
-            if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
+            $contextSkipClear = $this->stepExecution
+                ->getJobExecution()
+                ->getExecutionContext()
+                ->get(EntityWriter::SKIP_CLEAR);
+
+            if (empty($configuration[EntityWriter::SKIP_CLEAR]) && !$contextSkipClear) {
                 $em->clear();
             }
         } catch (\Exception $exception) {

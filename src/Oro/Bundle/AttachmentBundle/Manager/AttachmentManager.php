@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
 
+use Gaufrette\Stream;
+
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -18,7 +20,10 @@ use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class AttachmentManager
 {
@@ -35,27 +40,31 @@ class AttachmentManager
     /** @var  array */
     protected $fileIcons;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var AssociationManager */
+    protected $associationManager;
+
     /**
-     * @param FilesystemMap $filesystemMap
-     * @param Router        $router
-     * @param ServiceLink   $securityFacadeLink
-     * @param array         $fileIcons
+     * @param FilesystemMap      $filesystemMap
+     * @param Router             $router
+     * @param ServiceLink        $securityFacadeLink
+     * @param array              $fileIcons
+     * @param AssociationManager $associationManager
      */
     public function __construct(
         FilesystemMap $filesystemMap,
         Router $router,
         ServiceLink $securityFacadeLink,
-        $fileIcons
+        $fileIcons,
+        AssociationManager $associationManager
     ) {
         $this->filesystem         = $filesystemMap->get('attachments');
         $this->router             = $router;
         $this->fileIcons          = $fileIcons;
         $this->securityFacadeLink = $securityFacadeLink;
+        $this->associationManager = $associationManager;
     }
 
     /**
@@ -124,7 +133,7 @@ class AttachmentManager
                 $entity->setFileSize($file->getSize());
             }
 
-            $entity->setFilename(uniqid() . '.' . $entity->getExtension());
+            $entity->setFilename($this->generateFileName($entity->getExtension()));
 
             $fsAdapter = $this->filesystem->getAdapter();
             if ($fsAdapter instanceof MetadataSupporter) {
@@ -157,28 +166,22 @@ class AttachmentManager
      */
     public function copyLocalFileToStorage($localFilePath, $destinationFileName)
     {
-        $src = new LocalStream($localFilePath);
-        $dst = $this->filesystem->createStream($destinationFileName);
-
-        $src->open(new StreamMode('rb+'));
-        $dst->open(new StreamMode('wb+'));
-
-        while (!$src->eof()) {
-            $dst->write($src->read(self::READ_COUNT));
-        }
-        $dst->close();
-        $src->close();
+        $srcStream = new LocalStream($localFilePath);
+        $this->copyStreamToStorage($srcStream, $destinationFileName);
     }
 
     /**
      * Get file content
      *
-     * @param File $entity
+     * @param File|string $file The File object or file name
+     *
      * @return string
      */
-    public function getContent(File $entity)
+    public function getContent($file)
     {
-        return $this->filesystem->get($entity->getFilename())->getContent();
+        return $this->filesystem
+            ->get($file instanceof File ? $file->getFilename() : $file)
+            ->getContent();
     }
 
     /**
@@ -200,6 +203,26 @@ class AttachmentManager
             $entity,
             $type,
             $absolute
+        );
+    }
+
+    /**
+     * Get url of REST API resource which can be used to get the content of the given file
+     *
+     * @param int    $fileId           The id of the File object
+     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
+     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     *
+     * @return string
+     */
+    public function getFileRestApiUrl($fileId, $ownerEntityClass, $ownerEntityId)
+    {
+        return $this->router->generate(
+            'oro_api_get_file',
+            [
+                'key' => $this->buildFileKey($fileId, $ownerEntityClass, $ownerEntityId),
+                '_format' => 'binary'
+            ]
         );
     }
 
@@ -289,15 +312,18 @@ class AttachmentManager
     /**
      * Get resized image url
      *
-     * @param File $entity
-     * @param int  $width
-     * @param int  $height
+     * @param File        $entity
+     * @param int         $width
+     * @param int         $height
+     * @param bool|string $referenceType
+     *
      * @return string
      */
     public function getResizedImageUrl(
         File $entity,
         $width = self::DEFAULT_IMAGE_WIDTH,
-        $height = self::DEFAULT_IMAGE_HEIGHT
+        $height = self::DEFAULT_IMAGE_HEIGHT,
+        $referenceType = Router::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
             'oro_resize_attachment',
@@ -306,7 +332,8 @@ class AttachmentManager
                 'height'   => $height,
                 'id'       => $entity->getId(),
                 'filename' => $entity->getOriginalFilename()
-            ]
+            ],
+            $referenceType
         );
     }
 
@@ -355,5 +382,108 @@ class AttachmentManager
         if ($entity->isEmptyFile() && $entity->getFilename() === null) {
             $em->remove($entity);
         }
+    }
+
+    /**
+     * Builds the key of the File object
+     *
+     * @param int    $fileId           The id of the File object
+     * @param string $ownerEntityClass The FQCN of an entity the File object belongs
+     * @param mixed  $ownerEntityId    The id of an entity the File object belongs
+     *
+     * @return string
+     */
+    public function buildFileKey($fileId, $ownerEntityClass, $ownerEntityId)
+    {
+        return str_replace(
+            '/',
+            '_',
+            base64_encode(serialize([$fileId, $ownerEntityClass, $ownerEntityId]))
+        );
+    }
+
+    /**
+     * Extracts data from the given key of the File object
+     *
+     * @param string $key
+     *
+     * @return array [fileId, ownerEntityClass, ownerEntityId]
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function parseFileKey($key)
+    {
+        if (!($decoded = base64_decode(str_replace('_', '/', $key)))
+            || count($result = @unserialize($decoded)) !== 3
+        ) {
+            throw new \InvalidArgumentException(sprintf('Invalid file key: "%s".', $key));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the list of fields responsible to store attachment associations
+     *
+     * @return array [target_entity_class => field_name]
+     */
+    public function getAttachmentTargets()
+    {
+        return $this->associationManager->getAssociationTargets(
+            AttachmentScope::ATTACHMENT,
+            $this->associationManager->getSingleOwnerFilter('attachment'),
+            RelationType::MANY_TO_ONE
+        );
+    }
+
+    /**
+     * Copy attachment file object
+     *
+     * @param File $file
+     *
+     * @return File
+     */
+    public function copyAttachmentFile(File $file)
+    {
+        $fileCopy = clone $file;
+        $fileCopy->setFilename($this->generateFileName($file->getExtension()));
+
+        $sourceStream =  $this->filesystem->createStream($file->getFilename());
+        $this->copyStreamToStorage($sourceStream, $fileCopy->getFilename());
+
+        return $fileCopy;
+    }
+
+    /**
+     * Copy stream to storage
+     *
+     * @param Stream $srcStream
+     * @param string $destinationFileName
+     */
+    protected function copyStreamToStorage(Stream $srcStream, $destinationFileName)
+    {
+        $dstStream = $this->filesystem->createStream($destinationFileName);
+
+        $srcStream->open(new StreamMode('rb+'));
+        $dstStream->open(new StreamMode('wb+'));
+
+        while (!$srcStream->eof()) {
+            $dstStream->write($srcStream->read(self::READ_COUNT));
+        }
+
+        $dstStream->close();
+        $srcStream->close();
+    }
+
+    /**
+     * Generate unique file name with specific extension
+     *
+     * @param string $extension
+     *
+     * @return string
+     */
+    protected function generateFileName($extension)
+    {
+        return sprintf('%s.%s', uniqid(), $extension);
     }
 }

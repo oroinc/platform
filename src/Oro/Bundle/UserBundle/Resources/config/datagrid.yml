@@ -187,6 +187,7 @@ datagrid:
                     data_name: g.name
 
     roles-grid:
+        extended_entity_name: %oro_user.role.entity.class%
         options:
             entityHint: role
             entity_pagination: true
@@ -199,7 +200,7 @@ datagrid:
                     - r.role
                     - r.label
                 from:
-                    - { table: OroUserBundle:Role, alias: r }
+                    - { table: %oro_user.role.entity.class%, alias: r }
                 where:
                     and:
                         - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'
@@ -297,7 +298,9 @@ datagrid:
                         THEN true ELSE false END
                       END) as has_role
             bind_parameters:
-                - role_id
+                -
+                    name: role_id
+                    default: null
         columns:
             has_role:
                 label: oro.user.role.has_role.label
@@ -361,7 +364,9 @@ datagrid:
                         THEN true ELSE false END
                       END) as has_group
             bind_parameters:
-                - group_id
+                -
+                    name: group_id
+                    default: null
         columns:
             has_group:
                 label: oro.user.group.has_group.label
@@ -561,6 +566,8 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 10
+            routerEnabled: false
+
         source:
             acl_resource: oro_user_user_view
             type: orm

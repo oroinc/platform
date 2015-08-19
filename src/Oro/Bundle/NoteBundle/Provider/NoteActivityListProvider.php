@@ -4,25 +4,33 @@ namespace Oro\Bundle\NoteBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+    const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ServiceLink */
+    protected $entityOwnerAccessorLink;
+
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ServiceLink    $entityOwnerAccessorLink
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ServiceLink $entityOwnerAccessorLink)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityOwnerAccessorLink = $entityOwnerAccessorLink;
     }
 
     /**
@@ -58,6 +66,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
      * @param Note $entity
      *
      * {@inheritdoc}
@@ -65,6 +81,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     public function getSubject($entity)
     {
         return $this->truncate(strip_tags($entity->getMessage()), 100);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription($entity)
+    {
+        return null;
     }
 
     /**
@@ -128,6 +152,25 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $this->entityOwnerAccessorLink->getService()->getOwner($entity);
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
     }
 
     /**

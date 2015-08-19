@@ -1,0 +1,13 @@
+layout:
+    actions:
+        - @add:
+            id:        embedded_form
+            parentId:  content
+            blockType: form
+            options:
+                form_name: embedded_form
+
+    conditions:
+        @eq:
+            - ''
+            - $context.embedded_form_custom_layout

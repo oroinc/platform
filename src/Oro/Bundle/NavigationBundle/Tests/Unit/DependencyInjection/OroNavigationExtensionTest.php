@@ -76,8 +76,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             $data
         );
 
-        $this->assertTrue($container->hasDefinition('oro_navigation.title_service'));
-        $titleService = $container->getDefinition('oro_navigation.title_service');
+        $this->assertTrue($container->hasDefinition('oro_navigation.title_provider'));
+        $titleService = $container->getDefinition('oro_navigation.title_provider');
         $data = $titleService->getMethodCalls();
         $this->assertEquals(
             array(

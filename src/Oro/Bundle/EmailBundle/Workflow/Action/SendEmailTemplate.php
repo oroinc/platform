@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
 
@@ -13,15 +13,11 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
- * Class Processor
- *
- * @package Oro\Bundle\UserBundle\Mailer
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class SendEmailTemplate extends AbstractSendEmail
@@ -35,28 +31,28 @@ class SendEmailTemplate extends AbstractSendEmail
     /** @var ObjectManager */
     protected $objectManager;
 
-    /** @var Validator */
+    /** @var ValidatorInterface */
     protected $validator;
 
     /**
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
-     * @param NameFormatter      $nameFormatter
+     * @param EntityNameResolver $entityNameResolver
      * @param EmailRenderer      $renderer
      * @param ObjectManager      $objectManager
-     * @param Validator          $validator
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         EmailRenderer $renderer,
         ObjectManager $objectManager,
-        Validator $validator
+        ValidatorInterface $validator
     ) {
-        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $nameFormatter);
+        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
 
         $this->renderer = $renderer;
         $this->objectManager = $objectManager;
@@ -137,10 +133,10 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailModel->setBody($templateRendered);
         $emailModel->setType($type);
 
-        $email = $this->emailProcessor->process($emailModel);
+        $emailUser = $this->emailProcessor->process($emailModel);
 
         if (array_key_exists('attribute', $this->options)) {
-            $this->contextAccessor->setValue($context, $this->options['attribute'], $email);
+            $this->contextAccessor->setValue($context, $this->options['attribute'], $emailUser->getEmail());
         }
     }
 
@@ -154,7 +150,7 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailConstraint = new EmailConstraints();
         $emailConstraint->message = 'Invalid email address';
         if ($email) {
-            $errorList = $this->validator->validateValue(
+            $errorList = $this->validator->validate(
                 $email,
                 $emailConstraint
             );

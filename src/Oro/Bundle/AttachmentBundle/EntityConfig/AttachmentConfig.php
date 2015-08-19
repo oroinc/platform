@@ -37,7 +37,7 @@ class AttachmentConfig
      */
     public function isAttachmentAssociationEnabled($entity)
     {
-        if (null === $entity || !is_object($entity)) {
+        if (!is_object($entity)) {
             return false;
         }
 

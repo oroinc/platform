@@ -1,6 +1,5 @@
-/*global define*/
 define(['backbone', './model'
-    ], function (Backbone, StateModel) {
+    ], function(Backbone, StateModel) {
     'use strict';
 
     /**
@@ -11,7 +10,7 @@ define(['backbone', './model'
     return Backbone.Collection.extend({
         model: StateModel,
 
-        url: function () {
+        url: function() {
             return this.model.prototype.urlRoot;
         }
     });

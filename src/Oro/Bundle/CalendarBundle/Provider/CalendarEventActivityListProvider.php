@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -13,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 class CalendarEventActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ACL_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -59,10 +61,27 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSubject($entity)
     {
         /** @var $entity CalendarEvent */
         return $entity->getTitle();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDescription($entity)
+    {
+        /** @var $entity CalendarEvent */
+        return $entity->getDescription();
     }
 
     /**
@@ -131,5 +150,39 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $this->getOwner($entity);
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
+    }
+
+    /**
+     * Get calendar owner
+     *
+     * @param CalendarEvent $activityEntity
+     * @return null|User
+     */
+    protected function getOwner($activityEntity)
+    {
+        /** @var $activityEntity CalendarEvent */
+        if ($activityEntity->getCalendar()) {
+            return $activityEntity->getCalendar()->getOwner();
+        }
+        return null;
     }
 }

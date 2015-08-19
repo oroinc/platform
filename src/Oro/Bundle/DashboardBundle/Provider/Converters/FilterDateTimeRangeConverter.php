@@ -4,6 +4,8 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use \Datetime;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
@@ -19,14 +21,19 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     /** @var Compiler */
     protected $dateCompiler;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param DateTimeFormatter $formatter
-     * @param Compiler          $dateCompiler
+     * @param DateTimeFormatter   $formatter
+     * @param Compiler            $dateCompiler
+     * @param TranslatorInterface $translator
      */
-    public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler)
+    public function __construct(DateTimeFormatter $formatter, Compiler $dateCompiler, TranslatorInterface $translator)
     {
         $this->formatter    = $formatter;
         $this->dateCompiler = $dateCompiler;
+        $this->translator   = $translator;
     }
 
     /**
@@ -40,8 +47,9 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
             $end   = new DateTime('now', new \DateTimeZone('UTC'));
             $start = clone $end;
             $start = $start->sub(new \DateInterval('P1M'));
+            $type  = AbstractDateFilterType::TYPE_BETWEEN;
         } else {
-            list($startValue, $endValue) = $this->getPeriodValues($value);
+            list($startValue, $endValue, $type) = $this->getPeriodValues($value);
 
             $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
             $end   = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
@@ -49,7 +57,8 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 
         return [
             'start' => $start,
-            'end'   => $end
+            'end'   => $end,
+            'type'  => $type
         ];
     }
 
@@ -58,6 +67,21 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
      */
     public function getViewValue($value)
     {
+        switch ($value['type']) {
+            case AbstractDateFilterType::TYPE_MORE_THAN:
+                return sprintf(
+                    '%s %s',
+                    $this->translator->trans('oro.filter.form.label_date_type_more_than'),
+                    $this->formatter->formatDate($value['start'])
+                );
+            case AbstractDateFilterType::TYPE_LESS_THAN:
+                return sprintf(
+                    '%s %s',
+                    $this->translator->trans('oro.filter.form.label_date_type_less_than'),
+                    $this->formatter->formatDate($value['end'])
+                );
+        }
+
         return sprintf(
             '%s - %s',
             $this->formatter->formatDate($value['start']),
@@ -72,20 +96,23 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     protected function getPeriodValues($value)
     {
         $startValue = $value['value']['start'];
-        $endValue = $value['value']['end'];
+        $endValue   = $value['value']['end'];
+        $type       = $value['type'];
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
-            || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
+        if ($type === AbstractDateFilterType::TYPE_LESS_THAN
+            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
         ) {
             $startValue = new DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
+            $type       = AbstractDateFilterType::TYPE_LESS_THAN;
         }
 
-        if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
-            || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
+        if ($type === AbstractDateFilterType::TYPE_MORE_THAN
+            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
         ) {
             $endValue = new DateTime('now', new \DateTimeZone('UTC'));
+            $type     = AbstractDateFilterType::TYPE_MORE_THAN;
         }
 
-        return [$startValue, $endValue];
+        return [$startValue, $endValue, $type];
     }
 }

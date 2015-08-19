@@ -1,6 +1,13 @@
 CHANGELOG for 1.7.0
 ===================
- * Integration import processors may be tagged with `oro_integration.sync_processor` DIC tag with `integration` name. During integration import appropriate processor will be used if registered.
+This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
+* 1.7.0 (2015-04-28)
+ * New page layouts and layout themes
+ * Added Google single sign-on
+ * Added Change or reset users' passwords
+ * Added Grid views
+ * Dashboard widget configuration
+ * Email auto-response in workflow definition
 
 CHANGELOG for 1.6.0
 ===================

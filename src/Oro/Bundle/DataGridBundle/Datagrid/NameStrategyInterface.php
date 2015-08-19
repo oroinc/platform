@@ -15,6 +15,14 @@ interface NameStrategyInterface
     public function getDelimiter();
 
     /**
+     * Identifier of grid on page
+     *
+     * @param string $name
+     * @return string
+     */
+    public function getGridUniqueName($name);
+
+    /**
      * Returns parsed grid name, without scope
      *
      * @param string $fullName

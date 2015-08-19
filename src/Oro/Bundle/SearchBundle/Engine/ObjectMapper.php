@@ -7,12 +7,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 
 class ObjectMapper extends AbstractMapper
 {
     /**
      * @param EventDispatcherInterface $dispatcher
-     * @param $mappingConfig
+     * @param                          $mappingConfig
      */
     public function __construct(EventDispatcherInterface $dispatcher, $mappingConfig)
     {
@@ -25,7 +26,7 @@ class ObjectMapper extends AbstractMapper
      */
     public function getMappingConfig()
     {
-        return $this->mappingConfig;
+        return $this->mappingProvider->getMappingConfig();
     }
 
     /**
@@ -37,13 +38,35 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntitiesListAliases()
     {
-        $entities = array();
+        return $this->mappingProvider->getEntitiesListAliases();
+    }
 
-        foreach ($this->mappingConfig as $class => $mappingEntity) {
-            $entities[$class] = isset($mappingEntity['alias']) ? $mappingEntity['alias'] : '';
-        }
+    /**
+     * Gets search aliases for entities
+     *
+     * @param string[] $classNames The list of entity FQCN
+     *
+     * @return array [entity class name => entity search alias, ...]
+     *
+     * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
+     *                                   or has no the search alias
+     */
+    public function getEntityAliases(array $classNames = [])
+    {
+        return $this->mappingProvider->getEntityAliases($classNames);
+    }
 
-        return $entities;
+    /**
+     * Gets the search alias of a given entity
+     *
+     * @param string $className The FQCN of an entity
+     *
+     * @return string|null The search alias of the entity
+     *                     or NULL if the entity is not registered in a search index or has no the search alias
+     */
+    public function getEntityAlias($className)
+    {
+        return $this->mappingProvider->getEntityAlias($className);
     }
 
     /**
@@ -55,12 +78,13 @@ class ObjectMapper extends AbstractMapper
      */
     public function getEntities($modeFilter = null)
     {
-        $entities = array_keys($this->mappingConfig);
+        $entities = $this->mappingProvider->getEntityClasses();
         if (null == $modeFilter) {
             return $entities;
         }
 
         $self = $this;
+
         return array_filter(
             $entities,
             function ($entityName) use ($modeFilter, $self) {
@@ -80,50 +104,23 @@ class ObjectMapper extends AbstractMapper
      */
     public function mapObject($object)
     {
-        $mappingConfig = $this->mappingConfig;
-        $objectData = array();
-
+        $objectData  = [];
         $objectClass = ClassUtils::getRealClass($object);
-        if (is_object($object) && isset($mappingConfig[$objectClass])) {
+        if (is_object($object) && $this->mappingProvider->isFieldsMappingExists($objectClass)) {
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
-            foreach ($this->getEntityMapParameter($objectClass, 'fields', array()) as $field) {
-                if (!isset($field['relation_type'])) {
-                    $field['relation_type'] = 'none';
-                }
-                $value = $this->getFieldValue($object, $field['name']);
-                if (null === $value) {
-                    continue;
-                }
-                switch ($field['relation_type']) {
-                    case Indexer::RELATION_ONE_TO_ONE:
-                    case Indexer::RELATION_MANY_TO_ONE:
-                        $objectData = $this->setRelatedFields(
-                            $alias,
-                            $objectData,
-                            $field['relation_fields'],
-                            $value,
-                            $field['name']
-                        );
-                        break;
-                    case Indexer::RELATION_MANY_TO_MANY:
-                    case Indexer::RELATION_ONE_TO_MANY:
-                        foreach ($value as $relationObject) {
-                            $objectData = $this->setRelatedFields(
-                                $alias,
-                                $objectData,
-                                $field['relation_fields'],
-                                $relationObject,
-                                $field['name'],
-                                true
-                            );
-                        }
-                        break;
-                    default:
-                        $objectData = $this->setDataValue($alias, $objectData, $field, $value);
-                }
+            foreach ($this->getEntityMapParameter($objectClass, 'fields', []) as $field) {
+                $objectData = $this->processField($alias, $objectData, $field, $object);
             }
 
-            $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
+            /**
+             *  Dispatch oro_search.prepare_entity_map event
+             */
+            $event = new PrepareEntityMapEvent(
+                $object,
+                $objectClass,
+                $objectData,
+                $this->getEntityConfig($objectClass)
+            );
             $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
             $objectData = $event->getData();
         }
@@ -151,5 +148,108 @@ class ObjectMapper extends AbstractMapper
         }
 
         return false;
+    }
+
+    /**
+     * Processes field mapping
+     *
+     * @param string $alias
+     * @param array  $objectData
+     * @param array  $fieldConfig
+     * @param object $object
+     * @param string $parentFieldName
+     * @param bool   $isArray
+     *
+     * @return array
+     */
+    protected function processField(
+        $alias,
+        $objectData,
+        $fieldConfig,
+        $object,
+        $parentFieldName = null,
+        $isArray = false
+    ) {
+        $fieldValue = $this->getFieldValue($object, $fieldConfig['name']);
+        if (null === $fieldValue) {
+            // return $objectData unchanged
+            return $objectData;
+        }
+
+        if (isset($fieldConfig['relation_type']) && !empty($fieldConfig['relation_fields'])) {
+            foreach ($fieldConfig['relation_fields'] as $relationField) {
+                $objectData = $this->processRelatedField(
+                    $alias,
+                    $objectData,
+                    $relationField,
+                    $fieldValue,
+                    $fieldConfig['relation_type'],
+                    $fieldConfig['name'],
+                    $isArray
+                );
+            }
+        } else {
+            if (empty($fieldConfig['target_fields']) && $parentFieldName) {
+                $fieldConfig['target_fields'] = [$parentFieldName];
+            }
+            $objectData = $this->setDataValue($alias, $objectData, $fieldConfig, $fieldValue, $isArray);
+        }
+
+        return $objectData;
+    }
+
+    /**
+     * Processes related field mapping
+     *
+     * @param string $alias
+     * @param array  $objectData
+     * @param array  $fieldConfig
+     * @param object $object
+     * @param string $relationType
+     * @param string $parentFieldName
+     * @param bool   $isArray
+     *
+     * @return array
+     *
+     * @throws InvalidConfigurationException
+     */
+    protected function processRelatedField(
+        $alias,
+        $objectData,
+        $fieldConfig,
+        $object,
+        $relationType,
+        $parentFieldName,
+        $isArray = false
+    ) {
+        // many-to-many and one-to-many relations are expected to be joined on a collection
+        $isCollection =
+            $relationType === Indexer::RELATION_MANY_TO_MANY
+            || $relationType === Indexer::RELATION_ONE_TO_MANY;
+
+        if (!$isCollection) {
+            $object = [$object];
+        } elseif (!is_array($object) && !$object instanceof \Traversable) {
+            throw new InvalidConfigurationException(
+                sprintf(
+                    'The field "%s" specified as "%s" relation for entity "%s" is not a collection.',
+                    $fieldConfig['name'],
+                    $relationType,
+                    $alias
+                )
+            );
+        }
+        foreach ($object as $relationObject) {
+            $objectData = $this->processField(
+                $alias,
+                $objectData,
+                $fieldConfig,
+                $relationObject,
+                $parentFieldName,
+                $isCollection || $isArray // if there was at least one *-to-many relation in chain
+            );
+        }
+
+        return $objectData;
     }
 }

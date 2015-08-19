@@ -5,8 +5,6 @@ oro_system_configuration:
             title: oro.sso.system_configuration.groups.google_settings.title
         google_integration_settings:
             title: oro.sso.system_configuration.groups.google_integration_settings.title
-        integration_setup:
-            title: oro.sso.system_configuration.groups.integration_setup.title
 
     fields:
         oro_sso.enable_google_sso:
@@ -47,7 +45,7 @@ oro_system_configuration:
         system_configuration:
             platform:
                 children:
-                    integration_setup:
+                    integrations:
                         children:
                             google_settings:
                                 children:

@@ -73,17 +73,20 @@ class EmbeddedFormController extends Controller
         $css = $formManager->getDefaultCssByType($formType);
         $successMessage = $formManager->getDefaultSuccessMessageByType($formType);
 
-        return new JsonResponse([
-            'css' => $css,
-            'successMessage' => $successMessage
-        ], Codes::HTTP_OK);
+        return new JsonResponse(
+            [
+                'css'            => $css,
+                'successMessage' => $successMessage
+            ],
+            Codes::HTTP_OK
+        );
     }
 
     /**
      * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
      * @Template()
      * @Acl(
-     *      id="oro_embedded_form_edit",
+     *      id="oro_embedded_form_update",
      *      type="entity",
      *      permission="EDIT",
      *      class="OroEmbeddedFormBundle:EmbeddedForm"

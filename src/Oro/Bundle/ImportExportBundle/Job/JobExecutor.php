@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\ORM\UnitOfWork;
@@ -18,6 +20,11 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class JobExecutor
 {
     const CONNECTOR_NAME = 'oro_importexport';
@@ -60,6 +67,11 @@ class JobExecutor
     protected $skipClear = false;
 
     /**
+     * @var bool
+     */
+    protected $validationMode = false;
+
+    /**
      * @param ConnectorRegistry $jobRegistry
      * @param BatchJobRepository $batchJobRepository
      * @param ContextRegistry $contextRegistry
@@ -71,10 +83,10 @@ class JobExecutor
         ContextRegistry $contextRegistry,
         ManagerRegistry $managerRegistry
     ) {
-        $this->batchJobRegistry   = $jobRegistry;
+        $this->batchJobRegistry = $jobRegistry;
         $this->batchJobRepository = $batchJobRepository;
-        $this->contextRegistry    = $contextRegistry;
-        $this->managerRegistry    = $managerRegistry;
+        $this->contextRegistry = $contextRegistry;
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -117,21 +129,12 @@ class JobExecutor
             }
 
             $job->execute($jobExecution);
+            $isSuccessful = $this->handleJobResult($jobExecution, $jobResult);
 
-            $failureExceptions = $this->collectFailureExceptions($jobExecution);
-
-            if ($jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions) {
-                if (!$isTransactionRunning) {
-                    $this->entityManager->commit();
-                }
-                $jobResult->setSuccessful(true);
-            } else {
-                if (!$isTransactionRunning) {
-                    $this->entityManager->rollback();
-                }
-                foreach ($failureExceptions as $failureException) {
-                    $jobResult->addFailureException($failureException);
-                }
+            if (!$isTransactionRunning && $isSuccessful && !$this->validationMode) {
+                $this->entityManager->commit();
+            } elseif (!$isTransactionRunning) {
+                $this->entityManager->rollback();
             }
 
             // trigger save of JobExecution and JobInstance
@@ -151,6 +154,28 @@ class JobExecutor
         }
 
         return $jobResult;
+    }
+
+    /**
+     * @param JobExecution $jobExecution
+     * @param JobResult $jobResult
+     *
+     * @return bool
+     */
+    protected function handleJobResult(JobExecution $jobExecution, JobResult $jobResult)
+    {
+        $failureExceptions = $this->collectFailureExceptions($jobExecution);
+
+        $isSuccessful = $jobExecution->getStatus()->getValue() === BatchStatus::COMPLETED && !$failureExceptions;
+        if ($isSuccessful) {
+            $jobResult->setSuccessful(true);
+        } elseif ($failureExceptions) {
+            foreach ($failureExceptions as $failureException) {
+                $jobResult->addFailureException($failureException);
+            }
+        }
+
+        return $isSuccessful;
     }
 
     /**
@@ -298,9 +323,23 @@ class JobExecutor
         /** @var JobExecution $jobExecution */
         $jobExecution = $jobInstance->getJobExecutions()->first();
         if ($jobExecution) {
-            $stepExecution = $jobExecution->getStepExecutions()->first();
-            if ($stepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($stepExecution);
+            $stepExecutions = $jobExecution->getStepExecutions();
+            /** @var StepExecution $firstStepExecution */
+            $firstStepExecution = $stepExecutions->first();
+
+            if ($firstStepExecution) {
+                $context = $this->contextRegistry->getByStepExecution($firstStepExecution);
+
+                if ($stepExecutions->count() > 1) {
+                    /** @var StepExecution $stepExecution */
+                    foreach ($stepExecutions->slice(1) as $stepExecution) {
+                        ContextHelper::mergeContextCounters(
+                            $context,
+                            $this->contextRegistry->getByStepExecution($stepExecution)
+                        );
+                    }
+                }
+
                 $jobResult->setContext($context);
             }
         }
@@ -385,5 +424,21 @@ class JobExecutor
     public function isSkipClear()
     {
         return $this->skipClear;
+    }
+
+    /**
+     * @param boolean $validationMode
+     */
+    public function setValidationMode($validationMode)
+    {
+        $this->validationMode = $validationMode;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isValidationMode()
+    {
+        return $this->validationMode;
     }
 }

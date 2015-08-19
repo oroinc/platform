@@ -1,0 +1,107 @@
+services:
+    oro_layout.block_type.base:
+        class: Oro\Component\Layout\Block\Type\BaseType
+        tags:
+             - { name: layout.block_type, alias: block }
+
+    oro_layout.block_type.container:
+        class: Oro\Component\Layout\Block\Type\ContainerType
+        tags:
+             - { name: layout.block_type, alias: container }
+
+    oro_layout.block_type.root:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
+        tags:
+             - { name: layout.block_type, alias: root }
+
+    oro_layout.block_type.head:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
+        tags:
+             - { name: layout.block_type, alias: head }
+
+    oro_layout.block_type.meta:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
+        tags:
+             - { name: layout.block_type, alias: meta }
+
+    oro_layout.block_type.script:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
+        tags:
+             - { name: layout.block_type, alias: script }
+
+    oro_layout.block_type.style:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
+        tags:
+             - { name: layout.block_type, alias: style }
+
+    oro_layout.block_type.body:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
+        tags:
+             - { name: layout.block_type, alias: body }
+
+    oro_layout.block_type.form:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType
+        arguments:
+            - @oro_layout.form_layout_builder
+        tags:
+             - { name: layout.block_type, alias: form }
+
+    oro_layout.block_type.form_start:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormStartType
+        tags:
+             - { name: layout.block_type, alias: form_start }
+
+    oro_layout.block_type.form_end:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormEndType
+        tags:
+             - { name: layout.block_type, alias: form_end }
+
+    oro_layout.block_type.form_field:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType
+        tags:
+             - { name: layout.block_type, alias: form_field }
+
+    oro_layout.block_type.fieldset:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType
+        tags:
+             - { name: layout.block_type, alias: fieldset }
+
+    oro_layout.block_type.text:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\TextType
+        tags:
+             - { name: layout.block_type, alias: text }
+
+    oro_layout.block_type.link:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType
+        tags:
+             - { name: layout.block_type, alias: link }
+
+    oro_layout.block_type.button:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonType
+        tags:
+             - { name: layout.block_type, alias: button }
+
+    oro_layout.block_type.button_group:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ButtonGroupType
+        tags:
+             - { name: layout.block_type, alias: button_group }
+
+    oro_layout.block_type.resource:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
+        tags:
+             - { name: layout.block_type, alias: external_resource }
+
+    oro_layout.block_type.list:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListType
+        tags:
+             - { name: layout.block_type, alias: list }
+
+    oro_layout.block_type.ordered_list:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\OrderedListType
+        tags:
+             - { name: layout.block_type, alias: ordered_list }
+
+    oro_layout.block_type.list_item:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListItemType
+        tags:
+             - { name: layout.block_type, alias: list_item }

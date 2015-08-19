@@ -40,6 +40,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
+        $this->nameStrategy->expects($this->any())
+            ->method('getGridUniqueName')
+            ->willReturnCallback(function ($name) {
+                return $name;
+            });
+
         $this->manager = new Manager(
             $this->configurationProvider,
             $this->builder,

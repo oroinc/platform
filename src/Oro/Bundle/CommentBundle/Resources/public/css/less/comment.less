@@ -3,9 +3,6 @@
 .comments-view-header, .comments-view-body, .comments-view-footer {
   clear: both;
   margin: 13px 0;
-  &:empty {
-    display: none;
-  }
 }
 .comments-view-header {
   > .no-data {
@@ -33,6 +30,7 @@
 }
 .comment-form-container {
   .comment-form {
+    padding-bottom: 10px;
     .comment-text-field {
       width: 100%;
       box-sizing: border-box;
@@ -54,9 +52,6 @@
   }
 }
 .add-comment-dialog{
-  .ui-dialog-content {
-    margin: 25px 25px 8px;
-  }
   .comment-text-field {
     height: 165px;
   }
@@ -64,10 +59,26 @@
     margin-bottom: 8px;
   }
 }
+.responsive-section {
+  .email-content .responsive-cell .comment-list {
+    padding-left: @horizontalPadding;
+  }
+  &.responsive-small .email-content .responsive-cell .comment-list {
+    padding-left: 0;
+  }
+}
+.email-content {
+  .responsive-cell {
+    .comment-list {
+      padding-left: @horizontalPadding;
+    }
+  }
+}
 .comments-block {
   color: #888;
   margin: 0;
   display: table;
+  table-layout: fixed;
   width: 100%;
   min-width: initial;
   .comment-item {
@@ -129,6 +140,7 @@
   .comment-body{
     display: block;
     color: #444;
+    word-wrap: break-word;
   }
   .comment-attachments {
     margin: 0.5em 0 0 0;

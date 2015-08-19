@@ -1,6 +1,5 @@
-/*global define*/
 define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
-    function (__, routing, DialogWidget) {
+    function(__, routing, DialogWidget) {
     'use strict';
 
     var ConfigurationWidget = DialogWidget.extend({
@@ -15,10 +14,12 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget'],
             });
 
             options.dialogOptions = {
-                title: options.widget.options.title + ' ' + __('oro.dashboard.widget_configuration_label'),
+                title: __('oro.dashboard.widget_configuration_label') + ' - ' + options.widget.options.title,
                 modal: true,
-                minWidth: 575,
-                resizable: false
+                minHeight: 50,
+                minWidth: 680,
+                resizable: false,
+                width: 'auto'
             };
 
             ConfigurationWidget.__super__.initialize.apply(this, arguments);

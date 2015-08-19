@@ -24,6 +24,11 @@ class Folder extends BaseFolder
         self::FLAG_SPAM   => FolderType::SPAM,
     ];
 
+    /** @var array */
+    protected $possibleSentFolderNameMap = [
+        'SentBox', 'Sent'
+    ];
+
     /** @var string[] */
     public $flags = null;
 
@@ -122,15 +127,31 @@ class Folder extends BaseFolder
      */
     public function guessFolderType()
     {
-        $this->type = 'other';
-
+        $this->type = FolderType::OTHER;
         foreach ($this->flagTypeMap as $flag => $type) {
             if ($this->hasFlag($flag)) {
                 $this->type = $type;
                 break;
             }
         }
+        // if sent box do not include flag for correct type guess
+        if ($this->type === FolderType::OTHER && $this->guessSentTypeByName()) {
+            $this->type = FolderType::SENT;
+        }
 
         return $this->type;
+    }
+
+    /**
+     * Try to guess sent folder by folder name
+     *
+     * @return bool
+     */
+    public function guessSentTypeByName()
+    {
+        if (in_array($this->getGlobalName(), $this->possibleSentFolderNameMap, true)) {
+            return true;
+        }
+        return false;
     }
 }

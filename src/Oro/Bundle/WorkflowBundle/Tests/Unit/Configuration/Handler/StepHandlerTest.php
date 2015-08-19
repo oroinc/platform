@@ -39,10 +39,19 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'start_step' => 'first_step',
                     WorkflowConfiguration::NODE_STEPS => array(
+                        [
+                            'name' => 'step:starting_point',
+                            'order' => -1,
+                            '_is_start' => true,
+                            'is_final' => '',
+                            'allowed_transitions' => ['start_transition'],
+                            'label' => 'step:starting_point'
+                        ],
                         array(
                             'name' => 'first_step',
                             'label' => 'First Step',
                             'order' => 10,
+                            '_is_start' => false,
                             'is_final' => true,
                             'allowed_transitions' => array(),
                         ),
@@ -83,18 +92,29 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'start_step' => null,
                     WorkflowConfiguration::NODE_STEPS => array(
+                        [
+                            'name' => 'step:starting_point',
+                            'order' => -1,
+                            '_is_start' => true,
+                            'is_final' => '',
+                            'allowed_transitions' => ['start_transition'],
+                            'label' => 'step:starting_point'
+                        ],
                         array(
                             'name' => 'first_step',
                             'label' => 'First Step',
                             'order' => 10,
+                            '_is_start' => false,
                             'is_final' => false,
                             'entity_acl' => array('attribute' => array('delete' => false)),
                             'allowed_transitions' => array('regular_transition'),
+                            'position' => [1, 100],
                         ),
                         array(
                             'name' => 'second_step',
                             'label' => 'second_step',
                             'order' => 20,
+                            '_is_start' => false,
                             'is_final' => true,
                             'allowed_transitions' => array(),
                         ),
@@ -130,6 +150,7 @@ class StepHandlerTest extends \PHPUnit_Framework_TestCase
                             'allowed_transitions' => array('regular_transition', 'unknown_transition'),
                             'unknown_first' => 'first_value',
                             'unknown_second' => 'second_value',
+                            'position' => [1, 100]
                         ),
                         array(
                             'name' => 'second_step',

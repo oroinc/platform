@@ -1,7 +1,14 @@
 {% oro_css filter='cssrewrite, lessphp, cssmin' output='css/oro.css' %}
 {% set isLess = ('less' in asset_url|split('.')) %}
 {% if isLess %}
-<script type="text/javascript">localStorage.clear();</script>
+<script type="text/javascript">
+    // need to clear localStorage when less is compiled on client, to prevent caching
+    try {
+        localStorage.clear();
+    } catch (e) {
+        // catch IE protected mode or browsers w/o localStorage support
+    }
+</script>
 {% endif %}
 <link {% if isLess %}rel="stylesheet/less"{% else %}rel="stylesheet"{% endif %} media="all" href="{{ asset_url }}" />
 {% if isLess %}

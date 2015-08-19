@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_13';
     }
 
     /**
@@ -74,11 +74,13 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('mapping_settings', 'object', ['comment' => '(DC2Type:object)']);
         $table->addColumn('enabled', 'boolean', ['notnull' => false]);
         $table->addColumn('edit_mode', 'integer', ['notnull' => true, 'default' => Channel::EDIT_MODE_ALLOW]);
+        $table->addColumn('default_business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['transport_id'], 'UNIQ_55B9B9C59909C13F');
         $table->addIndex(['default_user_owner_id'], 'IDX_55B9B9C5A89019EA', []);
         $table->addIndex(['organization_id'], 'IDX_55B9B9C532C8A3DE', []);
         $table->addIndex(['name'], 'oro_integration_channel_name_idx', []);
+        $table->addIndex(['default_business_unit_owner_id'], 'IDX_55B9B9C5FA248E2', []);
     }
 
     /**
@@ -98,6 +100,8 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addColumn('data', Type::JSON_ARRAY, ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
+        $table->addIndex(['date'], 'oro_intch_date_idx', []);
+        $table->addIndex(['connector', 'code'], 'oro_intch_con_state_idx', []);
     }
 
     /**
@@ -110,6 +114,7 @@ class OroIntegrationBundleInstaller implements Installation
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
+        $table->addIndex(['type'], 'oro_int_trans_type_idx', []);
         $table->setPrimaryKey(['id']);
     }
 
@@ -136,6 +141,12 @@ class OroIntegrationBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['default_user_owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_business_unit'),
+            ['default_business_unit_owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );

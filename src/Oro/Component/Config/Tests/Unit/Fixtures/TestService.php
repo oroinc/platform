@@ -18,4 +18,10 @@ class TestService
     {
         return 'func3 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2);
     }
+
+    public static function func4($val1, $val2, $val3)
+    {
+        return 'func4 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2) . ' + ' .
+            ((null === $val3) ? 'NULL' : $val3);
+    }
 }

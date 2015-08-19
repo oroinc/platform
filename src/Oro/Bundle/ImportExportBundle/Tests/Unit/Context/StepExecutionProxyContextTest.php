@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
-use Oro\Bundle\ImportExportBundle\Exception\ErrorException;
 
 class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,7 +49,11 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     public function testIncrementReadCount()
     {
         $this->stepExecution->expects($this->once())
-            ->method('incrementReadCount');
+            ->method('setReadCount')
+            ->with(2);
+        $this->stepExecution->expects($this->once())
+            ->method('getReadCount')
+            ->will($this->returnValue(1));
 
         $this->context->incrementReadCount();
     }

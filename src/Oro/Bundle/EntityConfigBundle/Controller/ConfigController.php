@@ -22,7 +22,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * EntityConfig controller.
@@ -269,7 +268,7 @@ class ConfigController extends Controller
         $fields = [];
         if ($id) {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-            $className           = $entityRoutingHelper->decodeClassName($id);
+            $className           = $entityRoutingHelper->resolveEntityClass($id);
 
             /** @var EntityFieldProvider $fieldProvider */
             $fieldProvider = $this->get('oro_entity.entity_field_provider');
@@ -317,7 +316,7 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-        $ownerTypes              = $this->get('oro_organization.method.get_ownership_type')->execute();
+        $ownerTypes              = $this->get('oro_organization.form.type.ownership_type')->getOwnershipsArray();
         $ownerType               = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
         $ownerType               = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
@@ -421,7 +420,7 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['entityName' => $this->getRoutingHelper()->decodeClassName($entity->getClassName())]
+                    ['entityName' => $this->getRoutingHelper()->getUrlSafeClassName($entity->getClassName())]
                 );
             }
         }

@@ -13,6 +13,8 @@ use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 
 class CollectionType extends AbstractType
 {
+    const NAME = 'oro_collection';
+
     /**
      * {@inheritdoc}
      */
@@ -32,7 +34,10 @@ class CollectionType extends AbstractType
             $view->vars,
             [
                 'handle_primary'       => $options['handle_primary'],
-                'show_form_when_empty' => $options['show_form_when_empty']
+                'show_form_when_empty' => $options['show_form_when_empty'],
+                'prototype_name'       => $options['prototype_name'],
+                'add_label'            => $options['add_label'],
+                'allow_add_after'      => $options['allow_add_after'],
             ]
         );
     }
@@ -45,13 +50,15 @@ class CollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
+                'allow_add_after'      => false,
                 'allow_delete'         => true,
                 'by_reference'         => false,
                 'prototype'            => true,
                 'prototype_name'       => '__name__',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
-                'show_form_when_empty' => true
+                'show_form_when_empty' => true,
+                'add_label'            => ''
             ]
         );
         $resolver->setRequired(['type']);
@@ -77,6 +84,6 @@ class CollectionType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_collection';
+        return static::NAME;
     }
 }

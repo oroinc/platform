@@ -9,28 +9,28 @@ class CommentRepository extends EntityRepository
 {
     /**
      * @param string $fieldName
-     * @param string $entityId
+     * @param int[] $entityIds
      *
      * @return QueryBuilder
      */
-    public function getBaseQueryBuilder($fieldName, $entityId)
+    public function getBaseQueryBuilder($fieldName, $entityIds)
     {
         $qb = $this->createQueryBuilder('c');
-        $qb->andWhere('c.' . $fieldName . ' = :param1');
-        $qb->setParameter('param1', (int)$entityId);
+        $qb->andWhere('c.' . $fieldName . ' in (:param1)');
+        $qb->setParameter('param1', $entityIds);
 
         return $qb;
     }
 
     /**
      * @param string $fieldName
-     * @param string $entityId
+     * @param int[] $entityIds
      *
      * @return QueryBuilder
      */
-    public function getNumberOfComment($fieldName, $entityId)
+    public function getNumberOfComment($fieldName, $entityIds)
     {
-        $qb = $this->getBaseQueryBuilder($fieldName, $entityId);
+        $qb = $this->getBaseQueryBuilder($fieldName, $entityIds);
         $qb->select($qb->expr()->count('c.id'));
 
         return $qb;

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Soap;
 
-use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
+
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
 
 class EmailController extends SoapGetController
 {
@@ -18,7 +18,7 @@ class EmailController extends SoapGetController
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
      * @Soap\Result(phpType = "Oro\Bundle\EmailBundle\Entity\Email[]")
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function cgetAction($page = 1, $limit = 10)
     {
@@ -26,10 +26,24 @@ class EmailController extends SoapGetController
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function handleGetListRequest($page = 1, $limit = 10, $criteria = [], $orderBy = null)
+    {
+        $entities = array_filter(
+            $this->getManager()->getList($limit, $page, $criteria, $orderBy),
+            function ($entity) {
+                return $this->container->get('oro_security.security_facade')->isGranted('VIEW', $entity);
+            }
+        );
+        return $this->transformToSoapEntities($entities);
+    }
+
+    /**
      * @Soap\Method("getEmail")
      * @Soap\Param("id", phpType = "int")
      * @Soap\Result(phpType = "Oro\Bundle\EmailBundle\Entity\Email")
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getAction($id)
     {
@@ -37,10 +51,22 @@ class EmailController extends SoapGetController
     }
 
     /**
+     * {@inheritDoc}
+     */
+    protected function getEntity($id)
+    {
+        $entity = parent::getEntity($id);
+
+        $this->assertEmailAccessGranted('VIEW', $entity);
+
+        return $entity;
+    }
+
+    /**
      * @Soap\Method("getEmailBody")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="Oro\Bundle\EmailBundle\Entity\EmailBody")
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getEmailBodyAction($id)
     {
@@ -59,7 +85,7 @@ class EmailController extends SoapGetController
      * @Soap\Method("getEmailAttachment")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent")
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      */
     public function getEmailAttachment($id)
     {
@@ -67,71 +93,16 @@ class EmailController extends SoapGetController
     }
 
     /**
-     * @Soap\Method("postAssociation")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("targetClassName", phpType = "string")
-     * @Soap\Param("targetId", phpType = "int")
-     * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_edit")
+     * @param string $attribute
+     * @param Email $entity
+     *
+     * @throws \SoapFault
      */
-    public function postAssociationsAction($id, $targetClassName, $targetId)
+    protected function assertEmailAccessGranted($attribute, Email $entity)
     {
-        /**
-         * @var $entityRoutingHelper EntityRoutingHelper
-         */
-        $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($id);
-
-        if ($entity->supportActivityTarget($targetClassName)) {
-            $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-
-            if (!$entity->hasActivityTarget($target)) {
-                $entity->addActivityTarget($target);
-                $om = $this->getManager()->getObjectManager();
-                $om->persist($entity);
-                $om->flush();
-            } else {
-                throw new \SoapFault('BAD_REQUEST', 'Already added');
-            }
-        } else {
-            throw new \SoapFault('BAD_REQUEST', 'Does not support');
+        if (!$this->container->get('oro_security.security_facade')->isGranted($attribute, $entity)) {
+            throw new \SoapFault('FORBIDDEN', 'Record is forbidden');
         }
-
-        return $entity;
-    }
-
-    /**
-     * @Soap\Method("deleteAssociation")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("targetClassName", phpType = "string")
-     * @Soap\Param("targetId", phpType = "int")
-     * @Soap\Result(phpType = "boolean")
-     * @AclAncestor("oro_email_edit")
-     */
-    public function deleteAssociationAction($id, $targetClassName, $targetId)
-    {
-        try {
-            /**
-             * @var $entity Email
-             */
-            $entity = $this->getManager()->find($id);
-            $entityRoutingHelper = $this->container->get('oro_entity.routing_helper');
-            $om = $this->getManager()->getObjectManager();
-            $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $entity->removeActivityTarget($target);
-            $om->persist($entity);
-            $om->flush();
-
-            $response = true;
-        } catch (\RuntimeException $e) {
-            $response = false;
-        }
-
-        return $response;
     }
 
     /**
@@ -144,6 +115,7 @@ class EmailController extends SoapGetController
     protected function getEmailAttachmentContentEntity($attachmentId)
     {
         $attachment = $this->getManager()->findEmailAttachment($attachmentId);
+        $this->assertEmailAccessGranted('VIEW', $attachment->getEmailBody()->getEmail());
 
         if (!$attachment) {
             throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $attachmentId));

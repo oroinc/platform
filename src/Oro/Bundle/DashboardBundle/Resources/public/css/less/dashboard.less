@@ -77,11 +77,9 @@
     .actions-container .collapse-expand-action-container {
       margin-top: -1px;
     }
-    
+
     .actions-container {
-      position: absolute;
-      top: 10px;
-      height: 0px;
+      margin-top: 10px;
       .collapse-action{
         color: #727272;
         font-size: 13px;
@@ -94,7 +92,7 @@
           height: 13px;
           font-weight: normal;
           border: 1px solid #c3c3c3;
-          margin-right: 12px;
+          margin-right: 8px;
           background-color: #fcfcfc;
           font-size: 12px;
           line-height: 13px;
@@ -108,19 +106,12 @@
       }
     }
 
-    .actions-container.pull-left {
-      left: 0;
-    }
-
-    .actions-container.pull-right {
-      right: 0;
-    }
-
     .default-actions-container {
       display: none;
     }
 
     .widget-actions-container, .default-actions-container {
+      white-space: nowrap;
       .action-wrapper {
         border-right: 1px solid #ddd;
         padding: 3px 13px;
@@ -131,6 +122,10 @@
       .action-wrapper:last-child {
         border-right: none;
       }
+    }
+
+    .widget-actions-container {
+      margin: 10px -1px 0 0;
     }
 
     .move-action {
@@ -144,12 +139,18 @@
     }
 
     .title {
-      padding-left: 28px;
-      padding-right: 130px;
+      padding-left: 0;
+      padding-right: 0;
+      max-width: ~"calc(100% - 120px)";
+      padding-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .row-fluid {
       border-top: 1px solid #ddd;
+      margin-top: 5px;
     }
 
     .dashboard-widget-content {
@@ -197,7 +198,6 @@
   }
   .collapse-expand-action-container {
     padding-left: 8px;
-    padding-right: 5px;
   }
 }
 
@@ -363,6 +363,11 @@
       position: absolute;
       padding-bottom: .5em;
     }
+    .flotr-grid-label-x {
+      line-height: 14px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 .chart-legend table {
@@ -380,6 +385,7 @@
   }
 }
 .flotr-mouse-value {
+  z-index: 1;
   cursor: default;
 }
 .funnel-data{
@@ -514,5 +520,65 @@
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
+  }
+}
+.widget-configuration {
+  .controls > input[type=checkbox]:only-child{
+    margin-top: 8px;
+  }
+  .items-selector-widget {
+    margin-right: 20px;
+  }
+  .widget_title_widget{
+    float: left;
+    margin-right: 20px;
+  }
+  .date-range-filter {
+    .filter-separator{
+      top: 2px;
+    }
+    .filter-select-oro {
+      height: 20px;
+      line-height: 20px;
+      width: 120px;
+    }
+  }
+  .filter-criteria{
+    padding: 0;
+  }
+  .controls .horizontal{
+    padding: 0;
+  }
+  table {
+    .action-column, .action-cell {
+      width: 86px;
+    }
+    &.scrollable {
+      tbody {
+        display: block;
+        height: 120px;
+        border-left: 1px solid #ddd;
+      }
+      thead, tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      &.table-bordered td:first-child {
+        border-left: none;
+      }
+    }
+  }
+}
+
+.widget-content.widget-configuration {
+  .table input[type="checkbox"] {
+    margin: 0 0 1px 0;
+  }
+}
+.dashboard-widget-items {
+  margin-bottom: 10px;
+  .controls {
+    width: 445px
   }
 }

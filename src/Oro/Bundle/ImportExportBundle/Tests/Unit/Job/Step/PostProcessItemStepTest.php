@@ -56,11 +56,6 @@ class PostProcessItemStepTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
-
-        $stepExecution->expects($this->once())
-            ->method('getExecutionContext')
-            ->willReturn($executionContext);
-
         $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
         $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
         $jobExecution->expects($this->any())

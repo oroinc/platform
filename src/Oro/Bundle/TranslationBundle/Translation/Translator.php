@@ -128,7 +128,8 @@ class Translator extends BaseTranslator
             && isset($this->dynamicResources[$locale])
             && !empty($this->dynamicResources[$locale])
         ) {
-            $catalogueFile = $this->options['cache_dir'] . '/catalogue.' . $locale . '.php';
+            $catalogueFile = $this->options['cache_dir']
+                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
             if (is_file($catalogueFile)) {
                 $time = filemtime($catalogueFile);
                 /** @var DynamicResourceInterface $dynamicResource */
@@ -172,15 +173,17 @@ class Translator extends BaseTranslator
             );
             if (!$databaseResource) {
                 // register resources for all domains to load all available translations into cache
-                $availableDomains = $this->container->get('doctrine')
+                $locales = $this->getFallbackLocales();
+                array_unshift($locales, $locale);
+                $availableDomainsData = $this->container->get('doctrine')
                     ->getRepository(Translation::ENTITY_NAME)
-                    ->findAvailableDomains($locale);
-                foreach ($availableDomains as $domain) {
+                    ->findAvailableDomainsForLocales($locales);
+                foreach ($availableDomainsData as $item) {
                     $this->addResource(
                         'oro_database_translation',
                         new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
-                        $locale,
-                        $domain
+                        $item['locale'],
+                        $item['domain']
                     );
                 }
             }

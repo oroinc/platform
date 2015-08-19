@@ -24,16 +24,15 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var array
+     */
+    protected $actualDefinitions = array();
 
     /**
      * @var array
      */
-    private $actualDefinitions = array();
-
-    /**
-     * @var array
-     */
-    private $actualParameters = array();
+    protected $actualParameters = array();
 
     /**
      * Verifies that definitions have been initialized (defined and not empty)
@@ -96,13 +95,21 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
+     */
+    protected function buildContainerMock()
+    {
+        return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->setMethods(array('setDefinition', 'setParameter'))
+            ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\DependencyInjection\ContainerBuilder
      */
     protected function getContainerMock()
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('setDefinition', 'setParameter'))
-            ->getMock();
+        $container = $this->buildContainerMock();
         $container->expects($this->any())
             ->method('setDefinition')
             ->will(

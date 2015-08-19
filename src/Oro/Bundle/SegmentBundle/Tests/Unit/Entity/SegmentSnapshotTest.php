@@ -29,14 +29,18 @@ class SegmentSnapshotTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->entity->getId());
         $this->assertNull($this->entity->getCreatedAt());
         $this->assertNull($this->entity->getEntityId());
+        $this->assertNull($this->entity->getIntegerEntityId());
         $this->assertNotNull($this->entity->getSegment());
 
-        $testEntityId  = 12;
-        $testCreatedAt = new \DateTime('now - 1 day', new \DateTimeZone('UTC'));
+        $testEntityId        = 12;
+        $testIntegerEntityId = 13;
+        $testCreatedAt       = new \DateTime('now - 1 day', new \DateTimeZone('UTC'));
         $this->entity->setEntityId($testEntityId);
+        $this->entity->setIntegerEntityId($testIntegerEntityId);
         $this->entity->setCreatedAt($testCreatedAt);
 
         $this->assertSame($testEntityId, $this->entity->getEntityId());
+        $this->assertSame($testIntegerEntityId, $this->entity->getIntegerEntityId());
         $this->assertSame($testCreatedAt, $this->entity->getCreatedAt());
 
         $this->entity->prePersist();

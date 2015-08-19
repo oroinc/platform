@@ -39,6 +39,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->setInternalDate($internalDate)
             ->setImportance(1)
             ->setMessageId('testMessageId')
+            ->setMultiMessageId(['testMessageId1','testMessageId2'])
             ->setXMessageId('testXMessageId')
             ->setXThreadId('testXThreadId');
 
@@ -58,6 +59,8 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testMessageId', $obj->getMessageId());
         $this->assertEquals('testXMessageId', $obj->getXMessageId());
         $this->assertEquals('testXThreadId', $obj->getXThreadId());
+        $this->assertCount(2, $obj->getMultiMessageId());
+        $this->assertInternalType('array', $obj->getMultiMessageId());
 
         $srcBodyContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
             ->disableOriginalConstructor()
@@ -66,10 +69,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $srcBody->expects($this->at(0))
-            ->method('getContent')
-            ->with($this->equalTo(Body::FORMAT_HTML))
-            ->will($this->throwException(new InvalidBodyFormatException()));
-        $srcBody->expects($this->at(1))
             ->method('getContent')
             ->with($this->equalTo(Body::FORMAT_TEXT))
             ->will($this->returnValue($srcBodyContent));

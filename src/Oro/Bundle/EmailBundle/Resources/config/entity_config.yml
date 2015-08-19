@@ -22,7 +22,7 @@ oro_entity_config:
                         priority:               100
                         default_value:          false
                     form:
-                        type:                   choice
+                        type:                   oro_email_link_to_scope
                         options:
                             block:              attachments
                             choices:            ['oro.email.system_configuration.attachment_configuration.link_to_scope.choices.manual.label', 'oro.email.system_configuration.attachment_configuration.link_to_scope.choices.auto.label']

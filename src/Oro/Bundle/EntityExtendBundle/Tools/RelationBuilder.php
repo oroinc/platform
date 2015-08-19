@@ -78,7 +78,6 @@ class RelationBuilder
             $fieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_MANY);
 
             $relations[$relationKey] = [
-                'assign'          => false,
                 'field_id'        => $fieldId,
                 'owner'           => true,
                 'target_entity'   => $targetEntityName,
@@ -147,7 +146,6 @@ class RelationBuilder
             $fieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_ONE);
 
             $relations[$relationKey] = [
-                'assign'          => false,
                 'field_id'        => $fieldId,
                 'owner'           => true,
                 'target_entity'   => $targetEntityName,
@@ -186,7 +184,6 @@ class RelationBuilder
         $targetFieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_ONE);
 
         $relations[$relationKey] = [
-            'assign'          => false,
             'field_id'        => false,
             'owner'           => false,
             'target_entity'   => $sourceEntityName,

@@ -86,9 +86,30 @@ class WorkflowDefinitionController extends Controller
         return array(
             'form' => $form->createView(),
             'entity' => $workflowDefinition,
+            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
             'system_entities' => $this->get('oro_entity.entity_provider')->getEntities(),
             'delete_allowed' => true,
         );
+    }
+
+    /**
+     * Prepares workflow configuration to display. Translates attribute labels.
+     *
+     * @param WorkflowDefinition $workflowDefinition
+     * @return array
+     */
+    protected function prepareConfiguration(WorkflowDefinition $workflowDefinition)
+    {
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        $configuration = $workflowDefinition->getConfiguration();
+
+        if (isset($configuration['attributes'])) {
+            foreach ($configuration['attributes'] as $attrName => $attrConfig) {
+                $configuration['attributes'][$attrName]['translated_label'] = $translator->trans($attrConfig['label']);
+            }
+        }
+        return $configuration;
     }
 
     /**
@@ -134,7 +155,9 @@ class WorkflowDefinitionController extends Controller
     public function viewAction(WorkflowDefinition $workflowDefinition)
     {
         return array(
-            'entity' => $workflowDefinition
+            'entity' => $workflowDefinition,
+            'workflowConfiguration' => $this->prepareConfiguration($workflowDefinition),
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
         );
     }
 

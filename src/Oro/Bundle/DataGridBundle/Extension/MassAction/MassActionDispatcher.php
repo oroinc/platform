@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
@@ -16,6 +18,7 @@ use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class MassActionDispatcher
 {
@@ -29,10 +32,19 @@ class MassActionDispatcher
      */
     protected $manager;
 
-    public function __construct(ContainerInterface $container, Manager $manager)
+    /** @var AclHelper */
+    protected $aclHelper;
+
+    /**
+     * @param ContainerInterface $container
+     * @param Manager            $manager
+     * @param AclHelper          $aclHelper
+     */
+    public function __construct(ContainerInterface $container, Manager $manager, AclHelper $aclHelper)
     {
         $this->container = $container;
         $this->manager   = $manager;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -97,6 +109,10 @@ class MassActionDispatcher
 
         //prepare query builder
         $qb->setMaxResults(null);
+
+        if (!$datagrid->getConfig()->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)) {
+            $qb = $this->aclHelper->apply($qb);
+        }
 
         $resultIterator = $this->getResultIterator($qb);
         $handlerArgs    = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
@@ -174,12 +190,12 @@ class MassActionDispatcher
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param QueryBuilder|Query $qb
      * @param null         $bufferSize
      *
      * @return IterableResult
      */
-    protected function getResultIterator(QueryBuilder $qb, $bufferSize = null)
+    protected function getResultIterator($qb, $bufferSize = null)
     {
         $result = new IterableResult($qb);
 

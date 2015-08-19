@@ -1,8 +1,21 @@
 oro_translation_jstranslation:
     path:      /js/translation/{_locale}.js
     defaults:  { _controller:  oro_translation.controller:indexAction }
+    options:
+        expose: true
 
 oro_translation_service:
     resource:     "@OroTranslationBundle/Controller"
     type:         annotation
     prefix:       /translation
+
+
+oro_translation_bundle_api:
+    resource:     "@OroTranslationBundle/Resources/config/oro/routing_api.yml"
+    type:         rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest

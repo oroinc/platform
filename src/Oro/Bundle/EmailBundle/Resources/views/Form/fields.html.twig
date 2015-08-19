@@ -1,3 +1,13 @@
+{% block _oro_email_autoresponserule_conditions_entry_field_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _oro_email_autoresponserule_conditions_entry_filter_row %}
+    {% for child in form %}
+        {{ form_widget(child, {'attr': {'class': child.vars['name']}}) }}
+    {% endfor %}
+{% endblock %}
+
 {% block oro_email_template_list_row %}
     <script type="text/javascript">
         require(['jquery',
@@ -7,13 +17,19 @@
             $(function () {
                 'use strict';
                 var $templateSelectorEl = $('#{{ id }}');
+                {% if includeSystemTemplates is defined and not includeSystemTemplates %}
+                    var includeSystemTemplates = false;
+                {% else %}
+                    var includeSystemTemplates = true;
+                {% endif %}
                 new View({
                     el: $templateSelectorEl.closest('form').find('[name$="[{{ depends_on_parent_field }}]"]'),
                     target: $templateSelectorEl,
                     collection: new Collection(
                         '{{ data_route }}',
                         {{ data_route_parameter|json_encode|raw }},
-                        {{ includeSystem is defined and includeSystem ? 'true' : 'false' }}
+                        {{ includeNonEntity is defined and includeNonEntity ? 'true' : 'false' }},
+                        includeSystemTemplates
                     )
                 });
             });
@@ -25,6 +41,34 @@
         <% }); %>
     </script>
 
+    {{ form_row(form) }}
+{% endblock %}
+
+{% block oro_email_link_to_scope_row %}
+    <script type="text/javascript">
+        require(['jquery'],
+            function($) {
+                function initLinkToScopeEl(mainEl, el) {
+                    if (parseInt($(mainEl).val())) {
+                        $(el).attr('disabled', false);
+                        $(el).parent('div').removeClass('disabled');
+                    } else {
+                        $(el).attr('disabled', true);
+                        $(el).parent('div').addClass('disabled');
+                    }
+                }
+                $(function () {
+                    var selectorEl = '{{ form.vars.id }}';
+                    var emailLinkToScopeEl = $('#' + selectorEl);
+                    var enableAttachmentEl = $(emailLinkToScopeEl).closest('form')
+                            .find('[data-ftid=oro_entity_config_type_attachment_enabled]');
+                    initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    $(enableAttachmentEl).on('change', function() {
+                        initLinkToScopeEl(enableAttachmentEl, emailLinkToScopeEl);
+                    });
+                });
+            })
+    </script>
     {{ form_row(form) }}
 {% endblock %}
 
@@ -101,7 +145,7 @@
     {% endfor %}
 
     {% set options = options|merge({
-        container: id,
+        containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
         attachmentsAvailable: attachmentsAvailableArray
@@ -146,6 +190,123 @@
             {% endspaceless %}
         </div>
     </div>
+    <script type="text/javascript">
+        require(['jquery'],
+                function($) {
+                    $('.emailtemplate-translatation.oro-tabs.tabbable ul.nav.nav-tabs li a').on('show', function(e) {
+                        var target = e.target || window.event.target;
+                        var dataRelated = $(target).attr('data-related');
+                        $($(target).closest('form').find(':input.translation')).each(function(key, el) {
+                            $(el).val(dataRelated);
+                        });
+                    });
+                })
+    </script>
+{% endblock %}
+
+{% block oro_email_email_folder_row %}
+    {% if form.vars.value is not null and form.vars.value.outdatedAt is null %}
+        <div>
+            {{ form_widget(form.syncEnabled) }}<label class="folder-label">{{ form.vars.value.name }}</label>
+            {{ form_widget(form.fullName) }}
+            {{ form_widget(form.name) }}
+            {{ form_widget(form.type) }}
+            {% if form.vars.value.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {{ form_widget(form.subFolders) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_row %}
+    {% if form.vars.value is not null and form.vars.value|length > 0 %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_widget %}
+    <div class="folder-tree-widget">
+        <input id="check-all" type="checkbox"/><label class="folder-label">All</label>
+        <div id="folder-list">
+            {% for child in form.children %}
+                {% if child.vars.value.parentFolder is null and child.vars.value.outdatedAt is null %}
+                    {{ form_row(child) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery'], function($) {
+            var $folderList = $('#folder-list');
+            var $checkAll = $('#check-all');
+            $checkAll.click(function() {
+                var checked = this.checked;
+                $folderList.find(':checkbox').each(function() {
+                    this.checked = checked;
+                });
+            });
+
+            $folderList.find(':checkbox').each(function() {
+                $(this).css('margin', 0);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block oro_email_mailbox_grid_row %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params'),
+    } %}
+    <div class="row" style="margin-top: -42px;">
+        <div class="pull-right">
+            <div class="btn-group">
+                {{ UI.addButton({
+                    'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                    'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                }) }}
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-right: -20px;">
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {redirectData: redirectData}) }}
+    </div>
+{% endblock %}
+
+{% block oro_email_mailbox_widget %}
+    {% set email_origin = form_widget(form.children.origin) %}
+    {% set process = form_row(form.children.processType) ~
+        form_widget(form.children.processSettings) %}
+    {% set access = form_row(form.children.authorizedUsers) ~
+        form_row(form.children.authorizedRoles)
+    %}
+    {% set options = {
+        el: '#' ~ form.vars.id
+    } %}
+    <div data-page-component-module="oroemail/js/app/views/mailbox-update-view"
+         data-page-component-options="{{ options|json_encode }}">
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
+            {{ form_widget(form) }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
+            {{ email_origin|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
+            {{ process|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
+            {{ access|raw }}
+        </fieldset>
+    </div>
 {% endblock %}
 
 {#
@@ -159,8 +320,8 @@
     {% set locale = form.vars.name %}
 
     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
-        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab">
-            {{- localeLabels[locale]|default('N/A')|trans|capitalize -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
+        <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab" data-related="{{ locale }}">
+            {{- localeLabels[locale]|default('N/A')|trans -}}{% if isDefault %} {% trans %}[Default]{% endtrans %}{% endif -%}
         </a>
     </li>
 {% endmacro %}

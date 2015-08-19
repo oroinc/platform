@@ -1,6 +1,3 @@
-/*jshint devel:true, multistr:true*/
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
@@ -10,10 +7,32 @@ define([
     'orotranslation/js/translator',
     './multiselect-decorator',
     './datafilter-wrapper'
-], function ($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
+], function($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
     'use strict';
 
     var FiltersManager;
+    var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+
+    /**
+     * Defines parent element for dropdown-menu by toggle element
+     * (this method is taken from Bootstrap-Dropdown)
+     *
+     * @param {jQuery} $toggle
+     * @returns {*|jQuery|HTMLElement}
+     */
+    function getDropdownMenuParent($toggle) {
+        var $parent;
+        var selector = $toggle.attr('data-target');
+        if (!selector) {
+            selector = $toggle.attr('href');
+            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
+        }
+        $parent = selector && $(selector);
+        if (!$parent || !$parent.length) {
+            $parent = $toggle.parent();
+        }
+        return $parent;
+    }
 
     /**
      * View that represents all grid filters
@@ -86,7 +105,7 @@ define([
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var filterListeners;
 
             this.template = _.template($(this.templateSelector).html());
@@ -102,9 +121,10 @@ define([
 
             if (tools.isMobile()) {
                 filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
+                $('body').on('click.' + this.cid, DROPDOWN_TOGGLE_SELECTOR, _.bind(this._onBodyClick, this));
             }
 
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 if (filter.wrappable) {
                     _.extend(filter, filterWrapper);
                 }
@@ -122,11 +142,12 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.filters, function (filter) {
+            $('body').off('.' + this.cid);
+            _.each(this.filters, function(filter) {
                 filter.dispose();
             });
             delete this.filters;
@@ -143,7 +164,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterUpdated: function (filter) {
+        _onFilterUpdated: function(filter) {
             this.trigger('updateFilter', filter);
         },
 
@@ -153,7 +174,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterDisabled: function (filter) {
+        _onFilterDisabled: function(filter) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
         },
@@ -161,9 +182,9 @@ define([
         /**
          * Returns list of filter raw values
          */
-        getValues: function () {
+        getValues: function() {
             var values = {};
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 if (filter.enabled) {
                     values[filter.name] = filter.getValue();
                 }
@@ -175,8 +196,8 @@ define([
         /**
          * Sets raw values for filters
          */
-        setValues: function (values) {
-            _.each(values, function (value, name) {
+        setValues: function(values) {
+            _.each(values, function(value, name) {
                 if (_.has(this.filters, name)) {
                     this.filters[name].setValue(value);
                 }
@@ -188,7 +209,7 @@ define([
          *
          * @protected
          */
-        _onChangeFilterSelect: function () {
+        _onChangeFilterSelect: function() {
             this.trigger('updateList', this);
             this._processFilterStatus();
         },
@@ -199,7 +220,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
-        enableFilter: function (filter) {
+        enableFilter: function(filter) {
             return this.enableFilters([filter]);
         },
 
@@ -209,7 +230,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
-        disableFilter: function (filter) {
+        disableFilter: function(filter) {
             return this.disableFilters([filter]);
         },
 
@@ -219,13 +240,13 @@ define([
          * @param filters []
          * @return {*}
          */
-        enableFilters: function (filters) {
+        enableFilters: function(filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
-            _.each(filters, function (filter) {
+            _.each(filters, function(filter) {
                 filter.enable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
@@ -248,13 +269,13 @@ define([
          * @param filters []
          * @return {*}
          */
-        disableFilters: function (filters) {
+        disableFilters: function(filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
-            _.each(filters, function (filter) {
+            _.each(filters, function(filter) {
                 filter.disable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
@@ -276,13 +297,13 @@ define([
          *
          * @return {*}
          */
-        render: function () {
-            var $container = $(this.template({ filters: this.filters }));
+        render: function() {
+            var $container = $(this.template({filters: this.filters}));
             this.setElement($container);
 
             var fragment = document.createDocumentFragment();
 
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
@@ -290,7 +311,7 @@ define([
                 fragment.appendChild(filter.$el.get(0));
             }, this);
 
-            this.trigger("rendered");
+            this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
                 $container.hide();
@@ -307,7 +328,7 @@ define([
          *
          * @protected
          */
-        _initializeSelectWidget: function () {
+        _initializeSelectWidget: function() {
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: {
@@ -315,7 +336,7 @@ define([
                     selectedList: 0,
                     selectedText: this.addButtonHint,
                     classes: 'filter-list select-filter-widget',
-                    open: $.proxy(function () {
+                    open: $.proxy(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._updateDropdownPosition();
@@ -335,7 +356,7 @@ define([
          *
          * @protected
          */
-        _setDropdownWidth: function () {
+        _setDropdownWidth: function() {
             var widget = this.selectWidget.getWidget();
             var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
@@ -347,10 +368,10 @@ define([
          *
          * @protected
          */
-        _processFilterStatus: function () {
+        _processFilterStatus: function() {
             var activeFilters = this.$(this.filterSelector).val();
 
-            _.each(this.filters, function (filter, name) {
+            _.each(this.filters, function(filter, name) {
                 if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {
                     this.enableFilter(filter);
                 } else if (filter.enabled && _.indexOf(activeFilters, name) === -1) {
@@ -366,7 +387,7 @@ define([
          *
          * @protected
          */
-        _updateDropdownPosition: function () {
+        _updateDropdownPosition: function() {
             var button = this.$(this.buttonSelector);
             var buttonPosition = button.offset();
             var widgetWidth = this.selectWidget.getWidget().outerWidth();
@@ -385,7 +406,7 @@ define([
         /**
          * Reset button click handler
          */
-        _onReset: function () {
+        _onReset: function() {
             mediator.trigger('datagrid:doReset:' + this.collection.inputName);
         },
 
@@ -394,27 +415,46 @@ define([
          * @param e
          * @private
          */
-        _onDropdownToggle: function (e) {
+        _onDropdownToggle: function(e) {
+            var $dropdown = this.$('.dropdown');
             e.preventDefault();
             e.stopPropagation();
-            this.$el.find('.dropdown').toggleClass('oro-open');
+            if (!$dropdown.hasClass('oro-open')) {
+                // closes other dropdown-menus
+                $(DROPDOWN_TOGGLE_SELECTOR).each(function() {
+                    getDropdownMenuParent($(this)).removeClass('open');
+                });
+            }
+            $dropdown.toggleClass('oro-open');
+        },
+
+        /**
+         * Handles click on body element
+         * closes the filters-dropdown if event target does not belong to the view element
+         *
+         * @param {jQuery.Event} e
+         * @protected
+         */
+        _onBodyClick: function(e) {
+            if (!_.contains($(e.target).parents(), this.el)) {
+                this.closeDropdown();
+            }
         },
 
         /**
          * Closes dropdown on mobile
          */
-        closeDropdown: function () {
-            this.$el.find('.dropdown').removeClass('oro-open');
+        closeDropdown: function() {
+            this.$('.dropdown').removeClass('oro-open');
         },
 
         /**
          * On mobile closes filter box if value is changed
          */
-        _onUpdateCriteriaClick: function (filter) {
+        _onUpdateCriteriaClick: function(filter) {
             filter.once('update', this.closeDropdown, this);
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         }
-
     });
 
     return FiltersManager;

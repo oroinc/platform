@@ -1,0 +1,2 @@
+<?php //@codingStandardsIgnoreFile ?>
+<a <?php echo $view['layout']->block($block, 'block_attributes') ?> href="<?php echo $path ?: $view['router']->generate($route_name, $route_parameters) ?>"><?php if (isset($icon)): ?><?php echo $view['layout']->block($block, 'icon_block') ?><?php endif ?><?php if (isset($text)): ?><?php echo $view->escape($view['layout']->text($text, $translation_domain)) ?><?php endif ?></a>

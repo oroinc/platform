@@ -63,6 +63,7 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setRelatedEntity('My/Entity')
             ->setExecutionOrder(25)
+            ->setExcludeDefinitions(['foo'])
             ->setActionsConfiguration(array('key' => 'value'));
 
         $this->assertNotEquals($importedEntity->getName(), $this->entity->getName());
@@ -70,6 +71,7 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
         $this->assertNotEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
         $this->assertNotEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
+        $this->assertNotEquals($importedEntity->getExcludeDefinitions(), $this->entity->getExcludeDefinitions());
         $this->assertTrue($this->entity->isEnabled());
 
         $this->entity->import($importedEntity);
@@ -79,6 +81,7 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
         $this->assertEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
         $this->assertEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
+        $this->assertEquals($importedEntity->getExcludeDefinitions(), $this->entity->getExcludeDefinitions());
         $this->assertTrue($this->entity->isEnabled()); // enabled must not be changed
     }
 

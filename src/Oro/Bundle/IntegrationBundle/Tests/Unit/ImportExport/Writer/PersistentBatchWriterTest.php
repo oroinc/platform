@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Writer;
 
+use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Psr\Log\LoggerInterface;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
@@ -69,6 +70,8 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->expectGetJobName($stepExecution);
 
         $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $context->expects($this->once())
@@ -187,6 +190,9 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         $jobInstance  = new JobInstance(null, null, 'test');
         $jobExecution = new JobExecution();
         $jobExecution->setJobInstance($jobInstance);
+
+        $executionContext = new ExecutionContext();
+        $jobExecution->setExecutionContext($executionContext);
 
         $stepExecution->expects($this->once())
             ->method('getJobExecution')

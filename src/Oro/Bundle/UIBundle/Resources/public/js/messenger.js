@@ -1,60 +1,44 @@
-/*global define*/
-/*jslint nomen:true*/
-define(['jquery', 'underscore', 'oroui/js/tools', 'bootstrap', 'cryptojs/sha256'],
-function ($, _, tools) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/tools',
+    'cryptojs/sha256',
+    'bootstrap'
+], function($, _, tools, CryptoJS) {
     'use strict';
 
     var defaults = {
-            container: '',
-            delay: false,
-            template: $.noop,
-            insertMethod: 'appendTo'
-        },
-        queue = [],
-        storageKey = 'flash',
-        notFlashTypes = ['error', 'danger', 'warning', 'alert'],
+        container: '',
+        delay: false,
+        template: $.noop,
+        insertMethod: 'appendTo'
+    };
+    var queue = [];
+    var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
+    var console = window.console;
 
-        /**
-         * Same arguments as for Oro.NotificationMessage
-         */
-        showMessage = function(type, message, options) {
-            var opt = _.extend({}, defaults, options || {}),
-                $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container),
-                delay = opt.delay || (opt.flash && 5000),
-                actions = {close: _.bind($el.alert, $el, 'close')};
-            if (opt.namespace) {
-                $el.attr('data-messenger-namespace', opt.namespace);
-            }
-            if (delay) {
-                _.delay(actions.close, delay);
-            }
-            return actions;
-        },
+    /**
+     * Same arguments as for Oro.NotificationMessage
+     */
+    function showMessage(type, message, options) {
+        var opt = _.extend({}, defaults, options || {});
+        var $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container);
+        var delay = opt.delay || (opt.flash && 5000);
+        var actions = {close: _.bind($el.alert, $el, 'close')};
+        if (opt.namespace) {
+            $el.attr('data-messenger-namespace', opt.namespace);
+        }
+        if (delay) {
+            _.delay(actions.close, delay);
+        }
+        return actions;
+    }
 
-        /**
-         * Get flash messages from localStorage or cookie
-         */
-        getStoredMessages = function() {
-            var messages = localStorage ? localStorage.getItem(storageKey) : $.cookie(storageKey);
-            return JSON.parse(messages) || [];
-        },
-
-        /**
-         * Set stored messages to cookie or localStorage
-         */
-        setStoredMessages = function(flashMessages) {
-            var messages = JSON.stringify(flashMessages);
-            localStorage ?
-                localStorage.setItem(storageKey, messages) :
-                $.cookie(storageKey, messages);
-            return true;
-        };
-
-        /**
-         * @export oroui/js/messenger
-         * @name   oro.messenger
-         */
-        return {
+    /**
+     * @export oroui/js/messenger
+     * @name   oro.messenger
+     */
+    return {
             /**
              * Shows notification message
              *
@@ -72,9 +56,9 @@ function ($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationMessage:  function(type, message, options) {
-                var container = (options || {}).container ||  defaults.container,
-                    args = Array.prototype.slice.call(arguments),
-                    actions = {close: $.noop};
+                var container = (options || {}).container ||  defaults.container;
+                var args = Array.prototype.slice.call(arguments);
+                var actions = {close: $.noop};
                 if (container && $(container).length) {
                     actions = showMessage.apply(null, args);
                 } else {
@@ -101,7 +85,7 @@ function ($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                var isFlash   = notFlashTypes.indexOf(type) == -1;
+                var isFlash = notFlashTypes.indexOf(type) === -1;
                 var namespace = (options || {}).namespace;
 
                 if (!namespace) {
@@ -129,7 +113,7 @@ function ($, _, tools) {
              * @return {Object} collection of methods - actions over message element,
              *      at the moment there's only one method 'close', allows to close the message
              */
-            showErrorMessage: function (message, err) {
+            showErrorMessage: function(message, err) {
                 var msg = message;
                 if (!_.isUndefined(err) && !_.isNull(err)) {
                     if (!_.isUndefined(console)) {
@@ -151,12 +135,6 @@ function ($, _, tools) {
             setup: function(options) {
                 _.extend(defaults, options);
 
-                var flashMessages = getStoredMessages();
-                $.each(flashMessages, function(index, message){
-                    queue.push(message);
-                });
-                setStoredMessages([]);
-
                 while (queue.length) {
                     var args = queue.shift();
                     _.extend(args[1], showMessage.apply(null, args[0]));
@@ -168,14 +146,6 @@ function ($, _, tools) {
                 var actions = {close: $.noop};
 
                 queue.push([args, actions]);
-                // since navigation is always enabled, this condition does not make sense
-                /*if (options.hashNavEnabled) {
-                    queue.push([args, actions]);
-                } else { // add message to localStorage or cookie
-                    var flashMessages = getStoredMessages();
-                    flashMessages.push([args, actions]);
-                    setStoredMessages(flashMessages);
-                }*/
             },
 
             /**
@@ -186,7 +156,7 @@ function ($, _, tools) {
              */
             clear: function(namespace, options) {
                 var opt = _.extend({}, defaults, options || {});
-                $(opt.container).find('[data-messenger-namespace=' + namespace +']').remove();
+                $(opt.container).find('[data-messenger-namespace=' + namespace + ']').remove();
             }
         };
 });

@@ -9,7 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @package Oro\Bundle\IntegrationBundle\Entity
  * @ORM\Entity
- * @ORM\Table(name="oro_integration_channel_status")
+ * @ORM\Table(
+ *      name="oro_integration_channel_status",
+ *      indexes={
+ *          @ORM\Index(name="oro_intch_con_state_idx", columns={"connector", "code"}),
+ *          @ORM\Index(name="oro_intch_date_idx", columns={"date"})
+ *      }
+ * )
  */
 class Status
 {

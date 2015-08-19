@@ -78,7 +78,7 @@ class OroNavigationExtension extends Extension
             ->getDefinition('oro_navigation.title_config_reader')
             ->addMethodCall('setConfigData', array($titlesConfig));
         $container
-            ->getDefinition('oro_navigation.title_service')
+            ->getDefinition('oro_navigation.title_provider')
             ->addMethodCall('setTitles', array($titlesConfig));
         $container
             ->getDefinition('oro_navigation.content_provider.navigation_elements')

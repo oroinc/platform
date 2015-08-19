@@ -1,0 +1,7 @@
+oro_layout:
+    themes:
+        oro-black:
+            label:     Oro Black theme
+            logo:      bundles/oroui/images/oro-black-logo.png
+            directory: OroBlack
+            groups:    [main, frontend]

@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Selenium\Pages;
 
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
+use PHPUnit_Framework_Assert;
 
 /**
  * Class Search
  *
  * @package Oro\Bundle\SearchBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\SearchBundle\Tests\Selenium\Pages\Search openSearch() openSearch()
- * @method \Oro\Bundle\SearchBundle\Tests\Selenium\Pages\Search assertTitle() assertTitle($title, $message = '')
+ * @method Search openSearch()
+ * @method Search assertTitle($title, $message = '')
  */
 class Search extends AbstractPage
 {
@@ -69,6 +70,9 @@ class Search extends AbstractPage
      */
     public function select($filter)
     {
+        $result = $this->result($filter);
+        PHPUnit_Framework_Assert::assertInternalType('array', $result);
+        PHPUnit_Framework_Assert::assertNotEmpty($result);
         $found = current($this->result($filter));
         $found->click();
         $this->waitPageToLoad();

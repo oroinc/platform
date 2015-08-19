@@ -1,0 +1,21 @@
+{
+    "name": "oro/property-access",
+    "type": "library",
+    "description": "Oro Property Access Component",
+    "keywords": ["ORO", "BAP", "property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "symfony/property-access": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\PropertyAccess": "" }
+    },
+    "target-dir": "Oro/Component/PropertyAccess",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

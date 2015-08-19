@@ -8,7 +8,6 @@ use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\TrackingBundle\Entity\TrackingVisit;
 use Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension;
 use Oro\Bundle\TrackingBundle\Tools\IdentifierVisitGeneratorExtension;
 
@@ -49,20 +48,19 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    'class'        => TrackingVisit::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisit::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName(
-                                        'Test\TargetEntity',
-                                        IdentifierEventExtension::ASSOCIATION_KIND
-                                    ),
-                                    'manyToOne'
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                                ExtendHelper::buildAssociationName(
+                                    'Test\TargetEntity',
+                                    IdentifierEventExtension::ASSOCIATION_KIND
                                 ),
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -71,17 +69,16 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class'        => TrackingVisit::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisit::ENTITY_NAME,
-                                    'testField',
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                                'testField',
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -90,20 +87,19 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'class'        => TrackingVisit::ENTITY_NAME,
-                    'relation'     => 'test',
+                    'class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                    'relation' => 'test',
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    TrackingVisit::ENTITY_NAME,
-                                    ExtendHelper::buildAssociationName(
-                                        'Test\TargetEntity',
-                                        IdentifierEventExtension::ASSOCIATION_KIND
-                                    ),
-                                    'manyToMany'
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingVisit',
+                                ExtendHelper::buildAssociationName(
+                                    'Test\TargetEntity',
+                                    IdentifierEventExtension::ASSOCIATION_KIND
                                 ),
+                                'manyToMany'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -111,7 +107,7 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             [
-                ['class' => TrackingVisit::ENTITY_NAME],
+                ['class' => 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit'],
                 false
             ],
             [
@@ -126,52 +122,48 @@ class IdentifierVisitGeneratorExtensionTest extends \PHPUnit_Framework_TestCase
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity1',
-                                IdentifierEventExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToOne'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity1',
+                            IdentifierEventExtension::ASSOCIATION_KIND
                         ),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity1'
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity2',
-                                IdentifierEventExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToOne'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity2',
+                            IdentifierEventExtension::ASSOCIATION_KIND
                         ),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity2'
                 ],
                 [   // should be ignored because field type is not manyToOne
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName(
-                                'Test\TargetEntity3',
-                                IdentifierEventExtension::ASSOCIATION_KIND
-                            ),
-                            'manyToMany'
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName(
+                            'Test\TargetEntity3',
+                            IdentifierEventExtension::ASSOCIATION_KIND
                         ),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [   // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            'testField',
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        'testField',
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ]
             ]

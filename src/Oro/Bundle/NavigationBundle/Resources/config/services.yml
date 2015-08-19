@@ -25,6 +25,8 @@ parameters:
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
 
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
+    oro_navigation.title_provider.class:                       Oro\Bundle\NavigationBundle\Provider\TitleProvider
+    oro_navigation.title_translator.class:                     Oro\Bundle\NavigationBundle\Provider\TitleTranslator
     oro_navigation.title_service.twig.extension.class:         Oro\Bundle\NavigationBundle\Twig\TitleExtension
     oro_navigation.title_service.annotations_reader.class:     Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
     oro_navigation.title_service.config_reader.class:          Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
@@ -236,11 +238,25 @@ services:
         arguments:
           - @oro_navigation.title_annotations_reader
           - @oro_navigation.title_config_reader
-          - @translator.default
+          - @oro_navigation.title_translator
           - @doctrine.orm.entity_manager
           - @serializer
           - @oro_config.user
           - @oro_navigation.breadcrumb_manager
+          - @oro_navigation.title_provider
+
+    oro_navigation.title_provider:
+        class: %oro_navigation.title_provider.class%
+        public: false
+        arguments:
+          - @oro_entity.doctrine_helper
+
+    oro_navigation.title_translator:
+        class: %oro_navigation.title_translator.class%
+        public: false
+        arguments:
+          - @translator.default
+          - @oro_config.user
 
     oro_navigation.title_annotations_reader:
         class:                        %oro_navigation.title_service.annotations_reader.class%

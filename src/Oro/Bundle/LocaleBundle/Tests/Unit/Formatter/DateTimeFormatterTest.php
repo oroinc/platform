@@ -21,7 +21,15 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->formatter = new DateTimeFormatter($this->localeSettings);
+
+        $translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator->method('trans')
+            ->willReturn('MMM d');
+
+        $this->formatter = new DateTimeFormatter($this->localeSettings, $translator);
     }
 
     public function testEmptyDate()
@@ -390,15 +398,24 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param \DateTime $date
+     * @param int       $dateType
+     * @param string    $locale
+     * @param string    $timeZone
+     * @param string    $language
+     * @param string    $year
+     * @param string    $defaultLocale
+     * @param string    $defaultTimeZone
+     *
      * @dataProvider formatDayDataProvider
      */
     public function testFormatDay(
-        $expected,
         \DateTime $date,
         $dateType,
         $locale,
         $timeZone,
         $language,
+        $year,
         $defaultLocale = null,
         $defaultTimeZone = null
     ) {
@@ -412,30 +429,30 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($defaultTimeZone));
         }
 
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatDay($date, $dateType, $locale, $timeZone)
-        );
+        $actual = $this->formatter->formatDay($date, $dateType, $locale, $timeZone);
+        $this->assertNotContains("'", $actual);
+        $this->assertNotContains(',', $actual);
+        $this->assertNotContains($year, $actual);
     }
 
     public function formatDayDataProvider()
     {
         return [
             [
-                'expected' => 'Feb 2',
-                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'date' => $this->createDateTime('2032-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => 'ru_RU',
                 'timeZone' => 'America/Los_Angeles',
                 'language' => 'en_US',
+                'year' => '32',
             ],
             [
-                'expected' => '02 февр.',
-                'date' => $this->createDateTime('2015-02-03 00:00:00', 'Europe/London'),
+                'date' => $this->createDateTime('2032-02-03 00:00:00', 'Europe/London'),
                 'dateType' => \IntlDateFormatter::MEDIUM,
                 'locale' => null,
                 'timeZone' => null,
                 'language' => 'ru_RU',
+                'year' => '32',
                 'defaultLocale' => 'en_US',
                 'defaultTimeZone' => 'America/Los_Angeles',
             ],
@@ -493,6 +510,13 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param string $lang
+     * @param string $timeZone
+     * @param string $pattern
+     *
+     * @return \IntlDateFormatter
+     */
     protected function getFormatter($lang, $timeZone, $pattern)
     {
         return new \IntlDateFormatter(
@@ -505,6 +529,13 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param string $locale
+     * @param int $dateType
+     * @param int $timeType
+     *
+     * @return string
+     */
     protected function getPattern($locale, $dateType, $timeType)
     {
         $localeFormatter = new \IntlDateFormatter($locale, $dateType, $timeType, null, \IntlDateFormatter::GREGORIAN);

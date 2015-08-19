@@ -33,6 +33,20 @@
   .oro-subtitle {
     white-space: nowrap;
   }
+  .grid-views {
+    margin-left: 0;
+    .views-group>.dropdown-toggle {
+      height: auto;
+    }
+    .actions-group+.edited-label,
+    .actions-group .dropdown-toggle {
+      height: 28px;
+      &:after {
+        content: '';
+        font-size: 20px;
+      }
+    }
+  }
 }
 
 .customer-info {

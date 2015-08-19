@@ -111,7 +111,7 @@ class EnumExtension extends \Twig_Extension
             $items      = [];
             /** @var AbstractEnumValue[] $values */
             $values = $this->doctrine->getRepository($enumValueEntityClassOrEnumCode)->findAll();
-            usort($values, function($value1, $value2) {
+            usort($values, function ($value1, $value2) {
                 return $value1->getPriority() >= $value2->getPriority();
             });
             foreach ($values as $value) {

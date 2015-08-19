@@ -75,6 +75,12 @@ abstract class AbstractProperty implements PropertyInterface
                 }
                 $result = (string)$value;
                 break;
+            case self::TYPE_TIME:
+                if ($value instanceof \DateTime) {
+                    $value = $value->format('H:i:s');
+                }
+                $result = (string)$value;
+                break;
             case self::TYPE_STRING:
                 $result = (string)$value;
                 break;
@@ -86,6 +92,12 @@ abstract class AbstractProperty implements PropertyInterface
                 break;
             case self::TYPE_BOOLEAN:
                 $result = (bool)$value;
+                break;
+            case self::TYPE_SIMPLE_ARRAY:
+                $result = $value ? implode(', ', $value) : '';
+                break;
+            case self::TYPE_ARRAY:
+                $result = $value !== null ? json_encode($value, JSON_FORCE_OBJECT) : '';
                 break;
             default:
                 $result = $value;

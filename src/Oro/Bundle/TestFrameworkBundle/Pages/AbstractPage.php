@@ -9,9 +9,11 @@ use PHPUnit_Framework_Assert;
  * Class AbstractPage
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages
+ *
  */
 abstract class AbstractPage
 {
+    const URL = null;
     protected $redirectUrl = null;
 
     /** @var \PHPUnit_Extensions_Selenium2TestCase */
@@ -25,10 +27,10 @@ abstract class AbstractPage
     {
         $this->test = $testCase;
         // @codingStandardsIgnoreStart
-        $this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
+        //$this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
         // @codingStandardsIgnoreEnd
-        if (!is_null($this->redirectUrl) && $redirect) {
-            $this->test->url($this->redirectUrl);
+        if (!is_null(static::URL) && $redirect) {
+            $this->test->url(static::URL);
             $this->waitPageToLoad();
             $this->waitForAjax();
         }
@@ -204,31 +206,30 @@ JS;
     }
 
     /**
-     * @param $title
+     * @param $expectedTitle
      * @param string $message
      * @return $this
      */
-    public function assertTitle($title, $message = null)
+    public function assertTitle($expectedTitle, $message = null)
     {
-        PHPUnit_Framework_Assert::assertEquals(
-            $title,
-            $this->test->title(),
-            $message ?: $this->test->source()
-        );
+        $actual = $this->test->title();
+        $constraint = new \PHPUnit_Framework_Constraint_IsEqual($expectedTitle);
+
+        PHPUnit_Framework_Assert::assertThat($actual, $constraint, $message);
+
         return $this;
     }
 
     /**
-     * @param $messageText
+     * @param $expectedMessage
      * @param string $message
      * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
      */
-    public function assertMessage($messageText, $message = '')
+    public function assertMessage($expectedMessage, $message = 'Another flash message appears')
     {
-        PHPUnit_Framework_Assert::assertTrue(
-            $this->isElementPresent(
-                "//div[@id = 'flash-messages']//div[@class = 'message']"
-            ),
+        $this->assertElementPresent(
+            "//div[@id = 'flash-messages']//div[@class = 'message']",
             'Flash message is missing'
         );
 
@@ -240,40 +241,28 @@ JS;
             $renderedMessages[] = trim($messageElement->attribute('innerHTML'));
         }
 
-        PHPUnit_Framework_Assert::assertContains($messageText, $renderedMessages, $message);
+        PHPUnit_Framework_Assert::assertContains($expectedMessage, $renderedMessages, $message);
 
         return $this;
     }
 
     /**
-     * @param $messageText
+     * @param $expectedMessage
      * @param string $message
      * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
      */
-    public function assertErrorMessage($messageText, $message = '')
+    public function assertErrorMessage($expectedMessage, $message = 'Another flash message appears')
     {
-        PHPUnit_Framework_Assert::assertTrue(
-            $this->isElementPresent("//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]"),
+        $this->assertElementPresent(
+            "//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]",
             'Flash message is missing'
         );
-        $actualResult = $this->test->byXPath(
+        $actualMessage = $this->test->byXPath(
             "//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]/div"
         )->text();
 
-        PHPUnit_Framework_Assert::assertEquals($messageText, trim($actualResult), $message);
-        return $this;
-    }
-    /**
-     * @param $xpath
-     * @param string $message
-     * @return $this
-     */
-    public function assertElementPresent($xpath, $message = '')
-    {
-        PHPUnit_Framework_Assert::assertTrue(
-            $this->isElementPresent($xpath),
-            $message
-        );
+        PHPUnit_Framework_Assert::assertEquals($expectedMessage, trim($actualMessage), $message);
         return $this;
     }
 
@@ -281,13 +270,37 @@ JS;
      * @param $xpath
      * @param string $message
      * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
+     */
+    public function assertElementPresent($xpath, $message = '')
+    {
+        if ($message === '') {
+            $message = "Element {$xpath} is not present";
+        }
+
+        if (!$this->isElementPresent($xpath)) {
+            PHPUnit_Framework_Assert::fail($message);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $xpath
+     * @param string $message
+     * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
      */
     public function assertElementNotPresent($xpath, $message = '')
     {
-        PHPUnit_Framework_Assert::assertFalse(
-            $this->isElementPresent($xpath),
-            $message
-        );
+        if ($message === '') {
+            $message = "Element {$xpath} is present when not expected";
+        }
+
+        if ($this->isElementPresent($xpath)) {
+            PHPUnit_Framework_Assert::fail($message);
+        }
+
         return $this;
     }
 

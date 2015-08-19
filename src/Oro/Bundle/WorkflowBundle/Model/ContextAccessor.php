@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -39,7 +38,7 @@ class ContextAccessor
      */
     public function getValue($context, $value)
     {
-        if ($value instanceof PropertyPath) {
+        if ($value instanceof PropertyPathInterface) {
             try {
                 return $this->getPropertyAccessor()->getValue($context, $value);
             } catch (\Exception $e) {
@@ -59,7 +58,7 @@ class ContextAccessor
      */
     public function hasValue($context, $value)
     {
-        if ($value instanceof PropertyPath) {
+        if ($value instanceof PropertyPathInterface) {
             try {
                 $key = $value->getElement($value->getLength() - 1);
                 $parentValue = $this->getPropertyAccessor()->getValue($context, $value->getParent());

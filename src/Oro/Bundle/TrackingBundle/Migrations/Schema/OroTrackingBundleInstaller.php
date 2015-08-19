@@ -20,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -241,7 +241,7 @@ class OroTrackingBundleInstaller implements Installation
             $schema->getTable('oro_tracking_event_dictionary'),
             ['event_id'],
             ['id'],
-            ['onUpdate' => null, 'onDelete' => null]
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_tracking_visit'),

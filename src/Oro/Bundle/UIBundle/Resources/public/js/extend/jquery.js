@@ -1,5 +1,4 @@
-/*global define*/
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     'use strict';
 
     $.ajaxSetup({
@@ -7,45 +6,31 @@ define(['jquery'], function ($) {
             'X-CSRF-Header': 1
         }
     });
-    $.expr[':'].parents = function (a, i, m) {
+    $.expr[':'].parents = function(a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };
 
     $.fn.extend({
-        // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
-        focusAndSetCaretAtEnd: function () {
-            if (!this.length)
-                return;
-            var elem = this[0], elemLen = elem.value.length;
-            // For IE Only
-            if (document.selection) {
-                // Set focus
-                $(elem).focus();
-                // Use IE Ranges
-                var oSel = document.selection.createRange();
-                // Reset position to 0 & then set at end
-                oSel.moveStart('character', -elemLen);
-                oSel.moveStart('character', elemLen);
-                oSel.moveEnd('character', 0);
-                oSel.select();
-            }
-            else if (elem.selectionStart || elem.selectionStart == '0') {
-                // Firefox/Chrome
-                elem.selectionStart = elemLen;
-                elem.selectionEnd = elemLen;
-                $(elem).focus();
-            } // if
+        /**
+         * Sets cursor to end of input
+         */
+        setCursorToEnd: function(str) {
+            return this.each(function() {
+                var el = this;
+                if ('selectionStart' in el) {
+                    el.selectionEnd = el.selectionStart = el.value.length;
+                }
+            });
         },
 
         /**
          * Sets focus on first form field
          */
-        focusFirstInput: function () {
-            var $autoFocus,
-                $input = this.find(':input:visible, [data-focusable]')
+        focusFirstInput: function() {
+            var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().focus();
+            var $autoFocus = $input.filter('[autofocus]');
+            ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
         },
 
         focus: (function(orig) {
@@ -64,7 +49,7 @@ define(['jquery'], function ($) {
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
-        getBorders: function (el) {
+        getBorders: function(el) {
             var computed = window.getComputedStyle(el || this[0], null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
@@ -89,8 +74,29 @@ define(['jquery'], function ($) {
                 right: convertBorderToPx(computed.getPropertyValue('borderRightWidth') ||
                     computed.borderRightWidth)
             };
-        }
+        },
 
+        /**
+         * Inserts string in <textarea> or <input> at the cursor position and sets cursor after inserted data
+         *
+         * @returns {number}
+         */
+        insertAtCursor: function(str) {
+            return this.each(function() {
+                var start;
+                var end;
+                var el = this;
+                var value = el.value;
+                if ('selectionStart' in el) {
+                    start = el.selectionStart;
+                    end = el.selectionEnd;
+                    el.value = value.substr(0, start) + str + value.substr(end);
+                    el.selectionEnd = el.selectionStart = start + str.length;
+                } else {
+                    el.value += str;
+                }
+            });
+        }
     });
 
     return $;

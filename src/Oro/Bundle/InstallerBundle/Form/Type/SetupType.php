@@ -90,8 +90,9 @@ class SetupType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class'        => $this->dataClass,
-                'validation_groups' => array('Registration', 'Default'),
+                'data_class'              => $this->dataClass,
+                'validation_groups'       => array('Registration', 'Default'),
+                'dynamic_fields_disabled' => true
             )
         );
     }

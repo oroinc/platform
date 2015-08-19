@@ -1,12 +1,12 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var dateTimePickerViewMixin,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        moment = require('moment'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings  = require('orolocale/js/locale-settings');
+    var dateTimePickerViewMixin;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var moment = require('moment');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
+    var localeSettings = require('orolocale/js/locale-settings');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     /**
@@ -32,21 +32,26 @@ define(function (require) {
         backendFormat: datetimeFormatter.backendFormats.datetime,
 
         /**
+         * @type {string}
+         */
+        timezone: localeSettings.getTimeZone(),
+
+        /**
          * Returns supper prototype
          *
          * @returns {Object}
          * @protected
          */
-        _super: function () {
-            throw new Error("_super() should be defined");
+        _super: function() {
+            throw new Error('_super() should be defined');
         },
 
         /**
          * Initializes variable-date-time-picker view
          * @param {Object} options
          */
-        initialize: function (options) {
-            _.extend(this, _.pick(options, ['timezoneShift']));
+        initialize: function(options) {
+            _.extend(this, _.pick(options, ['timezone']));
             this._super().initialize.apply(this, arguments);
         },
 
@@ -58,7 +63,7 @@ define(function (require) {
          *
          * @override
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -77,7 +82,8 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        createFrontField: function (options) {
+        createFrontField: function(options) {
+            var dialogBelowClass = 'datetimepicker-dialog-is-below';
             this._super().createFrontField.call(this, options);
             if (options.fieldsWrapper) {
                 this.$frontDateField
@@ -88,6 +94,11 @@ define(function (require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.on('blur', function(e) {
+                $(this).parent().removeClass(dialogBelowClass);
+            }).on('datepicker:dialogReposition', function(e, position) {
+                $(this).parent().toggleClass(dialogBelowClass, position === 'below');
+            });
             this.$frontDateField.after(this.$frontTimeField);
         },
 
@@ -96,16 +107,32 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initPickerWidget: function (options) {
+        initPickerWidget: function(options) {
             var widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
+            this.$frontTimeField.on('showTimepicker', function() {
+                var $el = $(this);
+                var needClass = !$el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
+                $el.parent().toggleClass('datetimepicker-dialog-is-below', needClass);
+            });
+            this.$frontTimeField.on('hideTimepicker', function() {
+                $(this).parent().removeClass('datetimepicker-dialog-is-below');
+            });
+            this.$frontDateField.on('blur', function() {
+                if ($(this).hasClass('error')) {
+                    $(this).parent().removeClass('timepicker-error');
+                }
+            });
+            this.$frontTimeField.on('blur', function() {
+                $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
+            });
             this._super().initPickerWidget.apply(this, arguments);
         },
 
         /**
          * Destroys picker widget
          */
-        destroyTimePickerWidget: function () {
+        destroyTimePickerWidget: function() {
             this.$frontTimeField.timepicker('remove');
         },
 
@@ -114,7 +141,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        updateOrigin: function (e) {
+        updateOrigin: function(e) {
             this.checkConsistency(e.target);
             this._super().updateOrigin.apply(this, arguments);
             this.updateTimeFieldState();
@@ -123,7 +150,7 @@ define(function (require) {
         /**
          * Update front date and time fields values
          */
-        updateFront: function () {
+        updateFront: function() {
             this._super().updateFront.call(this);
             this.$frontTimeField.val(this.getFrontendFormattedTime());
             this.updateTimeFieldState();
@@ -134,13 +161,11 @@ define(function (require) {
          *
          * @param {HTMLElement} target
          */
-        checkConsistency: function (target) {
-            var date, time, isValidDate, isValidTime;
-
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+        checkConsistency: function(target) {
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
             // just changed the date
             if (this.$frontDateField.is(target) && isValidDate && !time) {
@@ -163,32 +188,15 @@ define(function (require) {
         updateTimeFieldState: $.noop,
 
         /**
-         * Sets datetime picker timezone
-         */
-        setTimeZoneShift: function (timezoneShift) {
-            this.timezoneShift = timezoneShift;
-        },
-
-        /**
-         * Gets datetime picker timezone
-         */
-        getTimeZoneShift: function () {
-            if (this.timezoneShift !== undefined) {
-                return this.timezoneShift;
-            }
-            return localeSettings.getTimeZoneShift();
-        },
-
-        /**
          * Reads value of original field and converts it to frontend format
          *
          * @returns {string}
          */
-        getFrontendFormattedTime: function () {
-            var value = '',
-                momentInstance = this.getOriginalMoment();
+        getFrontendFormattedTime: function() {
+            var value = '';
+            var momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getTimeFormat());
+                value = momentInstance.tz(this.timezone).format(this.getTimeFormat());
             }
             return value;
         },
@@ -198,15 +206,14 @@ define(function (require) {
          *
          * @returns {moment}
          */
-        getFrontendMoment: function () {
-            var value, date, time, format, momentInstance;
-            date = this.$frontDateField.val();
-            time = this.$frontTimeField.val();
-            value = date + this.getSeparatorFormat() + time;
-            format = this.getDateTimeFormat();
-            momentInstance = moment.utc(value, format, true);
+        getFrontendMoment: function() {
+            var date = this.$frontDateField.val();
+            var time = this.$frontTimeField.val();
+            var value = date + this.getSeparatorFormat() + time;
+            var format = this.getDateTimeFormat();
+            var momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
-                return momentInstance;
+                return momentInstance.tz(this.timezone, true);
             }
         },
 
@@ -215,12 +222,12 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
-            var value = '',
-                momentInstance = this.getFrontendMoment(),
-                format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+        getBackendFormattedValue: function() {
+            var value = '';
+            var momentInstance = this.getFrontendMoment();
+            var format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.subtract(this.getTimeZoneShift(), 'm').format(format);
+                value = momentInstance.utc().format(format);
             }
             return value;
         },
@@ -230,11 +237,11 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
-            var value = '',
-                momentInstance = this.getOriginalMoment();
+        getFrontendFormattedDate: function() {
+            var value = '';
+            var momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getDateFormat());
+                value = momentInstance.tz(this.timezone).format(this.getDateFormat());
             }
             return value;
         },
@@ -244,7 +251,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getTimeFormat: function () {
+        getTimeFormat: function() {
             return this.nativeMode ? this.nativeTimeFormat : datetimeFormatter.getTimeFormat();
         },
 
@@ -253,7 +260,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getSeparatorFormat: function () {
+        getSeparatorFormat: function() {
             return this.nativeMode ? ' ' : datetimeFormatter.getDateTimeFormatSeparator();
         },
 
@@ -262,11 +269,10 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getDateTimeFormat: function () {
-            var dateFormat, timeFormat, separatorFormat;
-            dateFormat = this.getDateFormat();
-            timeFormat = this.getTimeFormat();
-            separatorFormat = this.getSeparatorFormat();
+        getDateTimeFormat: function() {
+            var dateFormat = this.getDateFormat();
+            var timeFormat = this.getTimeFormat();
+            var separatorFormat = this.getSeparatorFormat();
             return dateFormat + separatorFormat + timeFormat;
         }
     };

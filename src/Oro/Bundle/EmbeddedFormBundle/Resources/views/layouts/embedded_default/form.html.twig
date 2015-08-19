@@ -1,0 +1,47 @@
+{% block root_widget %}
+<!DOCTYPE {{ doctype|default('html') }}>
+<!--[if IE 7 ]>
+<html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>
+<html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if IE 9 ]>
+<html class="no-js ie ie9" lang="en"> <![endif]-->
+<!--[if (gte IE 10)|!(IE)]><!-->
+<html class="no-js" lang="en"> <!--<![endif]-->
+{{ block('container_widget') }}
+</html>
+{% endblock %}
+
+{% block body_widget %}
+<body{{ block('block_attributes') }}>
+    <div id="page">
+        {{ block('container_widget') }}
+    </div>
+</body>
+{% endblock %}
+
+{% block _base_css_widget %}
+    {% set content %}
+    body {
+        min-width: 0;
+    }
+    {% endset %}
+    {{ block_widget(block, {'content': content }) }}
+{% endblock %}
+
+{% block _form_css_widget %}
+    {% set content = content|striptags %}
+    {{ block_widget(block, {'content': content}) }}
+{% endblock %}
+
+{% block embed_form_legacy_form_widget %}
+    {% if form_layout is not empty %}
+        {% include form_layout with {'form': form} %}
+    {% else %}
+        {{ form(form, {'attr': {'id': form.vars.id, 'name': form.vars.name, 'novalidate': 'novalidate' }}) }}
+    {% endif %}
+{% endblock %}
+
+{% block embed_form_success_widget %}
+    {{ message|default('oro.embeddedform.success_message.default'|trans)|back_link(form_id)|raw }}
+{% endblock %}

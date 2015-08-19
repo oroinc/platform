@@ -72,12 +72,13 @@ class Email extends EmailHeader
     {
         if ($this->body === null) {
             $this->body = new EmailBody();
-
             $body = $this->message->getBody();
-            try {
+
+            $contentType = $this->message->getPriorContentType();
+            if ($contentType && strtolower($contentType->getType()) === 'text/html') {
                 $this->body->setContent($body->getContent(Body::FORMAT_HTML)->getDecodedContent());
                 $this->body->setBodyIsText(false);
-            } catch (InvalidBodyFormatException $ex) {
+            } else {
                 $this->body->setContent($body->getContent(Body::FORMAT_TEXT)->getDecodedContent());
                 $this->body->setBodyIsText(true);
             }
@@ -97,14 +98,18 @@ class Email extends EmailHeader
             $this->attachments = array();
 
             foreach ($this->message->getAttachments() as $a) {
-                $content    = $a->getContent();
-                $attachment = new EmailAttachment();
-                $attachment
-                    ->setFileName($a->getFileName()->getValue())
-                    ->setContent($content->getContent())
-                    ->setContentType($content->getContentType())
-                    ->setContentTransferEncoding($content->getContentTransferEncoding());
-                $this->attachments[] = $attachment;
+                $content  = $a->getContent();
+                $filename = $a->getFileName()->getValue();
+                if ($filename !== null) {
+                    $attachment = new EmailAttachment();
+                    $attachment
+                        ->setFileName($filename)
+                        ->setContent($content->getContent())
+                        ->setContentType($content->getContentType())
+                        ->setContentTransferEncoding($content->getContentTransferEncoding())
+                        ->setContentId($a->getEmbeddedContentId());
+                    $this->attachments[] = $attachment;
+                }
             }
         }
 

@@ -68,6 +68,18 @@ class Manager implements ManagerInterface
     }
 
     /**
+     * Used to generate unique id for grid on page
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    public function getDatagridUniqueName($name)
+    {
+        return $this->nameStrategy->getGridUniqueName($name);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function getDatagridByRequestParams($name, array $additionalParameters = [])
@@ -82,7 +94,8 @@ class Manager implements ManagerInterface
             }
         }
 
-        $parameters = $this->parametersFactory->createParameters($name);
+        $uniqueName = $this->getDatagridUniqueName($name);
+        $parameters = $this->parametersFactory->createParameters($uniqueName);
         $parameters->add($additionalParameters);
 
         return $this->getDatagrid($name, $parameters);

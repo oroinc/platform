@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Symfony\Component\HttpFoundation\AcceptHeader;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
@@ -31,17 +33,12 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "entity"={
  *              "icon"="icon-envelope"
  *          },
- *          "security"={
- *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT",
- *              "group_name"=""
- *          },
  *          "grouping"={
  *              "groups"={"activity"}
  *          },
  *          "activity"={
  *              "route"="oro_email_activity_view",
- *              "acl"="oro_email_view",
+ *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
  *          },
@@ -107,7 +104,7 @@ class Email extends ExtendEmail
     /**
      * @var EmailAddress
      *
-     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER", cascade={"persist"})
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
      * @JMS\Exclude
      */
@@ -121,15 +118,6 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailRecipient[]")
      */
     protected $recipients;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="received", type="datetime")
-     * @Soap\ComplexType("dateTime")
-     * @JMS\Type("dateTime")
-     */
-    protected $receivedAt;
 
     /**
      * @var \DateTime
@@ -167,15 +155,6 @@ class Email extends ExtendEmail
     protected $head = true;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("boolean")
-     * @JMS\Type("boolean")
-     */
-    protected $seen = false;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="message_id", type="string", length=255)
@@ -183,6 +162,15 @@ class Email extends ExtendEmail
      * @JMS\Type("string")
      */
     protected $messageId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="multi_message_id", type="text", nullable=true)
+     * @Soap\ComplexType("string")
+     * @JMS\Type("string")
+     */
+    protected $multiMessageId;
 
     /**
      * @var string
@@ -222,22 +210,28 @@ class Email extends ExtendEmail
     protected $refs;
 
     /**
-     * @var ArrayCollection|EmailFolder[] $folders
+     * @var EmailBody
      *
-     * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
-     * @ORM\JoinTable(name="oro_email_to_folder")
-     * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailBody", inversedBy="email", cascade={"persist"})
+     * @ORM\JoinColumn(name="email_body_id", referencedColumnName="id", onDelete="SET NULL")
      * @JMS\Exclude
      */
-    protected $folders;
+    protected $emailBody;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="EmailBody", mappedBy="header", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
+     *      cascade={"persist", "remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
-    protected $emailBody;
+    protected $emailUsers;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $acceptLanguageHeader;
 
     public function __construct()
     {
@@ -245,8 +239,7 @@ class Email extends ExtendEmail
 
         $this->importance = self::NORMAL_IMPORTANCE;
         $this->recipients = new ArrayCollection();
-        $this->emailBody  = new ArrayCollection();
-        $this->folders    = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
     }
 
     /**
@@ -267,6 +260,16 @@ class Email extends ExtendEmail
     public function getCreated()
     {
         return $this->created;
+    }
+
+    /**
+     * Set entity created date/time
+     *
+     * @param \DateTime $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
     }
 
     /**
@@ -379,30 +382,6 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get date/time when email received
-     *
-     * @return \DateTime
-     */
-    public function getReceivedAt()
-    {
-        return $this->receivedAt;
-    }
-
-    /**
-     * Set date/time when email received
-     *
-     * @param \DateTime $receivedAt
-     *
-     * @return Email
-     */
-    public function setReceivedAt($receivedAt)
-    {
-        $this->receivedAt = $receivedAt;
-
-        return $this;
-    }
-
-    /**
      * Get date/time when email sent
      *
      * @return \DateTime
@@ -499,30 +478,6 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get if email is seen
-     *
-     * @return bool
-     */
-    public function isSeen()
-    {
-        return $this->seen;
-    }
-
-    /**
-     * Set email is read flag
-     *
-     * @param boolean $seen
-     *
-     * @return self
-     */
-    public function setSeen($seen)
-    {
-        $this->seen = (bool)$seen;
-
-        return $this;
-    }
-
-    /**
      * Get value of email Message-ID header
      *
      * @return string
@@ -542,6 +497,30 @@ class Email extends ExtendEmail
     public function setMessageId($messageId)
     {
         $this->messageId = $messageId;
+
+        return $this;
+    }
+
+    /**
+     * Get array values of email Message-ID header
+     *
+     * @return array|null
+     */
+    public function getMultiMessageId()
+    {
+        return $this->multiMessageId ? unserialize($this->multiMessageId) : null;
+    }
+
+    /**
+     * Set array values of email Message-ID header
+     *
+     * @param array $multiMessageId
+     *
+     * @return Email
+     */
+    public function setMultiMessageId($multiMessageId)
+    {
+        $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
 
         return $this;
     }
@@ -648,65 +627,13 @@ class Email extends ExtendEmail
     }
 
     /**
-     * Get email folders
-     *
-     * @return ArrayCollection|EmailFolder[]
-     */
-    public function getFolders()
-    {
-        return $this->folders;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return bool
-     */
-    public function hasFolder(EmailFolder $folder)
-    {
-        return $this->folders->contains($folder);
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return Email
-     */
-    public function addFolder(EmailFolder $folder)
-    {
-        if (!$this->folders->contains($folder)) {
-            $this->folders->add($folder);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return Email
-     */
-    public function removeFolder(EmailFolder $folder)
-    {
-        if ($this->folders->contains($folder)) {
-            $this->folders->removeElement($folder);
-        }
-
-        return $this;
-    }
-
-    /**
      * Get cached email body
      *
      * @return EmailBody
      */
     public function getEmailBody()
     {
-        if ($this->emailBody->count() === 0) {
-            return null;
-        }
-
-        return $this->emailBody->first();
+        return $this->emailBody;
     }
 
     /**
@@ -718,11 +645,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
-        if ($this->emailBody->count() > 0) {
-            $this->emailBody->clear();
-        }
-        $emailBody->setHeader($this);
-        $this->emailBody->add($emailBody);
+        $this->emailBody = $emailBody;
 
         return $this;
     }
@@ -734,7 +657,7 @@ class Email extends ExtendEmail
      */
     public function beforeSave()
     {
-        $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->created = $this->created ?: new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -805,5 +728,88 @@ class Email extends ExtendEmail
         }
 
         return $hasAttachment;
+    }
+
+    /**
+     * @return ArrayCollection|EmailUser[]
+     */
+    public function getEmailUsers()
+    {
+        return $this->emailUsers;
+    }
+
+    /**
+     * @param EmailFolder $emailFolder
+     *
+     * @return EmailUser|null
+     */
+    public function getEmailUserByFolder(EmailFolder $emailFolder)
+    {
+        $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
+            /** @var EmailUser $entry */
+            return $entry->getFolder() === $emailFolder;
+        });
+        if ($emailUsers != null && count($emailUsers) > 0) {
+            return $emailUsers->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param EmailUser $emailUser
+     *
+     * @return $this
+     */
+    public function addEmailUser(EmailUser $emailUser)
+    {
+        if (!$this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->add($emailUser);
+            $emailUser->setEmail($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param EmailUser $emailUser
+     *
+     * @return $this
+     */
+    public function removeEmailUser(EmailUser $emailUser)
+    {
+        if ($this->emailUsers->contains($emailUser)) {
+            $this->emailUsers->removeElement($emailUser);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcceptLanguageHeader()
+    {
+        return $this->acceptLanguageHeader;
+    }
+
+    /**
+     * @param string $acceptLanguageHeader
+     */
+    public function setAcceptLanguageHeader($acceptLanguageHeader = null)
+    {
+        $this->acceptLanguageHeader = $acceptLanguageHeader;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAcceptedLocales()
+    {
+        if (!$this->acceptLanguageHeader) {
+            return [];
+        }
+
+        return array_keys(AcceptHeader::fromString($this->acceptLanguageHeader)->all());
     }
 }

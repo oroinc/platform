@@ -13,6 +13,7 @@ oro:
         start_at.label:                   Start At
         state.label:                      State
         subject.label:                    Subject
+        sender.label:                     Sender
 
         entity_label:        Reminder
         entity_plural_label: Reminders

@@ -36,6 +36,9 @@ oro:
                 name:               Name
                 entity:             Entity
                 report_type:        Report type
+            row:
+                action:
+                    view:           View
         form:
             designer:               Designer
             chart_designer:         Chart Designer

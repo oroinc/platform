@@ -6,13 +6,6 @@
 {% set gridName = 'role-users-grid' %}
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
-{% block head_script %}
-    {{ parent() }}
-    <script type="text/javascript">
-        require(['orosecurity/js/security-access-levels'])
-    </script>
-{% endblock %}
-
 {% block navButtons %}
     {% if entityId and resource_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
@@ -68,6 +61,21 @@
             }
         ]
     }] %}
+
+    {% set additionalData = [] %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set additionalData = additionalData|merge([form_row(child)]) %}
+    {% endfor %}
+    {% if additionalData is not empty %}
+        {% set dataBlocks = dataBlocks|merge([{
+        'title': 'Additional'|trans,
+        'subblocks': [{
+        'title': '',
+        'useSpan': false,
+        'data' : additionalData
+        }]
+        }] ) %}
+    {% endif %}
 
     {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
         {% set dataBlocks = dataBlocks|merge([{

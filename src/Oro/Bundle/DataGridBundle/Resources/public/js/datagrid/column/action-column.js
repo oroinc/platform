@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backgrid',
     'oro/datagrid/cell/action-cell',
     '../header-cell/action-header-cell'
-], function (_, Backgrid, ActionCell, ActionHeaderCell) {
+], function(_, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
 
     var ActionColumn;
@@ -34,7 +32,7 @@ define([
         /**
          * {@inheritDoc}
          */
-        initialize: function (attributes) {
+        initialize: function(attributes) {
             var attrs = attributes || {};
             if (!attrs.cell) {
                 attrs.cell = this.defaults.cell;

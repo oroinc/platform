@@ -90,7 +90,7 @@ oro:
             title.label:             Title
             type.label:              Type
             event_date.label:        Event date
-            identifier_detected.label: Logged in
+            identifier_detected.label: Identified
 
         trackingeventdictionary:
             entity_label:        Tracking Visit Library

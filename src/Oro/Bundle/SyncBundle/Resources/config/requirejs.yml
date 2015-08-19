@@ -1,17 +1,5 @@
 config:
     shim:
-        'cryptojs/enc-base64':
-            deps:
-                - 'cryptojs/core'
-        'cryptojs/hmac':
-            deps:
-                - 'cryptojs/core'
-        'cryptojs/sha256':
-            deps:
-                - 'cryptojs/core'
-        'cryptojs/pbkdf2':
-            deps:
-                - 'cryptojs/core'
         'autobahn':
             deps:
                 - 'when'
@@ -25,11 +13,6 @@ config:
         'autobahn':
             'when': 'orosync/js/extend/when'
     paths:
-        'cryptojs/core': 'bundles/orosync/lib/cryptojs/core-min.js'
-        'cryptojs/enc-base64': 'bundles/orosync/lib/cryptojs/enc-base64-min.js'
-        'cryptojs/hmac': 'bundles/orosync/lib/cryptojs/hmac-min.js'
-        'cryptojs/sha256': 'bundles/orosync/lib/cryptojs/sha256-min.js'
-        'cryptojs/pbkdf2': 'bundles/orosync/lib/cryptojs/pbkdf2-min.js'
         'when': 'bundles/orosync/lib/when.js'
         'autobahn': 'bundles/orosync/lib/autobahn.js'
 

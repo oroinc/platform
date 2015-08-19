@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TrackingBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,14 +15,14 @@ use Oro\Bundle\TrackingBundle\Processor\TrackingProcessor;
 class TrackCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const STATUS_SUCCESS = 0;
-    const COMMAND_NAME = 'oro:cron:tracking:parse';
+    const COMMAND_NAME   = 'oro:cron:tracking:parse';
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
-        return '*/15 * * * *';
+        return '*/5 * * * *';
     }
 
     /**
@@ -31,7 +32,13 @@ class TrackCommand extends ContainerAwareCommand implements CronCommandInterface
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Parse tracking logs');
+            ->setDescription('Parse tracking logs')
+            ->addOption(
+                'max-execution-time',
+                'm',
+                InputOption::VALUE_OPTIONAL,
+                'Max execution time (in minutes). "0" means - unlimited. <comment>(default: 5)</comment>'
+            );
     }
 
     /**
@@ -48,6 +55,11 @@ class TrackCommand extends ContainerAwareCommand implements CronCommandInterface
 
         /** @var TrackingProcessor $processor */
         $processor = $this->getContainer()->get('oro_tracking.processor.tracking_processor');
+
+        $maxExecutionTime = $input->getOption('max-execution-time');
+        if ($maxExecutionTime && is_numeric($maxExecutionTime)) {
+            $processor->setMaxExecutionTime($maxExecutionTime);
+        }
 
         $processor->setLogger($logger);
         $processor->process();

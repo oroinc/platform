@@ -8,63 +8,24 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class TransactionEmails
  *
  * @package Oro\Bundle\TranslationBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\NotificationBundle\Tests\Selenium\Pages\TransactionEmails
- *          openTransactionEmails() openTransactionEmails()
- * @method \Oro\Bundle\NotificationBundle\Tests\Selenium\Pages\TransactionEmails
- *          assertTitle() assertTitle($title, $message = '')
+ * @method TransactionEmails openTransactionEmails(string $bundlePath)
+ * @method TransactionEmails assertTitle($title, $message = '')
+ * @method TransactionEmail add()
+ * @method TransactionEmail open(array $filter)
  */
 class TransactionEmails extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Notification Rule']";
     const URL = 'notification/email';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
-     * @return TransactionEmail
-     */
-    public function add()
-    {
-        $this->test->byXPath("//a[@title='Create Notification Rule']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new TransactionEmail($this->test);
     }
 
-    /**
-     * @param array $entityData
-     * @return TransactionEmail
-     */
-    public function open($entityData = array())
+    public function entityView()
     {
-        $transactionEmail = $this->getEntity($entityData);
-        $transactionEmail->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         return new TransactionEmail($this->test);
-    }
-
-    public function delete($filterBy, $entityName)
-    {
-        $this->filterBy($filterBy, $entityName);
-        $this->waitForAjax();
-        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        // hover will show menu, 1st click - will hide, 2nd - will show again
-        $action->click();
-        $action->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->waitForAjax();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
-        return $this;
     }
 
     /**

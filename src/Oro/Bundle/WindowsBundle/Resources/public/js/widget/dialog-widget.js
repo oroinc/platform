@@ -1,18 +1,17 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DialogWidget,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        tools = require('oroui/js/tools'),
-        error = require('oroui/js/error'),
-        messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        layout = require('oroui/js/layout'),
-        AbstractWidget = require('oroui/js/widget/abstract-widget'),
-        StateModel = require('orowindows/js/dialog/state/model');
+    var DialogWidget;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var error = require('oroui/js/error');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var layout = require('oroui/js/layout');
+    var AbstractWidget = require('oroui/js/widget/abstract-widget');
+    var StateModel = require('orowindows/js/dialog/state/model');
     require('jquery.dialog.extended');
 
     /**
@@ -113,7 +112,7 @@ define(function (require) {
          *
          * @param {Function|undefined} onClose External onClose handler
          */
-        closeHandler: function (onClose) {
+        closeHandler: function(onClose) {
             if (_.isFunction(onClose)) {
                 onClose();
             }
@@ -154,7 +153,7 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isEmbedded: function () {
+        isEmbedded: function() {
             // modal dialogs has same life cycle as embedded widgets
             return this._isEmbedded || this.options.dialogOptions.modal;
         },
@@ -162,7 +161,7 @@ define(function (require) {
         /**
          * Handles content load event and sets focus on first form input
          */
-        onContentUpdated: function () {
+        onContentUpdated: function() {
             this.$('form:first').focusFirstInput();
         },
 
@@ -212,7 +211,7 @@ define(function (require) {
          * Handles page change
          *  - closes dialogs with not tracked state (eg. modal dialogs)
          */
-        onPageChange: function () {
+        onPageChange: function() {
             if (!this.options.stateEnabled) {
                 this.remove();
             }
@@ -261,7 +260,7 @@ define(function (require) {
         /**
          * Show dialog
          */
-        show: function () {
+        show: function() {
             var dialogOptions;
             if (!this.widget) {
                 dialogOptions = _.extend({}, this.options.dialogOptions);
@@ -273,7 +272,7 @@ define(function (require) {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
                 this.widget = $('<div/>');
-                this._transmitDialogEvents();
+                this._bindDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
@@ -281,7 +280,6 @@ define(function (require) {
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             DialogWidget.__super__.show.apply(this);
-            this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
             this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
@@ -292,22 +290,27 @@ define(function (require) {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
             }, this));
-
-            this.widget.on('dialogresizestop', _.bind(this._fixBorderShifting, this));
         },
 
-        _afterLayoutInit: function () {
+        _afterLayoutInit: function() {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.renderDeferred) {
+                this.renderDeferred.resolve();
+                delete this.renderDeferred;
+            }
         },
 
         _initAdjustHeight: function(content) {
-            this.widget.off('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
+            this.widget.off('.adjust-height-events');
             var scrollableContent = content.find('.scrollable-container');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on('dialogresize dialogmaximize dialogrestore', _.bind(this._fixScrollableHeight, this));
+                var events = [
+                    'dialogresize.adjust-height-events',
+                    'dialogmaximize.adjust-height-events',
+                    'dialogrestore.adjust-height-events'
+                ];
+                this.widget.on(events.join(''), _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
         },
@@ -321,27 +324,17 @@ define(function (require) {
             }
         },
 
-        _fixBorderShifting: function() {
-            var dialogWidget = this.widget.dialog('widget');
-            var widthShift
-                = parseInt(dialogWidget.css('border-left-width')) + parseInt(dialogWidget.css('border-right-width'));
-            var heightShift
-                = parseInt(dialogWidget.css('border-top-width')) + parseInt(dialogWidget.css('border-bottom-width'));
-            this.widget.width(this.widget.width() - widthShift);
-            this.widget.height(this.widget.height() - heightShift);
-            this._fixScrollableHeight();
-        },
-
         _fixScrollableHeight: function() {
             var widget = this.widget;
             if (!tools.isMobile()) {
-                widget.find('.scrollable-container').each(_.bind(function(i, el){
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
+                widget.find('.scrollable-container').each(_.bind(function(i, el) {
                     var $el = $(el);
                     var height = widget.height() - $el.position().top;
                     if (height) {
                         $el.outerHeight(height);
                     }
-                },this));
+                }, this));
             }
             layout.updateResponsiveLayout();
         },
@@ -380,32 +373,58 @@ define(function (require) {
         },
 
         /**
-         * Transmits dialog window state events over system message bus
-         *
-         * @protected
-         */
-        _transmitDialogEvents: function () {
-            var self = this;
-            this.widget.on('dialogbeforeclose', function () {
-                mediator.trigger('widget_dialog:close', self);
-            });
-            this.widget.on('dialogopen', function () {
-                mediator.trigger('widget_dialog:open', self);
-            });
-            this.widget.on('dialogstatechange', function (event, data) {
-                if (data.state !== data.oldState) {
-                    mediator.trigger('widget_dialog:stateChange', self);
-                }
-            });
-        },
-
-        /**
          * Returns state of the dialog
          *
          * @returns {string}
          */
-        getState: function () {
+        getState: function() {
             return this.widget.dialog('state');
+        },
+
+        /**
+         * Binds dialog window state events,
+         * Transmits open/close/statechange events over system message bus
+         *
+         * @protected
+         */
+        _bindDialogEvents: function() {
+            var self = this;
+            this.widget.on('dialogbeforeclose', function() {
+                mediator.trigger('widget_dialog:close', self);
+            });
+            this.widget.on('dialogopen', function() {
+                mediator.trigger('widget_dialog:open', self);
+            });
+            this.widget.on('dialogstatechange', function(event, data) {
+                if (data.state !== data.oldState) {
+                    mediator.trigger('widget_dialog:stateChange', self);
+                }
+            });
+            this.widget.on({
+                'dialogresizestart': _.bind(this.onResizeStart, this),
+                'dialogresize dialogmaximize dialogrestore': _.bind(this.onResize, this),
+                'dialogresizestop': _.bind(this.onResizeStop, this)
+            });
+        },
+
+        onResizeStart: function(event) {
+            this.$el.css({overflow: 'hidden'});
+            this.forEachComponent(function(component) {
+                component.trigger('parentResizeStart', event, this);
+            });
+        },
+
+        onResize: function(event) {
+            this.forEachComponent(function(component) {
+                component.trigger('parentResize', event, this);
+            });
+        },
+
+        onResizeStop: function(event) {
+            this.$el.css({overflow: ''});
+            this.forEachComponent(function(component) {
+                component.trigger('parentResizeStop', event, this);
+            });
         }
     });
 

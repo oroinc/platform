@@ -7,13 +7,14 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 class SegmentSnapshotRepository extends EntityRepository
 {
     const DELETE_BATCH_SIZE = 20;
 
     /**
-     * @param array $entities
+     * @param array    $entities
      * @param int|null $batchSize
      * @throws \Exception
      */
@@ -64,9 +65,9 @@ class SegmentSnapshotRepository extends EntityRepository
      */
     public function removeByEntity($entity)
     {
-        $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities(array($entity));
+        $deleteQB = $this->getSnapshotDeleteQueryBuilderByEntities([$entity]);
 
-        return $deleteQB ? $deleteQB->getQuery()->execute() : array();
+        return $deleteQB ? $deleteQB->getQuery()->execute() : [];
     }
 
     /**
@@ -82,7 +83,7 @@ class SegmentSnapshotRepository extends EntityRepository
             throw new \InvalidArgumentException('List of entity can not be empty');
         }
 
-        $deleteParams  = array();
+        $deleteParams  = [];
         $entityManager = $this->getEntityManager();
 
         $segmentQB = $entityManager->createQueryBuilder();
@@ -90,7 +91,7 @@ class SegmentSnapshotRepository extends EntityRepository
 
         foreach ($entities as $key => $entity) {
             if (is_array($entity) && array_key_exists('id', $entity)) {
-                $entityId = $entity['id'];
+                $entityId  = $entity['id'];
                 $className = ClassUtils::getClass($entity['entity']);
             } else {
                 /** @var object $entity */
@@ -157,13 +158,13 @@ class SegmentSnapshotRepository extends EntityRepository
     public function getIdentifiersSelectQueryBuilder(Segment $segment)
     {
         $entityMetadata = $this->getEntityManager()->getClassMetadata($segment->getEntity());
-        $idField = $entityMetadata->getSingleIdentifierFieldName();
-        $idFieldType = $entityMetadata->getTypeOfField($idField);
+        $idField        = $entityMetadata->getSingleIdentifierFieldName();
+        $idFieldType    = $entityMetadata->getTypeOfField($idField);
+        $fieldToSelect  = SegmentSnapshot::ENTITY_REF_FIELD;
         if ($idFieldType == 'integer') {
-            $fieldToSelect = 'CAST(snp.entityId as int)';
-        } else {
-            $fieldToSelect = 'snp.entityId';
+            $fieldToSelect = SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
         }
+        $fieldToSelect = sprintf('snp.%s', $fieldToSelect);
 
         $qb = $this->createQueryBuilder('snp')
             ->select($fieldToSelect)

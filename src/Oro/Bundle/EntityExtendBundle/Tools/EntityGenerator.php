@@ -29,6 +29,26 @@ class EntityGenerator
      */
     public function __construct($cacheDir)
     {
+        $this->setCacheDir($cacheDir);
+    }
+
+    /**
+     * Gets the cache directory
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
+    }
+
+    /**
+     * Sets the cache directory
+     *
+     * @param string $cacheDir
+     */
+    public function setCacheDir($cacheDir)
+    {
         $this->cacheDir       = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
     }
@@ -52,10 +72,12 @@ class EntityGenerator
      */
     public function generate(array $schemas)
     {
+        ExtendClassLoadingUtils::ensureDirExists($this->entityCacheDir);
+
         $aliases = [];
         foreach ($schemas as $schema) {
             $this->generateSchemaFiles($schema);
-            if ($schema['type'] == 'Extend') {
+            if ($schema['type'] === 'Extend') {
                 $aliases[$schema['entity']] = $schema['parent'];
             }
         }

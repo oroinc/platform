@@ -3,6 +3,8 @@ parameters:
     oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
     oro_embedded_form.back_link.twig.extension.class:        Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
     oro_embedded_form.form_type.class:                       Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
+    oro_embedded_form.embed_form_layout_manager.class:       Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager
+
 services:
     oro_embedded_form.form_type.available_embedded_form:
         class: %oro.embedded_form.form_type.available_form.class%
@@ -29,3 +31,19 @@ services:
         class: %oro_embedded_form.form_type.class%
         tags:
             - { name: form.type, alias: embedded_form }
+
+    oro_embedded_form.embed_form_layout_manager:
+        class: %oro_embedded_form.embed_form_layout_manager.class%
+        arguments:
+            - @oro_layout.layout_manager
+            - @oro_embedded_form.manager
+
+    oro_embedded_form.layout.block_type.success_message:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType
+        tags:
+             - { name: layout.block_type, alias: embed_form_success }
+
+    oro_embedded_form.layout.block_type.default_form:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType
+        tags:
+             - { name: layout.block_type, alias: embed_form_legacy_form }

@@ -92,24 +92,23 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function getUsedJoinAliases($joins, $aliases, $rootAlias)
     {
-        $incomeAliasesCount = count($aliases);
-        /** @var Expr\Join $join */
-        foreach ($joins[$rootAlias] as $join) {
-            $joinTable = $join->getJoin();
-            $joinCondition = $join->getCondition();
-            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
-                $data = explode('.', $joinTable);
-                if (!in_array($data[0], $aliases)) {
-                    $aliases[] = $data[0];
+        $joinDependencies = $this->getJoinDependencies($joins[$rootAlias]);
+        $needProcessing   = !empty($joinDependencies);
+        while ($needProcessing) {
+            $needProcessing = false;
+            foreach ($joinDependencies as $alias => $data) {
+                if (in_array($alias, $aliases, true)) {
+                    foreach ($data[1] as $dependedByAlias) {
+                        if (!in_array($dependedByAlias, $aliases, true)) {
+                            $aliases[]      = $dependedByAlias;
+                            $needProcessing = true;
+                        }
+                    }
+                } elseif ($data[0] === Expr\Join::INNER_JOIN) {
+                    $aliases[]      = $alias;
+                    $needProcessing = true;
                 }
             }
-            $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
-        }
-
-        $aliases = array_unique($aliases);
-        if ($incomeAliasesCount !== count($aliases)) {
-            // resolve joins recursively in order to fetch dependencies between joins
-            return $this->getUsedJoinAliases($joins, $aliases, $rootAlias);
         }
 
         return $aliases;
@@ -268,5 +267,36 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         }
 
         return array_unique($usedAliases);
+    }
+
+    /**
+     * @param Expr\Join[] $joins
+     *
+     * @return array [joinAlias => [joinType, [dependedByAlias1, dependedByAlias2, ...]]]
+     */
+    protected function getJoinDependencies($joins)
+    {
+        $joinDependencies = [];
+        /** @var Expr\Join $join */
+        foreach ($joins as $join) {
+            $joinTable = $join->getJoin();
+            $joinAlias = $join->getAlias();
+
+            $joinDependencies[$joinAlias] = [$join->getJoinType(), []];
+            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
+                $data                              = explode('.', $joinTable);
+                $joinDependencies[$joinAlias][1][] = $data[0];
+            }
+
+            $joinCondition = $join->getCondition();
+            if ($joinCondition) {
+                $joinDependencies[$joinAlias][1] = array_merge(
+                    $joinDependencies[$joinAlias][1],
+                    array_diff($this->getUsedTableAliases($joinCondition), [$joinAlias])
+                );
+            }
+        }
+
+        return $joinDependencies;
     }
 }

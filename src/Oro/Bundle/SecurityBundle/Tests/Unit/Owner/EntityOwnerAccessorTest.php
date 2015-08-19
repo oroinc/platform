@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\OwnershipMetadataProviderStub;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntityWithOwnerFieldButWithoutGetOwnerMethod;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
@@ -23,6 +23,14 @@ class EntityOwnerAccessorTest extends \PHPUnit_Framework_TestCase
         $obj2 = new TestEntityWithOwnerFieldButWithoutGetOwnerMethod('testOwner2');
         $metadataProvider->setMetadata(get_class($obj2), new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id'));
         $this->assertEquals('testOwner2', $accessor->getOwner($obj2));
+
+        $obj1 = new TestEntity('testId3');
+        $obj1->setCustomOwner('testOwner3');
+        $metadataProvider->setMetadata(
+            get_class($obj1),
+            new OwnershipMetadata('ORGANIZATION', 'customOwner', 'custom_owner_id')
+        );
+        $this->assertEquals('testOwner3', $accessor->getOwner($obj1));
     }
 
     public function testGetOwnerNoMetadata()

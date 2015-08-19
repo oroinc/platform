@@ -21,8 +21,6 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisitEvent;
  */
 class TrackingVisitEvent extends ExtendTrackingVisitEvent
 {
-    const ENTITY_NAME = 'Oro\Bundle\TrackingBundle\Entity\TrackingVisitEvent';
-
     /**
      * @var integer
      *
@@ -44,7 +42,7 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
      * @var TrackingEventDictionary
      *
      * @ORM\ManyToOne(targetEntity="TrackingEventDictionary", fetch="EXTRA_LAZY", inversedBy="visitEvents")
-     * @ORM\JoinColumn(name="event_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="event_id", onDelete="CASCADE", referencedColumnName="id")
      */
     protected $event;
 

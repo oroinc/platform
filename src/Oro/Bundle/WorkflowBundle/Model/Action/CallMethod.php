@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
@@ -21,7 +21,7 @@ class CallMethod extends AbstractAction
         $object = $this->getObject($context);
         $method = $this->getMethod();
         if ($object) {
-            $callback = array($object, $method);
+            $callback = [$object, $method];
         } else {
             $callback = $method;
         }
@@ -37,7 +37,7 @@ class CallMethod extends AbstractAction
     }
 
     /**
-     * @return PropertyPath|null
+     * @return PropertyPathInterface|null
      */
     protected function getAttribute()
     {
@@ -69,7 +69,7 @@ class CallMethod extends AbstractAction
      */
     protected function getMethodParameters($context)
     {
-        $parameters = $this->getOption($this->options, 'method_parameters', array());
+        $parameters = $this->getOption($this->options, 'method_parameters', []);
 
         foreach ($parameters as $name => $value) {
             $parameters[$name] = $this->contextAccessor->getValue($context, $value);
@@ -87,7 +87,7 @@ class CallMethod extends AbstractAction
             throw new InvalidParameterException('Method name parameter is required');
         }
 
-        if (!empty($options['object']) && !$options['object'] instanceof PropertyPath) {
+        if (!empty($options['object']) && !$options['object'] instanceof PropertyPathInterface) {
             throw new InvalidParameterException('Object must be valid property definition');
         }
 

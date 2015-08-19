@@ -9,7 +9,7 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
@@ -21,8 +21,8 @@ class CalendarEventManager
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var NameFormatter */
-    protected $nameFormatter;
+    /** @var EntityNameResolver */
+    protected $entityNameResolver;
 
     /** @var SystemCalendarConfig */
     protected $calendarConfig;
@@ -30,19 +30,19 @@ class CalendarEventManager
     /**
      * @param DoctrineHelper       $doctrineHelper
      * @param SecurityFacade       $securityFacade
-     * @param NameFormatter        $nameFormatter
+     * @param EntityNameResolver   $entityNameResolver
      * @param SystemCalendarConfig $calendarConfig
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade,
-        NameFormatter $nameFormatter,
+        EntityNameResolver $entityNameResolver,
         SystemCalendarConfig $calendarConfig
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->securityFacade = $securityFacade;
-        $this->nameFormatter  = $nameFormatter;
-        $this->calendarConfig = $calendarConfig;
+        $this->doctrineHelper     = $doctrineHelper;
+        $this->securityFacade     = $securityFacade;
+        $this->entityNameResolver = $entityNameResolver;
+        $this->calendarConfig     = $calendarConfig;
     }
 
     /**
@@ -82,7 +82,7 @@ class CalendarEventManager
             ->getArrayResult();
         foreach ($calendars as &$calendar) {
             if (empty($calendar['name'])) {
-                $calendar['name'] = $this->nameFormatter->format($this->securityFacade->getLoggedUser());
+                $calendar['name'] = $this->entityNameResolver->getName($this->securityFacade->getLoggedUser());
             }
         }
 

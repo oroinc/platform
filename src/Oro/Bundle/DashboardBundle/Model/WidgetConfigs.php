@@ -4,9 +4,12 @@ namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
+use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -33,25 +36,37 @@ class WidgetConfigs
     /** @var ConfigValueProvider */
     protected $valueProvider;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param ConfigProvider         $configProvider
-     * @param SecurityFacade         $securityFacade
-     * @param ResolverInterface      $resolver
-     * @param EntityManagerInterface $entityManager
-     * @param ConfigValueProvider    $valueProvider
+     * @param ConfigProvider           $configProvider
+     * @param SecurityFacade           $securityFacade
+     * @param ResolverInterface        $resolver
+     * @param EntityManagerInterface   $entityManager
+     * @param ConfigValueProvider      $valueProvider
+     * @param TranslatorInterface      $translator
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
         ResolverInterface $resolver,
         EntityManagerInterface $entityManager,
-        ConfigValueProvider $valueProvider
+        ConfigValueProvider $valueProvider,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configProvider = $configProvider;
         $this->securityFacade = $securityFacade;
-        $this->resolver       = $resolver;
-        $this->entityManager  = $entityManager;
-        $this->valueProvider  = $valueProvider;
+        $this->resolver = $resolver;
+        $this->entityManager = $entityManager;
+        $this->valueProvider = $valueProvider;
+        $this->translator = $translator;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -139,7 +154,13 @@ class WidgetConfigs
         $widgetOptions = $this->getWidgetOptions($widgetId);
 
         $items = isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [];
-        $items = $this->filterWidgets($items, true, $widgetOptions->get('subWidgets', []));
+        $items = $this->filterWidgets($items);
+
+        if ($this->eventDispatcher->hasListeners(WidgetItemsLoadDataEvent::EVENT_NAME)) {
+            $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, $widgetOptions);
+            $this->eventDispatcher->dispatch(WidgetItemsLoadDataEvent::EVENT_NAME, $event);
+            $items = $event->getItems();
+        }
 
         foreach ($items as $itemName => $config) {
             $items[$itemName]['value'] = $this->resolver->resolve(
@@ -204,6 +225,24 @@ class WidgetConfigs
             $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $value);
         }
 
+        $options = $this->loadDefaultValue($options, $widgetConfig);
+
+        return $options;
+    }
+
+    /**
+     * @param $options
+     * @param $widgetConfig
+     *
+     * @return mixed
+     */
+    protected function loadDefaultValue($options, $widgetConfig)
+    {
+        if (!$options['title']['title'] || $options['title']['useDefault']) {
+            $options['title']['title'] = $this->translator->trans($widgetConfig['label']);
+            $options['title']['useDefault'] = true;
+        }
+
         return $options;
     }
 
@@ -211,23 +250,18 @@ class WidgetConfigs
      * Filter widget configs based on acl enabled, applicable flag and selected items
      *
      * @param array   $items
-     * @param boolean $applyVisible
-     * @param array   $visibleItems
      *
      * @return array filtered items
      */
-    protected function filterWidgets(array $items, $applyVisible = false, array $visibleItems = [])
+    protected function filterWidgets(array $items)
     {
         $securityFacade = $this->securityFacade;
         $resolver       = $this->resolver;
 
         return array_filter(
             $items,
-            function (&$item) use ($securityFacade, $resolver, $applyVisible, $visibleItems, &$items) {
+            function (&$item) use ($securityFacade, $resolver, &$items) {
                 $visible = true;
-                if ($applyVisible && !in_array(key($items), $visibleItems)) {
-                    $visible = false;
-                }
                 next($items);
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
@@ -237,7 +271,7 @@ class WidgetConfigs
                     $applicable = reset($resolved);
                 }
 
-                unset ($item['acl'], $item['applicable'], $item['enabled']);
+                unset($item['acl'], $item['applicable'], $item['enabled']);
 
                 return $visible && $enabled && $accessGranted && $applicable;
             }

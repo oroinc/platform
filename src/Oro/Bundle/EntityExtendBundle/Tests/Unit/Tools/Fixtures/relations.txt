@@ -15,15 +15,14 @@ class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterf
         if ((!$value instanceof \Traversable && !is_array($value) && !$value instanceof \ArrayAccess) ||
             !$this->rel1 instanceof \Doctrine\Common\Collections\Collection) {
             $this->rel1 = $value;
-
             return $this;
         }
-
-        $this->rel1->clear();
+        foreach ($this->rel1 as $item) {
+            $this->removeRel1($item);
+        }
         foreach ($value as $item) {
             $this->addRel1($item);
         }
-
         return $this;
     }
 

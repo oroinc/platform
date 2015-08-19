@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="test_search_item")
@@ -101,6 +102,14 @@ class Item implements TestFrameworkEntityInterface
      * @ORM\Column(name="phone1", type="string", nullable=true)
      */
     protected $phone;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @var Organization

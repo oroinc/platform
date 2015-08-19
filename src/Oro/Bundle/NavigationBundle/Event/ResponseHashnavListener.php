@@ -2,13 +2,11 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 class ResponseHashnavListener
 {
-
     const HASH_NAVIGATION_HEADER = 'x-oro-hash-navigation';
 
     /**
@@ -55,7 +53,7 @@ class ResponseHashnavListener
             $isFullRedirect = false;
             if ($response->isRedirect()) {
                 $location = $response->headers->get('location');
-                if (!is_object($this->security->getToken())) {
+                if ($request->attributes->get('_fullRedirect') || !is_object($this->security->getToken())) {
                     $isFullRedirect = true;
                 }
             }

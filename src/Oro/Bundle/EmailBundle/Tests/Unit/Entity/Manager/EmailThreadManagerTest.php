@@ -264,42 +264,36 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
     public function dataHeadProvider()
     {
         return [
-            'last unseen' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [false, false, false],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
-            'first all seen' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [true, true, true],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
-            'last unseen if the lastest is seen' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [true, false, false],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
-            'last unseen if and it is first' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [false, true, false],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
-            'unseen is single and last in list' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [true, true, false],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
-            'unseen is single and second in list' =>
-                [
-                    'setHead' => [true, false, false],
-                    'isSeen' => [true, false, true],
-                    'calls' => [1, 0, 0, 0, 0, 0]
-                ],
+            'last unseen' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [false, false, false],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
+            'first all seen' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [true, true, true],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
+            'last unseen if the lastest is seen' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [true, false, false],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
+            'last unseen if and it is first' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [false, true, false],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
+            'unseen is single and last in list' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [true, true, false],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
+            'unseen is single and second in list' => [
+                'setHead' => [true, false, false],
+                'isSeen' => [true, false, true],
+                'calls' => [1, 0, 0, 0, 0, 0]
+            ],
         ];
     }
 }

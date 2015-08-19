@@ -21,6 +21,7 @@
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
             <input type="hidden" name="{{ form.vars.full_name }}[organizations][]" value="{{ form.default_organization.vars.value }}" />
+            <input type="hidden" name="{{ form.vars.full_name }}[default_organization]" value="{{ form.default_organization.vars.value }}" />
             {{ _self.renderOrganizationChildren(
                 form,
                 form.vars.organization_tree_ids[0].organization,

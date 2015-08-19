@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+
 class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
 {
     /**
@@ -17,23 +19,31 @@ class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
                     'Previous date range configuration parameter should have dateRangeField attribute'
                 );
             }
-            $prevDateRange = $options[$config['converter_attributes']['dateRangeField']];
-            if (isset($prevDateRange['type'])) {
-                $prevDateRange = parent::getConvertedValue(
+            $currentDateRange = $options[$config['converter_attributes']['dateRangeField']];
+
+            if (isset($currentDateRange['value'])) {
+                $currentDateRange = parent::getConvertedValue(
                     $widgetConfig,
-                    $prevDateRange,
+                    $currentDateRange,
                     $config,
                     $options
                 );
             }
 
-            $from = $prevDateRange['start'];
-            $to   = $prevDateRange['end'];
+            if ($currentDateRange['type'] !== AbstractDateFilterType::TYPE_LESS_THAN) {
+                /**
+                 * @var \DateTime $from
+                 * @var \DateTime $to
+                 */
+                $from = $currentDateRange['start'];
+                $to   = $currentDateRange['end'];
 
-            $interval        = $from->diff($to);
-            $fromDate        = clone $from;
-            $result['start'] = $fromDate->sub($interval);
-            $result['end']   = clone $from;
+                $interval        = $from->diff($to);
+                $fromDate        = clone $from;
+                $result['start'] = $fromDate->sub($interval);
+                $result['end']   = clone $from;
+                $result['type']  = AbstractDateFilterType::TYPE_BETWEEN;
+            }
         }
 
         return $result;

@@ -28,13 +28,69 @@
 }
 
 .grid-views {
-  margin-left: 15px;
+  margin: 0 0 0 15px;
+
+  .page-title & {
+    float: left;
+  }
+
+  .btn,
+  .btn-group.open .btn.dropdown-toggle {
+    background: none;
+    background-color: inherit;
+    box-shadow: none;
+    text-decoration: none;
+
+    &:focus {
+      font-weight: normal;
+    }
+
+    .caret {
+      margin: 0 0 0 5px;
+      vertical-align: middle;
+    }
+  }
+
+  .actions-group {
+    .btn,
+    .btn-group.open .btn.dropdown-toggle {
+      color: #006acc;
+    }
+  }
+
+  .btn-link {
+      line-height: 32px;
+  }
+
+  .edited-label {
+    font-size: 13px;
+    color: #777;
+    vertical-align: bottom;
+    display: inline-block;
+    line-height: 24px;
+  }
+
+  .btn-toolbar {
+    margin: 0;
+    display: inline-block;
+  }
 }
 
 table.grid {
   overflow: hidden;
-  td.align-right, th.align-right {
-    text-align: right;
+  td, th {
+    &.align-right {
+      text-align: right;
+    }
+    &.align-left {
+      text-align: left;
+    }
+    &.align-center {
+      text-align: center;
+    }
+    > ul:only-child {
+      margin-bottom: 0;
+    }
   }
   thead {
     th {
@@ -117,10 +173,8 @@ table.grid {
   th:first-child {
       text-align: left !important;
   }
-  td:first-child:after {
-      content: '';
-      min-height: 14px;
-      display: inline-block;
+  td:first-child {
+      height: 30px;
   }
   .select-row-cell input[type=checkbox] {
       margin-top: -3px;
@@ -202,5 +256,32 @@ table .thead-sizing {
     thead.thead-sizing {
       display: table-header-group;
     }
+  }
+}
+td > .nowrap-ellipsis {
+  position: relative;
+  min-width: 100px;
+  > div {
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+}
+.td-expander {
+  font-size: 30px;
+  line-height: 0;
+  height: 0;
+  overflow: hidden;
+  &:before, &:after {
+    content: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ';
+  }
+}
+.radio-ul {
+  list-style-type: none;
+  margin-left: 0;
+  input, label {
+    margin: auto;
   }
 }

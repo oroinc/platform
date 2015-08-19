@@ -1,3 +1,4 @@
+@import "mixins";
 // Base
 * {
   -webkit-box-sizing:border-box;
@@ -127,6 +128,9 @@ label, input, button, select, textarea { font-size:13px;}
         padding-top:7px;
         width: 100%;
         word-wrap: break-word;
+        &.html-content {
+          overflow: auto;
+        }
       }
       label.control-label {
         width: auto;
@@ -826,12 +830,24 @@ footer {
   cursor: auto;
 }
 .ui-dialog-content {
-  margin: @verticalPadding/2 @horizontalPadding/2;
+  padding: @verticalPadding/2 @horizontalPadding/2 0 @verticalPadding/2;
+  margin: 0 auto;
   position: relative;
   min-width: 250px;
+  width: 100% !important;
+  height: calc(~"100% - 81px") !important;
   .ui-resizable-handle {
     cursor: move;
   }
+}
+.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 32px") !important;
+  border-radius: 0 0 3px 3px;
+}
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 50px") !important;
+  border-radius: 0 0 3px 3px;
+  border-bottom: 1px solid #e5e5e5;
 }
 .ui-dialog .widget-actions-section .btn,
 .ui-dialog .widget-actions-section a.action {
@@ -911,6 +927,11 @@ footer {
   &:empty {
     display: none;
   }
+}
+.extra-list .extra-list-element {
+  vertical-align: top;
+  line-height: 1.2em;
+  padding-bottom: 5px;
 }
 .a2lix_translations {
   .nav-tabs {
@@ -1021,9 +1042,15 @@ footer {
   line-height:1.2em;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"], [class*=" icon-"],
+[class^="fa-"], [class*=" fa-"] {
   margin: 0 3px;
 }
+
+.fa-google {
+  margin: 0 5px;
+}
+
 .icons-holder [class^="icon-"],
 .icons-holder [class*=" icon-"] {
   margin: 0 -3px;
@@ -1441,6 +1468,7 @@ footer {
 .oro-modal-normal{
   background-color: #fff;
   width: 700px;
+  margin-left: -350px;
   height: 450px;
   top: 20%;
   .modal-header{
@@ -1569,6 +1597,8 @@ footer {
     color: #fff;
     font-size: @baseFontSize;
     display: block;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
   }
   .ui-dialog-titlebar-buttonpane {
@@ -1698,6 +1728,7 @@ footer {
 }
 .ui-dialog.ui-widget-content {
   border: 1px solid #bbb;
+  background-color: #fafafa;
 }
 .user-info-state {
   clear: right;
@@ -2354,7 +2385,8 @@ div.uploader.focus,
 .alert-error > ul{
   margin-bottom: 0;
 }
-#flash-messages {
+#flash-messages,
+.flash-messages {
   position: relative;
   .alert {
     margin: 3px 0 0;
@@ -2595,6 +2627,25 @@ label.radio.error {
       color:#888;
     }
   }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
   .row-oro.oro-multiselect-holder {
     margin: 0 0 5px;
   }
@@ -2705,9 +2756,11 @@ label.radio.error {
   }
   .box-content {
     padding: 20px 15px;
-    background: url("../../img/vertical-separator.png") repeat-y 50% 0;
-    .responsive-small &, .responsive-big & {
-      background: none;
+    &.box-split-content {
+      background: url("../../img/vertical-separator.png") repeat-y center 0;
+      .responsive-small &, .responsive-big & {
+        background-image: none;
+      }
     }
   }
   .list-inline {
@@ -2764,7 +2817,6 @@ iframe.email-body {
   &>div {
     display: inline-block;
     margin-right: 20px;
-    min-width: 250px;
   }
   input[type="checkbox"]{
     margin: 0;
@@ -3146,4 +3198,16 @@ label .popover-content {
 
 .invisible {
   opacity: 0;
+}
+// dropdowns should be able to exceed accordion body area
+.accordion-body {
+  .clearfix();
+  // once accordion is opened and animation is finished
+  &[style="height: auto;"] {
+    overflow: visible;
+  }
+  &.in {
+    // fixes expand in FF
+    min-height: 1px;
+  }
 }

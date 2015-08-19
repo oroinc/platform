@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -226,19 +225,21 @@ class SegmentFilter extends EntityFilter
      */
     protected function getIdentityFieldWithAlias(QueryBuilder $queryBuilder, Segment $segment)
     {
-        $tableAliases = $queryBuilder->getRootAliases();
-        $em           = $queryBuilder->getEntityManager();
-        $entities     = $queryBuilder->getRootEntities();
+        $tableAliases   = $queryBuilder->getRootAliases();
+        $em             = $queryBuilder->getEntityManager();
+        $entityMetadata = $em->getClassMetadata($segment->getEntity());
+        $idField        = $entityMetadata->getSingleIdentifierFieldName();
 
         if ($this->isDynamic($segment)) {
-            /** @var ClassMetaData $metaData */
-            $metaData = $em->getClassMetadata($entities[0]);
-            /** @var array $primaryKey */
-            $primaryKey = $metaData->getIdentifierFieldNames();
-
-            return $tableAliases[0] . '.' . $primaryKey[0];
+            return $tableAliases[0] . '.' . $idField;
         }
 
-        return 'CAST(' . $tableAliases[0] . '.' . SegmentSnapshot::ENTITY_REF_FIELD . ' as int)';
+        $idFieldType   = $entityMetadata->getTypeOfField($idField);
+        $fieldToSelect = SegmentSnapshot::ENTITY_REF_FIELD;
+        if ($idFieldType == 'integer') {
+            $fieldToSelect = SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
+        }
+
+        return $tableAliases[0] . '.' . $fieldToSelect;
     }
 }

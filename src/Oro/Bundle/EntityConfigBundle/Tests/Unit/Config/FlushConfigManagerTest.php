@@ -119,16 +119,14 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             new ServiceLink($this->container, 'ConfigProviderBag'),
             $this->modelManager,
-            $this->auditManager
+            $this->auditManager,
+            $this->configCache
         );
-
-        $this->configManager->setCache($this->configCache);
     }
 
     public function testFlush()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $model     = new EntityConfigModel(self::ENTITY_CLASS);
+        $model = new EntityConfigModel(self::ENTITY_CLASS);
 
         $entityConfigId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $entityConfig   = new Config($entityConfigId);
@@ -142,8 +140,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
                         'label' => ['options' => ['indexed' => true]]
                     ]
                 ]
-            ],
-            $container
+            ]
         );
         $this->entityConfigProvider->expects($this->once())
             ->method('getPropertyConfig')
@@ -159,8 +156,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
                         'attr1' => []
                     ]
                 ]
-            ],
-            $container
+            ]
         );
         $this->testConfigProvider->expects($this->once())
             ->method('getPropertyConfig')
@@ -221,9 +217,11 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setFlushExpectations($em, $models)
     {
         $this->configCache->expects($this->once())
-            ->method('removeAllConfigurable');
+            ->method('deleteAllConfigurable');
         $this->auditManager->expects($this->once())
-            ->method('log');
+            ->method('buildLogEntry')
+            ->with($this->identicalTo($this->configManager))
+            ->willReturn(null);
 
         $em->expects($this->exactly(count($models)))
             ->method('persist')

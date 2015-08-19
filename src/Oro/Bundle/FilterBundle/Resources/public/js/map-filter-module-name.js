@@ -1,17 +1,18 @@
-/*global define*/
-define(function () {
+define(function() {
     'use strict';
-    var moduleNameTemplate = 'oro/filter/{{type}}-filter',
-        types = {
+
+    var moduleNameTemplate = 'oro/filter/{{type}}-filter';
+    var types = {
             string:      'choice',
             choice:      'select',
             single_choice: 'select',
             selectrow:   'select-row',
             multichoice: 'multiselect',
-            boolean:     'select'
+            boolean:     'select',
+            dictionary:  'dictionary'
         };
 
-    return function (type) {
+    return function(type) {
         return moduleNameTemplate.replace('{{type}}', types[type] || type);
     };
 });

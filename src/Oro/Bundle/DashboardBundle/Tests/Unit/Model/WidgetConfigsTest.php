@@ -27,6 +27,12 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
     /** @var WidgetConfigs */
     private $widgetConfigs;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     public function setUp()
     {
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\ConfigProvider')
@@ -53,12 +59,20 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
             $securityFacade,
             $resolver,
             $this->em,
-            $this->valueProvider
+            $this->valueProvider,
+            $this->translator,
+            $this->eventDispatcher
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')

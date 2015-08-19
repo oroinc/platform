@@ -15,18 +15,13 @@ class TrackingWebsite extends AbstractPageEntity
 {
     protected $owner = "//div[starts-with(@id,'s2id_oro_tracking_website_owner')]/a";
 
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
+     /**
      * @param string $name
      * @return $this
      */
     public function setName($name)
     {
-        $object = $this->test->byId('oro_tracking_website_name');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_name']");
         $object->clear();
         $object->value($name);
 
@@ -39,7 +34,7 @@ class TrackingWebsite extends AbstractPageEntity
      */
     public function setIdentifier($identifier)
     {
-        $object = $this->test->byId('oro_tracking_website_identifier');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_identifier']");
         $object->clear();
         $object->value($identifier);
 
@@ -52,7 +47,7 @@ class TrackingWebsite extends AbstractPageEntity
      */
     public function setUrl($url)
     {
-        $object = $this->test->byId('oro_tracking_website_url');
+        $object = $this->test->byXpath("//*[@data-ftid='oro_tracking_website_url']");
         $object->clear();
         $object->value($url);
 
@@ -86,7 +81,6 @@ class TrackingWebsite extends AbstractPageEntity
         return new TrackingWebsites($this->test, false);
     }
 
-
     /**
      * @param string $required
      * @param string $optional
@@ -96,13 +90,13 @@ class TrackingWebsite extends AbstractPageEntity
     public function assertTitles($required, $optional, $message = '')
     {
         try {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $optional,
                 $this->test->title(),
                 $message
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $required,
                 $this->test->title(),
                 $message

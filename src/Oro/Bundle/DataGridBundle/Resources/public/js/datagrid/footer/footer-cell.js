@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone',
     'backgrid'
-], function (_, Backbone, Backgrid) {
-    "use strict";
+], function(_, Backbone, Backgrid) {
+    'use strict';
 
     var FooterCell;
 
@@ -18,17 +16,18 @@ define([
      */
     FooterCell = Backbone.View.extend({
         /** @property */
-        tagName: "th",
+        tagName: 'th',
 
         /** @property */
         template: _.template(
-            '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>' // wrap label into span otherwise underscore will not render it
+            // wrap label into span otherwise underscore will not render it
+            '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>'
         ),
 
         /**
          * Initialize.
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
 
             this.column = options.column;
@@ -36,7 +35,7 @@ define([
                 this.column = new Backgrid.Column(this.column);
             }
 
-            this.listenTo(options.collection, "reset", this.render);
+            this.listenTo(options.collection, 'reset', this.render);
         },
 
         /**
@@ -44,21 +43,20 @@ define([
          *
          * @return {*}
          */
-        render: function () {
-            var columnName, columnTotals, state, totals;
-
+        render: function() {
             this.$el.empty();
-            columnName = this.column.get('name');
-            state      = this.collection.state || {};
-            totals     = state.totals || {};
+            var columnName = this.column.get('name');
+            var state = this.collection.state || {};
+            var totals = state.totals || {};
 
             if (_.isUndefined(totals[this.options.rowName])) {
                 this.$el.hide();
                 return;
             }
-            if (!_.isUndefined(totals[this.options.rowName]) && _.has(totals[this.options.rowName].columns, columnName)) {
+            if (!_.isUndefined(totals[this.options.rowName]) &&
+                _.has(totals[this.options.rowName].columns, columnName)) {
                 this.$el.show();
-                columnTotals = totals[this.options.rowName].columns[columnName];
+                var columnTotals = totals[this.options.rowName].columns[columnName];
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }
@@ -73,7 +71,8 @@ define([
             }
 
             if (this.column.has('align')) {
-                this.$el.css('text-align', this.column.get('align'));
+                this.$el.removeClass('align-left align-center align-right');
+                this.$el.addClass('align-' + this.column.get('align'));
             }
 
             return this;

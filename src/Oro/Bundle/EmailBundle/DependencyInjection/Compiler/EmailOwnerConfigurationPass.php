@@ -47,11 +47,18 @@ class EmailOwnerConfigurationPass implements CompilerPassInterface
                     break;
                 }
             }
-            $providers[$order] = $id;
+            $providers[$order][] = $id;
         }
         ksort($providers);
 
-        return $providers;
+        $providersPlain = [];
+        foreach ($providers as $order => $definitions) {
+            foreach ($definitions as $definition) {
+                $providersPlain[] = $definition;
+            }
+        }
+
+        return $providersPlain;
     }
 
     /**

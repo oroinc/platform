@@ -49,18 +49,17 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
     public function supportsProvider()
     {
         return [
-            'supported'                => [
+            'supported' => [
                 [
-                    'relation'     => ['test' => 'test'],
+                    'relation' => ['test' => 'test'],
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Test\Entity',
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity', self::ASSOCIATION_KIND),
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity', self::ASSOCIATION_KIND),
+                                'manyToOne'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -75,43 +74,39 @@ class MultipleManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity1',
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity2',
                 ],
                 [ // should be ignored because field type is not manyToOne
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [ // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            'testField',
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        'testField',
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ],
             ],

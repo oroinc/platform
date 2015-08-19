@@ -2,28 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\Builder\Helper;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Templating\EngineInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Class EmailModelBuilderHelper
- *
- * @package Oro\Bundle\EmailBundle\Builder\Helper
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailModelBuilderHelper
@@ -39,14 +38,14 @@ class EmailModelBuilderHelper
     protected $emailAddressHelper;
 
     /**
-     * @var NameFormatter
+     * @var EntityNameResolver
      */
-    protected $nameFormatter;
+    protected $entityNameResolver;
 
     /**
-     * @var SecurityContext
+     * @var SecurityFacade
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * @var EmailAddressManager
@@ -71,8 +70,8 @@ class EmailModelBuilderHelper
     /**
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param EmailAddressHelper  $emailAddressHelper
-     * @param NameFormatter       $nameFormatter
-     * @param SecurityContext     $securityContext
+     * @param EntityNameResolver  $entityNameResolver
+     * @param SecurityFacade      $securityFacade
      * @param EmailAddressManager $emailAddressManager
      * @param EntityManager       $entityManager
      * @param EmailCacheManager   $emailCacheManager
@@ -81,8 +80,8 @@ class EmailModelBuilderHelper
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter,
-        SecurityContext $securityContext,
+        EntityNameResolver $entityNameResolver,
+        SecurityFacade $securityFacade,
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
@@ -90,8 +89,8 @@ class EmailModelBuilderHelper
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->emailAddressHelper  = $emailAddressHelper;
-        $this->nameFormatter       = $nameFormatter;
-        $this->securityContext     = $securityContext;
+        $this->entityNameResolver  = $entityNameResolver;
+        $this->securityFacade      = $securityFacade;
         $this->emailAddressManager = $emailAddressManager;
         $this->entityManager       = $entityManager;
         $this->emailCacheManager   = $emailCacheManager;
@@ -102,14 +101,22 @@ class EmailModelBuilderHelper
      * @param string      $emailAddress
      * @param string|null $ownerClass
      * @param mixed|null  $ownerId
+     * @param bool        $excludeCurrentUser
      */
-    public function preciseFullEmailAddress(&$emailAddress, $ownerClass = null, $ownerId = null)
-    {
+    public function preciseFullEmailAddress(
+        &$emailAddress,
+        $ownerClass = null,
+        $ownerId = null,
+        $excludeCurrentUser = false
+    ) {
         if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
                 $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
                 if ($owner) {
-                    $ownerName = $this->nameFormatter->format($owner);
+                    if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
+                        return;
+                    }
+                    $ownerName = $this->entityNameResolver->getName($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 
@@ -122,7 +129,10 @@ class EmailModelBuilderHelper
             if ($emailAddressObj) {
                 $owner = $emailAddressObj->getOwner();
                 if ($owner) {
-                    $ownerName = $this->nameFormatter->format($owner);
+                    if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
+                        return;
+                    }
+                    $ownerName = $this->entityNameResolver->getName($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
                     }
@@ -132,21 +142,44 @@ class EmailModelBuilderHelper
     }
 
     /**
+     * @param bool $excludeCurrentUser
+     * @param string $emailAddress
+     * @param object $owner
+     * @return bool
+     */
+    protected function doExcludeCurrentUser($excludeCurrentUser, &$emailAddress, $owner)
+    {
+        if (!$excludeCurrentUser) {
+            return false;
+        }
+        $user = $this->getUser();
+        if (ClassUtils::getClass($owner) === ClassUtils::getClass($user) && $owner->getId() === $user->getId()) {
+            $emailAddress = false;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the current authenticated user
      *
      * @return User|UserInterface|EmailHolderInterface|EmailOwnerInterface|null
      */
     public function getUser()
     {
-        $token = $this->securityContext->getToken();
-        if ($token) {
-            $user = $token->getUser();
-            if ($this->isFullQualifiedUser($user)) {
-                return $user;
-            }
-        }
+        return $this->securityFacade->getLoggedUser();
+    }
 
-        return null;
+    /**
+     * Get current organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**
@@ -164,7 +197,7 @@ class EmailModelBuilderHelper
      */
     public function decodeClassName($className)
     {
-        return $this->entityRoutingHelper->decodeClassName($className);
+        return $this->entityRoutingHelper->resolveEntityClass($className);
     }
 
     /**
@@ -176,7 +209,7 @@ class EmailModelBuilderHelper
     {
         return $this->emailAddressHelper->buildFullEmailAddress(
             $user->getEmail(),
-            $this->nameFormatter->format($user)
+            $this->entityNameResolver->getName($user)
         );
     }
 
@@ -220,6 +253,21 @@ class EmailModelBuilderHelper
     public function getTargetEntity($entityClass, $entityId)
     {
         return $this->entityRoutingHelper->getEntity($entityClass, $entityId);
+    }
+
+    /**
+     * Returns mailboxes available to currently logged in user.
+     *
+     * @return Mailbox[]
+     */
+    public function getMailboxes()
+    {
+        $mailboxes = $this->entityManager->getRepository('OroEmailBundle:Mailbox')->findAvailableMailboxes(
+            $this->getUser(),
+            $this->getOrganization()
+        );
+
+        return $mailboxes;
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
@@ -27,6 +26,9 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $htmlTagHelper;
+
     /** @var TestActivityProvider */
     protected $testActivityProvider;
 
@@ -43,6 +45,9 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->translator     = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
+        $this->htmlTagHelper  = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->testActivityProvider = new TestActivityProvider();
 
@@ -50,7 +55,8 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->configManager,
             $this->translator,
-            $this->routeHelper
+            $this->routeHelper,
+            $this->htmlTagHelper
         );
         $this->provider->addProvider($this->testActivityProvider);
     }
@@ -85,20 +91,27 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubject()
     {
-        $testEntity          = new \stdClass();
+        $testEntity = new \stdClass();
         $testEntity->subject = 'test';
         $this->assertEquals('test', $this->provider->getSubject($testEntity));
     }
 
+    public function testGetDescription()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->description = 'test';
+        $this->assertEquals('test', $this->provider->getDescription($testEntity));
+    }
+
     public function testGetEmptySubject()
     {
-        $testEntity = new TestTarget();
+        $testEntity = new TestTarget(1);
         $this->assertNull($this->provider->getSubject($testEntity));
     }
 
     public function testGetTargetEntityClasses()
     {
-        $correctTarget    = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
+        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
@@ -128,7 +141,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
-        $configId     = new EntityConfigId('entity', 'Test\Entity');
+        $configId = new EntityConfigId('entity', 'Test\Entity');
         $entityConfig = new Config($configId);
         $userConfig = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -137,7 +150,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $entityConfig->set('label', 'test_label');
         $entityConfigProvider->expects($this->once())->method('getConfig')->willReturn($entityConfig);
         $this->translator->expects($this->once())->method('trans')->with('test_label')->willReturn('test_label');
-        $this->routeHelper->expects($this->once())->method('encodeClassName')
+        $this->routeHelper->expects($this->once())->method('getUrlSafeClassName')
             ->willReturn('Test_Entity');
         $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
 
@@ -170,6 +183,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
 
         $this->testActivityProvider->setTargets([new \stdClass()]);
         $this->doctrineHelper->expects($this->any())
@@ -187,5 +201,48 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getUpdatedActivityList($testEntity, $em);
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
+    }
+
+    public function testGetSupportedOwnerActivities()
+    {
+        $ownerClasses = $this->provider->getSupportedOwnerActivities();
+        $this->assertCount(1, $ownerClasses);
+        $this->assertEquals([TestActivityProvider::ACL_CLASS], $ownerClasses);
+    }
+
+    public function testIsSupportedOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->with($testEntity)
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertTrue($this->provider->isSupportedEntity($testEntity));
+    }
+
+    public function testGetProviderForOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(TestActivityProvider::ACL_CLASS);
+
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderForOwnerEntity($testEntity)
+        );
+    }
+
+    public function testGetProviderByOwnerClass()
+    {
+        $this->assertEquals(
+            $this->testActivityProvider,
+            $this->provider->getProviderByOwnerClass(TestActivityProvider::ACTIVITY_CLASS_NAME)
+        );
     }
 }

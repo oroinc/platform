@@ -1,19 +1,15 @@
-/*jslint browser:true, nomen:true*/
-/*global define, alert*/
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/app/views/base/view',
-    'routing',
-    'orolocale/js/formatter/datetime',
-    'oroui/js/app/views/loading-mask-view'
-], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter, LoadingMaskView) {
+define(function(require) {
     'use strict';
 
     var ActivityView;
-    
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var routing = require('routing');
+    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    var CommentComponent = require('orocomment/js/app/components/comment-component');
+
     ActivityView = BaseView.extend({
         options: {
             configuration: {
@@ -40,12 +36,18 @@ define([
             'click .accordion-heading': 'onAccordionHeaderClick'
         },
         listen: {
+            'addedToParent': function() {
+                var view = this.getEmailThreadView();
+                if (view) {
+                    view.refreshEmails();
+                }
+            },
             'change:contentHTML model': '_onContentChange',
             'change:commentCount model': '_onCommentCountChange',
             'change:isContentLoading model': '_onContentLoadingStatusChange'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collapsed = true;
             if (this.options.template) {
@@ -59,13 +61,13 @@ define([
             ActivityView.__super__.initialize.apply(this, arguments);
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = ActivityView.__super__.getTemplateData.call(this);
             data.has_comments = this.options.configuration.has_comments;
             data.ignoreHead = this.options.ignoreHead;
             data.collapsed = this.collapsed;
-            data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
-            data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
+            data.createdAt = dateTimeFormatter.formatSmartDateTime(data.createdAt);
+            data.updatedAt = dateTimeFormatter.formatSmartDateTime(data.updatedAt);
             data.relatedActivityClass = _.escape(data.relatedActivityClass);
             if (data.owner_id) {
                 data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});
@@ -79,31 +81,37 @@ define([
             }
             data.routing = routing;
             data.dateFormatter = dateTimeFormatter;
+            data.editable = this.model.get('editable');
+            data.removable = this.model.get('removable');
 
             return data;
         },
 
-        render: function () {
+        render: function() {
             ActivityView.__super__.render.apply(this, arguments);
-            this.$('.dropdown-toggle.activity-item').on('mouseover', function () {
+            this.$('.dropdown-toggle.activity-item').on('mouseover', function() {
                 $(this).trigger('click');
             });
-            this.$('.dropdown-menu.activity-item').on('mouseleave', function () {
+            this.$('.dropdown-menu.activity-item').on('mouseleave', function() {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
-            mediator.execute('layout:init', this.$el, this);
+            if (this.$('.dropdown-menu.activity-item .launcher-item').children().length === 0) {
+                this.$('.dropdown-menu.activity-item').hide();
+                this.$('.dropdown-toggle.activity-item').text('');
+            }
+            this.initLayout();
             return this;
         },
 
-        onEdit: function () {
+        onEdit: function() {
             this.model.collection.trigger('toEdit', this.model);
         },
 
-        onDelete: function () {
+        onDelete: function() {
             this.model.collection.trigger('toDelete', this.model);
         },
 
-        onAccordionHeaderClick: function (e) {
+        onAccordionHeaderClick: function(e) {
             var ignoreItems = 'a, button, .accordition-toggle';
             if ($(e.target).is(ignoreItems) || $(e.target).parents(ignoreItems).length) {
                 // ignore clicks on links, buttons and accordition-toggle
@@ -112,12 +120,12 @@ define([
             this.getAccorditionToggle().trigger('click');
         },
 
-        onToggle: function (e) {
+        onToggle: function(e) {
             e.preventDefault();
             this.toggle();
         },
 
-        toggle: function () {
+        toggle: function() {
             if (!this.options.ignoreHead && this.model.get('is_head')) {
                 this.model.collection.trigger('toViewGroup', this.model);
             } else {
@@ -125,31 +133,39 @@ define([
             }
         },
 
-        getAccorditionToggle: function () {
+        getAccorditionToggle: function() {
             return this.$('> .accordion-group > .accordion-heading .accordion-toggle');
         },
 
-        getAccorditionBody: function () {
+        getAccorditionBody: function() {
             return this.$('> .accordion-group > .accordion-body');
         },
 
-        isCollapsed: function () {
+        isCollapsed: function() {
             return this.getAccorditionToggle().hasClass('collapsed');
         },
 
-        _onContentChange: function () {
+        _onContentChange: function() {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
-            mediator.execute('layout:init', this.$el, this);
+            this.initLayout().done(_.bind(function() {
+                // if the activity has an EmailTreadView -- handle comment count change in own way
+                var view = this.getEmailThreadView();
+                if (view) {
+                    this.listenTo(view, 'commentCountChanged', function(diff) {
+                        this.model.set('commentCount', this.model.get('commentCount') + diff);
+                    });
+                }
+            }, this));
         },
 
-        _onCommentCountChange: function () {
-            var quantity = this.model.get('commentCount'),
-                $elem = this.$(this.options.commentsCountBlock);
+        _onCommentCountChange: function() {
+            var quantity = this.model.get('commentCount');
+            var $elem = this.$(this.options.commentsCountBlock);
             $elem.html(quantity);
             $elem.parent()[quantity > 0 ? 'show' : 'hide']();
         },
 
-        _onContentLoadingStatusChange: function () {
+        _onContentLoadingStatusChange: function() {
             if (this.model.get('isContentLoading')) {
                 this.subview('loading', new LoadingMaskView({
                     container: this.$el
@@ -160,21 +176,49 @@ define([
             }
         },
 
-        getCommentsBlock: function () {
-            return this.$(this.options.commentsBlock);
+        /**
+         * Initializes comments component if it is necessary
+         *
+         * @param {Object} options
+         */
+        initCommentsComponent: function(options) {
+            var commentsComponent;
+            if (!this.isCommentComponentRequired()) {
+                return;
+            }
+            options._sourceElement = this.$(this.options.commentsBlock);
+            commentsComponent = new CommentComponent(options);
+            this.pageComponent('comments', commentsComponent, options._sourceElement[0]);
+            this.listenTo(commentsComponent.collection, 'stateChange', this.updateCommentsQuantity, this);
         },
 
-        setCommentComponent: function (comments) {
-            this.subview('comments', comments);
-            this.listenTo(comments.collection, 'stateChange', this.updateCommentsQuantity, this);
+        /**
+         * Check if comments component have to be initialized
+         * @returns {boolean}
+         */
+        isCommentComponentRequired: function() {
+            // comments component is not initialized yet, activity is "commentable" and it has place to be initialized
+            return !this.pageComponent('comments') &&
+                this.model.get('commentable') &&
+                Boolean(this.$(this.options.commentsBlock).length);
         },
 
-        hasCommentComponent: function () {
-            return Boolean(this.subview('comments'));
+        updateCommentsQuantity: function() {
+            var component = this.pageComponent('comments');
+            if (component !== null) {
+                this.model.set('commentCount', component.collection.getState().totalItemsQuantity);
+            }
         },
 
-        updateCommentsQuantity: function () {
-            this.model.set('commentCount', this.subview('comments').collection.getState().totalItemsQuantity);
+        getEmailThreadView: function() {
+            var threadViewComponent = this.pageComponent('thread-view');
+            var view;
+
+            if (threadViewComponent) {
+                view = threadViewComponent.view.pageComponent('email-thread').view;
+            }
+
+            return view;
         }
     });
 

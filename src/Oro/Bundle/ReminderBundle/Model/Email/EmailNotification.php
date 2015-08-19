@@ -4,17 +4,14 @@ namespace Oro\Bundle\ReminderBundle\Model\Email;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\NotificationBundle\Processor\SenderAwareEmailNotificationInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 
-class EmailNotification implements EmailNotificationInterface
+class EmailNotification implements SenderAwareEmailNotificationInterface
 {
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
     const CONFIG_FIELD    = 'reminder_template_name';
@@ -35,17 +32,25 @@ class EmailNotification implements EmailNotificationInterface
     protected $reminder;
 
     /**
+     * @var EntityNameResolver
+     */
+    protected $entityNameResolver;
+
+    /**
      * Constructor
      *
-     * @param ObjectManager  $em
-     * @param ConfigProvider $configProvider
+     * @param ObjectManager      $em
+     * @param ConfigProvider     $configProvider
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ObjectManager $em,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        EntityNameResolver $entityNameResolver
     ) {
         $this->em = $em;
         $this->configProvider = $configProvider;
+        $this->entityNameResolver = $entityNameResolver;
     }
 
     /**
@@ -86,6 +91,28 @@ class EmailNotification implements EmailNotificationInterface
     public function getRecipientEmails()
     {
         return [$this->getReminder()->getRecipient()->getEmail()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSenderEmail()
+    {
+        $sender = $this->getReminder()->getSender();
+        return $sender ? $sender->getEmail() : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSenderName()
+    {
+        $sender = $this->getReminder()->getSender();
+        if ($sender) {
+            return $this->entityNameResolver->getName($sender);
+        }
+
+        return null;
     }
 
     /**

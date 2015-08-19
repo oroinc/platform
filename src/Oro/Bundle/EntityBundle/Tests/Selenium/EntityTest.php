@@ -24,7 +24,7 @@ class EntityTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->assertTitle('Entity Management - Entities - System')
+            ->assertTitle('All - Entity Management - Entities - System')
             ->add()
             ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityName)
@@ -108,13 +108,13 @@ class EntityTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $entityExist = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', $entityName)
-            ->deleteEntity(array($entityName), 'Remove')
+            ->delete(array($entityName), 'Remove')
             ->assertMessage('Item deleted')
             ->open(array($entityName))
             ->assertTitle($entityUpdateName . ' - Entity Management - Entities - System')
             ->updateSchema()
             ->assertMessage('Schema updated')
-            ->assertTitle('Entity Management - Entities - System')
+            ->assertTitle('All - Entity Management - Entities - System')
             ->close()
             ->entityExists(array($entityName));
 

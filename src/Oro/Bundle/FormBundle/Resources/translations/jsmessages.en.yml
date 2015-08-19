@@ -3,3 +3,7 @@ Remove: Remove
 Add: Add
 "Select {{ entity }}": "Select {{ entity }}"
 "Create {{ entity }}": "Create {{ entity }}"
+oro:
+    form:
+        choose_date: Choose a date
+        choose_time: time

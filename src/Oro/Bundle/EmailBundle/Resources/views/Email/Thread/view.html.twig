@@ -19,7 +19,13 @@
 {% endblock pageActions %}
 
 {% block navButtons %}
-    {{ Actions.addContextButton(entity) }}
+    {% set buttonsHtml %}
+        {{ Actions.addContextButton(entity) }}
+        {{ Actions.addMarkUnreadButton(entity) }}
+    {% endset %}
+    {{ UI.pinnedDropdownButton({
+        'html': buttonsHtml
+    }) }}
 {% endblock navButtons %}
 
 {% block breadcrumb %}
@@ -37,12 +43,14 @@
 
 {% block content_data %}
     <div class="container-fluid">
-        {{ oro_widget_render({
-            'widgetType': 'block',
-            'wid': 'thread-view',
-            'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false}),
-            'alias': 'thread-view',
-            'contextsRendered': true
-        }) }}
+        <div class="responsive-section">
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'wid': 'thread-view',
+                'url': path('oro_email_thread_widget', {'id': entity.id, 'renderContexts': false}),
+                'alias': 'thread-view',
+                'contextsRendered': true
+            }) }}
+        </div>
     </div>
 {% endblock content_data %}

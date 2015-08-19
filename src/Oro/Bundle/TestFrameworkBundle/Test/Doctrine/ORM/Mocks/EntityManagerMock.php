@@ -8,6 +8,8 @@ use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\ORM\Proxy\ProxyFactory;
 use Doctrine\ORM\Configuration;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 /**
  * Special EntityManager mock used for testing purposes.
  *
@@ -24,6 +26,14 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
      * @var mixed
      */
     private $proxyFactoryMock;
+
+    public function __destruct()
+    {
+        $fs = new Filesystem();
+        if ($fs->exists(__DIR__ . '/../Proxies')) {
+            $fs->remove(__DIR__ . '/../Proxies');
+        }
+    }
 
     /**
      * {@inheritdoc}

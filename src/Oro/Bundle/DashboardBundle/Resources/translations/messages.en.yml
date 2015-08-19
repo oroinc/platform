@@ -5,7 +5,7 @@ oro:
             quick_launchpad: Quick Launchpad
             chose_dashboard: Choose dashboard
             label: Widget title
-            use_default.label: Use default setting
+            use_default.label: Use default
 
         entity_label:        Dashboard
         entity_plural_label: Dashboards
@@ -23,6 +23,10 @@ oro:
         start_dashboard.empty_value: Blank Dashboard
 
         quick_launchpad_widget_description: This widget gives you access to most commonly used actions and pages
+
+        grid:
+            fields:
+                grid_view.label: Grid view
 
         no_data_found:    No data found
 
@@ -68,3 +72,11 @@ oro:
             time.label: Hour
         date_range.label: Date range
         previous_date_range.label: Compare with previous period
+        datagrid:
+            columns:
+                actions: Actions
+            actions:
+                move_column.label: Move column
+                add.label: Add
+                add_all.label: Add all
+                delete.label: Delete column

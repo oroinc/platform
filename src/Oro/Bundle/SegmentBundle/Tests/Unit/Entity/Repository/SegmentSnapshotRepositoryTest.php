@@ -119,7 +119,7 @@ class SegmentSnapshotRepositoryTest extends SegmentDefinitionTestCase
     public function identifierDataProvider()
     {
         return [
-            ['integer', 'CAST(snp.entityId as int)'],
+            ['integer', 'snp.integerEntityId'],
             ['string', 'snp.entityId'],
         ];
     }

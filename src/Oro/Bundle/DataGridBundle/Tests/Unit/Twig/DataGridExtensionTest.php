@@ -2,21 +2,27 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Twig;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface */
     protected $manager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|NameStrategyInterface */
     protected $nameStrategy;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface */
     protected $router;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade */
     protected $securityFacade;
 
     /** @var DataGridExtension */
@@ -52,8 +58,10 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ['oro_datagrid_metadata', 'getGridMetadata'],
             ['oro_datagrid_generate_element_id', 'generateGridElementId'],
             ['oro_datagrid_build_fullname', 'buildGridFullName'],
+            ['oro_datagrid_build_inputname', 'buildGridInputName'],
         ];
 
+        /** @var \Twig_SimpleFunction[] $actualFunctions */
         $actualFunctions = $this->twigExtension->getFunctions();
         $this->assertSameSize($expectedFunctions, $actualFunctions);
 
@@ -145,7 +153,13 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->twigExtension->getGrid($gridName));
     }
 
-    public function testGetGridMetadataWorks()
+    /**
+     * @param mixed $configRoute
+     * @param string $expectedRoute
+     *
+     * @dataProvider routeProvider
+     */
+    public function testGetGridMetadataWorks($configRoute, $expectedRoute)
     {
         $gridName = 'test-grid';
         $gridScope = 'test-scope';
@@ -153,6 +167,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $params = ['foo' => 'bar'];
         $url = '/datagrid/test-grid?test-grid-test-scope=foo=bar';
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
         $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $metadata = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\MetadataObject')
             ->disableOriginalConstructor()
@@ -178,7 +193,7 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
-                DataGridExtension::ROUTE,
+                $expectedRoute,
                 ['gridName' => $gridFullName, $gridFullName => $params]
             )
             ->will($this->returnValue($url));
@@ -186,6 +201,17 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $metadata->expects($this->once())
             ->method('offsetAddToArray')
             ->with('options', ['url' => $url, 'urlParams' => $params]);
+
+        $metadata->expects($this->any())
+            ->method('offsetGetByPath')
+            ->with()
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['[options][route]', $configRoute],
+                    ]
+                )
+            );
 
         $metadataArray = ['metadata-array'];
         $metadata->expects($this->once())
@@ -195,8 +221,19 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($metadataArray, $this->twigExtension->getGridMetadata($grid, $params));
     }
 
+    /**
+     * @return array
+     */
+    public function routeProvider()
+    {
+        return [
+            [null, DataGridExtension::ROUTE],
+        ];
+    }
+
     public function testGetGridDataWorks()
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
         $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
         $gridData = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\ResultsObject')
             ->disableOriginalConstructor()
@@ -217,9 +254,13 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider generateGridElementIdDataProvider
+     * @param string $gridName
+     * @param string $gridScope
+     * @param string $expectedPattern
      */
     public function testGenerateGridElementIdWorks($gridName, $gridScope, $expectedPattern)
     {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DatagridInterface $grid */
         $grid = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datagrid\\DatagridInterface');
 
         $grid->expects($this->once())
@@ -233,19 +274,22 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp($expectedPattern, $this->twigExtension->generateGridElementId($grid));
     }
 
+    /**
+     * @return array
+     */
     public function generateGridElementIdDataProvider()
     {
         return [
             [
                 'test-grid',
                 'test-scope',
-                '/grid-test-grid-test-scope-[\d]+/'
+                '/grid-test-grid-test-scope-[\d]+/',
             ],
             [
                 'test-grid',
                 '',
-                '/grid-test-grid-[\d]+/'
-            ]
+                '/grid-test-grid-[\d]+/',
+            ],
         ];
     }
 

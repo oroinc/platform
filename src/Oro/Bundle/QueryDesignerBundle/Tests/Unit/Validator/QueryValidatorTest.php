@@ -190,7 +190,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getDataSourceInterfaceMock(),
                 false,
-                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
+                new DBALException('failed'),
                 null,
                 1
             ],
@@ -211,7 +211,7 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getOrmDataSourceInterfaceMock(),
                 true,
-                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
+                new DBALException('failed'),
                 null,
                 1
             ],

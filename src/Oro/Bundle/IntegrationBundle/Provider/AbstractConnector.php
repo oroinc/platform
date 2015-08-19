@@ -16,7 +16,10 @@ use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 
-abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
+abstract class AbstractConnector extends IteratorBasedReader implements
+    ConnectorInterface,
+    ForceConnectorInterface,
+    StepExecutionAwareInterface
 {
     /** @var TransportInterface */
     protected $transport;
@@ -83,7 +86,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      *
      * @return bool
      */
-    protected function supportsForceSync()
+    public function supportsForceSync()
     {
         return false;
     }

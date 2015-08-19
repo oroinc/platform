@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UIBundle\Twig\HtmlTagExtension;
 
 class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
@@ -13,15 +13,16 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
     protected $extension;
 
     /**
-     * @var HtmlTagProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $htmlTagProvider;
+    protected $htmlTagHelper;
 
     protected function setUp()
     {
-        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->htmlTagHelper = $this->getMockBuilder('Oro\Bundle\UIBundle\Tools\HtmlTagHelper')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->extension = new HtmlTagExtension($this->htmlTagProvider);
+        $this->extension = new HtmlTagExtension($this->htmlTagHelper);
     }
 
     public function testGetName()
@@ -34,7 +35,7 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         $filters = $this->extension->getFilters();
 
         $this->assertTrue(is_array($filters));
-        $this->assertEquals(1, sizeof($filters));
+        $this->assertEquals(2, sizeof($filters));
 
         $filter = $filters[0];
         $this->assertInstanceOf('\Twig_SimpleFilter', $filter);

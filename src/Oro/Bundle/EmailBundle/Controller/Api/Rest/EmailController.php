@@ -2,38 +2,31 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Util\ClassUtils;
-
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 
 /**
  * @RouteResource("email")
  * @NamePrefix("oro_api_")
  */
-class EmailController extends RestGetController
+class EmailController extends RestController
 {
     /**
-     * REST GET list
+     * Get emails.
      *
      * @QueryParam(
      *      name="page",
@@ -47,253 +40,50 @@ class EmailController extends RestGetController
      *      nullable=true,
      *      description="Number of items per page. Defaults to 10."
      * )
+     * @QueryParam(
+     *     name="messageId",
+     *     requirements=".+",
+     *     nullable=true,
+     *     description="The email 'Message-ID' attribute. One or several message ids separated by comma."
+     * )
      * @ApiDoc(
-     *      description="Get all emails",
+     *      description="Get emails",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function cgetAction()
     {
-        $page = (int)$this->getRequest()->get('page', 1);
+        $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        return $this->handleGetListRequest($page, $limit);
-    }
-
-    /**
-     * @param integer $entityId Entity id
-     *
-     * @ApiDoc(
-     *      description="Returns an AssociationList object",
-     *      resource=true,
-     *      statusCodes={
-     *          200="Returned when successful",
-     *          404="Activity association was not found",
-     *      }
-     * )
-     * @AclAncestor("oro_email_view")
-     * @return Response
-     */
-    public function getAssociationAction($entityId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $associations = $entity->getActivityTargetEntities();
-        $this->filterUserAssociation($associations);
-
-        return $this->handleView(
-            $this->view($associations, is_array($associations) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
+        $filterParameters = [
+            'messageId' => new StringToArrayParameterFilter()
+        ];
+        $criteria         = $this->getFilterCriteria(
+            $this->getSupportedQueryParameters(__FUNCTION__),
+            $filterParameters
         );
+
+        return $this->handleGetListRequest($page, $limit, $criteria);
     }
 
     /**
-     * @param integer $entityId Entity id
-     *
-     * @ApiDoc(
-     *      description="Returns an AssociationList object",
-     *      resource=true,
-     *      statusCodes={
-     *          200="Returned when successful",
-     *          404="Activity association was not found",
-     *      }
-     * )
-     * @AclAncestor("oro_email_edit")
-     * @return Response
-     */
-    public function getAssociationsDataAction($entityId)
-    {
-        /** @var $entity Email */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $associations = $entity->getActivityTargetEntities();
-        $this->filterUserAssociation($associations);
-        $itemsArray = array();
-        foreach ($associations as $association) {
-            $className = ClassUtils::getClass($association);
-            /** @var $configManager ConfigManager */
-            $configManager = $this->container->get('oro_entity_config.config_manager');
-            $nameFormater = $this->get('oro_locale.formatter.name');
-            $title = $nameFormater->format($association);
-            if ($title === '') {
-                $title = $association->getEmail();
-            } elseif ($title === null) {
-                $title = $association->getId();
-            }
-            $metadata = $configManager->getEntityMetadata($className);
-            $route = $configManager->getEntityMetadata($className)->getRoute('view', false);
-            if ($metadata->routeView) {
-                $link = $this->container->get('router')->generate($route, ['id' => $association->getId()]);
-            } else {
-                $link = false;
-            }
-
-            $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-            $config = $entityConfigProvider->getConfig($className);
-
-            if ($title) {
-                $itemsArray[] = array(
-                    'entityId'=> $entity->getId(),
-                    'targetId'=> $association->getId(),
-                    'targetClassName'=> $className,
-                    'title'=> $title,
-                    'icon'=> $config->get('icon'),
-                    'link'=> $link
-                );
-            }
-        }
-
-        return $this->handleView(
-            $this->view($itemsArray, is_array($associations) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
-        );
-    }
-
-    /**
-     * Add new association
-     *
-     * @QueryParam(
-     *      name="entityId",
-     *      nullable=false,
-     *      strict=true,
-     *      description="Entity id"
-     * )
-     * @QueryParam(
-     *      name="targetClassName",
-     *      nullable=false,
-     *      strict=true,
-     *      description="Target class name"
-     * )
-     * @QueryParam(
-     *      name="targetId",
-     *      nullable=false,
-     *      strict=true,
-     *      description="Target Id"
-     * )
-     * @ApiDoc(
-     *      description="Add new association",
-     *      resource=true
-     * )
-     * @AclAncestor("oro_email_edit")
-     */
-    public function postAssociationsAction()
-    {
-        /**
-         * @var $entityRoutingHelper EntityRoutingHelper
-         */
-        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-
-        $entityId = $this->getRequest()->get('entityId');
-        $targetClassName = $this->getRequest()->get('targetClassName');
-        $targetId = $this->getRequest()->get('targetId');
-
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $targetClassName = $entityRoutingHelper->decodeClassName($targetClassName);
-        try {
-            if ($entity->supportActivityTarget($targetClassName)) {
-                $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-
-                $em = $this->getDoctrine()->getManager();
-                $thread = $entity->getThread();
-                if ($thread) {
-                    $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-                } else {
-                    $relatedEmails = [$entity];
-                }
-                foreach ($relatedEmails as $relatedEmail) {
-                    $relatedEmail->addActivityTarget($target);
-                }
-                $entity->addActivityTarget($target);
-                $em->persist($entity);
-                $em->flush();
-
-                $view = $this->view(['status' => Codes::HTTP_OK], Codes::HTTP_OK);
-            } else {
-                $view = $this->view([], Codes::HTTP_NOT_ACCEPTABLE);
-            }
-        } catch (Exception $e) {
-            $view = $this->view([], Codes::HTTP_BAD_REQUEST);
-        }
-
-        return $this->buildResponse($view, Codes::HTTP_CREATED, ['entity' => $entity]);
-    }
-
-    /**
-     * REST DELETE
-     *
-     * @param int $entityId
-     * @param string $targetClassName
-     * @param int $targetId
-     *
-     * @ApiDoc(
-     *      description="Delete Association",
-     *      resource=true
-     * )
-     * @AclAncestor("oro_email_edit")
-     *
-     * @Delete("/emails/{entityId}/associations/{targetClassName}/{targetId}")
-     *
-     * @return Response
-     */
-    public function deleteAssociationAction($entityId, $targetClassName, $targetId)
-    {
-        /**
-         * @var $entity Email
-         */
-        $entity = $this->getManager()->find($entityId);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
-        }
-
-        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-        $em = $this->getDoctrine()->getManager();
-
-        try {
-            $target = $entityRoutingHelper->getEntity($targetClassName, $targetId);
-            $entity->removeActivityTarget($target);
-            $em->persist($entity);
-            $em->flush();
-
-            $view = $this->view(['message' => 'Successfully removed'], Codes::HTTP_OK);
-        } catch (\RuntimeException $e) {
-            $view = $this->view([], Codes::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
-            $view = $this->view(['status'=> 'NOT_FOUND', 'message' => $e->getMessage() ], Codes::HTTP_OK);
-        }
-
-        return $this->buildResponse($view, Codes::HTTP_LOOP_DETECTED, ['id' => $entityId, 'entity' => $entity]);
-    }
-
-    /**
-     * REST GET item
+     * Get email.
      *
      * @param string $id
      *
+     * @Get(
+     *      "/emails/{id}",
+     *      name="",
+     *      requirements={"id"="\d+"}
+     * )
      * @ApiDoc(
      *      description="Get email",
      *      resource=true
      * )
-     * @AclAncestor("oro_email_view")
+     * @AclAncestor("oro_email_email_view")
      * @return Response
      */
     public function getAction($id)
@@ -302,70 +92,71 @@ class EmailController extends RestGetController
     }
 
     /**
-     * {@inheritdoc}
+     * Update email.
+     *
+     * @param int $id The id of the email
+     *
+     * @ApiDoc(
+     *      description="Update email",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_email_email_edit")
+     * @return Response
      */
-    protected function transformEntityField($field, &$value)
+    public function putAction($id)
     {
-        switch ($field) {
-            case 'fromEmailAddress':
-                if ($value) {
-                    /** @var EmailAddress $value */
-                    $value = $value->getEmail();
-                }
-                break;
-            case 'folder':
-                if ($value) {
-                    /** @var EmailFolder $value */
-                    $value = $value->getFullName();
-                }
-                break;
-            case 'emailBody':
-                if ($value) {
-                    /** @var EmailBody $value */
-                    $value = array(
-                        'content' => $value->getBodyContent(),
-                        'isText' => $value->getBodyIsText(),
-                        'hasAttachments' => $value->getHasAttachments(),
-                    );
-                }
-                break;
-            case 'recipients':
-                if ($value) {
-                    $result = array();
-                    /** @var $recipient EmailRecipient */
-                    foreach ($value as $index => $recipient) {
-                        $result[$index] = array(
-                            'name' => $recipient->getName(),
-                            'type' => $recipient->getType(),
-                            'emailAddress' => $recipient->getEmailAddress() ?
-                                $recipient->getEmailAddress()->getEmail()
-                                : null,
-                        );
-                    }
-                    $value = $result;
-                }
-                break;
-            default:
-                parent::transformEntityField($field, $value);
-        }
+        return $this->handleUpdateRequest($id);
     }
 
     /**
-     * @param array|null $associations
+     * Create new email.
+     *
+     * @ApiDoc(
+     *      description="Create new email",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_email_email_edit")
      */
-    protected function filterUserAssociation(&$associations)
+    public function postAction()
     {
-        if (!$associations) {
-            return;
+        return $this->handleCreateRequest();
+    }
+
+    /**
+     * Get email context data.
+     *
+     * @param int $id The email id
+     *
+     * @ApiDoc(
+     *      description="Get email context data",
+     *      resource=true
+     * )
+     *
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @return Response
+     */
+    public function getContextAction($id)
+    {
+        /** @var Email $email */
+        $email = $this->getManager()->find($id);
+        if (!$email) {
+            return $this->buildNotFoundResponse();
         }
-        $user = $this->get('security.context')->getToken()->getUser();
-        foreach ($associations as $key => $association) {
-            $userClassName = ClassUtils::getClass($user);
-            $associationClassName = ClassUtils::getClass($association);
-            if ($userClassName === $associationClassName && $user->getId() === $association->getId()) {
-                unset($associations[$key]);
-            }
-        }
+
+        $result = $this->getManager()->getEmailContext($email);
+
+        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
+    }
+
+    /**
+     * Get email cache manager
+     *
+     * @return EmailCacheManager
+     */
+    protected function getEmailCacheManager()
+    {
+        return $this->container->get('oro_email.email.cache.manager');
     }
 
     /**
@@ -376,5 +167,32 @@ class EmailController extends RestGetController
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        return $this->get('oro_email.form.email.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormHandler()
+    {
+        return $this->get('oro_email.form.handler.email.api');
+    }
+
+    /**
+     * @param string $attribute
+     * @param Email $email
+     *
+     * @return bool
+     */
+    protected function assertEmailAccessGranted($attribute, Email $email)
+    {
+        return $this->get('oro_security.security_facade')->isGranted($attribute, $email);
     }
 }

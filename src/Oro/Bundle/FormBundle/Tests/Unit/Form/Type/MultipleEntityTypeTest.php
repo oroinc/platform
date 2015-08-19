@@ -16,6 +16,9 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     const PERMISSION_DISALLOW = 'test_permission_disallow';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -26,6 +29,9 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     protected function setUp()
     {
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
 
@@ -57,7 +63,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
     protected function getExtensions()
     {
         $types = [
-            'oro_multiple_entity'   => new MultipleEntityType($this->securityFacade),
+            'oro_multiple_entity'   => new MultipleEntityType($this->doctrineHelper, $this->securityFacade),
             'oro_entity_identifier' => new EntityIdentifierType($this->registry)
         ];
 

@@ -49,13 +49,13 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
     public function supportsProvider()
     {
         return [
-            'supported'              => [
+            'supported' => [
                 [
-                    'relation'     => ['test' => 'test'],
+                    'relation' => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
                             'target_entity' => 'Entity\Target',
-                            'field_id'      =>
+                            'field_id' =>
                                 new FieldConfigId(
                                     'extend',
                                     'Entity\Test',
@@ -69,16 +69,15 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
             ],
             'another association kind' => [
                 [
-                    'relation'     => ['test' => 'test'],
+                    'relation' => ['test' => 'test'],
                     'relationData' => [
                         [
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Test\Entity',
-                                    ExtendHelper::buildAssociationName('Test\TargetEntity', 'another'),
-                                    'manyToMany'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity', 'another'),
+                                'manyToMany'
+                            ),
                             'target_entity' => 'Test\TargetEntity'
                         ]
                     ]
@@ -87,17 +86,16 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
             ],
             'unsupported field name' => [
                 [
-                    'relation'     => ['test' => 'test'],
+                    'relation' => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
                             'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    'target',
-                                    'manyToMany'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Entity\Test',
+                                'target',
+                                'manyToMany'
+                            ),
                         ],
                     ]
                 ],
@@ -105,34 +103,33 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
             ],
             'unsupported field type' => [
                 [
-                    'relation'     => ['test' => 'test'],
+                    'relation' => ['test' => 'test'],
                     'relationData' => [
                         'test' => [
                             'target_entity' => 'Entity\Target',
-                            'field_id'      =>
-                                new FieldConfigId(
-                                    'extend',
-                                    'Entity\Test',
-                                    ExtendHelper::buildAssociationName('Entity\Target', self::ASSOCIATION_KIND),
-                                    'manyToOne'
-                                ),
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Entity\Test',
+                                ExtendHelper::buildAssociationName('Entity\Target', self::ASSOCIATION_KIND),
+                                'manyToOne'
+                            ),
                         ],
                     ]
                 ],
                 false,
             ],
-            'empty data'             => [
+            'empty data' => [
                 [
-                    'relation'     => [],
+                    'relation' => [],
                     'relationData' => []
                 ],
                 false,
             ],
-            'no relationData'        => [
+            'no relationData' => [
                 ['relation' => ['test' => 'test']],
                 false,
             ],
-            'empty'                  => [
+            'empty' => [
                 [],
                 false,
             ],
@@ -144,43 +141,39 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
         $schema = [
             'relationData' => [
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity1',
                 ],
                 [
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity2',
                 ],
                 [ // should be ignored because field type is not manyToMany
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
-                            'manyToOne'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
+                        'manyToOne'
+                    ),
                     'target_entity' => 'Test\TargetEntity3'
                 ],
                 [ // should be ignored because field name is not match association naming conventions
-                    'field_id'      =>
-                        new FieldConfigId(
-                            'extend',
-                            'Test\Entity',
-                            'testField',
-                            'manyToMany'
-                        ),
+                    'field_id' => new FieldConfigId(
+                        'extend',
+                        'Test\Entity',
+                        'testField',
+                        'manyToMany'
+                    ),
                     'target_entity' => 'Test\TargetEntity4'
                 ],
             ],

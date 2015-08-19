@@ -209,17 +209,27 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
+
             return null;
         }
 
-        // increment context counter
+        $this->updateContextCounters($entity);
+
+        return $entity;
+    }
+
+    /**
+     * Increment context counters.
+     *
+     * @param $entity
+     */
+    protected function updateContextCounters($entity)
+    {
         $identifier = $this->databaseHelper->getIdentifier($entity);
         if ($identifier) {
             $this->context->incrementReplaceCount();
         } else {
             $this->context->incrementAddCount();
         }
-
-        return $entity;
     }
 }

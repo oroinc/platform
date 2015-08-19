@@ -1,14 +1,12 @@
-/*jslint nomen:true, browser:true*/
-/*global define, window*/
 define([
     'jquery',
     'underscore',
     'backgrid'
-], function ($, _, Backgrid) {
+], function($, _, Backgrid) {
     'use strict';
 
-    var Row, document;
-    document = window.document;
+    var Row;
+    var document = window.document;
 
     /**
      * Grid row.
@@ -24,7 +22,7 @@ define([
 
         /** @property */
         events: {
-            "click": "onClick"
+            'click': 'onClick'
         },
 
         /** @property */
@@ -34,14 +32,18 @@ define([
             hasSelectedText: false
         },
 
+        className: function() {
+            return this.model.get('row_class_name');
+        },
+
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.cells, function (cell) {
+            _.each(this.cells, function(cell) {
                 cell.dispose();
             });
             delete this.cells;
@@ -54,9 +56,9 @@ define([
          *
          * @param {Event} e
          */
-        onClick: function (e) {
-            var exclude = 'a, .dropdown',
-                $target = this.$(e.target);
+        onClick: function(e) {
+            var exclude = 'a, .dropdown, .editable, .skip-row-click';
+            var $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
                 return;
@@ -64,7 +66,7 @@ define([
 
             this.clickData.counter += 1;
             if (this.clickData.counter === 1 && !this._hasSelectedText()) {
-                _.delay(_.bind(function () {
+                _.delay(_.bind(function() {
                     if (!this._hasSelectedText() && this.clickData.counter === 1) {
                         this.trigger('clicked', this, e);
                     }
@@ -81,11 +83,11 @@ define([
          * @returns {string}
          * @return {boolean}
          */
-        _hasSelectedText: function () {
-            var text = "";
+        _hasSelectedText: function() {
+            var text = '';
             if (_.isFunction(window.getSelection)) {
                 text = window.getSelection().toString();
-            } else if (!_.isUndefined(document.selection) && document.selection.type === "Text") {
+            } else if (!_.isUndefined(document.selection) && document.selection.type === 'Text') {
                 text = document.selection.createRange().text;
             }
             return !_.isEmpty(text);
@@ -94,13 +96,17 @@ define([
         /**
          * @inheritDoc
          */
-        makeCell: function (column) {
-            var cell = new (column.get("cell"))({
+        makeCell: function(column) {
+            var cell = new (column.get('cell'))({
                 column: column,
                 model: this.model
             });
             if (column.has('align')) {
-                cell.$el.addClass('align-right');
+                cell.$el.removeClass('align-left align-center align-right');
+                cell.$el.addClass('align-' + column.get('align'));
+            }
+            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                cell.$el.addClass('skip-row-click');
             }
             this._listenToCellEvents(cell);
             return cell;
@@ -112,7 +118,7 @@ define([
          * @param {Backgrid.Cell} cell
          * @private
          */
-        _listenToCellEvents: function (cell) {
+        _listenToCellEvents: function(cell) {
             if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
                 this.on('clicked', cell.onRowClicked, cell);
             }

@@ -5,11 +5,17 @@ class TestListener implements \PHPUnit_Framework_TestListener
 {
     // @codingStandardsIgnoreEnd
     private $directory;
+    private $durationLimit;
 
-
-    public function __construct($directory)
+    /**
+     * @param string $directory     The log directory
+     * @param float  $durationLimit The max execution time in seconds
+     *                              after that a test duration time is logged
+     */
+    public function __construct($directory, $durationLimit = 0.1)
     {
         $this->directory = $directory;
+        $this->durationLimit = $durationLimit;
     }
 
     public function addError(\PHPUnit_Framework_Test $test, \Exception $e, $time)
@@ -25,6 +31,13 @@ class TestListener implements \PHPUnit_Framework_TestListener
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         //$this->storeAScreenshot($test);
+        if ($time > $this->durationLimit) {
+            @file_put_contents(
+                $this->directory . DIRECTORY_SEPARATOR . 'test_duration.log',
+                sprintf("%.2f sec: %s::%s\n", $time, get_class($test), $test->getName()),
+                FILE_APPEND
+            );
+        }
     }
 
     private function storeAScreenshot(\PHPUnit_Framework_Test $test)
@@ -68,9 +81,9 @@ class TestListener implements \PHPUnit_Framework_TestListener
         if ($suite instanceof PHPUnit_Extensions_SeleniumTestSuite ||
             in_array('selenium', $groups)
         ) {
-            $this->setSeleniumCoverageFlag();
             $this->runPhantom();
         }
+
     }
 
     public function endTestSuite(\PHPUnit_Framework_TestSuite $suite)
@@ -104,12 +117,17 @@ class TestListener implements \PHPUnit_Framework_TestListener
     private function runPhantom()
     {
         if (strtolower(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER) == 'phantomjs') {
-            if (!$this->waitServerRun(1)) {
+            if (!$this->waitServerRun(
+                1,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
+            )) {
                 if (PHP_OS == 'WINNT') {
                     pclose(
                         popen(
                             "start /b " . PHPUNIT_TESTSUITE_BROWSER_PATH_WINNT .
                             " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
+                            " --disk-cache=true" .
                             " --ignore-ssl-errors=true",
                             "r"
                         )
@@ -118,35 +136,36 @@ class TestListener implements \PHPUnit_Framework_TestListener
                     shell_exec(
                         "nohup " . PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX .
                         " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
+                        " --disk-cache=true" .
                         " --ignore-ssl-errors=true" .
                         " > /dev/null 2> /dev/null &"
                     );
                 }
+                $this->waitServerRun(
+                    60,
+                    PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+                    PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
+                );
             }
-            $this->waitServerRun(
-                5,
-                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
-                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
-            );
         }
     }
 
     private function waitServerRun($timeOut = 5, $url = 'localhost', $port = '4444')
     {
-        $running = false;
-        $i = 0;
         do {
-            $fp = @fsockopen($url, intval($port));
-            $i++;
-            if ($i >= $timeOut) {
+            $fp = @fsockopen($url, (int)$port, $errno, $errstr, 1);
+            $timeOut--;
+            if ($timeOut <= 0) {
                 break;
             }
-            sleep(1);
+            if (!$fp) {
+                sleep(1);
+            }
         } while (!$fp);
-        if ($fp !== false) {
+
+        if ($result = is_resource($fp)) {
             fclose($fp);
-            $running = true;
         }
-        return $running;
+        return $result;
     }
 }

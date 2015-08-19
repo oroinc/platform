@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
 use Doctrine\ORM\EntityManager;
@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -51,7 +52,7 @@ class EntityFieldProvider
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var ManagerRegistry */
@@ -68,7 +69,7 @@ class EntityFieldProvider
      * @param EntityClassResolver $entityClassResolver
      * @param FieldTypeHelper     $fieldTypeHelper
      * @param ManagerRegistry     $doctrine
-     * @param Translator          $translator
+     * @param TranslatorInterface $translator
      * @param array               $hiddenFields
      */
     public function __construct(
@@ -77,7 +78,7 @@ class EntityFieldProvider
         EntityClassResolver $entityClassResolver,
         FieldTypeHelper $fieldTypeHelper,
         ManagerRegistry $doctrine,
-        Translator $translator,
+        TranslatorInterface $translator,
         $hiddenFields
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
@@ -295,7 +296,9 @@ class EntityFieldProvider
                 false,
                 $translate
             );
-            if (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
+            if (isset($query['select']['related_entity_name']) && $query['select']['related_entity_name']) {
+                $result[$fieldName]['related_entity_name'] = $query['select']['related_entity_name'];
+            } elseif (isset($query['select']['filter_by_id']) && $query['select']['filter_by_id']) {
                 $result[$fieldName]['related_entity_name'] = $metadata->getAssociationTargetClass($fieldName);
             }
         }

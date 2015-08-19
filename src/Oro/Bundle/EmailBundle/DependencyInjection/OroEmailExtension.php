@@ -27,9 +27,16 @@ class OroEmailExtension extends Extension
             $config['email_sync_exclusions']
         );
 
+        $container->setParameter(
+            'oro_email.flash_notification.max_emails_display',
+            $config['flash_notification']['max_emails_display']
+        );
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('form.yml');
+        $loader->load('mass_action.yml');
+        $loader->load('filters.yml');
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }

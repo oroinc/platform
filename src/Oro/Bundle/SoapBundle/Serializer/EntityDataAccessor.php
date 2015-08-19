@@ -6,20 +6,30 @@ use Doctrine\Common\Util\ClassUtils;
 
 class EntityDataAccessor implements DataAccessorInterface
 {
+    /** @var \ReflectionClass[] */
+    private $reflCache = [];
+
     /**
      * {@inheritdoc}
      */
     public function hasGetter($className, $property)
     {
-        $suffix = ucfirst($property);
+        $suffix = $this->camelize($property);
 
-        if (method_exists($className, 'get' . $suffix)) {
+        $refl = $this->getReflectionClass($className);
+        if ($refl->hasMethod('get' . $suffix)) {
             return true;
         }
-        if (method_exists($className, 'is' . $suffix)) {
+        if ($refl->hasMethod('is' . $suffix)) {
             return true;
         }
-        if (method_exists($className, 'has' . $suffix)) {
+        if ($refl->hasMethod('has' . $suffix)) {
+            return true;
+        }
+        if ($refl->hasMethod($suffix)) {
+            return true;
+        }
+        if ($refl->hasProperty($property)) {
             return true;
         }
 
@@ -31,25 +41,52 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     public function tryGetValue($object, $property, &$value)
     {
-        $suffix = ucfirst($property);
+        if (is_array($object)) {
+            if (isset($object[$property]) || array_key_exists($property, $object)) {
+                $value = $object[$property];
 
-        $accessor = 'get' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+                return true;
+            }
+        } else {
+            $refl = $this->getReflectionClass(get_class($object));
 
-            return true;
-        }
-        $accessor = 'is' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+            $suffix = $this->camelize($property);
 
-            return true;
-        }
-        $accessor = 'has' . $suffix;
-        if (method_exists($object, $accessor)) {
-            $value = $object->$accessor();
+            $accessor = 'get' . $suffix;
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
 
-            return true;
+                return true;
+            }
+            $accessor = 'is' . $suffix;
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
+
+                return true;
+            }
+            $accessor = 'has' . $suffix;
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
+
+                return true;
+            }
+            $accessor = $suffix;
+            if ($refl->hasMethod($accessor)) {
+                $method = $refl->getMethod($accessor);
+                $value  = $method->invoke($object);
+
+                return true;
+            }
+            if ($refl->hasProperty($property)) {
+                $prop = $refl->getProperty($property);
+                $prop->setAccessible(true);
+                $value = $prop->getValue($object);
+
+                return true;
+            }
         }
 
         return false;
@@ -62,15 +99,55 @@ class EntityDataAccessor implements DataAccessorInterface
     {
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
-            throw new \RuntimeException(
-                sprintf(
-                    'Cannot get a value of "%s" field from "%s" entity.',
-                    $property,
-                    ClassUtils::getClass($object)
-                )
-            );
+            if (is_array($object)) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot get a value of "%s" field.',
+                        $property
+                    )
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf(
+                        'Cannot get a value of "%s" field from "%s" entity.',
+                        $property,
+                        ClassUtils::getClass($object)
+                    )
+                );
+            }
         };
 
         return $value;
+    }
+
+    /**
+     * Camelizes a given string.
+     *
+     * @param string $string Some string
+     *
+     * @return string The camelized version of the string
+     */
+    protected function camelize($string)
+    {
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+    }
+
+    /**
+     * Gets an instance of \ReflectionClass for the given class name
+     *
+     * @param string $className
+     *
+     * @return \ReflectionClass
+     */
+    protected function getReflectionClass($className)
+    {
+        if (isset($this->reflCache[$className])) {
+            return $this->reflCache[$className];
+        }
+
+        $reflClass                   = new \ReflectionClass($className);
+        $this->reflCache[$className] = $reflClass;
+
+        return $reflClass;
     }
 }

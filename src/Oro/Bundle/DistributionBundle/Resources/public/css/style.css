@@ -3,7 +3,7 @@
 }
 
 .ajax-loading {
-    position: absolute;
+    position: block;
     display: none;
 }
 
@@ -293,4 +293,8 @@ table.table {
 .control-group .controls,
 .control-group .actions {
     padding-left: 10px;
+}
+
+#page {
+    overflow: auto;
 }

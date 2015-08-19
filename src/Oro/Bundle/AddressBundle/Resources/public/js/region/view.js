@@ -1,6 +1,9 @@
-/* global define */
-define(['underscore', 'backbone', 'jquery.select2'],
-function(_, Backbone) {
+define([
+        'underscore',
+        'backbone',
+        'jquery.select2',
+        'jquery.validate'
+], function(_, Backbone) {
     'use strict';
 
     var $ = Backbone.$;
@@ -52,6 +55,7 @@ function(_, Backbone) {
             } else {
                 this.target.select2('container').hide();
                 this.removeRequiredFlag(this.$simpleEl);
+                this.target.validate().hideElementErrors(this.target);
             }
         },
 
@@ -60,7 +64,7 @@ function(_, Backbone) {
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
-                    .append('<em>*</em>');
+                    .find('em').html('*');
             }
         },
 
@@ -69,7 +73,7 @@ function(_, Backbone) {
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
-                    .find('em').remove();
+                    .find('em').html('&nbsp;');
             }
         },
 
@@ -81,7 +85,7 @@ function(_, Backbone) {
          * Trigger change event
          */
         sync: function() {
-            if (this.target.val() == '' && this.$el.val() != '') {
+            if (this.target.val() === '' && this.$el.val() !== '') {
                 this.$el.trigger('change');
             }
         },
@@ -92,7 +96,7 @@ function(_, Backbone) {
          * @param e {Object}
          */
         selectionChanged: function(e) {
-            if($(e.currentTarget).val()){
+            if ($(e.currentTarget).val()) {
                 var countryId = $(e.currentTarget).val();
                 this.collection.setCountryId(countryId);
                 this.collection.fetch({reset: true});

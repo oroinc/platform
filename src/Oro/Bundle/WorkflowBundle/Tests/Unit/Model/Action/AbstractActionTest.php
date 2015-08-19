@@ -31,7 +31,7 @@ class AbstractActionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCondition()
     {
-        $condition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')
+        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
