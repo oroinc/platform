@@ -104,8 +104,8 @@ define([
             var self = this;
             return _.map(data.results, function(section) {
                 if (typeof section.children === 'undefined') {
-                    processData.call(this, section.data);
-                    this.$el.trigger('recipient:add', section.id);
+                    processData.call(self, section.data);
+                    self.$el.trigger('recipient:add', section.id);
 
                     return {
                         id: section.id,
