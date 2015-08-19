@@ -51,7 +51,8 @@ class PlaceholderFilter
      */
     public function isApplicable($entity = null, $pageType = null)
     {
-        if ($pageType === null || !is_object($entity) || $this->doctrineHelper->isNewEntity($entity)) {
+        if ($pageType === null || !is_object($entity) || !$this->doctrineHelper->isManageableEntity($entity) ||
+            $this->doctrineHelper->isNewEntity($entity)) {
             return false;
         }
 

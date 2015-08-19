@@ -75,7 +75,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @ORM\OneToOne(
      *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
-     *     cascade={"all"}, orphanRemoval=true, inversedBy="mailbox"
+     *     cascade={"persist"}, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
      */
@@ -102,8 +102,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @var Collection|User[]
      *
      * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\User",
-     *      cascade={"persist", "remove"}
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\User"
      * )
      * @ORM\JoinTable(name="oro_email_mailbox_users",
      *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -118,8 +117,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      * @var Collection|Role[]
      *
      * @ORM\ManyToMany(
-     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role",
-     *      cascade={"persist", "remove"}
+     *      targetEntity="Oro\Bundle\UserBundle\Entity\Role"
      * )
      * @ORM\JoinTable(name="oro_email_mailbox_roles",
      *     joinColumns={@ORM\JoinColumn(name="mailbox_id", referencedColumnName="id", onDelete="CASCADE")},
@@ -466,5 +464,18 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Deactivate email origin if mailbox is deleted.
+     *
+     * @ORM\PreRemove
+     */
+    public function preRemove()
+    {
+        if ($this->origin !== null) {
+            $this->origin->setActive(false);
+            $this->origin->setMailbox(null);
+        }
     }
 }
