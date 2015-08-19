@@ -89,6 +89,54 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->provider->isSupportedEntity($testEntity));
     }
 
+    public function testIsSupportedTargetEntity()
+    {
+        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
+        $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->will(
+                $this->returnValue(
+                    [
+                        $correctTarget,
+                        $notCorrectTarget
+                    ]
+                )
+            );
+
+        $testEntity = new \stdClass();
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($testEntity)
+            ->will($this->returnValue($correctTarget->getClassName()));
+
+        $this->assertTrue($this->provider->isSupportedTargetEntity($testEntity));
+    }
+
+    public function testIsSupportedTargetEntityWrongEntity()
+    {
+        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
+        $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->will(
+                $this->returnValue(
+                    [
+                        $correctTarget,
+                        $notCorrectTarget
+                    ]
+                )
+            );
+
+        $testEntity = new \stdClass();
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->with($testEntity)
+            ->will($this->returnValue($notCorrectTarget->getClassName()));
+
+        $this->assertFalse($this->provider->isSupportedTargetEntity($testEntity));
+    }
+
     public function testGetSubject()
     {
         $testEntity = new \stdClass();
@@ -105,7 +153,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEmptySubject()
     {
-        $testEntity = new TestTarget();
+        $testEntity = new TestTarget(1);
         $this->assertNull($this->provider->getSubject($testEntity));
     }
 

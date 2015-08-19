@@ -50,7 +50,7 @@ abstract class AbstractCommand extends ContainerAwareCommand
         );
 
         $timeout = $input->getOption('timeout');
-        if ($timeout > 0) {
+        if ($timeout >= 0) {
             $commandExecutor->setDefaultOption('process-timeout', $timeout);
         }
 

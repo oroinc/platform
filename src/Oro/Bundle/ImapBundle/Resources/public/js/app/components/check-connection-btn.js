@@ -15,6 +15,8 @@ function($, _, routing, __, mediator, messenger) {
         if (options.elementNamePrototype) {
             var url;
 
+            var forEntity = options.forEntity || 'user';
+
             var $el = $(options._sourceElement);
             var $form = $el.closest('form');
 
@@ -43,12 +45,20 @@ function($, _, routing, __, mediator, messenger) {
                 }
 
                 url = routing.generate(routeName);
+
+                var delimiter;
+                var extraQuery;
+
                 if (options.id !== null) {
-                    var extraQuery = 'id=' + options.id;
-                    var delimiter = url.indexOf('?') === -1 ? '?' : '&';
+                    extraQuery = 'id=' + options.id;
+                    delimiter = url.indexOf('?') === -1 ? '?' : '&';
 
                     url += (delimiter + extraQuery);
                 }
+
+                extraQuery = 'for_entity=' + forEntity;
+                delimiter = url.indexOf('?') === -1 ? '?' : '&';
+                url += (delimiter + extraQuery);
 
                 mediator.execute('showLoading');
                 $('.folder-tree').remove();

@@ -42,12 +42,26 @@ class DoctrineHelper
     {
         // check if we can use getId method to fast get the identifier
         if (method_exists($entity, 'getId')) {
+            // @todo This code doesn't support composite keys.
             return ['id' => $entity->getId()];
         }
 
         return $this
             ->getEntityMetadata($entity)
             ->getIdentifierValues($entity);
+    }
+
+    /**
+     * Check entity is new
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function isNewEntity($entity)
+    {
+        $identifierValues = $this->getEntityMetadata($entity)->getIdentifierValues($entity);
+
+        return count($identifierValues) === 0;
     }
 
     /**
