@@ -390,7 +390,7 @@ abstract class EmailOrigin
      *
      * @return $this
      */
-    public function setMailbox($mailbox)
+    public function setMailbox(Mailbox $mailbox = null)
     {
         $this->mailbox = $mailbox;
 
