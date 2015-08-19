@@ -24,9 +24,10 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->autoResponseRuleRepository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->autoResponseRuleRepository =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
