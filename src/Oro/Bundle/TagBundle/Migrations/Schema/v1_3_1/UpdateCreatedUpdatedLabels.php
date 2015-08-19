@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_5;
+namespace Oro\Bundle\TagBundle\Migrations\Schema\v1_3_1;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
