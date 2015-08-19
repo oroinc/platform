@@ -89,7 +89,7 @@ abstract class EmailOrigin
      * @var User
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", inversedBy="emailOrigins")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
      */
     protected $owner;
 
@@ -100,6 +100,12 @@ abstract class EmailOrigin
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $organization;
+
+    /**
+     * @var Mailbox
+     * @ORM\OneToOne(targetEntity="Mailbox", mappedBy="origin")
+     */
+    protected $mailbox;
 
     public function __construct()
     {
@@ -226,7 +232,7 @@ abstract class EmailOrigin
      *
      * @return EmailOrigin
      */
-    public function setIsActive($isActive)
+    public function setActive($isActive)
     {
         $this->isActive = $isActive;
 
@@ -367,6 +373,26 @@ abstract class EmailOrigin
     public function setMailboxName($name)
     {
         $this->mailboxName = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Mailbox
+     */
+    public function getMailbox()
+    {
+        return $this->mailbox;
+    }
+
+    /**
+     * @param Mailbox $mailbox
+     *
+     * @return $this
+     */
+    public function setMailbox($mailbox)
+    {
+        $this->mailbox = $mailbox;
 
         return $this;
     }

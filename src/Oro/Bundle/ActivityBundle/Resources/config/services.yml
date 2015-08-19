@@ -67,6 +67,7 @@ services:
             - @oro_ui.placeholder.provider
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
+            - { name: oro_ui.update_action_provider, group: activity }
 
     oro_activity.routing.options_resolver.activity_association:
         class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver

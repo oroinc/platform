@@ -102,10 +102,13 @@ define(function(require) {
             // compensate scroll bar
             if (this.scrollVisible) {
                 this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
-                totalWidth = this.$grid[0].offsetWidth - scrollBarWidth;
+                totalWidth = this.domCache.gridScrollableContainer[0].offsetWidth - scrollBarWidth;
             } else {
-                totalWidth = this.$grid[0].offsetWidth;
+                totalWidth = this.domCache.gridScrollableContainer[0].offsetWidth;
             }
+
+            this.$grid.css({width: totalWidth});
+            this.domCache.gridContainer.css({width: totalWidth});
 
             // save widths
             headerCells.each(function(i, headerCell) {
@@ -114,6 +117,7 @@ define(function(require) {
 
             // FF sometimes gives wrong values, need to check
             sumWidth = _.reduce(widths, function(a, b) {return a + b;});
+
             if (sumWidth > totalWidth) {
                 widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001;
             }
@@ -121,7 +125,6 @@ define(function(require) {
             // add scroll bar width to last cell if scroll is visible
             if (self.scrollVisible) {
                 widths[widths.length - 1] += scrollBarWidth;
-                totalWidth += scrollBarWidth;
             }
 
             // set exact sizes to header cells and cells in first row
@@ -140,12 +143,6 @@ define(function(require) {
             this.$grid.css({borderRight: 'none'});
 
             this.$el.addClass('floatThead');
-            this.$grid.css({
-                width: totalWidth
-            });
-            this.domCache.gridContainer.css({
-                width: totalWidth
-            });
 
             this.selectMode();
         },
@@ -327,6 +324,11 @@ define(function(require) {
                 scrollStateModel.set({
                     headerHeight: self.headerHeight
                 });
+
+                // force layout update
+                scrollContainer.hide().height();
+                scrollContainer.show();
+
                 self.scrollVisible = scrollContainer[0].clientHeight + 1 /*IE fix*/ < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
                     visible: self.scrollVisible,
@@ -378,7 +380,7 @@ define(function(require) {
                     this._lastClientRect.left !== scrollContainerRect.left ||
                     this._lastClientRect.right !== scrollContainerRect.right)) {
                 if (!this._lastClientRect || (this._lastClientRect.left !== scrollContainerRect.left ||
-                    this._lastClientRect.right !== scrollContainerRect.right)) {
+                        this._lastClientRect.right !== scrollContainerRect.right)) {
                     this.fixHeaderCellWidth();
                 } else {
                     this.selectMode();
@@ -412,7 +414,7 @@ define(function(require) {
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
                 (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
-                ) {
+            ) {
                 // no need to calculate anything
                 return resultRect;
             }
