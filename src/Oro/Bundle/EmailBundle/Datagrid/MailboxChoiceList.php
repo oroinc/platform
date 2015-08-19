@@ -50,7 +50,9 @@ class MailboxChoiceList
             }
         }
         foreach ($systemMailboxes as $mailbox) {
-            $choiceList[$mailbox->getOrigin()->getId()] = $mailbox->getLabel();
+            if ($mailbox->getOrigin() !== null) {
+                $choiceList[$mailbox->getOrigin()->getId()] = $mailbox->getLabel();
+            }
         }
 
         return $choiceList;
