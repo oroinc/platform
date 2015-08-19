@@ -24,6 +24,7 @@ class AbstractPageState
      * @var AbstractUser $user
      */
     protected $user;
+
     /**
      * Base64 encoded page URL
      *
