@@ -175,6 +175,21 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['Acme\\DemoBundle\\Entity\\CorrectEntity'], $this->provider->getTargetEntityClasses());
     }
 
+    public function getTargetEntityClassesOnEmptyTargetList()
+    {
+        $this->configManager->expects($this->once())
+            ->method('getIds')
+            ->will(
+                $this->returnValue([])
+            );
+
+        $this->assertEquals([], $this->provider->getTargetEntityClasses());
+
+        // at the second execution of getTargetEntityClasses we should not collect targets again even if we have
+        // no targets (method getIds must be executed only once)
+        $this->provider->getTargetEntityClasses();
+    }
+
     public function testGetProviderForEntity()
     {
         $testEntity = new \stdClass();
