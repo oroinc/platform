@@ -35,6 +35,8 @@ config:
         'oroemail/js/app/modules/views-module': 'bundles/oroemail/js/app/modules/views-module.js'
         'oroemail/js/app/modules/email-module': 'bundles/oroemail/js/app/modules/email-module.js'
 
+        'oroemail/js/util/email': 'oroemail/js/util/email.js'
+
         'oroemail/js/validator/email-address': 'bundles/oroemail/js/validator/email-address.js'
 
         'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'

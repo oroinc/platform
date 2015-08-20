@@ -1,8 +1,9 @@
 define([
     'underscore',
     'orotranslation/js/translator',
+    'oroemail/js/util/email',
     'jquery.validate',
-], function( _, __) {
+], function( _, __, emailUtil) {
     'use strict';
 
     var defaultParam = {
@@ -12,25 +13,6 @@ define([
     var emailRegExp = new RegExp(
         '^(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|' +
         '(\\".+\\"))@(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))$', 'i');
-
-    function extractPureEmailAddress(fullEmailAddress) {
-        var atPos = fullEmailAddress.lastIndexOf('@');
-        if (atPos === -1) {
-            return fullEmailAddress;
-        }
-
-        var startPos = fullEmailAddress.lastIndexOf('<', atPos);
-        if (startPos === -1) {
-            return fullEmailAddress;
-        }
-
-        var endPos = fullEmailAddress.indexOf('>', atPos);
-        if (endPos === -1) {
-            return fullEmailAddress;
-        }
-
-        return fullEmailAddress.substring(startPos + 1, endPos);
-    }
 
     /**
      * @export oroemail/js/validator/email
@@ -44,7 +26,7 @@ define([
             var $el = $(element);
             var values = $el.data('select2') ? $el.select2('val') : [value];
             return this.optional(element) || _.every(values, function (val) {
-                return emailRegExp.test(extractPureEmailAddress(val));
+                return emailRegExp.test(emailUtil.extractPureEmailAddress(val));
             });
         },
         function(param, element) {
