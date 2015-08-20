@@ -39,8 +39,7 @@ class AutoResponseListener
         $this->emailBodies = array_merge(
             $this->emailBodies,
             array_filter($uow->getScheduledEntityInsertions(), function ($entity) {
-                return $entity instanceof EmailBody &&
-                    $this->getAutoResponseManager()->hasAutoResponses($entity->getEmail());
+                return $entity instanceof EmailBody;
             })
         );
     }
@@ -50,13 +49,14 @@ class AutoResponseListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->emailBodies) {
+        $emailIds = $this->popEmailIds();
+        if (!$emailIds) {
             return;
         }
 
         $jobArgs = array_map(function ($id) {
             return sprintf('--%s=%s', AutoResponseCommand::OPTION_ID, $id);
-        }, $this->popEmailIds());
+        }, $emailIds);
         $job = new Job(AutoResponseCommand::NAME, $jobArgs);
 
         $em = $args->getEntityManager();
@@ -69,9 +69,17 @@ class AutoResponseListener
      */
     protected function popEmailIds()
     {
-        $emailIds = array_map(function (EmailBody $emailBody) {
-            return $emailBody->getEmail()->getId();
-        }, $this->emailBodies);
+        $emailIds = array_map(
+            function(EmailBody $emailBody) {
+                return $emailBody->getEmail()->getId();
+            },
+            array_filter(
+                $this->emailBodies,
+                function (EmailBody $emailBody) {
+                    $this->getAutoResponseManager()->hasAutoResponses($emailBody->getEmail());
+                }
+            )
+        );
         $this->emailBodies = [];
 
         return array_values($emailIds);
