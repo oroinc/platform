@@ -86,10 +86,16 @@ define([
                 if (!this.results.find('.select2-highlighted').length) {
                     var val = this.search.val();
                     if (val) {
-                        this.onSelect({
-                            id: val,
-                            text: val
+                        var valueExistsAlready = _.some(this.opts.element.select2('val'), function(id) {
+                            return val === id;
                         });
+
+                        if (!valueExistsAlready) {
+                            this.onSelect({
+                                id: val,
+                                text: val
+                            });
+                        }
                     }
                 }
 
@@ -113,7 +119,7 @@ define([
                     return index === selectedIndex;
                 });
 
-                $el.select2('data', newData);
+                $el.select2('data', newData).trigger('change');
                 $searchField.click().val(removedItem.text).trigger('paste');
             });
         }
