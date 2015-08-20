@@ -6,6 +6,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\DBALException;
 
 class DatabaseConnectionValidator extends ConstraintValidator
 {
@@ -24,6 +25,8 @@ class DatabaseConnectionValidator extends ConstraintValidator
         try {
             DriverManager::getConnection($params)->connect();
         } catch (\PDOException $e) {
+            $this->context->addViolation($constraint->message, array('%name%' => $params['dbname']));
+        } catch (DBALException $e) {
             $this->context->addViolation($constraint->message, array('%name%' => $params['dbname']));
         }
     }

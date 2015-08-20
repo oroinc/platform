@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -68,7 +69,7 @@ class EmailEntityBuilder
      *                                                  Example of email address see in description of $from parameter
      * @param string|string[]|null $bcc                 The BCC email address(es).
      *                                                  Example of email address see in description of $from parameter
-     * @param User|null $owner                          Owner of the email
+     * @param User|Mailbox|null $owner                  Owner of the email
      * @param OrganizationInterface|null $organization
      *
      * @return EmailUser
@@ -94,7 +95,11 @@ class EmailEntityBuilder
         $emailUser->setReceivedAt($receivedAt);
         $emailUser->setEmail($email);
         if ($owner !== null) {
-            $emailUser->setOwner($owner);
+            if ($owner instanceof User) {
+                $emailUser->setOwner($owner);
+            } elseif ($owner instanceof Mailbox) {
+                $emailUser->setMailboxOwner($owner);
+            }
         }
         if ($organization !== null) {
             $emailUser->setOrganization($organization);

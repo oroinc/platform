@@ -250,8 +250,13 @@
 #}
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ label }}</a>
+    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% if route is not null %}
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+            {{ label }}</a>
+    {% else %}
+        {{ label }}
+    {% endif %}
 {%- endmacro -%}
 
 {#
@@ -261,8 +266,13 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|default(emailAddressName|default('N/A')) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ label }}</a>
+    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% if route is not null %}
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+            {{ label }}</a>
+    {% else %}
+        {{ label }}
+    {% endif %}
 {%- endmacro -%}
 
 {#
@@ -617,3 +627,44 @@
         </div>
     </div>
 {% endmacro %}
+
+{#
+    Render title and buttons for Mailbox configuration
+#}
+{% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
+    <div class="container-fluid configuration-header clearfix">
+        {% if pageTitle is iterable %}
+            <div class="customer-info customer-simple pull-left">
+                {% for title in pageTitle%}
+                    {% if not loop.last %}
+                        <div class="sub-title">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </div>
+                        <span class="separator">/</span>
+                    {% else %}
+                        <h1 class="user-name">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </h1>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>
+                {{ pageTitle }}
+            </h1>
+        {% endif %}
+
+        <div class="pull-right title-buttons-container">
+            {{ buttons|raw }}
+        </div>
+    </div>
+{% endmacro %}
+

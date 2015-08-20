@@ -151,15 +151,15 @@ class ExtendConfigDumper
 
     public function dump()
     {
-        $schemas        = [];
-        $extendConfigs  = $this->configProvider->getConfigs(null, true);
+        $schemas       = [];
+        $extendConfigs = $this->configProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
 
             if ($schema) {
                 $schemas[$className]                 = $schema;
-                $schemas[$className]['relationData'] = $extendConfig->get('relation');
+                $schemas[$className]['relationData'] = $extendConfig->get('relation', false, []);
             }
         }
 
@@ -175,6 +175,54 @@ class ExtendConfigDumper
                 $this->entityGenerator->setCacheDir($cacheDir);
                 throw $e;
             }
+        }
+    }
+
+    /**
+     * Makes sure that extended entity configs are ready to be processing by other config related commands
+     */
+    public function checkConfig()
+    {
+        $hasAliases = file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
+        if ($hasAliases) {
+            return;
+        }
+
+        $hasChanges    = false;
+        $extendConfigs = $this->configProvider->getConfigs(null, true);
+        foreach ($extendConfigs as $extendConfig) {
+            $schema = $extendConfig->get('schema', false, []);
+
+            // make sure that inheritance definition for extended entities is up-to-date
+            // this check is required to avoid doctrine mapping exceptions during the platform update
+            // in case if a parent class is changed in a new version of a code
+            if (isset($schema['type'], $schema['class'], $schema['entity']) && $schema['type'] === 'Extend') {
+                $entityClassName = $schema['entity'];
+                $parentClassName = get_parent_class($schema['class']);
+                if ($parentClassName !== $entityClassName) {
+                    $inheritClassName = get_parent_class($parentClassName);
+
+                    $hasSchemaChanges = false;
+                    if (!isset($schema['parent']) || $schema['parent'] !== $parentClassName) {
+                        $hasSchemaChanges = true;
+                        $schema['parent'] = $parentClassName;
+                    }
+                    if (!isset($schema['inherit']) || $schema['inherit'] !== $inheritClassName) {
+                        $hasSchemaChanges  = true;
+                        $schema['inherit'] = $inheritClassName;
+                    }
+
+                    if ($hasSchemaChanges) {
+                        $hasChanges = true;
+                        $extendConfig->set('schema', $schema);
+                        $this->configProvider->persist($extendConfig);
+                    }
+                }
+            }
+        }
+
+        if ($hasChanges) {
+            $this->configProvider->flush();
         }
     }
 
@@ -249,7 +297,7 @@ class ExtendConfigDumper
             $fieldType     = $fieldConfigId->getFieldType();
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
+            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
                 $relationProperties[$fieldName] = $fieldName;
                 if ($underlyingFieldType !== RelationType::MANY_TO_ONE && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldName;
@@ -341,27 +389,30 @@ class ExtendConfigDumper
         }
 
         $relations = $extendConfig->get('relation', false, []);
-        foreach ($relations as &$relation) {
-            if (!$relation['field_id']) {
+        foreach ($relations as $relation) {
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $relation['field_id'];
+            if (!$fieldId) {
                 continue;
             }
 
-            $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
-                $fieldName = $relation['field_id']->getFieldName();
-
+            $fieldName = $fieldId->getFieldName();
+            if (!isset($relationProperties[$fieldName])) {
+                $relationProperties[$fieldName] = $fieldName;
+            }
+            if ($fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
-                if ($relation['target_field_id']) {
-                    $addRemoveMethods[$fieldName]['target']              =
-                        $relation['target_field_id']->getFieldName();
-                    $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() === RelationType::MANY_TO_MANY;
+
+                /** @var FieldConfigId $targetFieldId */
+                $targetFieldId = $relation['target_field_id'];
+                if ($targetFieldId) {
+                    $fieldType = $fieldId->getFieldType();
+
+                    $addRemoveMethods[$fieldName]['target']              = $targetFieldId->getFieldName();
+                    $addRemoveMethods[$fieldName]['is_target_addremove'] = $fieldType === RelationType::MANY_TO_MANY;
                 }
             }
-
-            $this->updateRelationValues($relation['target_entity'], $relation['field_id']);
         }
-        $extendConfig->set('relation', $relations);
 
         $schema = [
             'class'     => $className,
@@ -440,36 +491,6 @@ class ExtendConfigDumper
         if ($hasChanges) {
             $this->configProvider->flush();
         }
-    }
-
-    /**
-     * @param string        $targetClass
-     * @param FieldConfigId $fieldId
-     */
-    protected function updateRelationValues($targetClass, FieldConfigId $fieldId)
-    {
-        $targetConfig = $this->configProvider->getConfig($targetClass);
-        $relations    = $targetConfig->get('relation', false, []);
-        $schema       = $targetConfig->get('schema', false, []);
-
-        foreach ($relations as &$relation) {
-            if ($relation['target_field_id'] == $fieldId) {
-                if ($relation['owner']) {
-                    $relation['assign'] = true;
-                }
-
-                /** @var FieldConfigId $relationFieldId */
-                $relationFieldId = $relation['field_id'];
-                if ($relationFieldId) {
-                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
-                }
-            }
-        }
-
-        $targetConfig->set('relation', $relations);
-        $targetConfig->set('schema', $schema);
-
-        $this->configProvider->persist($targetConfig);
     }
 
     /**
