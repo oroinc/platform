@@ -22,7 +22,7 @@ define([
             contexts[parsedItem.key] = {};
             contexts[parsedItem.key] = {
                 id: JSON.stringify(parsedItem.contextValue),
-                text: parsedItem.contextText,
+                text: parsedItem.contextText
             };
             if (parsedItem.organization) {
                 organizations[parsedItem.key] = parsedItem.organization;
@@ -57,7 +57,7 @@ define([
                 'search-choice': searchChoice,
                 'organizations': [],
                 'organization': null,
-                'contexts': [],
+                'contexts': []
             });
 
             var self = this;

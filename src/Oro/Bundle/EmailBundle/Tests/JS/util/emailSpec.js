@@ -6,32 +6,32 @@ define([
     var data = [
         {
             fullEmailAddress: 'john@example.com',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: '<john@example.com>',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: 'John Smith <john@example.com>',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: 'John Smith" <john@example.com>',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: '\'John Smith\' <john@example.com>',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: 'John Smith on behaf <john@example.com>',
-            pureEmailAddress: 'john@example.com',
+            pureEmailAddress: 'john@example.com'
         },
         {
             fullEmailAddress: '"john@example.com" <john@example.com>',
-            pureEmailAddress: 'john@example.com',
-        },
+            pureEmailAddress: 'john@example.com'
+        }
     ];
 
     describe('oroemail/js/util/email', function() {
