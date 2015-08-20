@@ -51,7 +51,7 @@ parameters:
     # Entity email user listener
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
 
-    oro_email.event_listener.mailboxes_datagrid_listener.class: Oro\Bundle\EmailBundle\EventListener\MailboxesDatagridListener
+    oro_email.event_listener.mailboxes_datagrid_listener.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\MailboxesDatagridListener
 
     # Providers
     oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
