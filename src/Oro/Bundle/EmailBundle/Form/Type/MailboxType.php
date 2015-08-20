@@ -110,6 +110,14 @@ class MailboxType extends AbstractType
         $data = $event->getData();
         $form = $event->getForm();
 
+        FormUtils::replaceField(
+            $form,
+            'processType',
+            [
+                'choices' => $this->storage->getProcessTypeChoiceList($data)
+            ]
+        );
+
         if ($data === null) {
             return;
         }
