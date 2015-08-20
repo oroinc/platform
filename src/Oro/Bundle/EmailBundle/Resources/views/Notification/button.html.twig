@@ -1,17 +1,17 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 <script type="text/template" id="email-notification-item-template">
-    <% if (entity.get('seen')) {  %>
-        <li class="" id="<%= entity.cid %>">
+    <% if (seen) {  %>
+        <li class="" id="<%= cid %>">
     <% } else { %>
-        <li class="new" id="<%= entity.cid %>">
+        <li class="new" id="<%= cid %>">
     <% }  %>
-        <div class="info" data-id="<%= entity.get('id') %>">
+        <div class="info" data-id="<%= id %>">
             <div class="body">
-                <div class="title nowrap-ellipsis"><%= entity.get('subject') %></div>
-                <div class="description nowrap-ellipsis"><%= entity.get('bodyContent') %></div>
+                <div class="title nowrap-ellipsis"><%= subject %></div>
+                <div class="description nowrap-ellipsis"><%= bodyContent %></div>
             </div>
-            <% if (entity.get('seen')) {  %>
+            <% if (seen) {  %>
                 <i class="icon-envelope"></i>
             <% } else { %>
                 <i class="icon-envelope new"></i>
@@ -19,15 +19,15 @@
         </div>
         <div class="footer row-fluid">
             <span class="pull-left fromName">
-                <% if (entity.get('linkFromName')) { %>
-                    <a href="<%= entity.get('linkFromName') %>"><%= entity.get('fromName') %></a>
+                <% if (linkFromName) { %>
+                    <a href="<%= linkFromName %>"><%= fromName %></a>
                 <% } else { %>
-                    <%= entity.get('fromName') %>
+                    <%= fromName %>
                 <% } %>
             </span>
             <span class="pull-right replay">
                 {{- UI.clientLink({
-                    'dataUrl': "<%= entity.get('route') %>",
+                    'dataUrl': "<%= route %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
                     'label': 'oro.email.reply'|trans,

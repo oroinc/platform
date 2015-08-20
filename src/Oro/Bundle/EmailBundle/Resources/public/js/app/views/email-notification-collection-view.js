@@ -1,59 +1,52 @@
 /*global define*/
-define([
-    'jquery',
-    'orotranslation/js/translator',
-    'underscore',
-    'oroui/js/mediator',
-    'routing',
-    'oroui/js/app/views/base/collection-view',
-    'oroemail/js/app/views/email-notification-view',
-    'oroui/js/messenger'
-], function($,
-            __,
-            _,
-            mediator,
-            routing,
-            BaseCollectionView,
-            EmailNotificationView,
-            messenger) {
+define(function(require) {
     'use strict';
 
     var EmailNotificationCollectionView;
+    var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var messenger = require('oroui/js/messenger');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
         listSelector: '.items',
-
         countNewEmail: 0,
 
-        events: {
-            'click button.mark-as-read': 'onClickMarkAsRead',
+        listen: {
+            'change:seen collection': 'updateViewMode',
             'reset collection': 'onResetCollection'
+        },
+
+        events: {
+            'click': 'onClickIconEnvelope',
+            'click button.mark-as-read': 'onClickMarkAsRead'
         },
 
         initialize: function(options) {
             BaseCollectionView.__super__.initialize.apply(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
+        },
 
-            this.itemView = this.itemView.extend({
-                collectionView: this
-            });
-
+        render: function() {
+            BaseCollectionView.__super__.render.apply(this);
             this.updateViewMode();
             this.$el.show();
-            this.initEvents();
         },
 
         updateViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
+                var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .icon-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
-                    this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
+                    $iconEnvelope.removeClass('new');
                 } else {
                     this.setModeDropDownMenu('content');
                     if (this.countNewEmail > 0) {
-                        this.$el.find('.oro-dropdown-toggle .icon-envelope').addClass('new');
+                        $iconEnvelope.addClass('new');
                     } else {
-                        this.$el.find('.oro-dropdown-toggle .icon-envelope').removeClass('new');
+                        $iconEnvelope.removeClass('new');
                     }
                 }
             }
@@ -81,6 +74,7 @@ define([
 
             return this;
         },
+
         setModeDropDownMenu: function(type) {
             this.resetModeDropDownMenu();
             this.$el.find('.dropdown-menu').addClass(type);
@@ -108,16 +102,12 @@ define([
             this.updateViewMode();
         },
 
-        initEvents: function() {
-            var self = this;
-
-            this.$el.click(function() {
-                if (self.isActiveTypeDropDown('notification')) {
-                    self.open();
-                    self.setModeDropDownMenu('content');
-                }
-                self.updateViewMode();
-            });
+        onClickIconEnvelope: function() {
+            if (this.isActiveTypeDropDown('notification')) {
+                this.open();
+                this.setModeDropDownMenu('content');
+            }
+            this.updateViewMode();
         },
 
         showNotification: function() {

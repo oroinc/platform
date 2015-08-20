@@ -78,8 +78,7 @@ define([
             $.ajax({
                 url: routing.generate('oro_email_last'),
                 success: function(response) {
-                    self.collectionView.collection.reset();
-                    self.collectionView.collection.add(response.emails);
+                    self.collectionView.collection.reset(response.emails);
                     self.collectionView.setCount(response.count);
                     if (hasNewEmail) {
                         self.collectionView.showNotification();

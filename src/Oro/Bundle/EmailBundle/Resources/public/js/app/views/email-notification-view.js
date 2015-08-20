@@ -1,23 +1,14 @@
 /*global define*/
-define([
-    'jquery',
-    'orotranslation/js/translator',
-    'underscore',
-    'oroui/js/mediator',
-    'routing',
-    'oroui/js/app/views/base/view',
-    'oroui/js/messenger',
-    'oroemail/js/app/models/email-notification-model'
-], function($, __, _, mediator, routing, BaseView, messenger, EmailNotificationModel) {
+define(function(require) {
     'use strict';
 
     var EmailNotificationView;
+    var $ = require('jquery');
+    var mediator = require('oroui/js/mediator');
+    var routing = require('routing');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailNotificationView = BaseView.extend({
-        model: EmailNotificationModel,
-
-        collectionView: null,
-
         templateSelector: '#email-notification-item-template',
 
         events: {
@@ -41,16 +32,10 @@ define([
 
             return EmailNotificationView.__super__.getTemplateFunction.call(this);
         },
-        getTemplateData: function() {
-            return {
-                'entity': this.model
-            };
-        },
 
         onClickOpenEmail: function() {
             var url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
             this.model.set({'seen': true});
-            this.collectionView.updateViewMode();
             mediator.execute('redirectTo', {url: url});
         }
     });
