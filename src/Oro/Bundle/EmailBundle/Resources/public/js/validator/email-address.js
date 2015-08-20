@@ -3,7 +3,7 @@ define([
     'underscore',
     'orotranslation/js/translator',
     'oroemail/js/util/email',
-    'jquery.validate',
+    'jquery.validate'
 ], function($, _, __, emailUtil) {
     'use strict';
 
