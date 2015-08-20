@@ -14,7 +14,7 @@ define(function(require) {
 
         autoRender: true,
         firstRender: true,
-        firstQuoteLine: false,
+        firstQuoteLine: void 0,
 
         tinymceConnected: false,
         height: false,
@@ -59,6 +59,7 @@ define(function(require) {
             if (this.enabled) {
                 this.connectTinyMCE();
                 this.$el.attr('data-focusable', true);
+                this.findFirstQuoteLine();
             } else {
                 this.$el.removeAttr('data-focusable');
             }
@@ -67,11 +68,8 @@ define(function(require) {
         },
 
         connectTinyMCE: function() {
-            var $quote;
-            var lines;
-            var loadingMaskContainer;
             var self = this;
-            loadingMaskContainer = this.$el.parents('.ui-dialog');
+            var loadingMaskContainer = this.$el.parents('.ui-dialog');
             if (!loadingMaskContainer.length) {
                 loadingMaskContainer = this.$el.parent();
             }
@@ -117,14 +115,6 @@ define(function(require) {
                 }
             }, options));
             this.tinymceConnected = true;
-            this.firstQuoteLine = false;
-            $quote = $('<div>').html(this.$el.val()).find('.quote');
-            if ($quote.length > 0) {
-                lines = txtHtmlTransformer.html2multiline($quote.html());
-                if (lines.length > 0) {
-                    this.firstQuoteLine = lines[0];
-                }
-            }
         },
 
         setEnabled: function(enabled) {
@@ -143,6 +133,21 @@ define(function(require) {
 
         getHeight: function() {
             return this.$el.parent().innerHeight();
+        },
+
+        findFirstQuoteLine: function() {
+            var quote = $('<div>').html(this.$el.val()).find('.quote').html();
+            if (quote) {
+                quote = txtHtmlTransformer.html2text(quote);
+                this.firstQuoteLine = _.find(quote.split(/(\n\r?|\r\n?)/g), function(line) {
+                    return line.trim().length > 0;
+                });
+                if (this.firstQuoteLine) {
+                    this.firstQuoteLine = this.firstQuoteLine.trim();
+                }
+            } else {
+                this.firstQuoteLine = void 0;
+            }
         },
 
         getFirstQuoteLine: function() {

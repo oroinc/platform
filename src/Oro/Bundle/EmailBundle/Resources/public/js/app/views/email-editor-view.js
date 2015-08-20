@@ -50,45 +50,14 @@ define(function(require) {
         onAddSignatureButtonClick: function() {
             var url;
             var message;
-            var value;
-            var signatureNode;
-            var quoteNode;
-            var quoteIndex;
-            var cursorPosition;
-            var firstQuoteLine;
-            var EOL = '\n';
             var signature = this.model.get('signature');
             var bodyEditorView = this.getBodyEditorView();
             var tinyMCE = bodyEditorView.tinymceInstance;
             if (signature) {
                 if (tinyMCE) {
-                    quoteNode = tinyMCE.getBody().querySelector('.quote');
-                    signatureNode = tinyMCE.dom.create('p', {}, signature);
-                    tinyMCE.getBody().insertBefore(signatureNode, quoteNode);
-                    tinyMCE.selection.setCursorLocation(signatureNode);
-                    signatureNode.scrollIntoView();
-                    tinyMCE.execCommand('mceFocus',false);
+                    this.addHTMLSignature(signature, tinyMCE);
                 } else {
-                    signature = signature.replace(/(<([^>]+)>)/ig, '');
-                    value = this.domCache.body.val();
-                    firstQuoteLine = bodyEditorView.getFirstQuoteLine();
-                    if (firstQuoteLine) {
-                        value = this.domCache.body.val();
-                        quoteIndex = value.indexOf(firstQuoteLine);
-                        if (quoteIndex !== -1) {
-                            value = value.substr(0, quoteIndex) + signature + EOL + value.substr(quoteIndex);
-                            cursorPosition = quoteIndex + signature.length;
-                        } else {
-                            value += EOL + signature;
-                            cursorPosition = value.length;
-                        }
-                    } else {
-                        value += EOL + signature;
-                        cursorPosition = value.length;
-                    }
-                    this.domCache.body.val(value)
-                        .setCursorPosition(cursorPosition)
-                        .focus();
+                    this.addTextSignature(signature.replace(/(<([^>]+)>)/ig, ''), bodyEditorView.getFirstQuoteLine());
                 }
             } else {
                 url = routing.generate('oro_user_profile_update');
@@ -97,6 +66,36 @@ define(function(require) {
                         __('oro.email.thread.no_signature_no_permission');
                 mediator.execute('showFlashMessage', 'info', message);
             }
+        },
+
+        addHTMLSignature: function(signature, tinyMCE) {
+            var quoteNode = tinyMCE.getBody().querySelector('.quote');
+            var signatureNode = tinyMCE.dom.create('p', {}, signature);
+            tinyMCE.getBody().insertBefore(signatureNode, quoteNode);
+            tinyMCE.selection.setCursorLocation(signatureNode);
+            signatureNode.scrollIntoView();
+            tinyMCE.execCommand('mceFocus',false);
+        },
+
+        addTextSignature: function(signature, firstQuoteLine) {
+            var quoteIndex;
+            var cursorPosition;
+            var value = this.domCache.body.val();
+            var EOL = '\r\n';
+            if (firstQuoteLine) {
+                quoteIndex = value.indexOf(firstQuoteLine);
+                if (quoteIndex !== -1) {
+                    value = value.substr(0, quoteIndex) + signature + EOL + value.substr(quoteIndex);
+                    cursorPosition = quoteIndex + signature.length;
+                }
+            }
+            if (_.isUndefined(cursorPosition)) {
+                value += EOL + signature;
+                cursorPosition = value.length;
+            }
+            this.domCache.body.val(value)
+                .setCursorPosition(cursorPosition)
+                .focus();
         },
 
         onTemplateChange: function(e) {

@@ -18,7 +18,7 @@ define(['jquery'], function($) {
             return this.each(function() {
                 var el = this;
                 if ('selectionStart' in el) {
-                    el.selectionEnd = el.selectionStart = index;
+                    el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
                 }
             });
         },
@@ -27,12 +27,7 @@ define(['jquery'], function($) {
          * Sets cursor to end of input
          */
         setCursorToEnd: function() {
-            return this.each(function() {
-                var el = this;
-                if ('selectionStart' in el) {
-                    el.selectionEnd = el.selectionStart = el.value.length;
-                }
-            });
+            return this.setCursorPosition('end');
         },
 
         /**
