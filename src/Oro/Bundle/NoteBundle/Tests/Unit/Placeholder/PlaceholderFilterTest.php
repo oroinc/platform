@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Placeholder;
 
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestNonManagedTarget;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -50,6 +51,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 throw new \RuntimeException('Something wrong');
             });
 
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntity')
+            ->willReturnCallback(function ($entity) {
+                return !$entity instanceof TestNonManagedTarget;
+            });
+
         $this->filter = new PlaceholderFilter(
             $this->noteConfigProvider,
             $this->entityConfigProvider,
@@ -60,6 +67,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->noteConfigProvider, $this->entityConfigProvider, $this->doctrineHelper, $this->filter);
+    }
+
+    public function testIsNoteAssociationEnabledWithNonManagedEntity()
+    {
+        $testEntity = new TestNonManagedTarget(1);
+        $this->assertFalse($this->filter->isNoteAssociationEnabled($testEntity));
     }
 
     public function testIsNoteAssociationEnabledWithNull()
