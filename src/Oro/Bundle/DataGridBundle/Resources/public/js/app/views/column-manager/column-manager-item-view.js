@@ -3,17 +3,12 @@ define(function(require) {
 
     var ColumnManagerItemView;
     var $ = require('jquery');
+    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerItemView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
         tagName: 'tr',
-
-        attributes: function() {
-            return {
-                'data-cid': this.cid
-            };
-        },
 
         events: {
             'change input[type=checkbox][data-role=renderable]': 'updateModel'
@@ -33,6 +28,7 @@ define(function(require) {
         getTemplateData: function() {
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
+            data.isMobile = tools.isMobile();
             return data;
         },
 

@@ -15,7 +15,9 @@ define(function(require) {
         listSelector: 'tbody',
 
         events: {
-            'click .dropdown-menu': 'onDropdownClick'
+            'click .dropdown-menu': 'onDropdownClick',
+            'click tbody tr [data-role=moveUp]': 'onMoveUp',
+            'click tbody tr [data-role=moveDown]': 'onMoveDown'
         },
 
         /**
@@ -70,25 +72,49 @@ define(function(require) {
         /**
          * Prevents dropdown from closing on click
          *
-         * @param e
+         * @param {jQuery.Event} e
          */
         onDropdownClick: function(e) {
             e.stopPropagation();
         },
 
         /**
+         * Reorders columns elements (moves the element up)
+         *
+         * @param {jQuery.Event} e
+         */
+        onMoveUp: function(e) {
+            var $elem = this.$(e.currentTarget).closest('tr');
+            var $prev = $elem.prev();
+            if ($prev.length) {
+                $elem.insertBefore($prev);
+                this.onReorder();
+            }
+        },
+
+        /**
+         * Reorders columns elements (moves the element down)
+         *
+         * @param {jQuery.Event} e
+         */
+        onMoveDown: function(e) {
+            var $elem = this.$(e.currentTarget).closest('tr');
+            var $next = $elem.next();
+            if ($next.length) {
+                $elem.insertAfter($next);
+                this.onReorder();
+            }
+        },
+
+        /**
          * Handles sorting change event and update order attribute for each column
          */
         onReorder: function() {
-            var columnsChain = {};
             var reordered = false;
-
-            this.$('tbody tr[data-cid]').each(function(i) {
-                columnsChain[this.getAttribute('data-cid')] = i;
-            });
+            var columnsElements = this.$('tbody tr').toArray();
 
             _.each(this.subviews, function(view) {
-                var order = columnsChain[view.cid];
+                var order = columnsElements.indexOf(view.el);
                 if (view.model.get('order') !== order) {
                     reordered = true;
                     view.model.set('order', order);

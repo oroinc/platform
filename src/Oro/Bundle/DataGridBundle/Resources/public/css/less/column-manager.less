@@ -64,4 +64,14 @@
       cursor: -webkit-grab;
     }
   }
+  td.sort-cell {
+    white-space: nowrap;
+  }
+  tr:first-child .btn.move-up,
+  tr:last-child .btn.move-down {
+    cursor: default;
+    background-image: none;
+    .opacity(65);
+    .box-shadow(none);
+  }
 }
