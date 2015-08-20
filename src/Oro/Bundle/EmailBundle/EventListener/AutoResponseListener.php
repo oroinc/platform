@@ -76,7 +76,7 @@ class AutoResponseListener
             array_filter(
                 $this->emailBodies,
                 function (EmailBody $emailBody) {
-                    $this->getAutoResponseManager()->hasAutoResponses($emailBody->getEmail());
+                    return $this->getAutoResponseManager()->hasAutoResponses($emailBody->getEmail());
                 }
             )
         );
