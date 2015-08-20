@@ -39,6 +39,10 @@ class AutoResponseListener
 
         foreach ($uow->getScheduledEntityInsertions() as $oid => $entity) {
             if ($entity instanceof EmailUser) {
+                /**
+                 * Add already flushed email body in case there is new binding to mailbox
+                 * (email was sent from the system and now mailbox is synchonized)
+                 */
                 $email = $entity->getEmail();
                 $mailboxEmailUsers = $email->getEmailUsers()->filter(function (EmailUser $emailUser) {
                     return $emailUser->getId() && $emailUser->getMailboxOwner();
