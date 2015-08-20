@@ -519,7 +519,7 @@ datagrid:
 
     base-mailboxes-grid:
         source:
-            acl_resource: oro_email_mailbox_view
+            acl_resource: oro_email_mailbox_update
             type: orm
             query:
                 select:
