@@ -9,12 +9,24 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EmailBundle\Command\AutoResponseCommand;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository;
+use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class AutoResponseListener
 {
+    /** @var ServiceLink */
+    private $autoResponseManagerLink;
+
     /** @var EmailBody[] */
     protected $emailBodies = [];
+
+    /**
+     * @param ServiceLink $autoResponseManagerLink
+     */
+    public function __construct(ServiceLink $autoResponseManagerLink)
+    {
+        $this->autoResponseManagerLink = $autoResponseManagerLink;
+    }
 
     /**
      * @param OnFlushEventArgs $args
@@ -22,17 +34,13 @@ class AutoResponseListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $em = $args->getEntityManager();
-        /* @var $autoResponseRuleRepository AutoResponseRuleRepository */
-        $autoResponseRuleRepository = $em->getRepository('OroEmailBundle:AutoResponseRule');
-        if (!$autoResponseRuleRepository->rulesExists()) {
-            return;
-        }
-
         $uow = $em->getUnitOfWork();
+
         $this->emailBodies = array_merge(
             $this->emailBodies,
             array_filter($uow->getScheduledEntityInsertions(), function ($entity) {
-                return $entity instanceof EmailBody;
+                return $entity instanceof EmailBody &&
+                    $this->getAutoResponseManager()->hasAutoResponses($entity->getEmail());
             })
         );
     }
@@ -67,5 +75,13 @@ class AutoResponseListener
         $this->emailBodies = [];
 
         return array_values($emailIds);
+    }
+
+    /**
+     * @return AutoResponseManager
+     */
+    protected function getAutoResponseManager()
+    {
+        return $this->autoResponseManagerLink->getService();
     }
 }

@@ -272,6 +272,8 @@ services:
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
+        arguments:
+            - @oro_email.link.autoresponserule_manager
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -291,6 +293,10 @@ services:
             - @oro_email.mailer.processor
             - @logger
             - %locale%
+
+    oro_email.link.autoresponserule_manager:
+        tags:
+            - { name: oro_service_link,  service: oro_email.autoresponserule_manager }
 
     oro_email.manager.email.api:
         class: %oro_email.manager.email.api.class%
