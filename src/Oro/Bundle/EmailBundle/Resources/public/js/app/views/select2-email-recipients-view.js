@@ -34,7 +34,8 @@ define([
             this.$contextEl.select2('data', data);
         },
 
-        _onchange: function(e) {
+        _onchange: function(e, additionalData) {
+            _.extend(e, additionalData);
             this.$el.valid();
             this.$el.data('search-choice', {id: '', text: ''});
 
@@ -119,7 +120,7 @@ define([
                     return index === selectedIndex;
                 });
 
-                $el.select2('data', newData).trigger('change');
+                $el.select2('data', newData).trigger('change', {removed: removedItem});
                 $searchField.click().val(removedItem.text).trigger('paste');
             });
         }
