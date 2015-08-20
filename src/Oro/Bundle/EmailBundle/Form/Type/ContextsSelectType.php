@@ -102,7 +102,7 @@ class ContextsSelectType extends AbstractType
                     'separator'          => ';',
                     'forceSelectedData'  => true,
                     'containerCssClass'  => 'taggable-email',
-                    'minimumInputLength' => 1,
+                    'minimumInputLength' => 0,
                 ]
             ]
         );
