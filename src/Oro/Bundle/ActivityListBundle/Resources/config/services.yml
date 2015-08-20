@@ -61,6 +61,9 @@ services:
             - @oro_activity_list.provider.chain
             - @doctrine
             - @oro_entity.doctrine_helper
+            - @oro_entity_config.provider.activity
+        tags:
+            - { name: kernel.event_listener, event: oro.ui.grouping_chain_widget.before, method: isAllowedButton }
 
     oro_activity_list.event_listener.actitity_list_listener:
         class:  %oro_activity_list.event_listener.actitity_list_listener.class%

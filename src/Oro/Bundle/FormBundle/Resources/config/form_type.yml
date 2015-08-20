@@ -10,6 +10,7 @@ parameters:
     oro_form.type.multiple_entity.class:                         Oro\Bundle\FormBundle\Form\Type\MultipleEntityType
     oro_form.type.collection.class:                              Oro\Bundle\FormBundle\Form\Type\CollectionType
     oro_form.type.entity_create_or_select.class:                 Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType
+    oro_form.type.entity_create_or_select_choice.class:          Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectChoiceType
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
@@ -32,6 +33,7 @@ parameters:
     oro_form.extension.js_validation.repeated.class:             Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension
     oro_form.extension.random_id.class:                          Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension
     oro_form.extension.data_transformer.class:                   Oro\Bundle\FormBundle\Form\Extension\DataTransformerExtension
+    oro_form.extension.sortable.class:                           Oro\Bundle\FormBundle\Form\Extension\SortableExtension
 
     oro_form.form_handler.api.class:                             Oro\Bundle\FormBundle\Form\Handler\ApiFormHandler
 
@@ -109,6 +111,13 @@ services:
             - @oro_entity.doctrine_helper
         tags:
             - { name: form.type, alias: oro_entity_create_or_select }
+
+    oro_form.type.entity_create_or_select_choice:
+        class: %oro_form.type.entity_create_or_select_choice.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: form.type, alias: oro_entity_create_or_select_choice }
 
     oro_form.type.simple_color_picker:
         class: %oro_form.type.simple_color_picker.class%
@@ -202,6 +211,11 @@ services:
         class: %oro_form.extension.data_transformer.class%
         arguments:
             - @service_container
+        tags:
+            - { name: form.type_extension, alias: form }
+
+    oro_form.extension.sortable:
+        class: %oro_form.extension.sortable.class%
         tags:
             - { name: form.type_extension, alias: form }
 

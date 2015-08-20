@@ -54,10 +54,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->registry);
-        unset($this->em);
-        unset($this->classMetadata);
-        unset($this->doctrineHelper);
+        unset($this->registry, $this->em, $this->classMetadata, $this->doctrineHelper);
     }
 
     /**
@@ -111,6 +108,73 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             $identifiers,
             $this->doctrineHelper->getEntityIdentifier($entity)
         );
+    }
+
+    /**
+     * @param object $entity
+     * @param string $class
+     * @param array $identifiers
+     * @param bool $expected
+     * @dataProvider testIsNewEntityDataProvider
+     */
+    public function testIsNewEntity($entity, $class, array $identifiers, $expected)
+    {
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->will($this->returnCallback(function ($entity) use ($identifiers) {
+                $res = [];
+                foreach ($identifiers as $identifier) {
+                    if (isset($entity->$identifier)) {
+                        $res[$identifier] = $entity->$identifier;
+                    }
+                }
+
+                return $res;
+            }));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $this->assertEquals(
+            $expected,
+            $this->doctrineHelper->isNewEntity($entity)
+        );
+    }
+
+    public function testIsNewEntityDataProvider()
+    {
+        $entityWithTwoId = new ItemStub();
+        $entityWithTwoId->id = 1;
+        $entityWithTwoId->id2 = 2;
+
+        $entityWithoutId = new ItemStub();
+
+        return [
+            'existing entity with 2 id fields' => [
+                'entity' => $entityWithTwoId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id', 'id2'],
+                'expected' => false
+            ],
+            'existing entity with 1 id fields' => [
+                'entity' => $entityWithTwoId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id'],
+                'expected' => false
+            ],
+            'existing entity without id fields' => [
+                'entity' => $entityWithoutId,
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'identifiers' => ['id'],
+                'expected' => true
+            ],
+        ];
     }
 
     /**
