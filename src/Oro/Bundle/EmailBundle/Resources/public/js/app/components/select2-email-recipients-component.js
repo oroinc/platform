@@ -6,30 +6,6 @@ define([
 ], function($, _, Select2Component, Select2View) {
     'use strict';
 
-    /**
-     * Extracts contexts and organizations from data
-     */
-    function processData(data) {
-        if (typeof data === 'undefined') {
-            return;
-        }
-
-        var contexts = this.$el.data('contexts');
-        var organizations = this.$el.data('organizations');
-
-        var parsedItem = JSON.parse(data);
-        if (parsedItem.contextText) {
-            contexts[parsedItem.key] = {};
-            contexts[parsedItem.key] = {
-                id: JSON.stringify(parsedItem.contextValue),
-                text: parsedItem.contextText
-            };
-            if (parsedItem.organization) {
-                organizations[parsedItem.key] = parsedItem.organization;
-            }
-        }
-    }
-
     function dataHasText(data, text) {
         return _.some(data, function(row) {
             if (!row.hasOwnProperty('children')) {
@@ -104,7 +80,7 @@ define([
             var self = this;
             return _.map(data.results, function(section) {
                 if (typeof section.children === 'undefined') {
-                    processData.call(self, section.data);
+                    self._processData(section.data);
                     self.$el.trigger('recipient:add', section.id);
 
                     return {
@@ -116,7 +92,7 @@ define([
                 return {
                     text: section.text,
                     children: _.map(section.children, function(item) {
-                        processData.call(self, item.data);
+                        self._processData(item.data);
 
                         return {
                             id: item.id,
@@ -125,7 +101,31 @@ define([
                     })
                 };
             });
-        }
+        },
+
+        /**
+        * Extracts contexts and organizations from data
+        */
+        _processData: function(data) {
+           if (typeof data === 'undefined') {
+               return;
+           }
+
+           var contexts = this.$el.data('contexts');
+           var organizations = this.$el.data('organizations');
+
+           var parsedItem = JSON.parse(data);
+           if (parsedItem.contextText) {
+               contexts[parsedItem.key] = {};
+               contexts[parsedItem.key] = {
+                   id: JSON.stringify(parsedItem.contextValue),
+                   text: parsedItem.contextText
+               };
+               if (parsedItem.organization) {
+                   organizations[parsedItem.key] = parsedItem.organization;
+               }
+           }
+       }
     });
 
     return Select2EmailRecipientsComponent;

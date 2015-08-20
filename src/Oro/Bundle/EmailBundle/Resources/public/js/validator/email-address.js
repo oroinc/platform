@@ -1,9 +1,10 @@
 define([
+    'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroemail/js/util/email',
     'jquery.validate',
-], function(_, __, emailUtil) {
+], function($, _, __, emailUtil) {
     'use strict';
 
     var defaultParam = {
