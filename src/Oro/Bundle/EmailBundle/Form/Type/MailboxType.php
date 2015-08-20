@@ -72,7 +72,7 @@ class MailboxType extends AbstractType
         ]);
         $builder->add(
             'authorizedUsers',
-            'oro_user_multiselect',
+            'oro_user_organization_acl_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
             ]
