@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareInterface
 {
@@ -64,8 +65,8 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
                 // might be "ALTER TABLE" query rather than "DROP/CREATE" queries
                 $dropTableSql   = $comparator->compare($currentSchema, new Schema())->toSql($this->platform);
                 $createTableSql = $comparator->compare(new Schema(), $requiredSchema)->toSql($this->platform);
-                $queries->addQuery($dropTableSql);
-                $queries->addQuery($createTableSql);
+                $queries->addQuery(new SqlMigrationQuery($dropTableSql));
+                $queries->addQuery(new SqlMigrationQuery($createTableSql));
             }
         }
     }
