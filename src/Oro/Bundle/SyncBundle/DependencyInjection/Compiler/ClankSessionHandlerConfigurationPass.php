@@ -70,7 +70,6 @@ class ClankSessionHandlerConfigurationPass implements CompilerPassInterface
             return;
         }
 
-
         // make sure that a ping service exists in a list of periodic services
         if ($container->hasParameter(self::PERIODIC_SERVICES_PARAM)) {
             $periodicServices = $container->getParameter(self::PERIODIC_SERVICES_PARAM);
