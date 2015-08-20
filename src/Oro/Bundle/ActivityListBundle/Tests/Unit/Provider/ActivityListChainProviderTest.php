@@ -185,8 +185,9 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([], $this->provider->getTargetEntityClasses());
 
-        // at the second execution of getTargetEntityClasses we should not collect targets again even if we have
-        // no targets (method getIds must be executed only once)
+        /**
+         * Each subsequent execution of getTargetEntityClasses should NOT collect targets again
+         */
         $this->provider->getTargetEntityClasses();
     }
 
