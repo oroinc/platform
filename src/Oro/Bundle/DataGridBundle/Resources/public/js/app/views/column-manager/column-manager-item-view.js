@@ -28,7 +28,6 @@ define(function(require) {
         getTemplateData: function() {
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
-            data.isMobile = tools.isMobile();
             return data;
         },
 

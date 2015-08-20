@@ -163,7 +163,7 @@ define(['jquery', 'underscore'], function($, _) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**

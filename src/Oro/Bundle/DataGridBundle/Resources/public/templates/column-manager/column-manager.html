@@ -2,8 +2,10 @@
     <i class="icon-cog hide-text"><%= _.__('oro.datagrid.column_manager.title') %></i>
 </a>
 <div class="dropdown-menu">
-    <div class="title"><%= _.__('oro.datagrid.column_manager.title') %></div>
-    <span class="hint"><%= _.__('oro.datagrid.column_manager.tooltip') %></span>
+    <div class="column-manager-title"><%= _.__('oro.datagrid.column_manager.title') %></div>
+    <% if (!_.isMobile()) { %>
+    <span class="column-manager-hint"><%= _.__('oro.datagrid.column_manager.tooltip')%></span>
+    <% } %>
     <div class="table-wrapper">
         <table class="grid table-hover table table-condensed">
             <thead>

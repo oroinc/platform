@@ -7,7 +7,7 @@
         <% if (obj.renderable) {%>checked<% } %>/>
 </td>
 <td class="sort-cell">
-    <% if (!isMobile) { %>
+    <% if (!_.isMobile()) { %>
     <span title="Move column"><i class="icon-list handle"></i></span>
     <% } else { %>
     <span class="btn move-up" data-role="moveUp" title="Move column up"><i class="icon-chevron-up"></i></span>
