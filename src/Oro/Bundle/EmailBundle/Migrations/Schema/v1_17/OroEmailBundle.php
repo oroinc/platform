@@ -15,17 +15,15 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(new ParametrizedSqlMigrationQuery(
-            'DELETE FROM oro_process_definition WHERE name = :name',
-            [
-                'name' => 'email_auto_response',
-            ]
-        ));
-        $queries->addQuery(new ParametrizedSqlMigrationQuery(
-            'DELETE FROM oro_process_trigger WHERE definition_name = :name',
-            [
-                'name' => 'email_auto_response',
-            ]
-        ));
+        if ($schema->hasTable('oro_process_definition')) {
+            $queries->addQuery(new ParametrizedSqlMigrationQuery(
+                'DELETE FROM oro_process_definition WHERE name = :name',
+                ['name' => 'email_auto_response']
+            ));
+            $queries->addQuery(new ParametrizedSqlMigrationQuery(
+                'DELETE FROM oro_process_trigger WHERE definition_name = :name',
+                ['name' => 'email_auto_response']
+            ));
+        }
     }
 }
