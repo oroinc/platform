@@ -60,12 +60,12 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
             $comparator = new Comparator();
             $changes    = $comparator->compare($currentSchema, $requiredSchema)->toSql($this->platform);
             if ($changes) {
-                // force data purging as a result of dropTable/createTable pair
+                // force to recreate oro_session table as a result of dropTable/createTable pair
                 // might be "ALTER TABLE" query rather than "DROP/CREATE" queries
-                $queries->addPreQuery('DELETE FROM oro_session');
-                // recreate oro_session table
-                $schema->dropTable('oro_session');
-                $this->createOroSessionTable($schema);
+                $dropTableSql   = $comparator->compare($currentSchema, new Schema())->toSql($this->platform);
+                $createTableSql = $comparator->compare(new Schema(), $requiredSchema)->toSql($this->platform);
+                $queries->addQuery($dropTableSql);
+                $queries->addQuery($createTableSql);
             }
         }
     }
