@@ -23,17 +23,13 @@ define(function(require) {
          * Collection of manageable columns
          * @type {Backgrid.Columns}
          */
-        collection: null,
+        manageableColumns: null,
 
         /**
          * Instance of grid
          * @type {Backgrid.Grid}
          */
         grid: null,
-
-        listen: {
-            'change:renderable collection': '_pushState'
-        },
 
         /**
          * @inheritDoc
@@ -49,14 +45,7 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
-            var manageableColumns = this.columns.filter(function(columns) {
-                return columns.get('manageable') !== false;
-            });
-
-            this.collection = new ColumnsCollection(
-                manageableColumns,
-                _.pick(options, ['minVisibleColumnsQuantity'])
-            );
+            this._createManageableCollection(options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
@@ -93,16 +82,40 @@ define(function(require) {
          * @returns {ColumnManagerView}
          */
         createLauncher: function() {
+            // index of first manageable column
+            var orderShift = this.manageableColumns[0] ? this.manageableColumns[0].get('order') : 0;
+
             var columnManagerView = new ColumnManagerView({
-                collection: this.collection
+                collection: this.manageableColumns,
+                orderShift: orderShift
             });
 
-            this.listenTo(columnManagerView, 'reordered', function() {
-                this.columns.sort();
-                this._pushState();
-            });
+            this.listenTo(columnManagerView, 'reordered', this._pushState);
+            this.listenTo(this.manageableColumns, 'change:renderable', this._pushState);
 
             return columnManagerView;
+        },
+
+        /**
+         * Create collection with manageable columns
+         *
+         * @param {Object} options
+         * @protected
+         */
+        _createManageableCollection: function(options) {
+            var manageableColumns = [];
+
+            this.columns.each(function(column, i) {
+                // set initial order
+                column.set('order', i, {silent: true});
+                // collect manageable columns
+                if (column.get('manageable') !== false) {
+                    manageableColumns.push(column);
+                }
+            });
+
+            this.manageableColumns = new ColumnsCollection(manageableColumns,
+                _.pick(options, ['minVisibleColumnsQuantity']));
         },
 
         /**
@@ -133,7 +146,7 @@ define(function(require) {
 
             this._applyingState = true;
 
-            this.collection.each(function(column) {
+            this.manageableColumns.each(function(column, i) {
                 var name = column.get('name');
                 if (columnsState[name]) {
                     attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
@@ -141,11 +154,11 @@ define(function(require) {
                 } else {
                     column.set({
                         renderable: true,
-                        order: void 0
+                        order: i
                     });
                 }
             });
-            this.collection.sort();
+            this.manageableColumns.sort();
 
             this.columns.sort();
 
@@ -162,7 +175,7 @@ define(function(require) {
         _createState: function() {
             var state = {};
 
-            this.collection.each(function(column) {
+            this.manageableColumns.each(function(column) {
                 var name = column.get('name');
                 var order = column.get('order');
 

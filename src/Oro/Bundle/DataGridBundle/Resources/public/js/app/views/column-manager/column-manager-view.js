@@ -21,6 +21,23 @@ define(function(require) {
         },
 
         /**
+         * Number that is used to normalize order value
+         *
+         * @type {number}
+         */
+        orderShift: 0,
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            _.extend(this, _.pick(options, ['orderShift']));
+
+            ColumnManagerView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
          * @inheritDoc
          */
         render: function() {
@@ -114,7 +131,7 @@ define(function(require) {
             var columnsElements = this.$('tbody tr').toArray();
 
             _.each(this.subviews, function(view) {
-                var order = columnsElements.indexOf(view.el);
+                var order = columnsElements.indexOf(view.el) + this.orderShift;
                 if (view.model.get('order') !== order) {
                     reordered = true;
                     view.model.set('order', order);
