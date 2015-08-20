@@ -16,7 +16,7 @@ use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 
 class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $autoResponseRuleRepository;
+    protected $autoResponseManager;
     protected $em;
     protected $uow;
 
@@ -24,10 +24,18 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->autoResponseRuleRepository =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository')
+        $this->autoResponseManager =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\AutoResponseManager')
                 ->disableOriginalConstructor()
                 ->getMock();
+
+        $autoResponseManagerLink =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $autoResponseManagerLink->expects($this->any())
+            ->method('getService')
+            ->will($this->returnValue($this->autoResponseManager));
 
         $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
@@ -39,12 +47,8 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->any())
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
-        $this->em->expects($this->any())
-            ->method('getRepository')
-            ->with('OroEmailBundle:AutoResponseRule')
-            ->will($this->returnValue($this->autoResponseRuleRepository));
 
-        $this->autoResponseListener = new AutoResponseListener();
+        $this->autoResponseListener = new AutoResponseListener($autoResponseManagerLink);
     }
 
     /**
@@ -52,14 +56,17 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testListenerShouldNotFlushJobIfRulesDoesntExists(array $entityInsertions, array $expectedArgs)
     {
-        $this->autoResponseRuleRepository
-            ->expects($this->once())
-            ->method('rulesExists')
+        $this->autoResponseManager
+            ->expects($this->exactly(count($entityInsertions)))
+            ->method('hasAutoResponses')
             ->will($this->returnValue(false));
 
-        $this->uow->expects($this->never())
+        $this->uow->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue($entityInsertions));
+
+        $this->em->expects($this->never())
+            ->method('persist');
 
         $this->autoResponseListener->onFlush(new OnFlushEventArgs($this->em));
         $this->autoResponseListener->postFlush(new PostFlushEventArgs($this->em));
@@ -70,9 +77,9 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testListenerShouldFlushJobIfRulesExists(array $entityInsertions, array $expectedArgs)
     {
-        $this->autoResponseRuleRepository
-            ->expects($this->once())
-            ->method('rulesExists')
+        $this->autoResponseManager
+            ->expects($this->exactly(count($entityInsertions)))
+            ->method('hasAutoResponses')
             ->will($this->returnValue(true));
 
         $this->uow->expects($this->once())
