@@ -311,7 +311,7 @@ class Processor
                 },
                 $body
             );
-            $message->setBody($body, 'text/html');
+            $message->setBody($body);
         }
     }
 
