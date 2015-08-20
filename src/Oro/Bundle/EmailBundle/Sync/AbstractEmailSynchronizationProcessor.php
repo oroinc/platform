@@ -287,6 +287,39 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
+     * @param array $messageIds
+     * @param int   $folderId
+     * @return array
+     */
+    protected function getExistingEmailUsers(array $messageIds, $folderId)
+    {
+        $existEmailUsers = [];
+
+        if (empty($messageIds)) {
+            return $existEmailUsers;
+        }
+
+        $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
+
+        $result =  $emailUserRepository->createQueryBuilder('email_user')
+            ->select('email_user')
+            ->leftJoin('email_user.email', 'email')
+            ->where('email.messageId IN (:messageIds)')
+            ->andWhere('email_user.folder = :folderId')
+            ->setParameters([
+                'messageIds' => $messageIds,
+                'folderId'   => $folderId
+            ])->getQuery()->getResult();
+
+        /** @var EmailUser $emailUser */
+        foreach ($result as $emailUser) {
+            $existEmailUsers[$emailUser->getEmail()->getMessageId()] = $emailUser;
+        }
+
+        return $existEmailUsers;
+    }
+
+    /**
      * Checks if the given folders types are comparable.
      * For example two "Sent" folders are comparable, "Inbox" and "Other" folders
      * are comparable as well, but "Inbox" and "Sent" folders are not comparable

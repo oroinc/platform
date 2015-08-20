@@ -425,11 +425,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $existingUids  = $this->getExistingUids($folder, $emails);
         $isMultiFolder = $this->manager->hasCapability(Imap::CAPABILITY_MSG_MULTI_FOLDERS);
 
+        $messageIds         = $this->getNewMessageIds($emails, $existingUids);
         $existingImapEmails = $this->getExistingImapEmails(
             $folder->getOrigin(),
-            $this->getNewMessageIds($emails, $existingUids),
+            $messageIds,
             $isMultiFolder
         );
+
+        $existingEmailUsers = $this->getExistingEmailUsers($messageIds, $folder->getId());
 
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
@@ -463,15 +466,19 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
                 try {
-                    $imapEmail = $this->createImapEmail(
-                        $email->getId()->getUid(),
-                        $this->addEmailUser(
+                    $emailUser = isset($existingEmailUsers[$email->getMessageId()])
+                        ? $existingEmailUsers[$email->getMessageId()]
+                        : $this->addEmailUser(
                             $email,
                             $folder,
                             $email->hasFlag("\\Seen"),
                             $this->currentUser,
                             $this->currentOrganization
-                        )->getEmail(),
+                        );
+
+                    $imapEmail = $this->createImapEmail(
+                        $email->getId()->getUid(),
+                        $emailUser->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;
