@@ -25,6 +25,10 @@ define([
             // return $.validator.methods.email.apply(this, arguments);
             var $el = $(element);
             var values = $el.data('select2') ? $el.select2('val') : [value];
+            if (!_.isArray(values)) {
+                values = [values];
+            }
+
             return this.optional(element) || _.every(values, function (val) {
                 return emailRegExp.test(emailUtil.extractPureEmailAddress(val));
             });
