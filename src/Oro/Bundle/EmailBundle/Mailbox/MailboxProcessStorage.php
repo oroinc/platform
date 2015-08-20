@@ -76,7 +76,7 @@ class MailboxProcessStorage
      *
      * @param Mailbox $mailbox
      *
-     * @return array ['type' => 'Process Type Label (translate id)']
+     * @return array('type' => 'Process Type Label (translate id)')
      */
     public function getProcessTypeChoiceList(Mailbox $mailbox = null)
     {
