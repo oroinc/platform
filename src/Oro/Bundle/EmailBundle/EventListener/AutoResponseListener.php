@@ -84,7 +84,7 @@ class AutoResponseListener
     protected function popEmailIds()
     {
         $emailIds = array_map(
-            function(EmailBody $emailBody) {
+            function (EmailBody $emailBody) {
                 return $emailBody->getEmail()->getId();
             },
             array_filter(
