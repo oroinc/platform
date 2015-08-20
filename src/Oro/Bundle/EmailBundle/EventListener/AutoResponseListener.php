@@ -9,6 +9,7 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EmailBundle\Command\AutoResponseCommand;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
@@ -36,12 +37,21 @@ class AutoResponseListener
         $em = $args->getEntityManager();
         $uow = $em->getUnitOfWork();
 
-        $this->emailBodies = array_merge(
-            $this->emailBodies,
-            array_filter($uow->getScheduledEntityInsertions(), function ($entity) {
-                return $entity instanceof EmailBody;
-            })
-        );
+        foreach ($uow->getScheduledEntityInsertions() as $oid => $entity) {
+            if ($entity instanceof EmailUser) {
+                $email = $entity->getEmail();
+                $mailboxEmailUsers = $email->getEmailUsers()->filter(function (EmailUser $emailUser) {
+                    return $emailUser->getId() && $emailUser->getMailboxOwner();
+                });
+
+                $emailBody = $email->getEmailBody();
+                if ($mailboxEmailUsers->isEmpty() && $emailBody && $emailBody->getId()) {
+                    $this->emailBodies[spl_object_hash($emailBody)] = $emailBody;
+                }
+            } elseif ($entity instanceof EmailBody) {
+                $this->emailBodies[$oid] = $entity;
+            }
+        }
     }
 
     /**
