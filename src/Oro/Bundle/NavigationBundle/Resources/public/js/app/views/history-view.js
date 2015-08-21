@@ -6,10 +6,21 @@ define([
     var HistoryView;
 
     HistoryView = PageRegionView.extend({
-        template: function(data) {
-            return data.history;
+        template: function() {},
+        pageItems: [],
+        dataItems: null,
+
+        initialize: function(options) {
+            this.dataItems = options.dataItems || 'history';
+            this.pageItems = [this.dataItems];
+
+            var self = this;
+            this.template = function (data) {
+                return data[self.dataItems];
+            };
+
+            HistoryView.__super__.initialize.apply(this, arguments);
         },
-        pageItems: ['history'],
 
         render: function() {
             // does not update view if data is from cache
