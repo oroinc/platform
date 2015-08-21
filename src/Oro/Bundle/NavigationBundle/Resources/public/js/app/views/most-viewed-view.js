@@ -15,7 +15,7 @@ define([
             this.pageItems = [this.dataItems];
 
             var self = this;
-            this.template = function (data) {
+            this.template = function(data) {
                 return data[self.dataItems];
             };
 
