@@ -51,37 +51,38 @@ define(function(require) {
             var url;
             var message;
             var signature = this.model.get('signature');
-            var bodyEditorView = this.getBodyEditorView();
-            var tinyMCE = bodyEditorView.tinymceInstance;
             if (signature) {
-                if (tinyMCE) {
-                    this.addHTMLSignature(signature, tinyMCE);
+                if (this.getBodyEditorView().tinymceInstance) {
+                    this.addHTMLSignature(signature);
                 } else {
-                    this.addTextSignature(signature.replace(/(<([^>]+)>)/ig, ''), bodyEditorView.getFirstQuoteLine());
+                    this.addTextSignature(signature);
                 }
             } else {
                 url = routing.generate('oro_user_profile_update');
                 message = this.model.get('isSignatureEditable') ?
                     __('oro.email.thread.no_signature', {url: url}) :
-                        __('oro.email.thread.no_signature_no_permission');
+                    __('oro.email.thread.no_signature_no_permission');
                 mediator.execute('showFlashMessage', 'info', message);
             }
         },
 
-        addHTMLSignature: function(signature, tinyMCE) {
+        addHTMLSignature: function(signature) {
+            var tinyMCE = this.getBodyEditorView().tinymceInstance;
             var quoteNode = tinyMCE.getBody().querySelector('.quote');
             var signatureNode = tinyMCE.dom.create('p', {}, signature);
             tinyMCE.getBody().insertBefore(signatureNode, quoteNode);
             tinyMCE.selection.setCursorLocation(signatureNode);
             signatureNode.scrollIntoView();
-            tinyMCE.execCommand('mceFocus',false);
+            tinyMCE.execCommand('mceFocus', false);
         },
 
-        addTextSignature: function(signature, firstQuoteLine) {
+        addTextSignature: function(signature) {
             var quoteIndex;
             var cursorPosition;
             var value = this.domCache.body.val();
             var EOL = '\r\n';
+            var firstQuoteLine = this.getBodyEditorView().getFirstQuoteLine();
+            signature = signature.replace(/(<([^>]+)>)/ig, '');
             if (firstQuoteLine) {
                 quoteIndex = value.indexOf(firstQuoteLine);
                 if (quoteIndex !== -1) {
