@@ -136,7 +136,12 @@ class FieldTypeTest extends BaseFieldTypeTest
         );
 
         $relationConfig = [
-            'oneToMany|OroCRM\Bundle\ContactBundle\Entity\Contact|OroCRM\Bundle\ContactBundle\Entity\ContactAddress|addresses' => [
+            implode('|', [
+                'oneToMany',
+                'OroCRM\Bundle\ContactBundle\Entity\Contact',
+                'OroCRM\Bundle\ContactBundle\Entity\ContactAddress',
+                'addresses'
+            ]) => [
                 'assign'          => true,
                 'field_id'        => $relationConfigFieldId,
                 'owner'           => false,
@@ -155,6 +160,7 @@ class FieldTypeTest extends BaseFieldTypeTest
      * from ContactAddress to Contact
      *
      * @return array
+     * @SuppressWarnings(PHPMD.)
      */
     protected function prepareManyToOneRelationsConfig()
     {
@@ -172,7 +178,12 @@ class FieldTypeTest extends BaseFieldTypeTest
         );
 
         $relationConfig = [
-            'oneToMany|OroCRM\Bundle\ContactBundle\Entity\Contact|OroCRM\Bundle\ContactBundle\Entity\ContactAddress|addresses' => [
+            implode('|', [
+                'oneToMany',
+                'OroCRM\Bundle\ContactBundle\Entity\Contact',
+                'OroCRM\Bundle\ContactBundle\Entity\ContactAddress',
+                'addresses'
+            ]) => [
                 'assign'          => true,
                 'field_id'        => $relationConfigFieldId,
                 'owner'           => true,
