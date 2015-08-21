@@ -143,3 +143,41 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_share_select_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set isButtonsEnabled = not disabled and not read_only %}
+    <div id="{{ id }}-el"
+         {% if isButtonsEnabled %}class="entity-create-or-select-container"{% endif %}>
+        <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
+            {{ form_widget(form) }}
+
+            {% if isButtonsEnabled %}
+                <button class="add-on btn entity-select-btn"
+                        data-url="{{ path('oro_share_entities', {
+                            entityClass: form.vars.entityClass
+                        }) }}"
+                        {{ UI.renderWidgetDataAttributes({
+                            'type': 'dialog',
+                            'multiple': true,
+                            'options': {
+                                'alias': 'sharing-entities-dialog',
+                                'dialogOptions': {
+                                    'title': 'oro.security.action.share_with'|trans,
+                                    'allowMaximize': true,
+                                    'allowMinimize': true,
+                                    'modal': true,
+                                    'dblclick': 'maximize',
+                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                    'width': 1000,
+                                    'height': 600
+                                }
+                            }
+                        }) }}>
+                    <i class="icon-bars"></i>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

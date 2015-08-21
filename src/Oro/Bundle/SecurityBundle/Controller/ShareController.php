@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\Form\Model\Share;
@@ -34,6 +35,48 @@ class ShareController extends Controller
         );
 
         return $this->update($this->get('oro_security.form.model.factory')->getShare(), $entity, $formAction);
+    }
+
+    /**
+     * @Route("/entities", name="oro_share_entities")
+     * @Template("OroSecurityBundle:Share:entities.html.twig")
+     */
+    public function entitiesAction()
+    {
+        $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
+        $supportedGridsInfo = $this->get('oro_security.provider.share_grid_provider')
+            ->getSupportedGridsInfo($entityClass);
+        $gridEntityClass = '';
+        if (isset($supportedGridsInfo[0]['className'])) {
+            $gridEntityClass = $supportedGridsInfo[0]['className'];
+        }
+
+        return [
+            'entityClass' => $gridEntityClass,
+            'supportedGridsInfo' => $supportedGridsInfo,
+            'params' => [
+                'grid_path' => $this->generateUrl(
+                    'oro_share_entities_grid',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                )
+            ],
+        ];
+    }
+
+    /**
+     * @Route("/entities/grid", name="oro_share_entities_grid")
+     * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
+     */
+    public function entitiesGridAction()
+    {
+        $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
+        return [
+            'params' => [],
+            'renderParams' => [],
+            'multiselect' => true,
+            'gridName' => $this->get('oro_security.provider.share_grid_provider')->getGridName($entityClass),
+        ];
     }
 
     /**

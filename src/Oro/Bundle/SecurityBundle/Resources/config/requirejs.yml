@@ -3,3 +3,7 @@ config:
         'orosecurity/js/security-access-levels': 'bundles/orosecurity/js/security-access-levels.js'
         'orosecurity/js/init-organization-selector': 'bundles/orosecurity/js/init-organization-selector'
         'orosecurity/js/app/components/security-access-levels-component': 'bundles/orosecurity/js/app/components/security-access-levels-component.js'
+        'orosecurity/js/app/models/share-model': 'bundles/orosecurity/js/app/models/share-model.js'
+        'orosecurity/js/app/models/share-collection': 'bundles/orosecurity/js/app/models/share-collection.js'
+        'orosecurity/js/app/views/share-view': 'bundles/orosecurity/js/app/views/share-view.js'
+        'orosecurity/js/app/components/share-component': 'bundles/orosecurity/js/app/components/share-component.js'
