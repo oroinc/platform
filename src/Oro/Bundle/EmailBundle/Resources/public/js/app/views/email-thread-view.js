@@ -68,7 +68,11 @@ define(function(require) {
                 this.updateToggleAllAction();
             }
             EmailTreadView.__super__.render.apply(this, arguments);
-            this.initEmailItemViews(this.$(this.selectors.emailItem));
+
+            this._deferredRender();
+            this.initEmailItemViews(this.$(this.selectors.emailItem))
+                .then(_.bind(this._resolveDeferredRender, this));
+
             return this;
         },
 
@@ -152,15 +156,18 @@ define(function(require) {
          * Initializes EmailItemView for all passed elements
          *
          * @param {Array<jQuery.Element>} $elems
+         * @return {Promise}
          */
         initEmailItemViews: function($elems) {
-            _.each($elems, this._initEmailItemView, this);
+            var promises = _.map($elems, this._initEmailItemView, this);
+            return $.when.apply(this, promises);
         },
 
         /**
          * Creates EmailItemView for the element and registers it as subview of the thread
          *
          * @param {HTMLElement} elem
+         * @return {Promise}
          * @protected
          */
         _initEmailItemView: function(elem) {
@@ -174,6 +181,7 @@ define(function(require) {
                 'toggle': this.updateToggleAllAction,
                 'commentCountChanged': this.onCommentCountChange
             });
+            return emailItemView.deferredRender.promise();
         },
 
         /**

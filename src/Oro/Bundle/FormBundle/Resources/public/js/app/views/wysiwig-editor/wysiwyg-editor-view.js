@@ -84,7 +84,7 @@ define(function(require) {
                     this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
                 }
             }
-            this.renderDeferred = $.Deferred();
+            this._deferredRender();
             var options = this.options;
             if ($(this.$el).prop('disabled')) {
                 options.readonly = true;
@@ -109,7 +109,7 @@ define(function(require) {
                          * fixes jumping dialog on refresh page
                          * (promise should be resolved in a separate process)
                          */
-                        self.renderDeferred.resolve();
+                        self._resolveDeferredRender();
                     });
                 }
             }, options));
