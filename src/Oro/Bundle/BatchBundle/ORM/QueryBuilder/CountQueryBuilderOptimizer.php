@@ -5,6 +5,9 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 class CountQueryBuilderOptimizer
 {
@@ -20,15 +23,16 @@ class CountQueryBuilderOptimizer
     /** @var QueryBuilderTools */
     protected $qbTools;
 
+    /** @var  OroEntityManager */
+    protected $em;
+
     /**
-     * @param QueryBuilderTools|null $qbTools
+     * @param ClassMetadataFactory $metadataFactory
      */
-    public function __construct(QueryBuilderTools $qbTools = null)
+    public function __construct(OroEntityManager $em)
     {
-        if (!$qbTools) {
-            $qbTools = new QueryBuilderTools();
-        }
-        $this->qbTools = $qbTools;
+        $this->qbTools = new QueryBuilderTools();
+        $this->em = $em;
     }
 
     /**
@@ -124,6 +128,16 @@ class CountQueryBuilderOptimizer
             $requiredToJoin,
             $this->qbTools->getUsedJoinAliases($parts['join'], $requiredToJoin, $this->rootAlias)
         );
+        $requiredToJoin = array_merge(
+            $requiredToJoin,
+            $this->qbTools->getNonSymmetricJoinAliases(
+                $parts['join'],
+                $parts['from'],
+                $this->rootAlias,
+                $this->em
+            )
+        );
+
         $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->rootAlias));
 
         /** @var Expr\Join $join */

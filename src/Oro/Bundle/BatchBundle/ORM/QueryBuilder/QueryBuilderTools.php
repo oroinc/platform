@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 class QueryBuilderTools extends AbstractQueryBuilderTools
 {
@@ -267,6 +270,70 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         }
 
         return array_unique($usedAliases);
+    }
+
+    /**
+     * Get join aliases that will produce non symmetric results
+     * (many-to-one left join or one-to-many right join)
+     *
+     * @param $joins \Doctrine\ORM\Query\Expr\Join[]
+     * @param $fromStatements \Doctrine\ORM\Query\Expr\From[]
+     * @param $rootAlias
+     *
+     * @return array
+     */
+    public function getNonSymmetricJoinAliases($joins, $fromStatements, $rootAlias, OroEntityManager $em)
+    {
+        $classMetadataFactory = $em->getMetadataFactory();
+
+        // initialize if factory was not initialized
+        $classMetadataFactory->getAllMetadata();
+        $aliasToClass = [];
+        foreach ($fromStatements as $from) {
+            /* @var $from \Doctrine\ORM\Query\Expr\From */
+            $fqcn = $from->getFrom();
+            if (strpos($fqcn, ':') !== false) {
+                $parts = explode(':', $fqcn);
+                $fqcn = $em->getConfiguration()->getEntityNamespace($parts[0]) . '\\' . $parts[1];
+            }
+            $aliasToClass[$from->getAlias()] = $fqcn;
+            if (array_key_exists($from->getAlias(), $joins)) {
+                foreach ($joins[$from->getAlias()] as $join) {
+                    /* @var $join \Doctrine\ORM\Query\Expr\Join */
+                    $fqcn = $join->getJoin();
+                    if (strpos($fqcn, ':') !== false) {
+                        $parts = explode(':', $fqcn);
+                        $fqcn = $em->getConfiguration()->getEntityNamespace($parts[0]) . '\\' . $parts[1];
+                    }
+                    $aliasToClass[$join->getAlias()] = $fqcn;
+                }
+            }
+        }
+
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata $rootMetadata */
+        $aliases = [];
+        foreach ($this->getJoinDependencies($joins[$rootAlias]) as $alias => $joinInfo) {
+            if ($classMetadataFactory->hasMetadataFor($aliasToClass[$alias])) {
+                /** @var \Doctrine\ORM\Mapping\ClassMetadata $metadata */
+                $metadata = $classMetadataFactory->getMetadataFor($aliasToClass[$alias]);
+                $rootAssociations = $metadata->getAssociationsByTargetClass($aliasToClass[$rootAlias]);
+                foreach ($joinInfo[1] as $dependantAlias) {
+                    $associations = array_merge($rootAssociations,
+                        $metadata->getAssociationsByTargetClass($aliasToClass[$dependantAlias]));
+
+                    foreach($associations as $name => $info) {
+                        if (in_array($info['type'],
+                            [ClassMetadataInfo::MANY_TO_ONE, ClassMetadataInfo::MANY_TO_MANY]
+                        )) {
+                            $aliases[] = $alias;
+                            $aliases[] = $dependantAlias;
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_unique($aliases);
     }
 
     /**

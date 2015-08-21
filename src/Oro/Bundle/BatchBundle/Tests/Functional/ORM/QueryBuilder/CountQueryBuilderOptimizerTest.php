@@ -18,7 +18,9 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
      */
     public function testGetCountQueryBuilder(QueryBuilder $queryBuilder, $expectedDql)
     {
-        $optimizer = new CountQueryBuilderOptimizer();
+        $em = self::getContainer()->get('doctrine.orm.entity_manager');
+
+        $optimizer = new CountQueryBuilderOptimizer($em);
         $countQb = $optimizer->getCountQueryBuilder($queryBuilder);
 
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
@@ -310,6 +312,25 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
                     . 'WHERE s.status = :statusName '
                     . 'GROUP BY _groupByPart0'
+            ],
+            'join_one_to_many_table_and_many_to_one_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:Email', 'e', Join::WITH, 'u MEMBER OF e.user_d41b1c4b')
+                    ->leftJoin('OroCommentBundle:Comment', 'c', Join::WITH, 'c.email_bb212599 = e')
+                    ->leftJoin('OroNoteBundle:Note', 'n', Join::WITH, 'c.note_c0db526d = n'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b '
+                    . 'LEFT JOIN OroCommentBundle:Comment c WITH c.email_bb212599 = e'
+            ],
+            'join_one_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:Email', 'e', Join::WITH, 'u MEMBER OF e.user_d41b1c4b'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b'
             ]
         ];
     }
