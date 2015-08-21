@@ -9,10 +9,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
@@ -145,6 +148,62 @@ class MailboxController extends Controller
         $mailboxManager->flush();
 
         return new Response(Response::HTTP_OK);
+    }
+
+    /**
+     * This is a separate route for user searing within mailbox organization.
+     *
+     * @Route(
+     *      "/mailbox/users/search/{organizationId}",
+     *      name="oro_email_mailbox_users_search"
+     * )
+     *
+     * @param Request $request
+     * @param int     $organizationId
+     *
+     * @return JsonResponse
+     */
+    public function searchUsersAction(Request $request, $organizationId)
+    {
+        $autocompleteRequest = new AutocompleteRequest($request);
+        $validator           = $this->get('validator');
+        $isXmlHttpRequest    = $request->isXmlHttpRequest();
+        $code                = 200;
+        $result              = [
+            'results' => [],
+            'hasMore' => false,
+            'errors'  => []
+        ];
+
+        if ($violations = $validator->validate($autocompleteRequest)) {
+            foreach ($violations as $violation) {
+                $result['errors'][] = $violation->getMessage();
+            }
+        }
+
+        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+            $result['errors'][] = 'Access denied.';
+        }
+
+        if (!empty($result['errors'])) {
+            if ($isXmlHttpRequest) {
+                return new JsonResponse($result, $code);
+            }
+
+            throw new HttpException($code, implode(', ', $result['errors']));
+        }
+
+        $searchHandler = $this->get('oro_email.autocomplete.mailbox_user_search_handler');
+        $searchHandler->setOrganizationId($organizationId);
+
+        return new JsonResponse(
+            $searchHandler->search(
+                $autocompleteRequest->getQuery(),
+                $autocompleteRequest->getPage(),
+                $autocompleteRequest->getPerPage(),
+                $autocompleteRequest->isSearchById()
+            )
+        );
     }
 
     /**

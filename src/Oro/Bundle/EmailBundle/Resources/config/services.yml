@@ -119,6 +119,7 @@ parameters:
     oro_email.mailbox.entity_name_provider.class:       Oro\Bundle\EmailBundle\Provider\MailboxEntityNameProvider
     oro_email.listener.mailbox.authorization.class:     Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
     oro_email.listener.datagrid.mailbox_grid.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\MailboxGridListener
+    oro_email.autocomplete.mailbox_user_search_handler.class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler
 
     # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
@@ -812,6 +813,12 @@ services:
             - @translator.default
         tags:
             - { name: oro_entity.name_provider, priority: 0}
+
+    oro_email.autocomplete.mailbox_user_search_handler:
+        class: %oro_email.autocomplete.mailbox_user_search_handler.class%
+        parent: oro_user.autocomplete.user.search_handler
+        calls:
+           - [setSecurityFacade, [@oro_security.security_facade]]
 
     oro_email.listener.mailbox.authorization:
         class: %oro_email.listener.mailbox.authorization.class%
