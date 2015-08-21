@@ -19,7 +19,7 @@ class UpdateEmailUser implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
