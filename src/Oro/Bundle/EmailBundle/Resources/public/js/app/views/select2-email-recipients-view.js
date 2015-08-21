@@ -37,7 +37,8 @@ define([
         _onchange: function(e, additionalData) {
             _.extend(e, additionalData);
             this.$el.valid();
-            this.$el.data('search-choice', {id: '', text: ''});
+            var searchChoice = this.$el.data('search-choice');
+            searchChoice.data = {id: '', text: ''};
 
             var data = this.$contextEl.select2('data');
             if (e.added) {
