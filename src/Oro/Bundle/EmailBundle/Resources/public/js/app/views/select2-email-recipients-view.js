@@ -35,8 +35,7 @@ define([
             this.$contextEl.select2('data', data);
         },
 
-        _onchange: function(e, additionalData) {
-            _.extend(e, additionalData);
+        _onchange: function(e) {
             this.$el.valid();
             var searchChoice = this.$el.data('search-choice');
             searchChoice.data = {id: '', text: ''};
@@ -120,15 +119,10 @@ define([
             $el.parent('.controls').on('click', '.select2-search-choice', function() {
                 var $choice = $(this);
 
-                var originalData = $el.select2('data');
-                var selectedIndex = $choice.index();
-                var removedItem = originalData[selectedIndex];
-                var newData = _.reject(originalData, function(item, index) {
-                    return index === selectedIndex;
+                $el.one('change', function(e) {
+                    $el.select2('search', e.removed.text);
                 });
-
-                $el.select2('data', newData).trigger('change', {removed: removedItem});
-                $el.select2('search', removedItem.text);
+                $choice.find('.select2-search-choice-close').click();
             });
         }
     });
