@@ -58,9 +58,6 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $connection->expects($this->once())
-            ->method('isConnected')
-            ->will($this->returnValue(false));
-        $connection->expects($this->once())
             ->method('connect')
             ->will($this->throwException(new \PDOException()));
 
@@ -79,9 +76,6 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->exactly(2))
-            ->method('isConnected')
-            ->will($this->returnValue(true));
         $connection->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue(new Configuration()));

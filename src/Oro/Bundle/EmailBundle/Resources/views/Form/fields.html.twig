@@ -266,10 +266,12 @@
     <div class="row" style="margin-top: -42px;">
         <div class="pull-right">
             <div class="btn-group">
-                {{ UI.addButton({
-                    'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
-                    'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
-                }) }}
+                {% if resource_granted('oro_email_mailbox_create') %}
+                    {{ UI.addButton({
+                        'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                        'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                    }) }}
+                {% endif %}
             </div>
         </div>
     </div>

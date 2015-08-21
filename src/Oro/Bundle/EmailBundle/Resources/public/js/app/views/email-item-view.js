@@ -24,14 +24,16 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
+            this._deferredRender();
             this.initLayout().done(_.bind(function() {
-                    var commentsComponent = this.pageComponent('comments');
-                    if (commentsComponent) {
-                        this.commentCount = this.fetchCommentsQuantity();
-                        this.listenTo(commentsComponent.collection, 'stateChange', this.onCommentsStateChange);
-                        this.updateCommentsQuantity();
-                    }
-                }, this));
+                var commentsComponent = this.pageComponent('comments');
+                if (commentsComponent) {
+                    this.commentCount = this.fetchCommentsQuantity();
+                    this.listenTo(commentsComponent.collection, 'stateChange', this.onCommentsStateChange);
+                    this.updateCommentsQuantity();
+                }
+                this._resolveDeferredRender();
+            }, this));
             return this;
         },
 

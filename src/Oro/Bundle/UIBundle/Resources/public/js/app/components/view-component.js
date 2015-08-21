@@ -42,8 +42,8 @@ define(function(require) {
                 this.view.trigger.apply(this.view, arguments);
             }, this);
 
-            if (this.view.renderDeferred) {
-                this.view.renderDeferred
+            if (this.view.deferredRender) {
+                this.view.deferredRender
                     .done(_.bind(this._resolveDeferredInit, this))
                     .fail(function() {
                         throw new Error('View rendering failed');
