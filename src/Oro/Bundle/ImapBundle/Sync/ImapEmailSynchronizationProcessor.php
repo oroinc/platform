@@ -432,7 +432,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $isMultiFolder
         );
 
-        $existingEmailUsers = $this->getExistingEmailUsers($messageIds, $folder->getId());
+        $existingEmailUsers = $this->getExistingEmailUsers($folder, $messageIds);
 
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];

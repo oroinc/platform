@@ -183,6 +183,22 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * @param EmailFolder $folder
+     * @param array       $messages
+     * @return array
+     */
+    public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
+    {
+        return $this
+            ->getEmailUserByFolder($folder)
+            ->leftJoin('eu.email', 'email')
+            ->andWhere('email.messageId IN (:messageIds)')
+            ->setParameter('messageIds', $messages)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param QueryBuilder $queryBuilder
      * @param User $user
      * @return $this

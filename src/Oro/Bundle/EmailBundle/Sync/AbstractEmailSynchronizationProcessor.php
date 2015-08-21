@@ -287,29 +287,18 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
-     * @param array $messageIds
-     * @param int   $folderId
+     * @param EmailFolder $folder
+     * @param array       $messageIds
      * @return array
      */
-    protected function getExistingEmailUsers(array $messageIds, $folderId)
+    protected function getExistingEmailUsers(EmailFolder $folder, array $messageIds)
     {
         $existEmailUsers = [];
-
         if (empty($messageIds)) {
             return $existEmailUsers;
         }
-
         $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
-
-        $result = $emailUserRepository->createQueryBuilder('email_user')
-            ->select('email_user')
-            ->leftJoin('email_user.email', 'email')
-            ->where('email.messageId IN (:messageIds)')
-            ->andWhere('email_user.folder = :folderId')
-            ->setParameters([
-                'messageIds' => $messageIds,
-                'folderId'   => $folderId
-            ])->getQuery()->getResult();
+        $result              = $emailUserRepository->getEmailUsersByFolderAndMessageIds($folder, $messageIds);
 
         /** @var EmailUser $emailUser */
         foreach ($result as $emailUser) {
