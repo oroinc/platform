@@ -100,6 +100,10 @@ config:
             'chaplin': 'chaplin'
         'oroui/js/extend/base64':
             'base64': 'base64'
+        'oroui/js/mediator':
+            'chaplin': 'chaplin'
+        'oroui/js/tools':
+            'chaplin': 'chaplin'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'

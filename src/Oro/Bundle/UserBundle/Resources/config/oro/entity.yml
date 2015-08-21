@@ -12,6 +12,3 @@ oro_entity:
         Oro\Bundle\UserBundle\Entity\Status:
             alias:        userstatus
             plural_alias: userstatuses
-
-    entity_alias_exclusions:
-        - Oro\Bundle\UserBundle\Entity\Session
