@@ -173,7 +173,7 @@ define([
             var frameWidth = options.width - shiftX;
             var frameHeight = options.height - shiftY * 2 - shift;
 
-            leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + options.extraHeight || 0;
+            leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + (options.extraHeight || 0);
             width = index > 0 ? this.shapes[index - 1].bottomWidth : frameWidth;
             if (shift > 0 && index !== 0) {
                 if (!series.isNozzle) {

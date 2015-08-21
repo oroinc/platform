@@ -40,6 +40,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setEnabled(true)
             ->addRole($role);
         $folder = new EmailFolder();
@@ -48,7 +49,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $folder->setType('sent');
         $origin = new InternalEmailOrigin();
         $origin->setName('simple_user_origin_name');
-        $origin->setIsActive(true);
+        $origin->setActive(true);
         $origin->addFolder($folder);
         $origin->setOwner($user);
         $origin->setOrganization($organization);
@@ -68,7 +69,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $folder2->setType('sent');
         $origin2 = new InternalEmailOrigin();
         $origin2->setName('simple_user_origin_name_2');
-        $origin2->setIsActive(true);
+        $origin2->setActive(true);
         $origin2->addFolder($folder2);
         $origin2->setOwner($user2);
         $origin2->setOrganization($organization);

@@ -27,8 +27,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->assertTitle('Create Role - Roles - User Management - System')
             ->save()
             ->assertMessage('Role saved')
-            ->assertTitle('All - Roles - User Management - System')
-            ->close();
+            ->assertTitle('All - Roles - User Management - System');
 
         return ($randomPrefix);
     }
@@ -50,8 +49,8 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
-            ->setFirstpassword('123123q')
-            ->setSecondpassword('123123q')
+            ->setFirstPassword('123123q')
+            ->setSecondPassword('123123q')
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
@@ -73,7 +72,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
      */
     public function testCreateTrackingWebsite()
     {
-        $identifier = 'Website' . mt_rand(10, 99);
+        $identifier = 'Website' . mt_rand();
 
         $login = $this->login();
         /** @var TrackingWebsites $login */
@@ -118,7 +117,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
                 $this->createAcl($login, $roleName, $username);
                 break;
             case 'view':
-                $this->viewAcl($login, $username, $roleName, $identifier);
+                $this->viewAcl($login, $username, $roleName);
                 break;
         }
     }

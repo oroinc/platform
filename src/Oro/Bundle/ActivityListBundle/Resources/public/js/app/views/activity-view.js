@@ -37,9 +37,9 @@ define(function(require) {
         },
         listen: {
             'addedToParent': function() {
-                var emailTreadComponent = this.pageComponent('email-thread');
-                if (emailTreadComponent) {
-                    emailTreadComponent.view.refreshEmails();
+                var view = this.getEmailThreadView();
+                if (view) {
+                    view.refreshEmails();
                 }
             },
             'change:contentHTML model': '_onContentChange',
@@ -148,12 +148,16 @@ define(function(require) {
         _onContentChange: function() {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
             this.initLayout().done(_.bind(function() {
-                // if the activity has an emailTreadComponent -- handle comment count change in own way
-                var threadComponent = this.pageComponent('email-thread');
-                if (threadComponent) {
-                    this.listenTo(threadComponent.view, 'commentCountChanged', function(diff) {
+                // if the activity has an EmailTreadView -- handle comment count change in own way
+                var emailTreadView = this.getEmailThreadView();
+                if (emailTreadView) {
+                    this.listenTo(emailTreadView, 'commentCountChanged', function(diff) {
                         this.model.set('commentCount', this.model.get('commentCount') + diff);
                     });
+                }
+                var loadingView = this.subview('loading');
+                if (loadingView) {
+                    loadingView.hide();
                 }
             }, this));
         },
@@ -171,8 +175,6 @@ define(function(require) {
                     container: this.$el
                 }));
                 this.subview('loading').show();
-            } else {
-                this.removeSubview('loading');
             }
         },
 
@@ -208,6 +210,17 @@ define(function(require) {
             if (component !== null) {
                 this.model.set('commentCount', component.collection.getState().totalItemsQuantity);
             }
+        },
+
+        getEmailThreadView: function() {
+            var threadViewComponent = this.pageComponent('thread-view');
+            var view;
+
+            if (threadViewComponent) {
+                view = threadViewComponent.view.pageComponent('email-thread').view;
+            }
+
+            return view;
         }
     });
 

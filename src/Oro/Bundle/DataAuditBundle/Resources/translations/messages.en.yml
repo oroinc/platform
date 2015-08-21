@@ -4,6 +4,11 @@ oro:
         change_history:         "Change History"
         change_history.title:   "%item% change history"
 
+        action:
+            create: "Create"
+            update: "Update"
+            remove: "Remove"
+
         auditfield:
             entity_label:         Audit Field
             entity_plural_label:  Audit Fields

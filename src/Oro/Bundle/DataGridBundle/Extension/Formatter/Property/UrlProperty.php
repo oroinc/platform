@@ -12,6 +12,7 @@ class UrlProperty extends AbstractProperty
     const IS_ABSOLUTE_KEY = 'isAbsolute';
     const ANCHOR_KEY      = 'anchor';
     const PARAMS_KEY      = 'params';
+    const DIRECT_PARAMS_KEY = 'direct_params';
 
     /** @var array */
     protected $excludeParams = [self::ROUTE_KEY, self::IS_ABSOLUTE_KEY, self::ANCHOR_KEY, self::PARAMS_KEY];
@@ -60,6 +61,6 @@ class UrlProperty extends AbstractProperty
             $result[$name] = $record->getValue($dataKey);
         }
 
-        return $result;
+        return array_merge($result, $this->getOr(static::DIRECT_PARAMS_KEY, []));
     }
 }

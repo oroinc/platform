@@ -100,6 +100,8 @@ define(function(require) {
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
+            this.debouncedRepaintEverything = _.debounce(
+                _.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
             var stepWithPosition = this.model.get('steps').find(function(step) {
                 var position = step.get('position');

@@ -180,6 +180,10 @@ class SystemAwareResolver implements ContainerAwareInterface
      */
     protected function resolveService($datagridName, $key, $val)
     {
+        if (strpos($val, '\@') !== false) {
+            return str_replace('\@', '@', $val);
+        }
+
         $serviceRegex = '@(?P<service>[\w\.]+)';
         $methodRegex = '(?P<method>\w+)';
         $argumentsRegex = '(?P<arguments>\(.*?\))';

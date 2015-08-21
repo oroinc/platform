@@ -83,7 +83,6 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
             this._initButtons();
             this._initializeContainer();
             this._initializeState(this.options.state);
-            this.adjustContentSize();
         },
 
         _destroy: function () {
@@ -306,6 +305,16 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
             return this;
         },
 
+        _size: function() {
+            this.uiDialog.css({
+                width: Math.max(this.options.width, this.options.minWidth),
+                height: this.options.height
+            });
+            if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
+                this.uiDialog.resizable( "option", "minHeight", this._minHeight() );
+            }
+        },
+
         _moveToVisible: function() {
             var $widget = this.widget();
             if ($widget.length > 0) {
@@ -314,17 +323,7 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
                     position: [offset.left, offset.top]
                 });
             }
-            this.adjustContentSize();
             return this;
-        },
-
-        adjustContentSize: function () {
-            var viewportHeight = $(window).height(),
-                dialogHeight = this.widget().outerHeight(),
-                widgetHeight = this.element.innerHeight(),
-                maxHeight = viewportHeight + widgetHeight - dialogHeight;
-            this.element.css('max-height', maxHeight);
-            this._position();
         },
 
         _getTitleBarHeight: function() {

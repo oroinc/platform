@@ -298,13 +298,11 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $filteredParameters = [];
         foreach ($matches as $paramData) {
             list (, $paramName, $operator, $value) = $paramData;
-            $paramName = urldecode($paramName);
-
-            if (false === in_array($paramName, $supportedParameters)) {
+            if (false === in_array($paramName, $supportedParameters, true)) {
                 continue;
             }
 
-            $filteredParameters[$paramName] = [$operator, urldecode($value)];
+            $filteredParameters[$paramName] = [$operator, $value];
         }
 
         return $filteredParameters;

@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  * Class Navigation
  *
  * @package Oro\Bundle\NavigationBundle\Tests\Selenium\Pages
- * @method Navigation openNavigation() openNavigation(string)
- * @method Navigation assertTitle() assertTitle($title, $message = '')
+ * @method Navigation openNavigation(string $bundlePath)
+ * @method Navigation assertTitle($title, $message = '')
  */
 class Navigation extends AbstractPage
 {

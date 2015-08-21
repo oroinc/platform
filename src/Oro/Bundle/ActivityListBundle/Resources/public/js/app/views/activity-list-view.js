@@ -30,11 +30,24 @@ define(function(require) {
             ignoreHead: false,
             doNotFetch: false
         },
+
         listen: {
             'toView collection': '_viewItem',
             'toViewGroup collection': '_viewGroup',
             'toEdit collection': '_editItem',
             'toDelete collection': '_deleteItem'
+        },
+
+        EDIT_DIALOG_CONFIGURATION_DEFAULTS: {
+            'regionEnabled': false,
+            'incrementalPosition': false,
+            'alias': 'activity_list:item:update',
+            'dialogOptions': {
+                'modal': true,
+                'resizable': true,
+                'width': 675,
+                'autoResize': true
+            }
         },
 
         initialize: function(options) {
@@ -357,22 +370,16 @@ define(function(require) {
                         .replace(/&#039;/g, '\'');
                 };
 
-                this.itemEditDialog = new DialogWidget({
+                var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, {
                     'url': this._getUrl('itemEdit', model),
                     'title': unescapeHTML(model.get('subject')),
-                    'regionEnabled': false,
-                    'incrementalPosition': false,
-                    'alias': 'activity_list:item:update',
                     'dialogOptions': {
-                        'modal': true,
-                        'resizable': false,
-                        'width': 675,
-                        'autoResize': true,
                         'close': _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }
                 });
+                this.itemEditDialog = new DialogWidget(dialogConfiguration);
 
                 this.itemEditDialog.render();
             }

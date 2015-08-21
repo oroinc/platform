@@ -4,6 +4,10 @@ oro_system_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
 
+        email_autocomplete_configuration:
+            title: oro.email.system_configuration.email_autocomplete_configuration.label
+            priority: 120
+
         signature_configuration:
             title: oro.email.system_configuration.signature_configuration.label
             priority: 100
@@ -20,7 +24,20 @@ oro_system_configuration:
             title: oro.email.system_configuration.reply_configuration.label
             priority: 80
 
+        mailboxes:
+            title: oro.email.system_configuration.mailbox_configuration.label
+            priority: -10
+
     fields:
+        oro_email.minimum_input_length:
+            data_type: integer
+            type: number
+            options:
+                label: oro.email.system_configuration.email_autocomplete_configuration.minimum_input_length.label
+                precision: 0
+                constraints:
+                    - NotBlank: ~
+
         oro_email.signature:
             data_type: string
             type: oro_rich_text
@@ -47,6 +64,14 @@ oro_system_configuration:
                     2: oro.email.reply_all
                 required: false
 
+        oro_email.mailbox_grid:
+            type: oro_email_mailbox_grid
+            ui_only: true
+            options:
+                label: false
+                required: false
+                resettable: false
+
     tree:
         system_configuration:
             platform:
@@ -55,6 +80,9 @@ oro_system_configuration:
                         children:
                             email_configuration:
                                 children:
+                                    email_autocomplete_configuration:
+                                        children:
+                                            - oro_email.minimum_input_length
                                     signature_configuration:
                                         children:
                                             - oro_email.signature
@@ -62,6 +90,10 @@ oro_system_configuration:
                                     reply_configuration:
                                         children:
                                             - oro_email.default_button_reply
+                                    mailboxes:
+                                        acl: oro_email_mailbox_view
+                                        children:
+                                            - oro_email.mailbox_grid
 
     api_tree:
         signature_configuration:
