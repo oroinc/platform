@@ -6,10 +6,21 @@ define([
     var MostViewedView;
 
     MostViewedView = PageRegionView.extend({
-        template: function(data) {
-            return data.mostviewed;
+        template: function() {},
+        pageItems: [],
+        dataItems: null,
+
+        initialize: function(options) {
+            this.dataItems = options.dataItems || 'mostviewed';
+            this.pageItems = [this.dataItems];
+
+            var self = this;
+            this.template = function (data) {
+                return data[self.dataItems];
+            };
+
+            MostViewedView.__super__.initialize.apply(this, arguments);
         },
-        pageItems: ['mostviewed'],
 
         render: function() {
             // does not update view is data is from cache
