@@ -245,6 +245,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####DataGridBundle
 - `Oro\Bundle\DataGridBundle\Datasource\ResultRecord` now has method `addData` that allows to add additional information to record
+- Added js event `datagrid:removeParam:<gridName>` to remove additional datagrid parameter 
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` `logEntityClass` and `logEntityFieldClass` parameters replaced by `oro_dataaudit.loggable.audit_entity_mapper` service `getAuditEntryClass` and `getAuditEntryFieldClass` methods
