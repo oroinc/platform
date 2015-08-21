@@ -30,7 +30,7 @@ class NavigationItemRepository extends EntityRepository implements NavigationRep
                 )
             )
         )
-        ->add('from', new Expr\From('Oro\Bundle\NavigationBundle\Entity\NavigationItem', 'ni'))
+        ->add('from', new Expr\From($this->_entityName, 'ni'))
         ->add(
             'where',
             $qb->expr()->andx(
