@@ -185,7 +185,7 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param EmailFolder $folder
      * @param array       $messages
-     * @return array
+     * @return EmailUser[]
      */
     public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
     {

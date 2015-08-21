@@ -289,7 +289,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /**
      * @param EmailFolder $folder
      * @param array       $messageIds
-     * @return array
+     * @return EmailUser[]
      */
     protected function getExistingEmailUsers(EmailFolder $folder, array $messageIds)
     {
