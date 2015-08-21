@@ -15,7 +15,6 @@ class OroUserBundle implements Migration
     {
         self::oroAccessGroupTable($schema);
         self::oroAccessRoleTable($schema);
-        self::oroSessionTable($schema);
         self::oroUserTable($schema);
         self::oroUserAccessGroupTable($schema);
         self::oroUserAccessGroupRoleTable($schema);
@@ -74,22 +73,6 @@ class OroUserBundle implements Migration
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
         $table->addIndex(['business_unit_owner_id'], 'IDX_673F65E759294170', []);
         /** End of generate table oro_access_role **/
-    }
-
-    /**
-     * Generate table oro_session
-     *
-     * @param Schema $schema
-     */
-    public static function oroSessionTable(Schema $schema)
-    {
-        /** Generate table oro_session **/
-        $table = $schema->createTable('oro_session');
-        $table->addColumn('id', 'string', ['length' => 255]);
-        $table->addColumn('sess_data', 'text', []);
-        $table->addColumn('sess_time', 'integer', []);
-        $table->setPrimaryKey(['id']);
-        /** End of generate table oro_session **/
     }
 
     /**

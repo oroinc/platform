@@ -78,27 +78,6 @@ define([
                 }
             }
             return $el;
-        },
-
-        /**
-         * Create flag of deferred render
-         *
-         * @protected
-         */
-        _deferredRender: function() {
-            this.deferredRender = $.Deferred();
-        },
-
-        /**
-         * Resolves deferred render
-         *
-         * @protected
-         */
-        _resolveDeferredRender: function() {
-            if (this.deferredRender) {
-                this.deferredRender.resolve(this);
-                delete this.deferredRender;
-            }
         }
     });
 

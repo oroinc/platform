@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Mailbox;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
+
 interface MailboxProcessProviderInterface
 {
     /**
@@ -26,7 +28,11 @@ interface MailboxProcessProviderInterface
     public function getLabel();
 
     /**
+     * Returns true if process is enabled for given mailbox.
+     *
+     * @param Mailbox $mailbox
+     *
      * @return bool
      */
-    public function isEnabled();
+    public function isEnabled(Mailbox $mailbox = null);
 }

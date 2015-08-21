@@ -26,11 +26,12 @@ abstract class AbstractPage
     public function __construct($testCase, $redirect = true)
     {
         $this->test = $testCase;
-        // @codingStandardsIgnoreStart
-        //$this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
-        // @codingStandardsIgnoreEnd
-        if (!is_null(static::URL) && $redirect) {
-            $this->test->url(static::URL);
+        $url = static::URL;
+        if (is_null($url)) {
+            $url = $this->redirectUrl;
+        }
+        if (!is_null($url) && $redirect) {
+            $this->test->url($url);
             $this->waitPageToLoad();
             $this->waitForAjax();
         }
