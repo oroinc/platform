@@ -96,12 +96,41 @@ class MailboxHandler implements FormAwareInterface
         /** @var Mailbox $mailbox */
         $mailbox = $this->form->getData();
 
+        $mailbox = $this->prepareMailbox($mailbox);
+
         $this->getEntityManager()->persist($mailbox);
         $this->getEntityManager()->flush();
 
         if ($this->dispatcher->hasListeners(MailboxSaved::NAME)) {
             $this->dispatcher->dispatch(MailboxSaved::NAME, new MailboxSaved($mailbox));
         }
+    }
+
+    /**
+     * Update new mailbox with current SynchronizedAt date to prevent sync old emails
+     *
+     * @param Mailbox $mailbox
+     *
+     * @return mixed
+     */
+    protected function prepareMailbox($mailbox)
+    {
+        if (!$mailbox->getId() && $mailbox->getOrigin()) {
+            $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+            $mailbox->getOrigin()->setSynchronizedAt($currentDate);
+
+            $folders = [];
+            foreach ($mailbox->getOrigin()->getFolders() as $folder) {
+                if ($folder->isSyncEnabled()) {
+                    $folders[] = $folder->setSynchronizedAt($currentDate);
+                } else {
+                    $folders[] = $folder;
+                }
+            }
+            $mailbox->getOrigin()->setFolders($folders);
+        }
+
+        return $mailbox;
     }
 
     /**
