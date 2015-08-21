@@ -22,24 +22,6 @@ oro_email_email_user_edit:
     permission: EDIT
     group_name: ""
 
-oro_email_mailbox_delete:
-    type: entity
-    class: OroEmailBundle:Mailbox
-    permission: DELETE
-    group_name: ""
-
-oro_email_mailbox_create:
-    type: entity
-    class: OroEmailBundle:Mailbox
-    permission: CREATE
-    group_name: ""
-
-oro_email_mailbox_update:
-    type: entity
-    class: OroEmailBundle:Mailbox
-    permission: EDIT
-    group_name: ""
-
 oro_email_autoresponserule_view:
     type: entity
     class: OroEmailBundle:AutoResponseRule

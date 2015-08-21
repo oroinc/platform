@@ -31,10 +31,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "owner_type"="ORGANIZATION",
  *              "owner_field_name"="organization",
  *              "owner_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "permissions"="CREATE;EDIT;DELETE"
  *          }
  *      }
  * )
