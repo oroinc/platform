@@ -301,7 +301,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
 
         $emailUserRepository = $this->em->getRepository('OroEmailBundle:EmailUser');
 
-        $result =  $emailUserRepository->createQueryBuilder('email_user')
+        $result = $emailUserRepository->createQueryBuilder('email_user')
             ->select('email_user')
             ->leftJoin('email_user.email', 'email')
             ->where('email.messageId IN (:messageIds)')
