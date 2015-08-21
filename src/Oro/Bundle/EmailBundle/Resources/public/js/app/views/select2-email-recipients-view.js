@@ -53,7 +53,7 @@ define([
                     this.$contextEl.select2('data', newData);
                 }
 
-                if (_.isEmpty(this.$el.select2('val'))) {
+                if (_.isEmpty(this.$el.select2('data'))) {
                     this.$el.data('organization', null);
                 }
             }
@@ -87,8 +87,8 @@ define([
                 if (!this.results.find('.select2-highlighted').length) {
                     var val = this.search.val();
                     if (val) {
-                        var valueExistsAlready = _.some(this.opts.element.select2('val'), function(id) {
-                            return val === id;
+                        var valueExistsAlready = _.some(this.opts.element.select2('data'), function(item) {
+                            return val === item.id;
                         });
 
                         if (!valueExistsAlready) {

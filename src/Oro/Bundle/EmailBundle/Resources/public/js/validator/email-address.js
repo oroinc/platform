@@ -25,9 +25,14 @@ define([
             // original email validator is too slow for some values
             // return $.validator.methods.email.apply(this, arguments);
             var $el = $(element);
-            var values = $el.data('select2') ? $el.select2('val') : [value];
-            if (!_.isArray(values)) {
-                values = [values];
+
+            var values = null;
+            if ($el.data('select2')) {
+                var data = $el.select2('data');
+                var arrayData = _.isArray(data) ? data : [data];
+                values = _.map(arrayData, _.partial(_.result, _, 'text'));
+            } else {
+                values = [value];
             }
 
             return this.optional(element) || _.every(values, function(val) {
