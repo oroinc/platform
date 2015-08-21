@@ -7,6 +7,7 @@ define([
 
     var Select2View = BaseView.extend({
         $contextEl: null,
+        clearSearch: null,
 
         initialize: function() {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
@@ -64,6 +65,12 @@ define([
             var select2 = this.$el.data('select2');
             var searchChoice = this.$el.data('search-choice');
 
+            this.clearSearch = _.bind(select2.clearSearch, select2);
+            select2.clearSearch = function() {
+            };
+            this.clearSearch();
+            this.$el.on('change select2-blur', this.clearSearch);
+
             /**
              * Updates searchChoice value so that if user press enter
              * it will select currently typed text
@@ -112,7 +119,6 @@ define([
             var $el = this.$el;
             $el.parent('.controls').on('click', '.select2-search-choice', function() {
                 var $choice = $(this);
-                var $searchField = $(this).parent('.select2-choices').find('input');
 
                 var originalData = $el.select2('data');
                 var selectedIndex = $choice.index();
@@ -122,7 +128,7 @@ define([
                 });
 
                 $el.select2('data', newData).trigger('change', {removed: removedItem});
-                $searchField.click().val(removedItem.text).trigger('paste');
+                $el.select2('search', removedItem.text);
             });
         }
     });
