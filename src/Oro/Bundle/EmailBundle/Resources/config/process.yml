@@ -1,26 +1,4 @@
 definitions:
-    email_auto_response:
-        label:   Email Auto Response
-        enabled: true
-        entity:  Oro\Bundle\EmailBundle\Entity\Email
-        actions_configuration:
-            - @tree:
-                conditions:
-                    @not_blank: [$emailBody]
-                actions:
-                    - @format_string:
-                        attribute: $.arguments
-                        string: '--id=%id%'
-                        arguments:
-                            id: $id
-                    - @create_entity:
-                        class: JMS\JobQueueBundle\Entity\Job
-                        attribute: $.syncJob
-                        flush: true
-                        arguments:
-                            - 'oro:email:autoresponse'
-                            - [$.arguments]
-
     sync_email_body_after_email_synchronize:
         label:   Sync Email Body After Email Sync
         enabled: true
@@ -90,13 +68,6 @@ definitions:
                             - ['--seen=true', $.arguments]
 
 triggers:
-    email_auto_response:
-        -
-            event: create
-        -
-            event: update
-            field: emailBody
-
     sync_email_body_after_email_synchronize:
         -
             event: create

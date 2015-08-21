@@ -645,6 +645,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
+        $emailBody->setEmail($this);
         $this->emailBody = $emailBody;
 
         return $this;

@@ -13,20 +13,29 @@ define(function(require) {
         // see Oro\Bundle\FormBundle\Resources\public\css\wysiwyg-editor.css)
         minimalWysiwygEditorHeight: 180,
 
+        /**
+         * Name of related WYSIWYG editor component
+         *
+         * @type {string}
+         */
+        editorComponentName: null,
+
         listen: {
             'component:parentResize': 'resizeEditor'
         },
 
         initialize: function(options) {
-            this.editorComponentName = options.editorComponentName;
-            _.extend(this, _.pick(options, ['minimalWysiwygEditorHeight']));
+            _.extend(this, _.pick(options, ['minimalWysiwygEditorHeight', 'editorComponentName']));
             WysiwygDialogView.__super__.initialize.apply(this, arguments);
         },
 
         render: function() {
             this._deferredRender();
             this.initLayout().done(_.bind(function() {
-                this.listenTo(this.getEditorView(), 'resize', this.resizeEditor());
+                if (this.getDialogContainer().length) {
+                    // there's dialog widget -- subscribe to resize event
+                    this.listenTo(this.getEditorView(), 'resize', this.resizeEditor());
+                }
                 this._resolveDeferredRender();
             }, this));
         },
@@ -36,7 +45,7 @@ define(function(require) {
         },
 
         calcWysiwygHeight: function() {
-            var content = this.$el.closest('.ui-widget-content');
+            var content = this.getDialogContainer();
             var editorHeight = this.getEditorView().getHeight();
             var style = getComputedStyle(content[0]);
             var availableHeight = editorHeight +
@@ -51,6 +60,10 @@ define(function(require) {
                 throw new Error('Could not find message editor');
             }
             return editor.view;
+        },
+
+        getDialogContainer: function() {
+            return this.$el.closest('.ui-widget-content');
         }
     });
 
