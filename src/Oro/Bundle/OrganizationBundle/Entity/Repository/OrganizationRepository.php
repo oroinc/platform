@@ -157,7 +157,7 @@ class OrganizationRepository extends EntityRepository
     /**
      * @param array $orgIds
      *
-     * @return mixed
+     * @return Organization[]
      */
     public function getEnabledOrganizations(array $orgIds)
     {
