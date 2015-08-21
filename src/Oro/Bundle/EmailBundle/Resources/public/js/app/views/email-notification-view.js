@@ -9,7 +9,13 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     EmailNotificationView = BaseView.extend({
+        tagName: 'li',
+
         templateSelector: '#email-notification-item-template',
+
+        className: function() {
+            return this.model.get('seen') ? '' : 'new';
+        },
 
         events: {
             'click .info': 'onClickOpenEmail'
