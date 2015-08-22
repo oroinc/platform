@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReminderBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\ReminderBundle\Migrations\Schema\v1_0\OroReminderBundle;
@@ -10,15 +11,15 @@ use Oro\Bundle\ReminderBundle\Migrations\Schema\v1_0\OroReminderBundle;
 class OroReminderBundleBundleInstaller implements Installation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_0_1';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
