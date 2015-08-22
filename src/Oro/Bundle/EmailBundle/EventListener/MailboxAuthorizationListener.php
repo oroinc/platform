@@ -8,6 +8,8 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 use Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class MailboxAuthorizationListener
@@ -71,7 +73,7 @@ class MailboxAuthorizationListener
     }
 
     /**
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository
+     * @return OrganizationRepository
      */
     protected function getOrganizationRepository()
     {
@@ -79,7 +81,7 @@ class MailboxAuthorizationListener
     }
 
     /**
-     * @return \Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository
+     * @return MailboxRepository
      */
     protected function getMailboxRepository()
     {
