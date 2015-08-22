@@ -289,44 +289,43 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         // initialize if factory was not initialized
         $classMetadataFactory->getAllMetadata();
         $aliasToClass = [];
+
         foreach ($fromStatements as $from) {
             /* @var $from \Doctrine\ORM\Query\Expr\From */
-            $fqcn = $from->getFrom();
-            if (strpos($fqcn, ':') !== false) {
-                $parts = explode(':', $fqcn);
-                $fqcn = $em->getConfiguration()->getEntityNamespace($parts[0]) . '\\' . $parts[1];
-            }
-            $aliasToClass[$from->getAlias()] = $fqcn;
-            if (array_key_exists($from->getAlias(), $joins)) {
-                foreach ($joins[$from->getAlias()] as $join) {
-                    /* @var $join \Doctrine\ORM\Query\Expr\Join */
-                    $fqcn = $join->getJoin();
-                    if (strpos($fqcn, ':') !== false) {
-                        $parts = explode(':', $fqcn);
-                        $fqcn = $em->getConfiguration()->getEntityNamespace($parts[0]) . '\\' . $parts[1];
-                    }
-                    $aliasToClass[$join->getAlias()] = $fqcn;
-                }
-            }
+            $aliasToClass[$from->getAlias()] = $from->getFrom();
         }
 
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata $rootMetadata */
+        foreach ($joins[$rootAlias] as $join) {
+            /* @var $join \Doctrine\ORM\Query\Expr\Join */
+            $aliasToClass[$join->getAlias()] = $join->getJoin();
+        }
+
+        $aliasToClass = array_map(function ($className) use ($em) {
+            if (strpos($className, ':') !== false) {
+                $parts = explode(':', $className);
+                $className = $em
+                           ->getConfiguration()
+                           ->getEntityNamespace($parts[0]) . '\\' . $parts[1];
+            }
+
+            return $className;
+        }, $aliasToClass);
+
         $aliases = [];
-        foreach ($this->getJoinDependencies($joins[$rootAlias]) as $alias => $joinInfo) {
+        foreach ($this->getAllDependencies($rootAlias, $joins[$rootAlias]) as $alias => $joinInfo) {
             if ($classMetadataFactory->hasMetadataFor($aliasToClass[$alias])) {
                 /** @var \Doctrine\ORM\Mapping\ClassMetadata $metadata */
                 $metadata = $classMetadataFactory->getMetadataFor($aliasToClass[$alias]);
-                $rootAssociations = $metadata->getAssociationsByTargetClass($aliasToClass[$rootAlias]);
-                foreach ($joinInfo[1] as $dependantAlias) {
-                    $associations = array_merge($rootAssociations,
-                        $metadata->getAssociationsByTargetClass($aliasToClass[$dependantAlias]));
 
-                    foreach($associations as $name => $info) {
-                        if (in_array($info['type'],
+                foreach ($joinInfo[1] as $dependantAlias) {
+                    $associations = $metadata->getAssociationsByTargetClass($aliasToClass[$dependantAlias]);
+
+                    foreach ($associations as $name => $info) {
+                        if (in_array(
+                            $info['type'],
                             [ClassMetadataInfo::MANY_TO_ONE, ClassMetadataInfo::MANY_TO_MANY]
                         )) {
                             $aliases[] = $alias;
-                            $aliases[] = $dependantAlias;
                         }
                     }
                 }
@@ -365,5 +364,39 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         }
 
         return $joinDependencies;
+    }
+
+    /**
+     * Retrieve alias dependencies including from statement aliases
+     *
+     * @param string $rootAlias
+     * @param Expr\Join[] $joins
+     *
+     * @return array [joinAlias => [joinType, [dependedByAlias1, dependedByAlias2, ...]]]
+     */
+    protected function getAllDependencies($rootAlias, $joins)
+    {
+        $joinDependencies = $this->getJoinDependencies($joins);
+        $fromDependencies = [];
+
+        foreach ($joins as $join) {
+            $joinAlias = $join->getAlias();
+            $joinType = $join->getJoinType();
+            $joinCondition = $join->getCondition();
+
+            $dependencies = [];
+            if ($joinCondition && strpos($joinCondition, $rootAlias . ' ') !== false) {
+                $dependencies = [$rootAlias];
+            }
+
+            if (array_key_exists($joinAlias, $joinDependencies)) {
+                $dependencies =
+                    array_merge($dependencies, $joinDependencies[$joinAlias][1]);
+            }
+
+            $fromDependencies[$joinAlias] = [$joinType, array_unique($dependencies)];
+        }
+
+        return $fromDependencies;
     }
 }
