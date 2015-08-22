@@ -33,7 +33,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
                 )
             )
         )
-        ->add('from', new Expr\From('Oro\Bundle\NavigationBundle\Entity\PinbarTab', 'pt'))
+        ->add('from', new Expr\From($this->_entityName, 'pt'))
         ->innerJoin('pt.item', 'ni', Expr\Join::WITH)
         ->add(
             'where',
@@ -60,17 +60,31 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
      */
     public function incrementTabsPositions($user, $navigationItemId, Organization $organization)
     {
-        $updateQuery = $this->_em->createQuery(
-            'UPDATE Oro\Bundle\NavigationBundle\Entity\NavigationItem p '
-            . 'set p.position = p.position + 1 '
-            . 'WHERE p.id != ' . (int) $navigationItemId
-            . " AND p.type = 'pinbar'"
-            . " AND p.user = :user"
-            . " AND p.organization = :organization"
-        );
-        $updateQuery->setParameter('user', $user);
-        $updateQuery->setParameter('organization', $organization);
+        $qb = $this->_em->createQueryBuilder();
 
-        return $updateQuery->execute();
+        return $qb->update($this->getNavigationItemClassName(), 'p')
+            ->set('p.position', 'p.position + 1')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->neq('p.id', ':item_id'),
+                    $qb->expr()->eq('p.type', ':type'),
+                    $qb->expr()->eq('p.user', ':user'),
+                    $qb->expr()->eq('p.organization', ':organization')
+                )
+            )
+            ->setParameter('item_id', $navigationItemId, \PDO::PARAM_INT)
+            ->setParameter('type', 'frontend_pinbar', \PDO::PARAM_STR)
+            ->setParameter('user', $user)
+            ->setParameter('organization', $organization)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getNavigationItemClassName()
+    {
+        return 'Oro\Bundle\NavigationBundle\Entity\NavigationItem';
     }
 }
