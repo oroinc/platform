@@ -5,9 +5,7 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_15;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -21,9 +19,8 @@ class OroEmailBundle implements Migration
     {
         self::addEmailFolderFields($schema);
         self::addEmailOriginFields($schema);
-        $this->updateMailboxName($schema, $queries);
+        self::updateMailboxName($schema, $queries);
         self::updateEmailRecipientConstraint($schema);
-        $this->updateSyncEnabledByDefault($schema, $queries);
     }
 
     /**
@@ -63,7 +60,7 @@ class OroEmailBundle implements Migration
      * @param Schema   $schema
      * @param QueryBag $queries
      */
-    protected function updateMailboxName(Schema $schema, QueryBag $queries)
+    public static function updateMailboxName(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_email_origin');
         $sql = 'UPDATE oro_email_origin SET mailbox_name = %s WHERE name = :name';
@@ -95,32 +92,6 @@ class OroEmailBundle implements Migration
                 ['name' => 'ewsemailorigin'],
                 ['name' => Type::STRING]
             ));
-        }
-    }
-
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    protected function updateSyncEnabledByDefault(Schema $schema, QueryBag $queries)
-    {
-        $table = $schema->getTable('oro_email_origin');
-
-        if ($table->hasColumn('imap_user')) {
-            $queries->addQuery(
-                new ParametrizedSqlMigrationQuery(
-                    'UPDATE oro_email_folder AS ef SET sync_enabled = :sync WHERE ef.id IN (
-                            SELECT eu.folder_id FROM oro_email_user AS eu WHERE eu.folder_id = ef.id GROUP BY eu.folder_id
-                        ) AND ef.origin_id IN (
-                            SELECT eo.id FROM oro_email_origin AS eo WHERE eo.id = ef.origin_id AND eo.name = :name GROUP BY eo.id
-                        );
-                    ',
-                    ['sync' => true, 'name' => 'imapemailorigin'],
-                    ['sync' => Type::BOOLEAN, 'name' => Type::STRING]
-                )
-            );
         }
     }
 
