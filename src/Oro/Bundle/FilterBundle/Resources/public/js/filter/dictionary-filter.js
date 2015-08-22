@@ -63,7 +63,7 @@ define([
         },
 
         render: function() {
-            this.renderDeferred = $.Deferred();
+            this._deferredRender();
             this.loadSelectedValue();
         },
 
@@ -86,7 +86,7 @@ define([
                     self.renderTemplate();
                     self.applySelect2();
 
-                    self.renderDeferred.resolve();
+                    self._resolveDeferredRender();
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);

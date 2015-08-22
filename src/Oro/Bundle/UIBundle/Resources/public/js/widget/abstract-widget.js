@@ -620,7 +620,7 @@ define(function(require) {
          * Render widget
          */
         render: function() {
-            this.renderDeferred = $.Deferred();
+            this._deferredRender();
             var loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
@@ -717,8 +717,8 @@ define(function(require) {
             delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
-            if (this.renderDeferred) {
-                this.renderDeferred
+            if (this.deferredRender) {
+                this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(function() {
                         throw new Error('Widget rendering failed');
@@ -763,9 +763,8 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.removeClass('invisible');
-            if (this.renderDeferred) {
-                this.renderDeferred.resolve();
-                delete this.renderDeferred;
+            if (this.deferredRender) {
+                this._resolveDeferredRender();
             }
         },
 

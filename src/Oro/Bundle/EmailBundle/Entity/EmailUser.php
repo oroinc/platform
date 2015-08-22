@@ -286,6 +286,7 @@ class EmailUser
     public function setEmail(Email $email)
     {
         $this->email = $email;
+        $email->addEmailUser($this);
 
         return $this;
     }

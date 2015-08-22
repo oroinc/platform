@@ -94,6 +94,23 @@ class AutoResponseManager
 
     /**
      * @param Email $email
+     *
+     * @return bool
+     */
+    public function hasAutoResponses(Email $email)
+    {
+        $mailboxes = $this->getMailboxRepository()->findForEmail($email);
+        foreach ($mailboxes as $mailbox) {
+            if ($this->getApplicableRules($mailbox, $email)->count()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Email $email
      */
     public function sendAutoResponses(Email $email)
     {
