@@ -97,10 +97,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
             $startDate = $folder->getSynchronizedAt();
-            $startDate = $startDate->modify('-1 month');
+            $checkStartDate = clone $startDate;
+            $checkStartDate->modify('-1 month');
 
             // set seen flags from previously synchronized emails
-            $this->checkFlags($imapFolder, $startDate);
+            $this->checkFlags($imapFolder, $checkStartDate);
 
             $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
