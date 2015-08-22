@@ -10,7 +10,8 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
- * Have dependence to v1_15/UpdateEmailOriginTableQuery update. Can not be moved to EmailBundle.
+ * Migration depends from v1_15/UpdateEmailOriginTableQuery update.
+ * Migration can not be moved to EmailBundle.
  * Turning on sync to all user folders with emails
  */
 class UpdateEmailFolderSyncState implements Migration
