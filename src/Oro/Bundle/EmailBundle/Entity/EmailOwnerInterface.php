@@ -32,18 +32,4 @@ interface EmailOwnerInterface extends FirstNameInterface, LastNameInterface
      * @return integer
      */
     public function getId();
-
-    /**
-     * Get first name
-     *
-     * @return string
-     */
-    public function getFirstName();
-
-    /**
-     * Get last name
-     *
-     * @return string
-     */
-    public function getLastName();
 }

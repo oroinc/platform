@@ -1,3 +1,13 @@
+{% block _oro_email_autoresponserule_conditions_entry_field_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _oro_email_autoresponserule_conditions_entry_filter_row %}
+    {% for child in form %}
+        {{ form_widget(child, {'attr': {'class': child.vars['name']}}) }}
+    {% endfor %}
+{% endblock %}
+
 {% block oro_email_template_list_row %}
     <script type="text/javascript">
         require(['jquery',
@@ -245,6 +255,62 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_email_mailbox_grid_row %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params'),
+    } %}
+    <div class="row" style="margin-top: -42px;">
+        <div class="pull-right">
+            <div class="btn-group">
+                {% if resource_granted('oro_email_mailbox_create') %}
+                    {{ UI.addButton({
+                        'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                        'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                    }) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-right: -20px;">
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {redirectData: redirectData}) }}
+    </div>
+{% endblock %}
+
+{% block oro_email_mailbox_widget %}
+    {% set email_origin = form_widget(form.children.origin) %}
+    {% set process = form_row(form.children.processType) ~
+        form_widget(form.children.processSettings) %}
+    {% set access = form_row(form.children.authorizedUsers) ~
+        form_row(form.children.authorizedRoles)
+    %}
+    {% set options = {
+        el: '#' ~ form.vars.id
+    } %}
+    <div data-page-component-module="oroemail/js/app/views/mailbox-update-view"
+         data-page-component-options="{{ options|json_encode }}">
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
+            {{ form_widget(form) }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
+            {{ email_origin|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
+            {{ process|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
+            {{ access|raw }}
+        </fieldset>
+    </div>
+{% endblock %}
+
 {#
     Renders tab `li` tag for bootstrap tab panels
     paramters:

@@ -21,6 +21,7 @@ parameters:
     oro_workflow.action.flash_message.class: Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
     oro_workflow.workflow.action.remove_entity.class:  Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue
+    oro_workflow.workflow.action.copy_tagging.class:  Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging
 
 services:
     oro_workflow.action_factory:
@@ -182,3 +183,11 @@ services:
             - @oro_workflow.context_accessor
         tags:
             - { name: oro_workflow.action, alias: assign_constant_value }
+
+    oro_workflow.workflow.action.copy_tagging.class:
+        class: %oro_workflow.workflow.action.copy_tagging.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_tag.tag.manager
+        tags:
+            - { name: oro_workflow.action, alias: copy_tagging }

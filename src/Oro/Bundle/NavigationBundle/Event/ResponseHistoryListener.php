@@ -18,13 +18,19 @@ use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class ResponseHistoryListener
 {
-    const HISTORY_ITEM_FQCN = 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem';
+    /** @var string */
+    protected $historyItemFQCN;
 
-    /** ItemFactory */
+    /** @var string */
+    protected $userFQCN;
+
+    /** @var string */
+    protected $navigationHistoryItemType;
+
+    /** var ItemFactory */
     protected $navItemFactory;
 
     /** @var SecurityContextInterface */
@@ -69,7 +75,7 @@ class ResponseHistoryListener
         }
 
         /** @var EntityManager $em */
-        $em       = $this->registry->getManagerForClass(self::HISTORY_ITEM_FQCN);
+        $em       = $this->registry->getManagerForClass($this->historyItemFQCN);
         $request  = $event->getRequest();
         $response = $event->getResponse();
         $token    = $this->securityContext->getToken();
@@ -77,13 +83,14 @@ class ResponseHistoryListener
         if ($token instanceof TokenInterface) {
             $user = $token->getUser();
         }
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
-        }
 
         // check if a current request can be added to a history
         if (!$this->canAddToHistory($response, $request, $user)) {
             return false;
+        }
+
+        if ($token instanceof OrganizationContextTokenInterface) {
+            $organization = $token->getOrganizationContext();
         }
 
         $postArray = [
@@ -93,7 +100,7 @@ class ResponseHistoryListener
         ];
 
         /** @var $historyItem  NavigationHistoryItem */
-        $historyItem = $em->getRepository(self::HISTORY_ITEM_FQCN)->findOneBy($postArray);
+        $historyItem = $em->getRepository($this->historyItemFQCN)->findOneBy($postArray);
 
         if (!$historyItem) {
             $routeParameters = $request->get('_route_params');
@@ -112,7 +119,7 @@ class ResponseHistoryListener
 
             /** @var $historyItem \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
             $historyItem = $this->navItemFactory->createItem(
-                NavigationHistoryItem::NAVIGATION_HISTORY_ITEM_TYPE,
+                $this->navigationHistoryItemType,
                 $postArray
             );
         }
@@ -149,16 +156,17 @@ class ResponseHistoryListener
      */
     private function canAddToHistory(Response $response, Request $request, $user = null)
     {
-        $result = $response->getStatusCode() == 200
-            && $request->getRequestFormat() == 'html'
-            && $request->getMethod() == 'GET'
+        $userFQCN = $this->userFQCN;
+        $result = ($user instanceof $userFQCN)
+            && $response->getStatusCode() === 200
+            && $request->getRequestFormat() === 'html'
+            && $request->getMethod() === 'GET'
             && (!$request->isXmlHttpRequest()
-                || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            && ($user instanceof User);
+                || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER));
 
         if ($result) {
             $route  = $request->get('_route');
-            $result = $route[0] != '_' && $route != 'oro_default';
+            $result = $route[0] !== '_' && $route !== 'oro_default';
         }
 
         if ($result && $response->headers->has('Content-Disposition')) {
@@ -168,5 +176,29 @@ class ResponseHistoryListener
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $entityFQCN
+     */
+    public function setHistoryItemEntityFQCN($entityFQCN)
+    {
+        $this->historyItemFQCN = $entityFQCN;
+    }
+
+    /**
+     * @param string $entityFQCN
+     */
+    public function setUserEntityFQCN($entityFQCN)
+    {
+        $this->userFQCN = $entityFQCN;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setNavigationHistoryItemType($type)
+    {
+        $this->navigationHistoryItemType = $type;
     }
 }

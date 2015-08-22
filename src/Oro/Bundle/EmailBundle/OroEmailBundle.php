@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFolderLoaderPass;
@@ -57,6 +58,7 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new EmailTemplateVariablesPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
         $container->addCompilerPass(new EmailRecipientsProviderPass());
+        $container->addCompilerPass(new MailboxProcessPass());
     }
 
     /**
