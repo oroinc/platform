@@ -122,6 +122,8 @@ class MailboxController extends Controller
         $data = new Mailbox();
         if ($organization != null) {
             $data->setOrganization($organization);
+        } else {
+            $data->setOrganization($this->get('oro_security.security_facade')->getOrganization());
         }
 
         return $this->update($data, $request);
