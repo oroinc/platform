@@ -364,7 +364,8 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->setMethods(['tablesExist'])
+            ->getMockForAbstractClass();
         $schemaManager->expects($this->any())
             ->method('tablesExist')
             ->willReturn(true);
