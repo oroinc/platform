@@ -282,29 +282,8 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         }
         $qb->select($select);
 
-        $result = [];
         $data   = $qb->getQuery()->getArrayResult();
-        foreach ($data as $item) {
-            $known = false;
-            foreach ($ownerIdFields as $field) {
-                if ($item[$field] !== null) {
-                    $known = true;
-                    break;
-                }
-            }
-
-            $email  = strtolower($item['email']);
-            $userId = $item[$userIdField];
-            $mailboxId = $item[$mailboxIdField];
-
-            $result[$email] = $userId === null
-                ? ['known' => $known]
-                : ['known' => $known, 'user' => (int)$userId];
-
-            if ($mailboxId !== null) {
-                $result[$email]['mailbox'] = $mailboxId;
-            }
-        }
+        $result = $this->prepareKnownEmailAddressesData($data, $ownerIdFields, $userIdField, $mailboxIdField);
 
         return $result;
     }
@@ -332,5 +311,41 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     protected function normalizeEmailAddress($email)
     {
         return strtolower($this->emailAddressHelper->extractPureEmailAddress($email));
+    }
+
+    /**
+     * @param array $data
+     * @param array $ownerIdFields
+     * @param string $userIdField
+     * @param string $mailboxIdField
+     *
+     * @return array
+     */
+    protected function prepareKnownEmailAddressesData($data, $ownerIdFields, $userIdField, $mailboxIdField)
+    {
+        $result = [];
+        foreach ($data as $item) {
+            $known = false;
+            foreach ($ownerIdFields as $field) {
+                if ($item[$field] !== null) {
+                    $known = true;
+                    break;
+                }
+            }
+
+            $email = strtolower($item['email']);
+            $userId = $item[$userIdField];
+            $mailboxId = $item[$mailboxIdField];
+
+            $result[$email] = $userId === null
+                ? ['known' => $known]
+                : ['known' => $known, 'user' => (int)$userId];
+
+            if ($mailboxId !== null) {
+                $result[$email]['mailbox'] = $mailboxId;
+            }
+        }
+
+        return $result;
     }
 }
