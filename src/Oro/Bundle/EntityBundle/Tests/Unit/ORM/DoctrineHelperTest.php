@@ -12,6 +12,8 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -98,9 +100,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetEntityIdentifierWithGetIdMethod()
     {
         $identifiers = ['id' => self::TEST_IDENTIFIER];
-
         $entity = new TestEntity($identifiers['id']);
-
         $this->registry->expects($this->never())
             ->method('getManagerForClass');
 
