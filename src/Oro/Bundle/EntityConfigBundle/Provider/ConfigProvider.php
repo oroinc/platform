@@ -104,6 +104,10 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig($className, $fieldName = null)
     {
+        if ($className) {
+            $className = $this->getClassName($className);
+        }
+
         if ($fieldName) {
             return $this->configManager->getFieldConfig($this->scope, $className, $fieldName);
         } elseif ($className) {
