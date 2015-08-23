@@ -1,5 +1,6 @@
 parameters:
     oro_email_filter.filter_origin_folder.class:  Oro\Bundle\EmailBundle\Filter\ChoiceOriginFolderFilter
+    oro_email_filter.filter_massage_type.class:  Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter
 
 services:
     oro_email_filter.filter_origin_folder:
@@ -9,3 +10,11 @@ services:
             - @oro_filter.filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multiselect-originfolder }
+
+    oro_email_filter.filter_massage_type:
+        class: %oro_email_filter.filter_massage_type.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: multiselect-massagetype }
