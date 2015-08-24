@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailRepository extends EntityRepository
@@ -49,11 +50,12 @@ class EmailRepository extends EntityRepository
      * Get $limit last emails
      *
      * @param User $user
+     * @param Organization $organization
      * @param $limit
      *
      * @return mixed
      */
-    public function getNewEmails(User $user, $limit)
+    public function getNewEmails(User $user, Organization $organization, $limit)
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, eu.seen')
@@ -62,7 +64,7 @@ class EmailRepository extends EntityRepository
             ->andWhere('eu.owner = :ownerId')
             ->groupBy('e, eu.seen')
             ->orderBy('e.sentAt', 'DESC')
-            ->setParameter('organizationId', $user->getOrganization()->getId())
+            ->setParameter('organizationId', $organization->getId())
             ->setParameter('ownerId', $user->getId())
             ->setMaxResults($limit);
 
@@ -73,10 +75,11 @@ class EmailRepository extends EntityRepository
      * Get count new emails
      *
      * @param User $user
+     * @param Organization $organization
      *
      * @return mixed
      */
-    public function getCountNewEmails(User $user)
+    public function getCountNewEmails(User $user, Organization $organization)
     {
         return $this->createQueryBuilder('e')
             ->select('COUNT(DISTINCT e)')
@@ -84,10 +87,31 @@ class EmailRepository extends EntityRepository
             ->where('eu.organization = :organizationId')
             ->andWhere('eu.owner = :ownerId')
             ->andWhere('eu.seen = :seen')
-            ->setParameter('organizationId', $user->getOrganization()->getId())
+            ->setParameter('organizationId', $organization->getId())
             ->setParameter('ownerId', $user->getId())
             ->setParameter('seen', false)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Get email entities by owner entity
+     *
+     * @param object $entity
+     * @param string $ownerColumnName
+     * @return array
+     */
+    public function getEmailsByOwnerEntity($entity, $ownerColumnName)
+    {
+        $queryBuilder = $this
+            ->createQueryBuilder('e')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'ea')
+            ->andWhere("ea.$ownerColumnName = :contactId")
+            ->andWhere('ea.hasOwner = :hasOwner')
+            ->setParameter('contactId', $entity->getId())
+            ->setParameter('hasOwner', true);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }

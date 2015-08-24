@@ -97,10 +97,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
             $startDate = $folder->getSynchronizedAt();
-            $startDate = $startDate->modify('-1 month');
+            $checkStartDate = clone $startDate;
+            $checkStartDate->modify('-1 month');
 
             // set seen flags from previously synchronized emails
-            $this->checkFlags($imapFolder, $startDate);
+            $this->checkFlags($imapFolder, $checkStartDate);
 
             $this->em->flush($folder);
             $this->cleanUp(true, $imapFolder->getFolder());
@@ -425,11 +426,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $existingUids  = $this->getExistingUids($folder, $emails);
         $isMultiFolder = $this->manager->hasCapability(Imap::CAPABILITY_MSG_MULTI_FOLDERS);
 
+        $messageIds         = $this->getNewMessageIds($emails, $existingUids);
         $existingImapEmails = $this->getExistingImapEmails(
             $folder->getOrigin(),
-            $this->getNewMessageIds($emails, $existingUids),
+            $messageIds,
             $isMultiFolder
         );
+
+        $existingEmailUsers = $this->getExistingEmailUsers($folder, $messageIds);
 
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
@@ -463,15 +467,19 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
                 try {
-                    $imapEmail = $this->createImapEmail(
-                        $email->getId()->getUid(),
-                        $this->addEmailUser(
+                    $emailUser = isset($existingEmailUsers[$email->getMessageId()])
+                        ? $existingEmailUsers[$email->getMessageId()]
+                        : $this->addEmailUser(
                             $email,
                             $folder,
                             $email->hasFlag("\\Seen"),
                             $this->currentUser,
                             $this->currentOrganization
-                        )->getEmail(),
+                        );
+
+                    $imapEmail = $this->createImapEmail(
+                        $email->getId()->getUid(),
+                        $emailUser->getEmail(),
                         $imapFolder
                     );
                     $newImapEmails[] = $imapEmail;

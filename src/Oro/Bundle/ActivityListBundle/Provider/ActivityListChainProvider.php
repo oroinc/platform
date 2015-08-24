@@ -42,7 +42,7 @@ class ActivityListChainProvider
     protected $routingHelper;
 
     /** @var array */
-    protected $targetClasses = [];
+    protected $targetClasses;
 
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
@@ -95,7 +95,8 @@ class ActivityListChainProvider
      */
     public function getTargetEntityClasses()
     {
-        if (empty($this->targetClasses)) {
+        if (null === $this->targetClasses) {
+            $this->targetClasses = [];
             /** @var ConfigIdInterface[] $configIds */
             $configIds = $this->configManager->getIds('entity', null, false);
             foreach ($configIds as $configId) {
@@ -147,6 +148,18 @@ class ActivityListChainProvider
     public function isSupportedEntity($entity)
     {
         return in_array($this->doctrineHelper->getEntityClass($entity), array_keys($this->providers));
+    }
+
+    /**
+     * Check if given target entity supports by target classes list
+     *
+     * @param $entity
+     *
+     * @return bool
+     */
+    public function isSupportedTargetEntity($entity)
+    {
+        return in_array($this->doctrineHelper->getEntityClass($entity), $this->getTargetEntityClasses());
     }
 
     /**
