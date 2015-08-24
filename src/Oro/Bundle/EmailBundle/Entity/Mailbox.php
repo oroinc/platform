@@ -63,7 +63,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var MailboxProcessSettings
      *
-     * @ORM\OneToOne(targetEntity="MailboxProcessSettings",
+     * @ORM\OneToOne(targetEntity="MailboxProcessSettings", inversedBy="mailbox",
      *     cascade={"all"}, orphanRemoval=true
      * )
      * @ORM\JoinColumn(name="process_settings_id", referencedColumnName="id", nullable=true)
@@ -234,6 +234,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function setProcessSettings(MailboxProcessSettings $processSettings = null)
     {
+        if ($processSettings) {
+            $processSettings->setMailbox($this);
+        } elseif ($this->processSettings) {
+            $this->processSettings->setMailbox(null);
+        }
         $this->processSettings = $processSettings;
 
         return $this;
