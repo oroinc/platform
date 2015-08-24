@@ -85,14 +85,18 @@ class TagManager
     /**
      * Loads or creates multiples tags from a list of tag names
      *
-     * @param  array $names Array of tag names
+     * @param array $names Array of tag names
+     * @param Organization|null Current organization if not specified
+     *
      * @return Tag[]
      */
-    public function loadOrCreateTags(array $names)
+    public function loadOrCreateTags(array $names, Organization $organization = null)
     {
         if (empty($names)) {
             return [];
         }
+
+        $usedOrganization = $organization ?: $this->getOrganization();
 
         array_walk(
             $names,
@@ -102,7 +106,7 @@ class TagManager
         );
         $names = array_unique($names);
         $tags = $this->em->getRepository($this->tagClass)->findBy(
-            ['name' => $names, 'organization' => $this->getOrganization()]
+            ['name' => $names, 'organization' => $usedOrganization]
         );
 
         $loadedNames = [];
@@ -128,12 +132,14 @@ class TagManager
      *
      * @param Taggable $entity
      * @param ArrayCollection|null $tags
+     * @param Organization|null Current organization if not specified
+     *
      * @return array
      */
-    public function getPreparedArray(Taggable $entity, $tags = null)
+    public function getPreparedArray(Taggable $entity, $tags = null, Organization $organization = null)
     {
         if (is_null($tags)) {
-            $this->loadTagging($entity);
+            $this->loadTagging($entity, $organization);
             $tags = $entity->getTags();
         }
         $result = [];
