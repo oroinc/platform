@@ -819,10 +819,6 @@ services:
         tags:
             - { name: oro_entity.name_provider, priority: 0}
 
-    oro_email.link.doctrine:
-        tags:
-            - { name: oro_service_link,  service: doctrine }
-
     oro_email.link.mailbox_process_storage:
         tags:
             - { name: oro_service_link,  service: oro_email.mailbox.process_storage }
@@ -832,7 +828,7 @@ services:
         arguments:
             - @oro_workflow.process.process_handler
             - @oro_email.link.mailbox_process_storage
-            - @oro_email.link.doctrine
+            - @doctrine
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }

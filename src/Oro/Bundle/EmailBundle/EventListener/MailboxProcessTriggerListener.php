@@ -9,8 +9,6 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\ServiceLinkPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -24,13 +22,18 @@ class MailboxProcessTriggerListener
     protected $emailBodies;
     /** @var ServiceLink */
     protected $processStorage;
-    /** @var ServiceLink */
+    /** @var Registry */
     protected $doctrine;
 
+    /**
+     * @param ProcessHandler $handler
+     * @param ServiceLink    $processStorage
+     * @param Registry       $doctrine
+     */
     public function __construct(
         ProcessHandler $handler,
         ServiceLink $processStorage,
-        ServiceLink $doctrine
+        Registry $doctrine
     ) {
         $this->handler = $handler;
         $this->processStorage = $processStorage;
@@ -49,7 +52,7 @@ class MailboxProcessTriggerListener
             if ($entity instanceof EmailUser) {
                 /*
                  * If EmailUser is being persisted and body of its email is already synced.
-                 * Process will be triggered provided that is has not yet been assigned to any mailbox.
+                 * Process will be triggered provided that it has not yet been assigned to any mailbox.
                  */
                 $email = $entity->getEmail();
                 $mailboxEmailUsers = $email->getEmailUsers()->filter(
@@ -120,6 +123,6 @@ class MailboxProcessTriggerListener
      */
     protected function getDefinitionRepository()
     {
-        return $this->doctrine->getService()->getRepository('OroWorkflowBundle:ProcessDefinition');
+        return $this->doctrine->getRepository('OroWorkflowBundle:ProcessDefinition');
     }
 }
