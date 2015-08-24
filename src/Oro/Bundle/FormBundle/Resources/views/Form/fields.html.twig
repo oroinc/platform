@@ -547,7 +547,7 @@
                 $(function() {
                     {% set urlParts = {
                         grid: {
-                            route: 'oro_datagrid_widget',
+                            route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
                             parameters: {
                                 gridName     : form.vars.grid_name,
                                 params       : form.vars.grid_parameters,
