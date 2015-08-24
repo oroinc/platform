@@ -72,7 +72,7 @@ class MailboxType extends AbstractType
         ]);
         $builder->add(
             'authorizedUsers',
-            'oro_user_organization_acl_multiselect',
+            'oro_user_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
             ]
@@ -110,6 +110,10 @@ class MailboxType extends AbstractType
         $data = $event->getData();
         $form = $event->getForm();
 
+        /*
+         * Process types are selected based on mailbox, some processes are for example not available in some
+         * organizations.
+         */
         FormUtils::replaceField(
             $form,
             'processType',
@@ -122,14 +126,24 @@ class MailboxType extends AbstractType
             return;
         }
 
+        /*
+         * If data has already selected some kind of process type, make it default value for field.
+         */
         $processType = null;
         if (null !== $processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
         }
-
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
 
+        /*
+         * Add appropriate field for selected process type to form.
+         */
         $this->addProcessField($form, $processType);
+
+        /*
+         * Configure user field to display only users from organization which mailbox belongs to.
+         */
+        $this->configureUserField($form, $data);
     }
 
     /**
@@ -190,6 +204,32 @@ class MailboxType extends AbstractType
             'hidden',
             [
                 'data' => null,
+            ]
+        );
+    }
+
+    /**
+     * Configures user field so it searches only within mailboxes' organization.
+     *
+     * @param FormInterface $form
+     * @param Mailbox       $data
+     */
+    protected function configureUserField(FormInterface $form, Mailbox $data)
+    {
+        FormUtils::replaceField(
+            $form,
+            'authorizedUsers',
+            [
+                'configs'            => [
+                    'route_name'              => 'oro_email_mailbox_users_search',
+                    'route_parameters'        => ['organizationId' => $data->getOrganization()->getId()],
+                    'multiple'                => true,
+                    'width'                   => '400px',
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'allowClear'              => true,
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                ]
             ]
         );
     }

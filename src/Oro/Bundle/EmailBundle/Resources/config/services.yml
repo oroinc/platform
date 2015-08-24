@@ -52,8 +52,6 @@ parameters:
     # Entity email user listener
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
 
-    oro_email.event_listener.mailboxes_datagrid_listener.class: Oro\Bundle\EmailBundle\EventListener\MailboxesDatagridListener
-
     # Providers
     oro_email.emailtemplate.variable_provider.class: Oro\Bundle\EmailBundle\Provider\VariablesProvider
     oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
@@ -120,6 +118,9 @@ parameters:
     oro_email.mailbox.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_email.mailbox.entity_name_provider.class:       Oro\Bundle\EmailBundle\Provider\MailboxEntityNameProvider
     oro_email.listener.mailbox_process_trigger_listener.class: Oro\Bundle\EmailBundle\EventListener\MailboxProcessTriggerListener
+    oro_email.listener.mailbox.authorization.class:     Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
+    oro_email.listener.datagrid.mailbox_grid.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\MailboxGridListener
+    oro_email.autocomplete.mailbox_user_search_handler.class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler
 
     # Workflow conditions
     oro_email.workflow.condition.instanceof.class:      Oro\Bundle\EmailBundle\Model\Condition\IsInstanceOf
@@ -244,11 +245,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 1 }
             - { name: doctrine.event_listener, event: postFlush, priority: 1 }
-
-    oro_email.event_listener.mailboxes_datagrid_listener:
-        class: %oro_email.event_listener.mailboxes_datagrid_listener.class%
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild }
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%
@@ -832,6 +828,29 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+
+    oro_email.autocomplete.mailbox_user_search_handler:
+        class: %oro_email.autocomplete.mailbox_user_search_handler.class%
+        parent: oro_user.autocomplete.user.search_handler
+        calls:
+           - [setSecurityFacade, [@oro_security.security_facade]]
+
+    oro_email.listener.mailbox.authorization:
+        class: %oro_email.listener.mailbox.authorization.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
+
+    oro_email.listener.datagrid.mailbox_grid:
+        class: %oro_email.listener.datagrid.mailbox_grid.class%
+        arguments:
+            - @doctrine
+            - @oro_security.acl_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-mailboxes-grid, method: onBuildAfter }
 
     oro_email.workflow.condition.instanceof:
         class: %oro_email.workflow.condition.instanceof.class%
