@@ -4,22 +4,18 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
-class MailboxProcessTriggerListener
+class MailboxProcessTriggerListener extends MailboxEmailListener
 {
     /** @var ProcessHandler */
     protected $handler;
-    /** @var EmailBody[] */
-    protected $emailBodies;
     /** @var ServiceLink */
     protected $processStorage;
     /** @var Registry */
@@ -41,41 +37,10 @@ class MailboxProcessTriggerListener
     }
 
     /**
-     * @param OnFlushEventArgs $args
-     */
-    public function onFlush(OnFlushEventArgs $args)
-    {
-        $em = $args->getEntityManager();
-        $uow = $em->getUnitOfWork();
-
-        foreach ($uow->getScheduledEntityInsertions() as $oid => $entity) {
-            if ($entity instanceof EmailUser) {
-                /*
-                 * If EmailUser is being persisted and body of its email is already synced.
-                 * Process will be triggered provided that it has not yet been assigned to any mailbox.
-                 */
-                $email = $entity->getEmail();
-                $mailboxEmailUsers = $email->getEmailUsers()->filter(
-                    function (EmailUser $emailUser) {
-                        return $emailUser->getId() && $emailUser->getMailboxOwner();
-                    }
-                );
-
-                $emailBody = $email->getEmailBody();
-                if ($mailboxEmailUsers->isEmpty() && $emailBody && $emailBody->getId()) {
-                    $this->emailBodies[spl_object_hash($emailBody)] = $emailBody;
-                }
-            } elseif ($entity instanceof EmailBody) {
-                /*
-                 * If new email body is created ...
-                 * Schedule it for processing.
-                 */
-                $this->emailBodies[$oid] = $entity;
-            }
-        }
-    }
-
-    /**
+     * Processes email bodies using processes provided in MailboxProcessProviders.
+     * Processes are triggered using this listener instead of normal triggers.
+     * Processes are triggered for new email bodies and email bodies of emails newly bound to some mailbox.
+     *
      * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
