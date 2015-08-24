@@ -183,7 +183,7 @@ datagrid:
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:
                     label: oro.email.message_type.label
-                    type: multiselect-massagetype
+                    type: multiselect-messagetype
                     options:
                         field_options:
                             multiple: true
