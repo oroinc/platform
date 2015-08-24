@@ -459,6 +459,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function beforeSave()
     {
+        if ($this->origin !== null) {
+            $this->origin->setOwner(null);
+        }
+
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
