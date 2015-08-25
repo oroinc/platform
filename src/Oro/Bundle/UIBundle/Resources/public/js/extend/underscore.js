@@ -1,6 +1,7 @@
 define(['underscore'], function(_) {
     'use strict';
-    var IE = function() {
+
+    var IE = (function() {
         var rv;
         var userAgent = window.navigator.userAgent;
         var msie = userAgent.indexOf('MSIE ');
@@ -23,7 +24,7 @@ define(['underscore'], function(_) {
 
         // other browser
         return false;
-    }();
+    })();
 
     _.mixin({
         nl2br: function(str) {
