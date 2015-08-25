@@ -509,11 +509,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * @param EmailFolder $folder
      * @param Email $email
-     * @param $existingUids
+     * @param array $existingUids
      *
      * @return bool
      */
-    protected function allowSaveEmail(EmailFolder $folder, Email $email, $existingUids)
+    protected function allowSaveEmail(EmailFolder $folder, Email $email, array $existingUids)
     {
         if ($folder->getSynchronizedAt() > $email->getSentAt()) {
             $this->logger->info(
