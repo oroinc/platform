@@ -21,6 +21,10 @@ define([
     return [
         'Oro\\Bundle\\EmailBundle\\Validator\\Constraints\\EmailAddress',
         function(value, element) {
+            if (_.isEmpty(value)) {
+                return true;
+            }
+
             // @TODO add support of MX check action
             // original email validator is too slow for some values
             // return $.validator.methods.email.apply(this, arguments);
