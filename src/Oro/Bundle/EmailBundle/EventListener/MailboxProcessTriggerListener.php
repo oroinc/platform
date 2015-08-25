@@ -48,12 +48,12 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         if (empty($this->emailBodies)) {
             return;
         }
+        $emailBodies = $this->emailBodies;
+        $this->emailBodies = [];
 
-        foreach ($this->emailBodies as $emailBody) {
+        foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody);
         }
-
-        $this->emailBodies = [];
     }
 
     /**
