@@ -7,10 +7,12 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
+    var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var messenger = require('oroui/js/messenger');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
+        itemView: EmailNotificationView,
         listSelector: '.items',
         countNewEmail: 0,
 

@@ -35,6 +35,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
  * @todo Should be refactored in the BAP-8520
  * @see EmailActivityListProvider::isApplicable
  * @see EmailActivityListProvider::getOrganization
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
