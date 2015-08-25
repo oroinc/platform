@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 class CountQueryBuilderOptimizer
 {
@@ -20,6 +21,9 @@ class CountQueryBuilderOptimizer
 
     /** @var QueryBuilderTools */
     protected $qbTools;
+
+    /** @var ClassMetadataFactory */
+    protected $metadataFactory;
 
     /**
      * @param QueryBuilderTools|null $qbTools
@@ -45,6 +49,11 @@ class CountQueryBuilderOptimizer
         $this->qbTools->prepareJoinTablePaths($originalQb->getDQLPart('join'));
         $this->rootAlias = current($this->originalQb->getRootAliases());
         $this->initIdFieldName();
+
+        $this->metadataFactory = $this->originalQb->getEntityManager()->getMetadataFactory();
+
+        // make sure that metadata factory is initialized
+        $this->metadataFactory->getAllMetadata();
     }
 
     /**
@@ -119,7 +128,8 @@ class CountQueryBuilderOptimizer
     {
         // Collect list of tables which should be added to new query
         $requiredToJoin = $this->qbTools->getUsedTableAliases($parts['where']);
-        $requiredToJoin = array_merge($requiredToJoin, $this->qbTools->getUsedTableAliases($parts['groupBy']));
+        $groupByAliases = $this->qbTools->getUsedTableAliases($parts['groupBy']);
+        $requiredToJoin = array_merge($requiredToJoin, $groupByAliases);
         $requiredToJoin = array_merge($requiredToJoin, $this->qbTools->getUsedTableAliases($parts['having']));
         $requiredToJoin = array_merge(
             $requiredToJoin,
@@ -127,7 +137,7 @@ class CountQueryBuilderOptimizer
         );
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->getNonSymmetricJoinAliases($parts['join'], $parts['from'])
+            $this->getNonSymmetricJoinAliases($parts['join'], $parts['from'], $groupByAliases)
         );
 
         $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->rootAlias));
@@ -239,16 +249,15 @@ class CountQueryBuilderOptimizer
      *
      * @param array       $joins
      * @param Expr\From[] $fromStatements
+     * @param string      $groupByAliases the aliases that was used in GROUP BY statement
      *
      * @return array
      */
-    protected function getNonSymmetricJoinAliases($joins, $fromStatements)
+    protected function getNonSymmetricJoinAliases($joins, $fromStatements, $groupByAliases)
     {
-        $metadataFactory = $this->originalQb->getEntityManager()->getMetadataFactory();
-
-        // make sure that metadata factory was initialized
-        $metadataFactory->getAllMetadata();
-
+        // collect the correspondence of select alias to it's entity class
+        // classes are sometimes arrive in short form (`OroEmailBundle:Email`)
+        // and sometimes there is relation (e. g. `a.owner`) instead of class name
         $aliasToClass = [];
         foreach ($fromStatements as $from) {
             /* @var Expr\From $from */
@@ -261,16 +270,77 @@ class CountQueryBuilderOptimizer
 
         $aliases      = [];
         $dependencies = $this->qbTools->getAllDependencies($this->rootAlias, $joins[$this->rootAlias]);
+
         foreach ($dependencies as $alias => $joinInfo) {
-            if ($metadataFactory->hasMetadataFor($aliasToClass[$alias])) {
-                /** @var ClassMetadata $metadata */
-                $metadata = $metadataFactory->getMetadataFor($aliasToClass[$alias]);
+            /** @var Expr\Join $joinExpr */
+            // find a join statement that corresponds to current alias
+            $joinExpr = current(array_filter($joins[$this->rootAlias], function (Expr\Join $join) use ($alias) {
+                return $join->getAlias() === $alias;
+            }));
+
+            // skip joins that is not left joins or was not used in GROUP BY statement
+            // if it was a GROUP BY statement at all
+            if ($joinExpr->getJoinType() !== 'LEFT'
+                || (count($groupByAliases) && !in_array($alias, $groupByAliases, true))) {
+                continue;
+            }
+
+            // association name or class name
+            $join = $joinExpr->getJoin();
+
+            $parts = explode('.', $join);
+
+            // if there is just association expression like `a.owner`
+            if (count($parts) === 2) {
+                list($associationAlias, $associationName) = $parts;
+                $className = $this->resolveEntityClassByAlias(
+                    $associationAlias,
+                    $associationName,
+                    $aliasToClass
+                );
+
+                if ($this->isToManyAssociation($className, $associationName)) {
+                    $aliases[] = $alias;
+                }
+
+            } else { // otherwise there is a class name
+                // join condition (e. g. `e.user = u`) or null
+                $condition = $joinExpr->getCondition();
+                $dependantClass = $this->resolveEntityClass($join);
+                $aliasToAssociation = [];
+
+                foreach ($this->qbTools->getFields($condition) as $field) {
+                    list($associationAlias, $associationName) = explode('.', $field);
+                    $aliasToAssociation[$associationAlias] = $associationName;
+                }
+
+                // for each dependant alias resolve it's entity class and check the relations
                 foreach ($joinInfo[1] as $dependantAlias) {
-                    $associations = $metadata->getAssociationsByTargetClass($aliasToClass[$dependantAlias]);
-                    foreach ($associations as $name => $info) {
-                        if (in_array($info['type'], [ClassMetadata::MANY_TO_ONE, ClassMetadata::MANY_TO_MANY])) {
-                            $aliases[] = $alias;
-                        }
+                    $aliasToCheck = array_key_exists($dependantAlias, $aliasToAssociation)
+                        ? $dependantAlias
+                        : $alias;
+
+                    $leftClass = $this->resolveEntityClassByAlias(
+                        $dependantAlias,
+                        $aliasToAssociation[$aliasToCheck],
+                        $aliasToClass
+                    );
+
+                    $plainAssociation = $this->isToManyAssociation(
+                        $leftClass,
+                        $aliasToAssociation[$aliasToCheck],
+                        $dependantClass
+                    );
+
+                    $inverseAssociation = $this->isToManyAssociation(
+                        $dependantClass,
+                        $aliasToAssociation[$aliasToCheck],
+                        $leftClass,
+                        true
+                    );
+
+                    if ($plainAssociation || $inverseAssociation) {
+                        $aliases[] = $alias;
                     }
                 }
             }
@@ -297,5 +367,65 @@ class CountQueryBuilderOptimizer
         }
 
         return $join;
+    }
+
+    /**
+     * Resolve the FQCN by it's alias and association name
+     *
+     * @param $alias
+     * @param $associationName
+     * @param $aliasToClass
+     * @param $metadataFactory
+     */
+    protected function resolveEntityClassByAlias($alias, $associationName, $aliasToClass)
+    {
+        $expression = $aliasToClass[$alias];
+
+        while (count(explode('.', $expression)) === 2) {
+            list($mediateAlias, $mediateAssociationName) = explode('.', $expression);
+            $expression = $aliasToClass[$mediateAlias];
+
+            /** @var ClassMetadata $metadata */
+            $metadata = $this->metadataFactory->getMetadataFor($expression);
+            $associationMapping = $metadata->getAssociationMapping($mediateAssociationName);
+            $expression = $associationMapping['sourceEntity'];
+
+            $metadata = $this->metadataFactory->getMetadataFor($expression);
+            if (!$metadata->hasAssociation($associationName)) {
+                $expression = $associationMapping['targetEntity'];
+            }
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Check if class A has a to-many relation to class B for particular association
+     * or vice versa if we are checking inverse association
+     *
+     * @param string $entityClassA
+     * @param string|null $entityClassB
+     * @param string $associationName
+     * @param $metadataFactory
+     * @param bool|false $inverse
+     * @return bool
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+    protected function isToManyAssociation($entityClassA, $associationName, $entityClassB = null, $inverse = false)
+    {
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->metadataFactory->getMetadataFor($entityClassA);
+        $checkAgainst = [ClassMetadata::MANY_TO_MANY];
+
+        $checkAgainst[] = $inverse
+            ? ClassMetadata::MANY_TO_ONE
+            : ClassMetadata::ONE_TO_MANY;
+
+        $associations = $entityClassB
+            ? $associations = $metadata->getAssociationsByTargetClass($entityClassB)
+            : [$associationName => $metadata->getAssociationMapping($associationName)];
+
+        return array_key_exists($associationName, $associations)
+               && in_array($associations[$associationName]['type'], $checkAgainst, true);
     }
 }

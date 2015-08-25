@@ -117,10 +117,12 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             'unused_left_join_with_condition_in_several_joins' => [
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
-                    ->leftJoin('u.owner', 'o', Join::WITH, 'o.id = 123')
-                    ->leftJoin('o.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                    ->leftJoin('u.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                    ->leftJoin('bu.users', 'o', Join::WITH, 'o.id = 123')
                     ->select('u.id, o.name'),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN u.businessUnits bu WITH bu.id = 456 '
+                    . 'LEFT JOIN bu.users o WITH o.id = 123',
             ],
             'used_left_join' => [
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -208,6 +210,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN u.roles r '
                     . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
                     . 'LEFT JOIN u.apiKeys api '
                     . 'WHERE gr.id > 10'
@@ -329,7 +332,15 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     ->leftJoin('OroEmailBundle:Email', 'e', Join::WITH, 'u MEMBER OF e.user_d41b1c4b'),
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b'
-            ]
+            ],
+            'join_many_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('u.businessUnits', 'b'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN u.businessUnits b'
+            ],
         ];
     }
 
