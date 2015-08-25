@@ -124,7 +124,7 @@ datagrid:
                 where:
                     and:
                         - o.isActive = true
-                groupBy: eu.id, e.sentAt
+                groupBy: e.id, e.sentAt
         columns:
             contacts:
                 data_name: email.contacts
