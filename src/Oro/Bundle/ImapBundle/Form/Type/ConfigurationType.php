@@ -354,16 +354,25 @@ class ConfigurationType extends AbstractType
                 $entity = $event->getForm()->getData();
 
                 if ($entity instanceof UserEmailOrigin) {
+                    /*
+                     * If useImap is disabled unset imap related data and set imap host to empty string.
+                     * Empty string as host will cause origin to be recreated if necessary.
+                     * Old origin will be disabled and later removed in cron job.
+                     */
                     if (!array_key_exists('useImap', $data) || $data['useImap'] === 0) {
                         unset($data['imapHost'], $data['imapPort'], $data['imapEncryption']);
+                        $data['imapHost'] = '';
                     }
+                    /*
+                     * If smtp is disabled, unset smtp related data.
+                     */
                     if (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0) {
                         unset($data['smtpHost'], $data['smtpPort'], $data['smtpEncryption']);
                     }
                     $event->setData($data);
                 }
             },
-            2
+            6
         );
     }
 
