@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -55,11 +56,7 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
                         return false;
                     }
 
-                    if ($tableForeignKey->getForeignColumns() !== [$columnName]) {
-                        return false;
-                    }
-
-                    return true;
+                    return $tableForeignKey->getForeignColumns() === [$columnName];
                 }
             );
 
@@ -73,10 +70,15 @@ class ChangeTypeExtension implements DatabasePlatformAwareInterface
                     $this->platform->getDropForeignKeySQL($tableForeignKey, $foreignKeyTableName)
                 );
 
-                $schema
-                    ->getTable($foreignKeyTableName)
-                    ->getColumn(reset($foreignKeyColumnNames))
-                    ->setType($type);
+                $column = $schema->getTable($foreignKeyTableName)->getColumn(reset($foreignKeyColumnNames));
+                if ($column instanceof ExtendColumn) {
+                    $column
+                        ->disableExtendOptions()
+                        ->setType($type)
+                        ->enableExtendOptions();
+                } else {
+                    $column->setType($type);
+                }
             }
         }
 
