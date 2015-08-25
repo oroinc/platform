@@ -285,10 +285,12 @@
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
     {% set redirectData = {
         'route': app.request.attributes.get('_route'),
-        'parameters': app.request.attributes.get('_route_params'),
+        'parameters': app.request.attributes.get('_route_params')
     } %}
     <div class="row" style="margin-right: -20px;">
-        {{ dataGrid.renderGrid('base-mailboxes-grid', {redirectData: redirectData}) }}
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {
+            'redirectData': redirectData, 'organization_ids': [get_current_organization().getId()]
+        }) }}
     </div>
 {% endblock %}
 
