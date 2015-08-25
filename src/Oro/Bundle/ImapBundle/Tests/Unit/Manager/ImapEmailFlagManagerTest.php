@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
-use Zend\Mail\Header\HeaderInterface;
-
-use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
 
 class ImapEmailFlagManagerTest extends \PHPUnit_Framework_TestCase

@@ -294,9 +294,8 @@ define(function(require) {
 
         _afterLayoutInit: function() {
             this.widget.closest('.invisible').removeClass('invisible');
-            if (this.renderDeferred) {
-                this.renderDeferred.resolve();
-                delete this.renderDeferred;
+            if (this.deferredRender) {
+                this._resolveDeferredRender();
             }
         },
 

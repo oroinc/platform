@@ -16,10 +16,13 @@ define([
             }
         },
 
+        postRoute: 'oro_api_post_pagestate',
+        putRoute: 'oro_api_put_pagestate',
+
         url: function(method) {
-            var args = ['oro_api_post_pagestate'];
+            var args = [this.postRoute];
             if (this.id) {
-                args = ['oro_api_put_pagestate', {id: this.id}];
+                args = [this.putRoute, {id: this.id}];
             }
             return routing.generate.apply(routing, args);
         }

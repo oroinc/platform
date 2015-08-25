@@ -111,9 +111,9 @@ define([
                 this.displaySelect2(true);
                 this.uniform.show();
 
-                this.target.val('').trigger('change');
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
+                this.target.val(this.target.data('selected-data') || '').trigger('change');
 
                 this.$simpleEl.hide();
                 this.$simpleEl.val('');
