@@ -18,9 +18,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
      */
     public function testGetCountQueryBuilder(QueryBuilder $queryBuilder, $expectedDql)
     {
-        $em = self::getContainer()->get('doctrine.orm.entity_manager');
-
-        $optimizer = new CountQueryBuilderOptimizer($em);
+        $optimizer = new CountQueryBuilderOptimizer();
         $countQb = $optimizer->getCountQueryBuilder($queryBuilder);
 
         $this->assertInstanceOf('Doctrine\ORM\QueryBuilder', $countQb);
