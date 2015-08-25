@@ -52,6 +52,8 @@ class StripHtmlTags extends AbstractAction
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function initialize(array $options)
     {

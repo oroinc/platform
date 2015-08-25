@@ -5,8 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 
-use Symfony\Component\DependencyInjection\Container;
-
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\ConnectionMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
@@ -53,6 +51,9 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager->expects($this->any())->method('getConfig')->will($this->returnValue($this->entityConfig));
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->will($this->returnValue($this->entityConfig));
         $this->configManager->expects($this->any())->method('hasConfig')->will($this->returnValue(true));
         $this->configManager->expects($this->any())->method('persist')->will($this->returnValue(true));
         $this->configManager->expects($this->any())->method('flush')->will($this->returnValue(true));
