@@ -8,8 +8,6 @@ config:
         'oroemail/js/app/models/email-context-activity-collection': 'bundles/oroemail/js/app/models/email-context-activity-collection.js'
         'oroemail/js/app/models/email-attachment-model': 'bundles/oroemail/js/app/models/email-attachment-model.js'
         'oroemail/js/app/models/email-attachment-collection': 'bundles/oroemail/js/app/models/email-attachment-collection.js'
-        'oroemail/js/app/models/email-notification-collection': 'bundles/oroemail/js/app/models/email-notification-collection.js'
-        'oroemail/js/app/models/email-notification-model': 'bundles/oroemail/js/app/models/email-notification-model.js'
 
         'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
         'oroemail/js/app/views/email-attachment-link-view': 'bundles/oroemail/js/app/views/email-attachment-link-view.js'
@@ -19,8 +17,6 @@ config:
         'oroemail/js/app/views/email-attachment-list-row-view': 'bundles/oroemail/js/app/views/email-attachment-list-row-view.js'
         'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
         'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
-        'oroemail/js/app/views/email-notification-view': 'bundles/oroemail/js/app/views/email-notification-view.js'
-        'oroemail/js/app/views/email-notification-collection-view': 'bundles/oroemail/js/app/views/email-notification-collection-view.js'
 
         'oroemail/js/app/views/mailbox-update-view': 'bundles/oroemail/js/app/views/mailbox-update-view.js'
 
@@ -41,5 +37,7 @@ config:
         'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'
 
         'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'
+
+        'oroemail/js/app/modules/views-module': 'oroemail/js/app/modules/views-module.js'
     appmodules:
         - oroemail/js/app/modules/views-module
