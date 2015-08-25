@@ -416,7 +416,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder) {
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
+    {
         $this->emailEntityBuilder->removeEmails();
 
         $folder        = $imapFolder->getFolder();
@@ -433,26 +434,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
         foreach ($emails as $email) {
-            if ($folder->getSynchronizedAt() > $email->getSentAt()) {
-                $this->logger->info(
-                    sprintf(
-                        'Skip "%s" (UID: %d) email, because it was sent early
-                        than mailbox was created or last synchronized was made.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
-                continue;
-            }
-
-            if (in_array($email->getId()->getUid(), $existingUids)) {
-                $this->logger->info(
-                    sprintf(
-                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
+            if (!$this->allowSaveEmail($folder, $email, $existingUids)) {
                 continue;
             }
 
@@ -522,6 +504,42 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->em->flush();
 
         $this->cleanUp();
+    }
+
+    /**
+     * @param EmailFolder $folder
+     * @param Email $email
+     * @param $existingUids
+     *
+     * @return bool
+     */
+    protected function allowSaveEmail(EmailFolder $folder, Email $email, $existingUids)
+    {
+        if ($folder->getSynchronizedAt() > $email->getSentAt()) {
+            $this->logger->info(
+                sprintf(
+                    'Skip "%s" (UID: %d) email, because it was sent early
+                        than mailbox was created or last synchronized was made.',
+                    $email->getSubject(),
+                    $email->getId()->getUid()
+                )
+            );
+
+            return false;
+        }
+
+        if (in_array($email->getId()->getUid(), $existingUids)) {
+            $this->logger->info(
+                sprintf(
+                    'Skip "%s" (UID: %d) email, because it is already synchronised.',
+                    $email->getSubject(),
+                    $email->getId()->getUid()
+                )
+            );
+            return false;
+        }
+
+        return true;
     }
 
     /**
