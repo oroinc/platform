@@ -53,8 +53,6 @@ define([
         enterEditMode: function() {
             if (this.column.get('editable')) {
                 SelectCell.__super__.enterEditMode.apply(this, arguments);
-
-                this.$el.find('select').uniform();
             }
         },
 
