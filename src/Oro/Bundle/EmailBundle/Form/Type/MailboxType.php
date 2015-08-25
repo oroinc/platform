@@ -216,6 +216,10 @@ class MailboxType extends AbstractType
      */
     protected function configureUserField(FormInterface $form, Mailbox $data)
     {
+        if (!$data->getOrganization()) {
+            return;
+        }
+
         FormUtils::replaceField(
             $form,
             'authorizedUsers',
