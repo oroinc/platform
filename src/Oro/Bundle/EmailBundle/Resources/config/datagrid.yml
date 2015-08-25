@@ -205,12 +205,13 @@ datagrid:
                             choices: @oro_email.datagrid.origin_folder.provider->getListTypeChoices
                 is_new:
                     label: oro.email.status.label
-                    type: choice
+                    type: boolean
                     options:
                         field_options:
                             choices:
-                                false: oro.email.status.unread.label
-                                true: oro.email.status.read.label
+                                # in boolean filter type, 1 = yes, 2 = false
+                                2: oro.email.status.unread.label
+                                1: oro.email.status.read.label
                     data_name: eu.seen
                 mailbox:
                     label: oro.email.mailbox.entity_label

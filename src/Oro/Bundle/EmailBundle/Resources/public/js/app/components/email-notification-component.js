@@ -8,6 +8,7 @@ define([
     'oroui/js/mediator',
     'orosync/js/sync',
     'oroui/js/app/components/base/component',
+    'oroemail/js/app/views/email-notification-collection-view',
     'oroemail/js/app/views/email-notification-view',
     'oroemail/js/app/models/email-notification-collection',
     'oroui/js/messenger'
@@ -18,6 +19,7 @@ define([
             mediator,
             sync,
             BaseComponent,
+            EmailNotificationCollectionView,
             EmailNotificationView,
             EmailNotificationCollection,
             messenger) {
@@ -26,7 +28,7 @@ define([
     var EmailNotification;
 
     EmailNotification = BaseComponent.extend({
-        view: null,
+        collectionView: null,
         collection: null,
 
         initialize: function(options) {
@@ -44,10 +46,11 @@ define([
         },
 
         initView: function() {
-            this.view = new EmailNotificationView({
+            this.collectionView = new EmailNotificationCollectionView({
                 el: this.options._sourceElement,
                 collection: this.collection,
-                count: this.options.count
+                countNewEmail: this.options.count,
+                itemView: EmailNotificationView
             });
 
             return this;
@@ -75,11 +78,10 @@ define([
             $.ajax({
                 url: routing.generate('oro_email_last'),
                 success: function(response) {
-                    self.view.collection.reset();
-                    self.view.collection.add(response.emails);
-                    self.view.setCount(response.count);
+                    self.collectionView.collection.reset(response.emails);
+                    self.collectionView.setCount(response.count);
                     if (hasNewEmail) {
-                        self.view.showNotification();
+                        self.collectionView.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
                 },
