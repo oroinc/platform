@@ -255,7 +255,6 @@ define(function(require) {
         enableOtherScroll: function() {
             var heightDec;
             var self = this;
-            var clientHeightCorrection = _.isIE() ? 1 : 0;
             var scrollContainer = this.domCache.gridScrollableContainer;
             var otherScroll = this.domCache.otherScroll;
             var otherScrollInner = this.domCache.otherScrollInner;
@@ -331,8 +330,7 @@ define(function(require) {
                 scrollContainer.hide().height();
                 scrollContainer.show();
 
-                self.scrollVisible = scrollContainer[0].clientHeight + clientHeightCorrection <
-                    scrollContainer[0].scrollHeight;
+                self.scrollVisible = scrollContainer[0].clientHeight < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
                     visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
