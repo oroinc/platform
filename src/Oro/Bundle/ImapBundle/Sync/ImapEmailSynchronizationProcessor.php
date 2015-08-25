@@ -519,7 +519,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $this->logger->info(
                 sprintf(
                     'Skip "%s" (UID: %d) email, because it was sent early
-                        than mailbox was created or last synchronized was made.',
+                        than mailbox was created or last synchronization was made.',
                     $email->getSubject(),
                     $email->getId()->getUid()
                 )
