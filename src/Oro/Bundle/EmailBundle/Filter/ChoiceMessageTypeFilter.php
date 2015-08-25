@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Filter;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class ChoiceMessageTypeFilter extends ChoiceFilter
 {
@@ -19,14 +19,14 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             return false;
         }
 
-        if (in_array('inbox', $data['value']) && in_array('sent', $data['value'])) {
+        if (in_array(FolderType::INBOX, $data['value']) && in_array(FolderType::SENT, $data['value'])) {
             $data['value'] = [];
-        }  else if (in_array('inbox', $data['value'])) {
-            $data['value'][] = 'spam';
-            $data['value'][] = 'other';
-            $data['value'][] = 'trash';
-        } else  if (in_array('sent', $data['value'])) {
-            $data['value'][] = 'drafts';
+        } elseif (in_array(FolderType::INBOX, $data['value'])) {
+            $data['value'][] = FolderType::SPAM;
+            $data['value'][] = FolderType::OTHER;
+            $data['value'][] = FolderType::TRASH;
+        } elseif (in_array(FolderType::SENT, $data['value'])) {
+            $data['value'][] = FolderType::DRAFTS;
         }
 
         return parent::apply($ds, $data);
