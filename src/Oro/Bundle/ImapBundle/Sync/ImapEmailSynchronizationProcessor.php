@@ -433,6 +433,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
         foreach ($emails as $email) {
+            if ($folder->getSynchronizedAt() > $email->getSentAt()) {
+                $this->logger->info(
+                    sprintf(
+                        'Skip "%s" (UID: %d) email, because it was sent early
+                        than mailbox was created or last synchronized was made.',
+                        $email->getSubject(),
+                        $email->getId()->getUid()
+                    )
+                );
+                continue;
+            }
+
             if (in_array($email->getId()->getUid(), $existingUids)) {
                 $this->logger->info(
                     sprintf(
