@@ -88,7 +88,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Removed `Oro\Component\PropertyAccess\Exception` namespace, `Symfony\Component\PropertyAccess\Exception` is used
 
 ####CommentBundle
-- Removed `applicable` attribute from `comment` scope of entity configs. Now comments can be enabled for most entities, except dictionaries ans some internal entities, like Attachment, File, etc.
+- Removed `applicable` attribute from `comment` scope of entity configs. Now comments can be enabled for most entities, except dictionaries and some internal entities, like Attachment, File, etc.
 
 ####EmailBundle
 - The format of object returned by GET /api/rest/{version}/emails and GET /api/rest/{version}/emails resources was changed. Not a email body is returned as "body" and "bodyType" properties rather than "emailBody" object. Possible values for "bodyType" are "text" and "html". Possible values for the "importance" property are "low", "normal" and "high" rather than -1, 0 and 1. The "recipients" property was removed and three new properties were added instead: "to", "cc" and "bcc". The format of "folders" collection was changed as well, now each folder can have the following properties: "origin", "fullName", "name" and "type". Possible values for "type" property are "inbox", "sent", "trash", "drafts", "spam" and "other".   
