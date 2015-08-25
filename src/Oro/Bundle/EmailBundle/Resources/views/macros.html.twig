@@ -29,7 +29,7 @@
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>( <%= variable.label %> )</span>
+                <span>&ndash; <%= variable.label %></span>
             </li>
             <% }); %>
         </ul>
