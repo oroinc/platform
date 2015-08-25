@@ -416,7 +416,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
      */
-    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder) {
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
+    {
         $this->emailEntityBuilder->removeEmails();
 
         $folder        = $imapFolder->getFolder();
