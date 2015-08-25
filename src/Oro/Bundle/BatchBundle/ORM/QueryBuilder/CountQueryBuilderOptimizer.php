@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 class CountQueryBuilderOptimizer
 {
@@ -23,16 +21,15 @@ class CountQueryBuilderOptimizer
     /** @var QueryBuilderTools */
     protected $qbTools;
 
-    /** @var  OroEntityManager */
-    protected $em;
-
     /**
-     * @param ClassMetadataFactory $metadataFactory
+     * @param QueryBuilderTools|null $qbTools
      */
-    public function __construct(OroEntityManager $em)
+    public function __construct(QueryBuilderTools $qbTools = null)
     {
-        $this->qbTools = new QueryBuilderTools();
-        $this->em = $em;
+        if (!$qbTools) {
+            $qbTools = new QueryBuilderTools();
+        }
+        $this->qbTools = $qbTools;
     }
 
     /**
@@ -130,12 +127,7 @@ class CountQueryBuilderOptimizer
         );
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->qbTools->getNonSymmetricJoinAliases(
-                $parts['join'],
-                $parts['from'],
-                $this->rootAlias,
-                $this->em
-            )
+            $this->getNonSymmetricJoinAliases($parts['join'], $parts['from'])
         );
 
         $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->rootAlias));
@@ -144,11 +136,11 @@ class CountQueryBuilderOptimizer
         foreach ($parts['join'][$this->rootAlias] as $join) {
             $alias     = $join->getAlias();
             // To count results number join all tables with inner join and required to tables
-            if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
+            if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin, true)) {
                 $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
                 $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
 
-                if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
+                if ($join->getJoinType() === Expr\Join::INNER_JOIN) {
                     $qb->innerJoin(
                         $join->getJoin(),
                         $alias,
@@ -176,7 +168,7 @@ class CountQueryBuilderOptimizer
      */
     protected function initIdFieldName()
     {
-        /** @var $from \Doctrine\ORM\Query\Expr\From */
+        /** @var Expr\From $from */
         $from = current($this->originalQb->getDQLPart('from'));
         $class = $from->getFrom();
 
@@ -239,5 +231,71 @@ class CountQueryBuilderOptimizer
         }
 
         return $expressions;
+    }
+
+    /**
+     * Get join aliases that will produce non symmetric results
+     * (many-to-one left join or one-to-many right join)
+     *
+     * @param array       $joins
+     * @param Expr\From[] $fromStatements
+     *
+     * @return array
+     */
+    protected function getNonSymmetricJoinAliases($joins, $fromStatements)
+    {
+        $metadataFactory = $this->originalQb->getEntityManager()->getMetadataFactory();
+
+        // make sure that metadata factory was initialized
+        $metadataFactory->getAllMetadata();
+
+        $aliasToClass = [];
+        foreach ($fromStatements as $from) {
+            /* @var Expr\From $from */
+            $aliasToClass[$from->getAlias()] = $this->resolveEntityClass($from->getFrom());
+        }
+        foreach ($joins[$this->rootAlias] as $join) {
+            /* @var Expr\Join $join */
+            $aliasToClass[$join->getAlias()] = $this->resolveEntityClass($join->getJoin());
+        }
+
+        $aliases      = [];
+        $dependencies = $this->qbTools->getAllDependencies($this->rootAlias, $joins[$this->rootAlias]);
+        foreach ($dependencies as $alias => $joinInfo) {
+            if ($metadataFactory->hasMetadataFor($aliasToClass[$alias])) {
+                /** @var ClassMetadata $metadata */
+                $metadata = $metadataFactory->getMetadataFor($aliasToClass[$alias]);
+                foreach ($joinInfo[1] as $dependantAlias) {
+                    $associations = $metadata->getAssociationsByTargetClass($aliasToClass[$dependantAlias]);
+                    foreach ($associations as $name => $info) {
+                        if (in_array($info['type'], [ClassMetadata::MANY_TO_ONE, ClassMetadata::MANY_TO_MANY])) {
+                            $aliases[] = $alias;
+                        }
+                    }
+                }
+            }
+        }
+
+        return array_unique($aliases);
+    }
+
+    /**
+     * Gets the full class name if the given join represents an entity name in form "bundle:class"
+     *
+     * @param string $join
+     *
+     * @return string
+     */
+    protected function resolveEntityClass($join)
+    {
+        $parts = explode(':', $join);
+        if (count($parts) === 2) {
+            $join = $this->originalQb
+                ->getEntityManager()
+                ->getConfiguration()
+                ->getEntityNamespace($parts[0]) . '\\' . $parts[1];
+        }
+
+        return $join;
     }
 }

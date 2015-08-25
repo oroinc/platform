@@ -5,5 +5,3 @@ parameters:
 services:
     oro_batch.orm.query_builder.count_query_optimizer:
         class: %oro_batch.orm.query_builder.count_query_optimizer.class%
-        arguments:
-            - @doctrine.orm.default_entity_manager
