@@ -47,16 +47,22 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($emails);
         $this->assertCount(10, $emails);
 
-        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId']);
+        $this->client->request('GET', $url . '?messageId=' . urlencode($emails[0]['messageId']));
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId']);
+        $this->client->request('GET', $url . '?messageId<>' . urlencode($emails[0]['messageId']));
         $this->assertCount(9, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId=' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->client->request(
+            'GET',
+            $url . '?messageId=' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
+        );
         $this->assertCount(2, $this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $this->client->request('GET', $url . '?messageId<>' . $emails[0]['messageId'] . ',' . $emails[5]['messageId']);
+        $this->client->request(
+            'GET',
+            $url . '?messageId<>' . urlencode($emails[0]['messageId'] . ',' . $emails[5]['messageId'])
+        );
         $this->assertCount(8, $this->getJsonResponseContent($this->client->getResponse(), 200));
     }
 

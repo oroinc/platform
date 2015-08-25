@@ -8,6 +8,8 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
     var BaseView = require('oroui/js/app/views/base/view');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+
     require('jquery.validate');
 
     function setValue($elem, value) {
@@ -20,11 +22,16 @@ define(function(require) {
     }
 
     CommentFormView = BaseView.extend({
+        options: {
+            messages: {
+                deleteConfirmation: __('oro.comment.attachment.delete_confirmation')
+            }
+        },
         autoRender: true,
         events: {
             'submit': 'onSubmit',
             'reset': 'onReset',
-            'click .remove-attachment': 'removeAttachment'
+            'click .remove-attachment': 'onRemoveAttachment'
         },
 
         listen: {
@@ -98,14 +105,30 @@ define(function(require) {
             this.render();
         },
 
-        removeAttachment: function(e) {
-            var itemView = this;
+        onRemoveAttachment: function(e) {
             e.stopPropagation();
             e.preventDefault();
+            this._confirmRemoveAttachment();
+        },
+
+        _confirmRemoveAttachment: function() {
+            var confirm = new DeleteConfirmation({
+                content: this._getMessage('deleteConfirmation')
+            });
+            confirm.on('ok', _.bind(this._removeAttachment, this));
+            confirm.open();
+        },
+
+        _removeAttachment: function() {
+            var itemView = this;
             this.model.removeAttachment().done(function() {
                 itemView.$('.attachment-item').remove();
                 mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));
             });
+        },
+
+        _getMessage: function(labelKey) {
+            return this.options.messages[labelKey];
         }
     });
 

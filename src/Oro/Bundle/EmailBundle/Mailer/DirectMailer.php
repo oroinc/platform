@@ -4,7 +4,10 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -16,6 +19,11 @@ class DirectMailer extends \Swift_Mailer
      * @var \Swift_Mailer
      */
     protected $baseMailer;
+
+    /**
+     * @var \Swift_SmtpTransport
+     */
+    protected $smtpTransport;
 
     /**
      * @var ContainerInterface
@@ -41,6 +49,51 @@ class DirectMailer extends \Swift_Mailer
             }
         }
         parent::__construct($transport);
+    }
+
+    /**
+     * Set SmtpTransport instance or create a new if default mailer transport is not smtp
+     *
+     * @param UserEmailOrigin $userEmailOrigin
+     */
+    public function prepareSmtpTransport($userEmailOrigin)
+    {
+        if (!$this->smtpTransport) {
+            $username = $userEmailOrigin->getUser();
+            /** @var Mcrypt $encoder */
+            $encoder  =  $this->container->get('oro_security.encoder.mcrypt');
+            $password = $encoder->decryptData($userEmailOrigin->getPassword());
+            $host     = $userEmailOrigin->getSmtpHost();
+            $port     = $userEmailOrigin->getSmtpPort();
+            $security = $userEmailOrigin->getSmtpEncryption();
+
+            $transport = $this->getTransport();
+            if ($transport instanceof \Swift_SmtpTransport
+                || $transport instanceof \Swift_Transport_EsmtpTransport) {
+                $transport->setHost($host);
+                $transport->setPort($port);
+                $transport->setEncryption($security);
+            } else {
+                $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
+            }
+
+            $transport->setUsername($username);
+            $transport->setPassword($password);
+            $this->smtpTransport = $transport;
+        }
+    }
+
+    /**
+     * The Transport used to send messages.
+     *
+     * @return \Swift_Transport|\Swift_SmtpTransport
+     */
+    public function getTransport()
+    {
+        if ($this->smtpTransport) {
+            return $this->smtpTransport;
+        }
+        return parent::getTransport();
     }
 
     /**
@@ -78,7 +131,11 @@ class DirectMailer extends \Swift_Mailer
         // send a mail
         $sendException = null;
         try {
-            $result = parent::send($message, $failedRecipients);
+            if ($this->smtpTransport) {
+                $result = $this->smtpTransport->send($message, $failedRecipients);
+            } else {
+                $result = parent::send($message, $failedRecipients);
+            }
         } catch (\Exception $unexpectedEx) {
             $sendException = $unexpectedEx;
         }

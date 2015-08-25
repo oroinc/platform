@@ -21,11 +21,7 @@
 {% block navButtons %}
     {% set buttonsHtml %}
         {{ Actions.addContextButton(entity) }}
-        {% if entity.id == 1 %} {# todo - Change to correct condition #}
-            {{ Actions.addMarkReadButton(entity) }}
-        {% else %}
-            {{ Actions.addMarkUnreadButton(entity) }}
-        {% endif %}
+        {{ Actions.addMarkUnreadButton(entity) }}
     {% endset %}
     {{ UI.pinnedDropdownButton({
         'html': buttonsHtml

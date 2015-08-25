@@ -61,7 +61,13 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
     }
 
     public function testSaveFieldConfig()
@@ -69,7 +75,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $configId     = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $configValues = ['key1' => 'val1'];
         $config       = new Config($configId, $configValues);
-        $cacheKey     = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey     = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -88,7 +94,14 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
     }
 
     public function testSaveEntityConfigLocalOnly()
@@ -106,14 +119,20 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config, true));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
     }
 
     public function testSaveFieldConfigLocalOnly()
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $config   = new Config($configId);
-        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -124,7 +143,14 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config, true));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
     }
 
     public function testSaveEntityConfigWhenAnotherScopeIsAlreadyCached()
@@ -148,8 +174,20 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
-        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
+        $this->assertEquals(
+            $anotherConfig,
+            $this->configCache->getEntityConfig(
+                $anotherConfigId->getScope(),
+                $anotherConfigId->getClassName()
+            )
+        );
     }
 
     public function testSaveFieldConfigWhenAnotherScopeIsAlreadyCached()
@@ -160,7 +198,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $anotherConfigId     = new FieldConfigId('another', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $anotherConfigValues = ['key2' => 'val2'];
         $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
-        $cacheKey            = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey            = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -184,8 +222,22 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->configCache->saveConfig($config));
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
-        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
+        $this->assertEquals(
+            $anotherConfig,
+            $this->configCache->getFieldConfig(
+                $anotherConfigId->getScope(),
+                $anotherConfigId->getClassName(),
+                $anotherConfigId->getFieldName()
+            )
+        );
     }
 
     public function testGetEntityConfig()
@@ -200,9 +252,21 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->with($cacheKey)
             ->willReturn([self::SCOPE => $configValues]);
 
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
     }
 
     public function testGetFieldConfig()
@@ -213,7 +277,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE),
             $configValues
         );
-        $cacheKey     = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey     = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -225,9 +289,23 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
         // test local cache
-        $this->assertEquals($config, $this->configCache->getConfig($configId));
+        $this->assertEquals(
+            $config,
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
     }
 
     public function testGetEntityConfigNotCached()
@@ -240,24 +318,46 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->with($cacheKey)
             ->willReturn(false);
 
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
         // test local cache
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
     }
 
     public function testGetFieldConfigNotCached()
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
-        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with($cacheKey)
             ->willReturn(false);
 
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
         // test local cache
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
     }
 
     public function testGetEntityConfigNotCachedScope()
@@ -273,10 +373,26 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->with($cacheKey)
             ->willReturn(['another' => $anotherConfigValues]);
 
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
         // test local cache
-        $this->assertNull($this->configCache->getConfig($configId));
-        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+        $this->assertNull(
+            $this->configCache->getEntityConfig(
+                $configId->getScope(),
+                $configId->getClassName()
+            )
+        );
+        $this->assertEquals(
+            $anotherConfig,
+            $this->configCache->getEntityConfig(
+                $anotherConfigId->getScope(),
+                $anotherConfigId->getClassName()
+            )
+        );
     }
 
     public function testGetFieldConfigNotCachedScope()
@@ -285,7 +401,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $anotherConfigId     = new FieldConfigId('another', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
         $anotherConfigValues = ['key2' => 'val2'];
         $anotherConfig       = new Config($anotherConfigId, $anotherConfigValues);
-        $cacheKey            = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey            = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -297,10 +413,29 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->assertNull($this->configCache->getConfig($configId));
+        $this->assertNull(
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
         // test local cache
-        $this->assertNull($this->configCache->getConfig($configId));
-        $this->assertEquals($anotherConfig, $this->configCache->getConfig($anotherConfigId));
+        $this->assertNull(
+            $this->configCache->getFieldConfig(
+                $configId->getScope(),
+                $configId->getClassName(),
+                $configId->getFieldName()
+            )
+        );
+        $this->assertEquals(
+            $anotherConfig,
+            $this->configCache->getFieldConfig(
+                $anotherConfigId->getScope(),
+                $anotherConfigId->getClassName(),
+                $anotherConfigId->getFieldName()
+            )
+        );
     }
 
     public function testDeleteEntityConfig()
@@ -313,20 +448,24 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             ->with($cacheKey)
             ->willReturn(true);
 
-        $this->assertTrue($this->configCache->deleteConfig($configId));
+        $this->assertTrue(
+            $this->configCache->deleteEntityConfig($configId->getClassName())
+        );
     }
 
     public function testDeleteFieldConfig()
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
-        $cacheKey = self::ENTITY_CLASS . '_' . self::FIELD_NAME;
+        $cacheKey = self::ENTITY_CLASS . '.' . self::FIELD_NAME;
 
         $this->cache->expects($this->once())
             ->method('delete')
             ->with($cacheKey)
             ->willReturn(true);
 
-        $this->assertTrue($this->configCache->deleteConfig($configId));
+        $this->assertTrue(
+            $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName())
+        );
     }
 
     public function testDeleteAllConfigs()
