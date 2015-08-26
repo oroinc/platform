@@ -518,8 +518,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         if ($folder->getSynchronizedAt() > $email->getSentAt()) {
             $this->logger->info(
                 sprintf(
-                    'Skip "%s" (UID: %d) email, because it was sent early
-                        than mailbox was created or last synchronization was made.',
+                    'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
                     $email->getSubject(),
                     $email->getId()->getUid()
                 )
