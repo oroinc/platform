@@ -124,7 +124,7 @@ datagrid:
                 where:
                     and:
                         - o.isActive = true
-                groupBy: e.id, e.sentAt
+                groupBy: eu.id, e.sentAt
         columns:
             contacts:
                 data_name: email.contacts
@@ -175,21 +175,27 @@ datagrid:
                 where:
                     and:
                         - >
-                            e.id = (
+                            eu.id = (
                                 SELECT
-                                    CASE
-                                        WHEN (MIN(se.id) IS NOT NULL) THEN MIN(se.id)
-                                        WHEN (e.head = true) THEN e.id
-                                        ELSE 0
-                                    END
+                                    MIN(seu2.id)
                                 FROM
-                                    OroEmailBundle:EmailUser seu
-                                JOIN
-                                    seu.email se
-                                LEFT JOIN
-                                    se.thread sthread
-                                WHERE
-                                    sthread.id IS NOT NULL AND sthread.id = thread.id AND seu.seen = false
+                                    OroEmailBundle:EmailUser seu2
+                                WHERE seu2.email = (
+                                    SELECT
+                                        CASE
+                                            WHEN (MIN(se.id) IS NOT NULL) THEN MIN(se.id)
+                                            WHEN (e.head = true) THEN e.id
+                                            ELSE 0
+                                        END
+                                    FROM
+                                        OroEmailBundle:EmailUser seu
+                                    JOIN
+                                        seu.email se
+                                    LEFT JOIN
+                                        se.thread sthread
+                                    WHERE
+                                        sthread.id IS NOT NULL AND sthread.id = thread.id AND seu.seen = false
+                                )
                             )
         filters:
             columns:
