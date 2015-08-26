@@ -140,7 +140,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
         $commandExecutor = $this->getContainer()->get('oro_entity_config.tools.command_executor');
 
         $timeout = $input->getOption('timeout');
-        if ($timeout > 0) {
+        if ($timeout >= 0) {
             $commandExecutor->setDefaultOption('process-timeout', $timeout);
         }
         if (true === $input->getOption('no-debug')) {

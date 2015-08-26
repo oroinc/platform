@@ -87,6 +87,9 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Removed `Oro\Component\PropertyAccess\PropertyPath` and `Oro\Component\PropertyAccess\PropertyPathInterface`, `Symfony\Component\PropertyAccess\PropertyPath` and `Symfony\Component\PropertyAccess\PropertyPathInterface` should be used instead
 - Removed `Oro\Component\PropertyAccess\Exception` namespace, `Symfony\Component\PropertyAccess\Exception` is used
 
+####CommentBundle
+- Removed `applicable` attribute from `comment` scope of entity configs. Now comments can be enabled for most entities, except dictionaries and some internal entities, like Attachment, File, etc.
+
 ####EmailBundle
 - The format of object returned by GET /api/rest/{version}/emails and GET /api/rest/{version}/emails resources was changed. Not a email body is returned as "body" and "bodyType" properties rather than "emailBody" object. Possible values for "bodyType" are "text" and "html". Possible values for the "importance" property are "low", "normal" and "high" rather than -1, 0 and 1. The "recipients" property was removed and three new properties were added instead: "to", "cc" and "bcc". The format of "folders" collection was changed as well, now each folder can have the following properties: "origin", "fullName", "name" and "type". Possible values for "type" property are "inbox", "sent", "trash", "drafts", "spam" and "other".   
 
@@ -94,6 +97,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Entity aliases are introduced. You can use `php app/console oro:entity-alias:debug` CLI command to see all aliases. In most cases aliases are generated automatically, but you can use `entity_aliases` and `entity_alias_exclusions` section in the `Resources/config/oro/entity.yml` of your bundle to define your rules.
 - Methods `encodeClassName` and `decodeClassName` of `Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper` are deprecated. Use `getUrlSafeClassName` and `resolveEntityClass` instead. Also `Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper` can be used for same purposes.
 - The entity name resolver service was introduced to allow configuring an entity name formatting more flexible. Now `Oro\Bundle\EntityBundle\Provider\EntityNameResolver` is used instead of `Oro\Bundle\LocaleBundle\Formatter\NameFormatter` and `Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter`. The list of affected services:
+- Added new method `\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::isNewEntity` to check entity is new.
 
 | Service ID | Class Name |
 |------------|------------|
@@ -120,6 +124,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Added [Query Hint Resolver](./src/Oro/Bundle/EntityBundle/Resources/doc/query_hint_resolver.md)
 - Removed `Oro\Bundle\EntityBundle\ORM\EntityConfigAwareRepositoryInterface` interface
 - Removed `Oro\Bundle\EntityBundle\ORM\Query\FilterCollection` class and `oro_entity.orm.sql_filter` DIC tag
+- The `Oro\Bundle\EntityBundle\ORM\OroEntityManager` triggers `preClose` event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked. 
 
 ####EntityConfigBundle
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
@@ -160,6 +165,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - `websocket_bind_port` and `websocket_bind_address` specify port and address to which the Clank server binds on startup and waits for incoming requests. By default (0.0.0.0), it listens to all addresses on the machine
 - `websocket_backend_port` and `websocket_backend_host` specify port and address to which the application should connect (PHP). By default ("*"), it connects to 127.0.0.1 address.
 - `websocket_frontend_port` and `websocket_frontend_host` specify port and address to which the browser should connect (JS). By default ("*"), it connects to host specified in the browser.
+- Renamed `oro_wamp.db_ping` service. New name is `oro_wamp.ping.pdo`.
 
 ####SoapBundle
 - Removed `EntitySerializerManagerInterface`. The serialization methods in `ApiEntityManager` class should be used instead.
@@ -167,6 +173,8 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 ####UiBundle
  - Macros `scrollData` in `Oro/Bundle/UIBundle/Resources/views/macros.html.twig` triggers event `oro_ui.scroll_data.before.<pageIdentifier>` before data rendering
  - Added `assets_version` parameter for outdating assets if needed
+ - Added parameters `EventDispatcherInterface $eventDispatcher` and `$pageType` to constructor of `Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider`
+ - Created new event `Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent` which is dispatched in `Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider`
 
 ####LocaleBundle
 - Deprecated method {{localeSettings.getTimeZoneShift()}} (calendar-view.js, formatter/datetime.js, datepicker/datetimepicker-view-mixin.js)
@@ -184,6 +192,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 - First argument `Doctrine\Common\Persistence\ObjectManager $objectManager` and fourth argument `Oro\Bundle\UserBundle\Entity\UserManager $userManager` of `Oro\Bundle\UserBundle\Mailer\Processor` constructor (which now is located in `Oro\Bundle\UserBundle\Mailer\BaseProcessor`) replaced by `Doctrine\Common\Persistence\ManagerRegistry $managerRegistry` and `Oro\Bundle\EmailBundle\Tools\EmailHolderHelper $emailHolderHelper` accordingly
 - `Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler` is now accepts Manager Registry instead of Entity Manager, added method `setManagerRegistry`, method `setEntityManager` marked as deprecated 
 - Changed a login form to be correspond Symfony standards. If you have overridden `login.html.twig`, please change `{{ error|trans }}` to `{{ error.messageKey|trans(error.messageData, 'security') }}` there.
+- Removed `Oro\Bundle\UserBundle\Entity\Session` entity.
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface` was introduced and based on access levels, considered to use in security layer instead of direct `Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata` usage
@@ -251,3 +260,16 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
  - Added brackets for search queries. Now user available to do queries like 'from oro_test where all_text ~ test and (integer count > 10 or float price = 10)'
  - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
 
+####ActivirtBundle
+ - Added entity config parameter `show_on_page` to `Oro/Bundle/ActivityBundle/Resources/config/entity_config.yml`
+
+####ActivityListBundle
+ - Added parameter `ConfigProvider $configProvider` to constructor of `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+ - Added parameter `$pageType` to `isApplicable` method in `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+ - Added method `isAllowedButton` to `\Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter`
+
+####AttachmentBundle
+ - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `\Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter`
+
+####NoteBundle
+ - Added parameter `DoctrineHelper $doctrineHelper` to constructor of `\Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter`

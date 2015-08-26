@@ -215,7 +215,15 @@ define([
          */
         _loadState: function(options) {
             var self = this;
-            var url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
+            var checkIdRoute = 'oro_api_get_pagestate_checkid';
+            var pageStateRoutes = this.$el.find('#pagestate-routes');
+            if (pageStateRoutes.data()) {
+                this.model.postRoute = pageStateRoutes.data('pagestate-put-route');
+                this.model.putRoute = pageStateRoutes.data('pagestate-put-route');
+                checkIdRoute = pageStateRoutes.data('pagestate-checkid-route');
+            }
+
+            var url = routing.generate(checkIdRoute, {'pageId': this._combinePageId()});
             $.get(url).done(function(data) {
                 var attributes;
                 attributes = {

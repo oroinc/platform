@@ -3,6 +3,7 @@ define(function(require) {
 
     var MultilineChartComponent;
     var _ = require('underscore');
+    var $ = require('jquery');
     var Flotr = require('flotr2');
     var dataFormatter = require('orochart/js/data_formatter');
     var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
@@ -13,6 +14,9 @@ define(function(require) {
      * @exports orochart/app/components/multiline-chart-component
      */
     MultilineChartComponent = BaseChartComponent.extend({
+
+        narrowScreen: false,
+
         /**
          * Draw chart
          *
@@ -23,12 +27,11 @@ define(function(require) {
             var $chart = this.$chart;
             var xFormat = options.data_schema.label.type;
             var yFormat = options.data_schema.value.type;
-            var narrowScreen = screen.width <= 480;
+            var rawData = this.data;
+
             if (!$chart.get(0).clientWidth) {
                 return;
             }
-
-            var rawData = this.data;
 
             if (dataFormatter.isValueNumerical(xFormat)) {
                 var sort = function(rawData) {
@@ -124,8 +127,9 @@ define(function(require) {
                 charts,
                 {
                     colors: colors,
+                    title: ' ',
                     fontColor: options.settings.chartFontColor,
-                    fontSize: options.settings.chartFontSize * (narrowScreen ? 0.7 : 1),
+                    fontSize: options.settings.chartFontSize * (this.narrowScreen ? 0.8 : 1),
                     lines: {
                         show: connectDots
                     },
@@ -152,10 +156,10 @@ define(function(require) {
                         tickFormatter: function(x) {
                             return getXLabel(x);
                         },
-                        title: narrowScreen ? void 0 : options.data_schema.label.label,
+                        title: this.narrowScreen ? ' ' : options.data_schema.label.label,
                         mode:    options.xaxis.mode,
                         noTicks: options.xaxis.noTicks,
-                        labelsAngle: narrowScreen ? 45 : 0,
+                        labelsAngle: this.narrowScreen ? 45 : 0,
                         margin: true
                     },
                     HtmlText: false,
@@ -169,6 +173,16 @@ define(function(require) {
                     }
                 }
             );
+        },
+
+        update: function() {
+            this.narrowScreen = $('html').width() < 520;
+            if (this.narrowScreen) {
+                this.aspectRatio = 0.55;
+            } else {
+                this.aspectRatio = MultilineChartComponent.__super__.aspectRatio;
+            }
+            MultilineChartComponent.__super__.update.apply(this, arguments);
         }
     });
 

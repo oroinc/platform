@@ -43,6 +43,26 @@ Generally widget will be rendered in placeholder "view_content_data_activities".
   }]) %}
 ```
 
+Show widget and it button on specific page (view/edit)
+----------------------------------------
+To show a widget and it button on specific pages you should set entity annotation.
+Widget can be displayed on `view` and/or `update` pages. Allowed values see in `\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope` e.g.:
+```
+/**
+...
+ * @Config(
+ *      defaultValues={
+ *          ...
+ *          "activity"={
+ *              "show_on_page"="\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE"
+ *          }
+ *          ...
+ *      }
+ * )
+ */
+class AccountUserRole extends AbstractRole { ... }
+```
+
 Register a new entity
 ----------------------
 To add a new entity to be displayed within widget you need to register a service that implements **ActivityListProviderInterface** and tagged as **oro_activity_list.provider**. Working example can be found in EmailBundle or CalendarBundle:

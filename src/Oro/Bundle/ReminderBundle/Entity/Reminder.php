@@ -29,6 +29,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },

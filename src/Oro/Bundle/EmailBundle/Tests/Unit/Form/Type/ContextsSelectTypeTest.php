@@ -95,7 +95,7 @@ class ContextsSelectTypeTest extends TypeTestCase
                         'separator'          => ';',
                         'forceSelectedData'  => true,
                         'containerCssClass'  => 'taggable-email',
-                        'minimumInputLength' => 1,
+                        'minimumInputLength' => 0,
                     ]
                 ]
             );

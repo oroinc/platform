@@ -157,7 +157,7 @@ class EmailType extends AbstractType
             ['choice_list', 'choices']
         );
 
-        if ($this->securityContext->isGranted('EDIT', 'entity:' . EmailEntity::ENTITY_CLASS)) {
+        if ($this->securityContext->isGranted('EDIT', 'entity:Oro\Bundle\EmailBundle\Entity\EmailUser')) {
             FormUtils::replaceField(
                 $form,
                 'contexts',

@@ -91,38 +91,30 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param UserEmailOrigin $origin
      */
-    protected function clearOrigin(UserEmailOrigin $origin)
+    protected function clearOrigin($origin)
     {
         $folders = $origin->getFolders();
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
         foreach ($folders as $folder) {
             $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
-
-            if (!$origin->isActive()) {
-                $this->removeFolder($imapFolder);
-            } elseif (!$folder->isSyncEnabled()) {
+            if ($imapFolder && !$origin->isActive()) {
+                $this->clearFolder($imapFolder);
+                $this->em->remove($imapFolder);
+            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
+            }
+        }
+        foreach ($folders as $folder) {
+            if (!$origin->isActive()) {
+                $this->em->remove($folder);
             }
         }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
-            $this->em->flush();
         }
-    }
-
-    /**
-     * @param ImapEmailFolder $imapFolder
-     */
-    protected function removeFolder(ImapEmailFolder $imapFolder)
-    {
-        $this->clearFolder($imapFolder);
-
-        $folder = $imapFolder->getFolder();
-        $this->em->remove($imapFolder);
-        $this->em->remove($folder);
 
         $this->em->flush();
     }
@@ -130,17 +122,13 @@ class ImapClearManager implements LoggerAwareInterface
     /**
      * @param ImapEmailFolder $imapFolder
      */
-    protected function clearFolder(ImapEmailFolder $imapFolder)
+    protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
-
-        $q = $this->em->createQueryBuilder()
-            ->select('eu')
-            ->from('OroEmailBundle:EmailUser', 'eu')
-            ->andWhere('eu.folder = :folder')
-            ->setParameter('folder', $folder)
+        $query = $this->em->getRepository('OroEmailBundle:EmailUser')
+            ->getEmailUserByFolder($folder)
             ->getQuery();
-        $iterableResult = $q->iterate();
+        $iterableResult = $query->iterate();
 
         $i = 0;
         while (($row = $iterableResult->next()) !== false) {
@@ -149,11 +137,11 @@ class ImapClearManager implements LoggerAwareInterface
             $email = $emailUser->getEmail();
             $this->em->remove($emailUser);
 
-            $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
+            $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
                 'email' => $email,
                 'imapFolder' => $imapFolder,
             ]);
-            if ($imapEmail !== null) {
+            foreach ($imapEmails as $imapEmail) {
                 $this->em->remove($imapEmail);
             }
 

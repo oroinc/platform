@@ -4,22 +4,18 @@ namespace Oro\Bundle\EntityConfigBundle\Config\Id;
 
 class EntityConfigId implements ConfigIdInterface
 {
-    /**
-     * @var string
-     */
-    protected $scope;
+    /** @var string */
+    private $scope;
+
+    /** @var string */
+    private $className;
 
     /**
-     * @var string
+     * @param string      $scope
+     * @param string|null $className
      */
-    protected $className;
-
     public function __construct($scope, $className = null)
     {
-        if (empty($scope)) {
-            throw new \InvalidArgumentException('$scope must not be empty');
-        }
-
         $this->scope     = $scope;
         $this->className = $className;
     }
@@ -31,7 +27,6 @@ class EntityConfigId implements ConfigIdInterface
     {
         return $this->className;
     }
-
 
     /**
      * @return string
@@ -46,7 +41,7 @@ class EntityConfigId implements ConfigIdInterface
      */
     public function toString()
     {
-        return sprintf('entity_%s_%s', $this->scope, strtr($this->className, '\\', '-'));
+        return sprintf('entity_%s_%s', $this->scope, str_replace('\\', '-', $this->className));
     }
 
     /**
@@ -54,12 +49,7 @@ class EntityConfigId implements ConfigIdInterface
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                $this->className,
-                $this->scope,
-            )
-        );
+        return serialize([$this->className, $this->scope]);
     }
 
     /**
@@ -67,10 +57,7 @@ class EntityConfigId implements ConfigIdInterface
      */
     public function unserialize($serialized)
     {
-        list(
-            $this->className,
-            $this->scope,
-            ) = unserialize($serialized);
+        list($this->className, $this->scope) = unserialize($serialized);
     }
 
     /**
