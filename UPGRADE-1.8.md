@@ -254,6 +254,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` `logEntityClass` and `logEntityFieldClass` parameters replaced by `oro_dataaudit.loggable.audit_entity_mapper` service `getAuditEntryClass` and `getAuditEntryFieldClass` methods
+- Removed `$entityClass` parameter from `isEntityAuditable` method of `Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter`.
 
 ####SearchBundle
 
