@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Symfony\Component\Routing\RouterInterface;
 
 class ConfigExtension extends \Twig_Extension
 {
@@ -144,12 +147,26 @@ class ConfigExtension extends \Twig_Extension
 
         $route = $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
 
-        if ($collection = $this->router->getRouteCollection()) {
-            if ($collection->get($route) === null) {
-                return null;
-            }
+        return $this->hasRoute($route)
+            ? $route
+            : null;
+    }
+
+    /**
+     * @param string $routeName
+     *
+     * @return bool
+     */
+    protected function hasRoute($routeName)
+    {
+        try {
+            $this->router->generate($routeName);
+        } catch (RouteNotFoundException $e) {
+            return false;
+        } catch (RoutingException $e) {
+            return true;
         }
 
-        return $route;
+        return true;
     }
 }
