@@ -147,6 +147,9 @@ define(function(require) {
          * @inheritDoc
          */
         dispose: function() {
+            if (this.disposed) {
+                return;
+            }
             if (this.layout === 'fullscreen') {
                 // fullscreen layout has side effects, need to clean up
                 this.setLayout('default');
@@ -898,10 +901,10 @@ define(function(require) {
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
-                    mediator.execute('layout:enablePageScroll', $calendarEl);
+                    mediator.execute('layout:enablePageScroll');
                     break;
                 case 'default':
-                    mediator.execute('layout:enablePageScroll', $calendarEl);
+                    mediator.execute('layout:enablePageScroll');
                     // default values
                     break;
                 default:

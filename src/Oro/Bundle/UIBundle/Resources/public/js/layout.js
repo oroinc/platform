@@ -43,6 +43,12 @@ define(function(require) {
         devToolbarHeight: undefined,
 
         /**
+         * List of elements with disabled scroll. Used to reset theirs state
+         * @private
+         */
+        _scrollDisabledElements: null,
+
+        /**
          * @returns {number} development toolbar height in dev mode, 0 in production mode
          */
         getDevToolbarHeight: function() {
@@ -272,16 +278,24 @@ define(function(require) {
             var $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
+            // keep list with disabled elements up to date
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this._scrollDisabledElements.push($scrollableParents);
+            } else {
+                this._scrollDisabledElements = $scrollableParents;
+            }
         },
 
         /**
-         * Enables ability to scroll of $mainEl's scrollable parents
+         * Enables ability to scroll where it was previously disabled
          *
-         * @param $mainEl
          * @returns {string}
          */
-        enablePageScroll: function($mainEl) {
-            $mainEl.parents().removeClass('disable-scroll');
+        enablePageScroll: function() {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this._scrollDisabledElements.parents().removeClass('disable-scroll');
+                delete this._scrollDisabledElements;
+            }
         },
 
         /**
