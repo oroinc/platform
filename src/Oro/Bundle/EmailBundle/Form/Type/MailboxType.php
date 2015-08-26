@@ -165,7 +165,7 @@ class MailboxType extends AbstractType
     }
 
     /**
-     * PostSubmit event handler.
+     * Set origin and folder sync date for prevent sync old emails
      *
      * @param FormEvent $event
      */
