@@ -17,36 +17,20 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
  */
 class ConfigModelManager
 {
-    /**
-     * mode of config model
-     */
-    const MODE_DEFAULT  = 'default';
-    const MODE_HIDDEN   = 'hidden';
+    const MODE_DEFAULT = 'default';
+    const MODE_HIDDEN = 'hidden';
     const MODE_READONLY = 'readonly';
 
-    /**
-     * @var EntityConfigModel[]
-     *
-     * {class name} => EntityConfigModel
-     */
-    protected $entityLocalCache;
+    /** @var EntityConfigModel[] [{class name} => EntityConfigModel, ...] */
+    private $entities;
 
-    /**
-     * @var array of FieldConfigModel[]
-     *
-     * {class name} => array of FieldConfigModel[]
-     *      {field name} => FieldConfigModel
-     */
-    protected $fieldLocalCache = [];
+    /** @var array [{class name} => [{field name} => FieldConfigModel, ...], ...] */
+    private $fields = [];
 
-    /**
-     * @var bool
-     */
-    protected $dbCheckCache;
+    /** @var bool */
+    private $dbCheck;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $proxyEm;
 
     private $requiredTables = [
@@ -76,34 +60,29 @@ class ConfigModelManager
      */
     public function checkDatabase()
     {
-        if ($this->dbCheckCache === null) {
-            $this->dbCheckCache = false;
+        if ($this->dbCheck === null) {
+            $this->dbCheck = false;
             try {
                 $conn = $this->getEntityManager()->getConnection();
-
-                if (!$conn->isConnected()) {
-                    $conn->connect();
-                }
-                if ($conn->isConnected()) {
-                    $sm                 = $conn->getSchemaManager();
-                    $this->dbCheckCache = $sm->tablesExist($this->requiredTables);
-                }
+                $conn->connect();
+                $this->dbCheck = $conn->getSchemaManager()->tablesExist($this->requiredTables);
             } catch (\PDOException $e) {
             }
         }
 
-        return $this->dbCheckCache;
+        return $this->dbCheck;
     }
 
     public function clearCheckDatabase()
     {
-        $this->dbCheckCache = null;
+        $this->dbCheck = null;
     }
 
     /**
      * Finds a model for an entity
      *
      * @param string $className
+     *
      * @return EntityConfigModel|null An instance of EntityConfigModel or null if a model was not found
      */
     public function findEntityModel($className)
@@ -112,13 +91,13 @@ class ConfigModelManager
             return null;
         }
 
-        $this->ensureEntityLocalCacheWarmed();
+        $this->ensureEntityCacheWarmed();
 
         $result = null;
 
         // check if a model exists in the local cache
-        if (isset($this->entityLocalCache[$className]) || array_key_exists($className, $this->entityLocalCache)) {
-            $result = $this->entityLocalCache[$className];
+        if (isset($this->entities[$className]) || array_key_exists($className, $this->entities)) {
+            $result = $this->entities[$className];
             if ($result && $this->isEntityDetached($result)) {
                 if ($this->areAllEntitiesDetached()) {
                     // reload all models because all of them are detached
@@ -128,8 +107,8 @@ class ConfigModelManager
                     // the detached model must be reloaded
                     $result = false;
 
-                    $this->entityLocalCache[$className] = null;
-                    unset($this->fieldLocalCache[$className]);
+                    $this->entities[$className] = null;
+                    unset($this->fields[$className]);
                 }
             }
         }
@@ -147,6 +126,7 @@ class ConfigModelManager
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return FieldConfigModel|null An instance of FieldConfigModel or null if a model was not found
      */
     public function findFieldModel($className, $fieldName)
@@ -155,22 +135,22 @@ class ConfigModelManager
             return null;
         }
 
-        $this->ensureFieldLocalCacheWarmed($className);
+        $this->ensureFieldCacheWarmed($className);
 
         $result = null;
 
         // check if a model exists in the local cache
-        if (isset($this->fieldLocalCache[$className][$fieldName])
+        if (isset($this->fields[$className][$fieldName])
             || (
-                isset($this->fieldLocalCache[$className])
-                && array_key_exists($fieldName, $this->fieldLocalCache[$className])
+                isset($this->fields[$className])
+                && array_key_exists($fieldName, $this->fields[$className])
             )
         ) {
-            $result = $this->fieldLocalCache[$className][$fieldName];
+            $result = $this->fields[$className][$fieldName];
             if ($result && $this->isEntityDetached($result)) {
                 // the detached model must be reloaded
-                $this->entityLocalCache[$className] = false;
-                unset($this->fieldLocalCache[$className]);
+                $this->entities[$className] = false;
+                unset($this->fields[$className]);
 
                 $result = $this->findFieldModel($className, $fieldName);
             }
@@ -181,6 +161,7 @@ class ConfigModelManager
 
     /**
      * @param string $className
+     *
      * @return EntityConfigModel
      * @throws \InvalidArgumentException if $className is empty
      * @throws RuntimeException if a model was not found
@@ -204,6 +185,7 @@ class ConfigModelManager
     /**
      * @param string $className
      * @param string $fieldName
+     *
      * @return FieldConfigModel
      * @throws \InvalidArgumentException if $className or $fieldName is empty
      * @throws RuntimeException if a model was not found
@@ -234,6 +216,7 @@ class ConfigModelManager
      * @param string $className
      * @param string $fieldName
      * @param string $newFieldName
+     *
      * @throws \InvalidArgumentException if $className, $fieldName or $newFieldName is empty
      * @return bool TRUE if the name was changed; otherwise, FALSE
      */
@@ -254,10 +237,10 @@ class ConfigModelManager
         if ($fieldModel && $fieldModel->getFieldName() !== $newFieldName) {
             $fieldModel->setFieldName($newFieldName);
             $this->getEntityManager()->persist($fieldModel);
-            unset($this->fieldLocalCache[$className][$fieldName]);
+            unset($this->fields[$className][$fieldName]);
 
-            $this->fieldLocalCache[$className][$newFieldName] = $fieldModel;
-            $result                                           = true;
+            $this->fields[$className][$newFieldName] = $fieldModel;
+            $result                                  = true;
         }
 
         return $result;
@@ -270,6 +253,7 @@ class ConfigModelManager
      * @param string $className
      * @param string $fieldName
      * @param string $fieldType
+     *
      * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
      */
@@ -291,8 +275,8 @@ class ConfigModelManager
             $fieldModel->setType($fieldType);
             $this->getEntityManager()->persist($fieldModel);
 
-            $this->fieldLocalCache[$className][$fieldName] = $fieldModel;
-            $result                                        = true;
+            $this->fields[$className][$fieldName] = $fieldModel;
+            $result                               = true;
         }
 
         return $result;
@@ -304,7 +288,8 @@ class ConfigModelManager
      *
      * @param string $className
      * @param string $fieldName
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModelManager::MODE_* constants
+     *
      * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
      */
@@ -326,8 +311,8 @@ class ConfigModelManager
             $fieldModel->setMode($mode);
             $this->getEntityManager()->persist($fieldModel);
 
-            $this->fieldLocalCache[$className][$fieldName] = $fieldModel;
-            $result                                        = true;
+            $this->fields[$className][$fieldName] = $fieldModel;
+            $result                               = true;
         }
 
         return $result;
@@ -338,7 +323,8 @@ class ConfigModelManager
      * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
      *
      * @param string $className
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModelManager::MODE_* constants
+     *
      * @throws \InvalidArgumentException if $className or $mode is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
      */
@@ -357,8 +343,8 @@ class ConfigModelManager
             $entityModel->setMode($mode);
             $this->getEntityManager()->persist($entityModel);
 
-            $this->entityLocalCache[$className] = $entityModel;
-            $result                             = true;
+            $this->entities[$className] = $entityModel;
+            $result                     = true;
         }
 
         return $result;
@@ -375,18 +361,18 @@ class ConfigModelManager
         $result = [];
 
         if ($className) {
-            $this->ensureFieldLocalCacheWarmed($className);
+            $this->ensureFieldCacheWarmed($className);
             /** @var FieldConfigModel $model */
-            foreach ($this->fieldLocalCache[$className] as $model) {
-                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
+            foreach ($this->fields[$className] as $model) {
+                if ($model && ($withHidden || $model->getMode() !== self::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
         } else {
-            $this->ensureEntityLocalCacheWarmed();
+            $this->ensureEntityCacheWarmed();
             /** @var EntityConfigModel $model */
-            foreach ($this->entityLocalCache as $model) {
-                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
+            foreach ($this->entities as $model) {
+                if ($model && ($withHidden || $model->getMode() !== self::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
@@ -398,6 +384,7 @@ class ConfigModelManager
     /**
      * @param string|null $className
      * @param string|null $mode
+     *
      * @return EntityConfigModel
      * @throws \InvalidArgumentException
      */
@@ -411,8 +398,8 @@ class ConfigModelManager
         $entityModel->setMode($mode);
 
         if (!empty($className)) {
-            $this->ensureEntityLocalCacheWarmed();
-            $this->entityLocalCache[$className] = $entityModel;
+            $this->ensureEntityCacheWarmed();
+            $this->entities[$className] = $entityModel;
         }
 
         return $entityModel;
@@ -423,6 +410,7 @@ class ConfigModelManager
      * @param string $fieldName
      * @param string $fieldType
      * @param string $mode
+     *
      * @return FieldConfigModel
      * @throws \InvalidArgumentException
      */
@@ -442,8 +430,8 @@ class ConfigModelManager
         $entityModel->addField($fieldModel);
 
         if (!empty($fieldName)) {
-            $this->ensureFieldLocalCacheWarmed($className);
-            $this->fieldLocalCache[$className][$fieldName] = $fieldModel;
+            $this->ensureFieldCacheWarmed($className);
+            $this->fields[$className][$fieldName] = $fieldModel;
         }
 
         return $fieldModel;
@@ -454,8 +442,8 @@ class ConfigModelManager
      */
     public function clearCache()
     {
-        $this->entityLocalCache = null;
-        $this->fieldLocalCache  = [];
+        $this->entities = null;
+        $this->fields   = [];
 
         $em = $this->getEntityManager();
         $em->clear('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
@@ -463,38 +451,38 @@ class ConfigModelManager
     }
 
     /**
-     * Checks $this->entityLocalCache and if it is empty loads all entity models at once
+     * Checks $this->entities and if it is empty loads all entity models at once
      */
-    protected function ensureEntityLocalCacheWarmed()
+    protected function ensureEntityCacheWarmed()
     {
-        if (null === $this->entityLocalCache) {
-            $this->entityLocalCache = [];
+        if (null === $this->entities) {
+            $this->entities = [];
 
             /** @var EntityConfigModel[] $models */
             $models = $this->getEntityManager()
                 ->getRepository(EntityConfigModel::ENTITY_NAME)
                 ->findAll();
             foreach ($models as $model) {
-                $this->entityLocalCache[$model->getClassName()] = $model;
+                $this->entities[$model->getClassName()] = $model;
             }
         }
     }
 
     /**
-     * Checks $this->fieldLocalCache[$className] and if it is empty loads all fields models at once
+     * Checks $this->fields[$className] and if it is empty loads all fields models at once
      *
      * @param string $className
      */
-    protected function ensureFieldLocalCacheWarmed($className)
+    protected function ensureFieldCacheWarmed($className)
     {
-        if (!isset($this->fieldLocalCache[$className])) {
-            $this->fieldLocalCache[$className] = [];
+        if (!isset($this->fields[$className])) {
+            $this->fields[$className] = [];
 
             $entityModel = $this->findEntityModel($className);
             if ($entityModel) {
                 $fields = $entityModel->getFields();
                 foreach ($fields as $model) {
-                    $this->fieldLocalCache[$className][$model->getFieldName()] = $model;
+                    $this->fields[$className][$model->getFieldName()] = $model;
                 }
             }
         }
@@ -502,6 +490,7 @@ class ConfigModelManager
 
     /**
      * @param string $className
+     *
      * @return EntityConfigModel|null
      */
     protected function loadEntityModel($className)
@@ -510,7 +499,7 @@ class ConfigModelManager
             ->getRepository(EntityConfigModel::ENTITY_NAME)
             ->findOneBy(['className' => $className]);
 
-        $this->entityLocalCache[$className] = $result;
+        $this->entities[$className] = $result;
 
         return $result;
     }
@@ -521,9 +510,9 @@ class ConfigModelManager
     protected function areAllEntitiesDetached()
     {
         $result = false;
-        if (!empty($this->entityLocalCache)) {
+        if (!empty($this->entities)) {
             $result = true;
-            foreach ($this->entityLocalCache as $model) {
+            foreach ($this->entities as $model) {
                 if ($model && !$this->isEntityDetached($model)) {
                     $result = false;
                     break;
@@ -538,6 +527,7 @@ class ConfigModelManager
      * Determines whether the given entity is managed by an entity manager or not
      *
      * @param object $entity
+     *
      * @return bool
      */
     protected function isEntityDetached($entity)

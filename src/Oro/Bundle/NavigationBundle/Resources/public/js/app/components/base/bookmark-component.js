@@ -16,6 +16,8 @@ define([
          */
         _options: {},
 
+        typeName: null,
+
         listen: {
             'toAdd collection': 'toAdd',
             'toRemove collection': 'toRemove'
@@ -31,6 +33,17 @@ define([
             this._options = _.defaults({}, options || {}, extraOptions);
 
             BaseBookmarkComponent.__super__.initialize.call(this, options);
+
+            var $button = $(this._options.buttonOptions.el);
+            var route = $button.data('navigation-items-route');
+            if (!_.isEmpty(route)) {
+                this.collection.model.prototype.route = route;
+            }
+
+            var typeName = $button.data('type-name');
+            if (!_.isEmpty(typeName)) {
+                this.typeName = typeName;
+            }
 
             this.collection.reset(data);
             this._createSubViews();

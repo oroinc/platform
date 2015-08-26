@@ -72,7 +72,7 @@ class MailboxType extends AbstractType
         ]);
         $builder->add(
             'authorizedUsers',
-            'oro_user_multiselect',
+            'oro_user_organization_acl_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
             ]
@@ -109,6 +109,14 @@ class MailboxType extends AbstractType
         /** @var Mailbox $data */
         $data = $event->getData();
         $form = $event->getForm();
+
+        FormUtils::replaceField(
+            $form,
+            'processType',
+            [
+                'choices' => $this->storage->getProcessTypeChoiceList($data)
+            ]
+        );
 
         if ($data === null) {
             return;
