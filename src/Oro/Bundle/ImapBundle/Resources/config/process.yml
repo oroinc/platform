@@ -5,21 +5,58 @@ definitions:
         order: 150
         entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin
         actions_configuration:
-            - @create_entity:
-                class: JMS\JobQueueBundle\Entity\Job
-                attribute: $.syncJob
-                flush: true
-                arguments:
-                    - 'oro:imap:clear-mailbox'
+            - @find_entity:
+                parameters:
+                    class: JMS\JobQueueBundle\Entity\Job
+                    attribute: $.pendingJob
+                    where:
+                        command: 'oro:imap:clear-mailbox'
+                        state: 'pending'
+            - @find_entity:
+                parameters:
+                    class: JMS\JobQueueBundle\Entity\Job
+                    attribute: $.runningJob
+                    where:
+                        command: 'oro:imap:clear-mailbox'
+                        state: 'running'
+            - @tree:
+                conditions:
+                    @and:
+                        - @empty: $.pendingJob
+                        - @empty: $.runningJob
+                actions:
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - 'oro:imap:clear-mailbox'
     clear_imap_email_folder_on_sync_enabled_change:
         label: Clear email folder on sync enabled change
         enabled: true
         order: 150
         entity: Oro\Bundle\EmailBundle\Entity\EmailFolder
         actions_configuration:
+            - @find_entity:
+                parameters:
+                    class: JMS\JobQueueBundle\Entity\Job
+                    attribute: $.pendingJob
+                    where:
+                        command: 'oro:imap:clear-mailbox'
+                        state: JMS\JobQueueBundle\Entity::STATE_PENDING
+            - @find_entity:
+                parameters:
+                    class: JMS\JobQueueBundle\Entity\Job
+                    attribute: $.runningJob
+                    where:
+                        command: 'oro:imap:clear-mailbox'
+                        state: JMS\JobQueueBundle\Entity::STATE_RUNNING
             - @tree:
                 conditions:
-                    @equal: [$syncEnabled, false]
+                    @and:
+                        - @equal: [$syncEnabled, false]
+                        - @empty: [$.pendingJob]
+                        - @empty: [$.runningJob]
                 actions:
                     - @create_entity:
                         class: JMS\JobQueueBundle\Entity\Job
