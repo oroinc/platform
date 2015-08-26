@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -15,6 +14,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class MailboxType extends AbstractType
 {
