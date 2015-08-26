@@ -58,9 +58,9 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
             $this->registry,
             $this->emailBuilder,
             $this->emailProcessor,
+            $this->render,
             $this->logger,
-            'en',
-            $this->render
+            'en'
         );
     }
 

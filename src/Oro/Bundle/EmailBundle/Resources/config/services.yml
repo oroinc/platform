@@ -288,9 +288,9 @@ services:
             - @doctrine
             - @oro_email.email.model.builder
             - @oro_email.mailer.processor
+            - @oro_email.email_renderer
             - @logger
             - %locale%
-            - @oro_email.email_renderer
 
     oro_email.link.autoresponserule_manager:
         tags:

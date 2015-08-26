@@ -7,7 +7,6 @@ use Exception;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -22,6 +21,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
@@ -75,18 +75,20 @@ class AutoResponseManager
     ];
 
     /**
-     * @param Registry $registry
+     * @param Registry          $registry
      * @param EmailModelBuilder $emailBuilder
-     * @param Processor $emailProcessor
-     * @param LoggerInterface $logger
+     * @param Processor         $emailProcessor
+     * @param EmailRenderer     $emailRender
+     * @param LoggerInterface   $logger
+     * @param string            $defaultLocale
      */
     public function __construct(
         Registry $registry,
         EmailModelBuilder $emailBuilder,
         Processor $emailProcessor,
+        EmailRenderer $emailRender,
         LoggerInterface $logger,
-        $defaultLocale,
-        EmailRenderer $emailRender
+        $defaultLocale
     ) {
         $this->registry = $registry;
         $this->emailBuilder = $emailBuilder;
