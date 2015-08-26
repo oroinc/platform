@@ -490,6 +490,10 @@ define(function(require) {
                 this.setAdditionalParameter(param, value);
             });
 
+            this.listenTo(mediator, 'datagrid:removeParam:' + this.name, function(param) {
+                this.removeAdditionalParameter(param);
+            });
+
             this.listenTo(mediator, 'datagrid:restoreState:' + this.name,
                 function(columnName, dataField, included, excluded) {
                     this.collection.each(function(model) {
