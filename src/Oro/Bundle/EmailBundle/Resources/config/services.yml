@@ -288,6 +288,7 @@ services:
             - @doctrine
             - @oro_email.email.model.builder
             - @oro_email.mailer.processor
+            - @oro_email.email_renderer
             - @logger
             - %locale%
 
