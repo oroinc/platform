@@ -26,13 +26,12 @@
             ownerLink = hasLink
                 ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.headOwnerName) + '</a>'
                 : '<span class="user">' + _.escape(data.headOwnerName) + '</span>';
-            updatedAt = dateFormatter.formatDateTime(data.headSentAt);
+            updatedAt = dateFormatter.formatSmartDateTime(data.headSentAt);
             subject = data.headSubject;
         }
-
     %>
     <%= _.template(
-    {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
+        {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
         { interpolate: /\{\{(.+?)\}\}/g }
     )({
         user: ownerLink,

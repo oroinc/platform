@@ -37,18 +37,18 @@ class EntityListener
      * @param EmailOwnerManager $emailOwnerManager
      * @param EmailActivityManager $emailActivityManager
      * @param EmailThreadManager $emailThreadManager
-     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param EmailOwnersProvider $emailOwnersProvider
      */
     public function __construct(
         EmailOwnerManager    $emailOwnerManager,
         EmailActivityManager $emailActivityManager,
         EmailThreadManager   $emailThreadManager,
-        EmailOwnersProvider   $emailOwnersProvider
+        EmailOwnersProvider  $emailOwnersProvider
     ) {
         $this->emailOwnerManager    = $emailOwnerManager;
         $this->emailActivityManager = $emailActivityManager;
         $this->emailThreadManager   = $emailThreadManager;
-        $this->emailOwnersProvider   = $emailOwnersProvider;
+        $this->emailOwnersProvider  = $emailOwnersProvider;
     }
 
     /**
