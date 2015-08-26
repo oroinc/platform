@@ -25,7 +25,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * ============================================================ */
 
     var preciseWidth = function(node) {
-        if ('nodeType' in node) {
+        if (_.result(node, 'nodeType') !== void 0) {
             return node.getBoundingClientRect().width;
         } else {
             return NaN;
