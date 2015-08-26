@@ -121,7 +121,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Added [Query Hint Resolver](./src/Oro/Bundle/EntityBundle/Resources/doc/query_hint_resolver.md)
 - Removed `Oro\Bundle\EntityBundle\ORM\EntityConfigAwareRepositoryInterface` interface
 - Removed `Oro\Bundle\EntityBundle\ORM\Query\FilterCollection` class and `oro_entity.orm.sql_filter` DIC tag
-- The `Oro\Bundle\EntityBundle\ORM\OroEntityManager` triggers `onClose` event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked. 
+- The `Oro\Bundle\EntityBundle\ORM\OroEntityManager` triggers `preClose` event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked. 
 
 ####EntityConfigBundle
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
