@@ -64,6 +64,8 @@ abstract class AbstractProperty implements PropertyInterface
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertValue($value)
     {

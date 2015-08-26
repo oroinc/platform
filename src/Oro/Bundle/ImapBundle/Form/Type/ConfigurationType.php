@@ -60,7 +60,6 @@ class ConfigurationType extends AbstractType
         $this->addOwnerOrganizationEventListener($builder);
         $this->addApplySyncListener($builder);
         $this->addSetOriginToFoldersListener($builder);
-        $this->addSetMailboxSyncDateListener($builder);
         $this->addEnableSMTPImapListener($builder);
         $this->finalDataCleaner($builder);
 
@@ -149,29 +148,6 @@ class ConfigurationType extends AbstractType
                 if ($data !== null && $data instanceof UserEmailOrigin) {
                     foreach ($data->getFolders() as $folder) {
                         $folder->setOrigin($data);
-                    }
-                    $event->setData($data);
-                }
-            }
-        );
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addSetMailboxSyncDateListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if ($data !== null && $data instanceof UserEmailOrigin && $data->getMailbox()) {
-                    $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-                    $data->setSynchronizedAt($currentDate);
-                    foreach ($data->getFolders() as $folder) {
-                        if ($folder->isSyncEnabled()) {
-                            $folder->setSynchronizedAt($currentDate);
-                        }
                     }
                     $event->setData($data);
                 }
