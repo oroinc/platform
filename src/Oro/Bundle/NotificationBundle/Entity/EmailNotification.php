@@ -22,6 +22,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },
