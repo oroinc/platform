@@ -46,8 +46,8 @@ class OroEntityManager extends EntityManager
     public function close()
     {
         $evm = $this->getEventManager();
-        if ($evm->hasListeners(Events::onClose)) {
-            $evm->dispatchEvent(Events::onClose, new OnCloseEventArgs($this));
+        if ($evm->hasListeners(Events::preClose)) {
+            $evm->dispatchEvent(Events::preClose, new OnCloseEventArgs($this));
         }
 
         parent::close();
