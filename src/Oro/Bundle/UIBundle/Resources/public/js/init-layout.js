@@ -24,11 +24,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
      * from layout.js
      * ============================================================ */
 
-    var preciseWidth = function(node) {
-        if (_.result(node, 'nodeType') !== void 0) {
-            return node.getBoundingClientRect().width;
+    var realWidth = function($selector) {
+        if ($selector instanceof $ && $selector.length > 0) {
+            return $selector[0].getBoundingClientRect().width;
         } else {
-            return NaN;
+            return 0;
         }
     };
 
@@ -250,7 +250,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 initializeContent();
 
                 // set width for #main container
-                $main.width(preciseWidth($topPage[0]) - preciseWidth($leftPanel[0]) - preciseWidth($rightPanel[0]));
+                $main.width(realWidth($topPage) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
                 var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
