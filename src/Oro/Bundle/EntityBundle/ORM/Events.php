@@ -15,12 +15,12 @@ final class Events
     }
 
     /**
-     * The onClose event occurs when the EntityManager#close() operation is invoked,
+     * The preClose event occurs when the EntityManager#close() operation is invoked,
      * before EntityManager#clear() is invoked.
      *
      * @var string
      */
     // @codingStandardsIgnoreStart
-    const onClose = 'onClose';
+    const preClose = 'preClose';
     // @codingStandardsIgnoreEnd
 }

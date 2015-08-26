@@ -35,6 +35,9 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },

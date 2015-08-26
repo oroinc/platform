@@ -14,6 +14,9 @@ class PlaceholderFilter
     /** @var ConfigProvider */
     protected $noteConfigProvider;
 
+    /** @var ConfigProvider */
+    protected $entityConfigProvider;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -40,8 +43,10 @@ class PlaceholderFilter
      */
     public function isNoteAssociationEnabled($entity)
     {
-        if (!is_object($entity) || !$this->doctrineHelper->isManageableEntity($entity) ||
-            $this->doctrineHelper->isNewEntity($entity)) {
+        if (!is_object($entity)
+            || !$this->doctrineHelper->isManageableEntity($entity)
+            || $this->doctrineHelper->isNewEntity($entity)
+        ) {
             return false;
         }
 

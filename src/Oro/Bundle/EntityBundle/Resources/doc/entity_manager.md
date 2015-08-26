@@ -7,4 +7,4 @@ In case any other modification are required, your class should extend `OroEntity
 
 In addition to standard [Doctrine ORM Lifecycle Events](http://doctrine-orm.readthedocs.org/en/latest/reference/events.html#lifecycle-events), the `OroEntityManager` triggers new events:
 
-- *onClose* - The onClose event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked.
+- *preClose* - The preClose event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked.

@@ -12,11 +12,11 @@
 
 <span class="nowrap">
 {% if folder is not null %}
-    {% if folder.type == 'sent' %}
+    {% if folder.type == 'sent' or folder.type == 'drafts' %}
         <span class="icon grid">
             <i class="icon-signout"></i>
         </span>
-    {% elseif folder.type == 'inbox' %}
+    {% else %}
         <span class="icon grid">
             <i class="icon-signin"></i>
         </span>
