@@ -118,7 +118,8 @@ class OptionSetCollectionType extends AbstractType
         $view->vars = array_replace(
             $view->vars,
             array(
-                'show_form_when_empty' => $options['show_form_when_empty']
+                'show_form_when_empty' => $options['show_form_when_empty'],
+                'allow_add_after'      => false
             )
         );
     }
