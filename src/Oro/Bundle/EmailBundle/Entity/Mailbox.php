@@ -353,21 +353,33 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return Role[]
+     * @return Collection|Role[]
      */
     public function getAuthorizedRoles()
     {
-        return $this->authorizedRoles->toArray();
+        return $this->authorizedRoles;
     }
 
     /**
-     * @param Collection|Role[] $authorizedRoles
+     * @param Role $role
      *
      * @return $this
      */
-    public function setAuthorizedRoles($authorizedRoles)
+    public function addAuthorizedRole(Role $role)
     {
-        $this->authorizedRoles = $authorizedRoles;
+        $this->authorizedRoles->add($role);
+
+        return $this;
+    }
+
+    /**
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function removeAuthorizedRole(Role $role)
+    {
+        $this->authorizedRoles->removeElement($role);
 
         return $this;
     }
