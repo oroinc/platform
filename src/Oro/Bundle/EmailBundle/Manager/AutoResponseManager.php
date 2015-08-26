@@ -7,6 +7,7 @@ use Exception;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -57,6 +58,9 @@ class AutoResponseManager
     /** @var string */
     protected $defaultLocale;
 
+    /** @var EmailRenderer */
+    protected $emailRender;
+
     /** @var array */
     protected $filterToConditionMap = [
         TextFilterType::TYPE_CONTAINS => 'contains',
@@ -81,7 +85,8 @@ class AutoResponseManager
         EmailModelBuilder $emailBuilder,
         Processor $emailProcessor,
         LoggerInterface $logger,
-        $defaultLocale
+        $defaultLocale,
+        EmailRenderer $emailRender
     ) {
         $this->registry = $registry;
         $this->emailBuilder = $emailBuilder;
@@ -90,6 +95,7 @@ class AutoResponseManager
         $this->defaultLocale = $defaultLocale;
         $this->configExpressions = new ConfigExpressions();
         $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->emailRender = $emailRender;
     }
 
     /**
@@ -159,6 +165,7 @@ class AutoResponseManager
             $emailModel->setFrom($rule->getMailbox()->getEmail());
             $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
             $emailModel->setContexts(array_merge([$email], $emailModel->getContexts()));
+
             $this->applyTemplate($emailModel, $rule->getTemplate(), $email);
 
             return $emailModel;
@@ -198,9 +205,12 @@ class AutoResponseManager
         $content = reset($validContents);
         $subject = reset($validsubjects);
 
+        $content = $content === false ? $template->getContent() : $content;
+        $subject = $subject === false ? $template->getSubject() : $subject;
+
         $emailModel
-            ->setSubject($subject === false ? $template->getSubject() : $subject)
-            ->setBody($content === false ? $template->getContent() : $content)
+            ->setSubject($this->emailRender->renderWithDefaultFilters($subject, ['entity' => $email]))
+            ->setBody($this->emailRender->renderWithDefaultFilters($content, ['entity' => $email]))
             ->setType($template->getType());
     }
 

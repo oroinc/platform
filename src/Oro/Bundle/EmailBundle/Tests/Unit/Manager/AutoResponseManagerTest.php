@@ -28,6 +28,9 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $render;
+
     /** @var AutoResponseManager */
     protected $autoResponseManager;
 
@@ -47,12 +50,17 @@ class AutoResponseManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->logger = $this->getMock('Psr\Log\LoggerInterface');
 
+        $this->render = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->autoResponseManager = new AutoResponseManager(
             $this->registry,
             $this->emailBuilder,
             $this->emailProcessor,
             $this->logger,
-            'en'
+            'en',
+            $this->render
         );
     }
 

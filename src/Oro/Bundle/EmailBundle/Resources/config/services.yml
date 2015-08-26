@@ -290,6 +290,7 @@ services:
             - @oro_email.mailer.processor
             - @logger
             - %locale%
+            - @oro_email.email_renderer
 
     oro_email.link.autoresponserule_manager:
         tags:
