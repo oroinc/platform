@@ -2,13 +2,25 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Placeholder;
 
+use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter;
-use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 {
+    const TEST_ENTITY_REFERENCE = 'Oro\Bundle\CommentBundle\Tests\Unit\Fixtures\TestEntity';
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    protected $commentConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
@@ -18,69 +30,141 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->commentConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityConfigProvider  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityFacade        = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntity')
+            ->willReturnCallback(function ($entity) {
+                return !$entity instanceof \stdClass;
+            });
 
-        $this->filter         = new CommentPlaceholderFilter($this->configManager, $this->securityFacade);
+        $this->filter = new CommentPlaceholderFilter(
+            $this->commentConfigProvider,
+            $this->entityConfigProvider,
+            $this->doctrineHelper,
+            $this->securityFacade
+        );
     }
 
-    /**
-     * @param mixed $entity
-     * @param int   $callsCount
-     * @param int   $callsProviderCount
-     * @param bool  $isApplicable
-     * @param bool  $isGranted
-     * @param bool  $expected
-     *
-     * @dataProvider commentProvider
-     */
-    public function testIsApplicable($entity, $callsCount, $callsProviderCount, $isApplicable, $isGranted, $expected)
+    public function testIsApplicableWithNull()
     {
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $config->expects($this->exactly($callsProviderCount))
-            ->method('is')
-            ->will($this->returnValue($isApplicable));
+        $this->commentConfigProvider->expects($this->never())
+            ->method('hasConfig');
 
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $provider->expects($this->exactly($callsProviderCount))
-            ->method('getConfig')
-            ->will($this->returnValue($config));
+        $this->assertFalse(
+            $this->filter->isApplicable(null)
+        );
+    }
 
-        $this->securityFacade->expects($this->any())
+    public function testIsApplicableWithNonManagedEntity()
+    {
+        $testEntity = new \stdClass();
+        $this->assertFalse(
+            $this->filter->isApplicable($testEntity)
+        );
+    }
+
+    public function testIsApplicableWithNotObject()
+    {
+        $this->commentConfigProvider->expects($this->never())
+            ->method('hasConfig');
+
+        $this->assertFalse(
+            $this->filter->isApplicable('test')
+        );
+    }
+
+    public function testIsApplicableWhenPermissionsAreNotGranted()
+    {
+        $this->securityFacade->expects($this->once())
             ->method('isGranted')
             ->with('oro_comment_view')
-            ->will($this->returnValue($isGranted));
-        $this->configManager->expects($this->exactly($callsProviderCount))
-            ->method('getProvider')
-            ->will($this->returnValue($provider));
-        $this->configManager->expects($this->exactly($callsCount))
-            ->method('hasConfig')
-            ->will($this->returnValue(true));
+            ->willReturn(false);
 
-        $this->assertEquals($expected, $this->filter->isApplicable($entity));
+        $this->assertFalse(
+            $this->filter->isApplicable(new TestEntity())
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function commentProvider()
+    public function testIsApplicableWithNotConfigurableEntity()
     {
-        $entity = new ItemStub();
-        return [
-            'is null'                 => [null, 0, 0, false, true, false],
-            'is null with enabled on' => [null, 0, 0, true, true, false],
-            'applicable not granted'  => [$entity, 0, 0, true, false, false],
-            'not applicable entity'   => [$entity, 1, 1, false, true, false],
-            'applicable entity'       => [$entity, 1, 2, true, true, true],
-        ];
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('oro_comment_view')
+            ->willReturn(true);
+
+        $this->commentConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(static::TEST_ENTITY_REFERENCE)
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->filter->isApplicable(new TestEntity()));
+    }
+
+    public function testIsApplicableWithNotUpdatedSchema()
+    {
+        $config = new Config(new EntityConfigId('comment', static::TEST_ENTITY_REFERENCE));
+        $config->set('enabled', true);
+
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('oro_comment_view')
+            ->willReturn(true);
+
+        $this->commentConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(static::TEST_ENTITY_REFERENCE)
+            ->will($this->returnValue(true));
+        $this->commentConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(static::TEST_ENTITY_REFERENCE)
+            ->will($this->returnValue($config));
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(Comment::ENTITY_NAME, ExtendHelper::buildAssociationName(static::TEST_ENTITY_REFERENCE))
+            ->will($this->returnValue(false));
+
+        $this->assertFalse(
+            $this->filter->isApplicable(new TestEntity())
+        );
+    }
+
+    public function testIsApplicable()
+    {
+        $config = new Config(new EntityConfigId('comment', static::TEST_ENTITY_REFERENCE));
+        $config->set('enabled', true);
+
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('oro_comment_view')
+            ->willReturn(true);
+
+        $this->commentConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(static::TEST_ENTITY_REFERENCE)
+            ->will($this->returnValue(true));
+        $this->commentConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(static::TEST_ENTITY_REFERENCE)
+            ->will($this->returnValue($config));
+        $this->entityConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(Comment::ENTITY_NAME, ExtendHelper::buildAssociationName(static::TEST_ENTITY_REFERENCE))
+            ->will($this->returnValue(true));
+
+        $this->assertTrue(
+            $this->filter->isApplicable(new TestEntity())
+        );
     }
 }

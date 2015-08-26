@@ -98,10 +98,10 @@ class ImapClearManager implements LoggerAwareInterface
 
         foreach ($folders as $folder) {
             $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
-            if (!$origin->isActive()) {
+            if ($imapFolder && !$origin->isActive()) {
                 $this->clearFolder($imapFolder);
                 $this->em->remove($imapFolder);
-            } elseif (!$folder->isSyncEnabled()) {
+            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
@@ -137,11 +137,11 @@ class ImapClearManager implements LoggerAwareInterface
             $email = $emailUser->getEmail();
             $this->em->remove($emailUser);
 
-            $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
+            $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
                 'email' => $email,
                 'imapFolder' => $imapFolder,
             ]);
-            if ($imapEmail !== null) {
+            foreach ($imapEmails as $imapEmail) {
                 $this->em->remove($imapEmail);
             }
 

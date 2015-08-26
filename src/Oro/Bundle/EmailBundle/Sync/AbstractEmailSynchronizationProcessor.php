@@ -20,6 +20,9 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;

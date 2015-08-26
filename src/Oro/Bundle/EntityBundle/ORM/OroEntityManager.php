@@ -9,6 +9,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 
+use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class OroEntityManager extends EntityManager
@@ -37,6 +38,19 @@ class OroEntityManager extends EntityManager
         }
 
         return new OroEntityManager($conn, $config, $conn->getEventManager());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $evm = $this->getEventManager();
+        if ($evm->hasListeners(Events::preClose)) {
+            $evm->dispatchEvent(Events::preClose, new PreCloseEventArgs($this));
+        }
+
+        parent::close();
     }
 
     /**
