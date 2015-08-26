@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -87,6 +88,7 @@ class MailboxType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -160,6 +162,29 @@ class MailboxType extends AbstractType
         }
 
         $this->addProcessField($form, $processType);
+    }
+
+    /**
+     * PostSubmit event handler.
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+        if ($data !== null) {
+            /** @var UserEmailOrigin $origin */
+            $origin = $data->getOrigin();
+            $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+            $origin->setSynchronizedAt($currentDate);
+            foreach ($origin->getFolders() as $folder) {
+                if ($folder->isSyncEnabled()) {
+                    $folder->setSynchronizedAt($currentDate);
+                }
+            }
+            $event->setData($data);
+        }
     }
 
     /**
