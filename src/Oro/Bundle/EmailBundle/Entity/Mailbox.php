@@ -281,12 +281,16 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param UserEmailOrigin $origin
+     * @param UserEmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(UserEmailOrigin $origin)
+    public function setOrigin(UserEmailOrigin $origin = null)
     {
+        $currentOrigin = $this->getOrigin();
+        if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
+            $currentOrigin->setActive(false);
+        }
         $this->origin = $origin;
 
         return $this;
@@ -459,10 +463,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function beforeSave()
     {
-        if ($this->origin !== null) {
-            $this->origin->setOwner(null);
-        }
-
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }

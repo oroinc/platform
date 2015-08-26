@@ -87,6 +87,7 @@ class MailboxType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -174,6 +175,26 @@ class MailboxType extends AbstractType
         }
 
         $this->addProcessField($form, $processType);
+    }
+
+    /**
+     * Sets proper organization to origin. Set owner to null.
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+
+        $organization = $data->getOrganization();
+
+        if (null !== $origin = $data->getOrigin()) {
+            if (null !== $origin->getOwner()) {
+                $origin->setOwner(null);
+            }
+            $origin->setOrganization($organization);
+        }
     }
 
     /**

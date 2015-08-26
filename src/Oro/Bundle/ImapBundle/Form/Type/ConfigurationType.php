@@ -326,7 +326,7 @@ class ConfigurationType extends AbstractType
                 /** @var UserEmailOrigin $data */
                 $data = $event->getData();
                 if ($data !== null) {
-                    if ($data->getOwner() === null) {
+                    if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
                         $data->setOwner($this->securityFacade->getLoggedUser());
                     }
                     if ($data->getOrganization() === null) {
