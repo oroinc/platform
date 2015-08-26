@@ -155,7 +155,7 @@ class AutoResponseManager
     protected function createReplyEmailModels(Email $email, Collection $rules)
     {
         return $rules->map(function (AutoResponseRule $rule) use ($email) {
-            $emailModel = $this->emailBuilder->createReplyEmailModel($email, true);
+            $emailModel = $this->emailBuilder->createReplyEmailModel($email);
             $emailModel->setFrom($rule->getMailbox()->getEmail());
             $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
             $emailModel->setContexts(array_merge([$email], $emailModel->getContexts()));

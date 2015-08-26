@@ -59,18 +59,19 @@ its settings (This entity is using single table inheritance).
 
 Mailbox processing is added using **processes** from OroWorkflowBundle.
 
-Process can look like following example and should be triggered on
-creation of EmailBody entity. In case you don't need email body for your
-process, feel free to use EmailUser entity. That one is created right when email
-is received, body is synchronized later, using a cron job or when user opens an
-email.
+Process can look like following example and will be triggered on
+creation of EmailBody entity. This will guarantee that complete email
+data (including body) is available for processing.
+
+**Do NOT define triggers for this process. It will be triggered by event
+listener on any new email assigned to mailbox.**
 
 ``` yaml
 definitions:
     convert_mailbox_email_to_lead:
         label: 'Convert Mailbox E-mail to Lead'
         enabled: true
-        entity: Oro\Bundle\EmailBundle\Entity\EmailBody     # EmailBody or EmailUser
+        entity: Oro\Bundle\EmailBundle\Entity\EmailBody
         order: 150
         actions_configuration:
             - @find_entity:
@@ -92,10 +93,6 @@ definitions:
                 value: $.mailbox
                 actions:
                     # Prepare mailbox dependent data and perform desired actions here.
-triggers:
-    convert_mailbox_email_to_lead:
-        -
-            event: create                   # Process triggered on creating of email body
 ```
 
 ### Additional actions
