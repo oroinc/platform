@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 
 class MailboxType extends AbstractType
 {
@@ -178,22 +179,54 @@ class MailboxType extends AbstractType
     }
 
     /**
-     * Sets proper organization to origin. Set owner to null.
+     * Form post submit handler.
      *
      * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
-        /** @var Mailbox $data */
         $data = $event->getData();
 
-        $organization = $data->getOrganization();
+        $this->setOriginOrganizationAndOwner($data);
+        $this->setOriginSyncDate($data);
+    }
 
-        if (null !== $origin = $data->getOrigin()) {
-            if (null !== $origin->getOwner()) {
-                $origin->setOwner(null);
+    /**
+     * Set origin and folder sync date for prevent sync old emails
+     *
+     * @param Mailbox $data
+     */
+    public function setOriginSyncDate(Mailbox $data = null)
+    {
+        if ($data !== null) {
+            /** @var UserEmailOrigin $origin */
+            $origin = $data->getOrigin();
+            $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+            $origin->setSynchronizedAt($currentDate);
+            foreach ($origin->getFolders() as $folder) {
+                if ($folder->isSyncEnabled()) {
+                    $folder->setSynchronizedAt($currentDate);
+                }
             }
-            $origin->setOrganization($organization);
+        }
+    }
+
+    /**
+     * Sets proper organization to origin. Set owner to null.
+     *
+     * @param Mailbox $data
+     */
+    protected function setOriginOrganizationAndOwner(Mailbox $data = null)
+    {
+        if ($data !== null) {
+            $organization = $data->getOrganization();
+
+            if (null !== $origin = $data->getOrigin()) {
+                if (null !== $origin->getOwner()) {
+                    $origin->setOwner(null);
+                }
+                $origin->setOrganization($organization);
+            }
         }
     }
 
