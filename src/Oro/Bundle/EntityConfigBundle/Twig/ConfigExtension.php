@@ -137,7 +137,7 @@ class ConfigExtension extends \Twig_Extension
      * @param string $routeType Route Type
      * @param bool   $strict    Should exception be thrown if no route of given type found
      *
-     * @return string
+     * @return string|null
      */
     public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
@@ -147,7 +147,7 @@ class ConfigExtension extends \Twig_Extension
 
         $route = $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
 
-        return $this->hasRoute($route)
+        return $route && $this->hasRoute($route)
             ? $route
             : null;
     }
