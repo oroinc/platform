@@ -146,6 +146,7 @@
 
 {% block oro_share_select_widget %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"
@@ -180,4 +181,160 @@
             {% endif %}
         </div>
     </div>
+    <h5 class="share-grid-title">{{ 'oro.security.datagrid.share_grid.title'|trans }}</h5>
+    <div class="entity-create-or-select-container">
+        {{ dataGrid.renderGrid(
+            'share-grid',
+            {'entityId': form.vars.entityId, 'entityClass': form.vars.entityClass},
+            {'cssClass': 'share-grid'}
+        ) }}
+    </div>
+    <script type="text/javascript">
+        require(
+            ['jquery', 'underscore', 'routing', 'oroui/js/mediator', 'oroui/js/widget-manager'],
+            function ($, _, routing, mediator, widgetManager) {
+                mediator.on('datagrid:mass:frontend:execute:share-grid', function (action) {
+                    var grid = action.datagrid;
+                    _.each(action.datagrid.getSelectionState().selectedModels, function (model) {
+                        grid.collection.remove(model.id);
+                    });
+                    var entitiesParam = [];
+                    _.each(grid.collection.models, function(model){
+                        entitiesParam.push(model.id)
+                    });
+                    grid.collection.sync('POST', grid.collection, {
+                        method: 'POST',
+                        url: routing.generate(
+                                'oro_share_update',
+                                {
+                                    'entityId': '{{ form.vars.entityId }}',
+                                    '_widgetContainer': 'dialog'
+                                }
+                        ) + '&entityClass=' + '{{ form.vars.entityClass|url_encode }}',
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: 'oro_share_form%5BentityClass%5D={{ form.vars.entityClass|url_encode }}'
+                        + '&oro_share_form%5BentityId%5D={{ form.vars.entityId }}'
+                        + '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
+                        wait: true,
+                        error: function () {
+                            mediator.trigger('datagrid:doRefresh:share-grid');
+                        },
+                        success: function () {
+                            mediator.trigger('datagrid:doRefresh:share-grid');
+                        }
+                    });
+                    return;
+                });
+                mediator.on('datagrid:frontend:execute:share-grid', function (action) {
+                    var collection = action.datagrid.collection;
+                    collection.remove(action.model);
+                    var entitiesParam = [];
+                    _.each(collection.models, function(model){
+                        entitiesParam.push(model.id)
+                    });
+                    action.model.destroy({
+                        method: 'POST',
+                        url: routing.generate(
+                            'oro_share_update',
+                            {
+                                'entityId': '{{ form.vars.entityId }}',
+                                '_widgetContainer': 'dialog'
+                            }
+                        ) + '&entityClass=' + '{{ form.vars.entityClass|url_encode }}',
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: 'oro_share_form%5BentityClass%5D={{ form.vars.entityClass|url_encode }}'
+                              + '&oro_share_form%5BentityId%5D={{ form.vars.entityId }}'
+                              + '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
+                        wait: true,
+                        error: function () {
+                            mediator.trigger('datagrid:doRefresh:share-grid');
+                        },
+                        success: function () {
+                            mediator.trigger('datagrid:doRefresh:share-grid');
+                        }
+                    });
+                });
+                mediator.on('datagrid:share-grid:add:data', function (data) {
+                    widgetManager.getWidgetInstanceByAlias('share-dialog', function (widget) {
+                        var grid = widget.pageComponent('share-grid').grid;
+                        var entitiesParam = [];
+                        _.each(grid.collection.models, function(model){
+                            entitiesParam.push(model.id)
+                        });
+                        _.each(data.models, function(model){
+                            var id = JSON.stringify({
+                                entityId: model.id,
+                                entityClass: data.entityClass
+                            });
+                            grid.collection.add([
+                                {
+                                    entity: model.name,
+                                    id: id
+                                }
+                            ]);
+                            entitiesParam.push(id);
+                        });
+                        grid.collection.sync('POST', grid.collection, {
+                            method: 'POST',
+                            url: routing.generate(
+                                    'oro_share_update',
+                                    {
+                                        'entityId': '{{ form.vars.entityId }}',
+                                        '_widgetContainer': 'dialog'
+                                    }
+                            ) + '&entityClass=' + '{{ form.vars.entityClass|url_encode }}',
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            data: 'oro_share_form%5BentityClass%5D={{ form.vars.entityClass|url_encode }}'
+                            + '&oro_share_form%5BentityId%5D={{ form.vars.entityId }}'
+                            + '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
+                            wait: true,
+                            error: function () {
+                                mediator.trigger('datagrid:doRefresh:share-grid');
+                            },
+                            success: function () {
+                                mediator.trigger('datagrid:doRefresh:share-grid');
+                            }
+                        });
+                    });
+                });
+                mediator.on('datagrid:share-grid:add:data-from-select2', function (data) {
+                    widgetManager.getWidgetInstanceByAlias('share-dialog', function (widget) {
+                        var grid = widget.pageComponent('share-grid').grid;
+                        var entitiesParam = [];
+                        _.each(grid.collection.models, function (model) {
+                            entitiesParam.push(model.id)
+                        });
+                        grid.collection.add([
+                            {
+                                entity: data.text,
+                                id: data.id
+                            }
+                        ]);
+                        entitiesParam.push(data.id);
+                        grid.collection.sync('POST', grid.collection, {
+                            method: 'POST',
+                            url: routing.generate(
+                                    'oro_share_update',
+                                    {
+                                        'entityId': '{{ form.vars.entityId }}',
+                                        '_widgetContainer': 'dialog'
+                                    }
+                            ) + '&entityClass=' + '{{ form.vars.entityClass|url_encode }}',
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            data: 'oro_share_form%5BentityClass%5D={{ form.vars.entityClass|url_encode }}'
+                            + '&oro_share_form%5BentityId%5D={{ form.vars.entityId }}'
+                            + '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
+                            wait: true,
+                            error: function () {
+                                mediator.trigger('datagrid:doRefresh:share-grid');
+                            },
+                            success: function () {
+                                mediator.trigger('datagrid:doRefresh:share-grid');
+                            }
+                        });
+                    });
+                });
+            }
+        );
+    </script>
 {% endblock %}

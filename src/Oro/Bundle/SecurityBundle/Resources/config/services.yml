@@ -85,6 +85,9 @@ parameters:
     oro_security.workflow.action.remove_ace_share_scope.class: Oro\Bundle\SecurityBundle\Model\Action\RemoveAceByShareScopeAction
     oro_security.ace.query.manager.class:                      Oro\Bundle\SecurityBundle\Model\Action\AceQueryManager
 
+    oro_security.datasource.share.class:                       Oro\Bundle\SecurityBundle\Extension\ShareDatasource
+    oro_security.event_listener.share_grid_listener.class:     Oro\Bundle\SecurityBundle\EventListener\Datagrid\ShareGridListener
+
 services:
     oro_security.security_facade:
         class: %oro_security.security_facade.class%
@@ -671,3 +674,23 @@ services:
             - @security.acl.cache.doctrine
         tags:
             - { name: oro_workflow.action, alias: remove_ace_share_scope }
+
+    oro_security.datasource.share:
+        class: %oro_security.datasource.share.class%
+        arguments:
+            - @security.acl.provider
+            - @oro_entity.routing_helper
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
+            - @translator
+            - @oro_attachment.manager
+        tags:
+            - { name: oro_datagrid.datasource, type: share }
+
+    oro_security.event_listener.share_grid_listener:
+        class: %oro_security.event_listener.share_grid_listener.class%
+        scope: request
+        arguments:
+            - @request
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.share-grid, method: onBuildBefore }

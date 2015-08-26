@@ -4,6 +4,7 @@ define(function(require) {
     var ShareComponent;
     var $ = require('jquery');
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ShareView = require('orosecurity/js/app/views/share-view');
@@ -13,7 +14,6 @@ define(function(require) {
      * @exports ShareComponent
      */
     ShareComponent = BaseComponent.extend({
-        selectElSelector: '.select2.select2-offscreen',
         shareView: null,
 
         initialize: function(options) {
@@ -66,16 +66,22 @@ define(function(require) {
             var targetClass = this.shareView.currentTargetClass();
 
             gridWidget._showLoading();
-            var select2Data = $(this.selectElSelector).select2('data');
             var text = data.model.get('username') ? data.model.get('username') : data.model.get('name');
-            select2Data = select2Data.concat({
+            var t = {
                 text: text,
                 id: JSON.stringify({
-                    'entityId': id,
-                    'entityClass': targetClass
+                    entityId: id,
+                    entityClass: targetClass
                 })
+            };
+            mediator.trigger('datagrid:share-grid:add:data', {
+                entityClass: targetClass,
+                models: [{
+                    id: id,
+                    name: text,
+                    entityClass: targetClass
+                }]
             });
-            $(this.selectElSelector).select2('data', select2Data);
             gridWidget._hideLoading();
             if (!dialogWidgetName) {
                 return;
@@ -87,27 +93,23 @@ define(function(require) {
 
         onGridAdd: function(gridWidget, data) {
             var dialogWidgetName = this.options.dialogWidgetName;
-            var select2Data = $(this.selectElSelector).select2('data');
             var selected = {};
             gridWidget.pageComponent(this.shareView.currentGridName()).
                 grid.collection.trigger('backgrid:getSelected', selected);
             var models = gridWidget.pageComponent(this.shareView.currentGridName()).grid.collection.models;
+            var selectedModels = [];
             gridWidget._showLoading();
             for(var key in models) {
                 var model = models[key];
                 if (selected.selected.indexOf(model.get('id')) !== -1) {
-                    var text = model.get('username') ? model.get('username') : model.get('name');
-                    select2Data = select2Data.concat({
-                        text: text,
-                        id: JSON.stringify({
-                            'entityId': model.get('id'),
-                            'entityClass': this.shareView.currentTargetClass()
-                        })
-                    });
+                    selectedModels.push(model);
                 }
             }
-            $(this.selectElSelector).select2('data', select2Data);
             gridWidget._hideLoading();
+            mediator.trigger('datagrid:share-grid:add:data', {
+                entityClass: this.shareView.currentTargetClass(),
+                models: selectedModels
+            });
             if (!dialogWidgetName) {
                 return;
             }

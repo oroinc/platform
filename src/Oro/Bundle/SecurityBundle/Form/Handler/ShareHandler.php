@@ -17,12 +17,10 @@ use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class ShareHandler
 {
@@ -98,10 +96,10 @@ class ShareHandler
                 // no ACL found, do nothing
                 $acl = null;
             }
-            $this->applyEntities($model, $acl);
+//            $this->applyEntities($model, $acl);
+            $this->form->get('entityClass')->setData($entityName);
+            $this->form->get('entityId')->setData($entity->getId());
         }
-        $this->form->get('entityClass')->setData($entityName);
-        $this->form->get('entityId')->setData($entity->getId());
 
         return false;
     }
@@ -135,44 +133,6 @@ class ShareHandler
         }
 
         $this->aclProvider->updateAcl($acl);
-    }
-
-    /**
-     * Extracts entities from SecurityIdentities and apply them to form model
-     *
-     * @param Share $model
-     * @param AclInterface|null $acl
-     */
-    protected function applyEntities(Share $model, AclInterface $acl = null)
-    {
-        if (!$acl) {
-            return;
-        }
-
-        $usernames = [];
-        $buIds = [];
-        foreach ($acl->getObjectAces() as $ace) {
-            /** @var $ace Entry */
-            $securityIdentity = $ace->getSecurityIdentity();
-            if ($securityIdentity instanceof UserSecurityIdentity) {
-                $usernames[] = $securityIdentity->getUsername();
-            } elseif ($securityIdentity instanceof BusinessUnitSecurityIdentity) {
-                $buIds[] = $securityIdentity->getId();
-            }
-        }
-        if ($usernames) {
-            /** @var $repo UserRepository */
-            $repo = $this->manager->getRepository('OroUserBundle:User');
-            $users = $repo->findUsersByUsernames($usernames);
-            $model->setEntities($users);
-        }
-        if ($buIds) {
-            /** @var $repo BusinessUnitRepository */
-            $repo = $this->manager->getRepository('OroOrganizationBundle:BusinessUnit');
-            $businessUnits = $repo->getBusinessUnits($buIds);
-            $model->setEntities(array_merge($model->getEntities(), $businessUnits));
-        }
-        $this->form->setData($model);
     }
 
     /**

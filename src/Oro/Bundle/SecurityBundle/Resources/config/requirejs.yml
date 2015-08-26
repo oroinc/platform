@@ -7,3 +7,4 @@ config:
         'orosecurity/js/app/models/share-collection': 'bundles/orosecurity/js/app/models/share-collection.js'
         'orosecurity/js/app/views/share-view': 'bundles/orosecurity/js/app/views/share-view.js'
         'orosecurity/js/app/components/share-component': 'bundles/orosecurity/js/app/components/share-component.js'
+        'oro/select2-share-component': 'bundles/orosecurity/js/app/components/select2-share-component.js'

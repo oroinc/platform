@@ -10,8 +10,8 @@
         <script type="text/javascript">
             require(['jquery', 'oroui/js/widget-manager'], function($, widgetManager) {
                 $(function () {
-                    $('.btn.btn-primary.sharing-entities').on('click', function() {
-                        widgetManager.getWidgetInstanceByAlias('{{ gridWidgetName }}', function(widget) {
+                    $('.btn.btn-primary.sharing-entities').on('click', function () {
+                        widgetManager.getWidgetInstanceByAlias('{{ gridWidgetName }}', function (widget) {
                             widget.trigger('sharing-grid-submitted');
                         });
                     });
