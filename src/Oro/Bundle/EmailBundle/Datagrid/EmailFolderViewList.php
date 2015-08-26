@@ -49,12 +49,14 @@ class EmailFolderViewList extends AbstractViewsList
 
         foreach ($choiceList as $id => $label) {
             $mailboxLabel = $this->translator->trans('oro.email.datagrid.mailbox.view', ['%mailbox%' => $label]);
-            $views[] = new View(
+            $view = new View(
                 $mailboxLabel,
                 [
                     'mailbox' => ['value' => $id]
                 ]
             );
+            $view->setLabel(str_replace('\@', '@', $mailboxLabel));
+            $views[] = $view;
         }
 
         return $views;

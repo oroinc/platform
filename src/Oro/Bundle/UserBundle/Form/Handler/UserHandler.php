@@ -164,8 +164,10 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         // Reloads the user to reset its username. This is needed when the
         // username or password have been changed to avoid issues with the
         // security layer.
+        // Additional checking for userConfigManager !== null is added because of API
+        // to avoid "Call to a member function on a non-object".
         $this->manager->reloadUser($user);
-        if ($this->form->has('signature')) {
+        if ($this->form->has('signature') && $this->userConfigManager !== null) {
             $this->userConfigManager->saveUserConfigSignature($this->form->get('signature')->getData());
         }
     }

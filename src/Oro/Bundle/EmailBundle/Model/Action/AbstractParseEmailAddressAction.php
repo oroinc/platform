@@ -11,8 +11,10 @@ abstract class AbstractParseEmailAddressAction extends AbstractAction
 {
     /** @var string */
     protected $address;
+
     /** @var string */
     protected $attribute;
+
     /** @var EmailAddressHelper */
     protected $addressHelper;
 
@@ -28,6 +30,8 @@ abstract class AbstractParseEmailAddressAction extends AbstractAction
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function initialize(array $options)
     {
