@@ -30,13 +30,13 @@ abstract class AbstractDriver implements DriverInterface
      */
     public function __construct(LayoutUpdateGeneratorInterface $generator, $debug, $cacheDir)
     {
+        if (empty($cacheDir)) {
+            throw new \InvalidArgumentException('Cache directory must not be empty.');
+        }
+
         $this->generator = $generator;
         $this->debug     = $debug;
-
-        if (empty($cacheDir)) {
-            throw new \InvalidArgumentException('Cache directory should not be empty.');
-        }
-        $this->cacheDir     = $cacheDir;
+        $this->cacheDir  = $cacheDir;
     }
 
     /**
