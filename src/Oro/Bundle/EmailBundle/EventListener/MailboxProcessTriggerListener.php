@@ -64,6 +64,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody);
         }
+
+
+        $this->doctrine->getManager()->flush();
+
     }
 
     /**
@@ -97,12 +101,26 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
     {
         $definition = $event->getProcessTrigger()->getDefinition();
         $definitions = $this->processStorage->getService()->getProcessDefinitionNames();
+        $mailbox = $event->getProcessData()->get('mailboxes');
+        $owner = null;
+        if (count($mailbox) > 0 ) {
+            $settings = $mailbox[0]->getProcessSettings();
+            $owner = $settings->getOwner();
+        }
         if (in_array($definition->getName(), $definitions)) {
+
             /**
              * @var Email $mail
              */
             $mail = $event->getProcessData()->get('email');
-            $this->collectManager->processFillOwners($mail->getEmailUsers(), $this->doctrine->getEntityManager());
+            $emailUsers = $mail->getEmailUsers();
+            foreach($emailUsers as $emailUser) {
+                if (!$emailUser->getOwner()){
+                    $emailUser->setOwner($owner);
+                }
+            }
+
+            $this->collectManager->processFillOwners($emailUsers, $this->doctrine->getEntityManager());
         }
     }
 
