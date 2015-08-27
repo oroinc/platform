@@ -11,6 +11,7 @@ parameters:
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
     oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
     oro_imap.imap_clear_manager.class:               Oro\Bundle\ImapBundle\Manager\ImapClearManager
+    oro_imap.workflow.action.dependency_job.class:   Oro\Bundle\ImapBundle\Workflow\Action\DependencyJob
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
     oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
@@ -93,3 +94,11 @@ services:
             - @doctrine.orm.entity_manager
         calls:
             - [setLogger, [@logger]]
+
+    oro_imap.workflow.action.dependency_job:
+        class: %oro_imap.workflow.action.dependency_job.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: job_add_dependency }
