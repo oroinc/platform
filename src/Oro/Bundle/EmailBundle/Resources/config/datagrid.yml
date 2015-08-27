@@ -324,7 +324,6 @@ datagrid:
                 where:
                     and:
                         - o.id IN (:origin_ids)
-                groupBy: e.id
         properties:
             id: ~
             row_class_name:
