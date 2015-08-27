@@ -324,6 +324,7 @@ datagrid:
                 where:
                     and:
                         - o.id IN (:origin_ids)
+                groupBy: e.id
         properties:
             id: ~
             row_class_name:
@@ -344,7 +345,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+                        - f.type = '%oro_email.email_folder.model.class%::INBOX'
         columns:
             receivedAt:
                 type: twig

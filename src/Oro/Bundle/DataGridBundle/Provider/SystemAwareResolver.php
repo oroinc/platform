@@ -92,13 +92,15 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        if (strpos($val, '%') !== false) {
+        while (strpos($val, '%') !== false) {
             $val = $this->resolveParameter($val);
         }
 
-        if (strpos($val, '::') !== false) {
+        while (is_scalar($val) && strpos($val, '::') !== false) {
             $val = $this->resolveStatic($datagridName, $key, $val);
-        } elseif (strpos($val, '@') !== false) {
+        }
+
+        if (is_scalar($val) && strpos($val, '@') !== false) {
             $val = $this->resolveService($datagridName, $key, $val);
         }
 
