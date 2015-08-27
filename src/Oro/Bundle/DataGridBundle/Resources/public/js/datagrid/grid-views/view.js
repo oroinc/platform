@@ -269,6 +269,7 @@ define([
             });
 
             modal.open();
+            $('#gridViewName').focus();
         },
 
         /**
