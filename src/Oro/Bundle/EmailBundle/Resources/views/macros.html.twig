@@ -23,13 +23,13 @@
         </div>
     </script>
     <script type="text/template" id="oro-email-template-variables-system-template">
-        <ul class="nav nav-list">
+        <ul class="nav">
             <% _.each(variables, function(variable, varName) { %>
             <li>
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>( <%= variable.label %> )</span>
+                <span>&ndash; <%= variable.label %></span>
             </li>
             <% }); %>
         </ul>

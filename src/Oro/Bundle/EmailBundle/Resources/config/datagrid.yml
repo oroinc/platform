@@ -174,7 +174,29 @@ datagrid:
             query:
                 where:
                     and:
-                        - e.head = true
+                        - >
+                            eu.id = (
+                                SELECT
+                                    MIN(seu2.id)
+                                FROM
+                                    OroEmailBundle:EmailUser seu2
+                                WHERE seu2.email = (
+                                    SELECT
+                                        CASE
+                                            WHEN (MIN(se.id) IS NOT NULL) THEN MIN(se.id)
+                                            WHEN (e.head = true) THEN e.id
+                                            ELSE 0
+                                        END
+                                    FROM
+                                        OroEmailBundle:EmailUser seu
+                                    JOIN
+                                        seu.email se
+                                    LEFT JOIN
+                                        se.thread sthread
+                                    WHERE
+                                        sthread.id IS NOT NULL AND sthread.id = thread.id AND seu.seen = false
+                                )
+                            )
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }
@@ -182,18 +204,14 @@ datagrid:
                 ccBcc:   { type: string,   data_name: r_cc_bcc.name, label: oro.email.cc_bcc.label }
                 date:    { type: datetime, data_name: e.sentAt, label: oro.email.date_time.label }
                 folder:
-                    label: oro.email.folder_type.label
-                    type: choice
+                    label: oro.email.message_type.label
+                    type: multiselect-messagetype
                     options:
                         field_options:
                             multiple: true
                             choices:
                                 inbox: oro.email.folder_type.inbox
                                 sent: oro.email.folder_type.sent
-                                other: oro.email.folder_type.other
-                                drafts: oro.email.folder_type.drafts
-                                spam: oro.email.folder_type.spam
-                                trash: oro.email.folder_type.trash
                     data_name: f.type
                 folders:
                     type: multiselect-originfolder
@@ -205,12 +223,13 @@ datagrid:
                             choices: @oro_email.datagrid.origin_folder.provider->getListTypeChoices
                 is_new:
                     label: oro.email.status.label
-                    type: choice
+                    type: boolean
                     options:
                         field_options:
                             choices:
-                                false: oro.email.status.unread.label
-                                true: oro.email.status.read.label
+                                # in boolean filter type, 1 = yes, 2 = false
+                                2: oro.email.status.unread.label
+                                1: oro.email.status.read.label
                     data_name: eu.seen
                 mailbox:
                     label: oro.email.mailbox.entity_label
@@ -519,7 +538,6 @@ datagrid:
 
     base-mailboxes-grid:
         source:
-            acl_resource: oro_email_mailbox_view
             type: orm
             query:
                 select:
@@ -565,19 +583,18 @@ datagrid:
                 params:
                     id: id
         options:
+            skip_acl_check: true
             toolbarOptions:
                 hide: true
         actions:
             update:
                 type:         navigate
-                acl_resource: oro_email_mailbox_update
                 label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit
                 rowAction:    true
             delete:
                 type:         delete
-                acl_resource: oro_email_mailbox_delete
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link

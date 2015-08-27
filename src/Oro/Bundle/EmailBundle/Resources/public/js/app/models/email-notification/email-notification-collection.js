@@ -1,12 +1,9 @@
-/*jslint nomen: true*/
-/*global define*/
-define([
-        './email-notification-model',
-        'oroui/js/app/models/base/collection'
-], function(EmailNotificationModel, BaseCollection) {
+define(function(require) {
     'use strict';
 
     var EmailNotificationCollection;
+    var EmailNotificationModel = require('./email-notification-model');
+    var BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @export oroemail/js/app/models/email-notification-collection

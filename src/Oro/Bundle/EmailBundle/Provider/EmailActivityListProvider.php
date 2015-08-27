@@ -35,6 +35,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
  * @todo Should be refactored in the BAP-8520
  * @see EmailActivityListProvider::isApplicable
  * @see EmailActivityListProvider::getOrganization
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
@@ -252,29 +253,12 @@ class EmailActivityListProvider implements
             'isHead'        => $email->isHead() && $email->getThread(),
             'treadId'       => $email->getThread() ? $email->getThread()->getId() : null
         ];
-
-        if ($email->getThread()) {
-            $emails = $email->getThread()->getEmails();
-            // if there are just two email - add replayedEmailId to use on client side
-            if (count($emails) === 2) {
-                $data['replayedEmailId'] = $emails[0]->getId();
-            }
-        }
+        $data = $this->setReplaedEmailId($email, $data);
 
         if ($email->getFromEmailAddress()->getHasOwner()) {
             $owner = $email->getFromEmailAddress()->getOwner();
             $data['headOwnerName'] = $data['ownerName'] = $this->entityNameResolver->getName($owner);
-            $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
-                ->getRoute('view');
-            $securityFacade = $this->securityFacadeLink->getService();
-            if (null !== $route && $securityFacade->isGranted('VIEW', $owner)) {
-                $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
-                try {
-                    $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
-                } catch (RouteNotFoundException $e) {
-                    // Do not set owner link if route is not found.
-                }
-            }
+            $data = $this->setOwnerLink($owner, $data);
         }
 
         return $data;
@@ -410,5 +394,47 @@ class EmailActivityListProvider implements
         }
 
         return $entity;
+    }
+
+    /**
+     * @param Email $email
+     * @param $data
+     *
+     * @return mixed
+     */
+    protected function setReplaedEmailId($email, $data)
+    {
+        if ($email->getThread()) {
+            $emails = $email->getThread()->getEmails();
+            // if there are just two email - add replayedEmailId to use on client side
+            if (count($emails) === 2) {
+                $data['replayedEmailId'] = $emails[0]->getId();
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param EmailOwnerInterface $owner
+     * @param $data
+     *
+     * @return mixed
+     */
+    protected function setOwnerLink($owner, $data)
+    {
+        $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
+            ->getRoute('view');
+        $securityFacade = $this->securityFacadeLink->getService();
+        if (null !== $route && $securityFacade->isGranted('VIEW', $owner)) {
+            $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
+            try {
+                $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+            } catch (RouteNotFoundException $e) {
+                // Do not set owner link if route is not found.
+            }
+        }
+
+        return $data;
     }
 }

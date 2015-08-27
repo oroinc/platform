@@ -243,22 +243,23 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {string}
          */
         formatSmartDateTime: function(value) {
-            var dateMoment = this.getMomentForBackendDateTime(value);
-            var dateOnly = this.formatDate(value);
-            var todayMoment = moment.utc().zone(this.timezoneOffset);
+            var dateMoment = this.getMomentForBackendDateTime(value).tz(this.timezone);
+            var todayMoment = moment().tz(this.timezone);
+            // full date with year
+            var result = this.formatDate(value);
 
-            if (dateOnly === todayMoment.format(this.getDateFormat())) {
+            if (result === todayMoment.format(this.getDateFormat())) {
                 // same day, only show time
-                return dateMoment.format(this.getTimeFormat());
-            } else if (dateOnly === todayMoment.subtract(1, 'days').format(this.getDateFormat())) {
+                result = dateMoment.format(this.getTimeFormat());
+            } else if (result === todayMoment.clone().subtract(1, 'days').format(this.getDateFormat())) {
                 // yesterday
-                return __('Yesterday');
+                result = __('Yesterday');
             } else if (dateMoment.year() === todayMoment.year()) {
                 // same year, return only day and month
-                return dateMoment.format(this.getDayFormat());
+                result = dateMoment.format(this.getDayFormat());
             }
-            // full date with year
-            return dateOnly;
+
+            return result;
         },
 
         /**

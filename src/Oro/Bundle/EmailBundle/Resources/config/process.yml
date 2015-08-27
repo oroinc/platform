@@ -21,6 +21,9 @@ definitions:
                         arguments:
                             - 'oro:email:body-sync'
                             - [$.arguments]
+                            - true
+                            - 'default'
+                            - -50
 
     sync_email_flag_after_changed:
         label:   Sync Email Flag After Changed
