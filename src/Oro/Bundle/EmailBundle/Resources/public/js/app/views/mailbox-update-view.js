@@ -28,8 +28,8 @@ define([
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             var passwordHolderField = $('input[name="oro_email_mailbox[passwordHolder]"]');
-            var passwordFiled = $('input[name="oro_email_mailbox[origin][password]"]');
-            passwordFiled.val(passwordHolderField.val());
+            var passwordField = $('input[name="oro_email_mailbox[origin][password]"]');
+            passwordField.val(passwordHolderField.val());
         },
 
         changeHandler: function(event) {
