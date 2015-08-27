@@ -50,7 +50,7 @@ class EmailTypeTest extends TypeTestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()->getMock();
         $this->emailModelBuilderHelper = $this
@@ -212,9 +212,9 @@ class EmailTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'data_class' => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                    'intention' => 'email',
-                    'csrf_protection' => true,
+                    'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
+                    'intention'          => 'email',
+                    'csrf_protection'    => true,
                     'cascade_validation' => true
                 ]
             );
