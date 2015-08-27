@@ -61,6 +61,6 @@ class AuthenticatedRolesHandler extends SearchHandler
     protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
     {
         $queryBuilder->andWhere($queryBuilder->expr()->like('r.label', ':search'))
-            ->setParameter('search', '%' . str_replace(' ', '%', $search) . '%');
+            ->setParameter('search', '%' . $search . '%');
     }
 }
