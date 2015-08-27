@@ -66,6 +66,7 @@ define(function(require) {
                 this.forEachComponent(function(component) {
                     if (!_.isUndefined(component.view) &&
                         !_.isUndefined(component.view.tinymceConnected) &&
+                        !_.isNull(this.options.emailVariableView) &&
                         component.view.tinymceConnected === true
                     ) {
                         $(component.view.tinymceInstance.getBody()).on(
