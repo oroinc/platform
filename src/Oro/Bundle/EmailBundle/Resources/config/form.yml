@@ -135,6 +135,8 @@ services:
         class: %oro_email.form.type.email.class%
         arguments:
             - @security.context
+            - @oro_email.email_renderer
+            - @oro_entity.doctrine_helper
         tags:
             - { name: form.type, alias: oro_email_email }
 

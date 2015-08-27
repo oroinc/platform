@@ -13,7 +13,9 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EmailType extends AbstractType
 {
@@ -23,11 +25,26 @@ class EmailType extends AbstractType
     protected $securityContext;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @var EmailRenderer
      */
-    public function __construct(SecurityContextInterface $securityContext)
-    {
+    protected $emailRenderer;
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param SecurityContextInterface $securityContext
+     * @param EmailRenderer $emailRenderer
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(
+        SecurityContextInterface $securityContext,
+        EmailRenderer $emailRenderer,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->securityContext = $securityContext;
+        $this->emailRenderer = $emailRenderer;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -119,6 +136,7 @@ class EmailType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'fillFormByTemplate']);
     }
 
     /**
@@ -165,6 +183,37 @@ class EmailType extends AbstractType
                     'read_only' => false,
                 ]
             );
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function fillFormByTemplate(FormEvent $event)
+    {
+        $form = $event->getForm();
+        /** @var Email|array $data */
+        $data = $event->getData();
+        if (null === $data || !is_object($data) || null === $data->getTemplate()) {
+            return;
+        }
+
+        if (null !== $data->getSubject() && null !== $data->getBody()) {
+            return;
+        }
+
+        $emailTemplate = $data->getTemplate();
+
+        $targetEntity = $this->doctrineHelper->getEntity($data->getEntityClass(), $data->getEntityId());
+
+        list($emailSubject, $emailBody) = $this->emailRenderer
+            ->compileMessage($emailTemplate, ['entity' => $targetEntity]);
+
+        if (null === $data->getSubject()) {
+            $data->setSubject($emailSubject);
+        }
+        if (null === $data->getBody()) {
+            $data->setBody($emailBody);
         }
     }
 

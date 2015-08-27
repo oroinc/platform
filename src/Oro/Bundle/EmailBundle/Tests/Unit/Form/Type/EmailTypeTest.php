@@ -6,9 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -23,29 +26,57 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\UserBundle\Entity\User;
 
+
 class EmailTypeTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \Symfony\Component\Security\Core\SecurityContextInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $securityContext;
+
+    /**
+     * @var \Oro\Bundle\EmailBundle\Provider\EmailRenderer|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $emailRenderer;
+
+    /**
+     * @var \Oro\Bundle\EntityBundle\ORM\DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
+    /**
+     * @var EmailTemplate
+     */
+    protected $emailTemplate;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
+            ->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()->getMock();
         $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+    }
+
+    /**
+     * @return EmailType
+     */
+    protected function createEmailType()
+    {
+        return new EmailType($this->securityContext, $this->emailRenderer, $this->doctrineHelper);
     }
 
     protected function getExtensions()
     {
-        $emailAddressType  = new EmailAddressType($this->securityContext);
-        $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translatableType->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue(TranslatableEntityType::NAME));
+        $emailAddressType = new EmailAddressType($this->securityContext);
+        $translatableType = new EntityType(
+            [
+                'test_name' => (new EmailTemplate())->setName('test_name'),
+            ],
+            TranslatableEntityType::NAME
+        );
 
         $user = new User();
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -150,7 +181,7 @@ class EmailTypeTest extends TypeTestCase
         if (isset($formData['body'])) {
             $body = $formData['body'];
         }
-        $type = new EmailType($this->securityContext);
+        $type = $this->createEmailType();
         $form = $this->factory->create($type);
 
         $form->submit($formData);
@@ -175,20 +206,20 @@ class EmailTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 [
-                    'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                    'intention'          => 'email',
-                    'csrf_protection'    => true,
+                    'data_class' => 'Oro\Bundle\EmailBundle\Form\Model\Email',
+                    'intention' => 'email',
+                    'csrf_protection' => true,
                     'cascade_validation' => true
                 ]
             );
 
-        $type = new EmailType($this->securityContext);
+        $type = $this->createEmailType();
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $type = new EmailType($this->securityContext);
+        $type = $this->createEmailType();
         $this->assertEquals('oro_email_email', $type->getName());
     }
 
@@ -242,5 +273,97 @@ class EmailTypeTest extends TypeTestCase
                 ['John Smith 7 <john7@example.com>', '"John Smith 8" <john8@example.com>', 'john9@example.com'],
             ],
         ];
+    }
+
+    /**
+     * @param Email $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider fillFormByTemplateProvider
+     */
+    public function testFillFormByTemplate(Email $inputData = null, array $expectedData = [])
+    {
+        $emailTemplate = $this->createEmailTemplate();
+        $this->emailRenderer
+            ->expects($this->any())
+            ->method('compileMessage')
+            ->with($emailTemplate)
+            ->willReturn(
+                [
+                    $emailTemplate->getSubject(),
+                    $emailTemplate->getContent()
+                ]
+            );
+
+        $formType = $this->createEmailType();
+        $form = $this->factory->create($formType, $inputData);
+
+        $formType->fillFormByTemplate(new FormEvent($form, $inputData));
+
+        $formData = $form->getData();
+
+        $propertyAccess = PropertyAccess::createPropertyAccessor();
+        foreach ($expectedData as $propertyPath => $expectedValue) {
+            $value = $propertyAccess->getValue($formData, $propertyPath);
+            $this->assertEquals($expectedValue, $value);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function fillFormByTemplateProvider()
+    {
+        return [
+            'template is not empty' => [
+                'inputData' => (new Email())->setTemplate($this->createEmailTemplate()),
+                'expectedData' => [
+                    'subject' => 'Test Subject',
+                    'body' => 'Test Body',
+                ],
+            ],
+            'template and subject is not empty' => [
+                'inputData' => (new Email())
+                    ->setTemplate($this->createEmailTemplate())
+                    ->setSubject('New Test Subject'),
+                'expectedData' => [
+                    'subject' => 'New Test Subject',
+                    'body' => 'Test Body',
+                ],
+            ],
+            'template and body is not empty' => [
+                'inputData' => (new Email())
+                    ->setTemplate($this->createEmailTemplate())
+                    ->setBody('New Test Body'),
+                'expectedData' => [
+                    'subject' => 'Test Subject',
+                    'body' => 'New Test Body',
+                ],
+            ],
+            'template, subject and body is not empty' => [
+                'inputData' => (new Email())
+                    ->setTemplate($this->createEmailTemplate())
+                    ->setSubject('New Test Subject')
+                    ->setBody('New Test Body'),
+                'expectedData' => [
+                    'subject' => 'New Test Subject',
+                    'body' => 'New Test Body',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return EmailTemplate
+     */
+    protected function createEmailTemplate()
+    {
+        $template = new EmailTemplate();
+        $template
+            ->setName('test_name')
+            ->setSubject('Test Subject')
+            ->setContent('Test Body');
+
+        return $template;
     }
 }
