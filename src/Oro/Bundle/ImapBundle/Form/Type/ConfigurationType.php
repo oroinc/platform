@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -166,10 +166,6 @@ class ConfigurationType extends AbstractType
                 $data = $event->getData();
                 $form = $event->getForm();
 
-                if ($data === null) {
-                    return;
-                }
-
                 if (array_key_exists('folders', $data)) {
                     /** @var UserEmailOrigin $origin */
                     $origin = $form->getData();
@@ -272,8 +268,19 @@ class ConfigurationType extends AbstractType
                         && ($entity->getImapHost() !== $data['imapHost']
                             || $entity->getUser() !== $data['user'])
                     ) {
-                        // in case when critical fields were changed new entity should be created
-                        $newConfiguration = new UserEmailOrigin();
+                        /*
+                         * In case when critical fields were changed, configuration should be reset.
+                         *  - When imap or smtp was disabled, don't create new configuration
+                         *  - If imap or smtp are still enabled create a new one.
+                         */
+                        if ((!array_key_exists('useImap', $data) || $data['useImap'] === 0)
+                            && (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0)
+                        ) {
+                            $newConfiguration = null;
+                            $event->setData(null);
+                        } else {
+                            $newConfiguration = new UserEmailOrigin();
+                        }
                         $event->getForm()->setData($newConfiguration);
                     }
                 } elseif ($entity instanceof UserEmailOrigin) {
@@ -295,7 +302,7 @@ class ConfigurationType extends AbstractType
                 /** @var UserEmailOrigin $data */
                 $data = $event->getData();
                 if ($data !== null) {
-                    if ($data->getOwner() === null) {
+                    if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
                         $data->setOwner($this->securityFacade->getLoggedUser());
                     }
                     if ($data->getOrganization() === null) {
@@ -323,16 +330,25 @@ class ConfigurationType extends AbstractType
                 $entity = $event->getForm()->getData();
 
                 if ($entity instanceof UserEmailOrigin) {
+                    /*
+                     * If useImap is disabled unset imap related data and set imap host to empty string.
+                     * Empty string as host will cause origin to be recreated if necessary.
+                     * Old origin will be disabled and later removed in cron job.
+                     */
                     if (!array_key_exists('useImap', $data) || $data['useImap'] === 0) {
                         unset($data['imapHost'], $data['imapPort'], $data['imapEncryption']);
+                        $data['imapHost'] = '';
                     }
+                    /*
+                     * If smtp is disabled, unset smtp related data.
+                     */
                     if (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0) {
                         unset($data['smtpHost'], $data['smtpPort'], $data['smtpEncryption']);
                     }
                     $event->setData($data);
                 }
             },
-            2
+            6
         );
     }
 
@@ -388,7 +404,7 @@ class ConfigurationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',

@@ -60,4 +60,37 @@ class RecipientEntity
     {
         return $this->organization;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getAdditionalInfo()
+    {
+        $additionalInfo = [];
+        if ($this->organization) {
+            $additionalInfo[] = $this->organization;
+        }
+
+        if ($typeLabel = $this->getTypeLabel()) {
+            $additionalInfo[] = $typeLabel;
+        }
+
+        if (!$additionalInfo) {
+            return null;
+        }
+
+        return sprintf('(%s)', implode(' ', $additionalInfo));
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getTypeLabel()
+    {
+        if (false === $start = strrpos($this->label, '(')) {
+            return null;
+        }
+
+        return substr($this->label, $start + 1, -1);
+    }
 }

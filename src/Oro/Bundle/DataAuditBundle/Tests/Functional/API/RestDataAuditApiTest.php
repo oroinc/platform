@@ -79,9 +79,12 @@ class RestDataAuditApiTest extends WebTestCase
     {
         $loggedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $loggedAt->setTimestamp(strtotime($audit['loggedAt']));
-        $loggedGTEFilter = '?loggedAt>=' . $loggedAt->format(\DateTime::ISO8601);
-        $loggedGTFilter  = '?loggedAt>' . $loggedAt->sub(new \DateInterval('PT1H'))->format(\DateTime::ISO8601);
-        $loggedLTFilter  = '?loggedAt<' . $loggedAt->sub(new \DateInterval('P1D'))->format(\DateTime::ISO8601);
+        $loggedGTEFilter = '?loggedAt>='
+            . urlencode($loggedAt->format(\DateTime::ISO8601));
+        $loggedGTFilter  = '?loggedAt>'
+            . urlencode($loggedAt->sub(new \DateInterval('PT1H'))->format(\DateTime::ISO8601));
+        $loggedLTFilter  = '?loggedAt<'
+            . urlencode($loggedAt->sub(new \DateInterval('P1D'))->format(\DateTime::ISO8601));
 
         $this->client->request('GET', $this->getUrl('oro_api_get_audits') . $loggedGTEFilter);
         $this->assertCount(1, $this->getJsonResponseContent($this->client->getResponse(), 200));

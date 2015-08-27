@@ -12,7 +12,7 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'orotranslation/js/translator'], function ($, __) {
+define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _, __) {
     'use strict';
     $.widget( "ui.dialog", $.ui.dialog, {
         version: "2.0.0",
@@ -306,10 +306,8 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
         },
 
         _size: function() {
-            this.uiDialog.css({
-                width: Math.max(this.options.width, this.options.minWidth),
-                height: this.options.height
-            });
+            var cssProperties = _.pick(this.options, ['width', 'height', 'minWidth']);
+            this.uiDialog.css(cssProperties);
             if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
                 this.uiDialog.resizable( "option", "minHeight", this._minHeight() );
             }

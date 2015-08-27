@@ -96,8 +96,19 @@
         #gradient > .vertical-three-colors(darken(@source-gradient-start-color, 5%), darken(@source-gradient-middle-color, 5%), 3%, darken(@source-gradient-end-color, 5%));
         cursor: pointer;
       }
-      &.jsplumb-source-top-left, &.jsplumb-source-top-right,
-      &.jsplumb-source-bottom-right, &.jsplumb-source-bottom-left {
+      &.jsplumb-source-top-left {
+        top: -@source-radius;
+        left: -@source-radius;
+      }
+      &.jsplumb-source-top-right {
+        top: -@source-radius;
+        right: -@source-radius;
+      }
+      &.jsplumb-source-bottom-right {
+        bottom: -@source-radius;
+        right: -@source-radius;
+      }
+      &.jsplumb-source-bottom-left {
         bottom: -@source-radius;
         left: -@source-radius;
       }

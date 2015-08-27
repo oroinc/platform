@@ -66,6 +66,9 @@ class RequestMailboxes extends AbstractAction
      *
      * @return ActionInterface
      * @throws InvalidParameterException
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function initialize(array $options)
     {

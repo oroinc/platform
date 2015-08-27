@@ -41,9 +41,6 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
- *          },
- *          "comment"={
- *              "applicable"=true
  *          }
  *      }
  * )
