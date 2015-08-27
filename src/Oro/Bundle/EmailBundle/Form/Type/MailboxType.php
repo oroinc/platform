@@ -223,21 +223,22 @@ class MailboxType extends AbstractType
     }
 
     /**
-     * Set origin and folder sync date for prevent sync old emails
+     * Set origin and folder sync date to prevent sync old emails
      *
      * @param Mailbox $data
      */
     public function setOriginSyncDate(Mailbox $data = null)
     {
-        if ($data !== null) {
-            /** @var UserEmailOrigin $origin */
-            $origin = $data->getOrigin();
-            $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-            $origin->setSynchronizedAt($currentDate);
-            foreach ($origin->getFolders() as $folder) {
-                if ($folder->isSyncEnabled()) {
-                    $folder->setSynchronizedAt($currentDate);
-                }
+        /* @var $origin UserEmailOrigin */
+        if (!$data || !$origin = $data->getOrigin()) {
+            return;
+        }
+
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $origin->setSynchronizedAt($currentDate);
+        foreach ($origin->getFolders() as $folder) {
+            if ($folder->isSyncEnabled()) {
+                $folder->setSynchronizedAt($currentDate);
             }
         }
     }
