@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class MailboxType extends AbstractType
 {
@@ -23,12 +24,17 @@ class MailboxType extends AbstractType
     /** @var MailboxProcessStorage */
     private $storage;
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * @param MailboxProcessStorage $storage
+     * @param Mcrypt $encryptor
      */
-    public function __construct(MailboxProcessStorage $storage)
+    public function __construct(MailboxProcessStorage $storage, Mcrypt $encryptor)
     {
         $this->storage = $storage;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -85,8 +91,14 @@ class MailboxType extends AbstractType
                 'label' => 'oro.user.role.entity_plural_label',
             ]
         );
+        $builder->add('passwordHolder', 'hidden', [
+            'required' => false,
+            'label' => '',
+            'mapped' => false
+        ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
@@ -146,6 +158,24 @@ class MailboxType extends AbstractType
          * Configure user field to display only users from organization which mailbox belongs to.
          */
         $this->configureUserField($form, $data);
+    }
+
+    /**
+     * Set password on form reload
+     *
+     * @param FormEvent $event
+     */
+    public function postSet(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if ($data instanceof Mailbox && $data->getOrigin() && $form->has('passwordHolder')) {
+            $form->get('passwordHolder')->setData(
+                $this->encryptor->decryptData($data->getOrigin()->getPassword())
+            );
+        }
     }
 
     /**
