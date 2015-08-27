@@ -63,7 +63,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
 
         foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody);
-         }
+        }
 
         $this->doctrine->getManager()->flush();
     }
