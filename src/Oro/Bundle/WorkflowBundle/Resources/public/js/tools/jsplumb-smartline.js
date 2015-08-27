@@ -201,11 +201,39 @@ define(function(require) {
             return el.offsetHeight / 2 - 1;
         }
 
+        function getSourceAdjustment(step, sourcePos) {
+            var shift = null;
+            $(step).find('.jsplumb-source').each(function() {
+                if (shift) {
+                    return true;
+                }
+                var diff = {
+                    x: sourcePos[0] - step.offsetLeft - this.offsetLeft,
+                    y: sourcePos[1] - step.offsetTop - this.offsetTop
+                }
+                if (0 <= diff.x && diff.x <= this.offsetWidth && 0 <= diff.y && diff.y <= this.offsetHeight  ) {
+                    shift = {
+                        x: diff.x - this.offsetWidth / 2,
+                        y: diff.y - this.offsetHeight / 2
+                    }
+                    return true;
+                }
+            });
+            return shift;
+        }
+
         this._compute = function(paintInfo, params) {
             if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
                 // use jsPlumb Flowchart connector behaviour
+                var adjustment = getSourceAdjustment(params.sourceEndpoint.element, params.sourcePos);
+                if (adjustment) {
+                    // put endpoint at the center of source circle
+                    paintInfo.points[0] -= adjustment.x;
+                    paintInfo.points[1] -= adjustment.y;
+                }
+
                 return this._flowchartConnectorCompute.apply(this, arguments);
             }
 
