@@ -443,4 +443,16 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             .trigger('content:remove')
             .remove();
     });
+
+    /**
+     * Support for [data-focusable] attribute
+     */
+    $(document).on('click', 'label[for]', function(e) {
+        var forAttribute = $(e.target).attr('for');
+        var labelForElement = $('#' + forAttribute + ':first');
+        if (labelForElement.is('[data-focusable]')) {
+            e.preventDefault();
+            labelForElement.trigger('set-focus');
+        }
+    });
 });
