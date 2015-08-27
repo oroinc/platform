@@ -24,6 +24,7 @@ class DependencyJob extends AbstractAction
 
     /** @var Registry */
     private $doctrine;
+
     /**
      * @param ContextAccessor       $contextAccessor
      * @param Registry              $doctrine
@@ -61,7 +62,6 @@ class DependencyJob extends AbstractAction
      * @return ActionInterface
      * @throws InvalidParameterException
      *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function initialize(array $options)
