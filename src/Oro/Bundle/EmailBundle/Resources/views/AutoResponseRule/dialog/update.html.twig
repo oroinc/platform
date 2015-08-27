@@ -13,21 +13,18 @@
             });
         </script>
     {% else %}
-        <div class="form-container">
-                {% set pageComponent = {
-                    'module': 'oroui/js/app/components/view-component',
-                    'options': {'view': 'oroemail/js/app/views/email-template-editor-view'},
-                    'layout': 'separate'
-                }
-            %}
-            <form id="{{ form.vars.id }}"
-                  name="{{ form.vars.name }}"
-                  action="{{ path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
-                  {{ form_enctype(form) }}
-                  method="{{ form.vars.method }}"
-                  data-ftid="oro_email_autoresponserule"
-                  {{ UI.renderPageComponentAttributes(pageComponent) }}
-            >
+        {% set pageComponent = {
+                'module': 'oroui/js/app/components/view-component',
+                'options': {'view': 'oroemail/js/app/views/email-template-editor-view'},
+                'layout': 'separate'
+            }
+        %}
+        <div class="form-container" {{ UI.renderPageComponentAttributes(pageComponent) }}>
+            {{ form_start(
+                    form,
+                    {action: path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')),}
+                )
+            }}
                 <fieldset class="form form-horizontal">
                     <div class="span8">
                         {{ form_rest(form) }}
@@ -38,7 +35,7 @@
                         <button class="btn btn-primary" type="submit">{{ label|trans }}</button>
                     </div>
                 </fieldset>
-            </form>
+            {{ form_end(form) }}
         </div>
     {% endif %}
 </div>
