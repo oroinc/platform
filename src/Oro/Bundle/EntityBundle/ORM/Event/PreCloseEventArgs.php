@@ -6,9 +6,9 @@ use Doctrine\Common\EventArgs;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Provides event arguments for the onClose event.
+ * Provides event arguments for the preClose event.
  */
-class OnCloseEventArgs extends EventArgs
+class PreCloseEventArgs extends EventArgs
 {
     /** @var EntityManager */
     private $em;

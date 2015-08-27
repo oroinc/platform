@@ -529,6 +529,7 @@ define(function(require) {
 
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
+            this._deferredRender();
             this.initLayout().always(_.bind(function() {
                 this.rendered = true;
                 /**
@@ -542,6 +543,7 @@ define(function(require) {
                  * @event grid_render:complete
                  */
                 mediator.trigger('grid_render:complete', this.$el);
+                this._resolveDeferredRender();
             }, this));
 
             return this;

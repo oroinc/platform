@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\EntityBundle\ORM\Event\OnCloseEventArgs;
+use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class RefreshContextListener
@@ -37,9 +37,9 @@ class RefreshContextListener
     }
 
     /**
-     * @param OnCloseEventArgs $event
+     * @param PreCloseEventArgs $event
      */
-    public function onClose(OnCloseEventArgs $event)
+    public function preClose(PreCloseEventArgs $event)
     {
         $this->isClosing = true;
     }

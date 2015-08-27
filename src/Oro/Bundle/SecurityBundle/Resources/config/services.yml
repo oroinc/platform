@@ -506,7 +506,7 @@ services:
             - @security.token_storage
             - @doctrine
         tags:
-            - { name: doctrine.event_listener, event: onClose }
+            - { name: doctrine.event_listener, event: preClose }
             - { name: doctrine.event_listener, event: onClear }
 
     oro_security.listener.console_context_listener:
