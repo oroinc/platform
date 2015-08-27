@@ -275,15 +275,13 @@ define(function(require) {
          * @returns {string}
          */
         disablePageScroll: function($mainEl) {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this.enablePageScroll();
+            }
             var $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
-            // keep list with disabled elements up to date
-            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
-                this._scrollDisabledElements.push($scrollableParents);
-            } else {
-                this._scrollDisabledElements = $scrollableParents;
-            }
+            this._scrollDisabledElements = $scrollableParents;
         },
 
         /**
