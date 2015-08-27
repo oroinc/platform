@@ -65,9 +65,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
             $this->scheduleProcess($emailBody);
         }
 
-
         $this->doctrine->getManager()->flush();
-
     }
 
     /**
@@ -97,30 +95,21 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         }
     }
 
+    /**
+     * Handler of event oro_workflow.process.handle_after
+     *
+     * @param ProcessHandleEvent $event
+     */
     public function addOwner(ProcessHandleEvent $event)
     {
         $definition = $event->getProcessTrigger()->getDefinition();
         $definitions = $this->processStorage->getService()->getProcessDefinitionNames();
-        $mailbox = $event->getProcessData()->get('mailboxes');
-        $owner = null;
-        if (count($mailbox) > 0 ) {
-            $settings = $mailbox[0]->getProcessSettings();
-            $owner = $settings->getOwner();
-        }
         if (in_array($definition->getName(), $definitions)) {
-
             /**
              * @var Email $mail
              */
-            $mail = $event->getProcessData()->get('email');
-            $emailUsers = $mail->getEmailUsers();
-            foreach($emailUsers as $emailUser) {
-                if (!$emailUser->getOwner()){
-                    $emailUser->setOwner($owner);
-                }
-            }
-
-            $this->collectManager->processFillOwners($emailUsers, $this->doctrine->getEntityManager());
+            $email = $event->getProcessData()->get('email');
+            $this->collectManager->processFillOwners($email->getEmailUsers(), $this->doctrine->getEntityManager());
         }
     }
 

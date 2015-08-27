@@ -394,14 +394,14 @@ class EmailActivityListProvider implements
                     $activityOwner = new ActivityOwner();
                     $activityOwner->setActivity($activityList);
                     $activityOwner->setOrganization($owner->getOrganization());
+                    $user = $owner->getOwner();
                     if (!$owner->getOwner() && $owner->getMailboxOwner()) {
                         $settings =  $owner->getMailboxOwner()->getProcessSettings();
-                        $owner1 = $settings->getOwner();
-                    } else {
-                        $owner1 = $owner->getOwner();
+                        if ($settings) {
+                            $user = $settings->getOwner();
+                        }
                     }
-
-                    $activityOwner->setUser($owner1);
+                    $activityOwner->setUser($user);
                     $activityArray[] = $activityOwner;
                 }
             }
