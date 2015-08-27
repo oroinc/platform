@@ -13,6 +13,9 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class DependencyJob extends AbstractAction
 {
+    const OPTION_KEY_JOB = 'job';
+    const OPTION_KEY_DEPENDENCY = 'dependency';
+
     /** @var string */
     protected $attribute;
 
@@ -70,15 +73,17 @@ class DependencyJob extends AbstractAction
             throw new InvalidParameterException('Two options must be defined.');
         }
 
-        if (!isset($options['job']) && !isset($options[0])) {
+        if (!isset($options[self::OPTION_KEY_JOB]) && !isset($options[0])) {
             throw new InvalidParameterException('Job must be defined.');
         }
 
-        if (!isset($options['dependency']) && !isset($options[1])) {
+        if (!isset($options[self::OPTION_KEY_DEPENDENCY]) && !isset($options[1])) {
             throw new InvalidParameterException('Dependency must be defined.');
         }
 
-        $this->job = isset($options['job']) ? $options['job'] : $options[0];
-        $this->dependency = isset($options['dependency']) ? $options['dependency'] : $options[1];
+        $this->job = isset($options[self::OPTION_KEY_JOB])
+            ? $options[self::OPTION_KEY_JOB] : $options[0];
+        $this->dependency = isset($options[self::OPTION_KEY_DEPENDENCY])
+            ? $options[self::OPTION_KEY_DEPENDENCY] : $options[1];
     }
 }
