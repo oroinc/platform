@@ -57,11 +57,6 @@ class SearchHandler implements SearchHandlerInterface
     protected $aclHelper;
 
     /**
-     * @var int
-     */
-    protected $latestFoundIdsCount = 0;
-
-    /**
      * @var PropertyAccessor
      */
     protected $propertyAccessor;
@@ -149,7 +144,7 @@ class SearchHandler implements SearchHandlerInterface
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
 
-        $hasMore = $this->latestFoundIdsCount === $perPage;
+        $hasMore = count($items) === $perPage;
         if ($hasMore) {
             $items = array_slice($items, 0, $perPage - 1);
         }
@@ -200,9 +195,8 @@ class SearchHandler implements SearchHandlerInterface
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->entityRepository->createQueryBuilder('e');
         $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
 
-        return $query->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -220,8 +214,6 @@ class SearchHandler implements SearchHandlerInterface
         foreach ($elements as $element) {
             $ids[] = $element->getRecordId();
         }
-
-        $this->latestFoundIdsCount = count($ids);
 
         return $ids;
     }

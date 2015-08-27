@@ -21,6 +21,7 @@ use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
@@ -57,39 +58,46 @@ class AutoResponseManager
     /** @var string */
     protected $defaultLocale;
 
+    /** @var EmailRenderer */
+    protected $emailRender;
+
     /** @var array */
     protected $filterToConditionMap = [
-        TextFilterType::TYPE_CONTAINS => 'contains',
-        TextFilterType::TYPE_ENDS_WITH => 'end_with',
-        TextFilterType::TYPE_EQUAL => 'eq',
-        TextFilterType::TYPE_IN => 'in',
+        TextFilterType::TYPE_CONTAINS     => 'contains',
+        TextFilterType::TYPE_ENDS_WITH    => 'end_with',
+        TextFilterType::TYPE_EQUAL        => 'eq',
+        TextFilterType::TYPE_IN           => 'in',
         TextFilterType::TYPE_NOT_CONTAINS => 'not_contains',
-        TextFilterType::TYPE_NOT_IN => 'not_in',
-        TextFilterType::TYPE_STARTS_WITH => 'start_with',
-        FilterUtility::TYPE_EMPTY => 'empty',
-        FilterUtility::TYPE_NOT_EMPTY => 'not_empty',
+        TextFilterType::TYPE_NOT_IN       => 'not_in',
+        TextFilterType::TYPE_STARTS_WITH  => 'start_with',
+        FilterUtility::TYPE_EMPTY         => 'empty',
+        FilterUtility::TYPE_NOT_EMPTY     => 'not_empty',
     ];
 
     /**
-     * @param Registry $registry
+     * @param Registry          $registry
      * @param EmailModelBuilder $emailBuilder
-     * @param Processor $emailProcessor
-     * @param LoggerInterface $logger
+     * @param Processor         $emailProcessor
+     * @param EmailRenderer     $emailRender
+     * @param LoggerInterface   $logger
+     * @param string            $defaultLocale
      */
     public function __construct(
         Registry $registry,
         EmailModelBuilder $emailBuilder,
         Processor $emailProcessor,
+        EmailRenderer $emailRender,
         LoggerInterface $logger,
         $defaultLocale
     ) {
-        $this->registry = $registry;
-        $this->emailBuilder = $emailBuilder;
-        $this->emailProcessor = $emailProcessor;
-        $this->logger = $logger;
-        $this->defaultLocale = $defaultLocale;
+        $this->registry          = $registry;
+        $this->emailBuilder      = $emailBuilder;
+        $this->emailProcessor    = $emailProcessor;
+        $this->logger            = $logger;
+        $this->defaultLocale     = $defaultLocale;
         $this->configExpressions = new ConfigExpressions();
-        $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->accessor          = PropertyAccess::createPropertyAccessor();
+        $this->emailRender       = $emailRender;
     }
 
     /**
@@ -116,17 +124,17 @@ class AutoResponseManager
     {
         $mailboxes = $this->getMailboxRepository()->findForEmail($email);
         foreach ($mailboxes as $mailbox) {
-             $this->processMailbox($mailbox, $email);
+            $this->processMailbox($mailbox, $email);
         }
     }
 
     /**
      * @param Mailbox $mailbox
-     * @param Email $email
+     * @param Email   $email
      */
     protected function processMailbox(Mailbox $mailbox, Email $email)
     {
-        $rules = $this->getApplicableRules($mailbox, $email);
+        $rules       = $this->getApplicableRules($mailbox, $email);
         $emailModels = $this->createReplyEmailModels($email, $rules);
         foreach ($emailModels as $emailModel) {
             $this->sendEmailModel($emailModel, $mailbox->getOrigin());
@@ -134,7 +142,7 @@ class AutoResponseManager
     }
 
     /**
-     * @param EmailModel $email
+     * @param EmailModel  $email
      * @param EmailOrigin $origin
      */
     protected function sendEmailModel(EmailModel $email, EmailOrigin $origin = null)
@@ -147,7 +155,7 @@ class AutoResponseManager
     }
 
     /**
-     * @param Email $email
+     * @param Email                         $email
      * @param AutoResponseRule[]|Collection $rules
      *
      * @return EmailModel[]|Collection
@@ -159,6 +167,7 @@ class AutoResponseManager
             $emailModel->setFrom($rule->getMailbox()->getEmail());
             $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
             $emailModel->setContexts(array_merge([$email], $emailModel->getContexts()));
+
             $this->applyTemplate($emailModel, $rule->getTemplate(), $email);
 
             return $emailModel;
@@ -166,13 +175,13 @@ class AutoResponseManager
     }
 
     /**
-     * @param EmailModel $emailModel
+     * @param EmailModel    $emailModel
      * @param EmailTemplate $template
-     * @param Email $email
+     * @param Email         $email
      */
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
-        $locales = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
+        $locales        = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
         $flippedLocales = array_flip($locales);
 
         $translatedSubjects = [];
@@ -198,15 +207,18 @@ class AutoResponseManager
         $content = reset($validContents);
         $subject = reset($validsubjects);
 
+        $content = $content === false ? $template->getContent() : $content;
+        $subject = $subject === false ? $template->getSubject() : $subject;
+
         $emailModel
-            ->setSubject($subject === false ? $template->getSubject() : $subject)
-            ->setBody($content === false ? $template->getContent() : $content)
+            ->setSubject($this->emailRender->renderWithDefaultFilters($subject, ['entity' => $email]))
+            ->setBody($this->emailRender->renderWithDefaultFilters($content, ['entity' => $email]))
             ->setType($template->getType());
     }
 
     /**
      * @param MailBox $mailbox
-     * @param Email $email
+     * @param Email   $email
      *
      * @return AutoResponseRule[]|Collection
      */
@@ -214,8 +226,8 @@ class AutoResponseManager
     {
         return $mailbox->getAutoResponseRules()->filter(function (AutoResponseRule $rule) use ($email) {
             return $rule->isActive()
-                && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email))
-                && $rule->getCreatedAt() < $email->getSentAt();
+            && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email))
+            && $rule->getCreatedAt() < $email->getSentAt();
         });
     }
 
@@ -227,12 +239,12 @@ class AutoResponseManager
      */
     protected function isExprApplicable(Email $email, array $expr)
     {
-        return (bool) $this->configExpressions->evaluate($expr, $email);
+        return (bool)$this->configExpressions->evaluate($expr, $email);
     }
 
     /**
      * @param AutoResponseRule $rule
-     * @param Email $email
+     * @param Email            $email
      *
      * @return array
      */
@@ -248,7 +260,7 @@ class AutoResponseManager
             }
 
             foreach ($paths as $path) {
-                $args[0] = $path;
+                $args[0]   = $path;
                 $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
                 $configs[] = [
                     $configKey => $args,
