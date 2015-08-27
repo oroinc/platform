@@ -82,6 +82,7 @@ class MailboxType extends AbstractType
             'authorizedRoles',
             'oro_role_multiselect',
             [
+                'autocomplete_alias' => 'roles_authenticated',
                 'label' => 'oro.user.role.entity_plural_label',
             ]
         );
