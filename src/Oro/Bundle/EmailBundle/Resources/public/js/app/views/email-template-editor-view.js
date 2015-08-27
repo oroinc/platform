@@ -56,6 +56,7 @@ define(function(require) {
                         component.view.el.id === fieldId
                     ) {
                         component.view.tinymceInstance.execCommand('mceInsertContent', false, value);
+                        component.view.tinymceInstance.execCommand('mceFocus', false, value);
                     }
                 });
             }
