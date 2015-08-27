@@ -98,10 +98,8 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
     public function addOwner(ProcessHandleEvent $event)
     {
         $definition = $event->getProcessTrigger()->getDefinition();
-        if (in_array($definition->getName(), [
-            'convert_mailbox_email_to_case',
-            'convert_mailbox_email_to_lead'
-        ])) {
+        $definitions = $this->processStorage->getService()->getProcessDefinitionNames();
+        if (in_array($definition->getName(), $definitions)) {
             /**
              * @var Email $mail
              */

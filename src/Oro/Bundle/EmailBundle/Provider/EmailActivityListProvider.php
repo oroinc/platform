@@ -78,14 +78,15 @@ class EmailActivityListProvider implements
     protected $mailboxProcessStorage;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ServiceLink         $doctrineRegistryLink
-     * @param EntityNameResolver  $entityNameResolver
-     * @param Router              $router
-     * @param ConfigManager       $configManager
-     * @param EmailThreadProvider $emailThreadProvider
-     * @param HtmlTagHelper       $htmlTagHelper
-     * @param ServiceLink         $securityFacadeLink
+     * @param DoctrineHelper        $doctrineHelper
+     * @param ServiceLink           $doctrineRegistryLink
+     * @param EntityNameResolver    $entityNameResolver
+     * @param Router                $router
+     * @param ConfigManager         $configManager
+     * @param EmailThreadProvider   $emailThreadProvider
+     * @param HtmlTagHelper         $htmlTagHelper
+     * @param ServiceLink           $securityFacadeLink
+     * @param MailboxProcessStorage $mailboxProcessStorage
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -95,20 +96,17 @@ class EmailActivityListProvider implements
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
-        ServiceLink $securityFacadeLink
+        ServiceLink $securityFacadeLink,
+        MailboxProcessStorage $mailboxProcessStorage
     ) {
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->doctrineRegistryLink = $doctrineRegistryLink;
-        $this->entityNameResolver   = $entityNameResolver;
-        $this->router               = $router;
-        $this->configManager        = $configManager;
-        $this->emailThreadProvider  = $emailThreadProvider;
-        $this->htmlTagHelper        = $htmlTagHelper;
-        $this->securityFacadeLink   = $securityFacadeLink;
-    }
-
-    public function setMailboxProcessStorage(MailboxProcessStorage $mailboxProcessStorage)
-    {
+        $this->doctrineHelper        = $doctrineHelper;
+        $this->doctrineRegistryLink  = $doctrineRegistryLink;
+        $this->entityNameResolver    = $entityNameResolver;
+        $this->router                = $router;
+        $this->configManager         = $configManager;
+        $this->emailThreadProvider   = $emailThreadProvider;
+        $this->htmlTagHelper         = $htmlTagHelper;
+        $this->securityFacadeLink    = $securityFacadeLink;
         $this->mailboxProcessStorage = $mailboxProcessStorage;
     }
 
