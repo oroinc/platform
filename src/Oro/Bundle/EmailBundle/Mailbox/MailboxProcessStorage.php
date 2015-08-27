@@ -93,6 +93,21 @@ class MailboxProcessStorage
     }
 
     /**
+     * Returns array of process definition names for all mailbox processes.
+     *
+     * @return array
+     */
+    public function getProcessDefinitionNames()
+    {
+        $list = [];
+        foreach ($this->processes as $process) {
+            $list[] = $process->getProcessDefinitionName();
+        }
+
+        return $list;
+    }
+
+    /**
      * Throws exception if provided type is not registered within storage instance.
      *
      * @param string $type

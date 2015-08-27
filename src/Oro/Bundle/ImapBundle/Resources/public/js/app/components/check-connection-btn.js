@@ -16,6 +16,7 @@ function($, _, routing, __, mediator, messenger) {
             var url;
 
             var forEntity = options.forEntity || 'user';
+            var organization = options.organization || '';
 
             var $el = $(options._sourceElement);
             var $form = $el.closest('form');
@@ -58,7 +59,7 @@ function($, _, routing, __, mediator, messenger) {
 
                 extraQuery = 'for_entity=' + forEntity;
                 delimiter = url.indexOf('?') === -1 ? '?' : '&';
-                url += (delimiter + extraQuery);
+                url += (delimiter + extraQuery + '&organization=' + organization);
 
                 mediator.execute('showLoading');
                 $('.folder-tree').remove();

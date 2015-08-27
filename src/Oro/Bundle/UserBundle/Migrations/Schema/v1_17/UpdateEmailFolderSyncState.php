@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_17;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_17;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
@@ -26,7 +26,7 @@ class UpdateEmailFolderSyncState implements Migration
         if ($table->hasColumn('imap_user')) {
             $queries->addPostQuery(
                 new ParametrizedSqlMigrationQuery(
-                    'UPDATE oro_email_folder AS ef SET ef.sync_enabled = :sync WHERE ef.id IN (
+                    'UPDATE oro_email_folder AS ef SET sync_enabled = :sync WHERE ef.id IN (
                         SELECT eu.folder_id FROM oro_email_user AS eu WHERE eu.folder_id = ef.id GROUP BY eu.folder_id
                     ) AND ef.origin_id IN (
                         SELECT eo.id FROM oro_email_origin AS eo WHERE eo.id = ef.origin_id

@@ -6,8 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -15,6 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="oro_email_mailbox")
@@ -63,7 +63,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * @var MailboxProcessSettings
      *
-     * @ORM\OneToOne(targetEntity="MailboxProcessSettings",
+     * @ORM\OneToOne(targetEntity="MailboxProcessSettings", inversedBy="mailbox",
      *     cascade={"all"}, orphanRemoval=true
      * )
      * @ORM\JoinColumn(name="process_settings_id", referencedColumnName="id", nullable=true)
@@ -234,6 +234,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      */
     public function setProcessSettings(MailboxProcessSettings $processSettings = null)
     {
+        if ($processSettings) {
+            $processSettings->setMailbox($this);
+        } elseif ($this->processSettings) {
+            $this->processSettings->setMailbox(null);
+        }
         $this->processSettings = $processSettings;
 
         return $this;
@@ -276,12 +281,16 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param UserEmailOrigin $origin
+     * @param UserEmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(UserEmailOrigin $origin)
+    public function setOrigin(UserEmailOrigin $origin = null)
     {
+        $currentOrigin = $this->getOrigin();
+        if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
+            $currentOrigin->setActive(false);
+        }
         $this->origin = $origin;
 
         return $this;
@@ -344,27 +353,39 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @return Role[]
+     * @return Collection|Role[]
      */
     public function getAuthorizedRoles()
     {
-        return $this->authorizedRoles->toArray();
+        return $this->authorizedRoles;
     }
 
     /**
-     * @param Collection|Role[] $authorizedRoles
+     * @param Role $role
      *
      * @return $this
      */
-    public function setAuthorizedRoles($authorizedRoles)
+    public function addAuthorizedRole(Role $role)
     {
-        $this->authorizedRoles = $authorizedRoles;
+        $this->authorizedRoles->add($role);
 
         return $this;
     }
 
     /**
-     * @return User[]
+     * @param Role $role
+     *
+     * @return $this
+     */
+    public function removeAuthorizedRole(Role $role)
+    {
+        $this->authorizedRoles->removeElement($role);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
      */
     public function getAuthorizedUsers()
     {
@@ -372,13 +393,25 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param Collection|User[] $authorizedUsers
+     * @param User $user
      *
      * @return $this
      */
-    public function setAuthorizedUsers($authorizedUsers)
+    public function addAuthorizedUser(User $user)
     {
-        $this->authorizedUsers = $authorizedUsers;
+        $this->authorizedUsers->add($user);
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function removeAuthorizedUser(User $user)
+    {
+        $this->authorizedUsers->removeElement($user);
 
         return $this;
     }

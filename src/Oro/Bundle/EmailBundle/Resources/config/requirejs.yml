@@ -17,6 +17,7 @@ config:
         'oroemail/js/app/views/email-attachment-list-row-view': 'bundles/oroemail/js/app/views/email-attachment-list-row-view.js'
         'oroemail/js/app/views/email-attachment-select-view': 'bundles/oroemail/js/app/views/email-attachment-select-view.js'
         'oroemail/js/app/views/email-attachment-view': 'bundles/oroemail/js/app/views/email-attachment-view.js'
+        'oroemail/js/app/views/select2-email-recipients-view': 'bundles/oroemail/js/app/views/select2-email-recipients-view.js'
 
         'oroemail/js/app/views/mailbox-update-view': 'bundles/oroemail/js/app/views/mailbox-update-view.js'
 
@@ -33,6 +34,11 @@ config:
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
 
         'oroemail/js/app/modules/views-module': 'bundles/oroemail/js/app/modules/views-module.js'
+        'oroemail/js/app/modules/email-module': 'bundles/oroemail/js/app/modules/email-module.js'
+
+        'oroemail/js/util/email': 'oroemail/js/util/email.js'
+
+        'oroemail/js/validator/email-address': 'bundles/oroemail/js/validator/email-address.js'
 
         'oro/datagrid/action/mark-email-mass-action': 'bundles/oroemail/js/datagrid/action/mark-email-mass-action.js'
 
@@ -41,3 +47,4 @@ config:
         'oroemail/js/app/modules/views-module': 'oroemail/js/app/modules/views-module.js'
     appmodules:
         - oroemail/js/app/modules/views-module
+        - oroemail/js/app/modules/email-module
