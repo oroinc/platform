@@ -11,7 +11,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Component\Testing\Unit\Form\Type\Stub\EntityType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -26,7 +26,6 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\UserBundle\Entity\User;
 
-
 class EmailTypeTest extends TypeTestCase
 {
     /**
@@ -40,9 +39,9 @@ class EmailTypeTest extends TypeTestCase
     protected $emailRenderer;
 
     /**
-     * @var \Oro\Bundle\EntityBundle\ORM\DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $doctrineHelper;
+    protected $emailModelBuilderHelper;
 
     /**
      * @var EmailTemplate
@@ -55,7 +54,8 @@ class EmailTypeTest extends TypeTestCase
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->emailModelBuilderHelper = $this
+            ->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
             ->disableOriginalConstructor()->getMock();
         $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
     }
@@ -65,18 +65,22 @@ class EmailTypeTest extends TypeTestCase
      */
     protected function createEmailType()
     {
-        return new EmailType($this->securityContext, $this->emailRenderer, $this->doctrineHelper);
+        return new EmailType($this->securityContext, $this->emailRenderer, $this->emailModelBuilderHelper);
     }
 
     protected function getExtensions()
     {
         $emailAddressType = new EmailAddressType($this->securityContext);
-        $translatableType = new EntityType(
-            [
-                'test_name' => (new EmailTemplate())->setName('test_name'),
-            ],
-            TranslatableEntityType::NAME
-        );
+
+        $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translatableType->expects($this->any())
+            ->method('getParent')
+            ->will($this->returnValue('text'));
+        $translatableType->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(TranslatableEntityType::NAME));
 
         $user = new User();
         $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')

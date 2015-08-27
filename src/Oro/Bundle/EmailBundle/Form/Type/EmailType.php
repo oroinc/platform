@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
+use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,12 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EmailType extends AbstractType
 {
@@ -29,22 +28,22 @@ class EmailType extends AbstractType
      */
     protected $emailRenderer;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var EmailModelBuilderHelper */
+    protected $emailModelBuilderHelper;
 
     /**
      * @param SecurityContextInterface $securityContext
      * @param EmailRenderer $emailRenderer
-     * @param DoctrineHelper $doctrineHelper
+     * @param EmailModelBuilderHelper $emailModelBuilderHelper
      */
     public function __construct(
         SecurityContextInterface $securityContext,
         EmailRenderer $emailRenderer,
-        DoctrineHelper $doctrineHelper
+        EmailModelBuilderHelper $emailModelBuilderHelper
     ) {
         $this->securityContext = $securityContext;
         $this->emailRenderer = $emailRenderer;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->emailModelBuilderHelper = $emailModelBuilderHelper;
     }
 
     /**
@@ -135,8 +134,8 @@ class EmailType extends AbstractType
             );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'fillFormByTemplate']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
     }
 
     /**
@@ -191,8 +190,7 @@ class EmailType extends AbstractType
      */
     public function fillFormByTemplate(FormEvent $event)
     {
-        $form = $event->getForm();
-        /** @var Email|array $data */
+        /** @var Email|null $data */
         $data = $event->getData();
         if (null === $data || !is_object($data) || null === $data->getTemplate()) {
             return;
@@ -204,7 +202,7 @@ class EmailType extends AbstractType
 
         $emailTemplate = $data->getTemplate();
 
-        $targetEntity = $this->doctrineHelper->getEntity($data->getEntityClass(), $data->getEntityId());
+        $targetEntity = $this->emailModelBuilderHelper->getTargetEntity($data->getEntityClass(), $data->getEntityId());
 
         list($emailSubject, $emailBody) = $this->emailRenderer
             ->compileMessage($emailTemplate, ['entity' => $targetEntity]);
