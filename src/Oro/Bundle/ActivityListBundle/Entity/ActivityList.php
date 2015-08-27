@@ -240,7 +240,7 @@ class ActivityList extends ExtendActivityList
     {
         /** @var $owner ActivityOwner */
         foreach ($this->getActivityOwners() as $owner) {
-            if ($owner->getUser()->getId() === $activityOwner->getUser()->getId()
+            if ($owner->getUser() && $owner->getUser()->getId() === $activityOwner->getUser()->getId()
                 && $owner->getActivity()->getId() === $activityOwner->getActivity()->getId()
             ) {
                 return true;

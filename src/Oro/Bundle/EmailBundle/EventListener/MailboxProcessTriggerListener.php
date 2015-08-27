@@ -6,20 +6,28 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
+use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 
 class MailboxProcessTriggerListener extends MailboxEmailListener
 {
     /** @var ProcessHandler */
     protected $handler;
+
     /** @var ServiceLink */
     protected $processStorage;
+
     /** @var Registry */
     protected $doctrine;
+
+    /** @var  CollectListManager */
+    protected $collectManager;
 
     /**
      * @param ProcessHandler $handler
@@ -29,11 +37,13 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
     public function __construct(
         ProcessHandler $handler,
         ServiceLink $processStorage,
-        Registry $doctrine
+        Registry $doctrine,
+        CollectListManager $collectManager
     ) {
         $this->handler = $handler;
         $this->processStorage = $processStorage;
         $this->doctrine = $doctrine;
+        $this->collectManager = $collectManager;
     }
 
     /**
@@ -53,7 +63,7 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
 
         foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody);
-        }
+         }
 
         $this->doctrine->getManager()->flush();
     }
@@ -82,6 +92,21 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
             $data->set('data', $emailBody);
 
             $this->handler->handleTrigger($trigger, $data);
+        }
+    }
+
+    public function addOwner(ProcessHandleEvent $event)
+    {
+        $definition = $event->getProcessTrigger()->getDefinition();
+        if (in_array($definition->getName(), [
+            'convert_mailbox_email_to_case',
+            'convert_mailbox_email_to_lead'
+        ])) {
+            /**
+             * @var Email $mail
+             */
+            $mail = $event->getProcessData()->get('email');
+            $this->collectManager->processFillOwners($mail->getEmailUsers(), $this->doctrine->getEntityManager());
         }
     }
 
