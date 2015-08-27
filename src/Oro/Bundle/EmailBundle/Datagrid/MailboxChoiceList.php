@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class MailboxChoiceList
 {
@@ -38,7 +39,7 @@ class MailboxChoiceList
         /** @var Mailbox[] $systemMailboxes */
         $systemMailboxes = $repo->findAvailableMailboxes(
             $this->securityFacade->getLoggedUser(),
-            $this->securityFacade->getOrganization()
+            $this->getOrganization()
         );
         $origins = $this->getOriginsList();
 
@@ -56,6 +57,14 @@ class MailboxChoiceList
         }
 
         return $choiceList;
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**
