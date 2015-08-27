@@ -27,7 +27,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 /**
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
  * we are trying to extract Organization from the current logged user.
@@ -73,6 +73,9 @@ class EmailActivityListProvider implements
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var MailboxProcessStorage */
+    protected $mailboxProcessStorage;
+
     /**
      * @param DoctrineHelper      $doctrineHelper
      * @param ServiceLink         $doctrineRegistryLink
@@ -101,6 +104,11 @@ class EmailActivityListProvider implements
         $this->emailThreadProvider  = $emailThreadProvider;
         $this->htmlTagHelper        = $htmlTagHelper;
         $this->securityFacadeLink   = $securityFacadeLink;
+    }
+
+    public function setMailboxProcessStorage(MailboxProcessStorage $mailboxProcessStorage)
+    {
+        $this->mailboxProcessStorage = $mailboxProcessStorage;
     }
 
     /**
@@ -222,6 +230,18 @@ class EmailActivityListProvider implements
         $token           = $securityContext->getToken();
         if ($token instanceof OrganizationContextTokenInterface) {
             return $token->getOrganizationContext();
+        }
+
+        $processes = $this->mailboxProcessStorage->getProcesses();
+        foreach ($processes as $process) {
+            $settingsClass = $process->getSettingsEntityFQCN();
+
+            $mailboxes = $this->doctrineRegistryLink->getService()->getRepository('OroEmailBundle:Mailbox')
+                ->findBySettingsClassAndEmail($settingsClass, $activityEntity);
+
+            foreach ($mailboxes as $mailbox) {
+                return $mailbox->getOrganization();
+            }
         }
 
         return null;

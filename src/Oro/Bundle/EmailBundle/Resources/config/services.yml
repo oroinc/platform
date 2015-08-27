@@ -622,6 +622,7 @@ services:
            - @oro_security.security_facade.link
         calls:
            - [ setSecurityContextLink, [@security.context.link] ]
+           - [ setMailboxProcessStorage, [@oro_email.mailbox.process_storage] ]
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
