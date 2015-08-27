@@ -2102,7 +2102,7 @@ body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
   resize: vertical;
-  text-align: justify;
+  text-align: left;
   vertical-align: top;
 }
 .scrollspy-title {
@@ -2637,6 +2637,25 @@ label.radio.error {
       font:14px/1em 'FontAwesome';
       color:#ddd;
       content: "\f00d";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
       text-indent:0;
     }
     &:hover:after {

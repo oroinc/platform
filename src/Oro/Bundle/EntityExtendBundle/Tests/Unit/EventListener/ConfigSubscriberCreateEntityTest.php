@@ -74,7 +74,7 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
 
         $this->assertObjectHasAttribute('persistConfigs', $cm);
         $this->assertAttributeSame(
-            ['extend_Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass' => $entityConfig],
+            ['extend.Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass' => $entityConfig],
             'persistConfigs',
             $cm
         );

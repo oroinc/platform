@@ -368,9 +368,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     protected function createEntityConfig($scope, $className, $values = [])
     {
         $config = new Config(new EntityConfigId($scope, $className));
-        foreach ($values as $code => $val) {
-            $config->set($code, $val);
-        }
+        $config->setValues($values);
 
         return $config;
     }

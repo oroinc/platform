@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
@@ -9,17 +13,19 @@ class ConfigExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
+    /** @var RouterInterface */
+    private $router;
 
     /**
      * @param ConfigManager $configManager
+     * @param RouterInterface $router
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, RouterInterface $router)
     {
         $this->configManager = $configManager;
+        $this->router = $router;
     }
 
     /**
@@ -131,7 +137,7 @@ class ConfigExtension extends \Twig_Extension
      * @param string $routeType Route Type
      * @param bool   $strict    Should exception be thrown if no route of given type found
      *
-     * @return string
+     * @return string|null
      */
     public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
@@ -139,6 +145,28 @@ class ConfigExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
+        $route = $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
+
+        return $route && $this->hasRoute($route)
+            ? $route
+            : null;
+    }
+
+    /**
+     * @param string $routeName
+     *
+     * @return bool
+     */
+    protected function hasRoute($routeName)
+    {
+        try {
+            $this->router->generate($routeName);
+        } catch (RouteNotFoundException $e) {
+            return false;
+        } catch (RoutingException $e) {
+            return true;
+        }
+
+        return true;
     }
 }

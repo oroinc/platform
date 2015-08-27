@@ -276,7 +276,8 @@ abstract class AbstractPageEntity extends AbstractPage
         $this->filterBy($filterName, $entityName);
         $this->assertElementPresent(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
-            "//preceding-sibling::td/input"
+            "//preceding-sibling::td/input",
+            "{$entityName} is not found in embedded grid"
         );
         $this->test->byXPath(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".

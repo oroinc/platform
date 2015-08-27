@@ -129,7 +129,9 @@ datagrid:
                         THEN true ELSE false END
                       END) as hasCurrentBusinessUnit
             bind_parameters:
-                - business_unit_id
+                -
+                    name: business_unit_id
+                    default: null
         columns:
             hasCurrentBusinessUnit:
                 label: oro.business_unit.datagrid.has_business_unit

@@ -160,7 +160,7 @@ datagrid:
                 loggedAt:
                     data_name: e.loggedAt
             default:
-                loggedAt: DESC
+                id: DESC
         filters:
             columns:
                 name:
