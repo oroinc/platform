@@ -7,6 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
@@ -37,7 +39,10 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             function (FormEvent $event) use ($options) {
                 $data = $event->getData();
                 $mode = !empty($data['mode']) ? $data['mode'] : $options['mode'];
-                if ($mode != OroEntityCreateOrSelectType::MODE_CREATE) {
+                if (!in_array(
+                    $mode,
+                    [OroEntityCreateOrSelectType::MODE_CREATE, OroEntityCreateOrSelectType::MODE_EDIT])
+                ) {
                     $this->disableNewEntityValidation($event->getForm(), $options);
                 }
             }
@@ -83,6 +88,18 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             'create_entity_form_options' => [],
             'select_entity_form_options' => [],
             'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
+            'edit_route' => null,
+            'editable' => false,
+        ]);
+
+        $resolver->setNormalizers([
+            'editable' => function (Options $options, $value) {
+                if (!$options['edit_route']) {
+                    return false;
+                }
+
+                return $value;
+            },
         ]);
     }
 
@@ -124,5 +141,14 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
                 ['validation_groups' => false]
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['editable'] = $options['editable'];
+        $view->vars['edit_route'] = $options['edit_route'];
     }
 }
