@@ -21,18 +21,22 @@ abstract class AbstractDriver implements DriverInterface
     private $debug;
 
     /** @var string */
-    private $cache;
+    private $cacheDir;
 
     /**
      * @param LayoutUpdateGeneratorInterface $generator
      * @param bool                           $debug
-     * @param string                         $cache
+     * @param string                         $cacheDir
      */
-    public function __construct(LayoutUpdateGeneratorInterface $generator, $debug, $cache)
+    public function __construct(LayoutUpdateGeneratorInterface $generator, $debug, $cacheDir)
     {
+        if (empty($cacheDir)) {
+            throw new \InvalidArgumentException('Cache directory must not be empty.');
+        }
+
         $this->generator = $generator;
         $this->debug     = $debug;
-        $this->cache     = $cache;
+        $this->cacheDir  = $cacheDir;
     }
 
     /**
@@ -43,16 +47,13 @@ abstract class AbstractDriver implements DriverInterface
         $className = $this->generateClassName($file);
 
         if (!class_exists($className, false)) {
-            if (false === $cache = $this->getCacheFilename($file)) {
-                eval('?>' . $this->doGenerate($className, $file));
-            } else {
-                // write cache to file, refresh cache if source file fresher then cached one in debug mode
-                if (!is_file($cache) || ($this->isDebug() && filemtime($file) > filemtime($cache))) {
-                    $this->writeCacheFile($cache, $this->doGenerate($className, $file));
-                }
-
-                require_once $cache;
+            $cacheFilename = $this->getCacheFilename($file);
+            // write cache to file, refresh cache if source file fresher then cached one in debug mode
+            if (!is_file($cacheFilename) || ($this->isDebug() && filemtime($file) > filemtime($cacheFilename))) {
+                $this->writeCacheFile($cacheFilename, $this->doGenerate($className, $file));
             }
+
+            require_once $cacheFilename;
         }
 
         return new $className($this);
@@ -123,11 +124,13 @@ abstract class AbstractDriver implements DriverInterface
     }
 
     /**
+     * Gets the cache directory
+     *
      * @return string
      */
-    protected function getCache()
+    protected function getCacheDir()
     {
-        return $this->cache;
+        return $this->cacheDir;
     }
 
     /**
@@ -163,10 +166,6 @@ abstract class AbstractDriver implements DriverInterface
      */
     protected function getCacheFilename($name)
     {
-        if (!$this->getCache()) {
-            return false;
-        }
-
         $class = substr($this->generateClassName($name), strlen(static::CLASS_PREFIX));
 
         return str_replace(
@@ -174,7 +173,7 @@ abstract class AbstractDriver implements DriverInterface
             DIRECTORY_SEPARATOR,
             sprintf(
                 '%s/%s/%s/%s.php',
-                $this->getCache(),
+                $this->getCacheDir(),
                 substr($class, 0, 2),
                 substr($class, 2, 2),
                 substr($class, 4)

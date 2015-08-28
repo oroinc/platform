@@ -18,24 +18,16 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
  */
 class ConfigProvider implements ConfigProviderInterface
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var PropertyConfigContainer
-     */
+    /** @var PropertyConfigContainer */
     protected $propertyConfigContainer;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $scope;
 
     /**
-     * Constructor.
-     *
      * @param ConfigManager $configManager
      * @param string        $scope
      * @param array         $config
@@ -79,12 +71,12 @@ class ConfigProvider implements ConfigProviderInterface
 
         if ($fieldName) {
             if ($fieldType) {
-                return new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType);
+                return new FieldConfigId($this->scope, $className, $fieldName, $fieldType);
             } else {
-                return $this->configManager->getId($this->getScope(), $className, $fieldName);
+                return $this->configManager->getId($this->scope, $className, $fieldName);
             }
         } else {
-            return new EntityConfigId($this->getScope(), $className);
+            return new EntityConfigId($this->scope, $className);
         }
     }
 
@@ -102,11 +94,9 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function hasConfigById(ConfigIdInterface $configId)
     {
-        if ($configId instanceof FieldConfigId) {
-            return $this->configManager->hasConfig($configId->getClassName(), $configId->getFieldName());
-        } else {
-            return $this->configManager->hasConfig($configId->getClassName());
-        }
+        return $configId instanceof FieldConfigId
+            ? $this->configManager->hasConfig($configId->getClassName(), $configId->getFieldName())
+            : $this->configManager->hasConfig($configId->getClassName());
     }
 
     /**
@@ -114,7 +104,17 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig($className, $fieldName = null)
     {
-        return $this->configManager->getConfig($this->getId($className, $fieldName));
+        if ($className) {
+            $className = $this->getClassName($className);
+        }
+
+        if ($fieldName) {
+            return $this->configManager->getFieldConfig($this->scope, $className, $fieldName);
+        } elseif ($className) {
+            return $this->configManager->getEntityConfig($this->scope, $className);
+        } else {
+            return $this->configManager->createEntityConfig($this->scope);
+        }
     }
 
     /**
@@ -122,10 +122,13 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfigById(ConfigIdInterface $configId)
     {
+        $className = $configId->getClassName();
         if ($configId instanceof FieldConfigId) {
-            return $this->configManager->getConfig($this->getId($configId->getClassName(), $configId->getFieldName()));
+            return $this->configManager->getFieldConfig($this->scope, $className, $configId->getFieldName());
+        } elseif ($className) {
+            return $this->configManager->getEntityConfig($this->scope, $className);
         } else {
-            return $this->configManager->getConfig($this->getId($configId->getClassName()));
+            return $this->configManager->createEntityConfig($this->scope);
         }
     }
 
@@ -145,7 +148,7 @@ class ConfigProvider implements ConfigProviderInterface
             $className = $this->getClassName($className);
         }
 
-        return $this->configManager->getIds($this->getScope(), $className, $withHidden);
+        return $this->configManager->getIds($this->scope, $className, $withHidden);
     }
 
     /**
@@ -164,7 +167,7 @@ class ConfigProvider implements ConfigProviderInterface
             $className = $this->getClassName($className);
         }
 
-        return $this->configManager->getConfigs($this->getScope(), $className, $withHidden);
+        return $this->configManager->getConfigs($this->scope, $className, $withHidden);
     }
 
     /**

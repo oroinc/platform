@@ -35,4 +35,13 @@ interface MailboxProcessProviderInterface
      * @return bool
      */
     public function isEnabled(Mailbox $mailbox = null);
+
+    /**
+     * Returns name of process definition.
+     * This process takes care of processing EmailBody entity.
+     * EmailBody is used as it can be created much later than Email or EmailUser.
+     *
+     * @return string
+     */
+    public function getProcessDefinitionName();
 }

@@ -6,6 +6,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
@@ -19,15 +20,14 @@ use Oro\Bundle\TagBundle\Form\Transformer\TagTransformer;
  */
 class TagSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TagManager
-     */
+    /** @var TagManager */
     protected $manager;
 
-    /**
-     * @var TagTransformer
-     */
+    /** @var TagTransformer */
     protected $transformer;
+
+    /** @var Organization|null */
+    protected $organization;
 
     public function __construct(TagManager $manager, TagTransformer $transformer)
     {
@@ -60,7 +60,7 @@ class TagSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tags = $this->manager->getPreparedArray($entity);
+        $tags = $this->manager->getPreparedArray($entity, null, $this->organization);
         $ownTags = array_filter(
             $tags,
             function ($item) {
@@ -70,6 +70,7 @@ class TagSubscriber implements EventSubscriberInterface
 
         // pass entity to transformer
         $this->transformer->setEntity($entity);
+        $this->transformer->setOrganization($this->organization);
 
         $event->setData(
             array(
@@ -107,7 +108,7 @@ class TagSubscriber implements EventSubscriberInterface
                         }
                     }
 
-                    $entities[$type] = $this->manager->loadOrCreateTags($names[$type]);
+                    $entities[$type] = $this->manager->loadOrCreateTags($names[$type], $this->organization);
                 } catch (\Exception $e) {
                     $entities[$type] = array();
                 }

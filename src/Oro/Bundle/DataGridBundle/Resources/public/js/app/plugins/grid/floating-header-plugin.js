@@ -53,6 +53,7 @@ define(function(require) {
         disable: function() {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
+            this.checkLayout();
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
@@ -252,13 +253,13 @@ define(function(require) {
          * Enables other scroll functionality
          */
         enableOtherScroll: function() {
+            var heightDec;
             var self = this;
             var scrollContainer = this.domCache.gridScrollableContainer;
             var otherScroll = this.domCache.otherScroll;
             var otherScrollInner = this.domCache.otherScrollInner;
             var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             var scrollStateModel = new Backbone.Model();
-            var heightDec;
 
             this.scrollStateModel = scrollStateModel;
 
@@ -329,7 +330,7 @@ define(function(require) {
                 scrollContainer.hide().height();
                 scrollContainer.show();
 
-                self.scrollVisible = scrollContainer[0].clientHeight + 1 /*IE fix*/ < scrollContainer[0].scrollHeight;
+                self.scrollVisible = scrollContainer[0].clientHeight < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
                     visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
@@ -351,6 +352,8 @@ define(function(require) {
             this.domCache.otherScroll.off('scroll');
             this.domCache.otherScroll.css({display: 'none'});
             this.domCache.gridScrollableContainer.css({width: ''}).removeClass('scrollbar-is-visible');
+            this.domCache.gridContainer.css({width: ''});
+            this.$grid.css({width: ''});
             this.scrollStateModel.destroy();
             delete this.scrollStateModel;
             delete this.rescrollCb;

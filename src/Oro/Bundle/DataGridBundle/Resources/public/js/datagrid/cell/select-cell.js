@@ -33,6 +33,8 @@ define([
 
             this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
+
+                this.$el.find('select').uniform();
             });
         },
 
@@ -53,8 +55,6 @@ define([
         enterEditMode: function() {
             if (this.column.get('editable')) {
                 SelectCell.__super__.enterEditMode.apply(this, arguments);
-
-                this.$el.find('select').uniform();
             }
         },
 
