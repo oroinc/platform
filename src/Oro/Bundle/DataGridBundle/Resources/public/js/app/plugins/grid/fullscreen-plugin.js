@@ -13,6 +13,11 @@ define(function(require) {
         enable: function() {
             this.listenTo(this.main, 'shown', this.updateLayout, this);
             this.listenTo(this.main, 'rendered', this.updateLayout, this);
+            if (this.main.filterManager) {
+                this.listenFilterManager();
+            } else {
+                this.listenTo(this.main, 'filterManager:connected', this.listenFilterManager, this);
+            }
             this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
             this.updateLayout();
             FullScreenPlugin.__super__.enable.call(this);
@@ -22,6 +27,12 @@ define(function(require) {
             clearTimeout(this.updateLayoutTimeoutId);
             this.setLayout('default');
             FullScreenPlugin.__super__.disable.call(this);
+        },
+
+        listenFilterManager: function() {
+            var debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
+            this.listenTo(this.main.filterManager, 'afterUpdateList', debouncedLayoutUpdate);
+            this.listenTo( this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
         },
 
         /**
