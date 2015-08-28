@@ -34,16 +34,24 @@
   .create-select-entity-choice-container {
     margin-left: -142px;
 
-    label {
-       width: 130px;
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(2) {
+      margin-left: 50px;
+      .control-label.wrap {
+        width: 130px;
+        label {
+          display: block;
+        }
+      }
+    }
+
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(3) > .control-label.wrap {
+      width: 130px;
     }
 
     [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:last-of-type {
       text-align: right;
 
-      label {
-        width: auto;
-        margin-right: 6px;
+      .control-label.wrap {
         float: none;
         display: inline-block;
       }
