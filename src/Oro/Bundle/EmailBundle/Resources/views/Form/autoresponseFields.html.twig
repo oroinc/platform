@@ -52,6 +52,6 @@
             <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
             {% endif %}
         </div>
+        {{ form_errors(form) }}
     </div>
-    {{ form_errors(form) }}
 {% endmacro %}
