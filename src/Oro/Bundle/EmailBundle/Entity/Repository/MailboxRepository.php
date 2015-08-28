@@ -105,7 +105,7 @@ class MailboxRepository extends EntityRepository
         if ($organization) {
             $qb
                 ->andWhere('mb.organization = :organization')
-                ->setParameter('organization', $organization);;
+                ->setParameter('organization', $organization);
         }
 
         return $qb;
