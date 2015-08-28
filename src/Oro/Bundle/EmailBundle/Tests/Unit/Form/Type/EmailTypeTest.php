@@ -67,6 +67,10 @@ class EmailTypeTest extends TypeTestCase
         return new EmailType($this->securityContext, $this->emailRenderer, $this->emailModelBuilderHelper);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     protected function getExtensions()
     {
         $emailAddressType  = new EmailAddressType($this->securityContext);
