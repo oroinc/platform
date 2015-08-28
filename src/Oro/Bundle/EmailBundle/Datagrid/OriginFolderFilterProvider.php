@@ -86,7 +86,7 @@ class OriginFolderFilterProvider
                 $results[$mailbox] = [];
                 $results[$mailbox]['active'] = $origin->isActive();
                 foreach ($folders as $folder) {
-                    $results[$mailbox]['folder'][$folder->getId()] = $folder->getFullName();
+                    $results[$mailbox]['folder'][$folder->getId()] = str_replace('@', '\@', $folder->getFullName());
                 }
             }
         }
