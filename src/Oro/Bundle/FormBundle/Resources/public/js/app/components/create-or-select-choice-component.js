@@ -122,7 +122,7 @@ define([
          * @private
          */
         _retrieveEntityData: function (id) {
-            var route = routing.generate(this.route, {id: id});
+            var route = routing.generate(this.editRoute, {id: id});
 
             $.get(route)
                 .done(_.bind(this._setNewEntityForm, this))
@@ -141,7 +141,7 @@ define([
             }, this));
         },
 
-        _handleDataRequestError(jqXHR, textStatus, error) {
+        _handleDataRequestError: function(jqXHR, textStatus, error) {
             console.error(textStatus); // TODO: Display error
         }
     });
