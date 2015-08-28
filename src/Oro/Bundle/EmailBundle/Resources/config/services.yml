@@ -827,11 +827,9 @@ services:
             - @oro_workflow.process.process_handler
             - @oro_email.link.mailbox_process_storage
             - @doctrine
-            - @oro_activity_list.collect_manager
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-            - { name: kernel.event_listener, event: oro_workflow.process.handle_after, method: addOwner }
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%

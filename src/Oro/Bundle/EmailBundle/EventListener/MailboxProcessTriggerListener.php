@@ -6,14 +6,11 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
-use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
 
 class MailboxProcessTriggerListener extends MailboxEmailListener
 {
@@ -26,9 +23,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
     /** @var Registry */
     protected $doctrine;
 
-    /** @var  CollectListManager */
-    protected $collectManager;
-
     /**
      * @param ProcessHandler $handler
      * @param ServiceLink    $processStorage
@@ -37,13 +31,11 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
     public function __construct(
         ProcessHandler $handler,
         ServiceLink $processStorage,
-        Registry $doctrine,
-        CollectListManager $collectManager
+        Registry $doctrine
     ) {
         $this->handler = $handler;
         $this->processStorage = $processStorage;
         $this->doctrine = $doctrine;
-        $this->collectManager = $collectManager;
     }
 
     /**
@@ -92,24 +84,6 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
             $data->set('data', $emailBody);
 
             $this->handler->handleTrigger($trigger, $data);
-        }
-    }
-
-    /**
-     * Handler of event oro_workflow.process.handle_after
-     *
-     * @param ProcessHandleEvent $event
-     */
-    public function addOwner(ProcessHandleEvent $event)
-    {
-        $definition = $event->getProcessTrigger()->getDefinition();
-        $definitions = $this->processStorage->getService()->getProcessDefinitionNames();
-        if (in_array($definition->getName(), $definitions)) {
-            /**
-             * @var Email $mail
-             */
-            $email = $event->getProcessData()->get('email');
-            $this->collectManager->processFillOwners($email->getEmailUsers(), $this->doctrine->getEntityManager());
         }
     }
 
