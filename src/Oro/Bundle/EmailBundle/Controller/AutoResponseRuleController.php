@@ -12,10 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\AutoResponseRuleRepository;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/autoresponserule")
@@ -55,6 +57,20 @@ class AutoResponseRuleController extends Controller
     public function updateAction(AutoResponseRule $rule)
     {
         return $this->update($rule);
+    }
+
+    /**
+     * @Route("/template/{id}", options={"expose"=true})
+     * @AclAncestor("oro_email_emailtemplate_update")
+     * @Template
+     */
+    public function editTemplateAction(EmailTemplate $template)
+    {
+        $form = $this->createForm('oro_email_autoresponse_template', $template);
+
+        return [
+            'form' => $form->createView(),
+        ];
     }
 
     /**
