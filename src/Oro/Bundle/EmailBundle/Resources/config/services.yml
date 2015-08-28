@@ -787,7 +787,6 @@ services:
         arguments:
             - @doctrine
             - @oro_security.security_facade
-            - @translator
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%

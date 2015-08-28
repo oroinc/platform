@@ -4,8 +4,6 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -21,21 +19,15 @@ class OriginFolderFilterProvider
     /** @var Registry */
     private $doctrine;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
      * @param Registry            $doctrine
      * @param SecurityFacade      $securityFacade
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         Registry $doctrine,
-        SecurityFacade $securityFacade,
-        TranslatorInterface $translator
+        SecurityFacade $securityFacade
     ) {
         $this->doctrine = $doctrine;
-        $this->translator = $translator;
         $this->securityFacade = $securityFacade;
     }
 

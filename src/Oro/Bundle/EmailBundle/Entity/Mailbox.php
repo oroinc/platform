@@ -71,10 +71,10 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     protected $processSettings;
 
     /**
-     * @var UserEmailOrigin
+     * @var EmailOrigin
      *
      * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\ImapBundle\Entity\UserEmailOrigin",
+     *     targetEntity="EmailOrigin",
      *     cascade={"persist"}, inversedBy="mailbox"
      * )
      * @ORM\JoinColumn(name="origin_id", referencedColumnName="id", nullable=true)
@@ -281,11 +281,11 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     }
 
     /**
-     * @param UserEmailOrigin|null $origin
+     * @param EmailOrigin|null $origin
      *
      * @return $this
      */
-    public function setOrigin(UserEmailOrigin $origin = null)
+    public function setOrigin(EmailOrigin $origin = null)
     {
         $currentOrigin = $this->getOrigin();
         if ($currentOrigin && ($origin === null || $currentOrigin !== $origin)) {
