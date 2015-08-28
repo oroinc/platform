@@ -504,9 +504,10 @@
          data-page-component-options="{{ {
              modeSelector: '#' ~ form.mode.vars.id,
              newEntitySelector: '.new-entity',
+             newEntityFormName: form.new_entity.name,
              existingEntitySelector: '.existing-entity',
              existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
-             editable: form.vars.editable,
+             editable: form.vars.editable|default(false),
              editRoute: form.vars.edit_route|default(null)
          }|json_encode }}">
         <div class="existing-entity">

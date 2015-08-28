@@ -1,8 +1,9 @@
 define([
     'underscore',
     'jquery',
-    'oroui/js/app/components/base/component'
-], function(_, $, BaseComponent) {
+    'oroui/js/app/components/base/component',
+    'routing'
+], function(_, $, BaseComponent, routing) {
     'use strict';
 
     return BaseComponent.extend({
@@ -22,6 +23,7 @@ define([
         $el: null,
         $mode: null,
         $newEntity: null,
+        $newFormName: null,
         $existingEntity: null,
         $existingEntityInput: null,
         $dialog: null,
@@ -46,6 +48,7 @@ define([
             this.$el = options._sourceElement;
             this.$mode = this.$el.find(options.modeSelector);
             this.$newEntity = this.$el.find(options.newEntitySelector);
+            this.newEntityFormName = options.newEntityFormName;
             this.$existingEntity = this.$el.find(options.existingEntitySelector);
             this.$existingEntityInput = $(options.existingEntityInputSelector);
             this.$dialog = this.$el.closest('.ui-dialog');
@@ -119,13 +122,23 @@ define([
          * @private
          */
         _retrieveEntityData: function (id) {
-            $.getJSON(this.editRoute, {id: id})
-                .done(_.bind(this._setEntityData, this))
+            var route = routing.generate(this.route, {id: id});
+
+            $.get(route)
+                .done(_.bind(this._setNewEntityForm, this))
                 .fail(_.bind(this._handleDataRequestError, this));
         },
 
-        _setEntityData: function(data) {
-
+        /**
+         * @param data HTML of edit form.
+         * @private
+         */
+        _setNewEntityForm: function(data) {
+            this.$newEntity.html(data);
+            this.$newEntity.find([name]).each(_.bind(function(index, element) {
+                var $element = $(element);
+                $element.attr('name', this.newEntityFormName + $element.attr('name'));
+            }, this));
         },
 
         _handleDataRequestError(jqXHR, textStatus, error) {
