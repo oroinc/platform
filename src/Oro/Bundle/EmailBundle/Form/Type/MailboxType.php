@@ -15,6 +15,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class MailboxType extends AbstractType
 {
@@ -23,12 +24,17 @@ class MailboxType extends AbstractType
     /** @var MailboxProcessStorage */
     private $storage;
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * @param MailboxProcessStorage $storage
+     * @param Mcrypt $encryptor
      */
-    public function __construct(MailboxProcessStorage $storage)
+    public function __construct(MailboxProcessStorage $storage, Mcrypt $encryptor)
     {
         $this->storage = $storage;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -82,11 +88,18 @@ class MailboxType extends AbstractType
             'authorizedRoles',
             'oro_role_multiselect',
             [
+                'autocomplete_alias' => 'roles_authenticated',
                 'label' => 'oro.user.role.entity_plural_label',
             ]
         );
+        $builder->add('passwordHolder', 'hidden', [
+            'required' => false,
+            'label' => '',
+            'mapped' => false
+        ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
@@ -149,6 +162,24 @@ class MailboxType extends AbstractType
     }
 
     /**
+     * Set password on form reload
+     *
+     * @param FormEvent $event
+     */
+    public function postSet(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if ($data instanceof Mailbox && $data->getOrigin() && $form->has('passwordHolder')) {
+            $form->get('passwordHolder')->setData(
+                $this->encryptor->decryptData($data->getOrigin()->getPassword())
+            );
+        }
+    }
+
+    /**
      * PreSubmit event handler.
      *
      * If process type is changed ... replace with proper form type and set process type to null.
@@ -192,21 +223,22 @@ class MailboxType extends AbstractType
     }
 
     /**
-     * Set origin and folder sync date for prevent sync old emails
+     * Set origin and folder sync date to prevent sync old emails
      *
      * @param Mailbox $data
      */
     public function setOriginSyncDate(Mailbox $data = null)
     {
-        if ($data !== null) {
-            /** @var UserEmailOrigin $origin */
-            $origin = $data->getOrigin();
-            $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-            $origin->setSynchronizedAt($currentDate);
-            foreach ($origin->getFolders() as $folder) {
-                if ($folder->isSyncEnabled()) {
-                    $folder->setSynchronizedAt($currentDate);
-                }
+        /* @var $origin UserEmailOrigin */
+        if (!$data || !$origin = $data->getOrigin()) {
+            return;
+        }
+
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $origin->setSynchronizedAt($currentDate);
+        foreach ($origin->getFolders() as $folder) {
+            if ($folder->isSyncEnabled()) {
+                $folder->setSynchronizedAt($currentDate);
             }
         }
     }
