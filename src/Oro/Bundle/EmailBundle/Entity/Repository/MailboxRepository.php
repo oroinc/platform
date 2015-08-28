@@ -34,47 +34,15 @@ class MailboxRepository extends EntityRepository
     }
 
     /**
-     * Returns a list of mailboxes available to user.
+     * Creates query for mailboxes available to user logged under organization.
+     * If no organization is provided, does not filter by it (useful when looking for mailboxes across organizations).
      *
-     * @param User|integer $user User or user id
-     * @param Organization $organization
-     *
-     * @return Collection|Mailbox[] Array or collection of Mailboxes
-     */
-    public function findAvailableMailboxes($user, $organization)
-    {
-        $qb = $this->createAvailableMailboxesQuery($user, $organization);
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Returns a list of ids of mailboxes available to user.
-     *
-     * @param User|integer $user User or user id
-     * @param Organization $organization
-     *
-     * @return array Array of ids
-     */
-    public function findAvailableMailboxIds($user, $organization)
-    {
-        $mailboxes = $this->findAvailableMailboxes($user, $organization);
-
-        $ids = [];
-        foreach ($mailboxes as $mailbox) {
-            $ids[] = $mailbox->getId();
-        }
-
-        return $ids;
-    }
-
-    /**
      * @param User|integer $user User or user id
      * @param Organization|integer|null $organization
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    protected function createAvailableMailboxesQuery($user, $organization)
+    public function createAvailableMailboxesQuery($user, $organization = null)
     {
         if (!$user instanceof User) {
             $user = $this->getEntityManager()->getRepository('OroUserBundle:User')->find($user);
