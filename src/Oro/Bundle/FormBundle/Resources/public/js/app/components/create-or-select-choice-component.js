@@ -124,7 +124,7 @@ define([
                 .fail(_.bind(this._handleDataRequestError, this));
         },
 
-        _setEntityData(data) {
+        _setEntityData: function(data) {
 
         },
 
