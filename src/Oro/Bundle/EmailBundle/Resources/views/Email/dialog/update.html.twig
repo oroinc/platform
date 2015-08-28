@@ -19,6 +19,7 @@
                     mediator.trigger('widget_success:' + widget.getWid());
                     mediator.trigger('datagrid:doRefresh:attachment-grid');
                     mediator.trigger('widget:doRefresh:email-thread');
+                    console.log(widget.getAlias());
                     widget.remove(true);
                 });
             });
