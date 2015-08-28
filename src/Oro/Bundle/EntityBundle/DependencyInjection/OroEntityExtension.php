@@ -34,6 +34,20 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
         $loader->load('form_type.yml');
         $loader->load('services.yml');
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('profiler.yml');
+            $hydrators = [];
+            foreach ($container->getParameter('oro_entity.orm.hydrators') as $key => $value) {
+                if (defined($key)) {
+                    $key = constant($key);
+                }
+                $value['loggingClass'] = 'OroLoggingHydrator\Logging' . $value['name'];
+
+                $hydrators[$key] = $value;
+            }
+            $container->setParameter('oro_entity.orm.hydrators', $hydrators);
+        }
+
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);
         $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
         $container->setParameter('oro_entity.virtual_relations', $config['virtual_relations']);

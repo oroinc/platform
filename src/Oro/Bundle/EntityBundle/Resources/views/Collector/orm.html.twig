@@ -1,0 +1,216 @@
+{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+    <img width="26" height="28" class="hover-icon" alt="Doctrine ORM"
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuNWWFMmUAAARASURBVEhLvVZJTGRVFEVNuh26W13owo2bXhndmriReSbM8zxpmCVKICSAgIRUDAkFlCyITEICIYAMC4F0hAVgCsM8hYhC2u4F0KCBdHUIXXU956U+0nR9msbhJ6fe/2845777znv1nEZHR5v9/PzMhLOzsxAJCQlfJSYmfigiTs8DjuFYjUfjpYYTX9BhT2skriKigWPPce1RQwmxgpE4GvhPoM1OCUVHRyvl853+LZCbGqdCTmee3Nzc6/Hx8bcRUQCjAvqBJaYB5RFgtZd3Ufcz+n6XlJSUzbSlpqa+ExER8ZKd6m+hgICAJ4Ti4uLew4Bm4BfgBGCeLwsLxH/Kzs7Or6uru0U+clPjKaHk5OQ7GGA9R/BcSE9PPyooKPiIfA6FbDbb+4jmLqJySHBZpKSkyPj4uBFrdE1PqDgzM/ORr6+vhIWFqdwilQ7JzoKBxcbGSlRUlAQHByvixcXF++C7qSdUj8W08dvFxUU8PDzEy8tLKMx+QUFBiigkJESVgYGB4u/vLz4+PuLp6Slubm6Ki+Xy8vIJZvS6npApPz9fibDuLFjnCOf7EQxsbW3NdpHQl1NTU8d5eXkqWnd3d3F1ddUl1MB2zoIZgLWltrZW9vb27l2UOt+BgYHdvr4+6enpEZPJJMXFxXSRhIeHq9QRDEJLY2RkpGBdpbKyUlpbW6W3t1e6u7tle3v7e/C9oieUj836kCQZGRlSU1MjFJ2enmYqZH5+XmZmZmRyclLMZrOsrKzI+vq6TExMSEdHh5SXlws2roSGhsrCwsImUndDT6gW1rTym2A6aAYuNmdBh6WlpUlOTo6aJV2Gc0y8vb2VGZhmjmMJ1x2D75aekAn76Jlr8iwwOMxW3wxoMIyNjZ3A4ipSLcLLgubhzLleOzs7f1w0o1Csw4OtrS1paWmRrKys001IYUbKFJGQJVPGfcQ14YYtKiqSoaEhWV1dld3d3QHw6ZohEWfUnySmgzY3N2Vubk4GBwelqalJmaO6uloqKipUSRszoJGREdnY2KABxGAwKCfi3Qy+1/SEvsYiP+Y3wahxyEpJSYnU19dLe3u7dHV1KQuzpAjFCgsLlf21teWMl5aWHoJPN3Xf0E2a0FVhP4Johjf57UjI2NjYaOWCXtV5NBCDxYZ9BKE3WPeUEBo+tVgs+/39/Y955sXExKg9xKOF6WCk58F6tjM4btbS0lKZnZ09wTMJvldPhc7+lWNGbwOfW63WH3BWPcApYBkeHra1tbWJ0WiUqqoqKSsrU2Q8BWiIhoYG6ezsFFypTpCuIwT6Ozg6gI8h9CK5Hd4Z0OE68C4QBXwLrBwfH/92eHh4f39/f5cBwLr7LA8ODnZQfw/tv6LfjyA2oHQF3sK7ujecCp29bikl+8OOwMsYdBP4AAgEPgG+AAqBz4AUwBe4jb43gGvAC3aKJ69b/MEZ9t9fIP+fK/Fo81+Uj0IwtS8YeAAAAABJRU5ErkJggg=="/>
+    <img width="26" height="28" style="display: none;" class="active-icon" alt="Doctrine ORM"
+         src="data:image/png;base64,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"/>
+    <span class="sf-toolbar-status">{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</span>
+    {% endset %}
+    {% set text %}
+    <div class="sf-toolbar-info-piece">
+        <b>Hydrations:</b>
+        <span>{{ collector.hydrationCount }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Hydration time</b>
+        <span>{{ '%0.2f'|format(collector.hydrationTime * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Hydrated entities:</b>
+        <span>{{ collector.hydratedEntities }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Persists:</b>
+        <span>{{ collector.stats.persist.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Persist time</b>
+        <span>{{ '%0.2f'|format(collector.stats.persist.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Detaches:</b>
+        <span>{{ collector.stats.detach.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Detach time</b>
+        <span>{{ '%0.2f'|format(collector.stats.detach.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Merges:</b>
+        <span>{{ collector.stats.merge.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Merge time</b>
+        <span>{{ '%0.2f'|format(collector.stats.merge.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Removes:</b>
+        <span>{{ collector.stats.remove.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Remove time</b>
+        <span>{{ '%0.2f'|format(collector.stats.remove.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Refreshes:</b>
+        <span>{{ collector.stats.refresh.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Refresh time</b>
+        <span>{{ '%0.2f'|format(collector.stats.refresh.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Flushes:</b>
+        <span>{{ collector.stats.flush.count }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Flush time</b>
+        <span>{{ '%0.2f'|format(collector.stats.flush.time * 1000) }} ms</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Total time</b>
+        <span>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</span>
+    </div>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+    <span class="icon"><img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAcCAYAAAB/E6/TAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAw5JREFUSEu1ll9IU1Ecx4cPQZalD0HPQb31Fj0Y5HS1iZvKcA/+QX3aSw8pgYPAEeUexRbUXsYeAmnsQSPwz6YP6kZzuflfGOFAyNFDUqFrYZg7fb8Xr1ydW7sXPPDZOZx7z+9zzr2/nXt0oVDI19DQ8InU1NQI0tnZOdDV1XVXCKFTA8dwrBxHjkuHjg3csCNfJFokMhx7KtYOHZKIHZzJ/Py8fm1tzbO+vv4Z/AKiCDmQxv1u8BDcWF5eroSsTHdU5NVJotbWVsnM2QSDwfDk5KRjdnbWurq6akeg9+DHUeCiQJQCI2g7gHFjY+M6YzI2HccizgAiAdFvkORzDYfDBgyqhtRQKrj/3tLS0s1kMlnBmMcii8VyQqRgf2pq6pnBYBjB9a9akEV0FBRhVYdzc3Me+R2WislkEkajUWoXE/1RiqLRqK+pqWlRDlIKXq9XuN1uUVdXx/d+gX15IgR/ClYgOtQqslqtorm5Wej1epHL5SrYlydCAjzGe7k9MTHRDdmiFpESlKus80QIvo+VJCDsHhsbq9rc3Kw+L5EyGVbi8bhta2vr+fb29sd0Oh1TQyqVelvw0Z0SMetedXR0RNva2kR7e7sqWlpa+I4uliSKRCLexsbGOK+XytDQkHC5XHLWXWbfWaKfSpGWZOjr6xM9PT2itraWK7rCvjwRMu4OBKMQZVEfaBExrQnbBZOB+9v09LQekgdI8dexWGzAZrMt1NfX59SC3eGg4IqOHtl31EHUT7BJ3h8eHn7p9/sXAoHAohp8Pt+HkpIB7M7MzDgdDsdof3//N6fTuaOG3t7eLxBd+q8IK2J6v8H1GDNILUWTAYJDpUhLMpjNZn5RpTZKFeuzRH6QhiSnVeTxeMTg4KC0KpRK9uWJuL9BwKxzQZjSIuLOjT+5lOIo5eyTRMpPuVwSiUT5+Pj4LXyOTXa7PYKTzF+1IG4GojLGzjsznC57e3vXwKNsNvsOBNSQyWReMMaxSHncwgzOPKtp5cRxiz9Y6vkfILntsCGvjHAmWmQcI6+CyHFDoZDvH1tISdFdR8A0AAAAAElFTkSuQmCC"
+                alt=""/></span>
+    <strong>Doctrine ORM</strong>
+    <span class="count">
+        <span>{{ '%0.0f'|format(collector.totalTime * 1000) }} ms</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    {{ block('stats') }}
+    {{ block('hydrations') }}
+{% endblock %}
+
+{% block stats %}
+    <h2>ORM Stats</h2>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Hydrations</th>
+                <td><pre>{{ collector.hydrationCount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Hydration time</th>
+                <td><pre>{{ '%0.2f'|format(collector.hydrationTime * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Hydrated entities</th>
+                <td><pre>{{ collector.hydratedEntities }}</pre></td>
+            </tr>
+            <tr>
+                <th>Persists</th>
+                <td><pre>{{ collector.stats.persist.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Persist time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.persist.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Detaches</th>
+                <td><pre>{{ collector.stats.detach.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Detach time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.detach.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Merges</th>
+                <td><pre>{{ collector.stats.merge.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Merge time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.merge.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Removes</th>
+                <td><pre>{{ collector.stats.remove.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Remove time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.remove.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Refreshes</th>
+                <td><pre>{{ collector.stats.refresh.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Refresh time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.refresh.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Flushes</th>
+                <td><pre>{{ collector.stats.flush.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Flush time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.flush.time * 1000) }} ms</pre></td>
+            </tr>
+            <tr>
+                <th>Total time</th>
+                <td><pre>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</pre></td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock stats %}
+
+{% block hydrations %}
+    <h2>Hydrations</h2>
+
+    {% if collector.hydrations is empty %}
+        <p>
+            <em>No hydrations.</em>
+        </p>
+    {% else %}
+        <table class="alt">
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>Entities</th>
+                <th>Type</th>
+                <th>Alias Map</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i, hydration in collector.hydrations %}
+                <tr id="hydrationNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
+                    <td>{% if hydration.executionMS is defined %}
+                            {{ '%0.2f'|format(hydration.executionMS * 1000) }}&nbsp;ms
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </td>
+
+                    <td>{% if hydration.resultNum is defined %}{{ hydration.resultNum }}{% else %}Unknown{% endif %}</td>
+                    <td>{% if hydration.type is defined %}{{ hydration.type }} {% else %}Unknown{% endif %}</td>
+                    <td>
+                        {% if hydration.aliasMap is defined %}
+                        <ul>
+                            {% for alias, class in hydration.aliasMap %}
+                                <li>{{ alias }} => {{ class }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}Unknown{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+{% endblock hydrations %}

@@ -14,6 +14,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class OroEntityManager extends EntityManager
 {
+    const CLASS_NAME = 'Oro\Bundle\EntityBundle\ORM\OroEntityManager';
+
     /**
      * Entity config provider for "extend" scope
      *
@@ -37,7 +39,9 @@ class OroEntityManager extends EntityManager
             throw new \InvalidArgumentException("Invalid argument: " . $conn);
         }
 
-        return new OroEntityManager($conn, $config, $conn->getEventManager());
+        $entityManagerClassName = static::CLASS_NAME;
+
+        return new $entityManagerClassName($conn, $config, $conn->getEventManager());
     }
 
     /**
