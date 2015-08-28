@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -82,9 +83,11 @@ class OriginFolderFilterProvider
         foreach ($origins as $origin) {
             $folders = $origin->getFolders();
             $mailbox = $origin->getMailboxName();
+            $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
                 $results[$mailbox] = [];
                 $results[$mailbox]['active'] = $origin->isActive();
+                /** @var EmailFolder $folder */
                 foreach ($folders as $folder) {
                     $results[$mailbox]['folder'][$folder->getId()] = $folder->getFullName();
                 }
@@ -105,9 +108,11 @@ class OriginFolderFilterProvider
             $origin = $mailbox->getOrigin();
             $folders = $origin->getFolders();
             $mailboxLabel = $mailbox->getLabel();
+            $folders = $this->filterFolders($folders->toArray());
             if (count($folders) > 0) {
                 $results[$mailboxLabel] = [];
                 $results[$mailboxLabel]['active'] = $origin->isActive();
+                /** @var EmailFolder $folder */
                 foreach ($folders as $folder) {
                     $results[$mailboxLabel]['folder'][$folder->getId()] = $folder->getFullName();
                 }
@@ -115,5 +120,22 @@ class OriginFolderFilterProvider
         }
 
         return $results;
+    }
+
+    /**
+     * @param $folders array
+     * @return array
+     */
+    private function filterFolders($folders)
+    {
+        $folders = array_filter(
+            $folders,
+            function ($item) {
+                /** @var EmailFolder $item */
+                return $item->isSyncEnabled();
+            }
+        );
+
+        return $folders;
     }
 }
