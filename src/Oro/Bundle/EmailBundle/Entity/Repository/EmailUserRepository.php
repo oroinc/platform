@@ -30,6 +30,21 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * @param $email Email
+     *
+     * @return EmailUser[]
+     */
+    public function findByEmailForMailbox(Email $email)
+    {
+        return $this->createQueryBuilder('ue')
+            ->andWhere('ue.email = :email')
+            ->andWhere('ue.mailboxOwner IS NOT NULL')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param User $user
      * @param Organization $organization
      * @param array $folderTypes
@@ -166,6 +181,36 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->andWhere($queryBuilder->expr()->in('t.id', $threadIds));
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return QueryBuilder
+     */
+    public function getEmailUserByFolder($folder)
+    {
+        $queryBuilder = $this->createQueryBuilder('eu')
+            ->andWhere('eu.folder = :folder')
+            ->setParameter('folder', $folder);
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     * @param array       $messages
+     * @return EmailUser[]
+     */
+    public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
+    {
+        return $this
+            ->getEmailUserByFolder($folder)
+            ->leftJoin('eu.email', 'email')
+            ->andWhere('email.messageId IN (:messageIds)')
+            ->setParameter('messageIds', $messages)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

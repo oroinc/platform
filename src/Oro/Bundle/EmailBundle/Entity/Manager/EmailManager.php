@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 
 /**
  * Class EmailManager
@@ -99,9 +100,11 @@ class EmailManager
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
-            $emailUser = $this->getCurrentEmailUser($email);
-            if ($emailUser) {
-                $this->setEmailUserSeen($emailUser, false, true);
+            $emailUsers = $this->getCurrentEmailUser($email);
+            if ($emailUsers) {
+                foreach ($emailUsers as $emailUser) {
+                    $this->setEmailUserSeen($emailUser, false, true);
+                }
             }
         }
     }
@@ -195,16 +198,17 @@ class EmailManager
      *
      * @param Email $entity - entity Email
      *
-     * @return null|EmailUser
+     * @return EmailUser[]
      */
     protected function getCurrentEmailUser(Email $entity)
     {
         $user = $this->securityFacade->getToken()->getUser();
         $currentOrganization = $this->securityFacade->getOrganization();
-        $emailUser = $this->em->getRepository('OroEmailBundle:EmailUser')
-            ->findByEmailAndOwner($entity, $user, $currentOrganization);
 
-        return $emailUser;
+        return array_merge(
+            $this->getEmailUserRepository()->findByEmailAndOwner($entity, $user, $currentOrganization),
+            $this->getEmailUserRepository()->findByEmailForMailbox($entity)
+        );
     }
 
     /**
@@ -226,5 +230,13 @@ class EmailManager
         }
 
         return $emails;
+    }
+
+    /**
+     * @return EmailUserRepository
+     */
+    protected function getEmailUserRepository()
+    {
+        return $this->em->getRepository('OroEmailBundle:EmailUser');
     }
 }

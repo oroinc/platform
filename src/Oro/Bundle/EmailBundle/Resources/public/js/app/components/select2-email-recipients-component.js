@@ -1,134 +1,132 @@
-define(['jquery', 'underscore', 'oro/select2-component'], function($, _, Select2Component) {
+define([
+    'jquery',
+    'underscore',
+    'oro/select2-component',
+    'oroemail/js/app/views/select2-email-recipients-view'
+], function($, _, Select2Component, Select2View) {
     'use strict';
 
-    var contexts = {};
-    var organizations = {};
-    var currentOrganization = null;
-
-    function processData(data) {
-        if (typeof data === 'undefined') {
-            return;
-        }
-
-        var parsedItem = JSON.parse(data);
-        if (parsedItem.contextText) {
-            contexts[parsedItem.key] = {};
-            contexts[parsedItem.key] = {
-                id: JSON.stringify(parsedItem.contextValue),
-                text: parsedItem.contextText,
-            };
-            if (parsedItem.organization) {
-                organizations[parsedItem.key] = parsedItem.organization;
+    function dataHasText(data, text) {
+        return _.some(data, function(row) {
+            if (!row.hasOwnProperty('children')) {
+                return row.text.localeCompare(text) === 0;
             }
-        }
+
+            return dataHasText(row.children, text);
+        });
     }
 
     var Select2EmailRecipientsComponent = Select2Component.extend({
+        ViewType: Select2View,
+
         $el: null,
-        $contextEl: null,
 
         initialize: function(options) {
             this.$el = options._sourceElement;
-            this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
-            this._initEditation();
             Select2EmailRecipientsComponent.__super__.initialize.apply(this, arguments);
         },
 
         preConfig: function() {
             var config = Select2EmailRecipientsComponent.__super__.preConfig.apply(this, arguments);
+            var searchChoice = {data: {id: '', text: ''}};
+            this.$el.data({
+                'search-choice': searchChoice,
+                'organizations': [],
+                'organization': null,
+                'contexts': []
+            });
 
             var self = this;
             config.ajax.results = function(data) {
-                var results = _.map(data.results, function(section) {
-                    if (typeof section.children === 'undefined') {
-                        processData(section.data);
-                        self._onRecipientAdd.call(self, section.id);
-
-                        return {
-                            id: section.id,
-                            text: section.text
-                        };
-                    }
-
-                    return {
-                        text: section.text,
-                        children: _.map(section.children, function(item) {
-                            processData(item.data);
-
-                            return {
-                                id: item.id,
-                                text: item.text
-                            };
-                        })
-                    };
-                });
-
-                self.$el.on('change', function(e) {
-                    var data = self.$contextEl.select2('data');
-
-                    if (e.added) {
-                        self._onRecipientAdd.call(self, e.added.id);
-                    }
-
-                    if (e.removed) {
-                        if (typeof contexts[e.removed.id] !== 'undefined') {
-                            var newData = _.reject(data, function(item) {
-                                return item.id === contexts[e.removed.id].id;
-                            });
-                            self.$contextEl.select2('data', newData);
-                        }
-
-                        if (_.isEmpty(self.$el.select2('val'))) {
-                            currentOrganization = null;
-                        }
-                    }
-                });
-
-                return {results: results};
+                return {results: self._processResultData.call(self, data)};
             };
 
+            /**
+             * Adds organization in request parameters so
+             * there is no mix of organizations in records
+             */
             var originalData = config.ajax.data;
             config.ajax.data = function() {
                 var params = originalData.apply(this, arguments);
 
-                if (currentOrganization) {
-                    params.organization = currentOrganization;
+                if (self.$el.data('organization')) {
+                    params.organization = self.$el.data('organization');
                 }
 
                 return params;
             };
 
+            /**
+             * Creates choice which can be modified later to prevent selection of
+             * previously autocompleted text instead of text currently typed
+             */
+            config.createSearchChoice = function(term, data) {
+                var selectedData = this.opts.element.select2('data');
+                if (!dataHasText(data, term) && !dataHasText(selectedData, term)) {
+                    searchChoice.data = {id: '', text: ''};
+                    searchChoice.data.id = term;
+                    searchChoice.data.text = term;
+
+                    return searchChoice.data;
+                }
+            };
+
             return config;
         },
 
-        _onRecipientAdd: function(id) {
-            if (typeof contexts[id] === 'undefined') {
-                return;
-            }
+        /**
+         * Extracts metadata, update contexts, retrieve data for select2
+         */
+        _processResultData: function(data) {
+            var self = this;
+            return _.map(data.results, function(section) {
+                if (typeof section.children === 'undefined') {
+                    self._processData(section.data);
+                    self.$el.trigger('recipient:add', section.id);
 
-            var data = this.$contextEl.select2('data');
-            currentOrganization = _.result(organizations, id, null);
-            data.push(contexts[id]);
-            this.$contextEl.select2('data', data);
+                    return {
+                        id: section.id,
+                        text: section.text
+                    };
+                }
+
+                return {
+                    text: section.text,
+                    children: _.map(section.children, function(item) {
+                        self._processData(item.data);
+
+                        return {
+                            id: item.id,
+                            text: item.text
+                        };
+                    })
+                };
+            });
         },
 
-        _initEditation: function() {
-            var $el = this.$el;
-            this.$el.parent('.controls').on('click', '.select2-search-choice', function(e) {
-                var $choice = $(this);
-                var $searchField = $(this).parent('.select2-choices').find('input');
+        /**
+        * Extracts contexts and organizations from data
+        */
+        _processData: function(data) {
+           if (typeof data === 'undefined') {
+               return;
+           }
 
-                var originalData = $el.select2('data');
-                var selectedIndex = $choice.index();
-                var removedItem = originalData[selectedIndex];
-                var newData = _.reject(originalData, function(item, index) {
-                    return index === selectedIndex;
-                });
+           var contexts = this.$el.data('contexts');
+           var organizations = this.$el.data('organizations');
 
-                $el.select2('data', newData);
-                $searchField.click().val(removedItem.text).trigger('paste');
-            });
-        }
+           var parsedItem = JSON.parse(data);
+           if (parsedItem.contextText) {
+               contexts[parsedItem.key] = {};
+               contexts[parsedItem.key] = {
+                   id: JSON.stringify(parsedItem.contextValue),
+                   text: parsedItem.contextText
+               };
+               if (parsedItem.organization) {
+                   organizations[parsedItem.key] = parsedItem.organization;
+               }
+           }
+       }
     });
 
     return Select2EmailRecipientsComponent;

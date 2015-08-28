@@ -1,5 +1,6 @@
 {% block oro_imap_configuration_check_row %}
-    {% if form.parent.vars.value and form.parent.vars.value.username is defined %}
+    {% set data = form.parent.parent.vars.value %}
+    {% if data and data.username is defined %}
         {% set forEntity = 'user' %}
     {% else %}
         {% set forEntity = 'mailbox' %}
@@ -7,7 +8,8 @@
     {% set options = {
         elementNamePrototype: full_name,
         id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
-        forEntity: forEntity
+        forEntity: forEntity,
+        organization: data and data.organization is defined and data.organization ? data.organization.id : null,
     } %}
     {% set attr = attr|merge({
         'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',

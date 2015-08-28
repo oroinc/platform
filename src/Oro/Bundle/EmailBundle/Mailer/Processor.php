@@ -26,6 +26,7 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -49,7 +50,7 @@ class Processor
     /** @var  DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \Swift_Mailer */
+    /** @var DirectMailer */
     protected $mailer;
 
     /** @var EmailAddressHelper */
@@ -78,17 +79,18 @@ class Processor
 
     /**
      * @param DoctrineHelper           $doctrineHelper
-     * @param \Swift_Mailer            $mailer
+     * @param DirectMailer             $mailer
      * @param EmailAddressHelper       $emailAddressHelper
      * @param EmailEntityBuilder       $emailEntityBuilder
      * @param EmailOwnerProvider       $emailOwnerProvider
      * @param EmailActivityManager     $emailActivityManager
      * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
+     * @param Mcrypt                   $encryptor
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        \Swift_Mailer $mailer,
+        DirectMailer $mailer,
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
@@ -235,38 +237,21 @@ class Processor
     /**
      * Process send email message. In case exist custom smtp host/port use it
      *
-     * @param object $message
-     * @param object $emailOrigin
+     * @param \Swift_Message  $message
+     * @param UserEmailOrigin $emailOrigin
      * @throws \Swift_SwiftException
      */
     public function processSend($message, $emailOrigin)
     {
         if ($emailOrigin instanceof UserEmailOrigin) {
-            $this->modifySmtpSettings($emailOrigin);
+            /* Modify transport smtp settings */
+            if ($emailOrigin->isSmtpConfigured()) {
+                $this->mailer->prepareSmtpTransport($emailOrigin);
+            }
         }
 
         if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
-        }
-    }
-
-    /**
-     * Modify transport smtp settings
-     *
-     * @param UserEmailOrigin $userEmailOrigin
-     */
-    protected function modifySmtpSettings(UserEmailOrigin $userEmailOrigin)
-    {
-        $transport = $this->mailer->getTransport();
-
-        if ($transport instanceof \Swift_Transport_EsmtpTransport && $userEmailOrigin->isSmtpConfigured()) {
-            $transport->setHost($userEmailOrigin->getSmtpHost());
-            $transport->setPort($userEmailOrigin->getSmtpPort());
-            $transport->setUsername($userEmailOrigin->getUser());
-            $transport->setPassword($this->encryptor->decryptData($userEmailOrigin->getPassword()));
-            if ($userEmailOrigin->getSmtpEncryption()) {
-                $transport->setEncryption($userEmailOrigin->getSmtpEncryption());
-            }
         }
     }
 
@@ -326,7 +311,7 @@ class Processor
                 },
                 $body
             );
-            $message->setBody($body, 'text/html');
+            $message->setBody($body);
         }
     }
 

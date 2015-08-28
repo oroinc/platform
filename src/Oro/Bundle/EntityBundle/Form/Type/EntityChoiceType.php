@@ -48,7 +48,22 @@ class EntityChoiceType extends AbstractType
                 'empty_value'          => '',
                 'show_plural'          => false,
                 'configs'              => $defaultConfigs,
-                'translatable_options' => false
+                'translatable_options' => false,
+                'group_by' => function () {
+                    // @codingStandardsIgnoreStart
+                    /**
+                     * This option was added since duplicated values are removed otherwise
+                     * (which happens if there are at least 2 entities having the same translations in
+                     * currently used language)
+                     *
+                     * Groups are created by flipping choices first
+                     * https://github.com/symfony/symfony/blob/c25e054d9e6b376d1f242e9d92454e7037bc4c01/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php#L444
+                     * then choiceView is created from each group:
+                     * https://github.com/symfony/symfony/blob/c25e054d9e6b376d1f242e9d92454e7037bc4c01/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L174
+                     */
+                    // @codingStandardsIgnoreEnd
+                    return null;
+                }
             ]
         );
         $resolver->setNormalizers(

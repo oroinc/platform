@@ -1,3 +1,4 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 <div class="widget-content">
     {% if saved %}
         <script type="text/javascript">
@@ -12,10 +13,21 @@
             });
         </script>
     {% else %}
-        <div class="form-container">
-            {{ form_start(form, {
-                action: path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')),
-            }) }}
+        {% set pageComponent = {
+            'module': 'oroui/js/app/components/view-component',
+            'options': {'view': 'oroemail/js/app/views/email-template-editor-view'},
+            'layout': 'separate'
+        } %}
+        <div class="form-container" {{ UI.renderPageComponentAttributes(pageComponent) }}>
+            {{ form_start(
+                form,
+                {
+                    action: path(
+                        app.request.attributes.get('_route'),
+                        app.request.attributes.get('_route_params')
+                    )
+                }
+            ) }}
                 <fieldset class="form form-horizontal">
                     <div class="span8">
                         {{ form_rest(form) }}

@@ -588,9 +588,8 @@ define([
          * @returns {undefined|Object}
          */
         _getView: function(name) {
-            var viewId = name === this.DEFAULT_GRID_VIEW_ID ? name : parseInt(name, 10);
             var currentViews =  _.filter(this.choices, function(item) {
-                return item.value === viewId;
+                return item.value === name;
             }, this);
 
             return _.first(currentViews);

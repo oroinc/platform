@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Mailbox;
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\MailboxProcessSettings;
 
 class MailboxProcessStorage
@@ -73,13 +74,15 @@ class MailboxProcessStorage
     /**
      * Returns choice list for process type choice field.
      *
-     * @return array['type' => 'Process Type Label (translate id)']
+     * @param Mailbox $mailbox
+     *
+     * @return array('type' => 'Process Type Label (translate id)')
      */
-    public function getProcessTypeChoiceList()
+    public function getProcessTypeChoiceList(Mailbox $mailbox = null)
     {
         $choices = [];
         foreach ($this->processes as $type => $provider) {
-            if (!$provider->isEnabled()) {
+            if (!$provider->isEnabled($mailbox)) {
                 continue;
             }
 
@@ -87,6 +90,21 @@ class MailboxProcessStorage
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns array of process definition names for all mailbox processes.
+     *
+     * @return array
+     */
+    public function getProcessDefinitionNames()
+    {
+        $list = [];
+        foreach ($this->processes as $process) {
+            $list[] = $process->getProcessDefinitionName();
+        }
+
+        return $list;
     }
 
     /**
