@@ -23,6 +23,7 @@ define([
         $mode: null,
         $newEntity: null,
         $existingEntity: null,
+        $existingEntityInput: null,
         $dialog: null,
         editable: false,
 
@@ -30,6 +31,9 @@ define([
          * @param options
          */
         initialize: function(options) {
+            if (this.editable = options.editable === true) {
+                this.requiredOptions.push('editRoute');
+            }
             var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
             if (missingProperties.length) {
                 throw new Error(
@@ -43,14 +47,15 @@ define([
             this.$mode = this.$el.find(options.modeSelector);
             this.$newEntity = this.$el.find(options.newEntitySelector);
             this.$existingEntity = this.$el.find(options.existingEntitySelector);
+            this.$existingEntityInput = $(options.existingEntityInputSelector);
             this.$dialog = this.$el.closest('.ui-dialog');
             this.$dialog.css('top', 0);
-            this.editable = options.editable == true;
+            this.editRoute = options.editRoute;
 
             this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
             this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
 
-            this._onEntityChange({val: $(options.existingEntityInputSelector).val()});
+            this._onEntityChange({val: this.$existingEntityInput.val()});
         },
 
         /**
@@ -78,6 +83,10 @@ define([
             } else {
                 this.$newEntity.hide();
             }
+
+            if (this._isInMode(this.MODE_EDIT)) {
+                this._retrieveEntityData(this.$existingEntityInput.val());
+            }
         },
 
         /**
@@ -101,6 +110,26 @@ define([
          */
         _isInMode: function(mode) {
             return this.$mode.val() === mode;
+        },
+
+        /**
+         * Retrieves entity data using set route. Provided id is used as query parameter for request.
+         *
+         * @param id
+         * @private
+         */
+        _retrieveEntityData: function (id) {
+            $.getJSON(this.editRoute, {id: id})
+                .done(_.bind(this._setEntityData, this))
+                .fail(_.bind(this._handleDataRequestError, this));
+        },
+
+        _setEntityData(data) {
+
+        },
+
+        _handleDataRequestError(jqXHR, textStatus, error) {
+            console.error(textStatus); // TODO: Display error
         }
     });
 });

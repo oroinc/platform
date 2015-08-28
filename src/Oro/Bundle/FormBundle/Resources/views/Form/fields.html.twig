@@ -502,10 +502,12 @@
     <div class="create-select-entity-choice-container"
          data-page-component-module="oroform/js/app/components/create-or-select-choice-component"
          data-page-component-options="{{ {
-            modeSelector: '#' ~ form.mode.vars.id,
-            newEntitySelector: '.new-entity',
-            existingEntitySelector: '.existing-entity',
-            existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
+             modeSelector: '#' ~ form.mode.vars.id,
+             newEntitySelector: '.new-entity',
+             existingEntitySelector: '.existing-entity',
+             existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
+             editable: form.vars.editable,
+             editRoute: form.vars.edit_route|default(null)
          }|json_encode }}">
         <div class="existing-entity">
             {{ form_widget(form.existing_entity) }}
