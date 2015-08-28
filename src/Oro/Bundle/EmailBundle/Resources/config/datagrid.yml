@@ -174,29 +174,7 @@ datagrid:
             query:
                 where:
                     and:
-                        - >
-                            eu.id = (
-                                SELECT
-                                    MIN(seu2.id)
-                                FROM
-                                    OroEmailBundle:EmailUser seu2
-                                WHERE seu2.email = (
-                                    SELECT
-                                        CASE
-                                            WHEN (MIN(se.id) IS NOT NULL) THEN MIN(se.id)
-                                            WHEN (e.head = true) THEN e.id
-                                            ELSE 0
-                                        END
-                                    FROM
-                                        OroEmailBundle:EmailUser seu
-                                    JOIN
-                                        seu.email se
-                                    LEFT JOIN
-                                        se.thread sthread
-                                    WHERE
-                                        sthread.id IS NOT NULL AND sthread.id = thread.id AND seu.seen = false
-                                )
-                            )
+                        - e.head = true
         filters:
             columns:
                 subject: { type: string,   data_name: e.subject }
