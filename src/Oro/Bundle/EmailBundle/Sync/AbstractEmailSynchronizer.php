@@ -255,6 +255,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
     /**
      * Switches the security context to the given organization
+     * @todo: Should be deleted after email sync process will be refactored
      */
     protected function impersonateOrganization(Organization $organization = null)
     {

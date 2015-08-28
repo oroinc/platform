@@ -130,23 +130,28 @@ class EmailActivityManager
     protected function addSenderOwner(&$targets, Email $email)
     {
         $from = $email->getFromEmailAddress();
-        if ($from) {
-            $owner = $from->getOwner();
-            if ($owner) {
-                $token = $this->tokenStorage->getToken();
-                if ($token) {
-                    $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
-                    if ($ownerOrganization
-                        && $token instanceof OrganizationContextTokenInterface
-                        && $token->getOrganizationContext()->getId() !== $ownerOrganization->getId()
-                    ) {
-                        return;
-                    }
-                }
+        if (!$from) {
+            return;
+        }
 
-                $this->addTarget($targets, $owner);
+        $owner = $from->getOwner();
+        if (!$owner) {
+            return;
+        }
+
+        // @todo: Should be deleted after email sync process will be refactored
+        $token = $this->tokenStorage->getToken();
+        if ($token) {
+            $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
+            if ($ownerOrganization
+                && $token instanceof OrganizationContextTokenInterface
+                && $token->getOrganizationContext()->getId() !== $ownerOrganization->getId()
+            ) {
+                return;
             }
         }
+
+        $this->addTarget($targets, $owner);
     }
 
     /**
