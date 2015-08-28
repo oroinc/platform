@@ -1,34 +1,25 @@
-/*jslint nomen: true*/
-/*global define*/
-define([
-    'jquery',
-    'orotranslation/js/translator',
-    'underscore',
-    'routing',
-    'oroui/js/mediator',
-    'orosync/js/sync',
-    'oroui/js/app/components/base/component',
-    'oroemail/js/app/views/email-notification-collection-view',
-    'oroemail/js/app/views/email-notification-view',
-    'oroemail/js/app/models/email-notification-collection',
-    'oroui/js/messenger'
-], function($,
-            __,
-            _,
-            routing,
-            mediator,
-            sync,
-            BaseComponent,
-            EmailNotificationCollectionView,
-            EmailNotificationView,
-            EmailNotificationCollection,
-            messenger) {
+define(function(require) {
     'use strict';
 
     var EmailNotification;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
+    var mediator = require('oroui/js/mediator');
+    var messenger = require('oroui/js/messenger');
+    var tools = require('oroui/js/tools');
+    var sync = require('orosync/js/sync');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var DesktopEmailNotificationView =
+        require('oroemail/js/app/views/email-notification/email-notification-collection-view');
+    var MobileEmailNotificationView =
+        require('oroemail/js/app/views/email-notification/mobile-email-notification-view');
+    var EmailNotificationCollection =
+        require('oroemail/js/app/models/email-notification/email-notification-collection');
 
     EmailNotification = BaseComponent.extend({
-        collectionView: null,
+        view: null,
         collection: null,
 
         initialize: function(options) {
@@ -46,12 +37,14 @@ define([
         },
 
         initView: function() {
-            this.collectionView = new EmailNotificationCollectionView({
+            var EmailNotificationView = tools.isMobile() ? MobileEmailNotificationView : DesktopEmailNotificationView;
+
+            this.view = new EmailNotificationView({
                 el: this.options._sourceElement,
                 collection: this.collection,
-                countNewEmail: this.options.count,
-                itemView: EmailNotificationView
+                countNewEmail: this.options.count
             });
+            this.view.render();
 
             return this;
         },
@@ -78,10 +71,10 @@ define([
             $.ajax({
                 url: routing.generate('oro_email_last'),
                 success: function(response) {
-                    self.collectionView.collection.reset(response.emails);
-                    self.collectionView.setCount(response.count);
+                    self.collection.reset(response.emails);
+                    self.view.setCount(response.count);
                     if (hasNewEmail) {
-                        self.collectionView.showNotification();
+                        self.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
                 },

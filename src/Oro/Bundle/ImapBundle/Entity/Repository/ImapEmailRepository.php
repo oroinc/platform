@@ -20,9 +20,8 @@ class ImapEmailRepository extends EntityRepository
     public function getEmailsByUidsQueryBuilder(EmailFolder $folder, array $uids)
     {
         return $this->createQueryBuilder('imap_email')
-            ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.emailUsers', 'email_users')
-            ->innerJoin('email_users.folder', 'folder')
+            ->innerJoin('imap_email.imapFolder', 'imapFolder')
+            ->innerJoin('imapFolder.folder', 'folder')
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
             ->setParameter('uids', $uids);

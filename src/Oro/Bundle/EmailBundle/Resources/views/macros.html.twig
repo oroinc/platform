@@ -23,13 +23,13 @@
         </div>
     </script>
     <script type="text/template" id="oro-email-template-variables-system-template">
-        <ul class="nav nav-list">
+        <ul class="nav">
             <% _.each(variables, function(variable, varName) { %>
             <li>
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>( <%= variable.label %> )</span>
+                <span>&ndash; <%= variable.label %></span>
             </li>
             <% }); %>
         </ul>
@@ -40,7 +40,7 @@
                class="variable"
                title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
             >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
-            <span>(</span>
+            <span>&ndash;</span>
             <ul class="caption">
                 <% for (var i = 1; i < breadcrumbs.length; i++) { %>
                 <li>
@@ -50,7 +50,6 @@
                 <% } %>
                 <li><%= variable.label %></li>
             </ul>
-            <span>)</span>
         </li>
     </script>
     <script type="text/template" id="oro-email-template-variables-entity-template">
@@ -78,7 +77,7 @@
             <% if (!_.isEmpty(fields)) { %>
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
-                <ul class="nav nav-list">
+                <ul class="nav">
                 <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
                 <% _.each(fields, function(variable, varName) { %>
                     <%= variableTemplate({
@@ -124,14 +123,14 @@
             <% if (!_.isEmpty(relations)) { %>
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.relations') %></div>
-                <ul class="nav nav-list">
+                <ul class="nav">
                     <% _.each(relations, function(variable, varName) { %>
                     <li>
                         <a href="javascript:void(0);"
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
                            title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>( <%= variable.label %> )</span>
+                        <span>&ndash; <%= variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>

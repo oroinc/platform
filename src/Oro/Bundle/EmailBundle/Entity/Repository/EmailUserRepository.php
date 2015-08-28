@@ -30,6 +30,21 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * @param $email Email
+     *
+     * @return EmailUser[]
+     */
+    public function findByEmailForMailbox(Email $email)
+    {
+        return $this->createQueryBuilder('ue')
+            ->andWhere('ue.email = :email')
+            ->andWhere('ue.mailboxOwner IS NOT NULL')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param User $user
      * @param Organization $organization
      * @param array $folderTypes

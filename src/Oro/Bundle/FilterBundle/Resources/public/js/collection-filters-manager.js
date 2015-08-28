@@ -37,6 +37,7 @@ define([
         render: function() {
             CollectionFiltersManager.__super__.render.apply(this, arguments);
             this._onUpdateCollectionState(this.collection);
+            this._onCollectionReset(this.collection);
             return this;
         },
 

@@ -76,7 +76,7 @@ class Recipient
             return $this->getName();
         }
 
-        return sprintf('%s (%s)', $this->getName(), $this->entity->getOrganization());
+        return sprintf('%s %s', $this->name, $this->entity->getAdditionalInfo());
     }
 
     /**

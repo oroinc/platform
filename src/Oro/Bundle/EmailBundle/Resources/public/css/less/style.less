@@ -152,8 +152,13 @@
     .group-label {
       font-weight: bold;
     }
-    .nav-list > li > a {
-      display: inline-block;
+    .nav {
+      padding-left: 15px;
+      padding-right: 15px;
+      & > li > a {
+        display: inline-block;
+        padding: 3px 0;
+      }
     }
   }
   ul.caption {
@@ -709,6 +714,13 @@ a.attachment .icon .icon-link {
   -webkit-border-radius: 4px;
   padding: 2px 2px 2px 3px;
   font-size: 12px;
+}
+.oro-email-user-emails .email-count {
+  margin-left: 4px;
+  color: orange;
+}
+.has-new-emails .icon-user {
+  color: orange;
 }
 
 a.sync-btn span.dots {

@@ -23,6 +23,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from layout.js
      * ============================================================ */
+
+    var realWidth = function($selector) {
+        if ($selector instanceof $ && $selector.length > 0) {
+            return $selector[0].getBoundingClientRect().width;
+        } else {
+            return 0;
+        }
+    };
+
     $(function() {
         var $pageTitle = $('#page-title');
         if ($pageTitle.size()) {
@@ -241,7 +250,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 initializeContent();
 
                 // set width for #main container
-                $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
+                $main.width(realWidth($topPage) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
                 var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
@@ -397,7 +406,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
         return {
             nextIndex: index,
-            nextItemHtml: html,
+            nextItemHtml: html
         };
     }
 
@@ -434,5 +443,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $(this).closest('*[data-content]')
             .trigger('content:remove')
             .remove();
+    });
+
+    /**
+     * Support for [data-focusable] attribute
+     */
+    $(document).on('click', 'label[for]', function(e) {
+        var forAttribute = $(e.target).attr('for');
+        var labelForElement = $('#' + forAttribute + ':first');
+        if (labelForElement.is('[data-focusable]')) {
+            e.preventDefault();
+            labelForElement.trigger('set-focus');
+        }
     });
 });

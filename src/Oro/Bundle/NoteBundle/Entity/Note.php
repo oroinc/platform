@@ -33,9 +33,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          },
  *          "activity"={
  *              "immutable"=true
- *          },
- *          "comment"={
- *              "applicable"=true
  *          }
  *      }
  * )
