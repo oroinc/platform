@@ -1,6 +1,10 @@
-define(['jquery', 'underscore', './view', 'json'
-    ], function($, _, TagView) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var TagView = require('./view');
+    require('json');
 
     /**
      * @export  orotag/js/update-view
@@ -8,6 +12,9 @@ define(['jquery', 'underscore', './view', 'json'
      * @extends orotag.View
      */
     return TagView.extend({
+        /** @property */
+        template: require('tpl!../templates/update-tag-list.html'),
+
         /** @property */
         tagsOverlayTemplate: _.template(
             '<div class="controls">' +
@@ -26,6 +33,11 @@ define(['jquery', 'underscore', './view', 'json'
             unassignGlobal: false,
             tagOverlayId: null
         }),
+
+
+        events: {
+            'click [data-action="remove-tag"]': '_removeItem'
+        },
 
         /**
          * Initialize widget
@@ -68,28 +80,6 @@ define(['jquery', 'underscore', './view', 'json'
             this.listenTo(this.getCollection(), 'remove', onCollectionChange);
 
             $(this.options.autocompleteFieldId).on('change', _.bind(this._addItem, this));
-        },
-
-        /**
-         * Render widget
-         *
-         * @returns {}
-         */
-        render: function() {
-            TagView.prototype.render.apply(this, arguments);
-            var _this = this;
-
-            if ((this.options.filter === 'owner' && this.options.unassign) ||
-                (this.options.filter !== 'owner' && this.options.unassignGlobal)) {
-                this.$tagsHolder.find('span.label').each(function(i, el) {
-                    var $el = $(el);
-
-                    var closeSpan = $('<span class="select2-search-choice-close"/>');
-                    closeSpan.click(_.bind(_this._removeItem, _this));
-                    $el.append(closeSpan);
-                    $el.addClass('with-button');
-                });
-            }
         },
 
         /**
