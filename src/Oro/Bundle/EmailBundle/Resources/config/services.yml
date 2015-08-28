@@ -785,8 +785,8 @@ services:
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @security.context
+            - @doctrine
+            - @oro_security.security_facade
             - @translator
 
     oro_email.mailbox.process_storage:
