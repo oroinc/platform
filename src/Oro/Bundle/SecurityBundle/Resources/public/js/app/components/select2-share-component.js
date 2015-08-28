@@ -13,12 +13,12 @@ define(function(require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function(options) {
+        initialize: function (options) {
             Select2ShareComponent.__super__.initialize.call(this, options);
 
             $(this.select2Selector).on('select2-selecting', function (e) {
                 e.stopPropagation();
-                mediator.trigger('datagrid:share-grid:add:data-from-select2', e.object);
+                mediator.trigger('datagrid:shared-datagrid:add:data-from-select2', e.object);
                 $(e.currentTarget).select2('close');
                 return false;
             });

@@ -47,7 +47,7 @@ class ShareSelectType extends AbstractType
                     'placeholder' => 'oro.security.action.share_with_placeholder',
                     'allowClear' => true,
                     'multiple' => true,
-                    'route_name' => 'oro_api_get_search_sharing_entities',
+                    'route_name' => 'oro_api_get_share_sharing_entities',
                     'separator' => ';',
                     'minimumInputLength' => 1,
                     'component' => 'share',

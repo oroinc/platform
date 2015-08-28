@@ -26,7 +26,7 @@ class ShareGridListener
     {
         $entityId = $this->request->get('entityId');
         $entityClass = $this->request->get('entityClass');
-        $shareGridParams = $this->request->get('share-grid');
+        $shareGridParams = $this->request->get('shared-datagrid');
         if ($shareGridParams) {
             $entityId = $shareGridParams['entityId'];
             $entityClass = $shareGridParams['entityClass'];

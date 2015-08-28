@@ -96,7 +96,6 @@ class ShareHandler
                 // no ACL found, do nothing
                 $acl = null;
             }
-//            $this->applyEntities($model, $acl);
             $this->form->get('entityClass')->setData($entityName);
             $this->form->get('entityId')->setData($entity->getId());
         }

@@ -137,7 +137,7 @@ define([
          * @param {boolean} selected
          */
         selectModel: function(model, selected) {
-            if (selected === this.inset) {
+            if (selected) {
                 this.selectedModels[model.id || model.cid] = model;
                 this.updateState();
             } else {

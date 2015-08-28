@@ -23,7 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-building",
- *              "share-grid"="business-unit-share-grid"
+ *              "share_with_datagrid"="share-with-business-units-datagrid"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

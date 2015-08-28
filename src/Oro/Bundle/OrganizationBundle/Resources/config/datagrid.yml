@@ -114,7 +114,7 @@ datagrid:
                     type: datetime
                     data_name: u.createdAt
 
-    business-unit-share-grid:
+    share-with-business-units-datagrid:
         options:
             entityHint: business unit
             skip_acl_check: true
@@ -130,6 +130,7 @@ datagrid:
                     - u.phone
                     - u.createdAt
                     - owner.name as ownerName
+                    - o.name as fromName
                 from:
                     - { table: OroOrganizationBundle:BusinessUnit, alias: u }
                 join:
@@ -137,6 +138,8 @@ datagrid:
                         owner:
                             join: u.owner
                             alias: owner
+                    inner:
+                        - { join: u.organization, alias: o }
 
         columns:
             name:
@@ -153,6 +156,11 @@ datagrid:
 
         properties:
             id: ~
+            entity:
+                type: twig
+                frontend_type: html
+                template: OroOrganizationBundle:Share:Property/entity.html.twig
+                data_name: u
         sorters:
             columns:
                 name:

@@ -6,3 +6,5 @@ oro:
                 okText: 'OK'
                 cancelText: 'Cancel'
                 content: 'Attention: removing the "{{ scope_name }}" sharing scope from "{{ entity_name_plural }}" will result in permanent un-sharing of all existing "{{ entity_name }}" records. This action cannot be undone. Do you want to continue?'
+        action:
+            shared: Sharing settings were successfully applied

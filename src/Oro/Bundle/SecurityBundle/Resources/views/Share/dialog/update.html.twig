@@ -25,12 +25,8 @@
                     'oroui/js/mediator'
                 ],
                 function(__, widgetManager, messenger, mediator) {
-                    $('.btn.btn-primary.share-dialog-apply').on('click', function () {
-                        widgetManager.getWidgetInstanceByAlias('share-dialog', function (widget) {
-                            messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
-                            widget.remove();
-                            mediator.execute('refreshPage');
-                        });
+                    $('.btn.btn-primary.shared-dialog-apply').on('click', function () {
+                        mediator.trigger('widget:shared-dialog:apply');
                     });
                 });
         </script>
@@ -47,7 +43,7 @@
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                        <button class="btn btn-primary share-dialog-apply" type="button">{{ 'Apply'|trans }}</button>
+                        <button class="btn btn-primary shared-dialog-apply" type="button">{{ 'Apply'|trans }}</button>
                     </div>
                 </fieldset>
             </form>

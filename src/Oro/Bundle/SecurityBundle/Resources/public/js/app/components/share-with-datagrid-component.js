@@ -1,34 +1,34 @@
 define(function(require) {
     'use strict';
 
-    var ShareComponent;
+    var ShareWithDatagridComponent;
     var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var ShareView = require('orosecurity/js/app/views/share-view');
+    var ShareWithDatagridView = require('orosecurity/js/app/views/share-with-datagrid-view');
     require('jquery.select2');
 
     /**
-     * @exports ShareComponent
+     * @exports ShareWithDatagridComponent
      */
-    ShareComponent = BaseComponent.extend({
-        shareView: null,
+    ShareWithDatagridComponent = BaseComponent.extend({
+        shareWithDatagridView: null,
 
-        initialize: function(options) {
+        initialize: function (options) {
             this.options = options;
             this.init();
         },
 
-        init: function() {
+        init: function () {
             this.initView();
-            this.shareView.render();
+            this.shareWithDatagridView.render();
             this._bindGridEvent();
         },
 
-        initView: function() {
-            this.shareView = new ShareView({
+        initView: function () {
+            this.shareWithDatagridView = new ShareWithDatagridView({
                 items: this.options.items || [],
                 el: this.options._sourceElement,
                 params: this.options.params || [],
@@ -40,16 +40,16 @@ define(function(require) {
          * Bind event handlers on grid widget
          * @protected
          */
-        _bindGridEvent: function() {
+        _bindGridEvent: function () {
             var self = this;
             var gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
                 return;
             }
 
-            widgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
+            widgetManager.getWidgetInstanceByAlias(gridWidgetName, function (widget) {
                 widget.on('grid-row-select', _.bind(self.onRowSelect, self, widget));
-                widget.on('sharing-grid-submitted', _.bind(self.onGridAdd, self, widget));
+                widget.on('share-with-datagrid-submitted', _.bind(self.onGridAdd, self, widget));
 
             });
         },
@@ -60,10 +60,10 @@ define(function(require) {
          * @param {} gridWidget
          * @param {} data
          */
-        onRowSelect: function(gridWidget, data) {
+        onRowSelect: function (gridWidget, data) {
             var id = data.model.get('id');
             var dialogWidgetName = this.options.dialogWidgetName;
-            var targetClass = this.shareView.currentTargetClass();
+            var targetClass = this.shareWithDatagridView.currentTargetClass();
 
             gridWidget._showLoading();
             var text = data.model.get('username') ? data.model.get('username') : data.model.get('name');
@@ -74,7 +74,7 @@ define(function(require) {
                     entityClass: targetClass
                 })
             };
-            mediator.trigger('datagrid:share-grid:add:data', {
+            mediator.trigger('datagrid:shared-datagrid:add:data', {
                 entityClass: targetClass,
                 models: [{
                     id: id,
@@ -86,17 +86,23 @@ define(function(require) {
             if (!dialogWidgetName) {
                 return;
             }
-            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {
+            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function (dialogWidget) {
                 dialogWidget.remove();
             });
         },
 
-        onGridAdd: function(gridWidget, data) {
+        /**
+         * Handels rows selection on a grid
+         *
+         * @param gridWidget
+         * @param data
+         */
+        onGridAdd: function (gridWidget, data) {
             var dialogWidgetName = this.options.dialogWidgetName;
             var selected = {};
-            gridWidget.pageComponent(this.shareView.currentGridName()).
+            gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).
                 grid.collection.trigger('backgrid:getSelected', selected);
-            var models = gridWidget.pageComponent(this.shareView.currentGridName()).grid.collection.models;
+            var models = gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).grid.collection.models;
             var selectedModels = [];
             gridWidget._showLoading();
             for(var key in models) {
@@ -106,18 +112,18 @@ define(function(require) {
                 }
             }
             gridWidget._hideLoading();
-            mediator.trigger('datagrid:share-grid:add:data', {
-                entityClass: this.shareView.currentTargetClass(),
+            mediator.trigger('datagrid:shared-datagrid:add:data', {
+                entityClass: this.shareWithDatagridView.currentTargetClass(),
                 models: selectedModels
             });
             if (!dialogWidgetName) {
                 return;
             }
-            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {
+            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function (dialogWidget) {
                 dialogWidget.remove();
             });
         }
     });
 
-    return ShareComponent;
+    return ShareWithDatagridComponent;
 });

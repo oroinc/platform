@@ -87,6 +87,8 @@ parameters:
 
     oro_security.datasource.share.class:                       Oro\Bundle\SecurityBundle\Extension\ShareDatasource
     oro_security.event_listener.share_grid_listener.class:     Oro\Bundle\SecurityBundle\EventListener\Datagrid\ShareGridListener
+    oro_security_search.index.class:                           Oro\Bundle\SecurityBundle\Search\SecurityIndexer
+    oro_security.formatter.share_formatter.class:              Oro\Bundle\SecurityBundle\Formatter\ShareFormatter
 
 services:
     oro_security.security_facade:
@@ -681,9 +683,7 @@ services:
             - @security.acl.provider
             - @oro_entity.routing_helper
             - @doctrine.orm.entity_manager
-            - @oro_entity_config.config_manager
-            - @translator
-            - @oro_attachment.manager
+            - @oro_security.formatter.share_formatter
         tags:
             - { name: oro_datagrid.datasource, type: share }
 
@@ -693,4 +693,20 @@ services:
         arguments:
             - @request
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.share-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.shared-datagrid, method: onBuildBefore }
+
+    oro_security_search.index:
+        class: %oro_security_search.index.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @twig
+            - @oro_entity_config.config_manager
+            - @oro_search.index
+            - @oro_security.search.acl_helper
+            - @oro_security.formatter.share_formatter
+
+    oro_security.formatter.share_formatter:
+        class: %oro_security.formatter.share_formatter.class%
+        arguments:
+            - @translator
+            - @oro_attachment.manager

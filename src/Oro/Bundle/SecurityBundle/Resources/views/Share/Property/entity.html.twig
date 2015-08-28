@@ -2,7 +2,7 @@
     <div class="share-info-image">
         {% if value.avatar is defined and value.avatar %}
             <img src="{{ value.avatar }}" />
-        {% else %}
+        {% elseif value.image %}
             <img src="{{ asset('bundles/oroui/img/' ~ value.image) }}" />
         {% endif %}
     </div>

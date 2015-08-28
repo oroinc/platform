@@ -100,6 +100,6 @@ class ShareGridProvider
         }
         $entityConfigId = new EntityConfigId('entity', $className);
 
-        return $this->configManager->getConfig($entityConfigId)->get('share-grid');
+        return $this->configManager->getConfig($entityConfigId)->get('share_with_datagrid');
     }
 }
