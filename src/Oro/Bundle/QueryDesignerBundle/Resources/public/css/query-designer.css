@@ -11,6 +11,11 @@
     margin-left: 10px;
     min-width: 63px;/* @TODO temporary solution, will be fixed in CRM-2025 */
 }
+.form-horizontal .query-designer-form .control-group .control-label.wrap {
+    width: auto;
+    margin-left: 10px;
+    min-width: 63px;
+}
 .form-horizontal .query-designer-form .control-group .controls {
     margin-left: 10px;
     float: left;

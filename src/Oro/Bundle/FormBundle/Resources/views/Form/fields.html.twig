@@ -393,7 +393,9 @@
             id="{{ viewsContainerId }}"
         >
             {% if label is not sameas(false) %}
-                {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
+                <div class="control-label wrap">
+                    {{ form_label(form, '' , { label_attr: label_attr}) }}
+                </div>
             {% endif %}
             <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
                 {{ form_widget(form) }}
