@@ -6,11 +6,16 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 class EmailActivityManager
 {
@@ -30,20 +35,32 @@ class EmailActivityManager
      */
     protected $queueUpdate;
 
+    /** @var TokenStorage */
+    protected $tokenStorage;
+
+    /** @var ServiceLink */
+    protected $entityOwnerAccessorLink;
+
     /**
-     * @param ActivityManager $activityManager
+     * @param ActivityManager           $activityManager
      * @param EmailActivityListProvider $activityListProvider
-     * @param EmailThreadProvider $emailThreadProvider
+     * @param EmailThreadProvider       $emailThreadProvider
+     * @param TokenStorage              $tokenStorage
+     * @param EntityOwnerAccessor       $entityOwnerAccessor
      */
     public function __construct(
         ActivityManager $activityManager,
         EmailActivityListProvider $activityListProvider,
-        EmailThreadProvider $emailThreadProvider
+        EmailThreadProvider $emailThreadProvider,
+        TokenStorage $tokenStorage,
+        ServiceLink $entityOwnerAccessorLink
     ) {
-        $this->activityManager = $activityManager;
+        $this->activityManager           = $activityManager;
         $this->emailActivityListProvider = $activityListProvider;
-        $this->emailThreadProvider = $emailThreadProvider;
+        $this->emailThreadProvider       = $emailThreadProvider;
         $this->resetQueue();
+        $this->tokenStorage            = $tokenStorage;
+        $this->entityOwnerAccessorLink = $entityOwnerAccessorLink;
     }
 
     /**
@@ -53,7 +70,7 @@ class EmailActivityManager
      */
     public function handleOnFlush(OnFlushEventArgs $event)
     {
-        $em = $event->getEntityManager();
+        $em  = $event->getEntityManager();
         $uow = $em->getUnitOfWork();
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($entity instanceof Email) {
@@ -116,6 +133,17 @@ class EmailActivityManager
         if ($from) {
             $owner = $from->getOwner();
             if ($owner) {
+                $token = $this->tokenStorage->getToken();
+                if ($token) {
+                    $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
+                    if ($ownerOrganization
+                        && $token instanceof OrganizationContextTokenInterface
+                        && $token->getOrganizationContext()->getId() !== $ownerOrganization->getId()
+                    ) {
+                        return;
+                    }
+                }
+
                 $this->addTarget($targets, $owner);
             }
         }
@@ -156,14 +184,14 @@ class EmailActivityManager
 
     /**
      * @param EntityManager $em
-     * @param Email $email
+     * @param Email         $email
      */
     protected function copyContexts(EntityManager $em, Email $email)
     {
         $thread = $email->getThread();
         if ($thread) {
             $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
-            $contexts = $this->emailActivityListProvider->getTargetEntities($email);
+            $contexts      = $this->emailActivityListProvider->getTargetEntities($email);
             // from email to thread emails
             if (count($contexts) > 0) {
                 foreach ($relatedEmails as $relatedEmail) {
@@ -172,11 +200,11 @@ class EmailActivityManager
                     }
                 }
             } else {
-            // from thread to email
+                // from thread to email
                 $relatedEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
                 if (count($relatedEmails) > 0) {
                     $parentEmail = $relatedEmails[0];
-                    $contexts = $this->emailActivityListProvider->getTargetEntities($parentEmail);
+                    $contexts    = $this->emailActivityListProvider->getTargetEntities($parentEmail);
                     $this->changeContexts($em, $email, $contexts);
                 }
             }
@@ -185,7 +213,7 @@ class EmailActivityManager
 
     /**
      * @param EntityManager $em
-     * @param Email $email
+     * @param Email         $email
      * @param [] $contexts
      */
     protected function addContextsToThread(EntityManager $em, Email $email, $contexts)
@@ -207,12 +235,12 @@ class EmailActivityManager
 
     /**
      * @param EntityManager $em
-     * @param Email $email
+     * @param Email         $email
      * @param [] $contexts
      */
     protected function changeContexts(EntityManager $em, Email $email, $contexts)
     {
-        $oldContexts = $this->emailActivityListProvider->getTargetEntities($email);
+        $oldContexts    = $this->emailActivityListProvider->getTargetEntities($email);
         $removeContexts = array_diff($oldContexts, $contexts);
         foreach ($removeContexts as $context) {
             $this->removeActivityTarget($email, $context);

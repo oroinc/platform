@@ -577,6 +577,8 @@ services:
             - @oro_activity.manager
             - @oro_email.activity_list.provider
             - @oro_email.email.thread.provider
+            - @security.token_storage
+            - @oro_security.owner.entity_owner_accessor.link
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
