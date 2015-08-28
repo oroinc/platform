@@ -95,7 +95,7 @@ class Indexer
         $this->configManager    = $configManager;
         $this->entityProvider   = $entityProvider;
         $this->translator       = $translator;
-        $this->searchAclHelper = $searchAclHelper;
+        $this->searchAclHelper  = $searchAclHelper;
     }
 
     /**

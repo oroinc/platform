@@ -515,6 +515,7 @@ class AclWalker extends TreeWalkerAdapter
         $conditionalFactors[] = $resultCondition;
 
         //Make expr acl_entries.security_identity_id IN (?) or acl_entries.security_identity_id = ?
+        $condition = $data[1];
         $aclCondition = new AclCondition(
             $condition['left']['entityAlias'],
             $condition['left']['field'],
@@ -534,6 +535,7 @@ class AclWalker extends TreeWalkerAdapter
         }
 
         //Make expr acl_entries.class_id = ?
+        $condition = $data[2];
         $aclCondition = new AclCondition(
             $condition['left']['entityAlias'],
             $condition['left']['field'],

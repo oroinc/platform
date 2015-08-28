@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * This entity class intended to allow usage of basic acl_classes table in DQL. The main goal of this approach
  * is possibility to use this entity in AclWalker to determine shared records.
  *
- * @ORM\Entity
+ * @ORM\Entity(readOnly=true)
  * @ORM\Table(
  *      name="acl_classes",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="UNIQ_69DD750638A36066", columns={"class_type"})}
