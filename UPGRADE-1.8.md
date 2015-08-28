@@ -260,6 +260,7 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
  - Added brackets for search queries. Now user available to do queries like 'from oro_test where all_text ~ test and (integer count > 10 or float price = 10)'
  - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
+ - Every Search request now is ACL protected. So, search results will contain only records what current user can see.
 
 ####ActivirtBundle
  - Added entity config parameter `show_on_page` to `Oro/Bundle/ActivityBundle/Resources/config/entity_config.yml`

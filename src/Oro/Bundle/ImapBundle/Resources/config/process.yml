@@ -82,6 +82,24 @@ definitions:
                         flush: true
                         arguments:
                             - $.command
+            - @tree:
+                conditions:
+                    @and:
+                        - @equal: [$syncEnabled, false]
+                        - @empty: [$.pendingJob]
+                        - @not_empty: [$.runningJob]
+                actions:
+                    - @create_entity:
+                        class: JMS\JobQueueBundle\Entity\Job
+                        attribute: $.syncJob
+                        flush: true
+                        arguments:
+                            - $.command
+                            - []
+                            - false
+                    - @job_add_dependency:
+                        job: $.syncJob
+                        dependency: $.runningJob
 
 triggers:
     clear_user_email_origin_on_deactivation:

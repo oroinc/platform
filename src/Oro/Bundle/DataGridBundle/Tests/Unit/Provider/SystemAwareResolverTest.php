@@ -47,29 +47,54 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function staticProvider()
     {
+        $staticCall = '%oro_datagrid.some.class%::testStaticCall';
+        $classConstant = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass::TEST';
+
         return [
             'static call'         => [
                 'test2',
                 [
                     'filters' => [
                         'entityName' => [
-                            'choices' => '%oro_datagrid.some.class%::testStaticCall'
+                            'choices' => $staticCall,
                         ]
                     ]
                 ],
                 84
+            ],
+            'static call 2'         => [
+                'test2',
+                [
+                    'filters' => [
+                        'entityName' => [
+                            'choices' => $staticCall . ' OR ' . $staticCall
+                        ]
+                    ]
+                ],
+                '84 OR 84'
             ],
             'class constant'      => [
                 'test3',
                 [
                     'filters' => [
                         'entityName' => [
-                            'choices' => 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass::TEST'
+                            'choices' => $classConstant,
                         ]
                     ]
                 ],
                 42
-            ]
+            ],
+            'class constant and static call'      => [
+                'test2',
+                [
+                    'filters' => [
+                        'entityName' => [
+                            'choices' => $classConstant . ' OR ' . $staticCall,
+                        ]
+                    ]
+                ],
+                '42 OR 84'
+            ],
         ];
     }
 
