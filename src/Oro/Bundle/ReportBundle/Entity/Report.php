@@ -11,6 +11,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
+use Oro\Bundle\ReportBundle\Model\ExtendReport;
+
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_report")
@@ -40,7 +42,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
  *      }
  * )
  */
-class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
+class Report extends ExtendReport implements GridQueryDesignerInterface
 {
     const GRID_PREFIX = 'oro_report_table_';
 
