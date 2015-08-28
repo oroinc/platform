@@ -16,8 +16,10 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
 {
     /** @var ProcessHandler */
     protected $handler;
+
     /** @var ServiceLink */
     protected $processStorage;
+
     /** @var Registry */
     protected $doctrine;
 
@@ -54,6 +56,8 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
         foreach ($emailBodies as $emailBody) {
             $this->scheduleProcess($emailBody);
         }
+
+        $this->doctrine->getManager()->flush();
     }
 
     /**

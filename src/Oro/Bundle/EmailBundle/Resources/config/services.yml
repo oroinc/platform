@@ -621,6 +621,7 @@ services:
            - @oro_email.email.thread.provider
            - @oro_ui.html_tag_helper
            - @oro_security.security_facade.link
+           - @oro_email.mailbox.process_storage
         calls:
            - [ setSecurityContextLink, [@security.context.link] ]
         tags:

@@ -251,27 +251,35 @@ class TagManager
                 }
             }
 
-            foreach ($tagsToAdd as $tag) {
-                if ($this->getUser() && (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)
-                    || (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()))
-                ) {
-                    // skip tags that have not ID because user not granted to create tags
-                    continue;
-                }
-
-                $this->em->persist($tag);
-
-                $alias = $this->mapper->getEntityConfig(ClassUtils::getClass($resource));
-
-                $tagging = $this->createTagging($tag, $resource)
-                    ->setAlias($alias['alias']);
-
-                $this->em->persist($tagging);
-            }
-
+            $this->persistTags($resource, $tagsToAdd);
             if (!$tagsToAdd->isEmpty() && $flush) {
                 $this->em->flush();
             }
+        }
+    }
+
+    /**
+     * @param Taggable $resource
+     * @param ArrayCollection $tagsToAdd
+     */
+    protected function persistTags(Taggable $resource, ArrayCollection $tagsToAdd)
+    {
+        foreach ($tagsToAdd as $tag) {
+            if ($this->getUser() && (!$this->securityFacade->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)
+                || (!$this->securityFacade->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()))
+            ) {
+                // skip tags that have not ID because user not granted to create tags
+                continue;
+            }
+
+            $this->em->persist($tag);
+
+            $alias = $this->mapper->getEntityConfig(ClassUtils::getClass($resource));
+
+            $tagging = $this->createTagging($tag, $resource)
+                ->setAlias($alias['alias']);
+
+            $this->em->persist($tagging);
         }
     }
 

@@ -41,6 +41,7 @@ services:
             - @oro_entity.entity_provider
             - @translator
             - @oro_security.search.acl_helper
+            - @event_dispatcher
 
     oro_search.security_provider:
         class:                        %oro_search.security_provider.class%
