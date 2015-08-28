@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -19,6 +20,7 @@ use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 
@@ -77,16 +79,18 @@ class Indexer
      * @param EntityProvider      $entityProvider
      * @param TranslatorInterface $translator
      * @param AclHelper           $searchAclHelper
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        ObjectManager       $em,
-        EngineInterface     $engine,
-        ObjectMapper        $mapper,
-        SecurityProvider    $securityProvider,
-        ConfigManager       $configManager,
-        EntityProvider      $entityProvider,
-        TranslatorInterface $translator,
-        AclHelper           $searchAclHelper
+        ObjectManager            $em,
+        EngineInterface          $engine,
+        ObjectMapper             $mapper,
+        SecurityProvider         $securityProvider,
+        ConfigManager            $configManager,
+        EntityProvider           $entityProvider,
+        TranslatorInterface      $translator,
+        AclHelper                $searchAclHelper,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->em               = $em;
         $this->engine           = $engine;
@@ -95,7 +99,8 @@ class Indexer
         $this->configManager    = $configManager;
         $this->entityProvider   = $entityProvider;
         $this->translator       = $translator;
-        $this->searchAclHelper = $searchAclHelper;
+        $this->searchAclHelper  = $searchAclHelper;
+        $this->dispatcher       = $dispatcher;
     }
 
     /**
@@ -235,6 +240,7 @@ class Indexer
         $results       = [];
         $searchResults = $this->simpleSearch($searchString, $offset, $maxResults, $tables);
         foreach ($searchResults->getElements() as $item) {
+            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
             $className = $item->getEntityName();
             if (ClassUtils::getClass($user) === $className && $user->getId() === $item->getRecordId()) {
                 continue;

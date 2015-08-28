@@ -343,6 +343,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $count = $processed = $invalid = $totalInvalid = 0;
 
         $emails = $this->manager->getEmails($searchQuery);
+        $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setBatchCallback(
             function ($batch) {
