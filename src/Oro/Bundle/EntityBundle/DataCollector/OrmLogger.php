@@ -10,9 +10,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class OrmLogger
 {
-    /** @var boolean */
-    public $enabled = true;
-
     /** @var array */
     protected $hydrations = [];
 
@@ -98,13 +95,11 @@ class OrmLogger
      */
     public function startHydration($hydrationType)
     {
-        if ($this->enabled) {
-            $this->startHydration = microtime(true);
+        $this->startHydration = microtime(true);
 
-            $this->hydrations[++$this->currentHydration]['type'] = $hydrationType;
-            if ($this->stopwatch) {
-                $this->stopwatch->start('doctrine.orm.hydrations');
-            }
+        $this->hydrations[++$this->currentHydration]['type'] = $hydrationType;
+        if ($this->stopwatch) {
+            $this->stopwatch->start('doctrine.orm.hydrations');
         }
     }
 
@@ -116,13 +111,11 @@ class OrmLogger
      */
     public function stopHydration($resultCount, $aliasMap)
     {
-        if ($this->enabled) {
-            $this->hydrations[$this->currentHydration]['time']        = microtime(true) - $this->startHydration;
-            $this->hydrations[$this->currentHydration]['resultCount'] = $resultCount;
-            $this->hydrations[$this->currentHydration]['aliasMap']    = $aliasMap;
-            if ($this->stopwatch) {
-                $this->stopwatch->stop('doctrine.orm.hydrations');
-            }
+        $this->hydrations[$this->currentHydration]['time']        = microtime(true) - $this->startHydration;
+        $this->hydrations[$this->currentHydration]['resultCount'] = $resultCount;
+        $this->hydrations[$this->currentHydration]['aliasMap']    = $aliasMap;
+        if ($this->stopwatch) {
+            $this->stopwatch->stop('doctrine.orm.hydrations');
         }
     }
 
@@ -227,13 +220,11 @@ class OrmLogger
      */
     protected function startOperation($name)
     {
-        if ($this->enabled) {
-            $startStopwatch = $this->stopwatch && !$this->hasNestedOperations();
+        $startStopwatch = $this->stopwatch && !$this->hasNestedOperations();
 
-            $this->startStack[$name][] = microtime(true);
-            if ($startStopwatch) {
-                $this->stopwatch->start('doctrine.orm.operations');
-            }
+        $this->startStack[$name][] = microtime(true);
+        if ($startStopwatch) {
+            $this->stopwatch->start('doctrine.orm.operations');
         }
     }
 
@@ -242,22 +233,20 @@ class OrmLogger
      */
     protected function stopOperation($name)
     {
-        if ($this->enabled) {
-            $time = microtime(true) - array_pop($this->startStack[$name]);
-            if (isset($this->stats[$name])) {
-                $this->stats[$name]['count'] += 1;
-            } else {
-                $this->stats[$name] = ['count' => 1, 'time' => 0];
-            }
-            // add to an execution time only if there are no nested operations
-            if (empty($this->startStack[$name])) {
-                $this->stats[$name]['time'] += $time;
-                // add to a total execution time only if there are no nested operations of any type
-                if (!$this->hasNestedOperations()) {
-                    $this->statsTime += $time;
-                    if ($this->stopwatch) {
-                        $this->stopwatch->stop('doctrine.orm.operations');
-                    }
+        $time = microtime(true) - array_pop($this->startStack[$name]);
+        if (isset($this->stats[$name])) {
+            $this->stats[$name]['count'] += 1;
+        } else {
+            $this->stats[$name] = ['count' => 1, 'time' => 0];
+        }
+        // add to an execution time only if there are no nested operations
+        if (empty($this->startStack[$name])) {
+            $this->stats[$name]['time'] += $time;
+            // add to a total execution time only if there are no nested operations of any type
+            if (!$this->hasNestedOperations()) {
+                $this->statsTime += $time;
+                if ($this->stopwatch) {
+                    $this->stopwatch->stop('doctrine.orm.operations');
                 }
             }
         }
