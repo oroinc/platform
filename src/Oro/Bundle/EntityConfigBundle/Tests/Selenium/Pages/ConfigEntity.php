@@ -179,11 +179,16 @@ class ConfigEntity extends CustomEntity
      */
     public function checkEntityField($fieldName)
     {
+        //label
         $this->assertElementPresent(
-            "//div[@class='control-group']/label[contains(., '{$fieldName}')]",
-            "Custom entity field not found : {$fieldName}"
+            "//div[@class='control-group']/div[@class='control-label wrap']/label[text()='{$fieldName}')]",
+            "Custom entity field label not found : {$fieldName}"
         );
-
+        //input
+        $this->assertElementPresent(
+            "//div[@class='control-group']/div[@class='controls']/input[contains(@data-ftid,'{$fieldName}')]",
+            "Custom entity field input not found : {$fieldName}"
+        );
         return $this;
     }
 
