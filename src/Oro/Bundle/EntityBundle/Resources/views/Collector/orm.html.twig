@@ -67,7 +67,7 @@
         <span>{{ '%0.2f'|format(collector.stats.flush.time * 1000) }} ms</span>
     </div>
     <div class="sf-toolbar-info-piece">
-        <b>Total time</b>
+        <b><abbr title="Total execution time of all monitored ORM hydrations and operations">Total time</abbr></b>
         <span>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</span>
     </div>
     {% endset %}
@@ -155,7 +155,7 @@
                 <td><pre>{{ '%0.2f'|format(collector.stats.flush.time * 1000) }} ms</pre></td>
             </tr>
             <tr>
-                <th>Total time</th>
+                <th><abbr title="Total execution time of all monitored ORM hydrations and operations">Total time</abbr></th>
                 <td><pre>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</pre></td>
             </tr>
         </tbody>

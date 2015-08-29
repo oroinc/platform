@@ -13,7 +13,7 @@ class OrmLogger
     public $enabled = true;
 
     /** @var array */
-    public $hydrations = [];
+    protected $hydrations = [];
 
     /** @var float */
     protected $startHydration;
@@ -22,24 +22,13 @@ class OrmLogger
     protected $currentHydration = 0;
 
     /** @var array */
-    public $stats = [
-        'persist' => ['count' => 0, 'time' => 0],
-        'detach'  => ['count' => 0, 'time' => 0],
-        'merge'   => ['count' => 0, 'time' => 0],
-        'remove'  => ['count' => 0, 'time' => 0],
-        'refresh' => ['count' => 0, 'time' => 0],
-        'flush'   => ['count' => 0, 'time' => 0]
-    ];
+    protected $stats = [];
+
+    /** @var float */
+    protected $statsTime = 0;
 
     /** @var array */
-    protected $startStack = [
-        'persist' => [],
-        'detach'  => [],
-        'merge'   => [],
-        'remove'  => [],
-        'refresh' => [],
-        'flush'   => []
-    ];
+    protected $startStack = [];
 
     /**
      * @param array           $hydrators
@@ -57,6 +46,42 @@ class OrmLogger
                 }
             }
         }
+    }
+
+    /**
+     * Gets all executed hydrations
+     *
+     * @return array
+     */
+    public function getHydrations()
+    {
+        return $this->hydrations;
+    }
+
+    /**
+     * Gets statistic of all executed operations
+     *
+     * @return array
+     */
+    public function getStats()
+    {
+        foreach (['persist', 'detach', 'merge', 'remove', 'refresh', 'flush'] as $name) {
+            if (!isset($this->stats[$name])) {
+                $this->stats[$name] = ['count' => 0, 'time' => 0];
+            }
+        }
+
+        return $this->stats;
+    }
+
+    /**
+     * Gets a total time of all executed operations
+     *
+     * @return float
+     */
+    public function getStatsTime()
+    {
+        return $this->statsTime;
     }
 
     /**
@@ -93,9 +118,7 @@ class OrmLogger
      */
     public function startPersist()
     {
-        if ($this->enabled) {
-            $this->startStack['persist'][] = microtime(true);
-        }
+        $this->startOperation('persist');
     }
 
     /**
@@ -103,10 +126,7 @@ class OrmLogger
      */
     public function stopPersist()
     {
-        if ($this->enabled) {
-            $this->stats['persist']['time'] += microtime(true) - array_pop($this->startStack['persist']);
-            $this->stats['persist']['count'] += 1;
-        }
+        $this->stopOperation('persist');
     }
 
     /**
@@ -114,9 +134,7 @@ class OrmLogger
      */
     public function startDetach()
     {
-        if ($this->enabled) {
-            $this->startStack['detach'][] = microtime(true);
-        }
+        $this->startOperation('detach');
     }
 
     /**
@@ -124,10 +142,7 @@ class OrmLogger
      */
     public function stopDetach()
     {
-        if ($this->enabled) {
-            $this->stats['detach']['time'] += microtime(true) - array_pop($this->startStack['detach']);
-            $this->stats['detach']['count'] += 1;
-        }
+        $this->stopOperation('detach');
     }
 
     /**
@@ -135,9 +150,7 @@ class OrmLogger
      */
     public function startMerge()
     {
-        if ($this->enabled) {
-            $this->startStack['merge'][] = microtime(true);
-        }
+        $this->startOperation('merge');
     }
 
     /**
@@ -145,10 +158,7 @@ class OrmLogger
      */
     public function stopMerge()
     {
-        if ($this->enabled) {
-            $this->stats['merge']['time'] += microtime(true) - array_pop($this->startStack['merge']);
-            $this->stats['merge']['count'] += 1;
-        }
+        $this->stopOperation('merge');
     }
 
     /**
@@ -156,9 +166,7 @@ class OrmLogger
      */
     public function startRefresh()
     {
-        if ($this->enabled) {
-            $this->startStack['refresh'][] = microtime(true);
-        }
+        $this->startOperation('refresh');
     }
 
     /**
@@ -166,10 +174,7 @@ class OrmLogger
      */
     public function stopRefresh()
     {
-        if ($this->enabled) {
-            $this->stats['refresh']['time'] += microtime(true) - array_pop($this->startStack['refresh']);
-            $this->stats['refresh']['count'] += 1;
-        }
+        $this->stopOperation('refresh');
     }
 
     /**
@@ -177,9 +182,7 @@ class OrmLogger
      */
     public function startRemove()
     {
-        if ($this->enabled) {
-            $this->startStack['remove'][] = microtime(true);
-        }
+        $this->startOperation('remove');
     }
 
     /**
@@ -187,10 +190,7 @@ class OrmLogger
      */
     public function stopRemove()
     {
-        if ($this->enabled) {
-            $this->stats['remove']['time'] += microtime(true) - array_pop($this->startStack['remove']);
-            $this->stats['remove']['count'] += 1;
-        }
+        $this->stopOperation('remove');
     }
 
     /**
@@ -198,9 +198,7 @@ class OrmLogger
      */
     public function startFlush()
     {
-        if ($this->enabled) {
-            $this->startStack['flush'][] = microtime(true);
-        }
+        $this->startOperation('flush');
     }
 
     /**
@@ -208,9 +206,46 @@ class OrmLogger
      */
     public function stopFlush()
     {
+        $this->stopOperation('flush');
+    }
+
+    /**
+     * @param string $name
+     */
+    protected function startOperation($name)
+    {
         if ($this->enabled) {
-            $this->stats['flush']['time'] += microtime(true) - array_pop($this->startStack['flush']);
-            $this->stats['flush']['count'] += 1;
+            $this->startStack[$name][] = microtime(true);
+        }
+    }
+
+    /**
+     * @param string $name
+     */
+    protected function stopOperation($name)
+    {
+        if ($this->enabled) {
+            $time = microtime(true) - array_pop($this->startStack[$name]);
+            if (isset($this->stats[$name])) {
+                $this->stats[$name]['count'] += 1;
+            } else {
+                $this->stats[$name] = ['count' => 1, 'time' => 0];
+            }
+            // add to an execution time only if there are no nested operations
+            if (empty($this->startStack[$name])) {
+                $this->stats[$name]['time'] += $time;
+                // add to a total execution time only if there are no nested operations of any type
+                $hasNested = false;
+                foreach ($this->startStack as $startStack) {
+                    if (!empty($startStack)) {
+                        $hasNested = true;
+                        break;
+                    }
+                }
+                if (!$hasNested) {
+                    $this->statsTime += $time;
+                }
+            }
         }
     }
 }
