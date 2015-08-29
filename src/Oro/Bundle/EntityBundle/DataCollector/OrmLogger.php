@@ -5,8 +5,9 @@ namespace Oro\Bundle\EntityBundle\DataCollector;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
-use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 use Symfony\Component\Stopwatch\Stopwatch;
+
+use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 
 class OrmLogger
 {
@@ -99,7 +100,7 @@ class OrmLogger
 
         $this->hydrations[++$this->currentHydration]['type'] = $hydrationType;
         if ($this->stopwatch) {
-            $this->stopwatch->start('doctrine.orm.hydrations');
+            $this->stopwatch->start('doctrine.orm.hydrations', 'doctrine');
         }
     }
 
@@ -224,7 +225,7 @@ class OrmLogger
 
         $this->startStack[$name][] = microtime(true);
         if ($startStopwatch) {
-            $this->stopwatch->start('doctrine.orm.operations');
+            $this->stopwatch->start('doctrine.orm.operations', 'doctrine');
         }
     }
 
