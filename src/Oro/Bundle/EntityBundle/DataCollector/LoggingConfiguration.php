@@ -7,7 +7,7 @@ use Doctrine\ORM\Configuration;
 class LoggingConfiguration extends Configuration
 {
     /**
-     * Gets the ORM logger.
+     * Gets the ORM profiling logger.
      *
      * @return OrmLogger
      */
@@ -19,7 +19,7 @@ class LoggingConfiguration extends Configuration
     }
 
     /**
-     * Sets the ORM logger.
+     * Sets the ORM profiling logger.
      *
      * @param OrmLogger $logger
      */

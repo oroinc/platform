@@ -27,10 +27,10 @@ parameters:
 
 services:
     oro_entity.cache.warmer.logging_hydrator:
+        public: false
         class: Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer
         arguments:
             - %oro_entity.orm.hydrators%
-            - @kernel
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 

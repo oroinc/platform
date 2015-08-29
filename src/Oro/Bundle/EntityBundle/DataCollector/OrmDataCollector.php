@@ -28,45 +28,75 @@ class OrmDataCollector extends DataCollector
         $this->data['stats']      = $this->logger->stats;
     }
 
+    /**
+     * Gets executed hydrations.
+     *
+     * @return array
+     */
     public function getHydrations()
     {
         return $this->data['hydrations'];
     }
 
+    /**
+     * Gets a number of executed hydrations.
+     *
+     * @return int
+     */
     public function getHydrationCount()
     {
         return count($this->data['hydrations']);
     }
 
+    /**
+     * Gets a total time of all executed hydrations.
+     *
+     * @return float
+     */
     public function getHydrationTime()
     {
         $time = 0;
         foreach ($this->data['hydrations'] as $hydration) {
-            if (isset($hydration['executionMS'])) {
-                $time += $hydration['executionMS'];
+            if (isset($hydration['time'])) {
+                $time += $hydration['time'];
             }
         }
 
         return $time;
     }
 
+    /**
+     * Gets a number of hydrated entities.
+     *
+     * @return int
+     */
     public function getHydratedEntities()
     {
         $result = 0;
         foreach ($this->data['hydrations'] as $hydration) {
-            if (isset($hydration['resultNum'])) {
-                $result += $hydration['resultNum'];
+            if (isset($hydration['resultCount'])) {
+                $result += $hydration['resultCount'];
             }
         }
 
         return $result;
     }
 
+    /**
+     * Gets statistic of executed ORM operations.
+     *
+     * @return array
+     */
     public function getStats()
     {
         return $this->data['stats'];
     }
 
+    /**
+     * Gets a total time of all executed hydrations and executed ORM operations.
+     *
+     * @return float
+     */
     public function getTotalTime()
     {
         $time = $this->getHydrationTime();

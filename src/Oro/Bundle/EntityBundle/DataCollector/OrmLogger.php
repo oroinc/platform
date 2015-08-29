@@ -13,6 +13,12 @@ class OrmLogger
     /** @var array */
     public $hydrations = [];
 
+    /** @var float */
+    protected $startHydration;
+
+    /** @var integer */
+    protected $currentHydration = 0;
+
     /** @var array */
     public $stats = [
         'persist' => ['count' => 0, 'time' => 0],
@@ -23,11 +29,15 @@ class OrmLogger
         'flush'   => ['count' => 0, 'time' => 0]
     ];
 
-    /** @var float */
-    protected $start;
-
-    /** @var integer */
-    protected $currentHydration = 0;
+    /** @var array */
+    protected $startStack = [
+        'persist' => [],
+        'detach'  => [],
+        'merge'   => [],
+        'remove'  => [],
+        'refresh' => [],
+        'flush'   => []
+    ];
 
     /**
      * @param array           $hydrators
@@ -55,7 +65,7 @@ class OrmLogger
     public function startHydration($hydrationType)
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startHydration = microtime(true);
 
             $this->hydrations[++$this->currentHydration]['type'] = $hydrationType;
         }
@@ -64,14 +74,14 @@ class OrmLogger
     /**
      * Marks a hydration as stopped
      *
-     * @param int   $resultNum
+     * @param int   $resultCount
      * @param array $aliasMap
      */
-    public function stopHydration($resultNum, $aliasMap)
+    public function stopHydration($resultCount, $aliasMap)
     {
         if ($this->enabled) {
-            $this->hydrations[$this->currentHydration]['executionMS'] = microtime(true) - $this->start;
-            $this->hydrations[$this->currentHydration]['resultNum']   = $resultNum;
+            $this->hydrations[$this->currentHydration]['time']        = microtime(true) - $this->startHydration;
+            $this->hydrations[$this->currentHydration]['resultCount'] = $resultCount;
             $this->hydrations[$this->currentHydration]['aliasMap']    = $aliasMap;
         }
     }
@@ -82,7 +92,7 @@ class OrmLogger
     public function startPersist()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['persist'][] = microtime(true);
         }
     }
 
@@ -92,8 +102,8 @@ class OrmLogger
     public function stopPersist()
     {
         if ($this->enabled) {
+            $this->stats['persist']['time'] += microtime(true) - array_pop($this->startStack['persist']);
             $this->stats['persist']['count'] += 1;
-            $this->stats['persist']['time'] += microtime(true) - $this->start;
         }
     }
 
@@ -103,7 +113,7 @@ class OrmLogger
     public function startDetach()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['detach'][] = microtime(true);
         }
     }
 
@@ -113,8 +123,8 @@ class OrmLogger
     public function stopDetach()
     {
         if ($this->enabled) {
+            $this->stats['detach']['time'] += microtime(true) - array_pop($this->startStack['detach']);
             $this->stats['detach']['count'] += 1;
-            $this->stats['detach']['time'] += microtime(true) - $this->start;
         }
     }
 
@@ -124,7 +134,7 @@ class OrmLogger
     public function startMerge()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['merge'][] = microtime(true);
         }
     }
 
@@ -134,8 +144,8 @@ class OrmLogger
     public function stopMerge()
     {
         if ($this->enabled) {
+            $this->stats['merge']['time'] += microtime(true) - array_pop($this->startStack['merge']);
             $this->stats['merge']['count'] += 1;
-            $this->stats['merge']['time'] += microtime(true) - $this->start;
         }
     }
 
@@ -145,7 +155,7 @@ class OrmLogger
     public function startRefresh()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['refresh'][] = microtime(true);
         }
     }
 
@@ -155,8 +165,8 @@ class OrmLogger
     public function stopRefresh()
     {
         if ($this->enabled) {
+            $this->stats['refresh']['time'] += microtime(true) - array_pop($this->startStack['refresh']);
             $this->stats['refresh']['count'] += 1;
-            $this->stats['refresh']['time'] += microtime(true) - $this->start;
         }
     }
 
@@ -166,7 +176,7 @@ class OrmLogger
     public function startRemove()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['remove'][] = microtime(true);
         }
     }
 
@@ -176,8 +186,8 @@ class OrmLogger
     public function stopRemove()
     {
         if ($this->enabled) {
+            $this->stats['remove']['time'] += microtime(true) - array_pop($this->startStack['remove']);
             $this->stats['remove']['count'] += 1;
-            $this->stats['remove']['time'] += microtime(true) - $this->start;
         }
     }
 
@@ -187,7 +197,7 @@ class OrmLogger
     public function startFlush()
     {
         if ($this->enabled) {
-            $this->start = microtime(true);
+            $this->startStack['flush'][] = microtime(true);
         }
     }
 
@@ -197,8 +207,8 @@ class OrmLogger
     public function stopFlush()
     {
         if ($this->enabled) {
+            $this->stats['flush']['time'] += microtime(true) - array_pop($this->startStack['flush']);
             $this->stats['flush']['count'] += 1;
-            $this->stats['flush']['time'] += microtime(true) - $this->start;
         }
     }
 }
