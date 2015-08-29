@@ -181,7 +181,8 @@ class ConfigEntity extends CustomEntity
     {
         //label
         $this->assertElementPresent(
-            "//div[@class='control-group']/div[@class='control-label wrap']/label[text()='{$fieldName}']",
+            "//div[@class='control-group']/div[@class='control-label wrap']" .
+            "/label[contains(@for,'{$fieldName}-uid') and contains(text(),'{$fieldName}')]",
             "Custom entity field label not found : {$fieldName}"
         );
         //input
@@ -250,8 +251,8 @@ class ConfigEntity extends CustomEntity
     {
         foreach ($options as $option) {
             $this->test->byXPath(
-                "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
-                "//following-sibling::div//label[contains(., '{$option}')]"
+                "//div[@class='control-group'][div/label[text() = '{$fieldName}']]".
+                "/div[@class='controls']//label[contains(., '{$option}')]"
             )->click();
         }
 

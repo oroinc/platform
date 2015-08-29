@@ -38,8 +38,8 @@ class CustomEntity extends AbstractPageEntity
     {
         $relation = $this->test->select(
             $this->test->byXPath(
-                "//div[@class='control-group extend-rel-target-field']/label[normalize-space(text())=" .
-                "'{$data}']/following-sibling::div/select"
+                "//div[@class='control-group extend-rel-target-field'][div/label[normalize-space(text())=" .
+                "'{$data}']]/div/select"
             )
         );
         foreach ($fields as $field) {
