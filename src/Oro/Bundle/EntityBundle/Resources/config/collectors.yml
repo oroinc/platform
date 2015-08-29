@@ -37,6 +37,7 @@ services:
         arguments:
             - %oro_entity.orm.hydrators%
             - @doctrine
+            - @?debug.stopwatch
 
     oro_entity.profiler.orm_data_collector:
         public: false

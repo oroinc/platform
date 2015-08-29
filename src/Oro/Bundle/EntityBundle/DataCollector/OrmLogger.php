@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class OrmLogger
 {
@@ -30,11 +31,15 @@ class OrmLogger
     /** @var array */
     protected $startStack = [];
 
+    /** @var Stopwatch|null */
+    protected $stopwatch;
+
     /**
      * @param array           $hydrators
      * @param ManagerRegistry $doctrine
+     * @param Stopwatch|null  $stopwatch
      */
-    public function __construct(array $hydrators, ManagerRegistry $doctrine)
+    public function __construct(array $hydrators, ManagerRegistry $doctrine, Stopwatch $stopwatch = null)
     {
         // inject profiling logger and logging hydrators into a configuration of all registered entity managers
         foreach ($doctrine->getManagers() as $manager) {
@@ -46,6 +51,8 @@ class OrmLogger
                 }
             }
         }
+
+        $this->stopwatch = $stopwatch;
     }
 
     /**
@@ -95,6 +102,9 @@ class OrmLogger
             $this->startHydration = microtime(true);
 
             $this->hydrations[++$this->currentHydration]['type'] = $hydrationType;
+            if ($this->stopwatch) {
+                $this->stopwatch->start('doctrine.orm.hydrations');
+            }
         }
     }
 
@@ -110,6 +120,9 @@ class OrmLogger
             $this->hydrations[$this->currentHydration]['time']        = microtime(true) - $this->startHydration;
             $this->hydrations[$this->currentHydration]['resultCount'] = $resultCount;
             $this->hydrations[$this->currentHydration]['aliasMap']    = $aliasMap;
+            if ($this->stopwatch) {
+                $this->stopwatch->stop('doctrine.orm.hydrations');
+            }
         }
     }
 
@@ -215,7 +228,12 @@ class OrmLogger
     protected function startOperation($name)
     {
         if ($this->enabled) {
+            $startStopwatch = $this->stopwatch && !$this->hasNestedOperations();
+
             $this->startStack[$name][] = microtime(true);
+            if ($startStopwatch) {
+                $this->stopwatch->start('doctrine.orm.operations');
+            }
         }
     }
 
@@ -235,17 +253,27 @@ class OrmLogger
             if (empty($this->startStack[$name])) {
                 $this->stats[$name]['time'] += $time;
                 // add to a total execution time only if there are no nested operations of any type
-                $hasNested = false;
-                foreach ($this->startStack as $startStack) {
-                    if (!empty($startStack)) {
-                        $hasNested = true;
-                        break;
-                    }
-                }
-                if (!$hasNested) {
+                if (!$this->hasNestedOperations()) {
                     $this->statsTime += $time;
+                    if ($this->stopwatch) {
+                        $this->stopwatch->stop('doctrine.orm.operations');
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasNestedOperations()
+    {
+        foreach ($this->startStack as $startStack) {
+            if (!empty($startStack)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
