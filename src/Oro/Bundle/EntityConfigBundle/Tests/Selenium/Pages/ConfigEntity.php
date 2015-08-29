@@ -186,7 +186,7 @@ class ConfigEntity extends CustomEntity
         );
         //input
         $this->assertElementPresent(
-            "//div[@class='control-group']/div[@class='controls']/input[contains(@data-ftid,'{$fieldName}')]",
+            "//div[@class='control-group']/div[@class='controls']//*[contains(@data-ftid,'form_{$fieldName}')]",
             "Custom entity field input not found : {$fieldName}"
         );
         return $this;
