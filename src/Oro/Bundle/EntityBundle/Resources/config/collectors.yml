@@ -1,7 +1,4 @@
 parameters:
-    doctrine.orm.entity_manager.class: Oro\Bundle\EntityBundle\DataCollector\LoggingEntityManager
-    doctrine.orm.configuration.class: Oro\Bundle\EntityBundle\DataCollector\LoggingConfiguration
-
     oro_entity.orm.hydrators:
         'Doctrine\ORM\Query::HYDRATE_OBJECT':
             name: ObjectHydrator

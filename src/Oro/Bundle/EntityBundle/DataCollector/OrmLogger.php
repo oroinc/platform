@@ -5,6 +5,8 @@ namespace Oro\Bundle\EntityBundle\DataCollector;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 
+use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
+
 class OrmLogger
 {
     /** @var boolean */
@@ -49,9 +51,9 @@ class OrmLogger
         foreach ($doctrine->getManagers() as $manager) {
             if ($manager instanceof EntityManagerInterface) {
                 $configuration = $manager->getConfiguration();
-                if ($configuration instanceof LoggingConfiguration) {
-                    $configuration->setOrmProfilingLogger($this);
-                    $configuration->setLoggingHydrators($hydrators);
+                if ($configuration instanceof OrmConfiguration) {
+                    $configuration->setAttribute('OrmProfilingLogger', $this);
+                    $configuration->setAttribute('LoggingHydrators', $hydrators);
                 }
             }
         }
