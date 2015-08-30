@@ -240,10 +240,15 @@ abstract class AbstractPageEntity extends AbstractPage
     {
         $this->assertElementPresent(
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
-            "/following-sibling::div[contains(., '{$value}')]",
-            "Field '{$fieldName}' data are not equals '{$value}'"
+            "/following-sibling::div/div",
+            "Field '{$fieldName}' is not found"
         );
+        $actualValue = $this->test->byXPath(
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div/div"
+        )->text();
 
+        \PHPUnit_Framework_Assert::assertEquals($value, $actualValue, "Field '{$fieldName}' has incorrect value");
         return $this;
     }
 
