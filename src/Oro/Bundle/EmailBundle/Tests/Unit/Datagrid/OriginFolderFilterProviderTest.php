@@ -5,11 +5,10 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
@@ -74,23 +73,24 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
     public function testPersonalOrigin()
     {
         $origin1 = new TestEmailOrigin(1);
-        ReflectionUtil::setId($origin1, 1);
         $origin1->setMailboxName('testName1');
-        $folder1 = new EmailFolder(1);
-        ReflectionUtil::setId($folder1, 1);
+        $folder1 = new TestEmailFolder(1);
+        $folder2 = new TestEmailFolder(2);
+        $folder3 = new TestEmailFolder(3);
         $folder1->setFullName('Folder1');
-        $folder2 = new EmailFolder(2);
-        ReflectionUtil::setId($folder2, 2);
+        $folder1->setSyncEnabled(true);
         $folder2->setFullName('Folder2');
+        $folder2->setSyncEnabled(true);
+        $folder3->setFullName('Folder - disabled');
         $origin1->addFolder($folder1);
         $origin1->addFolder($folder2);
+        $origin1->addFolder($folder3);
 
         $origin2 = new TestEmailOrigin(2);
-        ReflectionUtil::setId($origin2, 1);
         $origin2->setMailboxName('testName2');
         $origin2->setActive(false);
-        $folder3 = new EmailFolder(3);
-        ReflectionUtil::setId($folder3, 3);
+        $folder3 = new TestEmailFolder(3);
+        $folder3->setSyncEnabled(true);
         $folder3->setFullName('Folder3');
         $origin2->addFolder($folder3);
 
@@ -119,30 +119,28 @@ class OriginFolderFilterProviderTest extends \PHPUnit_Framework_TestCase
     public function testMailboxOrigins()
     {
         $mailbox1 = new TestMailbox();
-        ReflectionUtil::setId($mailbox1, 1);
-        $mailbox1->setLabel('Box1');
         $origin1 = new TestEmailOrigin(1);
-        ReflectionUtil::setId($origin1, 1);
         $origin1->setMailboxName('testName1');
-        $folder1 = new EmailFolder(1);
-        ReflectionUtil::setId($folder1, 1);
+        $folder1 = new TestEmailFolder(1);
+        $folder2 = new TestEmailFolder(2);
+        $folder3 = new TestEmailFolder(3);
         $folder1->setFullName('Folder1');
-        $folder2 = new EmailFolder(2);
-        ReflectionUtil::setId($folder2, 2);
+        $folder1->setSyncEnabled(true);
         $folder2->setFullName('Folder2');
+        $folder2->setSyncEnabled(true);
+        $folder3->setFullName('Folder - disabled');
         $origin1->addFolder($folder1);
         $origin1->addFolder($folder2);
+        $origin1->addFolder($folder3);
         $mailbox1->setOrigin($origin1);
 
         $mailbox2 = new TestMailbox();
-        ReflectionUtil::setId($mailbox2, 2);
         $mailbox2->setLabel('Box2');
         $origin2 = new TestEmailOrigin(2);
-        ReflectionUtil::setId($origin2, 1);
         $origin2->setMailboxName('testName2');
         $origin2->setActive(false);
-        $folder3 = new EmailFolder(3);
-        ReflectionUtil::setId($folder3, 3);
+        $folder3 = new TestEmailFolder(3);
+        $folder3->setSyncEnabled(true);
         $folder3->setFullName('Folder3');
         $origin2->addFolder($folder3);
         $mailbox2->setOrigin($origin2);
