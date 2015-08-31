@@ -45,7 +45,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -152,7 +151,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -261,7 +259,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -371,7 +368,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -859,7 +855,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'target_field_id' => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => false,
                     'target_entity'   => self::SOURCE_CLASS,

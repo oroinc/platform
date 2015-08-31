@@ -1,10 +1,12 @@
 define([
+    'jquery',
     'underscore',
     'backbone',
     'oroui/js/app/components/base/component-container-mixin'
-], function(_, Backbone, componentContainerMixin) {
+], function($, _, Backbone, componentContainerMixin) {
     'use strict';
 
+    // Backbone.View
     _.extend(Backbone.View.prototype, componentContainerMixin);
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function() {
@@ -57,7 +59,27 @@ define([
         // initializes page components
         return this.initPageComponents();
     };
+    /**
+     * Create flag of deferred render
+     *
+     * @protected
+     */
+    Backbone.View.prototype._deferredRender = function() {
+        this.deferredRender = $.Deferred();
+    };
+    /**
+     * Resolves deferred render
+     *
+     * @protected
+     */
+    Backbone.View.prototype._resolveDeferredRender = function() {
+        if (this.deferredRender) {
+            this.deferredRender.resolve(this);
+            delete this.deferredRender;
+        }
+    };
 
+    // Backbone.Model
     Backbone.Model.prototype.disposed = false;
     Backbone.Model.prototype.dispose = function() {
         var prop;
@@ -81,6 +103,7 @@ define([
         return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
     };
 
+    // Backbone.Collection
     Backbone.Collection.prototype.disposed = false;
     Backbone.Collection.prototype.dispose = function() {
         var prop;

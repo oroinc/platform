@@ -21,6 +21,8 @@ define([
      * @extends Backbone.View
      */
     GridViewsView = Backbone.View.extend({
+        DEFAULT_GRID_VIEW_ID: '__all__',
+
         className: 'grid-views',
 
         /** @property */
@@ -92,8 +94,9 @@ define([
 
             if (options.choices) {
                 this.choices = _.union(this.choices, options.choices);
-                if (!this._getView('__all__').label) {
-                    this._getView('__all__').label = __('oro.datagrid.gridView.all') + (options.title || '');
+                if (!this._getView(this.DEFAULT_GRID_VIEW_ID).label) {
+                    this._getView(this.DEFAULT_GRID_VIEW_ID).label =
+                        __('oro.datagrid.gridView.all') + (options.title || '');
                 }
             }
 
@@ -118,9 +121,9 @@ define([
 
             this.viewsCollection = new this.viewsCollection(options.views);
             if (!this.collection.state.gridView) {
-                this.collection.state.gridView = '__all__';
+                this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
             }
-            this.viewsCollection.get('__all__').set({
+            this.viewsCollection.get(this.DEFAULT_GRID_VIEW_ID).set({
                 filters: options.collection.initialState.filters,
                 sorters: options.collection.initialState.sorters
             });
@@ -149,7 +152,7 @@ define([
         _bindEventListeners: function() {
             this.listenTo(this.collection, 'updateState', function(collection) {
                 if (!collection.state.gridView) {
-                    collection.state.gridView = '__all__';
+                    collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
                 }
             });
             this.listenTo(this.collection, 'updateState', this.render);
@@ -384,12 +387,15 @@ define([
          * @param {GridViewModel} model
          */
         _onModelRemove: function(model) {
+            var viewId = this.collection.state.gridView;
+            viewId = viewId === this.DEFAULT_GRID_VIEW_ID ? viewId : parseInt(viewId, 10);
+
             this.choices = _.reject(this.choices, function(item) {
-                return item.value === this.collection.state.gridView;
+                return item.value === viewId;
             }, this);
 
-            if (model.id === this.collection.state.gridView) {
-                this.collection.state.gridView = '__all__';
+            if (model.id === viewId) {
+                this.collection.state.gridView = this.DEFAULT_GRID_VIEW_ID;
                 this.viewDirty = !this._isCurrentStateSynchronized();
             }
 

@@ -5,10 +5,11 @@ define([
     'routing',
     'orotranslation/js/translator',
     'oroui/js/mediator',
+    'oroui/js/tools',
     'oroui/js/error',
     'oroui/js/modal',
     'orodatagrid/js/datagrid/action-launcher'
-], function($, _, Backbone, routing, __, mediator, error, Modal, ActionLauncher) {
+], function($, _, Backbone, routing, __, mediator, tools, error, Modal, ActionLauncher) {
     'use strict';
 
     var AbstractAction;
@@ -94,7 +95,7 @@ define([
             this.subviews = [];
             this.datagrid = options.datagrid;
             // make own messages property from prototype
-            this.messages = _.extend({}, this.defaultMessages, this.messages);
+            this.messages = _.extend({}, this._getDefaultMessages(), this.messages);
             // make own launcherOptions property from prototype
             this.launcherOptions = $.extend(true, {}, this.launcherOptions, options.launcherOptions, {
                 action: this
@@ -167,6 +168,19 @@ define([
             default:
                 this._handleWidget();
             }
+        },
+
+        /**
+         * Collect and merge default messages from prototype chain of the action
+         *
+         * @returns {Object}
+         * @protected
+         */
+        _getDefaultMessages: function() {
+            var defaultMessages = tools.getAllPropertyVersions(this, 'defaultMessages');
+            defaultMessages.unshift({});
+            defaultMessages = _.extend.apply(_, defaultMessages);
+            return defaultMessages;
         },
 
         _confirmationExecutor: function(callback) {

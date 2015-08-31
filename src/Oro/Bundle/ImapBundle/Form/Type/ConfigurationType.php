@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -17,6 +17,10 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ConfigurationType extends AbstractType
 {
     const NAME = 'oro_imap_configuration';
@@ -119,11 +123,13 @@ class ConfigurationType extends AbstractType
             ->add('password', 'password', [
                 'label' => 'oro.imap.configuration.password.label', 'required' => true,
                 'attr' => ['class' => 'check-connection']
-            ])
-            ->add('check_connection', new CheckButtonType(), [
+            ]);
+        if ($options['add_check_button']) {
+            $builder->add('check_connection', new CheckButtonType(), [
                 'label' => $this->translator->trans('oro.imap.configuration.connect_and_retrieve_folders')
-            ])
-            ->add('folders', 'oro_email_email_folder_tree', [
+            ]);
+        }
+        $builder->add('folders', 'oro_email_email_folder_tree', [
                 'label'   => $this->translator->trans('oro.email.folders.label'),
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
@@ -238,6 +244,7 @@ class ConfigurationType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
     {
@@ -261,8 +268,19 @@ class ConfigurationType extends AbstractType
                         && ($entity->getImapHost() !== $data['imapHost']
                             || $entity->getUser() !== $data['user'])
                     ) {
-                        // in case when critical fields were changed new entity should be created
-                        $newConfiguration = new UserEmailOrigin();
+                        /*
+                         * In case when critical fields were changed, configuration should be reset.
+                         *  - When imap or smtp was disabled, don't create new configuration
+                         *  - If imap or smtp are still enabled create a new one.
+                         */
+                        if ((!array_key_exists('useImap', $data) || $data['useImap'] === 0)
+                            && (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0)
+                        ) {
+                            $newConfiguration = null;
+                            $event->setData(null);
+                        } else {
+                            $newConfiguration = new UserEmailOrigin();
+                        }
                         $event->getForm()->setData($newConfiguration);
                     }
                 } elseif ($entity instanceof UserEmailOrigin) {
@@ -284,7 +302,7 @@ class ConfigurationType extends AbstractType
                 /** @var UserEmailOrigin $data */
                 $data = $event->getData();
                 if ($data !== null) {
-                    if ($data->getOwner() === null) {
+                    if (($data->getOwner() === null) && ($data->getMailbox() === null)) {
                         $data->setOwner($this->securityFacade->getLoggedUser());
                     }
                     if ($data->getOrganization() === null) {
@@ -312,16 +330,25 @@ class ConfigurationType extends AbstractType
                 $entity = $event->getForm()->getData();
 
                 if ($entity instanceof UserEmailOrigin) {
+                    /*
+                     * If useImap is disabled unset imap related data and set imap host to empty string.
+                     * Empty string as host will cause origin to be recreated if necessary.
+                     * Old origin will be disabled and later removed in cron job.
+                     */
                     if (!array_key_exists('useImap', $data) || $data['useImap'] === 0) {
                         unset($data['imapHost'], $data['imapPort'], $data['imapEncryption']);
+                        $data['imapHost'] = '';
                     }
+                    /*
+                     * If smtp is disabled, unset smtp related data.
+                     */
                     if (!array_key_exists('useSmtp', $data) || $data['useSmtp'] === 0) {
                         unset($data['smtpHost'], $data['smtpPort'], $data['smtpEncryption']);
                     }
                     $event->setData($data);
                 }
             },
-            2
+            6
         );
     }
 
@@ -377,11 +404,12 @@ class ConfigurationType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
             'required'          => false,
+            'add_check_button'  => true,
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 

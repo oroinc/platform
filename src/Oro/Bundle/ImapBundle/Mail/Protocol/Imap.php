@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Protocol;
 
+use Zend\Mail\Storage\Exception as BaseException;
+
 /**
  * Class Imap
  * Add PEEK capability to Zend Imap Protocol
@@ -80,7 +82,7 @@ class Imap extends \Zend\Mail\Protocol\Imap
         }
 
         if ($to === null && !is_array($from)) {
-            throw new Exception\RuntimeException('the single id was not found in response');
+            throw new BaseException\RuntimeException('the single id was not found in response');
         }
 
         return $result;

@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Field;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -122,7 +123,7 @@ class FieldGenerator
      */
     protected function addRelationField($entityClass, $fieldName, $label, $description, $targetEntity, $targetField)
     {
-        $this->configManager->createConfigFieldModel($entityClass, $fieldName, 'manyToOne');
+        $this->configManager->createConfigFieldModel($entityClass, $fieldName, RelationType::MANY_TO_ONE);
 
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $entityFieldConfig = $entityConfigProvider->getConfig($entityClass, $fieldName);
@@ -138,7 +139,7 @@ class FieldGenerator
         $extendFieldConfig->set('target_field', $targetField);
         $extendFieldConfig->set(
             'relation_key',
-            ExtendHelper::buildRelationKey($entityClass, $targetField, 'manyToOne', $targetEntity)
+            ExtendHelper::buildRelationKey($entityClass, $targetField, RelationType::MANY_TO_ONE, $targetEntity)
         );
 
         $formConfigProvider = $this->configManager->getProvider('form');

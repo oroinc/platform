@@ -14,6 +14,7 @@ class StepHandler extends AbstractHandler
         'label',
         'order',
         'is_final',
+        '_is_start',
         'entity_acl',
         'allowed_transitions',
         'position'
@@ -34,14 +35,14 @@ class StepHandler extends AbstractHandler
         foreach ($rawSteps as $rawStep) {
             if (!empty($rawStep['_is_start'])) {
                 $configuration = $this->processStartingPoint($configuration, $rawStep);
+                $handledStep = $this->handleStepConfiguration($configuration, $rawStep);
             } else {
                 $handledStep = $this->handleStepConfiguration($configuration, $rawStep);
-                $handledSteps[] = $handledStep;
-
                 if (!empty($configuration['start_step']) && $configuration['start_step'] == $handledStep['name']) {
                     $startStepExists = true;
                 }
             }
+            $handledSteps[] = $handledStep;
         }
 
         $configuration[WorkflowConfiguration::NODE_STEPS] = $handledSteps;
@@ -96,6 +97,10 @@ class StepHandler extends AbstractHandler
 
         if (empty($step['label'])) {
             $step['label'] = $step['name'];
+        }
+
+        if (empty($step['_is_start'])) {
+            $step['_is_start'] = false;
         }
 
         if (empty($step['allowed_transitions'])) {

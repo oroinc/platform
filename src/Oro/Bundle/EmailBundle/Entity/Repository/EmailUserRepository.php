@@ -30,6 +30,21 @@ class EmailUserRepository extends EntityRepository
     }
 
     /**
+     * @param $email Email
+     *
+     * @return EmailUser[]
+     */
+    public function findByEmailForMailbox(Email $email)
+    {
+        return $this->createQueryBuilder('ue')
+            ->andWhere('ue.email = :email')
+            ->andWhere('ue.mailboxOwner IS NOT NULL')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @param User $user
      * @param Organization $organization
      * @param array $folderTypes
@@ -41,18 +56,19 @@ class EmailUserRepository extends EntityRepository
         $qb = $this->createQueryBuilder('eu');
         $qb
             ->join('eu.folder', 'f')
+            ->join('f.origin', 'o')
             ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
-            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()));
+            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
+            ->andWhere($qb->expr()->eq('o.isActive', ':active'))
+            ->setParameter('active', true);
 
         if ($folderTypes) {
             $qb->andWhere($qb->expr()->in('f.type', $folderTypes));
         }
 
         if ($isSeen !== null) {
-            $qb->add(
-                'where',
-                $qb->expr()->andX($qb->expr()->eq('eu.seen', ':seen'))
-            )->setParameters(['seen' => (bool)$isSeen]);
+            $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
+            ->setParameter('seen', (bool)$isSeen);
         }
 
         return $qb->getQuery()->getResult();
@@ -165,6 +181,36 @@ class EmailUserRepository extends EntityRepository
         $queryBuilder->andWhere($queryBuilder->expr()->in('t.id', $threadIds));
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return QueryBuilder
+     */
+    public function getEmailUserByFolder($folder)
+    {
+        $queryBuilder = $this->createQueryBuilder('eu')
+            ->andWhere('eu.folder = :folder')
+            ->setParameter('folder', $folder);
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     * @param array       $messages
+     * @return EmailUser[]
+     */
+    public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
+    {
+        return $this
+            ->getEmailUserByFolder($folder)
+            ->leftJoin('eu.email', 'email')
+            ->andWhere('email.messageId IN (:messageIds)')
+            ->setParameter('messageIds', $messages)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

@@ -4,28 +4,33 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
- * Cache for ConfigInterface
+ * A cache for entity configs
  */
 class ConfigCache
 {
-    /**
-     * @var CacheProvider
-     */
+    const FLAG_KEY = 0;
+    const FIELDS_KEY = 1;
+    const VALUES_KEY = 0;
+    const FIELD_TYPE_KEY = 1;
+
+    /** @var CacheProvider */
     protected $cache;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     protected $modelCache;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $isDebug;
+
+    /** @var array */
+    private $localCache = [];
+
+    /** @var array */
+    private $localModelCache = [];
 
     /**
      * @param CacheProvider $cache
@@ -40,55 +45,152 @@ class ConfigCache
     }
 
     /**
-     * @param ConfigIdInterface $configId
-     * @return ConfigInterface
+     * @param string $scope
+     * @param string $className
+     * @param bool   $localCacheOnly
+     *
+     * @return ConfigInterface|null
      */
-    public function loadConfigFromCache(ConfigIdInterface $configId)
+    public function getEntityConfig($scope, $className, $localCacheOnly = false)
     {
-        return $this->cache->fetch($this->buildConfigCacheKey($configId));
+        if (isset($this->localCache[$className])) {
+            $cacheEntry = $this->localCache[$className];
+        } else {
+            $cacheEntry = !$localCacheOnly ? $this->fetchEntityConfig($className) : [];
+        }
+
+        return isset($cacheEntry[$scope])
+            ? $cacheEntry[$scope]
+            : null;
+    }
+
+    /**
+     * @param string $scope
+     * @param string $className
+     * @param string $fieldName
+     * @param bool   $localCacheOnly
+     *
+     * @return ConfigInterface|null
+     */
+    public function getFieldConfig($scope, $className, $fieldName, $localCacheOnly = false)
+    {
+        $cacheKey = $className . '.' . $fieldName;
+
+        if (isset($this->localCache[$cacheKey])) {
+            $cacheEntry = $this->localCache[$cacheKey];
+        } else {
+            $cacheEntry = !$localCacheOnly ? $this->fetchFieldConfig($cacheKey, $className, $fieldName) : [];
+        }
+
+        return isset($cacheEntry[$scope])
+            ? $cacheEntry[$scope]
+            : null;
     }
 
     /**
      * @param ConfigInterface $config
+     * @param bool            $localCacheOnly
+     *
      * @return bool
-     * @throws \LogicException
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function putConfigInCache(ConfigInterface $config)
+    public function saveConfig(ConfigInterface $config, $localCacheOnly = false)
     {
         $configId = $config->getId();
-        if ($this->isDebug && $configId instanceof FieldConfigId) {
-            if ($configId->getFieldType() === null) {
-                // undefined field type can cause unpredictable logical bugs
-                throw new \LogicException(
-                    sprintf(
-                        'A field config "%s::%s" with undefined field type cannot be cached.'
-                        . ' It seems that there is some critical bug in entity config core functionality.'
-                        . ' Please contact ORO team if you see this error.',
-                        $configId->getClassName(),
-                        $configId->getFieldName()
-                    )
-                );
-            }
+        if ($this->isDebug && $configId instanceof FieldConfigId && null === $configId->getFieldType()) {
+            // undefined field type can cause unpredictable logical bugs
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'A field config "%s::%s" with undefined field type cannot be cached.'
+                    . ' It seems that there is some critical bug in entity config core functionality.'
+                    . ' Please contact ORO team if you see this error.',
+                    $configId->getClassName(),
+                    $configId->getFieldName()
+                )
+            );
         }
 
-        return $this->cache->save($this->buildConfigCacheKey($config->getId()), $config);
+        $className = $configId->getClassName();
+        if ($configId instanceof FieldConfigId) {
+            $fieldName  = $configId->getFieldName();
+            $cacheKey   = $className . '.' . $fieldName;
+            $cacheEntry = isset($this->localCache[$cacheKey])
+                ? $this->localCache[$cacheKey]
+                : $this->fetchFieldConfig($cacheKey, $className, $fieldName);
+        } else {
+            $cacheKey   = $className;
+            $cacheEntry = isset($this->localCache[$cacheKey])
+                ? $this->localCache[$cacheKey]
+                : $this->fetchEntityConfig($className);
+        }
+
+        $cacheEntry[$configId->getScope()] = $config;
+
+        $this->localCache[$cacheKey] = $cacheEntry;
+
+        return $localCacheOnly
+            ? true
+            : $this->pushConfig($cacheKey, $cacheEntry);
     }
 
     /**
-     * @param ConfigIdInterface $configId
+     * @param string $className
+     * @param bool   $localCacheOnly
+     *
      * @return bool
      */
-    public function removeConfigFromCache(ConfigIdInterface $configId)
+    public function deleteEntityConfig($className, $localCacheOnly = false)
     {
-        return $this->cache->delete($this->buildConfigCacheKey($configId));
+        unset($this->localCache[$className]);
+
+        return $localCacheOnly
+            ? true
+            : $this->cache->delete($className);
     }
 
     /**
+     * @param string $className
+     * @param string $fieldName
+     * @param bool   $localCacheOnly
+     *
      * @return bool
      */
-    public function removeAll()
+    public function deleteFieldConfig($className, $fieldName, $localCacheOnly = false)
     {
+        $cacheKey = $className . '.' . $fieldName;
+
+        unset($this->localCache[$cacheKey]);
+
+        return $localCacheOnly
+            ? true
+            : $this->cache->delete($cacheKey);
+    }
+
+    /**
+     * Deletes cache entries for all configs.
+     *
+     * @return bool TRUE if the cache entries were successfully deleted; otherwise, FALSE.
+     */
+    public function deleteAllConfigs()
+    {
+        $this->localCache = [];
+
         return $this->cache->deleteAll();
+    }
+
+    /**
+     * Flushes cache entries for all configs.
+     *
+     * @return bool TRUE if the cache entries were successfully flushed; otherwise, FALSE.
+     */
+    public function flushAllConfigs()
+    {
+        $this->localCache = [];
+
+        return $this->cache->flushAll();
     }
 
     /**
@@ -96,75 +198,182 @@ class ConfigCache
      *
      * @param string      $className
      * @param string|null $fieldName
+     *
      * @return bool|null true if an entity or entity field is configurable;
      *                   false if not;
      *                   null if unknown (it means that "is configurable" flag was not set yet)
      */
     public function getConfigurable($className, $fieldName = null)
     {
-        $flag = $this->modelCache->fetch(
-            $this->buildModelCacheKey($className, $fieldName)
-        );
+        $cacheEntry = isset($this->localModelCache[$className])
+            ? $this->localModelCache[$className]
+            : $this->fetchConfigurable($className);
 
-        if ($flag === false) {
-            // no cache entry exists
-            $flag = null;
-        } elseif ($flag === null) {
-            // no cache entry exists and it say that an entity or entity field is not configurable
-            $flag = false;
+        if ($fieldName) {
+            if (isset($cacheEntry[self::FIELDS_KEY][$fieldName])) {
+                return $cacheEntry[self::FIELDS_KEY][$fieldName];
+            }
+        } elseif (isset($cacheEntry[self::FLAG_KEY])) {
+            return $cacheEntry[self::FLAG_KEY];
         }
 
-        return $flag;
+        return null;
     }
 
     /**
      * Sets a flag indicates whether an entity or entity field is configurable or not.
      *
-     * @param bool        $flag      true if an entity or entity field is configurable; otherwise, false
+     * @param bool        $flag TRUE if an entity or entity field is configurable; otherwise, FALSE
      * @param string      $className
      * @param string|null $fieldName
-     * @return bool
+     * @param bool        $localCacheOnly
+     *
+     * @return boolean TRUE if the entry was successfully stored in the cache; otherwise, FALSE.
      */
-    public function setConfigurable($flag, $className, $fieldName = null)
+    public function saveConfigurable($flag, $className, $fieldName = null, $localCacheOnly = false)
     {
-        return $this->modelCache->save(
-            $this->buildModelCacheKey($className, $fieldName),
-            $flag === false ? null : $flag
-        );
+        $cacheEntry = isset($this->localModelCache[$className])
+            ? $this->localModelCache[$className]
+            : $this->fetchConfigurable($className);
+
+        if ($fieldName) {
+            $cacheEntry[self::FIELDS_KEY][$fieldName] = $flag;
+        } else {
+            $cacheEntry[self::FLAG_KEY] = $flag;
+        }
+        $this->localModelCache[$className] = $cacheEntry;
+
+        return $localCacheOnly
+            ? true
+            : $this->modelCache->save($className, $cacheEntry);
     }
 
     /**
-     * @return bool
+     * Deletes cached "configurable" flags for all configs.
+     *
+     * @return bool TRUE if the cache entries were successfully deleted; otherwise, FALSE.
      */
-    public function removeAllConfigurable()
+    public function deleteAllConfigurable()
     {
+        $this->localModelCache = [];
+
         return $this->modelCache->deleteAll();
     }
 
     /**
-     * Returns a string unique identifies each config model
+     * Flushes cached "configurable" flags for all configs.
      *
-     * @param string      $className
-     * @param string|null $fieldName
-     * @return string
+     * @return bool TRUE if the cache entries were successfully flushed; otherwise, FALSE.
      */
-    protected function buildModelCacheKey($className, $fieldName = null)
+    public function flushAllConfigurable()
     {
-        return $fieldName
-            ? sprintf('%s_%s', $className, $fieldName)
-            : $className;
+        $this->localModelCache = [];
+
+        return $this->modelCache->flushAll();
     }
 
     /**
-     * Returns a string unique identifies each config item
+     * @param string $className
      *
-     * @param ConfigIdInterface $configId
-     * @return string
+     * @return array
      */
-    protected function buildConfigCacheKey(ConfigIdInterface $configId)
+    protected function fetchEntityConfig($className)
     {
-        return $configId instanceof FieldConfigId
-            ? sprintf('%s_%s_%s', $configId->getScope(), $configId->getClassName(), $configId->getFieldName())
-            : sprintf('%s_%s', $configId->getScope(), $configId->getClassName());
+        /** @var array $cacheEntry */
+        $cacheEntry = $this->cache->fetch($className);
+        if (false === $cacheEntry) {
+            $cacheEntry = [];
+        }
+
+        if (!empty($cacheEntry)) {
+            $unpacked = [];
+            foreach ($cacheEntry as $scope => $values) {
+                $unpacked[$scope] = new Config(
+                    new EntityConfigId($scope, $className),
+                    $values
+                );
+            }
+            $cacheEntry = $unpacked;
+        }
+
+        $this->localCache[$className] = $cacheEntry;
+
+        return $cacheEntry;
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return array
+     */
+    protected function fetchFieldConfig($cacheKey, $className, $fieldName)
+    {
+        /** @var array $cacheEntry */
+        $cacheEntry = $this->cache->fetch($cacheKey);
+        if (false === $cacheEntry) {
+            $cacheEntry = [];
+        }
+
+        if (!empty($cacheEntry)) {
+            $unpacked  = [];
+            $fieldType = $cacheEntry[self::FIELD_TYPE_KEY];
+            foreach ($cacheEntry[self::VALUES_KEY] as $scope => $values) {
+                $unpacked[$scope] = new Config(
+                    new FieldConfigId($scope, $className, $fieldName, $fieldType),
+                    $values
+                );
+            }
+            $cacheEntry = $unpacked;
+        }
+
+        $this->localCache[$cacheKey] = $cacheEntry;
+
+        return $cacheEntry;
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param array  $cacheEntry
+     *
+     * @return bool
+     */
+    protected function pushConfig($cacheKey, $cacheEntry)
+    {
+        $packed    = [];
+        $fieldType = false;
+        /** @var Config $config */
+        foreach ($cacheEntry as $scope => $config) {
+            if (false === $fieldType) {
+                $configId  = $config->getId();
+                $fieldType = $configId instanceof FieldConfigId
+                    ? $configId->getFieldType()
+                    : null;
+            }
+            $packed[$scope] = $config->all();
+        }
+        if ($fieldType) {
+            $packed = [self::VALUES_KEY => $packed, self::FIELD_TYPE_KEY => $fieldType];
+        }
+
+        return $this->cache->save($cacheKey, $packed);
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array
+     */
+    protected function fetchConfigurable($className)
+    {
+        $cacheEntry = $this->modelCache->fetch($className);
+        if (false === $cacheEntry) {
+            $cacheEntry = [];
+        }
+
+        $this->localModelCache[$className] = $cacheEntry;
+
+        return $cacheEntry;
     }
 }

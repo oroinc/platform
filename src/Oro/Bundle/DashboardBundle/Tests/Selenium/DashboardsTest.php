@@ -73,7 +73,7 @@ class DashboardsTest extends Selenium2TestCase
         /** @var Dashboards $login */
         $login->openDashboards('Oro\Bundle\DashboardBundle')
             ->filterBy('Label', $dashboardName)
-            ->deleteEntity(array($dashboardName))
+            ->delete(array($dashboardName))
             ->assertMessage('Item deleted');
 
         $login->openDashboards('Oro\Bundle\DashboardBundle')

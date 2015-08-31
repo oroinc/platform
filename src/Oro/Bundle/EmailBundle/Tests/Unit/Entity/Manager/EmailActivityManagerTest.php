@@ -6,11 +6,14 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
  * Class EmailActivityManagerTest
@@ -34,6 +37,12 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
+    /** @var TokenStorage|\PHPUnit_Framework_MockObject_MockObject */
+    protected $tokenStorage;
+
+    /** @var ServiceLink|\PHPUnit_Framework_MockObject_MockObject */
+    protected $entityOwnerAccessorLink;
+
     /** @var EmailActivityManager */
     private $manager;
 
@@ -55,11 +64,21 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->tokenStorage = $this
+            ->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityOwnerAccessorLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->manager = new EmailActivityManager(
             $this->activityManager,
             $this->emailActivityListProvider,
-            $this->emailThreadProvider
+            $this->emailThreadProvider,
+            $this->tokenStorage,
+            $this->entityOwnerAccessorLink
         );
 
         $this->owners = [

@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  * Class Calendar
  *
  * @package Oro\Bundle\CalendarBundle\Tests\Selenium\Pages
- * @method Calendar openCalendar() openCalendar(string)
+ * @method Calendar openCalendar(string $bundlePath)
  * {@inheritdoc}
  */
 class Calendar extends Calendars

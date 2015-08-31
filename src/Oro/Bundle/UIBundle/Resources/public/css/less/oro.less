@@ -118,6 +118,21 @@ label, input, button, select, textarea { font-size:13px;}
       font-size: 13px;
       text-align:right;
     }
+    .control-label.wrap {
+      float:left;
+      padding-top:7px;
+      color: #777;
+      font-weight: normal;
+      font-size: 13px;
+      text-align:right;
+      .tooltip-icon {
+        margin-right: 5px;
+        cursor: pointer;
+      }
+      label {
+        display: inline;
+      }
+    }
     .controls {
       margin-left:170px;
       &.autocomplete-box{
@@ -131,6 +146,9 @@ label, input, button, select, textarea { font-size:13px;}
         &.html-content {
           overflow: auto;
         }
+      }
+      .control-label.wrap {
+        width: 130px;
       }
       label.control-label {
         width: auto;
@@ -273,6 +291,7 @@ i.color {
     .controls {
       margin-left: 240px;
     }
+    div.control-label,
     label.control-label {
       width: 230px;
       text-align: right;
@@ -830,12 +849,24 @@ footer {
   cursor: auto;
 }
 .ui-dialog-content {
-  margin: @verticalPadding/2 @horizontalPadding/2;
+  padding: @verticalPadding/2 @horizontalPadding/2 0 @verticalPadding/2;
+  margin: 0 auto;
   position: relative;
   min-width: 250px;
+  width: 100% !important;
+  height: calc(~"100% - 81px") !important;
   .ui-resizable-handle {
     cursor: move;
   }
+}
+.ui-dialog:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 32px") !important;
+  border-radius: 0 0 3px 3px;
+}
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) .ui-dialog-content{
+  height: calc(~"100% - 50px") !important;
+  border-radius: 0 0 3px 3px;
+  border-bottom: 1px solid #e5e5e5;
 }
 .ui-dialog .widget-actions-section .btn,
 .ui-dialog .widget-actions-section a.action {
@@ -1716,6 +1747,7 @@ footer {
 }
 .ui-dialog.ui-widget-content {
   border: 1px solid #bbb;
+  background-color: #fafafa;
 }
 .user-info-state {
   clear: right;
@@ -2073,7 +2105,7 @@ body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
   resize: vertical;
-  text-align: justify;
+  text-align: left;
   vertical-align: top;
 }
 .scrollspy-title {
@@ -2614,6 +2646,25 @@ label.radio.error {
       color:#888;
     }
   }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
   .row-oro.oro-multiselect-holder {
     margin: 0 0 5px;
   }
@@ -2785,7 +2836,6 @@ iframe.email-body {
   &>div {
     display: inline-block;
     margin-right: 20px;
-    min-width: 250px;
   }
   input[type="checkbox"]{
     margin: 0;
