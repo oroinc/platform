@@ -8,7 +8,6 @@ use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 
 class ConfigModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -112,12 +111,6 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
         $fieldModel->setType($fieldType1);
         $this->assertEquals($fieldName1, $fieldModel->getFieldName());
         $this->assertEquals($fieldType1, $fieldModel->getType());
-
-        $this->assertCount(0, $fieldModel->getOptions());
-        $optionSet = new OptionSet();
-        $fieldModel->setOptions(new ArrayCollection([$optionSet]));
-        $this->assertCount(1, $fieldModel->getOptions());
-        $this->assertSame($optionSet, $fieldModel->getOptions()->first());
     }
 
     /**
