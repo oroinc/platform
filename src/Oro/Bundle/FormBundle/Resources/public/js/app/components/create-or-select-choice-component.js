@@ -2,8 +2,9 @@ define([
     'underscore',
     'jquery',
     'oroui/js/app/components/base/component',
-    'routing'
-], function(_, $, BaseComponent, routing) {
+    'routing',
+    'oroui/js/mediator'
+], function(_, $, BaseComponent, routing, mediator) {
     'use strict';
 
     return BaseComponent.extend({
@@ -23,7 +24,6 @@ define([
         $el: null,
         $mode: null,
         $newEntity: null,
-        $newFormName: null,
         $existingEntity: null,
         $existingEntityInput: null,
         $dialog: null,
@@ -56,6 +56,8 @@ define([
             this.editRoute = options.editRoute;
 
             this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
+            this.$existingEntity.on('change', _.bind(this._retrieveEntityData, this));
+            this.$existingEntity.on('change', _.bind(this._cleanEntityData, this));
             this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
 
             this._onEntityChange({val: this.$existingEntityInput.val()});
@@ -86,10 +88,6 @@ define([
             } else {
                 this.$newEntity.hide();
             }
-
-            if (this._isInMode(this.MODE_EDIT)) {
-                this._retrieveEntityData(this.$existingEntityInput.val());
-            }
         },
 
         /**
@@ -118,15 +116,37 @@ define([
         /**
          * Retrieves entity data using set route. Provided id is used as query parameter for request.
          *
-         * @param id
+         * @param e
          * @private
          */
-        _retrieveEntityData: function (id) {
-            var route = routing.generate(this.editRoute, {id: id});
+        _retrieveEntityData: function (e) {
+            if (!this._isInMode(this.MODE_EDIT) || !e.val) {
+                return;
+            }
 
+            var route = routing.generate(this.editRoute, {id: e.val});
+
+            this._setLoading(true);
             $.get(route)
                 .done(_.bind(this._setNewEntityForm, this))
-                .fail(_.bind(this._handleDataRequestError, this));
+                .fail(_.bind(this._handleDataRequestError, this))
+                .always(_.bind(function() {
+                    this._setLoading(false);
+                }, this));
+        },
+
+        /**
+         * Cleans entity data when selecting default choice.
+         *
+         * @param e
+         * @private
+         */
+        _cleanEntityData: function (e) {
+            if (!this._isInMode(this.MODE_CREATE) || e.val || !this.editable) {
+                return;
+            }
+
+            this.$newEntity.find(':input').not(':checkbox').not(':radio').val(null);
         },
 
         /**
@@ -134,15 +154,48 @@ define([
          * @private
          */
         _setNewEntityForm: function(data) {
-            this.$newEntity.html(data);
-            this.$newEntity.find([name]).each(_.bind(function(index, element) {
+            var $data = $(data);
+            /*
+             * For each input element in added form, create new name to match naming scheme.
+             */
+            $data.find(':input').each(_.bind(function(index, element) {
                 var $element = $(element);
-                $element.attr('name', this.newEntityFormName + $element.attr('name'));
+                var inputName = $element.attr('name');
+                inputName = inputName.substr(inputName.indexOf('['));
+
+                var $modifiedField = this.$newEntity.find('[name$="' + inputName + '"]');
+
+                if ($element.is(':checkbox') || $element.is(':radio')) {
+                    $modifiedField = this.$newEntity.find(
+                        '[name$="' + inputName + '"][value="' + $element.val() + '"]'
+                    );
+                    $modifiedField.prop('checked', $element.is(':checked')).change();
+                } else {
+                    $modifiedField.val($element.val()).change();
+                }
             }, this));
         },
 
+        /**
+         * @param jqXHR
+         * @param textStatus
+         * @param error
+         * @private
+         */
         _handleDataRequestError: function(jqXHR, textStatus, error) {
-            console.error(textStatus); // TODO: Display error
+            console.error(textStatus); // Display error
+        },
+
+        /**
+         * @param enabled
+         * @private
+         */
+        _setLoading: function(enabled) {
+            if (enabled) {
+                mediator.execute('showLoading');
+            } else {
+                mediator.execute('hideLoading');
+            }
         }
     });
 });
