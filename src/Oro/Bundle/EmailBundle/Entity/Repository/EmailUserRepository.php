@@ -250,23 +250,25 @@ class EmailUserRepository extends EntityRepository
     {
         $queryBuilder->join('eu.folder', 'f');
 
-        if (is_array($type)) {
-            $expressions = [];
-            foreach ($type as $folderType) {
-                $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal($folderType));
-            }
-
-            if (in_array(FolderType::INBOX, $type)) {
-                $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal(FolderType::OTHER));
-            }
-
-            $expr = call_user_func_array([$queryBuilder->expr(), 'orX'], $expressions);
-            $queryBuilder->andWhere($expr);
-        } else {
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal($type))
-            );
+        if (!is_array($type)) {
+            $type = [$type];
         }
+
+        $expressions = [];
+        foreach ($type as $folderType) {
+            $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal($folderType));
+        }
+
+        /**
+         * In case of "inbox" type we should include "other" type too.
+         * Case with selective email folder sync, e.g. when syncing some folder different from "Inbox".
+         */
+        if (in_array(FolderType::INBOX, $type)) {
+            $expressions[] = $queryBuilder->expr()->eq('f.type', $queryBuilder->expr()->literal(FolderType::OTHER));
+        }
+
+        $expr = call_user_func_array([$queryBuilder->expr(), 'orX'], $expressions);
+        $queryBuilder->andWhere($expr);
 
         return $this;
     }
