@@ -53,6 +53,7 @@ define(function(require) {
         disable: function() {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
+            this.checkLayout();
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
@@ -114,6 +115,7 @@ define(function(require) {
 
             // FF sometimes gives wrong values, need to check
             sumWidth = _.reduce(widths, function(a, b) {return a + b;});
+
             if (sumWidth > totalWidth) {
                 widthDecrement = (sumWidth - totalWidth) / widths.length + 0.001;
             }
@@ -255,13 +257,13 @@ define(function(require) {
          * Enables other scroll functionality
          */
         enableOtherScroll: function() {
+            var heightDec;
             var self = this;
             var scrollContainer = this.domCache.gridScrollableContainer;
             var otherScroll = this.domCache.otherScroll;
             var otherScrollInner = this.domCache.otherScrollInner;
             var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             var scrollStateModel = new Backbone.Model();
-            var heightDec;
 
             this.scrollStateModel = scrollStateModel;
 
@@ -286,6 +288,7 @@ define(function(require) {
                 otherScroll.css({
                     display: val ? 'block' : 'none'
                 });
+                scrollContainer.toggleClass('scrollbar-is-visible', Boolean(val));
                 this.fixHeaderCellWidth();
             }, this);
             scrollStateModel.on('change:clientHeight', function(model, val) {
@@ -326,7 +329,8 @@ define(function(require) {
                 scrollStateModel.set({
                     headerHeight: self.headerHeight
                 });
-                self.scrollVisible = scrollContainer[0].clientHeight + 1 /*IE fix*/ < scrollContainer[0].scrollHeight;
+
+                self.scrollVisible = scrollContainer[0].clientHeight < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
                     visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
@@ -347,7 +351,9 @@ define(function(require) {
             this.domCache.gridScrollableContainer.off('scroll', this.rescrollCb);
             this.domCache.otherScroll.off('scroll');
             this.domCache.otherScroll.css({display: 'none'});
-            this.domCache.gridScrollableContainer.css({width: ''});
+            this.domCache.gridScrollableContainer.css({width: ''}).removeClass('scrollbar-is-visible');
+            this.domCache.gridContainer.css({width: ''});
+            this.$grid.css({width: ''});
             this.scrollStateModel.destroy();
             delete this.scrollStateModel;
             delete this.rescrollCb;
@@ -377,7 +383,7 @@ define(function(require) {
                     this._lastClientRect.left !== scrollContainerRect.left ||
                     this._lastClientRect.right !== scrollContainerRect.right)) {
                 if (!this._lastClientRect || (this._lastClientRect.left !== scrollContainerRect.left ||
-                    this._lastClientRect.right !== scrollContainerRect.right)) {
+                        this._lastClientRect.right !== scrollContainerRect.right)) {
                     this.fixHeaderCellWidth();
                 } else {
                     this.selectMode();
@@ -411,7 +417,7 @@ define(function(require) {
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
                 (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
-                ) {
+            ) {
                 // no need to calculate anything
                 return resultRect;
             }

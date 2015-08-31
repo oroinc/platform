@@ -30,11 +30,24 @@ define(function(require) {
             ignoreHead: false,
             doNotFetch: false
         },
+
         listen: {
             'toView collection': '_viewItem',
             'toViewGroup collection': '_viewGroup',
             'toEdit collection': '_editItem',
             'toDelete collection': '_deleteItem'
+        },
+
+        EDIT_DIALOG_CONFIGURATION_DEFAULTS: {
+            'regionEnabled': false,
+            'incrementalPosition': false,
+            'alias': 'activity_list:item:update',
+            'dialogOptions': {
+                'modal': true,
+                'resizable': true,
+                'width': 675,
+                'autoResize': true
+            }
         },
 
         initialize: function(options) {
@@ -54,6 +67,8 @@ define(function(require) {
             });
 
             this.template = _.template($(this.options.template).html());
+            this.isFiltersEmpty = true;
+            this.gridToolbar = $('.activity-list-widget .activity-list .grid-toolbar');
 
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
@@ -119,6 +134,12 @@ define(function(require) {
             }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+
+            if (this.collection.getCount() === 0 && this.isFiltersEmpty) {
+                this.gridToolbar.hide();
+            } else {
+                this.gridToolbar.show();
+            }
         },
 
         /**
@@ -349,22 +370,16 @@ define(function(require) {
                         .replace(/&#039;/g, '\'');
                 };
 
-                this.itemEditDialog = new DialogWidget({
+                var dialogConfiguration = $.extend(true, {}, this.EDIT_DIALOG_CONFIGURATION_DEFAULTS, {
                     'url': this._getUrl('itemEdit', model),
                     'title': unescapeHTML(model.get('subject')),
-                    'regionEnabled': false,
-                    'incrementalPosition': false,
-                    'alias': 'activity_list:item:update',
                     'dialogOptions': {
-                        'modal': true,
-                        'resizable': false,
-                        'width': 675,
-                        'autoResize': true,
                         'close': _.bind(function() {
                             delete this.itemEditDialog;
                         }, this)
                     }
                 });
+                this.itemEditDialog = new DialogWidget(dialogConfiguration);
 
                 this.itemEditDialog.render();
             }

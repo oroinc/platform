@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle;
 
+use Symfony\Component\ClassLoader\ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -18,12 +19,27 @@ use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvider
 class OroEntityBundle extends Bundle
 {
     /**
+     * Constructor
+     *
+     * @param KernelInterface $kernel
+     */
+    public function __construct(KernelInterface $kernel)
+    {
+        // register logging hydrators class loader
+        $loader = new ClassLoader();
+        $loader->addPrefix(
+            'OroLoggingHydrator\\',
+            $kernel->getCacheDir() . DIRECTORY_SEPARATOR . 'oro_entities'
+        );
+        $loader->register();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
-        $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
         $container->addCompilerPass(new EntityAliasProviderPass());
         $container->addCompilerPass(new EntityNameProviderPass());
         $container->addCompilerPass(new EntityClassNameProviderPass());

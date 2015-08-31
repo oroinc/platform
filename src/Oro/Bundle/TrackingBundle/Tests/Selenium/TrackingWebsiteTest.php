@@ -18,7 +18,7 @@ class TrackingWebsiteTest extends Selenium2TestCase
      */
     public function testCreate()
     {
-        $identifier = 'Website' . mt_rand(10, 99);
+        $identifier = 'Website' . mt_rand();
 
         $login = $this->login();
         /** @var TrackingWebsites $login */

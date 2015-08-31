@@ -122,11 +122,14 @@ define(function(require) {
             var connection;
             for (var i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
-                if (connection.stale) {
+                if (connection.stale && connection.jsplumbConnection._jsPlumb) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
                     if (connection.jsplumbConnection.overlayView) {
                         connection.jsplumbConnection.overlayView.dispose();
                     }
+                }
+                // if connection is detached from jsPlumb
+                if (!connection.jsplumbConnection._jsPlumb) {
                     this.connections.splice(i, 1);
                     i--;
                 }

@@ -62,6 +62,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailerTransport;
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -70,8 +73,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->mailer = $this->getMockBuilder('\Swift_Mailer')
-            ->disableOriginalConstructor()
+        $this->mailer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\DirectMailer')
+             ->disableOriginalConstructor()
             ->getMock();
         $this->mailerTransport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()
@@ -259,6 +262,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $message = new \Swift_Message();
 
+        $this->userEmailOrigin->expects($this->once())
+            ->method('isSmtpConfigured')
+            ->will($this->returnValue(true));
+
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));
@@ -312,16 +319,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $email->expects($this->any())
             ->method('getEmailBody')
             ->willReturn($body);
-
-        $this->mailerTransport
-            ->expects($this->exactly(1))
-            ->method('setHost')
-            ->with($this->userEmailOrigin->getSmtpHost());
-
-        $this->mailerTransport
-            ->expects($this->exactly(1))
-            ->method('setPort')
-            ->with($this->userEmailOrigin->getSmtpPort());
 
         if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
             $targetEntity = new TestUser();

@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\AclVoter as BaseAclVoter;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
@@ -18,9 +16,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
@@ -64,9 +60,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $triggeredMask;
 
     /**
-     * @var ConfigProvider
+     * @var EntityOwnerAccessor
      */
-    protected $configProvider;
+    protected $entityOwnerAccessor;
 
     /**
      * @var AclGroupProviderInterface
@@ -74,11 +70,11 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $groupProvider;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param EntityOwnerAccessor $entityOwnerAccessor
      */
-    public function setConfigProvider(ConfigProvider $configProvider)
+    public function setEntityOwnerAccessor(EntityOwnerAccessor $entityOwnerAccessor)
     {
-        $this->configProvider = $configProvider;
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
     }
 
     /**
@@ -209,7 +205,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
     /**
      * Check organization. If user try to access entity what was created in organization this user do not have access -
-     *  deny access
+     *  deny access. We should check organization for all the entities what have ownership
+     *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types)
      *
      * @param int $result
      * @return int
@@ -225,31 +222,19 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             && is_object($object)
             && !($object instanceof ObjectIdentity)
         ) {
-            $className = ClassUtils::getRealClass($object);
-            if ($this->configProvider->hasConfig($className)) {
-                $config = $this->configProvider->getConfig($className);
-                $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
-                // we need to check organization in case if Access level is not system,
-                // or then access level and owner type of test object is User or Business Unit (in this owner types we
-                // do not allow to use System access level)
-                // (do not allow to manipulate records from another organization)
-                if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
-                    || (
-                        $accessLevel === AccessLevel::SYSTEM_LEVEL
-                        && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT'])
-                    )
+            try {
+                // try to get entity organization value
+                $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+
+                // check entity organization with current organization
+                if ($objectOrganization
+                    && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
                 ) {
-                    if ($config->has('organization_field_name')) {
-                        $accessor = PropertyAccess::createPropertyAccessor();
-                        /** @var Organization $objectOrganization */
-                        $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
-                        if ($objectOrganization
-                            && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
-                        ) {
-                            $result = self::ACCESS_DENIED;
-                        }
-                    }
+                    $result = self::ACCESS_DENIED;
                 }
+            } catch (InvalidEntityException $e) {
+                // in case if entity has no organization field (none ownership type)
+                return $result;
             }
         }
 

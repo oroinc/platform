@@ -23,6 +23,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from layout.js
      * ============================================================ */
+
+    var realWidth = function($selector) {
+        if ($selector instanceof $ && $selector.length > 0) {
+            return $selector[0].getBoundingClientRect().width;
+        } else {
+            return 0;
+        }
+    };
+
     $(function() {
         var $pageTitle = $('#page-title');
         if ($pageTitle.size()) {
@@ -241,7 +250,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 initializeContent();
 
                 // set width for #main container
-                $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
+                $main.width(realWidth($topPage) - realWidth($leftPanel) - realWidth($rightPanel));
                 layout.updateResponsiveLayout();
 
                 var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
@@ -389,15 +398,43 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     /* ============================================================
      * from form/collection.js'
      * ============================================================ */
-    $(document).on('click', '.add-list-item', function(e) {
-        e.preventDefault();
-        var $listContainer = $(this).siblings('.collection-fields-list');
+
+    function getOroCollectionInfo($listContainer) {
         var index = $listContainer.data('last-index') || $listContainer.children().length;
         var prototypeName = $listContainer.attr('data-prototype-name') || '__name__';
         var html = $listContainer.attr('data-prototype').replace(new RegExp(prototypeName, 'g'), index);
-        $listContainer.append(html)
+
+        return {
+            nextIndex: index,
+            nextItemHtml: html
+        };
+    }
+
+    $(document).on('click', '.add-list-item', function(e) {
+        e.preventDefault();
+        var $listContainer = $(this).siblings('.collection-fields-list');
+        var collectionInfo = getOroCollectionInfo($listContainer);
+        $listContainer.append(collectionInfo.nextItemHtml)
             .trigger('content:changed')
-            .data('last-index', index + 1);
+            .data('last-index', collectionInfo.nextIndex + 1);
+
+        $listContainer.find('input.position-input').each(function(i, el) {
+            $(el).val(i);
+        });
+    });
+
+    $(document).on('click', '.addAfterRow', function(e) {
+        e.preventDefault();
+        var $item = $(this).closest('.row-oro').parent();
+        var $listContainer = $item.parent();
+        var collectionInfo = getOroCollectionInfo($listContainer);
+        $item.after(collectionInfo.nextItemHtml);
+        $listContainer.trigger('content:changed')
+            .data('last-index', collectionInfo.nextIndex + 1);
+
+        $listContainer.find('input.position-input').each(function(i, el) {
+            $(el).val(i);
+        });
     });
 
     $(document).on('click', '.removeRow', function(e) {
@@ -405,5 +442,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $(this).closest('*[data-content]')
             .trigger('content:remove')
             .remove();
+    });
+
+    /**
+     * Support for [data-focusable] attribute
+     */
+    $(document).on('click', 'label[for]', function(e) {
+        var forAttribute = $(e.target).attr('for');
+        var labelForElement = $('#' + forAttribute + ':first');
+        if (labelForElement.is('[data-focusable]')) {
+            e.preventDefault();
+            labelForElement.trigger('set-focus');
+        }
     });
 });

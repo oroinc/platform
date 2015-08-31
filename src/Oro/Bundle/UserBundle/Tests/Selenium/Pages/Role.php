@@ -7,27 +7,17 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 class Role extends AbstractPageEntity
 {
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
-    protected $name;
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
-    protected $label;
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $accessLevel;
-
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-        $this->label = $this->test->byXpath("//*[@data-ftid='oro_user_role_form_label']");
-    }
 
     public function setLabel($label)
     {
-        $this->label->value($label);
+        $this->test->byXpath("//*[@data-ftid='oro_user_role_form_label']")->value($label);
         return $this;
     }
 
     public function getLabel()
     {
-        return $this->label->value();
+        return $this->test->byXpath("//*[@data-ftid='oro_user_role_form_label']")->value();
     }
 
     /**
@@ -55,7 +45,7 @@ class Role extends AbstractPageEntity
                     "[contains(@name, '[$action][accessLevel')]"
                 )
             );
-            if ($accessLevel == 'System'
+            if ($accessLevel === 'System'
                 && !$this->isElementPresent(
                     "//div[strong/text() = '{$entityName}']/ancestor::tr//select[contains(@name, '[$action]".
                     "[accessLevel')]/option[text()='{$accessLevel}']"

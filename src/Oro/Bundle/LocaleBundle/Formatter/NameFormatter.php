@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
+use Oro\Bundle\LocaleBundle\Model\NameInterface;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -47,6 +48,10 @@ class NameFormatter
         }
         if ($person instanceof NameSuffixInterface) {
             $nameParts['suffix'] = $person->getNameSuffix();
+        }
+
+        if (empty($nameParts) && $person instanceof NameInterface) {
+            return $person->getName();
         }
 
         $format = $this->getNameFormat($locale);

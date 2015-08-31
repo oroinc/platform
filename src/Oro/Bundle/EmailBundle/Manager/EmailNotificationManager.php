@@ -5,11 +5,13 @@ namespace Oro\Bundle\EmailBundle\Manager;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -61,15 +63,19 @@ class EmailNotificationManager
      *
      * @return array
      */
-    public function getEmails(User $user, $maxEmailsDisplay)
+    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay)
     {
-        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails($user, $maxEmailsDisplay);
+        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
+            $user,
+            $organization,
+            $maxEmailsDisplay
+        );
 
         $emailsData = [];
         /** @var $email Email */
-        foreach ($emails as $email) {
-            $isSeen = $email['seen'];
-            $email = $email[0];
+        foreach ($emails as $element) {
+            $isSeen = $element['seen'];
+            $email = $element[0];
             $bodyContent = '';
             try {
                 $this->emailCacheManager->ensureEmailBodyCached($email);
@@ -97,6 +103,18 @@ class EmailNotificationManager
     }
 
     /**
+     * Get count new emails
+     *
+     * @param User $user
+     *
+     * @return integer
+     */
+    public function getCountNewEmails(User $user, Organization $organization)
+    {
+        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization);
+    }
+
+    /**
      * @param Email $email
      *
      * @return bool|string
@@ -107,21 +125,17 @@ class EmailNotificationManager
         if ($email->getFromEmailAddress() && $email->getFromEmailAddress()->getOwner()) {
             $className = $email->getFromEmailAddress()->getOwner()->getClass();
             $routeName = $this->configManager->getEntityMetadata($className)->getRoute('view', false);
-            $path = $this->router->generate($routeName, ['id' => $email->getFromEmailAddress()->getOwner()->getId()]);
+            $path = null;
+            try {
+                $path = $this->router->generate(
+                    $routeName,
+                    ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
+                );
+            } catch (RouteNotFoundException $e) {
+                return false;
+            }
         }
 
         return $path;
-    }
-
-    /**
-     * Get count new emails
-     *
-     * @param User $user
-     *
-     * @return integer
-     */
-    public function getCountNewEmails(User $user)
-    {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user);
     }
 }

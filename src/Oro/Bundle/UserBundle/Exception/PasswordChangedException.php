@@ -11,6 +11,6 @@ class PasswordChangedException extends AccountStatusException
      */
     public function getMessageKey()
     {
-        return 'Password has been changed';
+        return 'Password has been changed.';
     }
 }

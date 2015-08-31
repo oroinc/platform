@@ -59,7 +59,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         $defaultConfig = [
             'placeholder'        => 'oro.form.choose_value',
             'allowClear'         => true,
-            'minimumInputLength' => 1,
+            'minimumInputLength' => 0,
         ];
 
         $resolver

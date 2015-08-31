@@ -28,7 +28,15 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "entity"={
  *              "icon"="icon-align-justify"
  *          },
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
  *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "comment"={
  *              "immutable"=true
  *          },
  *          "activity"={
@@ -36,6 +44,10 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
  *          }
  *      }
  * )
@@ -228,7 +240,8 @@ class ActivityList extends ExtendActivityList
     {
         /** @var $owner ActivityOwner */
         foreach ($this->getActivityOwners() as $owner) {
-            if ($owner->getUser()->getId() === $activityOwner->getUser()->getId()
+            if ($owner->getUser() && $activityOwner->getUser() &&
+                $owner->getUser()->getId() === $activityOwner->getUser()->getId()
                 && $owner->getActivity()->getId() === $activityOwner->getActivity()->getId()
             ) {
                 return true;

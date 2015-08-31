@@ -59,17 +59,29 @@ define(function(require) {
             }
         }
 
-        mediator.on('widget_dialog:open', function(dialog) {
-            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
-            scrollUpdate();
-        });
-        mediator.on('widget_dialog:close', function(dialog) {
-            delete dialogs[dialog.cid];
-            scrollUpdate();
-        });
-        mediator.on('widget_dialog:stateChange', function(dialog) {
-            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
-            scrollUpdate();
+        mediator.on({
+            // widget dialogs
+            'widget_dialog:open': function(dialog) {
+                dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+                scrollUpdate();
+            },
+            'widget_dialog:close': function(dialog) {
+                delete dialogs[dialog.cid];
+                scrollUpdate();
+            },
+            'widget_dialog:stateChange': function(dialog) {
+                dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+                scrollUpdate();
+            },
+            // modals
+            'modal:open': function(modal) {
+                dialogs[modal.cid] = true;
+                scrollUpdate();
+            },
+            'modal:close': function(modal) {
+                delete dialogs[modal.cid];
+                scrollUpdate();
+            }
         });
     }
 

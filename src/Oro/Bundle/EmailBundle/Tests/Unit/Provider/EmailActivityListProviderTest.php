@@ -21,7 +21,13 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     protected $securityFacadeLink;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContextLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineRegistryLink;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $mailboxProcessStorage;
 
     protected function setUp()
     {
@@ -29,6 +35,11 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacadeLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->setMethods(['getService', 'getRepository', 'findBy'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityContextLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->setMethods(['getService', 'getRepository', 'findBy'])
             ->disableOriginalConstructor()
@@ -54,6 +65,12 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->mailboxProcessStorage = $this->getMockBuilder(
+            'Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
             $this->doctrineRegistryLink,
@@ -61,9 +78,11 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $router,
             $configManager,
             $emailThreadProvider,
-            $htmlTagHelper
+            $htmlTagHelper,
+            $this->securityFacadeLink,
+            $this->mailboxProcessStorage
         );
-        $this->emailActivityListProvider->setSecurityContextLink($this->securityFacadeLink);
+        $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }
 
     public function testGetActivityOwners()
@@ -78,21 +97,28 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
         $owners = [$emailUser];
 
         $emailMock = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['getFromEmailAddress', 'hasOwner', 'getOwner', 'getOrganization'])
+            ->setMethods(
+                ['getFromEmailAddress',
+                    'hasOwner',
+                    'getOwner',
+                    'getOrganization',
+                    'getActivityTargetEntities'
+                ]
+            )
             ->disableOriginalConstructor()
             ->getMock();
-        $emailMock->expects($this->exactly(3))
+        $emailMock->expects($this->once())
             ->method('getFromEmailAddress')
             ->willReturn($emailMock);
         $emailMock->expects($this->once())
-            ->method('hasOwner')
-            ->willReturn(true);
-        $emailMock->expects($this->exactly(2))
             ->method('getOwner')
             ->willReturn($emailMock);
         $emailMock->expects($this->exactly(2))
             ->method('getOrganization')
             ->willReturn($organization);
+        $emailMock->expects($this->exactly(1))
+            ->method('getActivityTargetEntities')
+            ->willReturn([]);
 
         $activityListMock = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
             ->disableOriginalConstructor()

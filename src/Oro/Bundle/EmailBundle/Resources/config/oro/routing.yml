@@ -17,3 +17,7 @@ oro_email_bundle_api:
         _format:  json
     defaults:
         version:  latest
+oro_mailbox_config:
+    resource:     "@OroEmailBundle/Controller/Configuration"
+    type:         annotation
+    prefix:       /config

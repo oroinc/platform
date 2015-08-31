@@ -216,7 +216,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
      * @param array $expectQueryBuilderCalls
      * @param array $expectExprCalls
      * @param array $expectQueryCalls
-     * @param array $expectAclHelperCalls
      */
     public function testSearch(
         $query,
@@ -226,8 +225,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         $expectEntityRepositoryCalls,
         $expectQueryBuilderCalls,
         $expectExprCalls,
-        $expectQueryCalls,
-        $expectAclHelperCalls
+        $expectQueryCalls
     ) {
         MockHelper::addMockExpectedCalls($this->indexer, $expectedIndexerCalls, $this);
         MockHelper::addMockExpectedCalls($this->searchResult, $expectSearchResultCalls, $this);
@@ -235,7 +233,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
         MockHelper::addMockExpectedCalls($this->queryBuilder, $expectQueryBuilderCalls, $this);
         MockHelper::addMockExpectedCalls($this->expr, $expectExprCalls, $this);
         MockHelper::addMockExpectedCalls($this->query, $expectQueryCalls, $this);
-        MockHelper::addMockExpectedCalls($this->aclHelper, $expectAclHelperCalls, $this);
 
         $actualResult = $this->searchHandler->search($query['query'], $query['page'], $query['perPage']);
         $this->assertEquals($expectedResult, $actualResult);
@@ -290,6 +287,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                 'expectQueryBuilderCalls' => [
                     ['expr', [], 'getMockExpr'],
                     ['where', ['e.id IN (1, 2, 3, 4)'], 'getMockQueryBuilder'],
+                    ['getQuery', [], 'getMockQuery']
                 ],
                 'expectExprCalls' => [
                     ['in', ['e.' . self::TEST_ID_FIELD, [1, 2, 3, 4]], 'e.id IN (1, 2, 3, 4)'],
@@ -316,9 +314,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                             ),
                         ],
                     ],
-                ],
-                'expectAclHelperCalls' => [
-                    ['apply', [], 'getMockQuery'],
                 ],
             ],
             'hasMore' => [
@@ -350,6 +345,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                 'expectQueryBuilderCalls' => [
                     ['expr', [], 'getMockExpr'],
                     ['where', ['e.id IN (1, 2)'], 'getMockQueryBuilder'],
+                    ['getQuery', [], 'getMockQuery']
                 ],
                 'expectExprCalls' => [
                     ['in', ['e.' . self::TEST_ID_FIELD, [1, 2]], 'e.id IN (1, 2)'],
@@ -367,9 +363,6 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                             ),
                         ],
                     ],
-                ],
-                'expectAclHelperCalls' => [
-                    ['apply', [], 'getMockQuery'],
                 ],
             ],
         ];

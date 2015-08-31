@@ -10,4 +10,14 @@ class SegmentData extends AbstractPageFilteredGrid
     {
         return;
     }
+
+    public function entityView()
+    {
+        return $this;
+    }
+
+    public function entityNew()
+    {
+        return $this;
+    }
 }

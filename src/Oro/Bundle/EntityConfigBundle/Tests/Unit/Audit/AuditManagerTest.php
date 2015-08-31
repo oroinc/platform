@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
@@ -11,111 +12,117 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var AuditManager
-     */
-    private $auditManager;
+    const SCOPE = 'testScope';
+    const ENTITY_CLASS = 'Test\Entity';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $tokenStorage;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
+
+    /** @var AuditManager */
+    private $auditManager;
 
     protected function setUp()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $token = $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->any())->method('getUser')->will($this->returnValue($user));
-
-        $securityContext = $this->getMockForAbstractClass('Symfony\Component\Security\Core\SecurityContextInterface');
-        $securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
-
-        $securityLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityLink->expects($this->any())->method('getService')->will($this->returnValue($securityContext));
+        $this->tokenStorage = $this->getMock(
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
+        );
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configManagerLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManagerLink->expects($this->any())->method('getService')->will($this->returnValue($this->configManager));
-
-        $provider = new ConfigProvider($this->configManager, 'testScope', array());
-
-        $this->configManager->expects($this->any())->method('getEntityManager')->will($this->returnValue($em));
-        $this->configManager->expects($this->any())->method('getUpdateConfig')->will(
-            $this->returnValue(
-                array(
-                    new Config(new EntityConfigId('testScope', 'testClass')),
-                    new Config(new FieldConfigId('testScope', 'testClass', 'testField', 'string')),
-                )
-            )
-        );
-
-        $this->configManager->expects($this->any())->method('getProvider')->will($this->returnValue($provider));
-
-        $this->auditManager = new AuditManager($configManagerLink, $securityLink);
+        $this->auditManager = new AuditManager($this->tokenStorage);
     }
 
     protected function tearDown()
     {
-        $this->auditManager = null;
+        unset($this->tokenStorage, $this->configManager, $this->auditManager);
     }
 
-    public function testLog()
+    public function testBuildLogEntry()
     {
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->will(
-            $this->returnValue(array('key' => 'value'))
-        );
+        $user = $this->initSecurityContext();
 
-        $this->auditManager->log();
+        $this->configManager->expects($this->once())
+            ->method('getUpdateConfig')
+            ->willReturn(
+                [
+                    new Config(new EntityConfigId(self::SCOPE, self::ENTITY_CLASS)),
+                    new Config(new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, 'testField', 'string')),
+                ]
+            );
+
+        $configProvider = new ConfigProvider($this->configManager, self::SCOPE, []);
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturn($configProvider);
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('getConfigChangeSet')
+            ->willReturn(['old_val', 'new_value']);
+
+        $result = $this->auditManager->buildLogEntry($this->configManager);
+
+        $this->assertSame($user, $result->getUser());
+        $this->assertCount(2, $result->getDiffs());
     }
 
-    public function testLogWithOutChanges()
+    public function testBuildLogEntryNoChanges()
     {
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->will(
-            $this->returnValue(array())
-        );
+        $this->initSecurityContext();
 
-        $this->auditManager->log();
+        $this->configManager->expects($this->once())
+            ->method('getUpdateConfig')
+            ->willReturn([]);
+
+        $this->assertNull($this->auditManager->buildLogEntry($this->configManager));
     }
 
-    public function testLogWithoutUser()
+    public function testBuildLogEntryWithoutSecurityToken()
     {
-        $securityContext = $this->getMockForAbstractClass('Symfony\Component\Security\Core\SecurityContextInterface');
-        $securityContext->expects($this->any())->method('getToken');
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->configManager->expects($this->never())
+            ->method('getUpdateConfig');
 
-        $securityLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityLink->expects($this->any())->method('getService')->will($this->returnValue($securityContext));
+        $this->auditManager->buildLogEntry($this->configManager);
+    }
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testBuildLogEntryWithUnsupportedSecurityToken()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn('test');
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->configManager->expects($this->never())
+            ->method('getUpdateConfig');
 
-        $configManagerLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManagerLink->expects($this->any())->method('getService')->will($this->returnValue($configManager));
+        $this->auditManager->buildLogEntry($this->configManager);
+    }
 
-        $auditManager = new AuditManager($configManagerLink, $securityLink);
+    /**
+     * @return UserInterface
+     */
+    protected function initSecurityContext()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
 
-        $auditManager->log();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        return $user;
     }
 }

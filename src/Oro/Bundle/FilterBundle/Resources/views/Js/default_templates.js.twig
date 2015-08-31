@@ -71,11 +71,13 @@
 
 <script type="text/template" id="select-field-template">
     <div class="horizontal clearfix">
-        <select name="<%= name %>" class="filter-select-oro">
-            <% _.each(choices, function (option) { %>
-            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
-            <% }); %>
-        </select>
+        <span class="filter-select-oro-wrapper">
+            <select name="<%= name %>" class="filter-select-oro">
+                <% _.each(choices, function (option) { %>
+                <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
+                <% }); %>
+            </select>
+        </span>
     </div>
 </script>
 
@@ -151,4 +153,8 @@
                 ><i class="icon-remove hide-text"><%- _.__("oro.filter.wrapper.reset.hint") %></i></span>
         </div>
     </div>
+</script>
+<script type="text/template" id="dictionary-filter-template">
+    <span> <%= _.__('oro.filter.embedded.choice.field_to_value') %></span><%= parts.join('') %>:
+    <input type="hidden" name="select-values-autocomplete" class="select-values-autocomplete hide" value="" />
 </script>
