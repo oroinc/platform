@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -79,7 +80,6 @@ class AutoResponseTemplateType extends AbstractType
                     'constraints' => [
                         new Assert\NotBlank(),
                     ],
-                    'data' => $this->cm->get('oro_email.signature', ''),
                 ],
                 'subject_options' => [
                     'constraints' => [
@@ -96,6 +96,12 @@ class AutoResponseTemplateType extends AbstractType
             $form = $event->getForm();
             if ($form->has('owner')) {
                 $form->remove('owner');
+            }
+
+            if (!$event->getData()) {
+                $emailTemplate = new EmailTemplate();
+                $emailTemplate->setContent($this->cm->get('oro_email.signature', ''));
+                $event->setData($emailTemplate);
             }
         });
 
