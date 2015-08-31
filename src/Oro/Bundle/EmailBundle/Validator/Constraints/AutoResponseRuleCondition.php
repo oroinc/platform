@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraint;
 class AutoResponseRuleCondition extends Constraint
 {
     public $emptyInputMessage = 'Field cannot be empty.';
-    public $nonEmptyInputMessage = 'Field have to be empty.';
+    public $nonEmptyInputMessage = 'Field must be empty.';
 
     /**
      * {@inheritdoc}
