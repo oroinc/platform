@@ -119,7 +119,7 @@ define([
          * @param e
          * @private
          */
-        _retrieveEntityData: function (e) {
+        _retrieveEntityData: function(e) {
             if (!this._isInMode(this.MODE_EDIT) || !e.val) {
                 return;
             }
@@ -141,7 +141,7 @@ define([
          * @param e
          * @private
          */
-        _cleanEntityData: function (e) {
+        _cleanEntityData: function(e) {
             if (!this._isInMode(this.MODE_CREATE) || e.val || !this.editable) {
                 return;
             }
