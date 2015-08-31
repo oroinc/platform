@@ -21,6 +21,12 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var array */
+    protected $validationEnabledModes = [
+        OroEntityCreateOrSelectType::MODE_CREATE,
+        OroEntityCreateOrSelectType::MODE_EDIT,
+    ];
+
     /**
      * @param DoctrineHelper $doctrineHelper
      */
@@ -39,10 +45,7 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
             function (FormEvent $event) use ($options) {
                 $data = $event->getData();
                 $mode = !empty($data['mode']) ? $data['mode'] : $options['mode'];
-                if (!in_array(
-                    $mode,
-                    [OroEntityCreateOrSelectType::MODE_CREATE, OroEntityCreateOrSelectType::MODE_EDIT])
-                ) {
+                if (!in_array($mode, $this->validationEnabledModes)) {
                     $this->disableNewEntityValidation($event->getForm(), $options);
                 }
             }
