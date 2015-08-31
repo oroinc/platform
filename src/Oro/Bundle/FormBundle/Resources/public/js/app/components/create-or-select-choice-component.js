@@ -33,7 +33,8 @@ define([
          * @param options
          */
         initialize: function(options) {
-            if (this.editable = options.editable === true) {
+            this.editable = (options.editable === true);
+            if (this.editable) {
                 this.requiredOptions.push('editRoute');
             }
             var missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
@@ -183,7 +184,7 @@ define([
          * @private
          */
         _handleDataRequestError: function(jqXHR, textStatus, error) {
-            console.error(textStatus); // Display error
+            throw new Error(textStatus); // Throw error
         },
 
         /**
