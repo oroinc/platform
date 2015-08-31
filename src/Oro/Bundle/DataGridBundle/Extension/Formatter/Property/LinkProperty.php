@@ -34,7 +34,7 @@ class LinkProperty extends UrlProperty
         $label = null;
 
         try {
-            $label = $record->getValue($this->getOr(self::DATA_NAME_KEY, $this->get(self::NAME_KEY)));
+            $label = $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY));
         } catch (\LogicException $e) {
         }
 

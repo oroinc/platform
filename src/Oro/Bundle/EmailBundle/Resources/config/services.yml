@@ -577,6 +577,8 @@ services:
             - @oro_activity.manager
             - @oro_email.activity_list.provider
             - @oro_email.email.thread.provider
+            - @security.token_storage
+            - @oro_security.owner.entity_owner_accessor.link
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -785,9 +787,8 @@ services:
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @security.context
-            - @translator
+            - @doctrine
+            - @oro_security.security_facade
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
