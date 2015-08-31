@@ -75,38 +75,6 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         $builder->add('mode', 'hidden', [
             'data' => $options['mode'],
         ]);
-
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-            $form = $event->getForm();
-            $root = $form->getRoot();
-            if (!$root->isValid()) {
-                return;
-            }
-
-            $accessor = \Symfony\Component\PropertyAccess\PropertyAccess::createPropertyAccessor();
-            $existingEntity = $form->get('existing_entity')->getData();
-            $updateForm = $form->get('new_entity');
-            $updatedData = $updateForm->getData();
-
-            foreach ($updateForm->all() as $child) {
-                if (!$child->getConfig()->getMapped()) {
-                    continue;
-                }
-
-                $childConfig = $child->getConfig();
-                if ($childConfig->hasOption('translatable_class')) {
-                    $defaultLocale = $child->get('defaultLocale');
-                    foreach ($defaultLocale as $localeChild) {
-                        foreach ($localeChild as $lc) {
-                            $data = $accessor->getValue($updatedData, $lc->getPropertyPath());
-                            $accessor->setValue($existingEntity, $lc->getPropertyPath(), $data);
-                        }
-                    }
-                }
-                $data = $accessor->getValue($updatedData, $child->getPropertyPath());
-                $accessor->setValue($existingEntity, $child->getPropertyPath(), $data);
-            }
-        });
     }
 
     /**
