@@ -7,12 +7,17 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -31,8 +36,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var KnownEmailAddressCheckerFactory */
     protected $knownEmailAddressCheckerFactory;
 
+    /** @var TokenStorage */
+    protected $tokenStorage;
+
     /** @var KnownEmailAddressCheckerInterface */
     private $knownEmailAddressChecker;
+
+    /** @var TokenInterface */
+    private $currentToken;
 
     /**
      * Constructor
@@ -46,6 +57,15 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+    }
+
+    /**
+     * @param TokenStorage $tokenStorage
+     */
+    public function setTokenStorage(TokenStorage $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+        $this->currentToken = $tokenStorage->getToken();
     }
 
     /**
@@ -194,6 +214,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
+        $this->impersonateOrganization($origin->getOrganization());
         $processor = $this->createSynchronizationProcessor($origin);
         if ($processor instanceof LoggerAwareInterface) {
             $processor->setLogger($this->logger);
@@ -229,6 +250,19 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             );
 
             throw $ex;
+        }
+    }
+
+    /**
+     * Switches the security context to the given organization
+     * @todo: Should be deleted after email sync process will be refactored
+     */
+    protected function impersonateOrganization(Organization $organization = null)
+    {
+        if ($this->currentToken === null && $organization) {
+            $this->tokenStorage->setToken(
+                new OrganizationToken($organization)
+            );
         }
     }
 
