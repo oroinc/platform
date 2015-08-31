@@ -179,6 +179,7 @@ define(function(require) {
         _onFilterDisabled: function(filter) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
+            this.trigger('afterDisableFilter', filter);
         },
 
         /**
@@ -214,6 +215,7 @@ define(function(require) {
         _onChangeFilterSelect: function() {
             this.trigger('updateList', this);
             this._processFilterStatus();
+            this.trigger('afterUpdateList', this);
         },
 
         /**
@@ -444,7 +446,7 @@ define(function(require) {
         },
 
         /**
-         * Closes dropdown on mobile
+         * Close dropdown
          */
         closeDropdown: function() {
             this.$('.dropdown').removeClass('oro-open');

@@ -27,7 +27,6 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           20
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -36,7 +35,6 @@ oro_entity_config:
                     grid:
                         type:               html
                         label:              oro.entity.entity_config.entity.entity.items.label
-                        filter_type:        string
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
@@ -90,7 +88,6 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           10
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -99,11 +96,7 @@ oro_entity_config:
                     grid:
                         type:               html
                         label:              oro.entity.entity_config.entity.field.items.label
-                        filter_type:        string
                         required:           true
-                        sortable:           false
-                        filterable:         false
-                        show_filter:        false
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
                         type:               text
