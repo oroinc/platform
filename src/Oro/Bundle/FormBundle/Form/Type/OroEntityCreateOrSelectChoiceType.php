@@ -49,7 +49,12 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
         );
 
         $builder->addViewTransformer(
-            new EntityCreateOrSelectTransformer($this->doctrineHelper, $options['class'], $options['mode'])
+            new EntityCreateOrSelectTransformer(
+                $this->doctrineHelper,
+                $options['class'],
+                $options['mode'],
+                $options['editable']
+            )
         );
 
         $builder->add(
@@ -88,6 +93,16 @@ class OroEntityCreateOrSelectChoiceType extends AbstractType
                     continue;
                 }
 
+                $childConfig = $child->getConfig();
+                if ($childConfig->hasOption('translatable_class')) {
+                    $defaultLocale = $child->get('defaultLocale');
+                    foreach ($defaultLocale as $localeChild) {
+                        foreach ($localeChild as $lc) {
+                            $data = $accessor->getValue($updatedData, $lc->getPropertyPath());
+                            $accessor->setValue($existingEntity, $lc->getPropertyPath(), $data);
+                        }
+                    }
+                }
                 $data = $accessor->getValue($updatedData, $child->getPropertyPath());
                 $accessor->setValue($existingEntity, $child->getPropertyPath(), $data);
             }

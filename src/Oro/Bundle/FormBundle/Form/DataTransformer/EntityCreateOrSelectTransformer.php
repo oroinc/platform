@@ -60,6 +60,9 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
                 $mode = $this->editable ?
                     OroEntityCreateOrSelectType::MODE_EDIT :
                     OroEntityCreateOrSelectType::MODE_VIEW;
+                if ($mode === OroEntityCreateOrSelectType::MODE_EDIT) {
+                    $newEntity = $value;
+                }
             } else {
                 $newEntity = $value;
                 $mode = OroEntityCreateOrSelectType::MODE_CREATE;
