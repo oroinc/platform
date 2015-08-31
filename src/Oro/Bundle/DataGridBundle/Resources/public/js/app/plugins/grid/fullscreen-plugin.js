@@ -32,7 +32,7 @@ define(function(require) {
         listenFilterManager: function() {
             var debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
             this.listenTo(this.main.filterManager, 'afterUpdateList', debouncedLayoutUpdate);
-            this.listenTo( this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
+            this.listenTo(this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
         },
 
         /**
