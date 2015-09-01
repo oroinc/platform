@@ -323,32 +323,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
-     * Adds OptionSet column
-     *
-     * @param Schema       $schema
-     * @param Table|string $table A Table object or table name
-     * @param string       $optionSetName
-     * @param array        $options
-     *
-     * @deprecated since 1.4. Will be removed in 2.0
-     */
-    public function addOptionSet(
-        Schema $schema,
-        $table,
-        $optionSetName,
-        array $options = []
-    ) {
-        $this->ensureExtendFieldSet($options);
-
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'optionSet';
-        $this->extendOptionsManager->setColumnOptions(
-            $this->getTableName($table),
-            $optionSetName,
-            $options
-        );
-    }
-
-    /**
      * Adds one-to-many relation
      *
      * @param Schema       $schema

@@ -297,7 +297,7 @@ class ExtendConfigDumper
             $fieldType     = $fieldConfigId->getFieldType();
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
+            if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)) {
                 $relationProperties[$fieldName] = $fieldName;
                 if ($underlyingFieldType !== RelationType::MANY_TO_ONE && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldName;
