@@ -7,12 +7,12 @@ define(function(require) {
     var _ = require('underscore');
 
     describe('oroworkflow/js/tools/path-finder/graph', function() {
-        function prepareGraph() {
+        beforeEach(function prepareGraph() {
             var graph = new Graph();
             graph.outerRect = new Rectangle (0, 0, 500, 500);
             graph.rectangles.push(new Rectangle(100, 100, 100, 100));
-            return graph;
-        }
+            this.graph = graph;
+        });
 
         function isConnected(node) {
             return node.connections[directions.TOP_TO_BOTTOM.id] ||
@@ -26,7 +26,7 @@ define(function(require) {
         }
 
         it('should add axises around block', function() {
-            var graph = prepareGraph();
+            var graph = this.graph;
             var firstRect = graph.rectangles[0];
             graph.buildCornerAxises();
             expect(graph.baseAxises.length).toBe(4);
@@ -37,7 +37,7 @@ define(function(require) {
         });
 
         it('should add axises out from block center', function() {
-            var graph = prepareGraph();
+            var graph = this.graph;
             var firstRect = graph.rectangles[0];
             var rectCenter = firstRect.center;
             graph.buildCenterAxises();
@@ -57,7 +57,7 @@ define(function(require) {
         });
 
         it('should add axises at center between block pairs', function() {
-            var graph = prepareGraph();
+            var graph = this.graph;
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.buildCenterLinesBetweenNodes();
             expect(graph.baseAxises.length).toBe(2);
@@ -65,7 +65,7 @@ define(function(require) {
         });
 
         it('should finalize (setup connections) correctly', function() {
-            var graph = prepareGraph();
+            var graph = this.graph;
             graph.rectangles.push(new Rectangle(300, 300, 100, 100));
             graph.build();
             expect(graph.verticalAxises.length).toBe(graph.horizontalAxises.length);

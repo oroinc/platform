@@ -8,7 +8,7 @@ define(function(require) {
 
     describe('oroworkflow/js/tools/path-finder/finder', function() {
 
-        function prepareGraph() {
+        beforeEach(function prepareGraph() {
             var graph = new Graph();
             var rect1 = new Rectangle(100, 100, 100, 100);
             var rect2 = new Rectangle(300, 300, 100, 100);
@@ -17,12 +17,13 @@ define(function(require) {
             graph.rectangles.push(rect1);
             graph.rectangles.push(rect2);
             graph.build();
-            return graph;
-        }
+            this.graph = graph;
+            this.finder = new Finder();
+        });
 
         it('should add `to` path specs', function() {
-            var graph = prepareGraph();
-            var finder = new Finder();
+            var graph = this.graph;
+            var finder = this.finder;
 
             finder.addTo(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             expect(finder.to.length).toBe(1);
@@ -33,16 +34,16 @@ define(function(require) {
         });
 
         it('should add `to` path siblings', function() {
-            var graph = prepareGraph();
-            var finder = new Finder();
+            var graph = this.graph;
+            var finder = this.finder;
             graph.updateWithPath(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             finder.addTo(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             expect(finder.to.length).toBe(3);
         });
 
         it('should add `from` path specs', function() {
-            var graph = prepareGraph();
-            var finder = new Finder();
+            var graph = this.graph;
+            var finder = this.finder;
             expect(function() {
                 finder.addFrom(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
             }).toThrow();
@@ -58,8 +59,8 @@ define(function(require) {
         });
 
         it('should add `from` path siblings', function() {
-            var graph = prepareGraph();
-            var finder = new Finder();
+            var graph = this.graph;
+            var finder = this.finder;
             graph.updateWithPath(graph.getPathFromCid('rect2', directions.TOP_TO_BOTTOM));
             expect(function() {
                 finder.addFrom(graph.getPathFromCid('rect1', directions.BOTTOM_TO_TOP));
@@ -72,7 +73,7 @@ define(function(require) {
         });
 
         it('should find pathes', function() {
-            var graph = prepareGraph();
+            var graph = this.graph;
             for (var firstDirection in directions) {
                 if (directions.hasOwnProperty(firstDirection)) {
                     for (var secondDirection in directions) {
@@ -94,8 +95,8 @@ define(function(require) {
         });
 
         it('should select center axis', function() {
-            var graph = prepareGraph();
-            var finder = new Finder();
+            var graph = this.graph;
+            var finder = this.finder;
             finder.addTo(graph.getPathFromCid('rect1', directions.TOP_TO_BOTTOM));
             finder.addFrom(graph.getPathFromCid('rect2', directions.BOTTOM_TO_TOP));
             expect(finder.find().allConnections[2].a.y).toBe(250);
