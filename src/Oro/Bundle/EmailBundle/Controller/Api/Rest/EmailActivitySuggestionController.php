@@ -24,7 +24,7 @@ class EmailActivitySuggestionController extends RestGetController
      *
      * @param int $id The id of the email entity.
      *
-     * @Get("/activities/emails/{id}/suggestions", name="")
+     * @Get("/activities/emails/{id}/suggestions", name="", requirements={"id"="\d+"})
      *
      * @QueryParam(
      *      name="page",
