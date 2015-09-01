@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\AST\PathExpression;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
@@ -13,6 +14,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -181,7 +183,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $accessLevel,
         $ownerType,
         $targetEntityClassName,
-        $expectedConstraint
+        $expectedConstraint,
+        $expectedGroup = ''
     ) {
         $this->buildTestTree();
 
@@ -220,9 +223,29 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $token->expects($this->any())
             ->method('getOrganizationContext')
             ->will($this->returnValue($organization));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface $aclGroupProvider */
+        $aclGroupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $aclGroupProvider->expects($this->any())->method('getGroup')->willReturn($expectedGroup);
+
+        $this->builder->setAclGroupProvider($aclGroupProvider);
+
         $this->securityContext->expects($this->any())
             ->method('isGranted')
-            ->with($this->equalTo('VIEW'), $this->equalTo('entity:' . $targetEntityClassName))
+            ->with(
+                $this->equalTo('VIEW'),
+                $this->callback(
+                    function (ObjectIdentity $identity) use ($targetEntityClassName, $expectedGroup) {
+                        $this->assertEquals('entity', $identity->getIdentifier());
+                        $this->assertStringEndsWith($targetEntityClassName, $identity->getType());
+                        if ($expectedGroup) {
+                            $this->assertStringStartsWith($expectedGroup, $identity->getType());
+                        }
+
+                        return true;
+                    }
+                )
+            )
             ->will($this->returnValue($isGranted));
         $this->securityContext->expects($this->any())
             ->method('getToken')
@@ -522,6 +545,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ),
             'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType' => array(
                 'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
+            ),
+            'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType WITH custom group' => array(
+                'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null, 'custom_group'
             ),
         );
     }
