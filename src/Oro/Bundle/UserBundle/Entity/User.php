@@ -41,7 +41,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "entity"={
  *              "icon"="icon-user",
  *              "context-grid"="users-for-context-grid",
- *              "share-grid"="users-for-context-grid"
+ *              "share_with_datagrid"="share-with-users-datagrid"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

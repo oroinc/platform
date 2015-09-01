@@ -1,0 +1,29 @@
+datagrid:
+    shared-datagrid:
+        source:
+            type: share
+        properties:
+            id: ~
+        columns:
+            entity:
+                label: Name
+                type: twig
+                frontend_type: html
+                template: OroSecurityBundle:Share:Property/entity.html.twig
+        actions:
+            delete:
+                type: frontend
+                label: delete
+                icon: trash
+                selector: share-item-delete
+        mass_actions:
+            delete:
+                type: frontend
+                label: delete
+                icon: trash
+                selector: share-items-delete
+        options:
+            toolbarOptions:
+                hide: true
+                pagination:
+                    hide: true

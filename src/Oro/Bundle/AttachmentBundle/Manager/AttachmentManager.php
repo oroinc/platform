@@ -30,6 +30,8 @@ class AttachmentManager
     const READ_COUNT = 100000;
     const DEFAULT_IMAGE_WIDTH = 100;
     const DEFAULT_IMAGE_HEIGHT = 100;
+    const SMALL_IMAGE_WIDTH = 16;
+    const SMALL_IMAGE_HEIGHT = 16;
 
     /** @var Filesystem */
     protected $filesystem;

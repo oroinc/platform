@@ -8,6 +8,7 @@ parameters:
     oro_datagrid.extension.mass_action.type.redirect.class:   Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Redirect\RedirectMassAction
     oro_datagrid.extension.mass_action.type.widget.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WidgetMassAction
     oro_datagrid.extension.mass_action.type.window.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget\WindowMassAction
+    oro_datagrid.extension.mass_action.type.frontend.class:     Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\FrontendMassAction
 services:
     oro_datagrid.extension.mass_action.handler.delete:
         class: %oro_datagrid.extension.mass_action.handler.delete.class%
@@ -55,3 +56,9 @@ services:
         scope: prototype
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: window }
+
+    oro_datagrid.extension.mass_action.type.frontend:
+        class: %oro_datagrid.extension.mass_action.type.frontend.class%
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.mass_action.type, type: frontend }

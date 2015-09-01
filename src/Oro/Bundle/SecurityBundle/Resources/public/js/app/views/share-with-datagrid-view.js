@@ -1,19 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var ShareView;
+    var ShareWithDatagridView;
     var _ = require('underscore');
     var $ = require('jquery');
     var Routing = require('routing');
-    var ShareCollection = require('orosecurity/js/app/models/share-collection');
+    var ShareWithDatagridCollection = require('orosecurity/js/app/models/share-with-datagrid-collection');
     var BaseView = require('oroui/js/app/views/base/view');
     var WidgetManager = require('oroui/js/widget-manager');
 
-    ShareView = BaseView.extend({
+    ShareWithDatagridView = BaseView.extend({
         initialize: function(options) {
             this.options = options;
-            this.template = _.template($('#sharing-entities-dropdown-item').html());
-            this.collection = new ShareCollection();
+            this.template = _.template($('#share-with-entity-dropdown-item').html());
+            this.collection = new ShareWithDatagridCollection();
             this.initEvents();
 
             if (this.options.items) {
@@ -35,11 +35,11 @@ define(function(require) {
 
         initEvents: function() {
             var self = this;
-            var dropdown = this.$('.sharing-entities-dropdown');
-            var firstItem = this.$('.sharing-entities-current-item');
+            var dropdown = this.$('.share-with-entity-dropdown');
+            var firstItem = this.$('.share-with-entity-current-item');
             this.collection.on('add', function(model) {
                 var gridUrl = Routing.generate(
-                    'oro_share_entities_grid',
+                    'oro_share_with_datagrid',
                     {
                         entityClass: model.attributes.className
                     }
@@ -56,17 +56,17 @@ define(function(require) {
                 }
 
                 dropdown.append($view);
-                dropdown.find('.sharing-entities-item:last').click(function() {
+                dropdown.find('.share-with-entity-item:last').click(function() {
                     self.currentTargetClass(model.attributes.className);
                     self.currentGridName(model.attributes.gridName);
-                    dropdown.find('> .sharing-entities-item').each(function() {
+                    dropdown.find('> .share-with-entity-item').each(function() {
                         $(this).removeClass('active');
                     });
                     var item = $(this);
                     firstItem.html(item.html());
                     item.addClass('active');
 
-                    WidgetManager.getWidgetInstanceByAlias('sharing-entities-grid', function(widget) {
+                    WidgetManager.getWidgetInstanceByAlias('share-with-datagrid', function(widget) {
                         widget.setUrl(gridUrl);
                         widget.render();
                     });
@@ -103,5 +103,5 @@ define(function(require) {
         }
     });
 
-    return ShareView;
+    return ShareWithDatagridView;
 });

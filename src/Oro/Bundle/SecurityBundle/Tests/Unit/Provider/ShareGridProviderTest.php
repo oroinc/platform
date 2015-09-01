@@ -9,7 +9,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
     const ENTITY_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
     const ENTITY_LABEL = 'User';
     const SHARE_SCOPE = 'user';
-    const GRID_NAME = 'oro-user-share-grid';
+    const GRID_NAME = 'share-with-users-datagrid';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $routingHelper;
@@ -132,7 +132,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $shareGridConfig->expects($this->once())
             ->method('get')
-            ->with('share-grid')
+            ->with('share_with_datagrid')
             ->willReturn(self::GRID_NAME);
         $this->configManager->expects($this->at(5))
             ->method('getConfig')
