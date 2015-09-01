@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var jsPlumb = require('jsplumb');
+    var $ = require('jquery');
     var _ = require('underscore');
     var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
 
@@ -201,25 +202,24 @@ define(function(require) {
             return el.offsetHeight / 2 - 1;
         }
 
-        function getSourceAdjustment(step, sourcePos) {
-            var shift = null;
-            $(step).find('.jsplumb-source').each(function() {
-                if (shift) {
-                    return true;
-                }
-                var diff = {
-                    x: sourcePos[0] - step.offsetLeft - this.offsetLeft,
-                    y: sourcePos[1] - step.offsetTop - this.offsetTop
-                }
-                if (0 <= diff.x && diff.x <= this.offsetWidth && 0 <= diff.y && diff.y <= this.offsetHeight  ) {
-                    shift = {
-                        x: diff.x - this.offsetWidth / 2,
-                        y: diff.y - this.offsetHeight / 2
-                    }
-                    return true;
-                }
+        function getSourceElement(elem, pos) {
+            return _.find($(elem).find('.jsplumb-source').toArray(), function(source) {
+                var offsetLeft = elem.offsetLeft + source.offsetLeft;
+                var offsetTop = elem.offsetTop + source.offsetTop;
+                return pos[0] >= offsetLeft && pos[0] <= (offsetLeft + source.offsetWidth) &&
+                    pos[1] >= offsetTop && pos[1] <= (offsetTop + source.offsetHeight);
             });
-            return shift;
+        }
+
+        function adjustmentPathStartPoint(paintInfo, params) {
+            var elem = params.sourceEndpoint.element;
+            var source = getSourceElement(elem, params.sourcePos);
+            if (source) {
+                paintInfo.points[0] +=
+                    (elem.offsetLeft + source.offsetLeft + source.offsetWidth / 2) - params.sourcePos[0];
+                paintInfo.points[1] +=
+                    (elem.offsetTop + source.offsetTop + source.offsetHeight / 2) - params.sourcePos[1];
+            }
         }
 
         this._compute = function(paintInfo, params) {
@@ -227,13 +227,7 @@ define(function(require) {
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
                 // use jsPlumb Flowchart connector behaviour
-                var adjustment = getSourceAdjustment(params.sourceEndpoint.element, params.sourcePos);
-                if (adjustment) {
-                    // put endpoint at the center of source circle
-                    paintInfo.points[0] -= adjustment.x;
-                    paintInfo.points[1] -= adjustment.y;
-                }
-
+                adjustmentPathStartPoint(paintInfo, params);
                 return this._flowchartConnectorCompute.apply(this, arguments);
             }
 
