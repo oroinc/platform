@@ -62,32 +62,6 @@ class NameFormatter
     }
 
     /**
-     * @param array $nameParts
-     * @param string $format
-     * @return string
-     */
-    protected function applyFormat(array $nameParts, $format)
-    {
-        $name = preg_replace_callback(
-            '/%(\w+)%/',
-            function ($data) use ($nameParts) {
-                $key = $data[1];
-                $lowerCaseKey = strtolower($key);
-                if (isset($nameParts[$lowerCaseKey])) {
-                    if ($key !== $lowerCaseKey) {
-                        $nameParts[$lowerCaseKey] = strtoupper($nameParts[$lowerCaseKey]);
-                    }
-                    return $nameParts[$lowerCaseKey];
-                }
-                return '';
-            },
-            $format
-        );
-
-        return trim(preg_replace('/ +/', ' ', $name));
-    }
-
-    /**
      * Get name format based on locale, if locale is not passed locale from system configuration will be used.
      *
      * @param string|null $locale
@@ -128,5 +102,31 @@ class NameFormatter
         }
 
         throw new \RuntimeException(sprintf('Cannot get name format for "%s"', $locale));
+    }
+
+    /**
+     * @param array $nameParts
+     * @param string $format
+     * @return string
+     */
+    protected function applyFormat(array $nameParts, $format)
+    {
+        $name = preg_replace_callback(
+            '/%(\w+)%/',
+            function ($data) use ($nameParts) {
+                $key = $data[1];
+                $lowerCaseKey = strtolower($key);
+                if (isset($nameParts[$lowerCaseKey])) {
+                    if ($key !== $lowerCaseKey) {
+                        $nameParts[$lowerCaseKey] = strtoupper($nameParts[$lowerCaseKey]);
+                    }
+                    return $nameParts[$lowerCaseKey];
+                }
+                return '';
+            },
+            $format
+        );
+
+        return trim(preg_replace('/ +/', ' ', $name));
     }
 }
