@@ -12,6 +12,8 @@ use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 
 class ClearInactiveMailboxCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:imap:clear-mailbox';
+
     /**
      * @var OutputLogger
      */
@@ -22,7 +24,7 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:imap:clear-mailbox')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Clears inactive mailboxes')
             ->addOption(
                 'id',
@@ -39,14 +41,10 @@ class ClearInactiveMailboxCommand extends ContainerAwareCommand
     {
         /** @var ImapClearManager $cleaner */
         $cleaner = $this->getContainer()->get('oro_imap.manager.clear');
-        $this->logger = new OutputLogger($output);
+        $cleaner->setLogger(new OutputLogger($output));
 
         $originId = $input->getOption('id');
 
-        if (!$cleaner->clear($originId)) {
-            $this->logger->notice('Nothing to clear');
-        } else {
-            $this->logger->notice('Finished');
-        }
+        $cleaner->clear($originId);
     }
 }

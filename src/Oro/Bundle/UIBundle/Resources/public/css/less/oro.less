@@ -118,6 +118,21 @@ label, input, button, select, textarea { font-size:13px;}
       font-size: 13px;
       text-align:right;
     }
+    .control-label.wrap {
+      float:left;
+      padding-top:7px;
+      color: #777;
+      font-weight: normal;
+      font-size: 13px;
+      text-align:right;
+      .tooltip-icon {
+        margin-right: 5px;
+        cursor: pointer;
+      }
+      label {
+        display: inline;
+      }
+    }
     .controls {
       margin-left:170px;
       &.autocomplete-box{
@@ -131,6 +146,9 @@ label, input, button, select, textarea { font-size:13px;}
         &.html-content {
           overflow: auto;
         }
+      }
+      .control-label.wrap {
+        width: 130px;
       }
       label.control-label {
         width: auto;
@@ -273,6 +291,7 @@ i.color {
     .controls {
       margin-left: 240px;
     }
+    div.control-label,
     label.control-label {
       width: 230px;
       text-align: right;
@@ -2086,7 +2105,7 @@ body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
   resize: vertical;
-  text-align: justify;
+  text-align: left;
   vertical-align: top;
 }
 .scrollspy-title {
@@ -2621,6 +2640,25 @@ label.radio.error {
       font:14px/1em 'FontAwesome';
       color:#ddd;
       content: "\f00d";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
       text-indent:0;
     }
     &:hover:after {

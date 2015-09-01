@@ -76,7 +76,7 @@ oro_entity_config:
                         translatable:  true         # means that value of this attribute is translation key
                                                     # and actual value should be taken from translation table
                                                     # or in twig via "|trans" filter
-                        indexed:       true         # should be TRUE because this attribute is displayed in a data grid
+                        indexed:       true         # TRUE if an attribute should be filterable or sortable in a data grid
                     grid:                           # configure a data grid to display 'demo_attr' attribute
                         type:          string       # sets the attribute type
                         label:         'Demo Attr'  # sets the data grid column name
@@ -96,7 +96,7 @@ Now you may go to System > Entities. The 'Demo Attr' column should be displayed 
 
 Indexed attributes
 ------------------
-All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section. In this case you can mark an attribute as indexed. For example:
+All configuration data are stored as a serialized array in `data` column of `oro_entity_config` and `oro_entity_config_field` tables for entities and fields appropriately. But sometime you need to get a value of some configuration attribute in SQL query. For example it is required for attributes visible in grids in System > Entities section and have a filter or allow sorting in this grid. In this case you can mark an attribute as indexed. For example:
 ``` yaml
 oro_entity_config:
     acme:

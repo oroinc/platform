@@ -170,4 +170,26 @@ class ArrayUtil
 
         return array_keys($sortable);
     }
+
+    /**
+     * Compares 2 values based on order specified in the argument
+     *
+     * @param int[] $order
+     *
+     * @return int
+     */
+    public static function createOrderedComparator(array $order)
+    {
+        return function ($a, $b) use ($order) {
+            if (!array_key_exists($b, $order)) {
+                return -1;
+            }
+
+            if (!array_key_exists($a, $order)) {
+                return 1;
+            }
+
+            return $order[$a] - $order[$b];
+        };
+    }
 }

@@ -1,3 +1,4 @@
+google: google
 oro:
     user:
         google_id.label: Google ID

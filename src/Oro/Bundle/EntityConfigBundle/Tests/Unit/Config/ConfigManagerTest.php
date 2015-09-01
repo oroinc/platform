@@ -311,12 +311,19 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getConfigCacheProvider
      */
-    public function testGetConfigCache($configId, $cachedConfig)
+    public function testGetConfigCache(ConfigIdInterface $configId, $cachedConfig)
     {
-        $this->configCache->expects($this->once())
-            ->method('getConfig')
-            ->with($this->identicalTo($configId))
-            ->willReturn($cachedConfig);
+        if ($configId instanceof FieldConfigId) {
+            $this->configCache->expects($this->once())
+                ->method('getFieldConfig')
+                ->with($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
+                ->willReturn($cachedConfig);
+        } else {
+            $this->configCache->expects($this->once())
+                ->method('getEntityConfig')
+                ->with($configId->getScope(), $configId->getClassName())
+                ->willReturn($cachedConfig);
+        }
 
         $this->modelManager->expects($this->never())
             ->method('checkDatabase');
@@ -353,7 +360,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getConfigNotCachedProvider
      */
-    public function testGetConfigNotCached($configId, $getModelResult, $expectedConfig)
+    public function testGetConfigNotCached(ConfigIdInterface $configId, $getModelResult, $expectedConfig)
     {
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
@@ -362,10 +369,17 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigurable')
             ->with(self::ENTITY_CLASS)
             ->willReturn(true);
-        $this->configCache->expects($this->once())
-            ->method('getConfig')
-            ->with($this->identicalTo($configId))
-            ->willReturn(null);
+        if ($configId instanceof FieldConfigId) {
+            $this->configCache->expects($this->once())
+                ->method('getFieldConfig')
+                ->with($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
+                ->willReturn(null);
+        } else {
+            $this->configCache->expects($this->once())
+                ->method('getEntityConfig')
+                ->with($configId->getScope(), $configId->getClassName())
+                ->willReturn(null);
+        }
         $this->configCache->expects($this->once())
             ->method('saveConfig')
             ->with($this->equalTo($expectedConfig));
@@ -583,12 +597,21 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testClearCache()
+    public function testClearEntityCache()
     {
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
         $this->configCache->expects($this->once())
-            ->method('deleteConfig')
-            ->with($this->equalTo($configId));
+            ->method('deleteEntityConfig')
+            ->with($configId->getClassName());
+        $this->configManager->clearCache($configId);
+    }
+
+    public function testClearFieldCache()
+    {
+        $configId = new FieldConfigId('entity', self::ENTITY_CLASS, 'field');
+        $this->configCache->expects($this->once())
+            ->method('deleteFieldConfig')
+            ->with($configId->getClassName(), $configId->getFieldName());
         $this->configManager->clearCache($configId);
     }
 
@@ -1485,7 +1508,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function buildConfigKey(ConfigIdInterface $configId)
     {
         return $configId instanceof FieldConfigId
-            ? $configId->getScope() . '_' . $configId->getClassName() . '_' . $configId->getFieldName()
-            : $configId->getScope() . '_' . $configId->getClassName();
+            ? $configId->getScope() . '.' . $configId->getClassName() . '.' . $configId->getFieldName()
+            : $configId->getScope() . '.' . $configId->getClassName();
     }
 }

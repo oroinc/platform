@@ -116,6 +116,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['Cc', $ccAddressList],
                         ['Bcc', $bccAddressList],
                         ['References', $this->getHeader('References')],
+                        ['Accept-Language', $this->getHeader('Accept-Language')],
                     ]
                 )
             );
@@ -251,7 +252,8 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['References', $this->getHeader('References')],
                         ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
                         ['X-GM-THR-ID', $this->getHeader('XThrId1')],
-                        ['X-GM-LABELS', false]
+                        ['X-GM-LABELS', false],
+                        ['Accept-Language', $this->getHeader('Accept-Language')],
                     ]
                 )
             );

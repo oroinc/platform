@@ -5,7 +5,6 @@
 {% block page_container %}
     {{ oro_widget_render({
         'widgetType': 'block',
-        'wid': 'thread-view',
         'url': path('oro_email_thread_widget', {'id': entity.id}),
         'alias': 'thread-view'
     }) }}

@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Symfony\Component\HttpFoundation\AcceptHeader;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
@@ -39,9 +41,6 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
- *          },
- *          "comment"={
- *              "applicable"=true
  *          }
  *      }
  * )
@@ -224,6 +223,12 @@ class Email extends ExtendEmail
      * @JMS\Exclude
      */
     protected $emailUsers;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $acceptLanguageHeader;
 
     public function __construct()
     {
@@ -637,6 +642,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
+        $emailBody->setEmail($this);
         $this->emailBody = $emailBody;
 
         return $this;
@@ -775,5 +781,33 @@ class Email extends ExtendEmail
         }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcceptLanguageHeader()
+    {
+        return $this->acceptLanguageHeader;
+    }
+
+    /**
+     * @param string $acceptLanguageHeader
+     */
+    public function setAcceptLanguageHeader($acceptLanguageHeader = null)
+    {
+        $this->acceptLanguageHeader = $acceptLanguageHeader;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAcceptedLocales()
+    {
+        if (!$this->acceptLanguageHeader) {
+            return [];
+        }
+
+        return array_keys(AcceptHeader::fromString($this->acceptLanguageHeader)->all());
     }
 }

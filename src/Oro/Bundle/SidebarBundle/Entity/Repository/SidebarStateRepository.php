@@ -4,7 +4,7 @@ namespace Oro\Bundle\SidebarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
-use Oro\Bundle\SidebarBundle\Entity\SidebarState;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SidebarStateRepository extends EntityRepository
@@ -12,11 +12,13 @@ class SidebarStateRepository extends EntityRepository
     /**
      * @param UserInterface $user
      * @param string $position
-     * @return SidebarState
+     * @return array
      */
     public function getState($user, $position)
     {
-        $qb = $this->createQueryBuilder('ss')
+        $qb = $this->_em->createQueryBuilder()
+            ->select(['ss.id', 'ss.position', 'ss.state'])
+            ->from($this->_entityName, 'ss')
             ->where('ss.user = :user')
             ->andWhere('ss.position = :position')
             ->setParameter('user', $user)

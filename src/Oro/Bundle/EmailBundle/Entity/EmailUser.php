@@ -85,6 +85,15 @@ class EmailUser
     protected $owner;
 
     /**
+     * @var Mailbox
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", inversedBy="emailUsers")
+     * @ORM\JoinColumn(name="mailbox_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $mailboxOwner;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
@@ -289,5 +298,25 @@ class EmailUser
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return Mailbox|null
+     */
+    public function getMailboxOwner()
+    {
+        return $this->mailboxOwner;
+    }
+
+    /**
+     * @param Mailbox|null $mailboxOwner
+     *
+     * @return $this
+     */
+    public function setMailboxOwner(Mailbox $mailboxOwner = null)
+    {
+        $this->mailboxOwner = $mailboxOwner;
+
+        return $this;
     }
 }
