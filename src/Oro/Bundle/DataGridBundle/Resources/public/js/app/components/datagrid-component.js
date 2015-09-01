@@ -174,7 +174,14 @@ define(function (require) {
                 gridContentManager.trace(collection);
             }
 
-            this.built.resolve(grid);
+            var deferredBuilt = this.built;
+            if (grid.deferredRender) {
+                grid.deferredRender.then(function() {
+                    deferredBuilt.resolve(grid);
+                });
+            } else {
+                deferredBuilt.resolve(grid);
+            }
         },
 
         /**

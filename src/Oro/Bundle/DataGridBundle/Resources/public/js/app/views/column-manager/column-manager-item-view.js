@@ -3,27 +3,23 @@ define(function(require) {
 
     var ColumnManagerItemView;
     var $ = require('jquery');
+    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerItemView = BaseView.extend({
         template: require('tpl!orodatagrid/templates/column-manager/column-manager-item.html'),
         tagName: 'tr',
 
-        attributes: function() {
-            return {
-                'data-cid': this.cid
-            };
-        },
-
         events: {
-            'change input[type=checkbox][data-role=renderable]': 'onChangeVisibility'
+            'change input[type=checkbox][data-role=renderable]': 'updateModel'
         },
 
         listen: {
             // for some reason events delegated in view constructor does not work
             addedToParent: 'delegateEvents',
             // update view on model change
-            'change:disabledVisibilityChange model': 'render'
+            'change:disabledVisibilityChange model': 'render',
+            'change:renderable model': 'updateView'
         },
 
         /**
@@ -40,9 +36,17 @@ define(function(require) {
          *
          * @param {jQuery.Event} e
          */
-        onChangeVisibility: function(e) {
+        updateModel: function(e) {
             var renderable = $(e.target).prop('checked');
             this.model.set('renderable', renderable);
+        },
+
+        /**
+         * Handles model event and updates the view
+         */
+        updateView: function() {
+            var renderable = this.model.get('renderable');
+            this.$('input[type=checkbox][data-role=renderable]').prop('checked', renderable);
         }
     });
 

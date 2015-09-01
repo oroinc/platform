@@ -21,9 +21,9 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
-    const SYNC_ENABLED_TRUE = 1;
-    const SYNC_ENABLED_FALSE = 0;
-    const SYNC_ENABLED_IGNORE = -1;
+    const SYNC_ENABLED_TRUE = true;
+    const SYNC_ENABLED_FALSE = false;
+    const SYNC_ENABLED_IGNORE = null;
 
     /**
      * @var integer

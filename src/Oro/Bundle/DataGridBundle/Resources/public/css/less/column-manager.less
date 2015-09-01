@@ -33,13 +33,13 @@
       right: -6px;
     }
   }
-  .title {
+  .column-manager-title {
     font-size: @fontSizeLarge;
     line-height: @fontSizeLarge;
     font-weight: bold;
     margin-bottom: -3px;
   }
-  .hint {
+  .column-manager-hint {
     font-size: @fontSizeSmall;
   }
   th, td {
@@ -63,5 +63,15 @@
       cursor: -moz-grab;
       cursor: -webkit-grab;
     }
+  }
+  td.sort-cell {
+    white-space: nowrap;
+  }
+  tr:first-child .btn.move-up,
+  tr:last-child .btn.move-down {
+    cursor: default;
+    background-image: none;
+    .opacity(65);
+    .box-shadow(none);
   }
 }

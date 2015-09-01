@@ -4,7 +4,6 @@ define(function(require) {
     var ColumnManagerComponent;
     var _ = require('underscore');
     var Backgrid = require('backgrid');
-    var tools = require('oroui/js/tools');
     var ColumnsCollection = require('orodatagrid/js/app/models/column-manager/columns-collection');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
@@ -24,23 +23,13 @@ define(function(require) {
          * Collection of manageable columns
          * @type {Backgrid.Columns}
          */
-        collection: null,
+        manageableColumns: null,
 
         /**
          * Instance of grid
          * @type {Backgrid.Grid}
          */
         grid: null,
-
-        /**
-         * Preserved initial state of columns
-         * @type {Object}
-         */
-        _initialState: null,
-
-        listen: {
-            'change:renderable collection': '_pushState'
-        },
 
         /**
          * @inheritDoc
@@ -56,18 +45,9 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
-            var manageableColumns = this.columns.filter(function(columns) {
-                return columns.get('manageable') !== false;
-            });
+            this._createManageableCollection(options);
 
-            this.collection = new ColumnsCollection(
-                manageableColumns,
-                _.pick(options, ['minVisibleColumnsQuantity'])
-            );
-
-            this._initialState = this._createState();
             this._applyState(this.grid.collection, this.grid.collection.state);
-            this.listenTo(this.grid.collection, 'updateState', this._applyState);
 
             ColumnManagerComponent.__super__.initialize.apply(this, arguments);
         },
@@ -88,21 +68,54 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        delegateListeners: function() {
+            this.listenTo(this.grid.collection, 'updateState', this._applyState);
+
+            return ColumnManagerComponent.__super__.delegateListeners.apply(this, arguments);
+        },
+
+        /**
          * Implements ActionInterface
          *
          * @returns {ColumnManagerView}
          */
         createLauncher: function() {
+            // index of first manageable column
+            var orderShift = this.manageableColumns[0] ? this.manageableColumns[0].get('order') : 0;
+
             var columnManagerView = new ColumnManagerView({
-                collection: this.collection
+                collection: this.manageableColumns,
+                orderShift: orderShift
             });
 
-            this.listenTo(columnManagerView, 'reordered', function() {
-                this.columns.sort();
-                this._pushState();
-            });
+            this.listenTo(columnManagerView, 'reordered', this._pushState);
+            this.listenTo(this.manageableColumns, 'change:renderable', this._pushState);
 
             return columnManagerView;
+        },
+
+        /**
+         * Create collection with manageable columns
+         *
+         * @param {Object} options
+         * @protected
+         */
+        _createManageableCollection: function(options) {
+            var manageableColumns = [];
+
+            this.columns.each(function(column, i) {
+                // set initial order
+                column.set('order', i, {silent: true});
+                // collect manageable columns
+                if (column.get('manageable') !== false) {
+                    manageableColumns.push(column);
+                }
+            });
+
+            this.manageableColumns = new ColumnsCollection(manageableColumns,
+                _.pick(options, ['minVisibleColumnsQuantity']));
         },
 
         /**
@@ -111,11 +124,11 @@ define(function(require) {
          * @protected
          */
         _pushState: function() {
-            var columnsState = this._createState();
-
-            if (tools.isEqualsLoosely(columnsState, this._initialState)) {
-                columnsState = {};
+            if (this._applyingState) {
+                return;
             }
+
+            var columnsState = this._createState();
 
             this.grid.collection.updateState({
                 columns: columnsState
@@ -129,16 +142,27 @@ define(function(require) {
          */
         _applyState: function(collection, state) {
             var columnsState = state.columns;
+            var attrs;
 
-            this.collection.each(function(column) {
+            this._applyingState = true;
+
+            this.manageableColumns.each(function(column, i) {
                 var name = column.get('name');
                 if (columnsState[name]) {
-                    column.set(columnsState[name]);
+                    attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
+                    column.set(attrs);
+                } else {
+                    column.set({
+                        renderable: true,
+                        order: i
+                    });
                 }
             });
-            this.collection.sort();
+            this.manageableColumns.sort();
 
             this.columns.sort();
+
+            this._applyingState = false;
         },
 
         /**
@@ -151,7 +175,7 @@ define(function(require) {
         _createState: function() {
             var state = {};
 
-            this.collection.each(function(column) {
+            this.manageableColumns.each(function(column) {
                 var name = column.get('name');
                 var order = column.get('order');
 

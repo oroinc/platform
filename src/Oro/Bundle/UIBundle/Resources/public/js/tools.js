@@ -1,11 +1,15 @@
-define(['jquery', 'underscore'], function($, _) {
+define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
     'use strict';
 
     /**
      * @export oroui/js/tools
      * @name   oroui.tools
      */
-    return {
+    var tools = {};
+
+    _.extend(tools, Chaplin.utils);
+
+    _.extend(tools, {
         /** @type {boolean} */
         debug: false,
         /**
@@ -163,7 +167,7 @@ define(['jquery', 'underscore'], function($, _) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**
@@ -229,5 +233,7 @@ define(['jquery', 'underscore'], function($, _) {
         ensureArray: function(value) {
             return _.isArray(value) ? value : [value];
         }
-    };
+    });
+
+    return tools;
 });

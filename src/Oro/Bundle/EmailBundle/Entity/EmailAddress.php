@@ -161,7 +161,7 @@ abstract class EmailAddress
      *
      * @return bool
      */
-    public function hasOwner()
+    public function getHasOwner()
     {
         return $this->hasOwner;
     }

@@ -1,0 +1,6 @@
+{% set origin = record.getValue('origin') %}
+{% if origin.active is not defined or not origin.active %}
+    {{ 'No'|trans }}
+{% else %}
+    {{ 'Yes'|trans }}
+{% endif %}

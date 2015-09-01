@@ -539,6 +539,9 @@
     {% if pageComponent.options is defined %}
         data-page-component-options="{{ pageComponent.options|json_encode }}"
     {% endif %}
+    {% if pageComponent.name is defined %}
+        data-page-component-name="{{ pageComponent.name }}"
+    {% endif %}
     {% if pageComponent.layout is defined %}
         data-layout="{{ pageComponent.layout }}"
     {% endif %}
@@ -550,10 +553,14 @@
     Parameters: options array for widget
 #}
 {% macro renderWidgetAttributes(options) %}
-    {{ _self.renderPageComponentAttributes({
+    {% set pageComponent = {
         module:  "oroui/js/app/components/widget-component",
         options: options
-    }) }}
+    }  %}
+    {% if options.options.pageComponentName is defined %}
+        {% set pageComponent = pageComponent|merge({name: options.options.pageComponentName}) %}
+    {% endif %}
+    {{ _self.renderPageComponentAttributes(pageComponent) }}
 {% endmacro %}
 {#
     @deprecated

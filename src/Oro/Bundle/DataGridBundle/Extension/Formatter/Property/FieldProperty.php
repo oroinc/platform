@@ -47,7 +47,7 @@ class FieldProperty extends AbstractProperty
     protected function getRawValue(ResultRecordInterface $record)
     {
         try {
-            $value = $record->getValue($this->getOr(self::DATA_NAME_KEY, $this->get(self::NAME_KEY)));
+            $value = $record->getValue($this->getOr(self::DATA_NAME_KEY) ?: $this->get(self::NAME_KEY));
         } catch (\LogicException $e) {
             // default value
             $value = null;

@@ -63,6 +63,16 @@ class View
     }
 
     /**
+     * Getter for label
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
      * Getter for name
      *
      * @return string

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 
 /**
  * User Email Origin
@@ -75,6 +76,13 @@ class UserEmailOrigin extends EmailOrigin
      * @ORM\Column(name="imap_password", type="string", length=100, nullable=true)
      */
     protected $password;
+
+    /**
+     * @var Mailbox
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", mappedBy="origin")
+     */
+    protected $mailbox;
 
     /**
      * Gets the host name of IMAP server
