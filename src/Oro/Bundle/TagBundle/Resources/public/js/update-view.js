@@ -4,7 +4,6 @@ define(function(require) {
     var _ = require('underscore');
     var $ = require('jquery');
     var TagView = require('./view');
-    require('json');
 
     /**
      * @export  orotag/js/update-view
@@ -33,7 +32,6 @@ define(function(require) {
             unassignGlobal: false,
             tagOverlayId: null
         }),
-
 
         events: {
             'click [data-action="remove-tag"]': '_removeItem'
