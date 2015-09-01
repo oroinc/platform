@@ -69,7 +69,6 @@ class AutoResponseTemplateType extends AbstractType
                     'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                     'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
                 ],
-                'data'     => 'html',
                 'required' => true
             ])
             ->add('translations', 'oro_email_emailtemplate_translatation', [
