@@ -1,5 +1,6 @@
 parameters:
-    doctrine.orm.entity_manager.class:                         Oro\Bundle\EntityBundle\ORM\OroEntityManager
+    doctrine.orm.entity_manager.class: Oro\Bundle\EntityBundle\ORM\OroEntityManager
+    doctrine.orm.configuration.class:  Oro\Bundle\EntityBundle\ORM\OrmConfiguration
 
     oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
     oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor

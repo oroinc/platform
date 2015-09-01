@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
+use Oro\Bundle\LocaleBundle\Model\NameInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
@@ -25,14 +26,16 @@ class NameFormatter
         $this->localeSettings = $localeSettings;
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @param NamePrefixInterface|FirstNameInterface|MiddleNameInterface|LastNameInterface|NameSuffixInterface $person
+     * @param NamePrefixInterface|FirstNameInterface|MiddleNameInterface|LastNameInterface|NameSuffixInterface|NameInterface $person
      * @param null|string $locale
      * @return string
      */
+    // @codingStandardsIgnoreEnd
     public function format($person, $locale = null)
     {
-        $nameParts = array();
+        $nameParts = [];
         if ($person instanceof NamePrefixInterface) {
             $nameParts['prefix'] = $person->getNamePrefix();
         }
@@ -49,25 +52,13 @@ class NameFormatter
             $nameParts['suffix'] = $person->getNameSuffix();
         }
 
-        $format = $this->getNameFormat($locale);
-        $name = preg_replace_callback(
-            '/%(\w+)%/',
-            function ($data) use ($nameParts) {
-                $key = $data[1];
-                $lowerCaseKey = strtolower($key);
-                if (isset($nameParts[$lowerCaseKey])) {
-                    if ($key !== $lowerCaseKey) {
-                        $nameParts[$lowerCaseKey] = strtoupper($nameParts[$lowerCaseKey]);
-                    }
-                    return $nameParts[$lowerCaseKey];
-                }
-                return '';
-            },
-            $format
-        );
+        if (empty($nameParts) && $person instanceof NameInterface) {
+            return $person->getName();
+        }
 
-        $name = preg_replace('/ +/', ' ', $name);
-        return trim($name);
+        $format = $this->getNameFormat($locale);
+
+        return $this->applyFormat($nameParts, $format);
     }
 
     /**
@@ -111,5 +102,31 @@ class NameFormatter
         }
 
         throw new \RuntimeException(sprintf('Cannot get name format for "%s"', $locale));
+    }
+
+    /**
+     * @param array $nameParts
+     * @param string $format
+     * @return string
+     */
+    protected function applyFormat(array $nameParts, $format)
+    {
+        $name = preg_replace_callback(
+            '/%(\w+)%/',
+            function ($data) use ($nameParts) {
+                $key = $data[1];
+                $lowerCaseKey = strtolower($key);
+                if (isset($nameParts[$lowerCaseKey])) {
+                    if ($key !== $lowerCaseKey) {
+                        $nameParts[$lowerCaseKey] = strtoupper($nameParts[$lowerCaseKey]);
+                    }
+                    return $nameParts[$lowerCaseKey];
+                }
+                return '';
+            },
+            $format
+        );
+
+        return trim(preg_replace('/ +/', ' ', $name));
     }
 }

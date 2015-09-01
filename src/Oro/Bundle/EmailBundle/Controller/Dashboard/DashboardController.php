@@ -34,17 +34,16 @@ class DashboardController extends Controller
             return $activeTabContent;
         } else {
             $currentOrganization = $this->get('security.context')->getToken()->getOrganizationContext();
-            $unreadMailList = $this
-                ->get('doctrine')
-                ->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserList($loggedUser, $currentOrganization, [], false);
+            $unreadMailCount = $this
+                ->get('oro_email.manager.notification')
+                ->getCountNewEmails($loggedUser, $currentOrganization);
 
             $params = array_merge(
                 [
                     'loggedUserId'     => $loggedUserId,
                     'activeTab'        => $activeTab,
                     'activeTabContent' => $activeTabContent,
-                    'unreadMailCount' => count($unreadMailList)
+                    'unreadMailCount'  => $unreadMailCount,
                 ],
                 $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
             );

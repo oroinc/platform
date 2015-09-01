@@ -41,8 +41,14 @@ class ActivityListChainProvider
     /** @var EntityRoutingHelper */
     protected $routingHelper;
 
-    /** @var array */
+    /** @var string[] */
     protected $targetClasses;
+
+    /** @var string[] */
+    protected $activities;
+
+    /** @var string[] */
+    protected $ownerActivities;
 
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
@@ -76,6 +82,10 @@ class ActivityListChainProvider
     public function addProvider(ActivityListProviderInterface $provider)
     {
         $this->providers[$provider->getActivityClass()] = $provider;
+
+        $this->activities      = null;
+        $this->ownerActivities = null;
+        $this->targetClasses   = null;
     }
 
     /**
@@ -91,7 +101,7 @@ class ActivityListChainProvider
     /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
-     * @return array
+     * @return string[]
      */
     public function getTargetEntityClasses()
     {
@@ -121,7 +131,11 @@ class ActivityListChainProvider
      */
     public function getSupportedActivities()
     {
-        return array_keys($this->providers);
+        if (null === $this->activities) {
+            $this->activities = array_keys($this->providers);
+        }
+
+        return $this->activities;
     }
 
     /**
@@ -131,11 +145,14 @@ class ActivityListChainProvider
      */
     public function getSupportedOwnerActivities()
     {
-        $ownerClasses = [];
-        foreach ($this->providers as $provider) {
-            $ownerClasses[] = $provider->getAclClass();
+        if (null === $this->ownerActivities) {
+            $this->ownerActivities = [];
+            foreach ($this->providers as $provider) {
+                $this->ownerActivities[] = $provider->getAclClass();
+            }
         }
-        return $ownerClasses;
+
+        return $this->ownerActivities;
     }
 
     /**
@@ -147,7 +164,11 @@ class ActivityListChainProvider
      */
     public function isSupportedEntity($entity)
     {
-        return in_array($this->doctrineHelper->getEntityClass($entity), array_keys($this->providers));
+        return in_array(
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->getSupportedActivities(),
+            true
+        );
     }
 
     /**
@@ -159,7 +180,11 @@ class ActivityListChainProvider
      */
     public function isSupportedTargetEntity($entity)
     {
-        return in_array($this->doctrineHelper->getEntityClass($entity), $this->getTargetEntityClasses());
+        return in_array(
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->getTargetEntityClasses(),
+            true
+        );
     }
 
     /**
@@ -171,11 +196,11 @@ class ActivityListChainProvider
      */
     public function isSupportedOwnerEntity($entity)
     {
-        $ownerClasses = [];
-        foreach ($this->providers as $provider) {
-            $ownerClasses[] = $provider->getAclClass();
-        }
-        return in_array($this->doctrineHelper->getEntityClass($entity), $ownerClasses);
+        return in_array(
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->getSupportedOwnerActivities(),
+            true
+        );
     }
 
     /**

@@ -26,6 +26,9 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineRegistryLink;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $mailboxProcessStorage;
+
     protected function setUp()
     {
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
@@ -62,6 +65,12 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->mailboxProcessStorage = $this->getMockBuilder(
+            'Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
             $this->doctrineRegistryLink,
@@ -70,7 +79,8 @@ class EmailActivityListProviderTest extends \PHPUnit_Framework_TestCase
             $configManager,
             $emailThreadProvider,
             $htmlTagHelper,
-            $this->securityFacadeLink
+            $this->securityFacadeLink,
+            $this->mailboxProcessStorage
         );
         $this->emailActivityListProvider->setSecurityContextLink($this->securityContextLink);
     }
