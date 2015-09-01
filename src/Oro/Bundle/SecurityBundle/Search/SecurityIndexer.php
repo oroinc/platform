@@ -179,7 +179,7 @@ class SecurityIndexer
             $details = $this->shareFormatter->getEntityDetails($object);
             $rows[] = [
                 'id' => json_encode([
-                    'entityId' => $this->propertyAccessor->getValue($object, 'id'),
+                    'entityId' => (string) $this->propertyAccessor->getValue($object, 'id'),
                     'entityClass' => ClassUtils::getRealClass($object),
                 ]),
                 'text' => $details['label'],

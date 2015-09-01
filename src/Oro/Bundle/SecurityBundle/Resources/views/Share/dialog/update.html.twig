@@ -18,13 +18,8 @@
         </script>
     {% else %}
         <script type="text/javascript">
-            require([
-                    'orotranslation/js/translator',
-                    'oroui/js/widget-manager',
-                    'oroui/js/messenger',
-                    'oroui/js/mediator'
-                ],
-                function(__, widgetManager, messenger, mediator) {
+            require(['jquery', 'oroui/js/mediator'],
+                function($, mediator) {
                     $('.btn.btn-primary.shared-dialog-apply').on('click', function () {
                         mediator.trigger('widget:shared-dialog:apply');
                     });

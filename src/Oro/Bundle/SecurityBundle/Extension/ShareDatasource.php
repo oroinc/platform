@@ -154,7 +154,7 @@ class ShareDatasource implements DatasourceInterface
         foreach ($objects as $object) {
             $rows[] = new ResultRecord([
                 'id' => json_encode([
-                    'entityId' => $this->propertyAccessor->getValue($object, 'id'),
+                    'entityId' => (string) $this->propertyAccessor->getValue($object, 'id'),
                     'entityClass' => ClassUtils::getRealClass($object),
                 ]),
                 'entity' => $this->shareFormatter->getEntityDetails($object),

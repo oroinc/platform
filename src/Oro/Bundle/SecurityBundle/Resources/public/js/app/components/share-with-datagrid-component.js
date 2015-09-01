@@ -8,6 +8,7 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ShareWithDatagridView = require('orosecurity/js/app/views/share-with-datagrid-view');
+    var helper = require('orosecurity/js/app/helper/component-helper');
     require('jquery.select2');
 
     /**
@@ -100,21 +101,13 @@ define(function(require) {
         onGridAdd: function (gridWidget, data) {
             var dialogWidgetName = this.options.dialogWidgetName;
             var selected = {};
-            gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).
-                grid.collection.trigger('backgrid:getSelected', selected);
-            var models = gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).grid.collection.models;
-            var selectedModels = [];
-            gridWidget._showLoading();
-            for(var key in models) {
-                var model = models[key];
-                if (selected.selected.indexOf(model.get('id')) !== -1) {
-                    selectedModels.push(model);
-                }
-            }
+            var grid = gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).grid;
+            grid.collection.trigger('backgrid:getSelected', selected);
+            var models = helper.extractModelsFromGridCollection(grid);
             gridWidget._hideLoading();
             mediator.trigger('datagrid:shared-datagrid:add:data', {
                 entityClass: this.shareWithDatagridView.currentTargetClass(),
-                models: selectedModels
+                models: models
             });
             if (!dialogWidgetName) {
                 return;
