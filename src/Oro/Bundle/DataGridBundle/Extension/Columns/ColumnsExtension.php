@@ -15,6 +15,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ColumnsExtension extends AbstractExtension
 {
+    const COLUMNS_PATH = 'columns';
+
     /** @var Registry */
     protected $registry;
 
@@ -44,21 +46,10 @@ class ColumnsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $columns = $config->offsetGetOr(Configuration::COLUMNS_PATH, []);
+        $columns = $config->offsetGetOr(self::COLUMNS_PATH, []);
         $this->processConfigs($config);
 
         return count($columns) > 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function processConfigs(DatagridConfiguration $config)
-    {
-        $this->validateConfiguration(
-            new Configuration(),
-            ['columns' => $config->offsetGetByPath(Configuration::COLUMNS_PATH)]
-        );
     }
 
     /**
