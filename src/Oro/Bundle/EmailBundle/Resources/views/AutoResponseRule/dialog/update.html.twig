@@ -19,6 +19,7 @@
             'layout': 'separate'
         } %}
         <div class="form-container" {{ UI.renderPageComponentAttributes(pageComponent) }}>
+            {% form_theme form 'OroEmailBundle:Form:autoresponseFields.html.twig' %}
             {{ form_start(
                 form,
                 {
