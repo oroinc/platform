@@ -389,6 +389,8 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.ownership_tree_provider.chain
             - @?security.acl.voter.basic_permissions
+        calls:
+            - [setAclGroupProvider, [@oro_security.acl.group_provider.chain]]
 
     oro_security.abstract_ownership_tree_provider:
         public: false
