@@ -2,8 +2,9 @@ define([
     'underscore',
     'backbone',
     'orotranslation/js/translator',
+    'oroui/js/mediator',
     'backbone-bootstrap-modal'
-], function(_, Backbone, __) {
+], function(_, Backbone, __, mediator) {
     'use strict';
 
     var Modal;
@@ -133,7 +134,21 @@ define([
                 this.$el.trigger('hidden');
             }, this));
 
+            this._fixHeight();
+            $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeight, this));
+            mediator.trigger('modal:open', this);
+
             return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        close: function() {
+            Modal.__super__.close.call(this);
+            $(document).off(this._eventNamespace());
+            $(window).off(this._eventNamespace());
+            mediator.trigger('modal:close', this);
         },
 
         /**
@@ -144,7 +159,6 @@ define([
                 return;
             }
             delete this.$content;
-            $(document).off(this._eventNamespace());
             Modal.__super__.dispose.call(this);
         },
 
@@ -164,6 +178,16 @@ define([
          */
         _eventNamespace: function() {
             return '.delegateEvents' + this.cid;
+        },
+
+        _fixHeight: function() {
+            this.$('.modal-body').height('auto');
+            var height = this.$el[0].clientHeight;
+            if (height < this.$el[0].scrollHeight) {
+                this.$('.modal-body').height(height -
+                    this.$('.modal-header').outerHeight() -
+                    this.$('.modal-footer').outerHeight());
+            }
         }
     });
 
