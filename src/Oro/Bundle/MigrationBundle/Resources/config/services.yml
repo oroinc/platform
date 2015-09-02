@@ -43,8 +43,6 @@ services:
 
     oro_migration.migration.pre_up.listener:
         class: %oro_migration.migration.pre_up.listener.class%
-        arguments:
-            - @kernel
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
 
