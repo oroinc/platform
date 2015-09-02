@@ -38,6 +38,9 @@ define(function(require) {
             var dropdown = this.$('.share-with-entity-dropdown');
             var firstItem = this.$('.share-with-entity-current-item');
             this.collection.on('add', function(model) {
+                if (!model.attributes.isGranted) {
+                    return false;
+                }
                 var gridUrl = Routing.generate(
                     'oro_share_with_datagrid',
                     {

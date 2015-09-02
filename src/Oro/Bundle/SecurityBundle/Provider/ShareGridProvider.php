@@ -8,9 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ShareGridProvider
 {
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /** @var EntityRoutingHelper */
     protected $routingHelper;
 
@@ -24,17 +28,20 @@ class ShareGridProvider
     protected $translator;
 
     /**
+     * @param SecurityFacade $securityFacade
      * @param EntityRoutingHelper $routingHelper
      * @param ConfigManager $configManager
      * @param AclHelper $helper
      * @param TranslatorInterface $translator
      */
     public function __construct(
+        SecurityFacade $securityFacade,
         EntityRoutingHelper $routingHelper,
         ConfigManager $configManager,
         AclHelper $helper,
         TranslatorInterface $translator
     ) {
+        $this->securityFacade = $securityFacade;
         $this->routingHelper = $routingHelper;
         $this->configManager = $configManager;
         $this->helper = $helper;
@@ -61,6 +68,7 @@ class ShareGridProvider
         $classNames = $this->helper->getClassNamesBySharingScopes($shareScopes);
         foreach ($classNames as $key => $className) {
             $results[] = [
+                'isGranted' => $this->securityFacade->isGranted('VIEW', 'entity:' . $className),
                 'label' => $this->getClassLabel($className),
                 'className' => $className,
                 'first' => !(bool) $key,

@@ -12,6 +12,9 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
     const GRID_NAME = 'share-with-users-datagrid';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $routingHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -31,6 +34,13 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->with('VIEW')
+            ->willReturn(true);
         $this->routingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -44,6 +54,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->provider = new ShareGridProvider(
+            $this->securityFacade,
             $this->routingHelper,
             $this->configManager,
             $this->helper,
@@ -149,6 +160,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 0 => [
+                    'isGranted' => true,
                     'label' => self::ENTITY_LABEL,
                     'className' => self::ENTITY_CLASS,
                     'first' => true,

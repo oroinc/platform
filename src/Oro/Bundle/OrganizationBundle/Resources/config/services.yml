@@ -162,6 +162,7 @@ services:
             - @?security.acl.voter.basic_permissions
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.business-unit-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.share-with-business-units-datagrid, method: onBuildBefore }
 
     # Autocomplete user organizations search handler
     oro_organization.autocomplete.organization_search_handler:
