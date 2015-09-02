@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
@@ -32,17 +34,23 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
     /**
      * Gets suggestion result
      *
-     * @param Email $email
-     * @param int   $page
-     * @param int   $limit
+     * @param int $emailId
+     * @param int $page
+     * @param int $limit
      *
      * @return array
      */
     public function getSuggestionResult(
-        Email $email,
+        $emailId,
         $page = 1,
         $limit = 10
     ) {
+        /** @var Email $email */
+        $email = $this->find($emailId);
+        if (!$email) {
+            throw new NotFoundHttpException();
+        }
+
         $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
             false,
             0,
