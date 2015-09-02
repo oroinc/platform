@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 
+use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,7 +41,14 @@ class CreateUserCommand extends ContainerAwareCommand
             ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
             ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password');
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password')
+            ->addOption(
+                'user-organization',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+                'User organizations'
+            )
+        ;
     }
 
     /**
@@ -48,6 +56,7 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var User $user */
         $user = $this->getUserManager()->createUser();
         $user->setEnabled(true);
 
@@ -92,6 +101,7 @@ class CreateUserCommand extends ContainerAwareCommand
 
             $user
                 ->setOwner($businessUnit)
+                ->setOrganization($businessUnit->getOrganization())
                 ->addBusinessUnit($businessUnit);
         }
 
@@ -110,7 +120,33 @@ class CreateUserCommand extends ContainerAwareCommand
             }
         }
 
+        $this->setOrganizations($user, $options);
+
         $this->getUserManager()->updateUser($user);
+    }
+
+    /**
+     * @param User $user
+     * @param array $options
+     * @throws InvalidArgumentException
+     */
+    protected function setOrganizations(User $user, $options)
+    {
+        if (empty($options['user-organization'])) {
+            return;
+        }
+
+        foreach ($options['user-organization'] as $organizationName) {
+            try {
+                $organization = $this->getEntityManager()
+                    ->getRepository('OroOrganizationBundle:Organization')
+                    ->getOrganizationByName($organizationName);
+            } catch (NoResultException $e) {
+                throw new InvalidArgumentException('Invalid Organization: "' . $organizationName . '"');
+            }
+
+            $user->addOrganization($organization);
+        }
     }
 
     /**
