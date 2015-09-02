@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
-use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -11,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class GridViewsExtension extends AbstractExtension

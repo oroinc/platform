@@ -95,7 +95,7 @@ define(function(require) {
                     this.main.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: ''
                     });
-                    mediator.execute('layout:enablePageScroll', this.main.$el);
+                    mediator.execute('layout:enablePageScroll');
                     break;
                 default:
                     throw new Error('Unknown grid layout');

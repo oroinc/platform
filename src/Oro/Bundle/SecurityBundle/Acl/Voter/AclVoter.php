@@ -270,7 +270,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
      */
     protected function checkAclGroup($group)
     {
-        if ($group=== null || !$this->groupProvider || !$this->object) {
+        if ($group === null || !$this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
