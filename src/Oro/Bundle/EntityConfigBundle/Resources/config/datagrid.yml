@@ -14,6 +14,7 @@ datagrid:
                     - ce.id
                     - ce.updated
                     - ce.mode
+                    - ce.data
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
                 where:
@@ -80,6 +81,7 @@ datagrid:
                     - cf.type
                     - cf.mode
                     - ce.id as entity_id
+                    - cf.data
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
                 join:

@@ -135,6 +135,8 @@ services:
         class: %oro_email.form.type.email.class%
         arguments:
             - @security.context
+            - @oro_email.email_renderer
+            - @oro_email.email.model.builder.helper
         tags:
             - { name: form.type, alias: oro_email_email }
 
@@ -215,7 +217,9 @@ services:
 
     oro_email.form.type.mailbox:
         class: %oro_email.form.type.mailbox.class%
-        arguments: [@oro_email.mailbox.process_storage]
+        arguments:
+            - @oro_email.mailbox.process_storage
+            - @oro_security.encoder.mcrypt
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 

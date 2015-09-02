@@ -9,8 +9,8 @@ class EmailDomainNotAllowedException extends AuthenticationException
     /**
      * {@inheritdoc}
      */
-    public function getMessageData()
+    public function getMessageKey()
     {
-        return 'Given email domain is not allowed.';
+        return 'Invalid credentials.';
     }
 }

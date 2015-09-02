@@ -257,26 +257,40 @@
 {% endblock %}
 
 {% block oro_email_mailbox_grid_row %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {{ form_label(form) }}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block oro_email_mailbox_grid_label %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set redirectData = {
         'route': app.request.attributes.get('_route'),
         'parameters': app.request.attributes.get('_route_params'),
     } %}
-    <div class="row" style="margin-top: -42px;">
-        <div class="pull-right">
-            <div class="btn-group">
-                {% if resource_granted('oro_email_mailbox_create') %}
+    {% if resource_granted('oro_organization_update') %}
+        <div class="row" style="margin-top: -42px;">
+            <div class="pull-right">
+                <div class="btn-group">
                     {{ UI.addButton({
                         'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
                         'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
                     }) }}
-                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_mailbox_grid_widget %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params')
+    } %}
     <div class="row" style="margin-right: -20px;">
-        {{ dataGrid.renderGrid('base-mailboxes-grid', {redirectData: redirectData}) }}
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {
+            'redirectData': redirectData, 'organization_ids': [get_current_organization().getId()]
+        }) }}
     </div>
 {% endblock %}
 

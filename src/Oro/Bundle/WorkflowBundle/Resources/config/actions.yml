@@ -18,6 +18,7 @@ parameters:
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
     oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
     oro_workflow.action.traverse.class: Oro\Bundle\WorkflowBundle\Model\Action\Traverse
+    oro_workflow.action.translate.class: Oro\Bundle\WorkflowBundle\Model\Action\TranslateAction
     oro_workflow.action.flash_message.class: Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
     oro_workflow.workflow.action.remove_entity.class:  Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue
@@ -158,6 +159,14 @@ services:
             - @oro_workflow.action.configurable
         tags:
             - { name: oro_workflow.action, alias: traverse|foreach }
+
+    oro_workflow.action.translate:
+        class: %oro_workflow.action.translate.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @translator
+        tags:
+            - { name: oro_workflow.action, alias: translate|trans }
 
     oro_workflow.action.flash_message:
         class: %oro_workflow.action.flash_message.class%

@@ -17,6 +17,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ConnectionController extends Controller
 {
@@ -70,18 +71,25 @@ class ConnectionController extends Controller
                     $emailFolders = $this->manager->getFolders();
                     $origin->setFolders($emailFolders);
 
-                    if ($request->get('for_entity', 'user') === 'user') {
+                    $entity = $request->get('for_entity', 'user');
+                    $organizationId = $request->get('organization');
+                    $organization = $this->getOrganization($organizationId);
+                    if ($entity === 'user') {
                         $user = new User();
                         $user->setImapConfiguration($origin);
+                        $user->setOrganization($organization);
                         $userForm = $this->get('oro_user.form.user');
                         $userForm->setData($user);
 
                         $response['imap']['folders'] = $this->renderView('OroImapBundle:Connection:check.html.twig', [
                             'form' => $userForm->createView(),
                         ]);
-                    } elseif ($request->get('for_entity', 'user') === 'mailbox') {
+                    } elseif ($entity === 'mailbox') {
                         $mailbox = new Mailbox();
                         $mailbox->setOrigin($origin);
+                        if ($organization) {
+                            $mailbox->setOrganization($organization);
+                        }
                         $mailboxForm = $this->createForm('oro_email_mailbox');
                         $mailboxForm->setData($mailbox);
 
@@ -116,5 +124,19 @@ class ConnectionController extends Controller
         }
 
         return new Response('', $responseCode);
+    }
+
+    /**
+     * @param int|null $id
+     *
+     * @return Organization|null
+     */
+    protected function getOrganization($id)
+    {
+        if (!$id) {
+            return null;
+        }
+
+        return $this->getDoctrine()->getRepository('OroOrganizationBundle:Organization')->find($id);
     }
 }
