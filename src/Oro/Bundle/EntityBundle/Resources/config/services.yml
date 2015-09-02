@@ -4,6 +4,7 @@ parameters:
     oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:   Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class: Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
+    oro_entity.event_listener.entity_lifecycle_listener.class:     Oro\Bundle\EntityBundle\EventListener\EntityLifecycleListener
     oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
     oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
@@ -79,6 +80,14 @@ services:
             - @router
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
+
+    oro_entity.event_listener.entity_lifecycle_listener:
+        class:  %oro_entity.event_listener.entity_lifecycle_listener.class%
+        arguments:
+            - @oro_security.security_facade.link
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
 
     oro_entity.event_listener.entity_relation_grid_listener:
         class: %oro_entity.event_listener.entity_relation_grid_listener.class%

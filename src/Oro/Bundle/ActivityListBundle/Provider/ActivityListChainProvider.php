@@ -412,6 +412,8 @@ class ActivityListChainProvider
                 $this->htmlTagHelper->purify($provider->getDescription($entity))
             ));
             $this->setDate($entity, $provider, $list);
+            $list->setOwner($provider->getOwner($entity));
+            $list->setEditor($provider->getUpdatedBy($entity));
             if ($this->hasGrouping($provider)) {
                 $list->setHead($provider->isHead($entity));
             }
@@ -472,8 +474,8 @@ class ActivityListChainProvider
     protected function setDate($entity, ActivityListProviderInterface $provider, $list)
     {
         if ($this->hasCustomDate($provider)) {
-            $list->setCreatedAt($provider->getDate($entity));
-            $list->setUpdatedAt($provider->getDate($entity));
+            $list->setCreatedAt($provider->getCreatedAt($entity));
+            $list->setUpdatedAt($provider->getUpdatedAt($entity));
         }
     }
 }

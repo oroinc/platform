@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Model;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -33,6 +34,34 @@ interface ActivityListProviderInterface
      * @return string|null
      */
     public function getDescription($entity);
+
+    /**
+     * @param object $entity
+     *
+     * @return User|null
+     */
+    public function getOwner($entity);
+
+    /**
+     * @param object $entity
+     *
+     * @return User|null
+     */
+    public function getUpdatedBy($entity);
+
+    /**
+     * @param object $entity
+     *
+     * @return \Datetime|null
+     */
+    public function getCreatedAt($entity);
+
+    /**
+     * @param object $entity
+     *
+     * @return \Datetime|null
+     */
+    public function getUpdatedAt($entity);
 
     /**
      * Get array of ActivityOwners for list entity

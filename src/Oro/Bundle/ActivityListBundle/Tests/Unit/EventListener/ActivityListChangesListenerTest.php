@@ -166,12 +166,116 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertInstanceOf('\DateTime', $entity->getUpdatedAt());
-        if ($mockUser) {
-            $this->assertEquals($newUser, $entity->getEditor());
-        } else {
-            $this->assertNull($entity->getEditor());
-        }
     }
+
+    public function testCreateWithSettedValues()
+    {
+        $date = new \DateTime('2012-12-12 12:12:12');
+        $entity = new ActivityList();
+        $newUser = new User();
+        $newUser->setFirstName('newUser');
+        $entity->setCreatedAt($date);
+        $entity->setOwner($newUser);
+
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->setMethods(['propertyChanged', 'getEntityState'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager = $this->getEntityManagerMock(true, $newUser);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+
+        $args = new LifecycleEventArgs($entity, $entityManager);
+
+        $this->listener->prePersist($args);
+
+        $this->assertEquals($date, $entity->getCreatedAt());
+        $this->assertEquals($newUser, $entity->getOwner());
+    }
+
+    public function testCreateWithDefaultValues()
+    {
+        $entity = new ActivityList();
+        $newUser = new User();
+        $newUser->setFirstName('newUser');
+
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->setMethods(['propertyChanged', 'getEntityState'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager = $this->getEntityManagerMock(true, $newUser);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+
+        $args = new LifecycleEventArgs($entity, $entityManager);
+
+        $this->mockSecurityContext($newUser);
+
+        $this->listener->prePersist($args);
+
+        $this->assertEquals($newUser, $entity->getOwner());
+    }
+
+    public function testUpdateWithSettedValues()
+    {
+        $date = new \DateTime('2012-12-12 12:12:12');
+        $entity = new ActivityList();
+        $newUser = new User();
+        $newUser->setFirstName('newUser');
+        $entity->setUpdatedAt($date);
+        $entity->setUpdatedBy($newUser);
+
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->setMethods(['propertyChanged', 'getEntityState'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager = $this->getEntityManagerMock(true, $newUser);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+
+        $changeSet = [];
+        $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+
+        $this->listener->preUpdate($args);
+
+        $this->assertEquals($date, $entity->getUpdatedAt());
+        $this->assertEquals($newUser, $entity->getUpdatedBy());
+    }
+
+    public function testUpdateWithDefaultValues()
+    {
+        $entity = new ActivityList();
+
+        $newUser = null;
+        $newUser = new User();
+        $newUser->setFirstName('newUser');
+
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->setMethods(['propertyChanged', 'getEntityState'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager = $this->getEntityManagerMock(true, $newUser);
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+
+        $this->mockSecurityContext($newUser);
+
+        $changeSet = [];
+        $args = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
+
+        $this->listener->preUpdate($args);
+
+        $this->assertEquals($newUser, $entity->getUpdatedBy());
+    }
+
 
     /**
      * @return array
@@ -212,7 +316,7 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         if ($reloadUser) {
-            $result->expects($this->once())->method('find')
+            $result->expects($this->any())->method('find')
                 ->with('OroUserBundle:User')
                 ->will($this->returnValue($newUser));
         } else {

@@ -11,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedbyInterface;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
@@ -37,7 +40,10 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *      }
  * )
  */
-class Note extends ExtendNote
+class Note extends ExtendNote implements
+    LifecycleDatesInterface,
+    LifecycleUpdatedbyInterface,
+    LifecycleOwnerInterface
 {
     const ENTITY_NAME = 'Oro\Bundle\NoteBundle\Entity\Note';
 
@@ -110,6 +116,16 @@ class Note extends ExtendNote
     protected $updatedAt;
 
     /**
+     * @var bool
+     */
+    protected $isUpdatedUpdatedAt = null;
+
+    /**
+     * @var bool
+     */
+    protected $isUpdatedUpdatedBy = null;
+
+    /**
      * @return int
      */
     public function getId()
@@ -164,6 +180,10 @@ class Note extends ExtendNote
      */
     public function setUpdatedAt($updatedAt)
     {
+        if ($updatedAt !== null) {
+            $this->isUpdatedUpdatedAt = true;
+        }
+
         $this->updatedAt = $updatedAt;
 
         return $this;
@@ -178,15 +198,27 @@ class Note extends ExtendNote
     }
 
     /**
+     * @return bool
+     */
+    public function isUpdatedUpdatedAtProperty()
+    {
+        return $this->isUpdatedUpdatedAt;
+    }
+
+    /**
      * Not using type hint due to the fact that entity setter can be called when no logged user available
      * So $updatedBy will be null
      *
-     * @param UserInterface|null $updatedBy
+     * @param User|null $updatedBy
      *
      * @return Note
      */
-    public function setUpdatedBy($updatedBy)
+    public function setUpdatedBy(User $updatedBy)
     {
+        if ($updatedBy !== null) {
+            $this->isUpdatedUpdatedBy = true;
+        }
+
         $this->updatedBy = $updatedBy;
 
         return $this;
@@ -201,11 +233,19 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param UserInterface|null $owningUser
+     * @return bool
+     */
+    public function isUpdatedUpdatedByProperty()
+    {
+        return $this->isUpdatedUpdatedBy;
+    }
+
+    /**
+     * @param User|null $owningUser
      *
      * @return Note
      */
-    public function setOwner($owningUser)
+    public function setOwner(User $owningUser)
     {
         $this->owner = $owningUser;
 

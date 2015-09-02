@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -62,7 +63,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
+class CalendarEvent extends ExtendCalendarEvent implements
+    RemindableInterface,
+    LifecycleDatesInterface
 {
     const NOT_RESPONDED        = 'not_responded';
     const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
@@ -275,6 +278,11 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * )
      */
     protected $invitationStatus;
+
+    /**
+     * @var bool
+     */
+    protected $isUpdatedUpdatedAt = null;
 
     public function __construct()
     {
@@ -715,26 +723,19 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function setUpdatedAt($updatedAt)
     {
+        if ($updatedAt !== null) {
+            $this->isUpdatedUpdatedAt = true;
+        }
+
         $this->updatedAt = $updatedAt;
     }
 
     /**
-     * @ORM\PrePersist
+     * @return bool
      */
-    public function prePersist()
+    public function isUpdatedUpdatedAtProperty()
     {
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        $this->createdAt = $this->createdAt ? : $now;
-        $this->updatedAt = $now;
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        return $this->isUpdatedUpdatedAt;
     }
 
     /**

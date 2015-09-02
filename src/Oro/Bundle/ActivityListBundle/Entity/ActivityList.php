@@ -14,6 +14,9 @@ use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedbyInterface;
+use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
@@ -52,7 +55,11 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class ActivityList extends ExtendActivityList
+class ActivityList extends ExtendActivityList implements
+    LifecycleDatesInterface,
+    LifecycleUpdatedbyInterface,
+    LifecycleOwnerInterface
+
 {
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
@@ -180,6 +187,16 @@ class ActivityList extends ExtendActivityList
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $activityOwners;
+
+    /**
+     * @var bool
+     */
+    protected $isUpdatedUpdatedAt = null;
+
+    /**
+     * @var bool
+     */
+    protected $isUpdatedUpdatedBy = null;
 
     public function __construct()
     {
@@ -396,13 +413,13 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * @param User $owningUser
+     * @param User $owner
      *
      * @return self
      */
-    public function setOwner(User $owningUser = null)
+    public function setOwner(User $owner = null)
     {
-        $this->owner = $owningUser;
+        $this->owner = $owner;
 
         return $this;
     }
@@ -430,6 +447,10 @@ class ActivityList extends ExtendActivityList
      */
     public function setEditor(User $editor = null)
     {
+        if ($editor !== null) {
+            $this->isUpdatedUpdatedBy = true;
+        }
+
         $this->editor = $editor;
 
         return $this;
@@ -441,6 +462,46 @@ class ActivityList extends ExtendActivityList
     public function getEditor()
     {
         return $this->editor;
+    }
+
+    /**
+     * @param User $updatedBy
+     *
+     * @return self
+     */
+    public function setUpdatedBy(User $updatedBy = null)
+    {
+        if ($updatedBy !== null) {
+            $this->isUpdatedUpdatedBy = true;
+        }
+
+        $this->editor = $updatedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUpdatedBy()
+    {
+        return $this->editor;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatedUpdatedByProperty()
+    {
+        return $this->isUpdatedUpdatedBy;
+    }
+
+    /**
+     * @param bool $value
+     */
+    public function setUpdatedUpdatedByProperty($value)
+    {
+        $this->isUpdatedUpdatedBy = (bool) $value;
     }
 
     /**
@@ -518,9 +579,21 @@ class ActivityList extends ExtendActivityList
      */
     public function setUpdatedAt($updatedAt)
     {
+        if ($updatedAt !== null) {
+            $this->isUpdatedUpdatedAt = true;
+        }
+
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatedUpdatedAtProperty()
+    {
+        return $this->isUpdatedUpdatedAt;
     }
 
     /**

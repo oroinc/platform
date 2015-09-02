@@ -4,14 +4,12 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\EntityBundle\EventListener\EntityLifecycleListener;
 
 /**
  * Class ActivityListChangesListener
@@ -20,11 +18,8 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ActivityListChangesListener
+class ActivityListChangesListener extends EntityLifecycleListener
 {
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
-
     /** @var  ActivityListChainProvider */
     protected $activityListChainProvider;
 
@@ -34,7 +29,7 @@ class ActivityListChangesListener
      */
     public function __construct(ServiceLink $securityFacadeLink, ActivityListChainProvider $activityListChainProvider)
     {
-        $this->securityFacadeLink = $securityFacadeLink;
+        parent::__construct($securityFacadeLink);
         $this->activityListChainProvider = $activityListChainProvider;
     }
 
@@ -44,17 +39,13 @@ class ActivityListChangesListener
     public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        if (!$this->isActivityListEntity($entity)) {
+        if (!$this->isActivityEntity($entity)) {
             return;
         }
 
-        /** @var ActivityList $entity */
-        if (!$entity->getCreatedAt()) {
-            $this->setCreatedProperties($entity, $args->getEntityManager());
-        }
-        if (!$entity->getUpdatedAt()) {
-            $this->setUpdatedProperties($entity, $args->getEntityManager());
-        }
+        $this->entityManager = $args->getEntityManager();
+        $this->setCreatedProperties($entity);
+        $this->setUpdatedProperties($entity);
     }
 
     /**
@@ -63,14 +54,30 @@ class ActivityListChangesListener
     public function preUpdate(PreUpdateEventArgs $args)
     {
         $entity = $args->getEntity();
-        if (!$this->isActivityListEntity($entity)) {
+        if (!$this->isActivityEntity($entity)) {
             return;
         }
 
+        $this->entityManager = $args->getEntityManager();
         /** @var ActivityList $entity */
         if ($this->isDateUpdatable($entity)) {
-            $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
+            $this->setUpdatedProperties($entity, true);
         }
+    }
+
+    /**
+     * @param object $entity
+     * @param bool $update
+     */
+    protected function setUpdatedProperties($entity, $update = false)
+    {
+        $newUpdatedBy = $this->getUser();
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+        if ($update && $newUpdatedBy != $entity->getEditor()) {
+            $unitOfWork->propertyChanged($entity, 'updatedAt', $entity->getUpdatedAt(), $this->getNowDate());
+            $unitOfWork->propertyChanged($entity, 'editor', $entity->getEditor(), $newUpdatedBy);
+        }
+        parent::setUpdatedProperties($entity);
     }
 
     /**
@@ -78,55 +85,9 @@ class ActivityListChangesListener
      *
      * @return bool
      */
-    protected function isActivityListEntity($entity)
+    protected function isActivityEntity($entity)
     {
         return $entity instanceof ActivityList;
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     *
-     * @return User|null
-     */
-    protected function getUser(EntityManager $entityManager)
-    {
-        /** @var User $user */
-        $user = $this->securityFacadeLink->getService()->getLoggedUser();
-        if ($user && $entityManager->getUnitOfWork()->getEntityState($user) == UnitOfWork::STATE_DETACHED) {
-            $user = $entityManager->find('OroUserBundle:User', $user->getId());
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param ActivityList  $activityList
-     * @param EntityManager $entityManager
-     */
-    protected function setCreatedProperties(ActivityList $activityList, EntityManager $entityManager)
-    {
-        $activityList->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        $activityList->setOwner($this->getUser($entityManager));
-    }
-
-    /**
-     * @param ActivityList  $activityList
-     * @param EntityManager $entityManager
-     * @param bool          $update
-     */
-    protected function setUpdatedProperties(ActivityList $activityList, EntityManager $entityManager, $update = false)
-    {
-        $newUpdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $newUpdatedBy = $this->getUser($entityManager);
-
-        $unitOfWork = $entityManager->getUnitOfWork();
-        if ($update && $newUpdatedBy != $activityList->getEditor()) {
-            $unitOfWork->propertyChanged($activityList, 'updatedAt', $activityList->getUpdatedAt(), $newUpdatedAt);
-            $unitOfWork->propertyChanged($activityList, 'editor', $activityList->getEditor(), $newUpdatedBy);
-        }
-
-        $activityList->setUpdatedAt($newUpdatedAt);
-        $activityList->setEditor($newUpdatedBy);
     }
 
     /**
