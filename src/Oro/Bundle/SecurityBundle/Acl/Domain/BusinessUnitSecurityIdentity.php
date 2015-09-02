@@ -18,8 +18,8 @@ class BusinessUnitSecurityIdentity implements SecurityIdentityInterface
     /**
      * Constructor.
      *
-     * @param $id
-     * @param $class
+     * @param int|string $id
+     * @param string     $class
      */
     public function __construct($id, $class)
     {

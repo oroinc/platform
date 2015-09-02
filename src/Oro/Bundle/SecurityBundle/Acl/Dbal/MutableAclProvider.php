@@ -186,7 +186,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL for updating a security identity.
-     * Clear Sids cache, that findAcls update Sids cache after Sid is updated
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
      *
      * @param SecurityIdentityInterface $sid
      * @param string $oldName
@@ -236,7 +236,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL to delete a security identity.
-     * Clear Sids cache, that findAcls update Sids cache after Sid is deleted
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
      *
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
@@ -268,7 +268,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL for inserting a security identity.
-     * Clear Sids cache, that findAcls update Sids cache after new Sid is inserted
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
      *
      * @param SecurityIdentityInterface $sid
      *
@@ -278,21 +278,7 @@ class MutableAclProvider extends BaseMutableAclProvider
      */
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
-        if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getClass().'-'.$sid->getUsername();
-            $username = true;
-        } elseif ($sid instanceof RoleSecurityIdentity) {
-            $identifier = $sid->getRole();
-            $username = false;
-        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
-            $identifier = $sid->getClass() . '-' . $sid->getId();
-            $username = false;
-        } else {
-            throw new \InvalidArgumentException(
-                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
-                ' or BusinessUnitSecurityIdentity.'
-            );
-        }
+        list($identifier, $username) = $this->getSecurityIdentifier($sid);
 
         $this->sids = null;
 
@@ -315,21 +301,7 @@ class MutableAclProvider extends BaseMutableAclProvider
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
-        if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getClass().'-'.$sid->getUsername();
-            $username = true;
-        } elseif ($sid instanceof RoleSecurityIdentity) {
-            $identifier = $sid->getRole();
-            $username = false;
-        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
-            $identifier = $sid->getClass() . '-' . $sid->getId();
-            $username = false;
-        } else {
-            throw new \InvalidArgumentException(
-                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
-                ' or BusinessUnitSecurityIdentity.'
-            );
-        }
+        list($identifier, $username) = $this->getSecurityIdentifier($sid);
 
         return sprintf(
             'SELECT id FROM %s WHERE identifier = %s AND username = %s',
@@ -340,7 +312,35 @@ class MutableAclProvider extends BaseMutableAclProvider
     }
 
     /**
+     * Get Security Identifier and Username flag to create SQL queries
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    protected function getSecurityIdentifier(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            return [$sid->getClass().'-'.$sid->getUsername(), true];
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            return [$sid->getRole(), false];
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            return [$sid->getClass() . '-' . $sid->getId(), false];
+        } else {
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
+            );
+        }
+    }
+
+    /**
      * {@inheritdoc}
+     *
+     * Property updatedAcl uses in method getInsertAccessControlEntrySql to take record id.
+     * Method getInsertAccessControlEntrySql executes in parent method updateAcl
      */
     public function updateAcl(MutableAclInterface $acl)
     {
@@ -429,12 +429,13 @@ QUERY;
 
         $sql = $this->getSelectAllSidsSql();
         $stmt = $this->connection->executeQuery($sql);
+        $stmtResult = $stmt->fetchAll(\PDO::FETCH_NUM);
 
-        foreach ($stmt->fetchAll(\PDO::FETCH_NUM) as $data) {
-            list($username,
-                $securityIdentifier) = $data;
+        foreach ($stmtResult as $data) {
+            list($username, $securityIdentifier) = $data;
+            $key = ($username ? '1' : '0').$securityIdentifier;
 
-            if (!isset($sids[$key = ($username ? '1' : '0').$securityIdentifier])) {
+            if (!isset($sids[$key])) {
                 $sids[$key] = $this->getSecurityIdentityFromString($securityIdentifier, $username);
             }
         }
@@ -463,14 +464,14 @@ SELECTCLAUSE;
     }
 
     /**
-     * @param string $securityIdentifier
-     * @param string $username
+     * @param string  $securityIdentifier
+     * @param boolean $isUsername
      *
      * @return BusinessUnitSecurityIdentity|RoleSecurityIdentity
      */
-    protected function getSecurityIdentityFromString($securityIdentifier, $username)
+    protected function getSecurityIdentityFromString($securityIdentifier, $isUsername)
     {
-        if ($username) {
+        if ($isUsername) {
             return new UserSecurityIdentity(
                 substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
                 substr($securityIdentifier, 0, $pos)

@@ -4,21 +4,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Query\AST\ArithmeticExpression;
-use Doctrine\ORM\Query\AST\Literal;
-use Doctrine\ORM\Query\AST\ComparisonExpression;
-use Doctrine\ORM\Query\AST\ConditionalPrimary;
-use Doctrine\ORM\Query\AST\ConditionalTerm;
-use Doctrine\ORM\Query\AST\InExpression;
 use Doctrine\ORM\Query\AST\PathExpression;
-use Doctrine\ORM\Query\AST\ExistsExpression;
-use Doctrine\ORM\Query\AST\SimpleSelectClause;
-use Doctrine\ORM\Query\AST\SimpleSelectExpression;
-use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\SubselectFromClause;
-use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\WhereClause;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
@@ -461,8 +447,16 @@ class OwnershipConditionDataBuilder
      */
     public function getAclShareData($entityName, $entityAlias, $permissions = BasicPermissionMap::PERMISSION_VIEW)
     {
+        if ($permissions !== BasicPermissionMap::PERMISSION_VIEW) {
+            return null;
+        }
+
         $aclClass = $this->getObjectManager()->getRepository('OroSecurityBundle:AclClass')
             ->findOneBy(['classType' => $entityName]);
+
+        if (!$aclClass) {
+            return null;
+        }
 
         $shareConfig = null;
 
@@ -470,42 +464,32 @@ class OwnershipConditionDataBuilder
             $shareConfig = $this->configProvider->getConfig($entityName)->get('share_scopes');
         }
 
+        if (!$shareConfig) {
+            return null;
+        }
+
         $aclSIds = $this->getSecurityIdentityIds((array) $shareConfig);
+
+        if (empty($aclSIds)) {
+            return null;
+        }
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityName);
 
-        if (!$aclClass
-            || empty($aclSIds)
-            || $permissions !== BasicPermissionMap::PERMISSION_VIEW
-            || !$shareConfig
-            || !$isGranted
-            || !in_array($observer->getAccessLevel(), $this->shareAccessLevels)
-        ) {
+        if (!$isGranted || !in_array($observer->getAccessLevel(), $this->shareAccessLevels)) {
             return null;
         }
 
-        $literal = new Literal(Literal::NUMERIC, 1);
-        $simpleSelectEx = new SimpleSelectExpression($literal);
-        $simpleSelect = new SimpleSelectClause($simpleSelectEx, false);
-
-        $rangeVarDeclaration = new RangeVariableDeclaration(
-            self::ACL_ENTRIES_SCHEMA_NAME,
-            self::ACL_ENTRIES_ALIAS,
-            true
-        );
-        $idVarDeclaration = new IdentificationVariableDeclaration($rangeVarDeclaration, null, []);
-
-        $subSelectFrom = new SubselectFromClause([$idVarDeclaration]);
-        $subSelect = new Subselect($simpleSelect, $subSelectFrom);
-
-        $shareCondition = new ExistsExpression($subSelect);
-        $shareCondition->not = false;
-
-        $subSelect->whereClause = new WhereClause(
-            new ConditionalTerm($this->getShareSubselectWhereConditions($entityAlias, $aclSIds, $aclClass))
-        );
+        $shareCondition = [
+            'existsSubselect' => [
+                'select' => 1,
+                'from'   => ['schemaName' => self::ACL_ENTRIES_SCHEMA_NAME, 'alias' => self::ACL_ENTRIES_ALIAS],
+                'where'  => $this->getShareSubselectWhereConditions($entityAlias, $aclSIds, $aclClass)
+            ],
+            'not'             => false,
+        ];
 
         //Add query components for OutputSqlWalker
         $queryComponents[self::ACL_ENTRIES_ALIAS] = [
@@ -645,67 +629,6 @@ class OwnershipConditionDataBuilder
     }
 
     /**
-     * @param int    $exType
-     * @param string $entityAlias
-     * @param string $field
-     * @param int    $type
-     *
-     * @return PathExpression
-     */
-    protected function getPathExpression($exType, $entityAlias, $field, $type)
-    {
-        $pathExpression = new PathExpression($exType, $entityAlias, $field);
-        $pathExpression->type = $type;
-
-        return $pathExpression;
-    }
-
-    /**
-     * @param PathExpression $pathExpression
-     * @param mixed          $value
-     * @param int            $type
-     *
-     * @return ConditionalPrimary
-     */
-    protected function getLiteralComparisonExpression(PathExpression $pathExpression, $value, $type = Literal::NUMERIC)
-    {
-        $resultCondition = new ConditionalPrimary();
-        $leftExpression = new ArithmeticExpression();
-        $leftExpression->simpleArithmeticExpression = $pathExpression;
-        $rightExpression  = new ArithmeticExpression();
-        $rightExpression->simpleArithmeticExpression = new Literal($type, $value);
-        $resultCondition->simpleConditionalExpression =
-            new ComparisonExpression($leftExpression, '=', $rightExpression);
-
-        return $resultCondition;
-    }
-
-    /**
-     * @param PathExpression $pathExpression
-     * @param array          $values
-     * @param int            $type
-     *
-     * @return ConditionalPrimary
-     */
-    protected function getInExpression(PathExpression $pathExpression, array $values, $type = Literal::NUMERIC)
-    {
-        $resultCondition = new ConditionalPrimary();
-
-        $literals = [];
-        foreach ($values as $value) {
-            $literals[] = new Literal($type, $value);
-        }
-
-        $arithmeticExpression = new ArithmeticExpression();
-        $arithmeticExpression->simpleArithmeticExpression = $pathExpression;
-        $expression = new InExpression($arithmeticExpression);
-        $expression->literals = $literals;
-        $resultCondition->simpleConditionalExpression = $expression;
-
-        return $resultCondition;
-    }
-
-    /**
      * @param string    $entityAlias
      * @param int|array $aclSIds
      * @param AclClass  $aclClass
@@ -714,49 +637,46 @@ class OwnershipConditionDataBuilder
      */
     protected function getShareSubselectWhereConditions($entityAlias, $aclSIds, AclClass $aclClass)
     {
-        //Make expr rootEntity.id = acl_entries.record_id
-        $leftExpression = new ArithmeticExpression();
-        $leftExpression->simpleArithmeticExpression = $this->getPathExpression(
-            AclWalker::EXPECTED_TYPE,
-            $entityAlias,
-            'id',
-            PathExpression::TYPE_STATE_FIELD
-        );
-        $rightExpression = new ArithmeticExpression();
-        $rightExpression->simpleArithmeticExpression = $this->getPathExpression(
-            AclWalker::EXPECTED_TYPE,
-            self::ACL_ENTRIES_ALIAS,
-            self::ACL_ENTRIES_SHARE_RECORD,
-            PathExpression::TYPE_STATE_FIELD
-        );
-        $resultCondition      = new ConditionalPrimary();
-        $resultCondition->simpleConditionalExpression =
-            new ComparisonExpression($leftExpression, '=', $rightExpression);
-        $conditionalFactors[] = $resultCondition;
-
-        //Make expr acl_entries.security_identity_id IN (?) or acl_entries.security_identity_id = ?
-        $pathExpression = $this->getPathExpression(
-            AclWalker::EXPECTED_TYPE,
-            self::ACL_ENTRIES_ALIAS,
-            self::ACL_ENTRIES_SECURITY_ID,
-            PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
-        );
-
-        if (is_array($aclSIds)) {
-            $conditionalFactors[] = $this->getInExpression($pathExpression, $aclSIds);
-        } else {
-            $conditionalFactors[] = $this->getLiteralComparisonExpression($pathExpression, $aclSIds);
-        }
-
-        //Make expr acl_entries.class_id = ?
-        $pathExpression = $this->getPathExpression(
-            AclWalker::EXPECTED_TYPE,
-            self::ACL_ENTRIES_ALIAS,
-            self::ACL_ENTRIES_CLASS_ID,
-            PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
-        );
-        $conditionalFactors[] = $this->getLiteralComparisonExpression($pathExpression, $aclClass->getId());
-
-        return $conditionalFactors;
+        return [
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => $entityAlias,
+                    'field' => 'id',
+                    'typeOperand' => PathExpression::TYPE_STATE_FIELD
+                ],
+                'right' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_SHARE_RECORD,
+                    'typeOperand' => PathExpression::TYPE_STATE_FIELD
+                ],
+                'operation' => '='
+            ],
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_SECURITY_ID,
+                    'typeOperand' => PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                ],
+                'right' => [
+                    'value' => $aclSIds
+                ],
+                'operation' => is_array($aclSIds) ? 'IN' : '='
+            ],
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_CLASS_ID,
+                    'typeOperand' => PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                ],
+                'right' => [
+                    'value' => $aclClass->getId()
+                ],
+                'operation' => '='
+            ]
+        ];
     }
 }

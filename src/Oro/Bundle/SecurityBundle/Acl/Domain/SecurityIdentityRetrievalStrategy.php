@@ -17,7 +17,7 @@ class SecurityIdentityRetrievalStrategy extends BaseStrategy
     {
         $sids = parent::getSecurityIdentities($token);
 
-        // add organization and business unit security identities
+        // business unit security identities
         if (!$token instanceof AnonymousToken) {
             $user = $token->getUser();
             if ($user instanceof User) {
@@ -25,7 +25,7 @@ class SecurityIdentityRetrievalStrategy extends BaseStrategy
                     try {
                         $sids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($businessUnit);
                     } catch (\InvalidArgumentException $invalid) {
-                        // ignore, user has no business unit security identity
+                        // ignore, user has not business unit security identity
                     }
                 }
             }
