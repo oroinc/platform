@@ -31,9 +31,7 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-
-        // 3 assigned users and 3 users from search result(not assigned).
-        $this->assertCount(6, $entities);
+        $this->assertCount(3, $entities);
     }
 
     public function testGetEntitiesWithPaging()
@@ -54,8 +52,7 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         $this->assertCount(1, $entities);
         $this->assertArrayHasKey('assigned', reset($entities));
 
-        // 3 assigned users and 3 users from search result(not assigned).
-        $this->assertEquals(6, $response->headers->get('X-Include-Total-Count'));
+        $this->assertEquals(3, $response->headers->get('X-Include-Total-Count'));
     }
 
 }

@@ -11,6 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
@@ -48,13 +49,16 @@ class EmailActivitySuggestionController extends RestGetController
      */
     public function cgetAction($id)
     {
+        /** @var Email $email */
+        $email = $this->getManager()->find($id);
+        if (!$email) {
+            return $this->buildNotFoundResponse();
+        }
+
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-
-        $criteria = $this->buildFilterCriteria(['id' => ['=', $id]]);
-
-        $data = $this->getManager()->getSuggestionResult($page, $limit, $criteria);
+        $data = $this->getManager()->getSuggestionResult($email, $page, $limit);
 
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }
