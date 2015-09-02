@@ -9,6 +9,7 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
+use Oro\Bundle\EmailBundle\Entity\Email;
 
 class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityManager
 {
@@ -31,29 +32,32 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
     /**
      * Gets suggestion result
      *
+     * @param Email $email
      * @param int   $page
      * @param int   $limit
-     * @param array $criteria
      *
      * @return array
      */
     public function getSuggestionResult(
+        Email $email,
         $page = 1,
-        $limit = 10,
-        $criteria = []
+        $limit = 10
     ) {
-
         $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
             false,
             0,
             0,
             $this->getSearchAliases([])
         );
+        $searchCriteria = $searchQueryBuilder->getCriteria();
+        $searchCriteria->andWhere(
+            $searchCriteria->expr()->contains('email', $email->getFromEmailAddress()->getEmail())
+        );
         $searchResult = $this->searchIndexer->query($searchQueryBuilder);
 
         $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
             $this->class,
-            $criteria
+            ['id' => $email->getId()]
         );
         $queryResult = $queryBuilder->getQuery()->getArrayResult();
 
