@@ -1,0 +1,16 @@
+<ul class="inline tag-list">
+<% _.each(models, function(tag, i) { %>
+    <li data-id="<%= tag.get('id') %>">
+    <% if (tag.get("url").length > 0) { %>
+        <a href="<%= tag.get('url') %>">
+    <%} %>
+        <span class="label label-info"><%- tag.get('name') %></span>
+    <% if (tag.get('url').length > 0) { %>
+        </a>
+    <%} %>
+    </li>
+<%}) %>
+<% if (models.length == 0) { %>
+    <li class="not-tagged-message"><%= _.__('Not tagged') %></li>
+<%} %>
+</ul>
