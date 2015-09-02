@@ -452,8 +452,13 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
-                    '--process-isolation' => true,
-                    '--fixtures-type'     => 'demo',
+                    '--process-isolation'  => true,
+                    '--fixtures-type'      => 'demo',
+                    '--disabled-listeners' =>
+                        [
+                            'oro_dataaudit.listener.entity_listener',
+                            'oro_dataaudit.listener.deprecated_audit_data_listener'
+                        ]
                 )
             );
         }

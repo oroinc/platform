@@ -75,6 +75,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
         $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
 
         $searchAclHelper->expects($this->any())
             ->method('apply')
@@ -92,7 +94,8 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
             $this->configManager,
             $this->entityProvider,
             $this->translator,
-            $searchAclHelper
+            $searchAclHelper,
+            $eventDispatcher
         );
     }
 

@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ShareModel;
+    var ShareWithDatagridModel;
     var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
-     * @export orosecurity/js/app/models/share-model
+     * @export orosecurity/js/app/models/share-datagrid-model
      */
-    ShareModel = BaseModel.extend({
+    ShareWithDatagridModel = BaseModel.extend({
         defaults: {
             label: '',
             first: '',
@@ -16,5 +16,5 @@ define(function(require) {
         }
     });
 
-    return ShareModel;
+    return ShareWithDatagridModel;
 });

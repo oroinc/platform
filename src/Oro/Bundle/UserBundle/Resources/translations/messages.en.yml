@@ -8,6 +8,11 @@ oro.user.form.choose_gender: Choose a gender...
 oro.user.gender.male: Male
 oro.user.gender.female: Female
 
+Username: Username
+Password: Password
+"Remember me on this computer": Remember me on this computer
+"Forgot your password?": Forgot your password?
+"Log in": Log in
 Login: Login
 Logout: Logout
 Login page: Login page

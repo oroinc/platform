@@ -36,13 +36,12 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     public function addFilter($filterName)
     {
         $addFilter = $this->test->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button//a[@id='add-filter-button']"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button//a[@class='add-filter-button']"
         );
         //expand filter list
         $addFilter->click();
         $filter = $this->test->byXPath(
-            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']]" .
-            "[@name='multiselect_add-filter-select']"
+            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']][@type='checkbox']"
         );
         if (!$filter->selected()) {
             $filter->click();

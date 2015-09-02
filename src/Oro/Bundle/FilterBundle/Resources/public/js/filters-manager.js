@@ -1,17 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'orotranslation/js/translator',
-    './multiselect-decorator',
-    './datafilter-wrapper'
-], function($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
+define(function(require) {
     'use strict';
 
     var FiltersManager;
     var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var MultiselectDecorator = require('./multiselect-decorator');
+    var filterWrapper = require('./datafilter-wrapper');
 
     /**
      * Defines parent element for dropdown-menu by toggle element
@@ -39,19 +38,20 @@ define([
      *
      * @export  orofilter/js/filters-manager
      * @class   orofilter.FiltersManager
-     * @extends Backbone.View
+     * @extends BaseView
      *
      * @event updateList    on update of filter list
      * @event updateFilter  on update data of specific filter
      * @event disableFilter on disable specific filter
      */
-    FiltersManager = Backbone.View.extend({
+    FiltersManager = BaseView.extend({
         /**
          * List of filter objects
          *
+         * @type {Object}
          * @property
          */
-        filters: {},
+        filters: null,
 
         /**
          * Template selector
@@ -68,7 +68,7 @@ define([
          *
          * @property
          */
-        filterSelector: '#add-filter-select',
+        filterSelector: '[data-action=add-filter-select]',
 
         /**
          * Add filter button hint
@@ -93,8 +93,8 @@ define([
 
         /** @property */
         events: {
-            'change #add-filter-select': '_onChangeFilterSelect',
-            'click #reset-filter-button': '_onReset',
+            'change [data-action=add-filter-select]': '_onChangeFilterSelect',
+            'click .reset-filter-button': '_onReset',
             'click a.dropdown-toggle': '_onDropdownToggle'
         },
 
@@ -110,8 +110,10 @@ define([
 
             this.template = _.template($(this.templateSelector).html());
 
+            this.filters = {};
+
             if (options.filters) {
-                this.filters = options.filters;
+                _.extend(this.filters, options.filters);
             }
 
             filterListeners = {
@@ -177,6 +179,7 @@ define([
         _onFilterDisabled: function(filter) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
+            this.trigger('afterDisableFilter', filter);
         },
 
         /**
@@ -212,6 +215,7 @@ define([
         _onChangeFilterSelect: function() {
             this.trigger('updateList', this);
             this._processFilterStatus();
+            this.trigger('afterUpdateList', this);
         },
 
         /**
@@ -346,7 +350,7 @@ define([
 
             this.selectWidget.setViewDesign(this);
             this.$('.filter-list span:first').replaceWith(
-                '<a id="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
+                '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
                     '<span class="caret"></span></a>'
             );
         },
@@ -442,7 +446,7 @@ define([
         },
 
         /**
-         * Closes dropdown on mobile
+         * Close dropdown
          */
         closeDropdown: function() {
             this.$('.dropdown').removeClass('oro-open');

@@ -33,3 +33,6 @@ oro:
             share_with_placeholder: Enter Name
             shared_with: Shared with {{ name }}
             shared_with_plural: Shared with {{ name }} and +{{ count }} more
+        datagrid:
+            shared_datagrid.title: Who Has Access
+            share_grid_row_details_from: from

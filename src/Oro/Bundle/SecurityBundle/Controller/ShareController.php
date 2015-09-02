@@ -17,11 +17,13 @@ use Oro\Bundle\SecurityBundle\Form\Model\Share;
 class ShareController extends Controller
 {
     /**
-     * @Route("/update/{entityClass}/{entityId}", name="oro_share_update")
+     * @Route("/update", name="oro_share_update")
      * @Template("OroSecurityBundle:Share:update.html.twig")
      */
-    public function updateAction($entityClass, $entityId)
+    public function updateAction()
     {
+        $entityId = $this->get('request_stack')->getCurrentRequest()->get('entityId');
+        $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
         $entityRoutingHelper = $this->get('oro_entity.routing_helper');
         $entity = $entityRoutingHelper->getEntity($entityClass, $entityId);
         if (!$this->get('oro_security.security_facade')->isGranted('SHARE', $entity)) {
@@ -38,10 +40,10 @@ class ShareController extends Controller
     }
 
     /**
-     * @Route("/entities", name="oro_share_entities")
-     * @Template("OroSecurityBundle:Share:entities.html.twig")
+     * @Route("/entities", name="oro_share_with_dialog")
+     * @Template("OroSecurityBundle:Share:share_with.html.twig")
      */
-    public function entitiesAction()
+    public function dialogAction()
     {
         $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
         $supportedGridsInfo = $this->get('oro_security.provider.share_grid_provider')
@@ -56,7 +58,7 @@ class ShareController extends Controller
             'supportedGridsInfo' => $supportedGridsInfo,
             'params' => [
                 'grid_path' => $this->generateUrl(
-                    'oro_share_entities_grid',
+                    'oro_share_with_datagrid',
                     [],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 )
@@ -65,10 +67,10 @@ class ShareController extends Controller
     }
 
     /**
-     * @Route("/entities/grid", name="oro_share_entities_grid")
+     * @Route("/entities/grid", name="oro_share_with_datagrid")
      * @Template("OroDataGridBundle:Grid:dialog/widget.html.twig")
      */
-    public function entitiesGridAction()
+    public function datagridAction()
     {
         $entityClass = $this->get('request_stack')->getCurrentRequest()->get('entityClass');
         return [

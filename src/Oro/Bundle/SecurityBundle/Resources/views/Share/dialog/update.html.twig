@@ -17,6 +17,14 @@
         });
         </script>
     {% else %}
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/mediator'],
+                function($, mediator) {
+                    $('.btn.btn-primary.shared-dialog-apply').on('click', function () {
+                        mediator.trigger('widget:shared-dialog:apply');
+                    });
+                });
+        </script>
         {% if not form.vars.valid and form.vars.errors|length %}
             <div class="alert alert-error">
                 <div class="message">
@@ -30,7 +38,7 @@
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                        <button class="btn btn-primary" type="submit">{{ 'Apply'|trans }}</button>
+                        <button class="btn btn-primary shared-dialog-apply" type="button">{{ 'Apply'|trans }}</button>
                     </div>
                 </fieldset>
             </form>

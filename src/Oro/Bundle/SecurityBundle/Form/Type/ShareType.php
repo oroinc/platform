@@ -36,7 +36,7 @@ class ShareType extends AbstractType
             [
                 'data_class'         => 'Oro\Bundle\SecurityBundle\Form\Model\Share',
                 'intention'          => 'entities',
-                'csrf_protection'    => true,
+                'csrf_protection'    => false,
                 'cascade_validation' => true,
             ]
         );

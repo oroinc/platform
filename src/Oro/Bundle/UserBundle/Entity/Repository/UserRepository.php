@@ -128,4 +128,19 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    /**
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function findUsersByIds(array $ids)
+    {
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('u');
+        $queryBuilder->where($queryBuilder->expr()->in('u.id', $ids))
+            ->orderBy('u.username');
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
