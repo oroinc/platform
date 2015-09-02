@@ -412,7 +412,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
-        var $listContainer = $(this).siblings('.collection-fields-list');
+        var containerSelector = $(this).data('container') || '.collection-fields-list';
+        var $listContainer = $(this).closest('.row-oro').find(containerSelector);
         var collectionInfo = getOroCollectionInfo($listContainer);
         $listContainer.append(collectionInfo.nextItemHtml)
             .trigger('content:changed')
