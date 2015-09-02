@@ -19,7 +19,7 @@ define(function(require) {
         }
 
         function axisLocation(axis) {
-            return [axis.a.x, axis.a.y, axis.b.x, axis.b.x].toString();
+            return [axis.a.x, axis.a.y, axis.b.x, axis.b.x];
         }
 
         it('should construct', function() {
@@ -136,12 +136,12 @@ define(function(require) {
                 var axisV = this.axis;
 
                 var leftClone = axisV.cloneAtDirection(directions.LEFT_TO_RIGHT);
-                expect(leftClone.nodes.map(mapNodesToCoordinates).toString())
-                    .toBe(axisV.nodes.map(mapNodesToCoordinates).toString());
+                expect(leftClone.nodes.map(mapNodesToCoordinates))
+                    .toEqual(axisV.nodes.map(mapNodesToCoordinates));
 
                 var rightClone = axisV.cloneAtDirection(directions.RIGHT_TO_LEFT);
-                expect(rightClone.nodes.map(mapNodesToCoordinates).toString())
-                    .toBe(axisV.nodes.map(mapNodesToCoordinates).toString());
+                expect(rightClone.nodes.map(mapNodesToCoordinates))
+                    .toEqual(axisV.nodes.map(mapNodesToCoordinates));
             });
 
             it('should merge another axis into itself', function() {
@@ -151,9 +151,9 @@ define(function(require) {
                 var node2 = new NodePoint(0, 75);
                 var smallerAxis = new Axis(node1, node2, this.graph);
                 biggerAxis.merge(smallerAxis);
-                expect(axisLocation(biggerAxis)).toBe(initialLocation);
+                expect(axisLocation(biggerAxis)).toEqual(initialLocation);
                 smallerAxis.merge(biggerAxis);
-                expect(axisLocation(smallerAxis)).toBe(axisLocation(biggerAxis));
+                expect(axisLocation(smallerAxis)).toEqual(axisLocation(biggerAxis));
             });
 
             it('should have valid connection vectors', function() {

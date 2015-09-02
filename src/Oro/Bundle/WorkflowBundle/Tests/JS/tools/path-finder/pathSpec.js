@@ -27,7 +27,7 @@ define(function(require) {
             expect(path.connection === this.node100100.connections[directions.LEFT_TO_RIGHT.id]).toBeTruthy();
             expect(path.fromNode === this.node100100).toBeTruthy();
             expect(path.toNode === this.node150100).toBeTruthy();
-            expect(path.cost === 50).toBeTruthy();
+            expect(path.cost).toBe(50);
         });
 
         it('should return uid', function() {
@@ -44,7 +44,7 @@ define(function(require) {
             var path4s = new Path(this.node200200.connections[directions.BOTTOM_TO_TOP.id], this.node200200, null);
             var uidsS = [path1s.uid, path2s.uid, path3s.uid, path4s.uid];
 
-            expect(uids.toString()).toBe(uidsS.toString());
+            expect(uids).toEqual(uidsS);
         });
 
         it('should calculate if it can be joined with another path', function() {

@@ -21,10 +21,6 @@ define(function(require) {
                 node.connections[directions.RIGHT_TO_LEFT.id];
         }
 
-        function hasDifferentAxises(node) {
-            return node.hAxis !== node.vAxis;
-        }
-
         it('should add axises around block', function() {
             var graph = this.graph;
             var firstRect = graph.rectangles[0];
@@ -73,7 +69,7 @@ define(function(require) {
             for (var id in graph.nodes) {
                 if (graph.nodes.hasOwnProperty(id)) {
                     expect(isConnected(graph.nodes[id])).toBeTruthy();
-                    expect(hasDifferentAxises(graph.nodes[id])).toBeTruthy();
+                    expect(graph.nodes[id].vAxis).not.toBe(graph.nodes[id].hAxis);
                 }
             }
         });
