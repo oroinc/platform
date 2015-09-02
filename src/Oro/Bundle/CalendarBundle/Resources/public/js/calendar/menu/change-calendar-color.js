@@ -124,7 +124,8 @@ define([
 
         changeColor: function(color) {
             if (this.connectionsView._initActionSyncObject()) {
-                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+                var savingMsg = messenger.notificationMessage('warning',
+                    __('oro.calendar.flash_message.calendar_updating'));
                 var $connection = this.connectionsView.findItem(this.model);
                 var saveAttributes = {backgroundColor: color};
                 if (!this.model.get('visible')) {
@@ -136,9 +137,8 @@ define([
                         wait: true,
                         success: _.bind(function() {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'), {
-                                namespace: 'calendar-ns'
-                            });
+                            messenger.notificationFlashMessage('success',
+                                __('oro.calendar.flash_message.calendar_updated'), {namespace: 'calendar-ns'});
                             this.colorManager.setCalendarColors(this.model.get('calendarUid'), color);
                             this.connectionsView._actionSyncObject.resolve();
                         }, this),
