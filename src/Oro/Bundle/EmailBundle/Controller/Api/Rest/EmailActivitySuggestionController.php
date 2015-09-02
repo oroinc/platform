@@ -49,16 +49,10 @@ class EmailActivitySuggestionController extends RestGetController
      */
     public function cgetAction($id)
     {
-        /** @var Email $email */
-        $email = $this->getManager()->find($id);
-        if (!$email) {
-            return $this->buildNotFoundResponse();
-        }
-
         $page  = (int)$this->getRequest()->get('page', 1);
         $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
-        $data = $this->getManager()->getSuggestionResult($email, $page, $limit);
+        $data = $this->getManager()->getSuggestionResult($id, $page, $limit);
 
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }
