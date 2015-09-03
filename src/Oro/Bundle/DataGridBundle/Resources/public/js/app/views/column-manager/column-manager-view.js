@@ -139,6 +139,7 @@ define(function(require) {
             }, this);
 
             if (reordered) {
+                this.collection.sort();
                 this.trigger('reordered');
             }
         }

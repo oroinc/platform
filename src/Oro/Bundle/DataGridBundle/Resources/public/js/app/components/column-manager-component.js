@@ -4,6 +4,7 @@ define(function(require) {
     var ColumnManagerComponent;
     var _ = require('underscore');
     var Backgrid = require('backgrid');
+    var tools = require('oroui/js/tools');
     var ColumnsCollection = require('orodatagrid/js/app/models/column-manager/columns-collection');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
@@ -92,6 +93,9 @@ define(function(require) {
 
             this.listenTo(columnManagerView, 'reordered', this._pushState);
             this.listenTo(this.manageableColumns, 'change:renderable', this._pushState);
+            this.listenTo(this.manageableColumns, 'sort', function() {
+                this.columns.sort();
+            });
 
             return columnManagerView;
         },
@@ -144,23 +148,23 @@ define(function(require) {
             var columnsState = state.columns;
             var attrs;
 
+            if (tools.isEqualsLoosely(this._createState(), columnsState)) {
+                // nothing to apply, state is the same
+                return;
+            }
+
             this._applyingState = true;
 
             this.manageableColumns.each(function(column, i) {
                 var name = column.get('name');
                 if (columnsState[name]) {
                     attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
-                    column.set(attrs);
                 } else {
-                    column.set({
-                        renderable: true,
-                        order: i
-                    });
+                    attrs = {renderable: true, order: i};
                 }
+                column.set(attrs);
             });
             this.manageableColumns.sort();
-
-            this.columns.sort();
 
             this._applyingState = false;
         },

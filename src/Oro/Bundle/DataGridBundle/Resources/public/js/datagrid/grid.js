@@ -188,7 +188,7 @@ define(function(require) {
 
             // Listen and proxy events
             this._listenToCollectionEvents();
-            this._listenToBodyEvents();
+            this._listenToContentEvents();
             this._listenToCommands();
         },
 
@@ -482,10 +482,16 @@ define(function(require) {
          *
          * @private
          */
-        _listenToBodyEvents: function() {
+        _listenToContentEvents: function() {
             this.listenTo(this.body, 'rowClicked', function(row) {
                 this.trigger('rowClicked', this, row);
                 this._runRowClickAction(row);
+            });
+            this.listenTo(this.columns, 'change:renderable', function() {
+                this.trigger('content:update');
+            });
+            this.listenTo(this.header.row, 'content:update', function() {
+                this.trigger('content:update');
             });
         },
 

@@ -43,10 +43,8 @@ define(function(require) {
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
-            this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
+            this.listenTo(this.grid, 'content:update', this.onGridContentUpdate);
             this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
-            this.listenTo(this.grid.columns, 'change:renderable', this.onGridHeaderChange);
-            this.listenTo(this.grid.header.row, 'content:update', this.onGridHeaderChange);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
             FloatingHeaderPlugin.__super__.enable.call(this);
@@ -250,7 +248,7 @@ define(function(require) {
          * Handles grid head changes
          * (hiding/showing and sorting columns)
          */
-        onGridHeaderChange: function() {
+        onGridContentUpdate: function() {
             this.$grid.find('.thead-sizing').remove();
             this._ensureTHeadSizing();
             this.fixHeaderCellWidth();
