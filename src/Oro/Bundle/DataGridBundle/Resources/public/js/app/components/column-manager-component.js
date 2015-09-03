@@ -47,6 +47,7 @@ define(function(require) {
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
             this._createManageableCollection(options);
+            this._createColumnManagerView(options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
 
@@ -73,31 +74,30 @@ define(function(require) {
          */
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
-
-            return ColumnManagerComponent.__super__.delegateListeners.apply(this, arguments);
-        },
-
-        /**
-         * Implements ActionInterface
-         *
-         * @returns {ColumnManagerView}
-         */
-        createLauncher: function() {
-            // index of first manageable column
-            var orderShift = this.manageableColumns[0] ? this.manageableColumns[0].get('order') : 0;
-
-            var columnManagerView = new ColumnManagerView({
-                collection: this.manageableColumns,
-                orderShift: orderShift
-            });
-
-            this.listenTo(columnManagerView, 'reordered', this._pushState);
+            this.listenTo(this.columnManagerView, 'reordered', this._pushState);
             this.listenTo(this.manageableColumns, 'change:renderable', this._pushState);
             this.listenTo(this.manageableColumns, 'sort', function() {
                 this.columns.sort();
             });
 
-            return columnManagerView;
+            return ColumnManagerComponent.__super__.delegateListeners.apply(this, arguments);
+        },
+
+        /**
+         * Creates view for column manager
+         *
+         * @param {Object} options
+         * @protected
+         */
+        _createColumnManagerView: function(options) {
+            // index of first manageable column
+            var orderShift = this.manageableColumns[0] ? this.manageableColumns[0].get('order') : 0;
+
+            this.columnManagerView = new ColumnManagerView({
+                el: options._sourceElement,
+                collection: this.manageableColumns,
+                orderShift: orderShift
+            });
         },
 
         /**

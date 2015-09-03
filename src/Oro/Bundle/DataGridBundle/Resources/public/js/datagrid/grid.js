@@ -19,8 +19,8 @@ define(function(require) {
     var RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
+    var ShowColumnManagerAction = require('oro/datagrid/action/show-column-manager-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var ColumnManagerComponent = require('orodatagrid/js/app/components/column-manager-component');
 
     /**
      * Basic grid class.
@@ -408,11 +408,13 @@ define(function(require) {
          * @returns {ColumnManagerComponent}
          */
         getColumnManager: function() {
-            var options = _.extend({
-                columns: this.columns,
-                grid: this
-            }, this.toolbarOptions.columnManager);
-            return new ColumnManagerComponent(options);
+            var options = {
+                datagrid: this,
+                launcherOptions: _.extend({
+                    columns: this.columns
+                }, this.toolbarOptions.columnManager)
+            };
+            return new ShowColumnManagerAction(options);
         },
 
         /**

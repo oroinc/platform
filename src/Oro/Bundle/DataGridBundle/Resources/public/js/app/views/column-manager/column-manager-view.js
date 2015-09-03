@@ -11,11 +11,10 @@ define(function(require) {
         template: require('tpl!orodatagrid/templates/column-manager/column-manager.html'),
         itemView: ColumnManagerItemView,
 
-        className: 'column-manager action btn',
+        className: 'dropdown-menu',
         listSelector: 'tbody',
 
         events: {
-            'click .dropdown-menu': 'onDropdownClick',
             'click tbody tr [data-role=moveUp]': 'onMoveUp',
             'click tbody tr [data-role=moveDown]': 'onMoveDown'
         },
@@ -68,31 +67,6 @@ define(function(require) {
                 },
                 stop: _.bind(this.onReorder, this)
             }).disableSelection();
-        },
-
-        /**
-         * Switches column manager into enable mode
-         * (ActionLauncherInterface)
-         */
-        enable: function() {
-            this.$el.removeClass('disabled');
-        },
-
-        /**
-         * Switches column manager into disable mode
-         * (ActionLauncherInterface)
-         */
-        disable: function() {
-            this.$el.addClass('disabled');
-        },
-
-        /**
-         * Prevents dropdown from closing on click
-         *
-         * @param {jQuery.Event} e
-         */
-        onDropdownClick: function(e) {
-            e.stopPropagation();
         },
 
         /**
