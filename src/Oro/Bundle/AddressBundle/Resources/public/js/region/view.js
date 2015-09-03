@@ -96,6 +96,7 @@ define([
          * @param e {Object}
          */
         selectionChanged: function(e) {
+            this.$el.trigger('value:changing');
             if ($(e.currentTarget).val()) {
                 var countryId = $(e.currentTarget).val();
                 this.collection.setCountryId(countryId);
@@ -124,6 +125,7 @@ define([
                 this.uniform.hide();
                 this.$simpleEl.show();
             }
+            this.$el.trigger('value:changed');
         }
     });
 });
