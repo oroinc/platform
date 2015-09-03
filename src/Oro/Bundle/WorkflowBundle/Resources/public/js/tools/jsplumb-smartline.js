@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var jsPlumb = require('jsplumb');
+    var $ = require('jquery');
     var _ = require('underscore');
     var JsPlumbSmartlineManager = require('./jsplumb-smartline-manager');
 
@@ -201,11 +202,32 @@ define(function(require) {
             return el.offsetHeight / 2 - 1;
         }
 
+        function getSourceElement(elem, pos) {
+            return _.find($(elem).find('.jsplumb-source').toArray(), function(source) {
+                var offsetLeft = elem.offsetLeft + source.offsetLeft;
+                var offsetTop = elem.offsetTop + source.offsetTop;
+                return pos[0] >= offsetLeft && pos[0] <= (offsetLeft + source.offsetWidth) &&
+                    pos[1] >= offsetTop && pos[1] <= (offsetTop + source.offsetHeight);
+            });
+        }
+
+        function adjustmentPathStartPoint(paintInfo, params) {
+            var elem = params.sourceEndpoint.element;
+            var source = getSourceElement(elem, params.sourcePos);
+            if (source) {
+                paintInfo.points[0] +=
+                    (elem.offsetLeft + source.offsetLeft + source.offsetWidth / 2) - params.sourcePos[0];
+                paintInfo.points[1] +=
+                    (elem.offsetTop + source.offsetTop + source.offsetHeight / 2) - params.sourcePos[1];
+            }
+        }
+
         this._compute = function(paintInfo, params) {
             if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
                 // use jsPlumb Flowchart connector behaviour
+                adjustmentPathStartPoint(paintInfo, params);
                 return this._flowchartConnectorCompute.apply(this, arguments);
             }
 
