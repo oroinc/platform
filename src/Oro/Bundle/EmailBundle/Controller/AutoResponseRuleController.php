@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -54,8 +55,20 @@ class AutoResponseRuleController extends Controller
      * )
      * @Template("OroEmailBundle:AutoResponseRule:dialog/update.html.twig")
      */
-    public function updateAction(AutoResponseRule $rule)
+    public function updateAction(AutoResponseRule $rule, Request $request)
     {
+        if ($request->isMethod('POST')) {
+            $params = $request->request->get(AutoResponseRuleType::NAME);
+            if (!$params['template']['existing_entity'] && $rule->getTemplate()) {
+                $oldTemplate = $rule->getTemplate();
+                if (!$oldTemplate->isVisible()) {
+                    $em = $this->getAutoResponseRuleManager();
+                    $em->remove($oldTemplate);
+                }
+                $rule->setTemplate(new EmailTemplate());
+            }
+        }
+
         return $this->update($rule);
     }
 

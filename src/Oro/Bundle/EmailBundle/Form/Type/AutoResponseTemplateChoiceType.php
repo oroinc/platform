@@ -39,7 +39,6 @@ class AutoResponseTemplateChoiceType extends AbstractType
             },
             'configs' => [
                 'allowClear'  => true,
-                'placeholder' => 'oro.form.custom_value',
             ]
         ]);
     }

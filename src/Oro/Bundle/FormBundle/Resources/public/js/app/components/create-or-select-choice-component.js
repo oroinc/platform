@@ -147,7 +147,8 @@ define([
                 return;
             }
 
-            this.$newEntity.find(':input').not(':checkbox').not(':radio').val(null);
+            this.$newEntity.find('input[type=text], textarea').val(null);
+            this.$newEntity.find('textarea').text('');
         },
 
         /**
