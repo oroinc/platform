@@ -3,9 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -16,12 +21,17 @@ class AutoResponseTemplateChoiceType extends AbstractType
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
      * @param SecurityFacade $securityFacade
+     * @param TranslatorInterface $translator
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, TranslatorInterface $translator)
     {
         $this->securityFacade = $securityFacade;
+        $this->translator = $translator;
     }
 
     /**
@@ -42,6 +52,23 @@ class AutoResponseTemplateChoiceType extends AbstractType
                 'placeholder' => 'oro.form.custom_value',
             ]
         ]);
+    }
+
+    /**
+     * @param FormView $view
+     * @param FormInterface $form
+     * @param array $options
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        /* @var $choice ChoiceView */
+        foreach ($view->vars['choices'] as $choice) {
+            /* @var $template EmailTemplate */
+            $template = $choice->data;
+            if (!$template->isVisible()) {
+                $choice->label = $this->translator->trans('oro.form.custom_value');
+            }
+        }
     }
 
     /**
