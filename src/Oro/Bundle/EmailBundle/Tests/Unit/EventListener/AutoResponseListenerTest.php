@@ -7,9 +7,6 @@ use ReflectionClass;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
-use JMS\JobQueueBundle\Entity\Job;
-
-use Oro\Bundle\EmailBundle\Command\AutoResponseCommand;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
@@ -17,6 +14,7 @@ use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
 {
     protected $autoResponseManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
     protected $uow;
 
@@ -66,7 +64,8 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityInsertions));
 
         $this->em->expects($this->never())
-            ->method('persist');
+            ->method('persist')
+            ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('JMS\JobQueueBundle\Entity\Job'));
 
         $this->autoResponseListener->onFlush(new OnFlushEventArgs($this->em));
         $this->autoResponseListener->postFlush(new PostFlushEventArgs($this->em));
@@ -87,8 +86,8 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityInsertions));
 
         $this->em->expects($this->once())
-            ->method('persist')
-            ->with(new Job(AutoResponseCommand::NAME, $expectedArgs));
+            ->method('persist');
+
         $this->em->expects($this->once())
             ->method('flush');
 
