@@ -82,25 +82,6 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testProcessConfigs()
-    {
-        $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configArray = [
-            'name'  => ['order' => 2, 'label' => 'name'],
-            'label' => ['order' => 2, 'label' => 'label']
-        ];
-
-        $config
-            ->expects(static::once())
-            ->method('offsetGetByPath')
-            ->will(static::returnValue($configArray));
-
-        $this->extension->processConfigs($config);
-    }
-
     /**
      * @param $columnsConfigArray
      * @param $dataState
@@ -136,7 +117,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $config
-            ->expects(static::exactly(2))
+            ->expects(static::exactly(3))
             ->method('offsetGet')
             ->with('columns')
             ->will(static::returnValue($columnsConfigArray));
