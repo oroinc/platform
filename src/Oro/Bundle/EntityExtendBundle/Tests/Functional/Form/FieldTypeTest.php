@@ -27,11 +27,9 @@ class FieldTypeTest extends WebTestCase
      */
     public function testCreateNewFieldFormWorks()
     {
-        $contactEntityId = $this->getEntityIdFromGrid('Contact', 'OroCRMContactBundle');
-
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_entityextend_field_create', ['id' => $contactEntityId])
+            $this->getUrl('oro_entityextend_field_create', ['id' => 1])
         );
 
         $result = $this->client->getResponse();
@@ -62,31 +60,5 @@ class FieldTypeTest extends WebTestCase
         $this->getContainer()->set($serviceName, $newService);
 
         return $baseFieldType;
-    }
-
-    /**
-     * @param string $entityName
-     * @param string $entityModule
-     *
-     * @return int
-     */
-    protected function getEntityIdFromGrid($entityName, $entityModule)
-    {
-        $gridName = 'entityconfig-grid';
-        $response = $this->client->requestGrid(['gridName' => $gridName]);
-        $result   = $this->getJsonResponseContent($response, 200);
-
-        return array_reduce(
-            $result['data'],
-            function ($carry, $item) use ($entityName, $entityModule) {
-                if ($item['entity_config_entity_name'] == $entityName &&
-                    $item['entity_config_module_name'] == $entityModule) {
-                    $carry = $item['id'];
-                }
-
-                return $carry;
-            },
-            null
-        );
     }
 }
