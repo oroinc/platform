@@ -11,7 +11,6 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 
 /**
