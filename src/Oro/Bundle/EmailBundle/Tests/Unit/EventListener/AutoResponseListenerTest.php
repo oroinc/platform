@@ -86,7 +86,8 @@ class AutoResponseListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityInsertions));
 
         $this->em->expects($this->once())
-            ->method('persist');
+            ->method('persist')
+            ->with(new \PHPUnit_Framework_Constraint_IsInstanceOf('JMS\JobQueueBundle\Entity\Job'));
 
         $this->em->expects($this->once())
             ->method('flush');
