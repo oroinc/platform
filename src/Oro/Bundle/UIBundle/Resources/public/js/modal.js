@@ -182,12 +182,10 @@ define([
 
         _fixHeight: function() {
             this.$('.modal-body').height('auto');
-            var height = this.$el[0].clientHeight;
-            if (height < this.$el[0].scrollHeight) {
-                this.$('.modal-body').height(height -
-                    this.$('.modal-header').outerHeight() -
-                    this.$('.modal-footer').outerHeight());
-            }
+            this.$('.modal-body').innerHeight(
+                this.$el[0].clientHeight -
+                this.$('.modal-header').outerHeight() -
+                this.$('.modal-footer').outerHeight());
         }
     });
 
