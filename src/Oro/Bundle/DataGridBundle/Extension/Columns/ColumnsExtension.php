@@ -65,28 +65,29 @@ class ColumnsExtension extends AbstractExtension
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
 
+        if (!$gridViews) {
+            return;
+        }
+
         /** Get default columns data from config */
         $columnsData = $config->offsetGet('columns');
-
-        if (!$gridViews) {
-            /** Set default columns data to metadata */
-            $this->setState($data, $columnsData);
-            $this->setGridViewDefaultOrder($data, $columnsData);
-        } else {
-            $newGridView  = $this->createNewGridView($config, $data);
-            $currentState = $data->offsetGet('state');
-            foreach ($gridViews as $gridView) {
-                if ((int)$currentState['gridView'] === $gridView->getId()) {
-                    $columnsData = $gridView->getColumnsData();
-                }
+        $newGridView = $this->createNewGridView($config, $data);
+        $currentState = $data->offsetGet('state');
+        foreach ($gridViews as $gridView) {
+            if ((int)$currentState['gridView'] === $gridView->getId()) {
+                /** Get columns state from current view */
+                $columnsData = $gridView->getColumnsData();
             }
-            /** Set new columns data to state or set config columns data */
-            $this->setState($data, $columnsData);
-            $this->setGridViewDefaultOrder($data, $newGridView->getColumnsData());
         }
+
+        /** Save current columns state or restore to default view __all__ setting config columns data */
+        $this->setState($data, $columnsData);
+        $this->setGridViewDefaultOrder($data, $newGridView->getColumnsData());
     }
 
     /**
+     * Create grid view for default grid state __all__
+     *
      * @param DatagridConfiguration $config
      * @param MetadataObject        $data
      *
@@ -99,8 +100,10 @@ class ColumnsExtension extends AbstractExtension
         $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
         $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
 
+        /** Set config columns state to __all__ grid view */
         $newGridView->setColumnsData($columns);
-        $data->offsetAddToArray('initialState', ['columns' => $newGridView->getColumnsData()]);
+        $this->setState($data, $columns);
+        $this->setInitialState($data, $columns);
 
         return $newGridView;
     }
@@ -115,7 +118,16 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
-     * Set View Default Order and columns data for default grid view __all__
+     * @param MetadataObject $data
+     * @param array $columnsData
+     */
+    protected function setInitialState(MetadataObject $data, array $columnsData)
+    {
+        $data->offsetAddToArray('initialState', ['columns' => $columnsData]);
+    }
+
+    /**
+     * Set Default columns data for default grid view __all__
      *
      * @param MetadataObject $data
      * @param array          $columnsData
@@ -124,15 +136,15 @@ class ColumnsExtension extends AbstractExtension
     {
         $gridViews = $data->offsetGet('gridViews');
 
-        foreach ($gridViews['views'] as &$gridView) {
-            if ('__all__' === $gridView['name']) {
-                $gridView['columns'] = $columnsData;
+        if ($gridViews && isset($gridViews['views'])) {
+            foreach ($gridViews['views'] as &$gridView) {
+                if ('__all__' === $gridView['name']) {
+                    $gridView['columns'] = $columnsData;
+                }
             }
+            unset($gridView);
+            $data->offsetSet('gridViews', $gridViews);
         }
-
-        unset($gridView);
-
-        $data->offsetSet('gridViews', $gridViews);
     }
 
     /**
