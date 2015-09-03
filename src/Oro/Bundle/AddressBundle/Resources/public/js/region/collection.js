@@ -1,8 +1,9 @@
 define([
     'backbone',
     'routing',
-    'oroaddress/js/region/model'
-], function(Backbone, routing, RegionModel) {
+    'oroaddress/js/region/model',
+    'underscore'
+], function(Backbone, routing, RegionModel, _) {
     'use strict';
 
     /**
