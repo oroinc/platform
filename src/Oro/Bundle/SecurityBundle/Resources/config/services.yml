@@ -431,6 +431,8 @@ services:
             - @oro_entity_config.provider.security
             - @security.acl.security_identity_retrieval_strategy
             - @?security.acl.voter.basic_permissions
+        calls:
+            - [setAclGroupProvider, [@oro_security.acl.group_provider.chain]]
 
     oro_security.abstract_ownership_tree_provider:
         public: false

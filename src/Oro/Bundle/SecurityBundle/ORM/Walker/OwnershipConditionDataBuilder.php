@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query\AST\PathExpression;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -13,6 +14,7 @@ use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -63,6 +65,9 @@ class OwnershipConditionDataBuilder
 
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
+
+    /** @var AclGroupProviderInterface */
+    protected $aclGroupProvider;
 
     /**
      * @var ConfigProvider
@@ -117,6 +122,14 @@ class OwnershipConditionDataBuilder
     }
 
     /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider($aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
+    }
+
+    /**
      * Get data for query acl access level check
      * Return empty array if entity has full access, null if user does't have access to the entity
      *  and array with entity field and field values which user have access.
@@ -141,7 +154,18 @@ class OwnershipConditionDataBuilder
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityClassName);
+
+        $groupedEntityClassName = $entityClassName;
+        if ($this->aclGroupProvider) {
+            $group = $this->aclGroupProvider->getGroup();
+            if ($group) {
+                $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
+            }
+        }
+        $isGranted = $this->getSecurityContext()->isGranted(
+            $permissions,
+            new ObjectIdentity('entity', $groupedEntityClassName)
+        );
 
         if ($isGranted) {
             $condition = $this->buildConstraintIfAccessIsGranted(
