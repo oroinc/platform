@@ -89,13 +89,6 @@ class ShareHandler
                 return true;
             }
         } else {
-            $objectIdentity = ObjectIdentity::fromDomainObject($entity);
-            try {
-                $acl = $this->aclProvider->findAcl($objectIdentity);
-            } catch (AclNotFoundException $e) {
-                // no ACL found, do nothing
-                $acl = null;
-            }
             $this->form->get('entityClass')->setData($entityName);
             $this->form->get('entityId')->setData($entity->getId());
         }
