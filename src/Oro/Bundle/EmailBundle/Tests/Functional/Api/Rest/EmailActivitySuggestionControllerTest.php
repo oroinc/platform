@@ -54,5 +54,4 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
 
         $this->assertEquals(3, $response->headers->get('X-Include-Total-Count'));
     }
-
 }
