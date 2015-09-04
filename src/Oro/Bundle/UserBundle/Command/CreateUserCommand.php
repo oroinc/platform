@@ -4,8 +4,8 @@ namespace Oro\Bundle\UserBundle\Command;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-
 use Doctrine\ORM\NoResultException;
+
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,7 +43,7 @@ class CreateUserCommand extends ContainerAwareCommand
             ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password')
             ->addOption(
-                'user-organization',
+                'user-organizations',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
                 'User organizations'
@@ -132,17 +132,18 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function setOrganizations(User $user, $options)
     {
-        if (empty($options['user-organization'])) {
+        if (empty($options['user-organizations'])) {
             return;
         }
 
-        foreach ($options['user-organization'] as $organizationName) {
+        foreach ($options['user-organizations'] as $organizationName) {
             try {
                 $organization = $this->getEntityManager()
                     ->getRepository('OroOrganizationBundle:Organization')
                     ->getOrganizationByName($organizationName);
             } catch (NoResultException $e) {
-                throw new InvalidArgumentException('Invalid Organization: "' . $organizationName . '"');
+                throw new InvalidArgumentException('Invalid organization "' . $organizationName .
+                    '" in "--user-organizations" parameter');
             }
 
             $user->addOrganization($organization);
