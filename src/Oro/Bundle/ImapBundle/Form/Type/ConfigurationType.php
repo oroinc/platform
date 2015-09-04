@@ -411,7 +411,16 @@ class ConfigurationType extends AbstractType
             'required'          => false,
             'add_check_button'  => true,
             'validation_groups' => function (FormInterface $form) {
-                $groups = ['Imap', 'Smtp'];
+                $groups = [];
+
+                $isSubmitted = $form->isSubmitted() === true;
+                if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
+                    $groups[] = 'Imap';
+                }
+                if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
+                    $groups[] = 'Smtp';
+                }
+
                 return $groups;
             },
         ]);
