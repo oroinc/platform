@@ -4,8 +4,10 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\PathExpression;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -41,6 +43,9 @@ class OwnershipConditionDataBuilder
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
+    /** @var AclGroupProviderInterface */
+    protected $aclGroupProvider;
+
     /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
@@ -63,6 +68,14 @@ class OwnershipConditionDataBuilder
         $this->entityMetadataProvider = $entityMetadataProvider;
         $this->metadataProvider       = $metadataProvider;
         $this->treeProvider           = $treeProvider;
+    }
+
+    /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider($aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
     }
 
     /**
@@ -90,7 +103,18 @@ class OwnershipConditionDataBuilder
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityClassName);
+
+        $groupedEntityClassName = $entityClassName;
+        if ($this->aclGroupProvider) {
+            $group = $this->aclGroupProvider->getGroup();
+            if ($group) {
+                $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
+            }
+        }
+        $isGranted = $this->getSecurityContext()->isGranted(
+            $permissions,
+            new ObjectIdentity('entity', $groupedEntityClassName)
+        );
 
         if ($isGranted) {
             $condition = $this->buildConstraintIfAccessIsGranted(
