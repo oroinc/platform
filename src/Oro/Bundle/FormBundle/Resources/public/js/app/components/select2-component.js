@@ -187,7 +187,10 @@ define(function(require) {
             }
         );
 
-        if (selectedData.length > 0) {
+        var emptySelection = selectedData.length === 0 ||
+            (selectedData.length === 1 && _.first(selectedData).id === null && _.first(selectedData).name === null);
+
+        if (!emptySelection) {
             dataIds = _.map(selectedData, function(item) {
                 return item.id;
             });
