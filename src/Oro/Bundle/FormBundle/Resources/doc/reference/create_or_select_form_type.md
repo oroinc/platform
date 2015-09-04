@@ -11,7 +11,8 @@ Form type has 4 modes - create (default), edit, grid and select.
 includes frontend and backend validation. In this mode user can click button "Select Existing"
 that will redirect user to grid mode.
 
-**Edit mode** shows forms for both create and view mode, allowing user to edit the entity using form for create mode
+**Edit mode** shows forms for both create and view mode, allowing user to edit the entity using form for create mode.
+This mode is currently supported by 'oro_entity_create_or_select_choice' type only
 
 **Grid mode** shows grid with existing entities and allows user select any of it by clicking on appropriate row.
 This mode has two button - "Cancel" that returns user back to previous mode (create or view), and "Create new"
