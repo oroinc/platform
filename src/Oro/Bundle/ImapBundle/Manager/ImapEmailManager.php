@@ -231,7 +231,7 @@ class ImapEmailManager
             $header->rewind();
             $acceptHeader->add(
                 AcceptHeaderItem::fromString(
-                    sprintf('"%s"', $header->current()->getFieldValue())
+                    $header->current()->getFieldValue()
                 )
             );
         } else {
