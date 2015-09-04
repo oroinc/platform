@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Manager;
 
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
