@@ -162,7 +162,7 @@ define([
          * @param {jQuery} $el
          * @returns {String}
          */
-        _getCleanValue: function ($el) {
+        _getCleanValue: function($el) {
             if (typeof $el.data('default-value') !== 'undefined') {
                 return $el.data('default-value');
             }
