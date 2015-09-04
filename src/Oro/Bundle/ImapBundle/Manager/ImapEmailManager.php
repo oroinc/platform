@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
@@ -183,7 +185,7 @@ class ImapEmailManager
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
                 ->setMessageId($this->getMessageId($headers, 'Message-ID'))
                 ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
-                ->setAcceptLanguageHeader($this->getString($headers, 'Accept-Language'));
+                ->setAcceptLanguageHeader($this->getAcceptLanguageHeader($headers));
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
@@ -207,6 +209,35 @@ class ImapEmailManager
                 $e
             );
         }
+    }
+
+    /**
+     * Returns Accept-Language header from headers.
+     *
+     * @param Headers $headers
+     *
+     * @return string
+     */
+    protected function getAcceptLanguageHeader(Headers $headers)
+    {
+        $header = $headers->get('Accept-Language');
+
+        $acceptHeader = new AcceptHeader([]);
+
+        if ($header === false) {
+            return '';
+        } elseif ($header instanceof \ArrayIterator) {
+            $header->rewind();
+            $acceptHeader->add(
+                AcceptHeaderItem::fromString(
+                    sprintf('"%s"', $header->current()->getFieldValue())
+                )
+            );
+        } else {
+            $acceptHeader = AcceptHeader::fromString($header);
+        }
+
+        return $acceptHeader->__toString();
     }
 
     /**
