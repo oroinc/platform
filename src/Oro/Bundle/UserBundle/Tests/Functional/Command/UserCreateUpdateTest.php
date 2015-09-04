@@ -107,7 +107,7 @@ class UserCreateUpdateTest extends WebTestCase
     {
         return [
             'create' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-business-unit'  => 'bu1',
                     '--user-name'           => 'test_user_1',
@@ -120,7 +120,7 @@ class UserCreateUpdateTest extends WebTestCase
                 'result' => '',
             ],
             'update' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:update',
                     'user-name'             => 'test_user_main',
                     '--user-name'           => 'test_user_2',
@@ -132,30 +132,33 @@ class UserCreateUpdateTest extends WebTestCase
                 'result' => '',
             ],
             'create existent user' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-name'           => 'test_user_main',
                 ],
                 'result' => 'User exists',
             ],
             'invalid business unit' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:create',
-                    '--user-business-unit'  => uniqid(),
+                    '--user-business-unit'  => 'invalid_business_unit_123o',
+                    '--user-name'           => 'new_user_1',
                 ],
                 'result' => 'Invalid Business Unit',
             ],
             'invalid organization' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:create',
-                    '--user-organizations'  => [uniqid()],
+                    '--user-organizations'  => ['invalid_user_organization_123o'],
+                    '--user-name'           => 'new_user_2',
                 ],
                 'result' => 'Invalid organization',
             ],
             'invalid role' => [
-                'arguments'    => [
+                'arguments' => [
                     'command'               => 'oro:user:create',
-                    '--user-role'  => [uniqid()],
+                    '--user-role'           => ['invalid_user_role_123o'],
+                    '--user-name'           => 'new_user_3',
                 ],
                 'result' => 'Invalid Role',
             ],
