@@ -45,6 +45,7 @@ parameters:
     oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
 
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
+    oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
 
     oro_navigation.twig.content_tags.class:                    Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension
     oro_navigation.content.topic_sender.class:                 Oro\Bundle\NavigationBundle\Content\TopicSender
@@ -264,6 +265,8 @@ services:
           - @oro_config.user
           - @oro_navigation.breadcrumb_manager
           - @oro_navigation.title_provider
+        calls:
+          - [ setChainBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
@@ -344,6 +347,10 @@ services:
             - @oro_menu.builder_chain
             - @knp_menu.matcher
             - @router
+    oro_navigation.chain_breadcrumb_manager:
+        class: %oro_navigation.chain_breadcrumbs_manager.class%
+        arguments:
+            - @oro_navigation.breadcrumb_manager
 
     oro_navigation.twig.content_tags:
         class: %oro_navigation.twig.content_tags.class%

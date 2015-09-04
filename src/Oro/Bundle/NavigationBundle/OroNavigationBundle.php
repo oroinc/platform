@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\TagGeneratorPass;
 use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderChainPass;
+use Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\ChainBreadcrumbProviderPass;
 
 class OroNavigationBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroNavigationBundle extends Bundle
 
         $container->addCompilerPass(new MenuBuilderChainPass());
         $container->addCompilerPass(new TagGeneratorPass());
+        $container->addCompilerPass(new ChainBreadcrumbProviderPass());
     }
 }

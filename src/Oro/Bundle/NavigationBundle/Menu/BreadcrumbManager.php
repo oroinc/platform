@@ -157,7 +157,7 @@ class BreadcrumbManager
     /**
      * Get menu item breadcrumbs list
      *
-     * @param ItemInterface $menu
+     * @param ItemInterface|string $menu
      * @param string $route
      * @return array
      */

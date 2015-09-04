@@ -15,6 +15,7 @@ use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
+use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -89,10 +90,26 @@ class TitleService implements TitleServiceInterface
     protected $breadcrumbManager;
 
     /**
+     * @var ChainBreadcrumbManager
+     */
+    protected $chainBreadcrumbManager;
+
+    /**
      * @var ConfigManager
      */
     protected $userConfigManager;
 
+    /**
+     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbProviderInterface
+     * @param AnnotationsReader $reader
+     * @param ConfigReader $configReader
+     * @param TitleTranslator $titleTranslator
+     * @param ObjectManager $em
+     * @param Serializer $serializer
+     * @param $userConfigManager
+     * @param BreadcrumbManager $breadcrumbManager
+     * @param TitleProvider $titleProvider
+     */
     public function __construct(
         AnnotationsReader $reader,
         ConfigReader $configReader,
@@ -110,6 +127,15 @@ class TitleService implements TitleServiceInterface
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManager = $breadcrumbManager;
         $this->titleProvider = $titleProvider;
+    }
+
+    /**
+     * @deprecated since 1.8 will be moved to constructor
+     * @param ChainBreadcrumbManager $chainBreadcrumbManager
+     */
+    public function setChainBreadcrumbManager(ChainBreadcrumbManager $chainBreadcrumbManager)
+    {
+        $this->chainBreadcrumbManager = $chainBreadcrumbManager;
     }
 
     /**
@@ -422,7 +448,7 @@ class TitleService implements TitleServiceInterface
      */
     protected function getBreadcrumbs($route)
     {
-        return $this->breadcrumbManager->getBreadcrumbLabels(
+        return $this->chainBreadcrumbManager->getBreadcrumbLabels(
             $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
             $route
         );
