@@ -148,6 +148,7 @@ define([
             Modal.__super__.close.call(this);
             $(document).off(this._eventNamespace());
             $(window).off(this._eventNamespace());
+            this.stopListening();
             mediator.trigger('modal:close', this);
         },
 

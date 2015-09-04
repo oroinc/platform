@@ -1,4 +1,3 @@
-
 define(function(require) {
     'use strict';
 
@@ -96,6 +95,7 @@ define(function(require) {
             $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MAXIMIZED), maximized);
             $main.toggleClass(stateToClass(model.get('position'), constants.SIDEBAR_MINIMIZED), minimized);
 
+            this.onWidgetsReset();
             if (minimized) {
                 view.renderIcons();
             } else {

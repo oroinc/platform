@@ -3,6 +3,8 @@ define(function(require) {
     'use strict';
 
     var Modal = require('oroui/js/modal');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
 
     /**
      * @export  oro/sidebar/widget-controller/widget-setup-view
@@ -18,6 +20,7 @@ define(function(require) {
             var model = view.model;
 
             options.content = '<div class="sidebar-widget-setup"></div>';
+            options.title = _.result(options.content, 'widgetTitle') || __('Widget setup');
             options.snapshot = options.snapshot || {};
 
             var moduleId = model.get('module');

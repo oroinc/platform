@@ -1,4 +1,3 @@
-
 define(['jquery', 'underscore', 'backbone', '../constants',
     'text!./templates/widget-min-template.html',
     'text!./templates/widget-max-template.html'
