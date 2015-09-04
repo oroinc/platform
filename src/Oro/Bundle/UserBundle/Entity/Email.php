@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @ORM\Table(name="oro_user_email")
  *  @Config(
  *      defaultValues={
- *          "dataaudit"={"auditable"=true}
+ *          "dataaudit"={"auditable"=false}
  *      }
  * )
  */
