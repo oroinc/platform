@@ -25,19 +25,29 @@ class View
     /** @var bool */
     protected $deletable = false;
 
+    /** @var array */
+    protected $columnsData;
+
     /**
      * @param string $name
-     * @param array $filtersData
-     * @param array $sortersData
+     * @param array  $filtersData
+     * @param array  $sortersData
      * @param string $type
+     * @param array  $columnsData
      */
-    public function __construct($name, array $filtersData = [], array $sortersData = [], $type = 'system')
-    {
+    public function __construct(
+        $name,
+        array $filtersData = [],
+        array $sortersData = [],
+        $type = 'system',
+        array $columnsData = []
+    ) {
         $this->name        = $name;
         $this->label       = $name;
         $this->filtersData = $filtersData;
         $this->sortersData = $sortersData;
         $this->type        = $type;
+        $this->columnsData = $columnsData;
     }
 
     /**
@@ -157,6 +167,22 @@ class View
     }
 
     /**
+     * @return array
+     */
+    public function getColumnsData()
+    {
+        return $this->columnsData;
+    }
+
+    /**
+     * @param array $columnsData
+     */
+    public function setColumnsData(array $columnsData = [])
+    {
+        $this->columnsData = $columnsData;
+    }
+
+    /**
      * Convert to view data
      *
      * @return array
@@ -169,6 +195,7 @@ class View
             'type'      => $this->getType(),
             'filters'   => $this->getFiltersData(),
             'sorters'   => $this->getSortersData(),
+            'columns'   => $this->columnsData,
             'editable'  => $this->editable,
             'deletable' => $this->deletable,
         ];
