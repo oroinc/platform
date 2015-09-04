@@ -14,7 +14,7 @@ define(function(require) {
     var IconView = require('./widget-container/icon-view');
     var WidgetContainerView = require('./widget-container/view');
     var WidgetAddView = require('./widget-container/widget-add-view');
-    var WidgetSetupView = require('./widget-container/widget-setup-view');
+    var WidgetSetupModalView = require('./widget-container/widget-setup-view');
 
     var sidebarTemplate = require('text!./templates/template.html');
     require('jquery-ui');
@@ -374,18 +374,21 @@ define(function(require) {
         },
 
         onSetupWidget: function(cid) {
-            var widget = this.getWidgets().get(cid);
-            if (!widget) {
+            var widgetModel = this.getWidgets().get(cid);
+            if (!widgetModel) {
                 return;
             }
 
-            var widgetSetupView = new WidgetSetupView({
-                model: widget,
-                okCloses: false,
-                snapshot: JSON.stringify(widget)
-            });
+            requirejs([widgetModel.get('module')], function(widgetModule) {
+                var widgetSetupModal = new WidgetSetupModalView({
+                    model: widgetModel,
+                    contentView: widgetModule.SetupView,
+                    okCloses: false,
+                    snapshot: JSON.stringify(widgetModel)
+                });
 
-            widgetSetupView.open();
+                widgetSetupModal.open();
+            });
         }
     });
 });
