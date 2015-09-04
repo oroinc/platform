@@ -147,8 +147,35 @@ define([
                 return;
             }
 
-            this.$newEntity.find('input[type=text], textarea').val(null);
-            this.$newEntity.find('textarea').text('');
+            var self = this;
+            this.$newEntity.find('input[type=text], input[data-default-value], textarea').each(function() {
+                var $el = $(this);
+                var newVal = self._getCleanValue($el);
+                $el.val(newVal);
+                if ($el.is('textarea')) {
+                    $el.text(newVal);
+                }
+            });
+        },
+
+        /**
+         * @param {jQuery} $el
+         * @returns {String}
+         */
+        _getCleanValue: function ($el) {
+            if (typeof $el.data('default-value') !== 'undefined') {
+                return $el.data('default-value');
+            }
+
+            if ($el.is('textarea')) {
+                return '';
+            }
+
+            if ($el.is('input[type=hidden]')) {
+                return $el.val();
+            }
+
+            return null;
         },
 
         /**
