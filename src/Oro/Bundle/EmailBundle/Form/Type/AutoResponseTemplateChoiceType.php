@@ -34,7 +34,8 @@ class AutoResponseTemplateChoiceType extends AbstractType
             'query_builder' => function (EmailTemplateRepository $repository) {
                 return $repository->getEntityTemplatesQueryBuilder(
                     Email::ENTITY_CLASS,
-                    $this->securityFacade->getOrganization()
+                    $this->securityFacade->getOrganization(),
+                    true
                 );
             },
             'configs' => [
