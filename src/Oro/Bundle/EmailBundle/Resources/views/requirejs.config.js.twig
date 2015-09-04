@@ -1,0 +1,7 @@
+require({
+    config: {
+        'oroemail/js/app/components/email-notification-component': {
+            clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
+        }
+    }
+});

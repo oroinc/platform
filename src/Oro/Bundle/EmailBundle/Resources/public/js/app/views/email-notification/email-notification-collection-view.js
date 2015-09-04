@@ -12,6 +12,7 @@ define(function(require) {
     var messenger = require('oroui/js/messenger');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
+        template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
         listSelector: '.items',
         countNewEmail: 0,
@@ -27,14 +28,19 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            BaseCollectionView.__super__.initialize.apply(this, options);
+            EmailNotificationCollectionView.__super__.initialize.apply(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
         },
 
         render: function() {
-            BaseCollectionView.__super__.render.apply(this);
+            EmailNotificationCollectionView.__super__.render.call(this);
             this.updateViewMode();
-            this.$el.show();
+        },
+
+        getTemplateData: function() {
+            var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
+            data.userEmailsUrl = routing.generate('oro_email_user_emails');
+            return data;
         },
 
         updateViewMode: function() {

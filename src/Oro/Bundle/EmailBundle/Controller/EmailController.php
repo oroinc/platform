@@ -82,7 +82,6 @@ class EmailController extends Controller
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
         return [
-            'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser(), $currentOrganization),
             'emails' => json_encode($emailNotificationManager->getEmails(
                 $this->getUser(),
                 $currentOrganization,

@@ -5,6 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var module = require('module');
     var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var messenger = require('oroui/js/messenger');
@@ -31,7 +32,11 @@ define(function(require) {
         },
 
         initCollection: function() {
-            this.collection = new EmailNotificationCollection(JSON.parse(this.options.emails));
+            var emails = this.options.emails || [];
+            if (typeof emails === 'string') {
+                emails = JSON.parse(emails);
+            }
+            this.collection = new EmailNotificationCollection(emails);
 
             return this;
         },
@@ -50,10 +55,12 @@ define(function(require) {
         },
 
         initSync: function() {
-            var clankEvent = this.options.clank_event;
+            var channel = module.config().clankEvent;
             var handlerNotification = _.bind(this.handlerNotification, this);
-            sync.subscribe(clankEvent, handlerNotification);
-
+            sync.subscribe(channel, handlerNotification);
+            this.once('dispose', function() {
+                sync.unsubscribe(channel, handlerNotification);
+            });
             return this;
         },
 

@@ -15,7 +15,7 @@ require([
                 var $menu = $('.email-notification-menu');
                 if ($menu.length !== 0) {
                     var options = $menu.data('page-component-options');
-                    options._sourceElement = $menu;
+                    options._sourceElement = $menu.find('.dropdown-menu');
                     this.component = new EmailNotificationComponent(options);
                 }
             }

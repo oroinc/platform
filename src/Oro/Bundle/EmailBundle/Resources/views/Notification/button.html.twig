@@ -54,15 +54,13 @@
 {% endif %}
 
 {% set options = {
-    'clank_event': clank_event,
     'emails': emails,
     'count': count
 } %}
 
 <li class="email-notification-menu dropdown"
     data-page-component-options="{{ options|json_encode }}"
-    data-layout="separate"
-    style="display: none;">
+    data-layout="separate">
     <a href="#" class="oro-dropdown-toggle">
         <i class="icon-envelope {{ classNew }}">
             <span>
@@ -74,25 +72,5 @@
             </span>
         </i>
     </a>
-    <div class="dropdown-menu pull-right" tabindex="0">
-        <div class="content" >
-            <div class="header row-fluid">
-                <a class="my-emails pull-left" href="{{ path("oro_email_user_emails") }}">
-                    {{ "oro.email.menu.user_emails"|trans }}
-                </a>
-                <button class="mark-as-read pull-right btn btn-primary">
-                    <i class="icon-check"></i>
-                    {{ "oro.email.notification.mark_read.label"|trans }}
-                </button>
-            </div>
-            <ul class="items">
-            </ul>
-        </div>
-        <div class="empty">
-            {{ "oro.email.notification.empty"|trans }}
-        </div>
-        <div class="notification">
-            {{ "oro.email.notification.new_email"|trans }}
-        </div>
-    </div>
+    <div class="dropdown-menu pull-right" tabindex="0"></div>
 </li>
