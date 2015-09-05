@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity;
+namespace Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

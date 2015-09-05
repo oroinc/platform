@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\Unit\Serializer;
+namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 class ToManyEntitySerializerTest extends EntitySerializerTestCase
 {
