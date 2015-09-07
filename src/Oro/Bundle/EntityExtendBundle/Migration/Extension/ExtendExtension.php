@@ -59,6 +59,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * @return ExtendDbIdentifierNameGenerator
+     */
+    public function getNameGenerator()
+    {
+        return $this->nameGenerator;
+    }
+
+    /**
      * Creates a table for a custom entity.
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
      * created automatically in Symfony cache
