@@ -1,0 +1,26 @@
+{
+    "name": "oro/test-utils",
+    "type": "library",
+    "description": "ORO Test Utils Component",
+    "keywords": ["ORO", "BAP", "Test", "PhpUnit", "Utils", "Util"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9"
+    },
+    "require-dev": {
+      "doctrine/common": "~2.3",
+      "doctrine/dbal": "~2.3",
+      "doctrine/orm": "~2.3",
+      "symfony/filesystem": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\TestUtils": "" }
+    },
+    "target-dir": "Oro/Component/TestUtils",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

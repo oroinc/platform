@@ -90,7 +90,7 @@
       border-radius: @source-radius;
       border: @source-radius / 2 solid @source-border-color;
       position: absolute;
-      display: none;
+      visibility: hidden;
       #gradient > .vertical-three-colors(@source-gradient-start-color, @source-gradient-middle-color, 3%, @source-gradient-end-color);
       &:hover {
         #gradient > .vertical-three-colors(darken(@source-gradient-start-color, 5%), darken(@source-gradient-middle-color, 5%), 3%, darken(@source-gradient-end-color, 5%));
@@ -115,7 +115,7 @@
     }
     &:hover {
       .jsplumb-source {
-        display: block;
+        visibility: visible;
       }
     }
     &.dropdown {
@@ -178,11 +178,11 @@
   /* common style for step and transition */
   &.workflow-drag-connection {
     .jsplumb-source {
-      display: block;
+      visibility: visible;
     }
     .workflow-step.start-step {
       .jsplumb-source {
-        display: none;
+        visibility: hidden;
       }
     }
     .workflow-step.connection-source {
