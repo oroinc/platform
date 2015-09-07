@@ -36,14 +36,14 @@ class EntityProcessor
     /**
      * @param MaintenanceMode $maintenance
      * @param CommandExecutor $commandExecutor
-     * @param string          $readFrom Assetic read from directory.
+     * @param string          $webRoot Application web root directory.
      * @param LoggerInterface $logger
      * @param Profiler        $profiler
      */
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
-        $readFrom,
+        $webRoot,
         LoggerInterface $logger,
         Profiler $profiler = null
     ) {
@@ -54,7 +54,7 @@ class EntityProcessor
 
         $this->updateRoutingCommands = [
             'router:cache:clear'  => [],
-            'fos:js-routing:dump' => ['--target' => $readFrom . '/js/routes.js'],
+            'fos:js-routing:dump' => ['--target' => $webRoot . '/js/routes.js'],
         ];
     }
 
