@@ -465,11 +465,11 @@ class ActivityList extends ExtendActivityList implements
     }
 
     /**
-     * @param User $updatedBy
+     * @param User|null $updatedBy
      *
      * @return self
      */
-    public function setUpdatedBy(User $updatedBy = null)
+    public function setUpdatedBy($updatedBy = null)
     {
         if ($updatedBy !== null) {
             $this->isUpdatedUpdatedBy = true;

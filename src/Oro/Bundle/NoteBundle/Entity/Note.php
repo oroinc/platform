@@ -213,7 +213,7 @@ class Note extends ExtendNote implements
      *
      * @return Note
      */
-    public function setUpdatedBy(User $updatedBy)
+    public function setUpdatedBy($updatedBy)
     {
         if ($updatedBy !== null) {
             $this->isUpdatedUpdatedBy = true;
