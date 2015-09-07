@@ -14,8 +14,14 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 
-class TransferOptionSets implements Migration, ContainerAwareInterface, OrderedMigrationInterface, DataStorageExtensionAwareInterface
+class CreateEnumsFromOptionSets implements
+    Migration,
+    ContainerAwareInterface,
+    OrderedMigrationInterface,
+    DataStorageExtensionAwareInterface,
+    ExtendExtensionAwareInterface
 {
     /** @var EntityMetadataHelper */
     protected $metadataHelper;
@@ -31,13 +37,18 @@ class TransferOptionSets implements Migration, ContainerAwareInterface, OrderedM
         $this->storage  = $storage;
     }
 
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
+        // no other way of doing this
         $this->metadataHelper = $container->get('oro_entity_extend.migration.entity_metadata_helper');
-        $this->extendExtension = $container->get('oro_entity_extend.migration.extension.extend');
     }
 
     /**
@@ -45,13 +56,16 @@ class TransferOptionSets implements Migration, ContainerAwareInterface, OrderedM
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $optionSets = $this->storage->get('existing_option_sets');
+        $existingEnumTables = $this->storage->get('existing_enum_values');
+        $optionSets         = $this->storage->get('existing_option_sets');
+        $nameGenerator      = $this->extendExtension->getNameGenerator();
 
         $updatedOptionSets = [];
         foreach ($optionSets as $optionSet) {
             $data = $optionSet['data'];
 
             $entityTableName = $this->metadataHelper->getTableNameByEntityClass($optionSet['class_name']);
+
             // limit enum identifier to the size of 21
             $enumTableName = sprintf(
                 '%s_%s',
@@ -59,10 +73,22 @@ class TransferOptionSets implements Migration, ContainerAwareInterface, OrderedM
                 substr($optionSet['field_name'], 0, 6)
             );
 
-            $optionSet['table_name'] = $enumTableName;
-            $updatedOptionSets[] = $optionSet;
+            // check if there are already enums with that name and generate new one if so
+            while (in_array(
+                $nameGenerator->generateEnumTableName($enumTableName),
+                $existingEnumTables,
+                true
+            )
+            ) {
+                $enumTableName = sprintf(
+                    '%s_%s_%s',
+                    substr($entityTableName, 0, 12),
+                    substr($optionSet['field_name'], 0, 5),
+                    substr(str_shuffle(MD5(microtime())), 0, 2)
+                );
+            }
 
-            $this->extendExtension->addEnumField(
+            $table = $this->extendExtension->addEnumField(
                 $schema,
                 $entityTableName,
                 $optionSet['field_name'],
@@ -74,18 +100,15 @@ class TransferOptionSets implements Migration, ContainerAwareInterface, OrderedM
                 ]
             );
 
-            //$table = $schema->getTable('oro_enum_' . $optionSet['table_name']);
-            //$table->changeColumn('id', ['autoincrement' => true]);
-            // TODO: add autoincrement for id column
+            $optionSet['table_name'] = $table->getName();
+            $existingEnumTables[]    = $table->getName();
+            $updatedOptionSets[]     = $optionSet;
         }
 
-
-        $queries->addPostQuery(new ConvertOptionSetsToEnumsQuery(
+        $queries->addPostQuery(new PopulateNewEnumsWithValuesQuery(
             $this->metadataHelper,
             $updatedOptionSets
         ));
-
-        // TODO: delete optionSet
     }
 
     /**

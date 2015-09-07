@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
 
-class ConvertOptionSetsToEnums implements Migration, OrderedMigrationInterface, DataStorageExtensionAwareInterface
+class FindExistingOptionSets implements Migration, OrderedMigrationInterface, DataStorageExtensionAwareInterface
 {
     /** @var DataStorageExtension */
     protected $storage;
