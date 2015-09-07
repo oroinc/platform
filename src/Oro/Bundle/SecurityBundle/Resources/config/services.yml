@@ -550,7 +550,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
         arguments:
-             - @security.context
+             - @security.token_storage
 
     oro_security.query_hint.filter_by_current_user:
         public: false
