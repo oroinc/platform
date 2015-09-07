@@ -59,7 +59,7 @@ class ReportsTest extends Selenium2TestCase
     /**
      * Test to check that report can be created by data audit filter
      */
-    public function testDataTimeReport()
+    public function testReportByDataAudit()
     {
         $date = new \DateTime();
         $dataFilter['Start'] = $date->sub(new \DateInterval('P1D'))->format('M j, Y');
@@ -112,7 +112,7 @@ class ReportsTest extends Selenium2TestCase
      * Test to check that report can be created by activity filter
      * @return string
      */
-    public function testActivityReport()
+    public function testReportByActivity()
     {
         $date = new \DateTime();
         $dataFilter['Start'] = $date->sub(new \DateInterval('P1D'))->format('M j, Y');
