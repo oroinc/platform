@@ -20,6 +20,9 @@ class EntityProcessor
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Profiler  */
+    protected $profiler;
+
     /** @var array */
     protected $commands = [
         'oro:entity-extend:update-config' => [],
@@ -28,20 +31,19 @@ class EntityProcessor
     ];
 
     /** @var array */
-    protected $updateRoutingCommands = [
-        'router:cache:clear'  => [],
-        'fos:js-routing:dump' => ['--target' => 'web/js/routes.js']
-    ];
+    protected $updateRoutingCommands;
 
     /**
      * @param MaintenanceMode $maintenance
      * @param CommandExecutor $commandExecutor
+     * @param string          $readFrom Assetic read from directory.
      * @param LoggerInterface $logger
      * @param Profiler        $profiler
      */
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
+        $readFrom,
         LoggerInterface $logger,
         Profiler $profiler = null
     ) {
@@ -49,6 +51,11 @@ class EntityProcessor
         $this->commandExecutor = $commandExecutor;
         $this->logger          = $logger;
         $this->profiler        = $profiler;
+
+        $this->updateRoutingCommands = [
+            'router:cache:clear'  => [],
+            'fos:js-routing:dump' => ['--target' => $readFrom . '/js/routes.js'],
+        ];
     }
 
     /**

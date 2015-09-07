@@ -61,7 +61,10 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('router:cache:clear', array('--process-isolation' => true))
                 ->runCommand(
                     'fos:js-routing:dump',
-                    array('--target' => 'web/js/routes.js', '--process-isolation' => true)
+                    array(
+                        '--target' => $this->getContainer()->getParameter('assetic.read_from') . '/js/routes.js',
+                        '--process-isolation' => true
+                    )
                 )
                 ->runCommand('oro:localization:dump', array('--process-isolation' => true))
                 ->runCommand('oro:translation:dump', array('--process-isolation' => true))

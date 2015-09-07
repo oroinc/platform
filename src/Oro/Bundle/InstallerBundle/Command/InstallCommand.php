@@ -495,7 +495,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->runCommand(
                 'fos:js-routing:dump',
                 array(
-                    '--target'            => 'web/js/routes.js',
+                    '--target'            => $this->getContainer()->getParameter('assetic.read_from') . '/js/routes.js',
                     '--process-isolation' => true,
                 )
             )
