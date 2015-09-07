@@ -266,6 +266,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                       public flag is allowed or not. More details can be found
      *                                       in entity_config.yml
      * @param array         $options
+     *
+     * @return Table A table that is used to store enum values
      */
     public function addEnumField(
         Schema $schema,
@@ -278,10 +280,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $selfTable     = $this->getTable($table, $schema);
+        $enumTable     = null;
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+        } else {
+            $enumTable = $this->getTable($enumTableName, $schema);
         }
 
         // create appropriate relation
@@ -320,6 +325,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 'enum'
             );
         }
+
+        return $enumTable;
     }
 
     /**
