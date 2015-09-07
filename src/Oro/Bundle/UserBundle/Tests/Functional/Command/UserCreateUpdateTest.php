@@ -101,6 +101,25 @@ class UserCreateUpdateTest extends WebTestCase
     }
 
     /**
+     * @depends testParameters
+     */
+    public function testCreateExistentUser()
+    {
+        $arguments = [
+            'command'               => 'oro:user:create',
+            '--user-name'           => 'test_user_main',
+            '--user-email'          => 'test_user_main@example.com',
+            '--user-password'       => 'admin',
+        ];
+
+        $command = $this->application->find('oro:user:create');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute($arguments);
+
+        $this->assertStringStartsWith('User exists', $commandTester->getDisplay());
+    }
+
+    /**
      * @return array
      */
     public function parametersProvider()
@@ -130,15 +149,6 @@ class UserCreateUpdateTest extends WebTestCase
                     '--user-organizations'  => ['org1'],
                 ],
                 'result' => '',
-            ],
-            'create existent user' => [
-                'arguments' => [
-                    'command'               => 'oro:user:create',
-                    '--user-name'           => 'test_user_main',
-                    '--user-email'          => 'test_user_main@example.com',
-                    '--user-password'       => 'admin',
-                ],
-                'result' => 'User exists',
             ],
             'invalid business unit' => [
                 'arguments' => [
