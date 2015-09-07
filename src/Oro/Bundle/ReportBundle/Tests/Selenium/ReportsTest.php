@@ -110,6 +110,7 @@ class ReportsTest extends Selenium2TestCase
 
     /**
      * Test to check that report can be created by activity filter
+     * @return string
      */
     public function testActivityReport()
     {
@@ -168,6 +169,20 @@ class ReportsTest extends Selenium2TestCase
             ->enableNotes('No')
             ->save()
             ->assertMessage('Entity saved');
+
+        return $reportName;
+    }
+
+    /**
+     * Test to check that report will not show entities with disabled activities
+     * @depends testActivityReport
+     * @param $reportName
+     */
+    public function testReportForDisabledActivity($reportName)
+    {
+        $this->markTestSkipped('Test skipped due to bug BAP-8967');
+        $login = $this->login();
+
         /** @var Reports $login */
         $login->openReports('Oro\Bundle\ReportBundle')
             ->filterBy('Name', $reportName)
