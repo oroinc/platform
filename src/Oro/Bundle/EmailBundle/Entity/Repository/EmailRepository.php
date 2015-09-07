@@ -60,12 +60,11 @@ class EmailRepository extends EntityRepository
         $qb = $this->createQueryBuilder('e')
             ->select('e, eu.seen')
             ->leftJoin('e.emailUsers', 'eu')
-            ->where('eu.organization = :organizationId')
-            ->andWhere('eu.owner = :ownerId')
+            ->where($this->getAclWhereCondition($user, $organization))
             ->groupBy('e, eu.seen')
             ->orderBy('e.sentAt', 'DESC')
-            ->setParameter('organizationId', $organization->getId())
-            ->setParameter('ownerId', $user->getId())
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
             ->setMaxResults($limit);
 
         return $qb->getQuery()->getResult();
@@ -84,11 +83,10 @@ class EmailRepository extends EntityRepository
         return $this->createQueryBuilder('e')
             ->select('COUNT(DISTINCT e)')
             ->leftJoin('e.emailUsers', 'eu')
-            ->where('eu.organization = :organizationId')
-            ->andWhere('eu.owner = :ownerId')
+            ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
-            ->setParameter('organizationId', $organization->getId())
-            ->setParameter('ownerId', $user->getId())
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
             ->setParameter('seen', false)
             ->getQuery()
             ->getSingleScalarResult();
@@ -113,5 +111,27 @@ class EmailRepository extends EntityRepository
             ->setParameter('hasOwner', true);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param User         $user
+     * @param Organization $organization
+     *
+     * @return \Doctrine\ORM\Query\Expr\Orx
+     */
+    protected function getAclWhereCondition(User $user, Organization $organization)
+    {
+        $mailboxes = $this->getEntityManager()->getRepository('OroEmailBundle:Mailbox')
+            ->findAvailableMailboxIds($user, $organization);
+
+        $expr = $this->getEntityManager()->createQueryBuilder()->expr();
+
+        return $expr->orX(
+            $expr->andX(
+                'eu.owner = :owner',
+                'eu.organization = :organization'
+            ),
+            $expr->in('eu.mailboxOwner', $mailboxes)
+        );
     }
 }
