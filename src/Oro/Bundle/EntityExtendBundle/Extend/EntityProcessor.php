@@ -31,19 +31,20 @@ class EntityProcessor
     ];
 
     /** @var array */
-    protected $updateRoutingCommands;
+    protected $updateRoutingCommands = [
+        'router:cache:clear'  => [],
+        'fos:js-routing:dump' => []
+    ];
 
     /**
      * @param MaintenanceMode $maintenance
      * @param CommandExecutor $commandExecutor
-     * @param string          $webRoot Application web root directory.
      * @param LoggerInterface $logger
      * @param Profiler        $profiler
      */
     public function __construct(
         MaintenanceMode $maintenance,
         CommandExecutor $commandExecutor,
-        $webRoot,
         LoggerInterface $logger,
         Profiler $profiler = null
     ) {
@@ -51,11 +52,6 @@ class EntityProcessor
         $this->commandExecutor = $commandExecutor;
         $this->logger          = $logger;
         $this->profiler        = $profiler;
-
-        $this->updateRoutingCommands = [
-            'router:cache:clear'  => [],
-            'fos:js-routing:dump' => ['--target' => $webRoot . '/js/routes.js'],
-        ];
     }
 
     /**
