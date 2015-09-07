@@ -63,6 +63,9 @@ oro:
                 label: System Mailboxes
                 add_mailbox.label: Add Mailbox
 
+            show_new_email_notifications:
+                label: Show new email notifications
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
