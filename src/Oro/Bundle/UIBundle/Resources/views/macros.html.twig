@@ -638,7 +638,12 @@
 {% macro buttonType(parameters) %}
     <div class="btn-group">
         <button type="{{ parameters.type }}" class="btn {% if (parameters.class is defined) %}{{ parameters.class }}{% endif %}{% if (parameters.action is defined) %} action-button{% endif %}"
-                {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}>
+                {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}
+                {% if parameters.data is defined %}
+                    {% for dataItemName,dataItemValue in parameters.data %}
+                        data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
+                    {% endfor %}
+                {% endif %}>
             {{ parameters.label }}
         </button>
     </div>
