@@ -16,7 +16,7 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInte
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 
-class CreateEnumsFromOptionSets implements
+class CreateEnumsFromOptionSetsAndCleanUp implements
     Migration,
     ContainerAwareInterface,
     OrderedMigrationInterface,
@@ -109,6 +109,8 @@ class CreateEnumsFromOptionSets implements
             $this->metadataHelper,
             $updatedOptionSets
         ));
+        $queries->addPostQuery('DROP TABLE IF EXISTS oro_entity_config_optset_rel');
+        $queries->addPostQuery('DROP TABLE IF EXISTS oro_entity_config_optionset');
     }
 
     /**
