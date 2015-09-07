@@ -67,6 +67,10 @@ class CreateUserCommand extends ContainerAwareCommand
         } catch (InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
         } catch (DBALException $exception) {
+            $output->writeln($exception->getMessage());
+            $output->writeln($exception->getCode());
+            $output->writeln($exception->getFile());
+            $output->writeln($exception->getLine());
             $output->writeln('User exists');
         }
     }

@@ -122,7 +122,7 @@ class UserCreateUpdateTest extends WebTestCase
             'update' => [
                 'arguments' => [
                     'command'               => 'oro:user:update',
-                    'user-name'             => 'test_user_main',
+                    'user-name'             => 'test_user_1',
                     '--user-name'           => 'test_user_2',
                     '--user-email'          => 'test_user_2@mailinator.com',
                     '--user-firstname'      => 'User2F',
@@ -135,6 +135,8 @@ class UserCreateUpdateTest extends WebTestCase
                 'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-name'           => 'test_user_main',
+                    '--user-email'          => 'test_user_main@example.com',
+                    '--user-password'       => 'admin',
                 ],
                 'result' => 'User exists',
             ],
