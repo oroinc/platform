@@ -65,7 +65,6 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->addProvider($supportedProvider);
 
         $this->assertEquals($supportedProvider, $this->manager->getSupportedProvider());
-
     }
 
     public function testSetDefaultProvider()
@@ -99,7 +98,6 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->getMenu(self::MENU_NAME);
     }
 
-
     public function testGetBreadcrumbArray()
     {
         $menuItem = new MenuItem('test', $this->factory);
@@ -111,7 +109,6 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->setDefaultProvider($provider);
         $this->manager->getBreadcrumbArray(self::MENU_NAME, $menuItem);
-
     }
 
     public function testGetCurrentMenuItem()
@@ -135,6 +132,5 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->setDefaultProvider($provider);
         $this->manager->getBreadcrumbLabels(self::MENU_NAME, $route);
-
     }
 }
