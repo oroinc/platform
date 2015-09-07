@@ -211,8 +211,16 @@ define(function(require) {
             });
         }
 
-        function adjustmentPathStartPoint(paintInfo, params) {
+        function adjustSourcePosition(paintInfo, params) {
             var elem = params.sourceEndpoint.element;
+            if ($(elem).hasClass('start-step')) {
+                adjustStartSourcePosition(elem, paintInfo, params);
+            } else {
+                adjustRegularSourcePosition(elem, paintInfo, params);
+            }
+        }
+
+        function adjustRegularSourcePosition(elem, paintInfo, params) {
             var source = getSourceElement(elem, params.sourcePos);
             if (source) {
                 paintInfo.points[0] +=
@@ -222,12 +230,23 @@ define(function(require) {
             }
         }
 
+        function adjustStartSourcePosition(elem, paintInfo, params) {
+            var radius = elem.offsetWidth / 2;
+            var centerX = elem.offsetLeft + radius;
+            var centerY = elem.offsetTop + radius;
+            var dx = params.sourcePos[0] - centerX;
+            var dy = params.sourcePos[1] - centerY;
+            var ratio = (radius - 1.5) / Math.sqrt(dx * dx + dy * dy);
+            paintInfo.points[0] += centerX + dx * ratio - params.sourcePos[0];
+            paintInfo.points[1] += centerY + dy * ratio - params.sourcePos[1];
+        }
+
         this._compute = function(paintInfo, params) {
             if (params.sourceEndpoint.isTemporarySource || params.sourceEndpoint.getAttachedElements().length === 0 ||
                 params.targetEndpoint.getAttachedElements().length === 0) {
                 // in case this connection is new one or is moving to another target or source
                 // use jsPlumb Flowchart connector behaviour
-                adjustmentPathStartPoint(paintInfo, params);
+                adjustSourcePosition(paintInfo, params);
                 return this._flowchartConnectorCompute.apply(this, arguments);
             }
 
