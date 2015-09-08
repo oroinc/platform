@@ -75,12 +75,12 @@ oro_system_configuration:
                 label: false
                 required: false
                 resettable: false
-        oro_email.show_new_email_notifications:
+        oro_email.show_recent_emails_in_user_bar:
             data_type: boolean
             type: oro_config_checkbox
             priority: 100
             options:
-                label: oro.email.system_configuration.show_new_email_notifications.label
+                label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
                 required: true
 
     tree:
@@ -93,7 +93,7 @@ oro_system_configuration:
                                 children:
                                     user_bar_settings:
                                         children:
-                                            - oro_email.show_new_email_notifications
+                                            - oro_email.show_recent_emails_in_user_bar
                             email_configuration:
                                 children:
                                     email_autocomplete_configuration:

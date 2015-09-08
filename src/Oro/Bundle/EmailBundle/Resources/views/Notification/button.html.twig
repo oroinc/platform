@@ -1,6 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% if oro_config_value('oro_email.show_new_email_notifications') %}
+{% if oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
 <script type="text/template" id="email-notification-item-template">
     <div class="info" data-id="<%= id %>">
         <div class="body">
