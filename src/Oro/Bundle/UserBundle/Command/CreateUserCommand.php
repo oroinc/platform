@@ -36,12 +36,12 @@ class CreateUserCommand extends ContainerAwareCommand
             ->setName('oro:user:create')
             ->setDescription('Create user.')
             ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'User role')
-            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit')
-            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name')
-            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email')
+            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit (required)')
+            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name (required)')
+            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email (required)')
             ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
             ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password')
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password (required)')
             ->addOption(
                 'user-organizations',
                 null,
@@ -63,12 +63,37 @@ class CreateUserCommand extends ContainerAwareCommand
         $options = $input->getOptions();
 
         try {
-            $this->updateUser($user, $options);
+            $this
+                ->checkRequiredOptions($options)
+                ->updateUser($user, $options);
         } catch (InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
         } catch (DBALException $exception) {
             $output->writeln('User exists');
         }
+    }
+
+    /**
+     * @param array $options
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    protected function checkRequiredOptions($options)
+    {
+        $requiredOptions = [
+            'user-business-unit',
+            'user-name',
+            'user-email',
+            'user-password'
+        ];
+
+        foreach ($requiredOptions as $requiredOption) {
+            if (empty($options[$requiredOption])) {
+                throw new InvalidArgumentException('--' . $requiredOption . ' option required');
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -78,10 +103,35 @@ class CreateUserCommand extends ContainerAwareCommand
      */
     protected function updateUser(User $user, $options)
     {
+        if (!empty($options['user-name'])) {
+            $user->setUsername($options['user-name']);
+        }
+
+        if (!empty($options['user-password'])) {
+            $user->setPlainPassword($options['user-password']);
+        }
+
+        $this
+            ->setRole($user, $options)
+            ->setBusinessUnit($user, $options)
+            ->setOrganizations($user, $options)
+            ->setProperties($user, $options);
+
+        $this->getUserManager()->updateUser($user);
+    }
+
+    /**
+     * @param User $user
+     * @param array $options
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    protected function setRole(User $user, $options)
+    {
         if (!empty($options['user-role'])) {
             $role = $this->getEntityManager()
                 ->getRepository('OroUserBundle:Role')
-                ->findOneBy(array('role' => $options['user-role']));
+                ->findOneBy(['role' => $options['user-role']]);
 
             if (!$role) {
                 throw new InvalidArgumentException('Invalid Role');
@@ -90,10 +140,21 @@ class CreateUserCommand extends ContainerAwareCommand
             $user->addRole($role);
         }
 
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     * @param array $options
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    protected function setBusinessUnit(User $user, $options)
+    {
         if (!empty($options['user-business-unit'])) {
             $businessUnit = $this->getEntityManager()
                 ->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->findOneBy(array('name' => $options['user-business-unit']));
+                ->findOneBy(['name' => $options['user-business-unit']]);
 
             if (!$businessUnit) {
                 throw new InvalidArgumentException('Invalid Business Unit');
@@ -105,14 +166,43 @@ class CreateUserCommand extends ContainerAwareCommand
                 ->addBusinessUnit($businessUnit);
         }
 
-        if (!empty($options['user-name'])) {
-            $user->setUsername($options['user-name']);
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     * @param array $options
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    protected function setOrganizations(User $user, $options)
+    {
+        if (!empty($options['user-organizations'])) {
+            foreach ($options['user-organizations'] as $organizationName) {
+                try {
+                    $organization = $this->getEntityManager()
+                        ->getRepository('OroOrganizationBundle:Organization')
+                        ->getOrganizationByName($organizationName);
+                } catch (NoResultException $e) {
+                    throw new InvalidArgumentException('Invalid organization "' . $organizationName .
+                        '" in "--user-organizations" parameter');
+                }
+
+                $user->addOrganization($organization);
+            }
         }
 
-        if (!empty($options['user-password'])) {
-            $user->setPlainPassword($options['user-password']);
-        }
+        return $this;
+    }
 
+    /**
+     * @param User $user
+     * @param array $options
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    protected function setProperties(User $user, $options)
+    {
         $properties = ['email', 'firstname', 'lastname'];
         foreach ($properties as $property) {
             if (!empty($options['user-' . $property])) {
@@ -120,34 +210,7 @@ class CreateUserCommand extends ContainerAwareCommand
             }
         }
 
-        $this->setOrganizations($user, $options);
-
-        $this->getUserManager()->updateUser($user);
-    }
-
-    /**
-     * @param User $user
-     * @param array $options
-     * @throws InvalidArgumentException
-     */
-    protected function setOrganizations(User $user, $options)
-    {
-        if (empty($options['user-organizations'])) {
-            return;
-        }
-
-        foreach ($options['user-organizations'] as $organizationName) {
-            try {
-                $organization = $this->getEntityManager()
-                    ->getRepository('OroOrganizationBundle:Organization')
-                    ->getOrganizationByName($organizationName);
-            } catch (NoResultException $e) {
-                throw new InvalidArgumentException('Invalid organization "' . $organizationName .
-                    '" in "--user-organizations" parameter');
-            }
-
-            $user->addOrganization($organization);
-        }
+        return $this;
     }
 
     /**
