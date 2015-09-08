@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\Unit\Serializer;
+namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
@@ -352,7 +352,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity\Group'
+                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
                 ]
             ],
             $result
@@ -399,7 +399,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity\Group'
+                    'entity' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group'
                 ]
             ],
             $result

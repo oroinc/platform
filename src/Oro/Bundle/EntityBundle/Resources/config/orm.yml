@@ -5,7 +5,7 @@ parameters:
     oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
     oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
     oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
-    oro_entity.query_hint_resolver.class:                      Oro\Bundle\EntityBundle\ORM\QueryHintResolver
+    oro_entity.query_hint_resolver.class:                      Oro\Component\DoctrineUtils\ORM\QueryHintResolver
 
 services:
     oro_entity.doctrine_helper:
