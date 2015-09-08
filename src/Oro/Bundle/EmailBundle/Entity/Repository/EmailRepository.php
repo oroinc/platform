@@ -126,12 +126,18 @@ class EmailRepository extends EntityRepository
 
         $expr = $this->getEntityManager()->createQueryBuilder()->expr();
 
-        return $expr->orX(
-            $expr->andX(
-                'eu.owner = :owner',
-                'eu.organization = :organization'
-            ),
-            $expr->in('eu.mailboxOwner', $mailboxes)
+        $andExpr = $expr->andX(
+            'eu.owner = :owner',
+            'eu.organization = :organization'
         );
+
+        if ($mailboxes) {
+            return $expr->orX(
+                $andExpr,
+                $expr->in('eu.mailboxOwner', $mailboxes)
+            );
+        } else {
+            return $andExpr;
+        }
     }
 }
