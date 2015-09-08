@@ -54,7 +54,7 @@ class EmailActivitySearchController extends RestGetController
      *      name="email",
      *      requirements=".+",
      *      nullable=true,
-     *      description="An email address."
+     *      description="An email address. One or several addresses separated by comma."
      * )
      *
      * @ApiDoc(
@@ -72,18 +72,21 @@ class EmailActivitySearchController extends RestGetController
         $filters = [
             'search' => $this->getRequest()->get('search')
         ];
-        $from    = $this->getRequest()->get('from', null);
+        $filter = new StringToArrayParameterFilter();
+
+        $from = $this->getRequest()->get('from', null);
         if ($from) {
-            $filter          = new StringToArrayParameterFilter();
             $filters['from'] = $filter->filter($from, null);
         }
 
         $email = $this->getRequest()->get('email', null);
         if ($email) {
-            $filter           = new EmailAddressParameterFilter(
+            $filters['emails'] = $filter->filter($email, null);
+
+            $emailFilter       = new EmailAddressParameterFilter(
                 $this->container->get('oro_email.email.address.helper')
             );
-            $filters['email'] = $filter->filter($email, null);
+            $filters['emails'] = $emailFilter->filter($filters['emails'], null);
         }
 
         return $this->handleGetListRequest($page, $limit, $filters);
