@@ -119,7 +119,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $quantity = ($isGridView) ? 2 : 1;
+        $quantity = ($isGridView) ? 3 : 2;
 
         $config
             ->expects(static::exactly($quantity))
