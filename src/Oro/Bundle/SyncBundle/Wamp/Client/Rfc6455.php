@@ -113,6 +113,7 @@ class Rfc6455
         $out = chr(
             ($fin << 7) | ($rsv1 << 6) | ($rsv2 << 5) | ($rsv3 << 4) | $opcode
         );
+
         if (0xffff < $length) {
             $out .= chr(($mask << 7) | 0x7f) . pack('NN', 0, $length);
         } elseif (0x7d < $length) {
@@ -120,29 +121,77 @@ class Rfc6455
         } else {
             $out .= chr(($mask << 7) | $length);
         }
+
+        return $out . $this->maskMessage($message, $mask);
+    }
+
+    /**
+     * Hoa
+     *
+     *
+     * @license
+     *
+     * New BSD License
+     *
+     * Copyright © 2007-2015, Hoa community. All rights reserved.
+     *
+     * Redistribution and use in source and binary forms, with or without
+     * modification, are permitted provided that the following conditions are met:
+     *     * Redistributions of source code must retain the above copyright
+     *       notice, this list of conditions and the following disclaimer.
+     *     * Redistributions in binary form must reproduce the above copyright
+     *       notice, this list of conditions and the following disclaimer in the
+     *       documentation and/or other materials provided with the distribution.
+     *     * Neither the name of the Hoa nor the names of its contributors may be
+     *       used to endorse or promote products derived from this software without
+     *       specific prior written permission.
+     *
+     * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+     * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+     * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+     * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+     * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+     * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+     * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+     * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+     * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+     * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+     * POSSIBILITY OF SUCH DAMAGE.
+     *
+     * ============
+     * Link to the original method:
+     * https://github.com/hoaproject/Websocket/blob/bec469034ab9da8d09368f5e4d7e86b395f2af03/Protocol/Rfc6455.php#L226
+     *
+     * @param string $message
+     * @param bool $mask
+     *
+     * @return string
+     */
+    protected function maskMessage($message, $mask)
+    {
         if (0x0 === $mask) {
-            $out .= $message;
-        } else {
-            $maskingKey = [];
-            if (function_exists('openssl_random_pseudo_bytes')) {
-                $maskingKey = array_map(
-                    'ord',
-                    str_split(
-                        openssl_random_pseudo_bytes(4)
-                    )
-                );
-            } else {
-                for ($i = 0; $i < 4; ++$i) {
-                    $maskingKey[] = mt_rand(1, 255);
-                }
-            }
-            for ($i = 0, $max = strlen($message); $i < $max; ++$i) {
-                $message[$i] = chr(ord($message[$i]) ^ $maskingKey[$i % 4]);
-            }
-            $out .= implode('', array_map('chr', $maskingKey)) . $message;
+            return $message;
         }
 
-        return $out;
+        $maskingKey = [];
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            $maskingKey = array_map(
+                'ord',
+                str_split(
+                    openssl_random_pseudo_bytes(4)
+                )
+            );
+        } else {
+            for ($i = 0; $i < 4; ++$i) {
+                $maskingKey[] = mt_rand(1, 255);
+            }
+        }
+
+        for ($i = 0, $max = strlen($message); $i < $max; ++$i) {
+            $message[$i] = chr(ord($message[$i]) ^ $maskingKey[$i % 4]);
+        }
+
+        return implode('', array_map('chr', $maskingKey)) . $message;
     }
 
     /**
