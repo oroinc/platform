@@ -14,6 +14,19 @@ class OroSecurityBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::updateAclTables($schema, $queries);
+    }
+
+    /**
+     * Updates acl tables.
+     *
+     * @param Schema $schema
+     * @param QueryBag $queries
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function updateAclTables(Schema $schema, QueryBag $queries)
+    {
         // remove platform-depended sql parts, for example "ON UPDATE CASCADE" for MySql
         $aclEntriesTable = $schema->getTable('acl_entries');
         // additional column, which duplicates acl_object_identities.object_identifier field.
