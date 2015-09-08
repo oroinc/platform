@@ -59,25 +59,26 @@ class EmailUserListener
 
             $ownerIds = [];
             if ($entity->getOwner() !== null) {
-                $ownerIds[] = $entity->getOwner();
+                $ownerIds[] = $entity->getOwner()->getId();
             } else {
                 $em = $args->getEntityManager();
                 $mailbox = $entity->getMailboxOwner();
+                if ($mailbox !== null) {
+                    $authorizedUsers = $mailbox->getAuthorizedUsers();
 
-                $authorizedUsers = $mailbox->getAuthorizedUsers();
-
-                foreach ($authorizedUsers as $user) {
-                    $ownerIds[] = $user->getId();
-                }
-
-                $authorizedRoles = $mailbox->getAuthorizedRoles();
-                foreach ($authorizedRoles as $role) {
-                    $users = $em->getRepository('OroUserBundle:Role')
-                        ->getUserQueryBuilder($role)
-                        ->getQuery()->getResult();
-
-                    foreach ($users as $user) {
+                    foreach ($authorizedUsers as $user) {
                         $ownerIds[] = $user->getId();
+                    }
+
+                    $authorizedRoles = $mailbox->getAuthorizedRoles();
+                    foreach ($authorizedRoles as $role) {
+                        $users = $em->getRepository('OroUserBundle:Role')
+                            ->getUserQueryBuilder($role)
+                            ->getQuery()->getResult();
+
+                        foreach ($users as $user) {
+                            $ownerIds[] = $user->getId();
+                        }
                     }
                 }
             }

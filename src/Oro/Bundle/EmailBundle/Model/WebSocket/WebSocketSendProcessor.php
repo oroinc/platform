@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Model\WebSocket;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
@@ -19,18 +17,11 @@ class WebSocketSendProcessor
     protected $publisher;
 
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
      * @param TopicPublisher $publisher
-     * @param Registry $doctrine
      */
-    public function __construct(TopicPublisher $publisher, Registry $doctrine)
+    public function __construct(TopicPublisher $publisher)
     {
         $this->publisher = $publisher;
-        $this->doctrine = $doctrine;
     }
 
     /**
