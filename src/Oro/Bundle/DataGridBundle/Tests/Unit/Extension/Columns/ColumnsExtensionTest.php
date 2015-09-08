@@ -117,7 +117,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $config
-            ->expects(static::exactly(3))
+            ->expects(static::exactly(2))
             ->method('offsetGet')
             ->with('columns')
             ->will(static::returnValue($columnsConfigArray));

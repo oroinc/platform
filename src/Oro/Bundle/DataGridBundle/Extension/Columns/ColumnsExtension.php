@@ -67,9 +67,8 @@ class ColumnsExtension extends AbstractExtension
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
 
-        $this->setInitialStateColumnsOrder($config, $data);
-
         if (!$gridViews) {
+            $this->addColumnsOrder($config, $data);
             return;
         }
 
@@ -90,16 +89,19 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * Adding column with order for state and for initialState
+     *
      * @param DatagridConfiguration $config
      * @param MetadataObject        $data
      */
-    protected function setInitialStateColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
+    protected function addColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
     {
         $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
         $columnsOrder = $this->buildColumnsOrder($columnsData);
         $columns      = $this->applyColumnsOrder($columnsData, $columnsOrder);
 
         $this->setInitialState($data, $columns);
+        $this->setState($data, $columns);
     }
 
     /**
