@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Serializer;
+namespace Oro\Component\EntitySerializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
