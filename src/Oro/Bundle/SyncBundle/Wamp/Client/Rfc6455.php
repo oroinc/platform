@@ -35,19 +35,19 @@ class Rfc6455
         $header .= "Sec-WebSocket-Version: 13\r\n";
         $header .= "\r\n";
 
-        $socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, self::SOCKET_TIMEOUT);
+        $this->socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, self::SOCKET_TIMEOUT);
 
-        if (!$socket) {
+        if (!$this->socket) {
             throw new \RuntimeException(sprintf('WebSocket connection error (%u): %s', $errno, $errstr));
         }
 
-        if (!fwrite($socket, $header)) {
+        if (!fwrite($this->socket, $header)) {
             throw new \RuntimeException('WebSocket write error');
         }
 
-        stream_set_blocking($socket, false);
+        stream_set_blocking($this->socket, false);
 
-        return $socket;
+        return $this->socket;
     }
 
     /**
