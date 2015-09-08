@@ -172,3 +172,5 @@ oro:
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
             password_reseted.message: Your password was successfully reset. You may login now.
+        user_bar_settings:
+            title: User bar
