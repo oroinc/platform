@@ -2,74 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks;
 
+use Oro\Component\TestUtils\ORM\Mocks\StatementMock as BaseStatementMock;
+
 /**
- * This class is a clone of namespace Doctrine\Tests\Mocks\StatementMock that is excluded from doctrine
- * package since v2.4.
+ * @deprecated since 1.9. use {@see Oro\Component\TestUtils\ORM\Mocks\StatementMock}
  */
-class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Statement
+class StatementMock extends BaseStatementMock
 {
-    public function bindValue($param, $value, $type = null)
-    {
-
-    }
-
-    public function bindParam($column, &$variable, $type = null, $length = null)
-    {
-
-    }
-
-    public function errorCode()
-    {
-
-    }
-
-    public function errorInfo()
-    {
-
-    }
-
-    public function execute($params = null)
-    {
-
-    }
-
-    public function rowCount()
-    {
-
-    }
-
-    public function closeCursor()
-    {
-
-    }
-
-    public function columnCount()
-    {
-
-    }
-
-    public function setFetchMode($fetchStyle, $arg2 = null, $arg3 = null)
-    {
-
-    }
-
-    public function fetch($fetchStyle = null)
-    {
-
-    }
-
-    public function fetchAll($fetchStyle = null)
-    {
-
-    }
-
-    public function fetchColumn($columnIndex = 0)
-    {
-
-    }
-
-    public function getIterator()
-    {
-
-    }
 }
