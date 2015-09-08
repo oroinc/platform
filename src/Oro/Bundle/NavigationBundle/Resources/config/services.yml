@@ -99,6 +99,8 @@ services:
             - @knp_menu.helper
             - @oro_menu.builder_chain
             - @oro_navigation.breadcrumb_manager
+        calls:
+          - [ setBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
         tags:
             - { name: twig.extension }
 
@@ -266,7 +268,7 @@ services:
           - @oro_navigation.breadcrumb_manager
           - @oro_navigation.title_provider
         calls:
-          - [ setChainBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
+          - [ setBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
@@ -347,10 +349,11 @@ services:
             - @oro_menu.builder_chain
             - @knp_menu.matcher
             - @router
+
     oro_navigation.chain_breadcrumb_manager:
         class: %oro_navigation.chain_breadcrumbs_manager.class%
-        arguments:
-            - @oro_navigation.breadcrumb_manager
+        calls:
+          - [ setDefaultManager, [ @oro_navigation.chain_breadcrumb_manager ]]
 
     oro_navigation.twig.content_tags:
         class: %oro_navigation.twig.content_tags.class%

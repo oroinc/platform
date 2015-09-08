@@ -6,45 +6,41 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Routing\Route;
 
-class ChainBreadcrumbManager
+class ChainBreadcrumbManager implements BreadcrumbManagerInterface
 {
     /**
      * @var ArrayCollection|BreadcrumbManager[]
      */
-    protected $providers;
+    protected $managers;
 
     /**
      * @var BreadcrumbManager
      */
-    protected $defaultProvider;
+    protected $defaultManager;
 
-    /**
-     * @param BreadcrumbManager $defaultProvider
-     */
-    public function __construct(BreadcrumbManager $defaultProvider)
+    public function __construct()
     {
-        $this->providers = new ArrayCollection();
-        $this->defaultProvider = $defaultProvider;
+        $this->managers = new ArrayCollection();
     }
 
     /**
-     * @param BreadcrumbProviderInterface $provider
+     * @param BreadcrumbManagerInterface $manager
      */
-    public function addProvider(BreadcrumbProviderInterface $provider)
+    public function addManager(BreadcrumbManagerInterface $manager)
     {
-        if ($this->providers->contains($provider)) {
+        if ($this->managers->contains($manager)) {
             return;
         }
 
-        $this->providers->add($provider);
+        $this->managers->add($manager);
     }
 
     /**
-     * @param BreadcrumbManager $defaultProvider
+     * @param BreadcrumbManagerInterface $defaultManager
      */
-    public function setDefaultProvider($defaultProvider)
+    public function setDefaultManager(BreadcrumbManagerInterface $defaultManager)
     {
-        $this->defaultProvider = $defaultProvider;
+        $this->defaultManager = $defaultManager;
     }
 
     /**
@@ -53,63 +49,48 @@ class ChainBreadcrumbManager
      */
     public function getSupportedProvider($route = null)
     {
-        foreach ($this->providers as $provider) {
-            if ($provider->supports($route)) {
-                return $provider;
+        foreach ($this->managers as $manager) {
+            if ($manager->supports($route)) {
+                return $manager;
             }
         }
 
-        return $this->defaultProvider;
+        return $this->defaultManager;
     }
 
-    /**
-     * @param $menuName
-     * @param bool|true $isInverse
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbs($menuName, $isInverse = true)
     {
         return $this->getSupportedProvider()->getBreadcrumbs($menuName, $isInverse);
     }
 
-    /**
-     * @param \Knp\Menu\ItemInterface|string $menu
-     * @param array $pathName
-     * @param array $options
-     * @return \Knp\Menu\ItemInterface
-     */
+    /** {@inheritdoc} */
     public function getMenu($menu, array $pathName = [], array $options = [])
     {
         return $this->getSupportedProvider()->getMenu($menu, $pathName, $options);
     }
 
-    /**
-     * @param $menu
-     * @return \Knp\Menu\ItemInterface|null
-     */
+    /** {@inheritdoc} */
     public function getCurrentMenuItem($menu)
     {
         return $this->getSupportedProvider()->getCurrentMenuItem($menu);
     }
 
-    /**
-     * @param $menuName
-     * @param $item
-     * @param bool|true $isInverse
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbArray($menuName, $item, $isInverse = true)
     {
         return $this->getSupportedProvider()->getBreadcrumbArray($menuName, $item, $isInverse);
     }
 
-    /**
-     * @param \Knp\Menu\ItemInterface|string $menu
-     * @param string $route
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbLabels($menu, $route)
     {
         return $this->getSupportedProvider($route)->getBreadcrumbLabels($menu, $route);
+    }
+
+    /** {@inheritdoc} */
+    public function supports($route = null)
+    {
+        return (bool)$this->getSupportedProvider($route);
     }
 }

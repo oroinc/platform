@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class ChainBreadcrumbProviderPass implements CompilerPassInterface
+class ChainBreadcrumbManagerPass implements CompilerPassInterface
 {
     const TAG = 'oro_breadcrumbs.provider';
     const PROVIDER_SERVICE_ID = 'oro_navigation.chain_breadcrumb_manager';
@@ -38,7 +38,7 @@ class ChainBreadcrumbProviderPass implements CompilerPassInterface
         // register
         $serviceDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
         foreach ($providers as $provider) {
-            $serviceDef->addMethodCall('addProvider', [$provider]);
+            $serviceDef->addMethodCall('addManager', [$provider]);
         }
     }
 }

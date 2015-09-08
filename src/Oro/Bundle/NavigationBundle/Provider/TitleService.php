@@ -14,8 +14,8 @@ use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
-use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -41,14 +41,14 @@ class TitleService implements TitleServiceInterface
      *
      * @var array
      */
-    private $readers = array();
+    private $readers = [];
 
     /**
      * Current title template params
      *
      * @var array
      */
-    private $params = array();
+    private $params = [];
 
     /**
      * Current title suffix
@@ -85,14 +85,9 @@ class TitleService implements TitleServiceInterface
     protected $serializer = null;
 
     /**
-     * @var BreadcrumbManager
+     * @var BreadcrumbManagerInterface
      */
     protected $breadcrumbManager;
-
-    /**
-     * @var ChainBreadcrumbManager
-     */
-    protected $chainBreadcrumbManager;
 
     /**
      * @var ConfigManager
@@ -100,7 +95,6 @@ class TitleService implements TitleServiceInterface
     protected $userConfigManager;
 
     /**
-     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbProviderInterface
      * @param AnnotationsReader $reader
      * @param ConfigReader $configReader
      * @param TitleTranslator $titleTranslator
@@ -109,6 +103,9 @@ class TitleService implements TitleServiceInterface
      * @param $userConfigManager
      * @param BreadcrumbManager $breadcrumbManager
      * @param TitleProvider $titleProvider
+     *
+     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
+     * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
      */
     public function __construct(
         AnnotationsReader $reader,
@@ -120,7 +117,7 @@ class TitleService implements TitleServiceInterface
         BreadcrumbManager $breadcrumbManager,
         TitleProvider $titleProvider
     ) {
-        $this->readers = array($reader, $configReader);
+        $this->readers = [$reader, $configReader];
         $this->titleTranslator = $titleTranslator;
         $this->em = $em;
         $this->serializer = $serializer;
@@ -130,12 +127,13 @@ class TitleService implements TitleServiceInterface
     }
 
     /**
+     * @param BreadcrumbManagerInterface $breadcrumbManager
+     *
      * @deprecated since 1.8 will be moved to constructor
-     * @param ChainBreadcrumbManager $chainBreadcrumbManager
      */
-    public function setChainBreadcrumbManager(ChainBreadcrumbManager $chainBreadcrumbManager)
+    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
     {
-        $this->chainBreadcrumbManager = $chainBreadcrumbManager;
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -150,7 +148,7 @@ class TitleService implements TitleServiceInterface
      * @return $this
      */
     public function render(
-        $params = array(),
+        $params = [],
         $title = null,
         $prefix = null,
         $suffix = null,
@@ -176,7 +174,7 @@ class TitleService implements TitleServiceInterface
                 }
             } catch (RuntimeException $e) {
                 // wrong json string - ignore title
-                $params = array();
+                $params = [];
                 $title  = 'Untitled';
                 $prefix = '';
                 $suffix = '';
@@ -421,7 +419,7 @@ class TitleService implements TitleServiceInterface
     protected function createTitle($route, $title)
     {
         if (!($title instanceof Route)) {
-            $titleData = array();
+            $titleData = [];
 
             if ($title) {
                 $titleData[] = $title;
@@ -448,7 +446,7 @@ class TitleService implements TitleServiceInterface
      */
     protected function getBreadcrumbs($route)
     {
-        return $this->chainBreadcrumbManager->getBreadcrumbLabels(
+        return $this->breadcrumbManager->getBreadcrumbLabels(
             $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
             $route
         );

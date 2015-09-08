@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Symfony\Component\Routing\Router;
