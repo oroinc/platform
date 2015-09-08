@@ -3,7 +3,7 @@
     float: left;
     height: 100%;
     position: relative;
-    z-index: 750;
+    z-index: 2400;
     overflow: visible;
 
     -webkit-touch-callout: none;
