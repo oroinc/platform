@@ -109,6 +109,7 @@ define(function(require) {
         });
 
         it('renders choice filter', function(done) {
+            require('oro/filter/choice-filter');
             var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -201,6 +202,8 @@ define(function(require) {
         });
 
         it('replaces filter', function(done) {
+            require('oro/filter/choice-filter');
+            require('oro/filter/datetime-filter');
             var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
