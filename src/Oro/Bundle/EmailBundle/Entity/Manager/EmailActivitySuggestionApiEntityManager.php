@@ -11,7 +11,9 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
+use Oro\Bundle\SearchBundle\Query\Query as QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 
 class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityManager
 {
@@ -32,7 +34,7 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
     }
 
     /**
-     * Gets suggestion result
+     * Gets suggestion result.
      *
      * @param int $emailId
      * @param int $page
@@ -51,25 +53,10 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
             throw new NotFoundHttpException();
         }
 
-        $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
-            false,
-            0,
-            0,
-            $this->getSearchAliases([])
+        $data = $this->diff(
+            $this->getSuggestionEntities($email),
+            $this->getAssociatedEntities($email)
         );
-        $searchCriteria = $searchQueryBuilder->getCriteria();
-        $searchCriteria->andWhere(
-            $searchCriteria->expr()->contains('email', $email->getFromEmailAddress()->getEmail())
-        );
-        $searchResult = $this->searchIndexer->query($searchQueryBuilder);
-
-        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
-            $this->class,
-            ['id' => $email->getId()]
-        );
-        $queryResult = $queryBuilder->getQuery()->getArrayResult();
-
-        $data = $this->mergeResults($searchResult, $queryResult);
 
         $slice = array_slice(
             $data,
@@ -88,26 +75,89 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
         return $result;
     }
 
+    /**
+     * @param Email $email
+     *
+     * @return SearchResult
+     */
+    protected function getSuggestionEntities(Email $email)
+    {
+        $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
+            false,
+            0,
+            0,
+            $this->getSearchAliases([])
+        );
+        $this->prepareSearchCriteria($searchQueryBuilder, $this->getEmails($email));
+
+        return $this->searchIndexer->query($searchQueryBuilder);
+    }
 
     /**
-     * Merges results from the search(suggested to assign) and assigned entities to email.
-     * Added assigned flag.
+     * @param QueryBuilder $searchQueryBuilder
+     * @param string[]     $emails
+     */
+    protected function prepareSearchCriteria(QueryBuilder $searchQueryBuilder, $emails = [])
+    {
+        $searchCriteria = $searchQueryBuilder->getCriteria();
+        foreach ($emails as $email) {
+            $searchCriteria->orWhere(
+                $searchCriteria->expr()->contains('email', $email)
+            );
+        }
+    }
+
+    /**
+     * Gets all(FROM, TO, CC, BCC) emails.
+     *
+     * @param Email $email
+     *
+     * @return string[]
+     */
+    protected function getEmails(Email $email)
+    {
+        /** @var EmailRepository $repository */
+        $repository = $this->getRepository();
+        $recipients = $repository->findRecipientsEmailsByEmailId($email->getId());
+
+        $emails   = array_map(
+            function ($email) {
+                return $email['email'];
+            },
+            $recipients
+        );
+
+        $emails[] = $email->getFromEmailAddress()->getEmail();
+
+        return array_unique($emails);
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return array of [id, entity, title]
+     */
+    protected function getAssociatedEntities(Email $email)
+    {
+        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
+            $this->class,
+            ['id' => $email->getId()]
+        );
+
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Exclude assigned entities from the search(suggested to assign) result.
      *
      * @param SearchResult $searchResult
      * @param array        $queryResult
      *
-     * @return array
+     * @return array of [id, entity, title]
      */
-    protected function mergeResults(SearchResult $searchResult, array $queryResult = [])
+    protected function diff(SearchResult $searchResult, array $queryResult = [])
     {
-        $result = array_map(
-            function ($res) {
-                $res['assigned'] = true;
-
-                return $res;
-            },
-            $queryResult
-        );
+        $result = [];
 
         /** @var SearchResultItem $item */
         foreach ($searchResult->getElements() as $item) {
@@ -121,10 +171,9 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
             }
 
             $result[] = [
-                'id'       => $id,
-                'entity'   => $className,
-                'title'    => $item->getRecordTitle(),
-                'assigned' => false
+                'id'     => $id,
+                'entity' => $className,
+                'title'  => $item->getRecordTitle(),
             ];
         }
 
