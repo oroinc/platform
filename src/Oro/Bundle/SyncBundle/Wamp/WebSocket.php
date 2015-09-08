@@ -42,6 +42,7 @@ class WebSocket
             throw new \RuntimeException('WebSocket write error');
         }
 
+        // This is a bit weird since the the mode on stream is non-blocking
         $wsData = fread($this->socket, 2000);
 
         return trim($wsData, "\x00\xff");
