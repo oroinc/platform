@@ -49,9 +49,9 @@ class EmailRepository extends EntityRepository
     /**
      * Get $limit last emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
-     * @param $limit
+     * @param              $limit
      *
      * @return mixed
      */
@@ -74,7 +74,7 @@ class EmailRepository extends EntityRepository
     /**
      * Get count new emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
      *
      * @return mixed
@@ -99,6 +99,7 @@ class EmailRepository extends EntityRepository
      *
      * @param object $entity
      * @param string $ownerColumnName
+     *
      * @return array
      */
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)
@@ -113,5 +114,25 @@ class EmailRepository extends EntityRepository
             ->setParameter('hasOwner', true);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+
+    /**
+     * @param $id
+     *
+     * @return array
+     */
+    public function findRecipientsEmailsByEmailId($id)
+    {
+        $queryBuilder = $this
+            ->createQueryBuilder('e')
+            ->select('ea.email')
+            ->distinct(true)
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'ea')
+            ->where('e.id = :id')
+            ->setParameter('id', $id);
+
+        return $queryBuilder->getQuery()->getScalarResult();
     }
 }
