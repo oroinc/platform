@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SyncBundle\Wamp\Client;
+namespace Oro\Bundle\SyncBundle\WebSocket\Client;
 
 class Rfc6455
 {

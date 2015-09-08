@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Wamp;
 
-use Oro\Bundle\SyncBundle\Wamp\Client\Rfc6455;
+use Oro\Bundle\SyncBundle\WebSocket\Client\Rfc6455;
 
 class WebSocket
 {
