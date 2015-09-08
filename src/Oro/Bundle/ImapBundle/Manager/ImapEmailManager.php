@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use ArrayIterator;
+
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 
@@ -223,20 +225,20 @@ class ImapEmailManager
     {
         $header = $headers->get('Accept-Language');
 
-        $acceptHeader = new AcceptHeader([]);
-
         if ($header === false) {
             return '';
-        } elseif ($header instanceof \ArrayIterator) {
-            $header->rewind();
-            $acceptHeader->add(
-                AcceptHeaderItem::fromString(
-                    $header->current()->getFieldValue()
-                )
-            );
-        } else {
-            $acceptHeader = AcceptHeader::fromString($header);
+        } elseif (!$header instanceof \ArrayIterator) {
+            $header = new ArrayIterator([$header]);
         }
+
+        $items = [];
+        $header->rewind();
+        while ($header->valid()) {
+            $items[] = AcceptHeaderItem::fromString($header->current()->getFieldValue());
+            $header->next();
+        }
+
+        $acceptHeader = new AcceptHeader($items);
 
         return $acceptHeader->__toString();
     }
