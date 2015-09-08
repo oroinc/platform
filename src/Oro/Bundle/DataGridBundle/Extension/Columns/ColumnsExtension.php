@@ -16,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 class ColumnsExtension extends AbstractExtension
 {
     const COLUMNS_PATH = 'columns';
+    const ORDER_FIELD_NAME = 'order';
+    const DEFAULT_GRID_NAME = '__all__';
 
     /** @var Registry */
     protected $registry;
@@ -64,14 +66,17 @@ class ColumnsExtension extends AbstractExtension
 
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
+        $this->setInitialStateColumnsOrder($config, $data);
 
         if (!$gridViews) {
+            $this->setStateColumnsOrder($config, $data);
+
             return;
         }
 
         /** Get default columns data from config */
-        $columnsData = $config->offsetGet('columns');
-        $newGridView = $this->createNewGridView($config, $data);
+        $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
+        $newGridView  = $this->createNewGridView($config, $data);
         $currentState = $data->offsetGet('state');
         foreach ($gridViews as $gridView) {
             if ((int)$currentState['gridView'] === $gridView->getId()) {
@@ -86,6 +91,40 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject        $data
+     */
+    protected function setInitialStateColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $columns = $this->getColumnsWithOrder($config);
+        $this->setInitialState($data, $columns);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject        $data
+     */
+    protected function setStateColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $columns = $this->getColumnsWithOrder($config);
+        $this->setState($data, $columns);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return array
+     */
+    protected function getColumnsWithOrder(DatagridConfiguration $config)
+    {
+        $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
+        $columnsOrder = $this->buildColumnsOrder($columnsData);
+        $columns      = $this->applyColumnsOrder($columnsData, $columnsOrder);
+
+        return $columns;
+    }
+
+    /**
      * Create grid view for default grid state __all__
      *
      * @param DatagridConfiguration $config
@@ -95,10 +134,8 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function createNewGridView(DatagridConfiguration $config, MetadataObject $data)
     {
-        $newGridView  = new View('__all__');
-        $columns      = $config->offsetGet('columns');
-        $columnsOrder = $this->buildColumnsOrder($config->offsetGet('columns'));
-        $columns      = $this->applyColumnsOrder($columns, $columnsOrder);
+        $newGridView = new View(self::DEFAULT_GRID_NAME);
+        $columns     = $this->getColumnsWithOrder($config);
 
         /** Set config columns state to __all__ grid view */
         $newGridView->setColumnsData($columns);
@@ -114,16 +151,16 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function setState(MetadataObject $data, array $columnsData)
     {
-        $data->offsetAddToArray('state', ['columns' => $columnsData]);
+        $data->offsetAddToArray('state', [self::COLUMNS_PATH => $columnsData]);
     }
 
     /**
      * @param MetadataObject $data
-     * @param array $columnsData
+     * @param array          $columnsData
      */
     protected function setInitialState(MetadataObject $data, array $columnsData)
     {
-        $data->offsetAddToArray('initialState', ['columns' => $columnsData]);
+        $data->offsetAddToArray('initialState', [self::COLUMNS_PATH => $columnsData]);
     }
 
     /**
@@ -138,8 +175,8 @@ class ColumnsExtension extends AbstractExtension
 
         if ($gridViews && isset($gridViews['views'])) {
             foreach ($gridViews['views'] as &$gridView) {
-                if ('__all__' === $gridView['name']) {
-                    $gridView['columns'] = $columnsData;
+                if (self::DEFAULT_GRID_NAME === $gridView['name']) {
+                    $gridView[self::COLUMNS_PATH] = $columnsData;
                 }
             }
             unset($gridView);
@@ -157,8 +194,8 @@ class ColumnsExtension extends AbstractExtension
         $orders = [];
 
         foreach ($columns as $name => $column) {
-            if (array_key_exists('order', $column)) {
-                $orders[$name] = (int)$column['order'];
+            if (array_key_exists(self::ORDER_FIELD_NAME, $column)) {
+                $orders[$name] = (int)$column[self::ORDER_FIELD_NAME];
             } else {
                 $orders[$name] = 0;
             }
@@ -194,9 +231,9 @@ class ColumnsExtension extends AbstractExtension
         $result = [];
         foreach ($columns as $name => $column) {
             if (array_key_exists($name, $columnsOrder)) {
-                $column['order']        = $columnsOrder[$name];
-                $result[$name]          = [];
-                $result[$name]['order'] = $columnsOrder[$name];
+                $column[self::ORDER_FIELD_NAME]        = $columnsOrder[$name];
+                $result[$name]                         = [];
+                $result[$name][self::ORDER_FIELD_NAME] = $columnsOrder[$name];
 
                 if (array_key_exists('renderable', $column) && true === $column['renderable']) {
                     $result[$name]['renderable'] = $column['renderable'];
