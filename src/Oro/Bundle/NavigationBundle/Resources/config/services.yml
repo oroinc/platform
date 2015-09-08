@@ -353,7 +353,7 @@ services:
     oro_navigation.chain_breadcrumb_manager:
         class: %oro_navigation.chain_breadcrumbs_manager.class%
         calls:
-          - [ setDefaultManager, [ @oro_navigation.chain_breadcrumb_manager ]]
+          - [ setDefaultManager, [ @oro_navigation.breadcrumb_manager ]]
 
     oro_navigation.twig.content_tags:
         class: %oro_navigation.twig.content_tags.class%
