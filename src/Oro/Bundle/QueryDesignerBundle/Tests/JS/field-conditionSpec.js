@@ -33,7 +33,7 @@ define(function(require) {
         });
 
         function waitForFilter(cb) {
-            var timeout = 20;
+            var timeout = 100;
             var tick = 1;
             var t = timeout;
             var html = $el.find('.active-filter').html();
