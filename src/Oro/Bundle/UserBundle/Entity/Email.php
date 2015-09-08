@@ -11,11 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_user_email")
- *  @Config(
- *      defaultValues={
- *          "dataaudit"={"auditable"=true}
- *      }
- * )
+ * @Config()
  */
 class Email implements EmailInterface
 {

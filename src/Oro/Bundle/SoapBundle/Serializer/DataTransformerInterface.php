@@ -2,17 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle\Serializer;
 
-interface DataTransformerInterface
+use Oro\Component\EntitySerializer\DataTransformerInterface as BaseDataTransformerInterface;
+
+/**
+ * @deprecated since 1.9. use {@see Oro\Component\EntitySerializer\DataTransformerInterface}
+ */
+interface DataTransformerInterface extends BaseDataTransformerInterface
 {
-    /**
-     * Prepares the given value for serialization
-     *
-     * @param string $class
-     * @param string $property
-     * @param mixed  $value
-     * @param array  $config
-     *
-     * @return mixed
-     */
-    public function transform($class, $property, $value, $config);
 }
