@@ -7,7 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
-use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQueryBuilder;
 
 class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
 {
@@ -32,16 +32,26 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
-        $searchQuery = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
+        $searchQueryBuilder = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
 
-        if (!empty($criteria['email'])) {
-            $searchQuery->andWhere(
-                'email',
-                SearchQuery::OPERATOR_CONTAINS,
-                $criteria['email']
-            );
+        if (!empty($criteria['emails'])) {
+            $this->prepareSearchEmailCriteria($searchQueryBuilder, $criteria['emails']);
         }
 
-        return $searchQuery;
+        return $searchQueryBuilder;
+    }
+
+    /**
+     * @param SearchQueryBuilder $searchQueryBuilder
+     * @param string[]           $emails
+     */
+    protected function prepareSearchEmailCriteria(SearchQueryBuilder $searchQueryBuilder, $emails = [])
+    {
+        $searchCriteria = $searchQueryBuilder->getCriteria();
+        foreach ($emails as $email) {
+            $searchCriteria->orWhere(
+                $searchCriteria->expr()->contains('email', $email)
+            );
+        }
     }
 }

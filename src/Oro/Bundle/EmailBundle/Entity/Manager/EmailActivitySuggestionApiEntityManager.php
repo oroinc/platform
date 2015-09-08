@@ -4,35 +4,13 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Bundle\SearchBundle\Query\Query as QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 
-class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityManager
+class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
-    /**
-     * @param string          $class
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
-     * @param SearchIndexer   $searchIndexer
-     */
-    public function __construct(
-        $class,
-        ObjectManager $om,
-        ActivityManager $activityManager,
-        SearchIndexer $searchIndexer
-    ) {
-        parent::__construct($om, $activityManager, $searchIndexer);
-        $this->setClass($class);
-    }
-
     /**
      * Gets suggestion result.
      *
@@ -55,7 +33,7 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
 
         $data = $this->diff(
             $this->getSuggestionEntities($email),
-            $this->getAssociatedEntities($email)
+            $this->getAssignedEntities($email)
         );
 
         $slice = array_slice(
@@ -82,29 +60,15 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
      */
     protected function getSuggestionEntities(Email $email)
     {
-        $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
-            false,
-            0,
-            0,
-            $this->getSearchAliases([])
-        );
-        $this->prepareSearchCriteria($searchQueryBuilder, $this->getEmails($email));
+        $filters = [
+            'search' => false,
+            'emails' => $this->getEmails($email),
+        ];
+
+        // Prepare search query builder without limits and offsets
+        $searchQueryBuilder = parent::getListQueryBuilder(0, 0, $filters);
 
         return $this->searchIndexer->query($searchQueryBuilder);
-    }
-
-    /**
-     * @param QueryBuilder $searchQueryBuilder
-     * @param string[]     $emails
-     */
-    protected function prepareSearchCriteria(QueryBuilder $searchQueryBuilder, $emails = [])
-    {
-        $searchCriteria = $searchQueryBuilder->getCriteria();
-        foreach ($emails as $email) {
-            $searchCriteria->orWhere(
-                $searchCriteria->expr()->contains('email', $email)
-            );
-        }
     }
 
     /**
@@ -137,7 +101,7 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
      *
      * @return array of [id, entity, title]
      */
-    protected function getAssociatedEntities(Email $email)
+    protected function getAssignedEntities(Email $email)
     {
         $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
             $this->class,
@@ -151,11 +115,11 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
      * Exclude assigned entities from the search(suggested to assign) result.
      *
      * @param SearchResult $searchResult
-     * @param array        $queryResult
+     * @param array        $assignedEntities
      *
      * @return array of [id, entity, title]
      */
-    protected function diff(SearchResult $searchResult, array $queryResult = [])
+    protected function diff(SearchResult $searchResult, array $assignedEntities = [])
     {
         $result = [];
 
@@ -164,8 +128,8 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
             $id        = $item->getRecordId();
             $className = $item->getEntityName();
 
-            foreach ($queryResult as $res) {
-                if ($res['id'] == $id && $res['entity'] == $className) {
+            foreach ($assignedEntities as $entity) {
+                if ($entity['id'] == $id && $entity['entity'] == $className) {
                     continue 2;
                 }
             }
