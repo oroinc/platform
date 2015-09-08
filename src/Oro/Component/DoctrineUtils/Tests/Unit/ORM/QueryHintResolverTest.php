@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
+namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 
 class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
 {
@@ -183,7 +183,7 @@ class QueryHintResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->queryHintResolver->addOutputWalker('test_output', 'Test\OutputWalker', null, 'HINT_1');
 
-        $walkerHintProvider = $this->getMock('Oro\Bundle\EntityBundle\ORM\QueryWalkerHintProviderInterface');
+        $walkerHintProvider = $this->getMock('Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface');
         $this->queryHintResolver->addTreeWalker('test_tree', 'Test\TreeWalker', $walkerHintProvider, 'HINT_2');
         $walkerHintProvider->expects($this->once())
             ->method('getHints')

@@ -299,9 +299,6 @@ datagrid:
                         - { join: eu.folder, alias: f }
                         - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
         properties:
             id: ~
             row_class_name:

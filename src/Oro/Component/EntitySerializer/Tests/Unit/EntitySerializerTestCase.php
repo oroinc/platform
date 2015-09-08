@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Tests\Unit\Serializer;
+namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\SoapBundle\Serializer\EntityDataAccessor;
-use Oro\Bundle\SoapBundle\Serializer\EntityDataTransformer;
-use Oro\Bundle\SoapBundle\Serializer\EntitySerializer;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
+use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {
@@ -17,7 +17,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $configManager;
+    protected $entityFieldFilter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $container;
@@ -30,14 +30,14 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         $reader         = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
-            'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity'
+            'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
         );
 
         $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(
             [
-                'Test' => 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity'
+                'Test' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
             ]
         );
 
@@ -52,24 +52,23 @@ abstract class EntitySerializerTestCase extends OrmTestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['Test', 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity']
+                        ['Test', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity']
                     ]
                 )
             );
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityFieldFilter = $this->getMock('Oro\Component\EntitySerializer\EntityFieldFilterInterface');
+        $this->entityFieldFilter->expects($this->any())
+            ->method('isApplicableField')
+            ->willReturn(true);
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $queryHintResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\QueryHintResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryHintResolver = $this->getMock('Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface');
 
         $this->serializer = new EntitySerializer(
             $doctrine,
-            $this->configManager,
+            $this->entityFieldFilter,
             new EntityDataAccessor(),
             new EntityDataTransformer($this->container),
             $queryHintResolver
@@ -95,7 +94,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
      */
     protected function assertDqlEquals($expected, $actual, $message = '')
     {
-        $expected = str_replace('Test:', 'Oro\Bundle\SoapBundle\Tests\Unit\Serializer\Fixtures\Entity\\', $expected);
+        $expected = str_replace('Test:', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\\', $expected);
         $this->assertEquals($expected, $actual, $message);
     }
 
