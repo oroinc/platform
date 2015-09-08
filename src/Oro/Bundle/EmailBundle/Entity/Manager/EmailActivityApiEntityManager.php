@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -15,13 +18,21 @@ class EmailActivityApiEntityManager extends ApiEntityManager
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var TokenStorageInterface */
+    protected $securityTokenStorage;
+
     /**
-     * @param string          $class
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
+     * @param string                $class
+     * @param ObjectManager         $om
+     * @param ActivityManager       $activityManager
+     * @param TokenStorageInterface $securityTokenStorage
      */
-    public function __construct($class, ObjectManager $om, ActivityManager $activityManager)
-    {
+    public function __construct(
+        $class,
+        ObjectManager $om,
+        ActivityManager $activityManager,
+        TokenStorageInterface $securityTokenStorage
+    ) {
         parent::__construct($class, $om);
         $this->activityManager = $activityManager;
     }
@@ -61,7 +72,7 @@ class EmailActivityApiEntityManager extends ApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
-        return $this->activityManager->getActivityTargetsQueryBuilder(
+        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
             $this->class,
             $criteria,
             $joins,
@@ -69,5 +80,22 @@ class EmailActivityApiEntityManager extends ApiEntityManager
             $page,
             $orderBy
         );
+
+        /**
+         * Need to exclude current user from result because of email context.
+         * @see \Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager::getEmailContext
+         */
+        if ($queryBuilder) {
+            $currentUser = $this->securityTokenStorage->getToken()->getUser();
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->neq('id', $currentUser->getId()),
+                    $queryBuilder->expr()->neq('entity', ClassUtils::getClass($currentUser))
+                )
+            );
+        }
+
+        return $queryBuilder;
+
     }
 }

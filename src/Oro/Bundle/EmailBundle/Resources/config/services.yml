@@ -758,6 +758,7 @@ services:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+            - @security.token_storage
 
     oro_email.manager.email_activity_search.api:
         class: %oro_email.manager.email_activity_search.api.class%
