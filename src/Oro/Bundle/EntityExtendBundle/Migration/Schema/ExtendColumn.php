@@ -40,6 +40,8 @@ class ExtendColumn extends Column
 
     /**
      * {@inheritdoc}
+     *
+     * @return ExtendColumn
      */
     public function setOptions(array $options)
     {
@@ -61,6 +63,8 @@ class ExtendColumn extends Column
 
     /**
      * {@inheritdoc}
+     *
+     * @return ExtendColumn
      */
     public function setType(Type $type)
     {
@@ -79,6 +83,8 @@ class ExtendColumn extends Column
 
     /**
      * {@inheritdoc}
+     *
+     * @return ExtendColumn
      */
     public function setLength($length)
     {
@@ -91,6 +97,8 @@ class ExtendColumn extends Column
 
     /**
      * {@inheritdoc}
+     *
+     * @return ExtendColumn
      */
     public function setPrecision($precision)
     {
@@ -103,6 +111,8 @@ class ExtendColumn extends Column
 
     /**
      * {@inheritdoc}
+     *
+     * @return ExtendColumn
      */
     public function setScale($scale)
     {
@@ -111,5 +121,25 @@ class ExtendColumn extends Column
         }
 
         return parent::setScale($scale);
+    }
+
+    /**
+     * @return ExtendColumn
+     */
+    public function enableExtendOptions()
+    {
+        $this->constructed = true;
+
+        return $this;
+    }
+
+    /**
+     * @return ExtendColumn
+     */
+    public function disableExtendOptions()
+    {
+        $this->constructed = false;
+
+        return $this;
     }
 }

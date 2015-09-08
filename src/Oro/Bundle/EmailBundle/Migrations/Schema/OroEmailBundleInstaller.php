@@ -18,7 +18,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_6_1';
     }
 
     /**
@@ -49,6 +49,7 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle::oroEmailTemplateTranslationForeignKeys($schema);
 
         OroEmailBundle13::addOrganization($schema);
+
         OroEmailBundle14::addColumns($schema);
     }
 }
