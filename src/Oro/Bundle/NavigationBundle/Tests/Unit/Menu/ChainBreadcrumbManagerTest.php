@@ -64,7 +64,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->addManager($unsupportedProvider);
         $this->manager->addManager($supportedProvider);
 
-        $this->assertEquals($supportedProvider, $this->manager->getSupportedProvider());
+        $this->assertEquals($supportedProvider, $this->manager->getSupportedManager());
     }
 
     public function testSetDefaultProvider()
@@ -73,7 +73,7 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->manager->setDefaultManager($manager);
 
-        $this->assertEquals($manager, $this->manager->getSupportedProvider());
+        $this->assertEquals($manager, $this->manager->getSupportedManager());
     }
 
     public function testGetBreadcrumbs()
