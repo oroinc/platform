@@ -47,7 +47,7 @@ class ChainBreadcrumbManager implements BreadcrumbManagerInterface
      * @param Route|string $route
      * @return BreadcrumbManager
      */
-    public function getSupportedProvider($route = null)
+    public function getSupportedManager($route = null)
     {
         foreach ($this->managers as $manager) {
             if ($manager->supports($route)) {
@@ -61,36 +61,36 @@ class ChainBreadcrumbManager implements BreadcrumbManagerInterface
     /** {@inheritdoc} */
     public function getBreadcrumbs($menuName, $isInverse = true)
     {
-        return $this->getSupportedProvider()->getBreadcrumbs($menuName, $isInverse);
+        return $this->getSupportedManager()->getBreadcrumbs($menuName, $isInverse);
     }
 
     /** {@inheritdoc} */
     public function getMenu($menu, array $pathName = [], array $options = [])
     {
-        return $this->getSupportedProvider()->getMenu($menu, $pathName, $options);
+        return $this->getSupportedManager()->getMenu($menu, $pathName, $options);
     }
 
     /** {@inheritdoc} */
     public function getCurrentMenuItem($menu)
     {
-        return $this->getSupportedProvider()->getCurrentMenuItem($menu);
+        return $this->getSupportedManager()->getCurrentMenuItem($menu);
     }
 
     /** {@inheritdoc} */
     public function getBreadcrumbArray($menuName, $item, $isInverse = true)
     {
-        return $this->getSupportedProvider()->getBreadcrumbArray($menuName, $item, $isInverse);
+        return $this->getSupportedManager()->getBreadcrumbArray($menuName, $item, $isInverse);
     }
 
     /** {@inheritdoc} */
     public function getBreadcrumbLabels($menu, $route)
     {
-        return $this->getSupportedProvider($route)->getBreadcrumbLabels($menu, $route);
+        return $this->getSupportedManager($route)->getBreadcrumbLabels($menu, $route);
     }
 
     /** {@inheritdoc} */
     public function supports($route = null)
     {
-        return (bool)$this->getSupportedProvider($route);
+        return (bool)$this->getSupportedManager($route);
     }
 }
