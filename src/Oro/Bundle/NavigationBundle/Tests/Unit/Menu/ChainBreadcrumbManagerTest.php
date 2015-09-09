@@ -51,20 +51,20 @@ class ChainBreadcrumbManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddProvider()
     {
-        $supportedProvider = $this->getManagerMock();
-        $supportedProvider->expects($this->once())
+        $supportedManager = $this->getManagerMock();
+        $supportedManager->expects($this->once())
             ->method('supports')
             ->willReturn(true);
 
-        $unsupportedProvider = $this->getManagerMock();
-        $unsupportedProvider->expects($this->once())
+        $unsupportedManager = $this->getManagerMock();
+        $unsupportedManager->expects($this->once())
             ->method('supports')
             ->willReturn(false);
 
-        $this->manager->addManager($unsupportedProvider);
-        $this->manager->addManager($supportedProvider);
+        $this->manager->addManager($unsupportedManager);
+        $this->manager->addManager($supportedManager);
 
-        $this->assertEquals($supportedProvider, $this->manager->getSupportedManager());
+        $this->assertEquals($supportedManager, $this->manager->getSupportedManager());
     }
 
     public function testSetDefaultProvider()
