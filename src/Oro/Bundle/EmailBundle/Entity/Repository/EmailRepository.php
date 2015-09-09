@@ -14,9 +14,9 @@ class EmailRepository extends EntityRepository
     /**
      * Gets emails by ids
      *
-     * @param array $ids
+     * @param int[] $ids
      *
-     * @return array
+     * @return Email[]
      */
     public function findEmailsByIds($ids)
     {
@@ -51,7 +51,7 @@ class EmailRepository extends EntityRepository
      *
      * @param User         $user
      * @param Organization $organization
-     * @param              $limit
+     * @param int          $limit
      *
      * @return mixed
      */
@@ -140,25 +140,5 @@ class EmailRepository extends EntityRepository
         } else {
             return $andExpr;
         }
-    }
-
-
-    /**
-     * @param $id
-     *
-     * @return array
-     */
-    public function findRecipientsEmailsByEmailId($id)
-    {
-        $queryBuilder = $this
-            ->createQueryBuilder('e')
-            ->select('ea.email')
-            ->distinct(true)
-            ->join('e.recipients', 'r')
-            ->join('r.emailAddress', 'ea')
-            ->where('e.id = :id')
-            ->setParameter('id', $id);
-
-        return $queryBuilder->getQuery()->getScalarResult();
     }
 }
