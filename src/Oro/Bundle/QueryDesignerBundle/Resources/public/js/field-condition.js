@@ -73,7 +73,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/ma
                 filterId = this._getApplicableFilterId(conditions),
                 filter = this.options.filters[filterId];
 
-            if (!filterId) {
+            if (filterId === null) {
                 filter = {
                     type: 'none',
                     applicable: {},
