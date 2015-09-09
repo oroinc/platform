@@ -1,4 +1,5 @@
 datagrid:
+    # todo datagrid doesn't consider acl
     shared-datagrid:
         source:
             type: share

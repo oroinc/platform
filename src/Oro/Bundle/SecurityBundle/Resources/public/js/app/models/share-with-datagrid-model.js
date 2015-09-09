@@ -12,7 +12,8 @@ define(function(require) {
             label: '',
             first: '',
             className: '',
-            gridName: ''
+            gridName: '',
+            isGranted: false
         }
     });
 

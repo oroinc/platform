@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SoapBundle\Serializer;
+namespace Oro\Component\EntitySerializer;
 
 use Doctrine\ORM\Mapping\ClassMetadata as ClassMetadata;
 
