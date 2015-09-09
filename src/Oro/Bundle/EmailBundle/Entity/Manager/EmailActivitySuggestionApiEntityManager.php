@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
@@ -11,6 +12,29 @@ use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 
 class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function find($id)
+    {
+        // force load from and to email addresses by one query
+        $object = $this->getRepository()->createQueryBuilder('e')
+            ->select('e, from_addr, recipients, to_addr')
+            ->leftJoin('e.fromEmailAddress', 'from_addr')
+            ->leftJoin('e.recipients', 'recipients')
+            ->leftJoin('recipients.emailAddress', 'to_addr')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($object) {
+            $this->checkFoundEntity($object);
+        }
+
+        return $object;
+    }
+
     /**
      * Gets suggestion result.
      *
@@ -80,17 +104,10 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
      */
     protected function getEmails(Email $email)
     {
-        /** @var EmailRepository $repository */
-        $repository = $this->getRepository();
-        $recipients = $repository->findRecipientsEmailsByEmailId($email->getId());
-
-        $emails   = array_map(
-            function ($email) {
-                return $email['email'];
-            },
-            $recipients
-        );
-
+        $emails = [];
+        foreach ($email->getRecipients() as $recipient) {
+            $emails[] = $recipient->getEmailAddress()->getEmail();
+        }
         $emails[] = $email->getFromEmailAddress()->getEmail();
 
         return array_unique($emails);
