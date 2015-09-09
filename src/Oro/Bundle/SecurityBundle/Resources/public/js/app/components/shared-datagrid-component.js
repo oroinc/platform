@@ -106,9 +106,14 @@ define(function(require) {
                 _.each(grid.collection.models, function (model) {
                     entitiesParam.push(model.id)
                 });
-                var finallyFunc = function () {
+                var finallyFunc = function (e) {
                     widgetManager.getWidgetInstanceByAlias('shared-dialog', function (widget) {
-                        messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
+                        if (e.status === 200) {
+                            messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
+                        } else {
+                            messenger.notificationFlashMessage('error', __('oro.security.action.share_failed'));
+                        }
+
                         widget.remove();
                         mediator.execute('refreshPage');
                     });

@@ -372,6 +372,7 @@ class MutableAclProvider extends BaseMutableAclProvider
             }
             $this->connection->commit();
         } catch (\Exception $e) {
+            $this->updatedAcl = null;
             $this->connection->rollBack();
 
             throw $e;
