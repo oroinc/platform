@@ -8,7 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class DashboardControllerAclTest extends WebTestCase
 {

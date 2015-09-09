@@ -7,7 +7,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class ControllersResetTest extends WebTestCase
 {

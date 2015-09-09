@@ -6,7 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class ControllersTest extends WebTestCase
 {

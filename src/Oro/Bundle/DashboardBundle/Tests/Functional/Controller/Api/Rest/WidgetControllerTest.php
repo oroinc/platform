@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class WidgetControllerTest extends WebTestCase
 {
