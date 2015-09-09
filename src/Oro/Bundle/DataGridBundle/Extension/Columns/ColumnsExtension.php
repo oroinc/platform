@@ -100,10 +100,14 @@ class ColumnsExtension extends AbstractExtension
 
         /** Get columns data from config or current view if no data in URL */
         $columnsData = $this->getColumnsWithOrder($config);
-        if ($this->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
+        if (!empty($urlColumnsData)) {
+            if ($this->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
+                $columnsData = $gridViewColumnsData;
+            } else {
+                $columnsData = $urlColumnsData;
+            }
+        } elseif ($gridViewColumnsData !== null) {
             $columnsData = $gridViewColumnsData;
-        } elseif (!empty($urlColumnsData)) {
-            $columnsData = $urlColumnsData;
         }
 
         /** Save current columns state or restore to default view __all__ setting config columns data */
@@ -185,11 +189,11 @@ class ColumnsExtension extends AbstractExtension
             return false;
         }
 
-        $diff = array_diff_assoc($viewData, $urlData);
+        $diff = array_diff_key($viewData, $urlData);
         if (!empty($diff)) {
             return false;
         }
-        $diff = array_diff_assoc($urlData, $viewData);
+        $diff = array_diff_key($urlData, $viewData);
         if (!empty($diff)) {
             return false;
         }

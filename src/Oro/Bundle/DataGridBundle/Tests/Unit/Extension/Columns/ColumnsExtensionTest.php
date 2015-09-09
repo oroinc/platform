@@ -243,9 +243,9 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'different state id' => [
                 'columnsConfigArray'  => [
-                    'name'  => ['order' => 3,'renderable' => true, 'label' => 'name', 'type' => 'string'],
+                    'name'  => ['order' => 2,'renderable' => true, 'label' => 'name', 'type' => 'string'],
                     'label' => ['order' => 1,'renderable' => true, 'label' => 'label', 'type' => 'string'],
-                    'some'  => ['order' => 2,'renderable' => true, 'label' => 'label', 'type' => 'string']
+                    'some'  => ['order' => 3,'renderable' => true, 'label' => 'label', 'type' => 'string']
                 ],
                 'dataState'           => ['gridView' => '__all__', 'filters' => []],
                 'columnsDataArray'    => [
