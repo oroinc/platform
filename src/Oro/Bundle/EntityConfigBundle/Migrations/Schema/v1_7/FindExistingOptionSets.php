@@ -27,6 +27,7 @@ class FindExistingOptionSets implements Migration, OrderedMigrationInterface, Da
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new StoreOptionSetsQuery($this->storage));
+        $queries->addQuery(new StoreOptionSetsValuesQuery($this->storage));
     }
 
     /**

@@ -24,7 +24,7 @@ class StoreOptionSetsQuery extends ParametrizedMigrationQuery
      */
     public function getDescription()
     {
-        return '';
+        return 'Retrieve existing option sets possible values';
     }
 
     /**
@@ -41,12 +41,12 @@ class StoreOptionSetsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query, $params);
         $optionSets = $this->connection->fetchAll($query, $params);
 
-        $query2 = 'SHOW TABLES LIKE "%oro_enum%"';
+        $existingEnumsQuery = 'SHOW TABLES LIKE "%oro_enum%"';
         $enumTables = array_map(
             function ($row) {
                 return current(array_values($row));
             },
-            $this->connection->fetchAll($query2)
+            $this->connection->fetchAll($existingEnumsQuery)
         );
 
         $type = Type::getType(Type::TARRAY);
