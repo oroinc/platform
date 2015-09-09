@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
-use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 
 class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
