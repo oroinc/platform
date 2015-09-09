@@ -56,16 +56,10 @@ class ActivityEntityApiEntityManager extends ApiEntityManager
             $currentUser = $this->securityTokenStorage->getToken()->getUser();
             // @todo: Filter aliases should be refactored in BAP-8979.
             $queryBuilder->andWhere(
-                $queryBuilder->expr()->andX(
-                    //Filter by entity id
-                    $queryBuilder->expr()->neq('id_1', $currentUser->getId()),
-                    //Filter by entity class
-                    $queryBuilder->expr()->neq(
-                        'sclr_2',
-                        sprintf("'%s'", str_replace('\\', '\\\\\\\\', ClassUtils::getClass($currentUser)))
-                    )
-                )
+                'NOT (id_1 = :userId AND sclr_2 =:userClass)'
             );
+            $queryBuilder->setParameter('userId', $currentUser->getId());
+            $queryBuilder->setParameter('userClass', ClassUtils::getClass($currentUser));
         }
 
         return $queryBuilder;
