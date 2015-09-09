@@ -524,7 +524,10 @@ class AclWalker extends TreeWalkerAdapter
         );
 
         if ($condition['operation'] === 'IN') {
-            $conditionalFactors[] = $this->getInExpression($aclCondition);
+            $condition = new ConditionalPrimary();
+            $condition->simpleConditionalExpression = $this->getInExpression($aclCondition);
+            $conditionalFactors[] = $condition;
+
         } else {
             $pathExpression = $this->getPathExpression($aclCondition);
             $conditionalFactors[] = $this->getLiteralComparisonExpression(

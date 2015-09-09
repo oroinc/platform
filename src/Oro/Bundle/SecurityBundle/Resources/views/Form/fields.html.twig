@@ -119,8 +119,8 @@
                                 cancelText: __("oro.security.share_scopes.confirmModal.cancelText"),
                                 content: __("oro.security.share_scopes.confirmModal.content", {
                                     scope_name: $(el).parent().find('label').text().trim(),
-                                    entity_name_plural: $('#oro_entity_config_type_entity_plural_label').val().trim(),
-                                    entity_name: $('#oro_entity_config_type_entity_label').val().trim()
+                                    entity_name_plural: $('input[name="oro_entity_config_type[entity][plural_label]"]').val().trim(),
+                                    entity_name: $('input[name="oro_entity_config_type[entity][label]"]').val().trim()
                                 }),
                                 className: 'modal oro-modal-danger',
                                 okButtonClass: 'btn-primary btn-large',

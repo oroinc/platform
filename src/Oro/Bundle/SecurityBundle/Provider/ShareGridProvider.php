@@ -66,15 +66,23 @@ class ShareGridProvider
             return $results;
         }
         $classNames = $this->helper->getClassNamesBySharingScopes($shareScopes);
-        foreach ($classNames as $key => $className) {
+        foreach ($classNames as $className) {
             $results[] = [
                 'isGranted' => $this->securityFacade->isGranted('VIEW', 'entity:' . $className),
                 'label' => $this->getClassLabel($className),
                 'className' => $className,
-                'first' => !(bool) $key,
+                'first' => false,
                 'gridName' => $this->getGridName($className),
             ];
         }
+        usort(
+            $results,
+            function ($itemA) {
+                return $itemA['isGranted'] ? -1 : 1;
+            }
+        );
+
+        !empty($results[0]) && $results[0]['first'] = true;
 
         return $results;
     }
