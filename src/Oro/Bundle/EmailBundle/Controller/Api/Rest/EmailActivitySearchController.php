@@ -12,6 +12,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EmailAddressParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
@@ -54,7 +55,7 @@ class EmailActivitySearchController extends RestGetController
      *      name="email",
      *      requirements=".+",
      *      nullable=true,
-     *      description="An email address."
+     *      description="An email address. One or several addresses separated by comma."
      * )
      *
      * @ApiDoc(
@@ -72,7 +73,8 @@ class EmailActivitySearchController extends RestGetController
         $filters = [
             'search' => $this->getRequest()->get('search')
         ];
-        $from    = $this->getRequest()->get('from', null);
+
+        $from = $this->getRequest()->get('from', null);
         if ($from) {
             $filter          = new StringToArrayParameterFilter();
             $filters['from'] = $filter->filter($from, null);
@@ -80,10 +82,13 @@ class EmailActivitySearchController extends RestGetController
 
         $email = $this->getRequest()->get('email', null);
         if ($email) {
-            $filter           = new EmailAddressParameterFilter(
-                $this->container->get('oro_email.email.address.helper')
+            $filter            = new ChainParameterFilter(
+                [
+                    new StringToArrayParameterFilter(),
+                    new EmailAddressParameterFilter($this->container->get('oro_email.email.address.helper'))
+                ]
             );
-            $filters['email'] = $filter->filter($email, null);
+            $filters['emails'] = $filter->filter($email, null);
         }
 
         return $this->handleGetListRequest($page, $limit, $filters);
