@@ -119,7 +119,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $quantity = ($isGridView) ? 2 : 1;
+        $quantity = ($isGridView) ? 3 : 2;
 
         $config
             ->expects(static::exactly($quantity))
@@ -205,89 +205,89 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             'same state'         => [
                 'columnsConfigArray'  => [
-                    'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
-                    'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],
-                    'some'  => ['label' => 'label', 'type' => 'string']
+                    'name'  => ['order' => 2,'renderable' => true, 'label' => 'name', 'type' => 'string'],
+                    'label' => ['order' => 1,'renderable' => true, 'label' => 'label', 'type' => 'string'],
+                    'some'  => ['order' => 3,'renderable' => true, 'label' => 'label', 'type' => 'string']
                 ],
                 'dataState'           => ['gridView' => 1, 'filters' => []],
                 'columnsDataArray'    => [
-                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2],
+                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2,'renderable' => true],
                     ['label' => 'Test Label', 'type' => 'string', 'name' => 'label'],
                     ['label' => 'Test Some', 'type' => 'string', 'name' => 'some']
                 ],
                 'gridViewColumnsData' => [
-                    'name'  => ['renderable' => true, 'order' => 2],
-                    'label' => ['renderable' => true, 'order' => 0],
-                    'some'  => ['renderable' => true, 'order' => 1],
+                    'name'  => ['order' => 2,'renderable' => true],
+                    'label' => ['order' => 1,'renderable' => true],
+                    'some'  => ['order' => 3,'renderable' => true],
                 ],
                 'gridViewId'          => 1,
                 'stateResult'         => [
                     'gridView' => 1,
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['renderable' => true, 'order' => 2],
-                        'label' => ['renderable' => true, 'order' => 0],
-                        'some'  => ['renderable' => true, 'order' => 1],
+                        'name'  => ['order' => 2,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 3,'renderable' => true],
                     ]
                 ],
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2],
-                        'label' => ['order' => 1],
-                        'some'  => ['order' => 3]
+                        'name'  => ['order' => 2,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 3,'renderable' => true]
                     ]
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
             ],
             'different state id' => [
                 'columnsConfigArray'  => [
-                    'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
-                    'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],
-                    'some'  => ['label' => 'label', 'type' => 'string']
+                    'name'  => ['order' => 3,'renderable' => true, 'label' => 'name', 'type' => 'string'],
+                    'label' => ['order' => 1,'renderable' => true, 'label' => 'label', 'type' => 'string'],
+                    'some'  => ['order' => 2,'renderable' => true, 'label' => 'label', 'type' => 'string']
                 ],
                 'dataState'           => ['gridView' => '__all__', 'filters' => []],
                 'columnsDataArray'    => [
-                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2],
+                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2,'renderable' => true],
                     ['label' => 'Test Label', 'type' => 'string', 'name' => 'label'],
                     ['label' => 'Test Some', 'type' => 'string', 'name' => 'some']
                 ],
                 'gridViewColumnsData' => [
-                    'name'  => ['renderable' => true, 'order' => 2],
-                    'label' => ['renderable' => true, 'order' => 0],
-                    'some'  => ['renderable' => true, 'order' => 1],
+                    'name'  => ['order' => 3,'renderable' => true],
+                    'label' => ['order' => 1,'renderable' => true],
+                    'some'  => ['order' => 2,'renderable' => true],
                 ],
                 'gridViewId'          => 0,
                 'stateResult'         => [
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['renderable' => true, 'order' => 2],
-                        'label' => ['renderable' => true, 'order' => 0],
-                        'some'  => ['renderable' => true, 'order' => 1],
+                        'name'  => ['order' => 3,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 2,'renderable' => true],
                     ]
                 ],
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2],
-                        'label' => ['order' => 1],
-                        'some'  => ['order' => 3]
+                        'name'  => ['order' => 2,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 3,'renderable' => true]
                     ]
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
             ],
             'No grid view'       => [
                 'columnsConfigArray'  => [
-                    'name'  => ['order' => 2, 'label' => 'name', 'type' => 'string'],
-                    'label' => ['order' => 1, 'label' => 'label', 'type' => 'string'],
+                    'name'  => ['order' => 2,'renderable' => true, 'label' => 'name', 'type' => 'string'],
+                    'label' => ['order' => 1,'renderable' => true, 'label' => 'label', 'type' => 'string'],
                     'some'  => ['label' => 'label', 'type' => 'string']
                 ],
                 'dataState'           => ['gridView' => '__all__', 'filters' => []],
                 'columnsDataArray'    => [
-                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2],
+                    ['label' => 'Test Name', 'type' => 'string', 'name' => 'name', 'order' => 2,'renderable' => true],
                     ['label' => 'Test Label', 'type' => 'string', 'name' => 'label'],
                     ['label' => 'Test Some', 'type' => 'string', 'name' => 'some']
                 ],
@@ -297,18 +297,18 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2],
-                        'label' => ['order' => 1],
-                        'some'  => ['order' => 3],
+                        'name'  => ['order' => 2,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 3,'renderable' => true],
                     ]
                 ],
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
                     'columns'  => [
-                        'name'  => ['order' => 2],
-                        'label' => ['order' => 1],
-                        'some'  => ['order' => 3]
+                        'name'  => ['order' => 2,'renderable' => true],
+                        'label' => ['order' => 1,'renderable' => true],
+                        'some'  => ['order' => 3,'renderable' => true]
                     ]
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
