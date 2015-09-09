@@ -56,6 +56,7 @@ define(function (require) {
         });
 
         it('renders empty filter', function (done) {
+            require('oro/filter/none-filter');
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -76,6 +77,7 @@ define(function (require) {
         });
 
         it('renders none filter', function (done) {
+            require('oro/filter/none-filter');
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -105,6 +107,7 @@ define(function (require) {
         });
 
         it('renders choice filter', function (done) {
+            require('oro/filter/choice-filter');
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -196,6 +199,8 @@ define(function (require) {
         });
 
         it('replaces filter', function (done) {
+            require('oro/filter/choice-filter');
+            require('oro/filter/datetime-filter');
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
