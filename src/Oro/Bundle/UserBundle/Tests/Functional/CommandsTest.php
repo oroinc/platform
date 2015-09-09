@@ -12,7 +12,6 @@ use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */

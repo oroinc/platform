@@ -6,7 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */

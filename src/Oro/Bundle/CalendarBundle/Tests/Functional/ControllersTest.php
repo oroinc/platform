@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */

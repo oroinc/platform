@@ -11,7 +11,6 @@ use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */

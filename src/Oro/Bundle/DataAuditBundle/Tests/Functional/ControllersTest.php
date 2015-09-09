@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataAudit\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class ControllersTest extends WebTestCase

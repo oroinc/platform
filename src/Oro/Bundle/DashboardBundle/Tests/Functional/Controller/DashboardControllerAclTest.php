@@ -7,7 +7,6 @@ use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUser
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */
