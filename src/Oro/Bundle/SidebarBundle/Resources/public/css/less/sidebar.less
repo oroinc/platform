@@ -1,9 +1,10 @@
+@import "../../../oroui/lib/bootstrap/variables";
 .sidebar {
-    background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
+    background: #e0e0e0 url("../../images/divider.png") repeat-x 0 0;
     float: left;
     height: 100%;
     position: relative;
-    z-index: 2400;
+    z-index: @zindexFixedNavbar;
     overflow: visible;
 
     -webkit-touch-callout: none;
@@ -95,7 +96,6 @@
 .sidebar-toggle a {
     position: absolute;
     height: 22px;
-
     width: 30px;
     bottom: 0;
 }
@@ -103,18 +103,18 @@
 .sidebar-left .sidebar-toggle a {
     right: 5px;
     bottom: -1px;
-}
-.sidebar-left .sidebar-toggle a i{
-    right: 7px;
-    bottom: 4px;
+    i {
+        right: 7px;
+        bottom: 4px;
+    }
 }
 .sidebar-right .sidebar-toggle a {
     bottom: -1px;
     left: 5px;
-}
-.sidebar-right .sidebar-toggle a i{
-    left: 7px;
-    bottom: 4px;
+    i {
+        left: 7px;
+        bottom: 4px;
+    }
 }
 .sidebar-left i.icon-backward{
     display: none !important;
