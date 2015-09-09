@@ -91,6 +91,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+            - @security.token_storage
 
     oro_activity.manager.activity_search.api:
         class: %oro_activity.manager.activity_search.api.class%

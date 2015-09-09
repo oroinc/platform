@@ -35,6 +35,7 @@ class EmailActivityApiEntityManager extends ApiEntityManager
     ) {
         parent::__construct($class, $om);
         $this->activityManager = $activityManager;
+        $this->securityTokenStorage = $securityTokenStorage;
     }
 
     /**
@@ -87,10 +88,16 @@ class EmailActivityApiEntityManager extends ApiEntityManager
          */
         if ($queryBuilder) {
             $currentUser = $this->securityTokenStorage->getToken()->getUser();
+            // @todo: Filter aliases should be refactored in BAP-8979.
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->neq('id', $currentUser->getId()),
-                    $queryBuilder->expr()->neq('entity', ClassUtils::getClass($currentUser))
+                    //Filter by entity id
+                    $queryBuilder->expr()->neq('id_1', $currentUser->getId()),
+                    //Filter by entity class
+                    $queryBuilder->expr()->neq(
+                        'sclr_2',
+                        sprintf("'%s'", str_replace('\\', '\\\\\\\\', ClassUtils::getClass($currentUser)))
+                    )
                 )
             );
         }
