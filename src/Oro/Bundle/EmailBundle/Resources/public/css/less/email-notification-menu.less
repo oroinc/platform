@@ -1,0 +1,73 @@
+
+.email-notification-menu {
+  .oro-dropdown-toggle {
+    .icon-envelope {
+      position: relative;
+      padding-top: 3px;
+      span {
+        font-size: 9px;
+        width: 23px;
+        display: inline-block;
+        background: #36424c;
+        border-radius: 8px;
+        position: absolute;
+        left: 12px;
+        top: 6px;
+        line-height: 10px;
+        padding-left: 3px;
+      }
+    }
+  }
+  .dropdown-menu {
+    width: 335px !important;
+    padding: 0;
+    outline: none;
+  }
+
+  .icon-envelope {
+    color: #FFFFFF;
+  }
+  .oro-dropdown-toggle {
+    .icon-envelope.new {
+      width: 25px;
+    }
+  }
+  .icon-envelope.new {
+    color: #fabb18;
+  }
+
+  .dropdown-menu {
+    .empty {
+      display: none;
+    }
+    .notification {
+      display: none;
+    }
+  }
+
+  .dropdown-menu.content {
+    .content {
+      display: block;
+    }
+  }
+
+  .dropdown-menu.empty {
+    width: 200px !important;
+    .empty {
+      display: block;
+    }
+  }
+
+  .dropdown-menu.notification {
+    width: 160px !important;
+    .notification {
+      display: block;
+    }
+  }
+
+  .dropdown-menu {
+    .empty, .notification {
+      padding: 5px 10px
+    }
+  }
+}

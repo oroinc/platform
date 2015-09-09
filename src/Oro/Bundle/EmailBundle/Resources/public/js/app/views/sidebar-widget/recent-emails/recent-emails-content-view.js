@@ -14,7 +14,7 @@ define(function(require) {
             }
 
             var options = {
-                _sourceElement: this.$el,
+                _sourceElement: this.$el
             };
             this.component = new EmailNotificationComponent(options);
             this.component.loadLastEmail(false);
