@@ -1,5 +1,5 @@
 <% if (iconClass) { %>
-    <i class="<%= iconClass %>" title="<%= title %>"></i>
+    <i class="<%= iconClass %><% if (typeof count !== 'undefined') { %> icon-with-counter<% } %>" title="<%= title %>"><% if (typeof count !== 'undefined') { %><span><%= count %></span><% } %></i>
 <% } else { %>
     <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
 <% } %>

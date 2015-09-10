@@ -13,11 +13,17 @@ define(function(require) {
                 this.component.dispose();
             }
 
+            var that = this;
             var options = {
                 _sourceElement: this.$el
             };
             this.component = new EmailNotificationComponent(options);
+
             this.component.loadLastEmail(false);
+
+            this.component.collection.on('reset', function(collection) {
+                that.model.set('count', collection.length);
+            });
 
             return this;
         }
