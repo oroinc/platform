@@ -101,6 +101,26 @@ class UserCreateUpdateTest extends WebTestCase
     }
 
     /**
+     * @depends testParameters
+     */
+    public function testCreateExistentUser()
+    {
+        $arguments = [
+            'command'               => 'oro:user:create',
+            '--user-business-unit'  => 'bu1',
+            '--user-name'           => 'test_user_main',
+            '--user-email'          => 'test_user_main@example.com',
+            '--user-password'       => 'admin',
+        ];
+
+        $command = $this->application->find('oro:user:create');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute($arguments);
+
+        $this->assertStringStartsWith('User exists', $commandTester->getDisplay());
+    }
+
+    /**
      * @return array
      */
     public function parametersProvider()
@@ -122,7 +142,7 @@ class UserCreateUpdateTest extends WebTestCase
             'update' => [
                 'arguments' => [
                     'command'               => 'oro:user:update',
-                    'user-name'             => 'test_user_main',
+                    'user-name'             => 'test_user_1',
                     '--user-name'           => 'test_user_2',
                     '--user-email'          => 'test_user_2@mailinator.com',
                     '--user-firstname'      => 'User2F',
@@ -131,18 +151,13 @@ class UserCreateUpdateTest extends WebTestCase
                 ],
                 'result' => '',
             ],
-            'create existent user' => [
-                'arguments' => [
-                    'command'               => 'oro:user:create',
-                    '--user-name'           => 'test_user_main',
-                ],
-                'result' => 'User exists',
-            ],
             'invalid business unit' => [
                 'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-business-unit'  => 'invalid_business_unit_123o',
                     '--user-name'           => 'new_user_1',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                    '--user-password'       => 'admin',
                 ],
                 'result' => 'Invalid Business Unit',
             ],
@@ -150,7 +165,10 @@ class UserCreateUpdateTest extends WebTestCase
                 'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-organizations'  => ['invalid_user_organization_123o'],
+                    '--user-business-unit'  => 'bu1',
                     '--user-name'           => 'new_user_2',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                    '--user-password'       => 'admin',
                 ],
                 'result' => 'Invalid organization',
             ],
@@ -158,9 +176,48 @@ class UserCreateUpdateTest extends WebTestCase
                 'arguments' => [
                     'command'               => 'oro:user:create',
                     '--user-role'           => ['invalid_user_role_123o'],
+                    '--user-business-unit'  => 'bu1',
                     '--user-name'           => 'new_user_3',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                    '--user-password'       => 'admin',
                 ],
                 'result' => 'Invalid Role',
+            ],
+            'business unit required' => [
+                'arguments' => [
+                    'command'               => 'oro:user:create',
+                    '--user-name'           => 'new_user_1',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                    '--user-password'       => 'admin',
+                ],
+                'result' => '--user-business-unit option required',
+            ],
+            'username required' => [
+                'arguments' => [
+                    'command'               => 'oro:user:create',
+                    '--user-business-unit'  => 'invalid_business_unit_123o',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                    '--user-password'       => 'admin',
+                ],
+                'result' => '--user-name option required',
+            ],
+            'user email required' => [
+                'arguments' => [
+                    'command'               => 'oro:user:create',
+                    '--user-business-unit'  => 'invalid_business_unit_123o',
+                    '--user-name'           => 'new_user_1',
+                    '--user-password'       => 'admin',
+                ],
+                'result' => '--user-email option required',
+            ],
+            'user password required' => [
+                'arguments' => [
+                    'command'               => 'oro:user:create',
+                    '--user-business-unit'  => 'invalid_business_unit_123o',
+                    '--user-name'           => 'new_user_1',
+                    '--user-email'          => 'test_user_2@mailinator.com',
+                ],
+                'result' => '--user-password option required',
             ],
         ];
     }
