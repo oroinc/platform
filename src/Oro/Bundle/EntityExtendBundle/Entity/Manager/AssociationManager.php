@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\QueryUtils;
@@ -14,17 +11,18 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SoapBundle\Event\GetListBefore;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class AssociationManager
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    /** @var ServiceLink */
+    protected $aclHelperLink;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -33,19 +31,19 @@ class AssociationManager
     protected $entityNameResolver;
 
     /**
-     * @param ConfigManager            $configManager
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param DoctrineHelper           $doctrineHelper
-     * @param EntityNameResolver       $entityNameResolver
+     * @param ConfigManager      $configManager
+     * @param ServiceLink        $aclHelperLink
+     * @param DoctrineHelper     $doctrineHelper
+     * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
-        EventDispatcherInterface $eventDispatcher,
+        ServiceLink $aclHelperLink,
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver
     ) {
         $this->configManager      = $configManager;
-        $this->eventDispatcher    = $eventDispatcher;
+        $this->aclHelperLink      = $aclHelperLink;
         $this->doctrineHelper     = $doctrineHelper;
         $this->entityNameResolver = $entityNameResolver;
     }
@@ -196,11 +194,6 @@ class AssociationManager
         $selectStmt = null;
         $subQueries = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
-            // dispatch oro_api.request.get_list.before event
-            $event = new GetListBefore($this->cloneCriteria($criteria), $entityClass);
-            $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
-            $subCriteria = $event->getCriteria();
-
             $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'target');
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(
@@ -214,9 +207,9 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            $subQb->addCriteria($subCriteria);
+            $subQb->addCriteria($criteria);
 
-            $subQuery = $subQb->getQuery();
+            $subQuery = $this->getAclHelper()->apply($subQb);
 
             $subQueries[] = QueryUtils::getExecutableSql($subQuery);
 
@@ -316,11 +309,6 @@ class AssociationManager
         $subQueries        = [];
         $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($associationTargetClass);
         foreach ($associationOwners as $ownerClass => $fieldName) {
-            // dispatch oro_api.request.get_list.before event
-            $event = new GetListBefore($this->cloneCriteria($criteria), $associationTargetClass);
-            $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
-            $subCriteria = $event->getCriteria();
-
             $nameExpr = $this->entityNameResolver->getNameDQL($ownerClass, 'e');
             $subQb    = $em->getRepository($ownerClass)->createQueryBuilder('e')
                 ->select(
@@ -334,9 +322,9 @@ class AssociationManager
                 ->innerJoin('e.' . $fieldName, 'target');
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
-            $subQb->addCriteria($subCriteria);
+            $subQb->addCriteria($criteria);
 
-            $subQuery = $subQb->getQuery();
+            $subQuery = $this->getAclHelper()->apply($subQb);
 
             $subQueries[] = QueryUtils::getExecutableSql($subQuery);
 
@@ -402,19 +390,10 @@ class AssociationManager
     }
 
     /**
-     * Makes a clone of the given Criteria
-     *
-     * @param Criteria $criteria
-     *
-     * @return Criteria
+     * @return AclHelper
      */
-    protected function cloneCriteria(Criteria $criteria)
+    protected function getAclHelper()
     {
-        return new Criteria(
-            $criteria->getWhereExpression(),
-            $criteria->getOrderings(),
-            $criteria->getFirstResult(),
-            $criteria->getMaxResults()
-        );
+        return $this->aclHelperLink->getService();
     }
 }
