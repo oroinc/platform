@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -20,8 +21,8 @@ class AssociationManager
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    /** @var ServiceLink */
+    protected $aclHelperLink;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -31,18 +32,18 @@ class AssociationManager
 
     /**
      * @param ConfigManager      $configManager
-     * @param AclHelper          $aclHelper
+     * @param ServiceLink        $aclHelperLink
      * @param DoctrineHelper     $doctrineHelper
      * @param EntityNameResolver $entityNameResolver
      */
     public function __construct(
         ConfigManager $configManager,
-        AclHelper $aclHelper,
+        ServiceLink $aclHelperLink,
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver
     ) {
         $this->configManager      = $configManager;
-        $this->aclHelper          = $aclHelper;
+        $this->aclHelperLink      = $aclHelperLink;
         $this->doctrineHelper     = $doctrineHelper;
         $this->entityNameResolver = $entityNameResolver;
     }
@@ -208,7 +209,7 @@ class AssociationManager
 
             $subQb->addCriteria($criteria);
 
-            $subQuery = $this->aclHelper->apply($subQb);
+            $subQuery = $this->getAclHelper()->apply($subQb);
 
             $subQueries[] = QueryUtils::getExecutableSql($subQuery);
 
@@ -323,7 +324,7 @@ class AssociationManager
 
             $subQb->addCriteria($criteria);
 
-            $subQuery = $this->aclHelper->apply($subQb);
+            $subQuery = $this->getAclHelper()->apply($subQb);
 
             $subQueries[] = QueryUtils::getExecutableSql($subQuery);
 
@@ -386,5 +387,13 @@ class AssociationManager
                 $relation['target_entity'],
                 $associationKind
             );
+    }
+
+    /**
+     * @return AclHelper
+     */
+    protected function getAclHelper()
+    {
+        return $this->aclHelperLink->getService();
     }
 }
