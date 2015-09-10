@@ -367,7 +367,7 @@ class ColumnsExtension extends AbstractExtension
             }
         }
 
-        $iteration  = 1;
+        $iteration  = 0;
         $ignoreList = [];
 
         foreach ($orders as $name => &$order) {
