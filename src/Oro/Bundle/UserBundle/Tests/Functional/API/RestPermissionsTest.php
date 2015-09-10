@@ -9,7 +9,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestPermissionsTest extends WebTestCase
