@@ -283,8 +283,8 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                false: Inactive
-                                true:  Active
+                                'false': Inactive
+                                'true':  Active
 
     base-system-calendar-event-grid:
         source:
