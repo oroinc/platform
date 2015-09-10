@@ -85,8 +85,10 @@ class ShareScopeType extends AbstractType
         $className = $configId->getClassName();
 
         if (!empty($className)) {
-            $applicable = $this->configManager->getProvider('security')->getConfig($className)->get('share_scopes');
-            if ($applicable) {
+            $shareScopes = $this->configManager->getProvider('security')->getConfig($className)->get('share_scopes');
+            // do not set as read-only if value is empty array - checkboxes were unchecked, but entity supports sharing
+            // set as read-only if value equivalent to null - entity doesn't support sharing
+            if ($shareScopes !== null) {
                 return false;
             }
         }

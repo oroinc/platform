@@ -23,6 +23,8 @@ class AclConfigurationPass implements CompilerPassInterface
     const DEFAULT_ACL_CACHE = 'security.acl.cache.doctrine';
     const DEFAULT_ACL_SECURITY_ID_STRATEGY_CLASS = 'security.acl.security_identity_retrieval_strategy.class';
 
+    const EVENT_DISPATCHER_LINK = 'event_dispatcher';
+
     const ACL_EXTENSION_SELECTOR = 'oro_security.acl.extension_selector';
     const ACL_EXTENSION_TAG = 'oro_security.acl.extension';
 
@@ -98,6 +100,7 @@ class AclConfigurationPass implements CompilerPassInterface
             if ($container->hasDefinition(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY)) {
                 $providerDef->replaceArgument(1, new Reference(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY));
             }
+            $providerDef->addMethodCall('setEventDispatcher', [new Reference(self::EVENT_DISPATCHER_LINK)]);
         }
     }
 

@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\DBAL\Driver\Connection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Dbal\MutableAclProvider as BaseMutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
@@ -16,6 +17,7 @@ use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+use Oro\Bundle\SecurityBundle\Event\UpdateAcl;
 
 /**
  * This class extends the standard Symfony MutableAclProvider.
@@ -33,6 +35,11 @@ class MutableAclProvider extends BaseMutableAclProvider
      * @var PermissionGrantingStrategyInterface
      */
     protected $permissionStrategy;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @var MutableAclInterface
@@ -59,6 +66,14 @@ class MutableAclProvider extends BaseMutableAclProvider
         $this->permissionStrategy = $permissionGrantingStrategy;
         parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
 
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -345,7 +360,24 @@ class MutableAclProvider extends BaseMutableAclProvider
     public function updateAcl(MutableAclInterface $acl)
     {
         $this->updatedAcl = $acl;
-        parent::updateAcl($acl);
+        $this->connection->beginTransaction();
+        try {
+            $event = new UpdateAcl($acl);
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(UpdateAcl::NAME_BEFORE, $event);
+            }
+            parent::updateAcl($acl);
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(UpdateAcl::NAME_AFTER, $event);
+            }
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->updatedAcl = null;
+            $this->connection->rollBack();
+
+            throw $e;
+        }
+
         $this->updatedAcl = null;
     }
 
