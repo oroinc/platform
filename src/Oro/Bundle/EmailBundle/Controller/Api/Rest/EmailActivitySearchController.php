@@ -91,7 +91,9 @@ class EmailActivitySearchController extends RestGetController
             $filters['emails'] = $filter->filter($email, null);
         }
 
-        return $this->handleGetListRequest($page, $limit, $filters);
+        $data = $this->getManager()->getSearchResult($limit, $page, $filters);
+
+        return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }
 
     /**
