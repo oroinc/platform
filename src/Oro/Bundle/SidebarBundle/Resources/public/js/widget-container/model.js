@@ -1,6 +1,6 @@
 define([
-    'underscore', 'backbone', '../constants'
-], function(_, Backbone, constants) {
+    'require', 'underscore', 'jquery', 'backbone', '../constants', 'oroui/js/mediator'
+], function(require, _, $, Backbone, constants, mediator) {
     'use strict';
 
     /**
@@ -23,6 +23,35 @@ define([
         initialize: function() {
             this.stateSnapshot = this.get('state');
             this.isDragged = false;
+            this.loadModule()
+                .done(_.bind(this.createController, this))
+                .fail(_.bind(this.onWidgetLoadError, this));
+        },
+
+        loadModule: function() {
+            if (!this.deferredModuleLoad) {
+                this.deferredModuleLoad = $.Deferred();
+                require([this.get('module')], _.bind(function(Widget) {
+                    this.module = Widget;
+                    this.deferredModuleLoad.resolve(this.module, this);
+                }, this), _.bind(function() {
+                    this.deferredModuleLoad.reject(arguments);
+                }, this));
+            }
+            return this.deferredModuleLoad;
+        },
+
+        createController: function() {
+            if (this.module.Component) {
+                var Component = this.module.Component;
+                this.component = new Component({
+                    model: this
+                });
+            }
+        },
+
+        onWidgetLoadError: function() {
+            mediator.execute('showErrorMessage', 'Cannot load sidebar widget module "' + this.get('module') + '"');
         },
 
         /**
