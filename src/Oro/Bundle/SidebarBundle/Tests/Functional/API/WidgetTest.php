@@ -5,7 +5,6 @@ namespace Oro\Bundle\SidebarBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class WidgetTest extends WebTestCase
