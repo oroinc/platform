@@ -53,13 +53,13 @@ class AssociationManagerTest extends OrmTestCase
             ]
         );
 
-        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
+        $this->aclHelper     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine              = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine            = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())
@@ -70,9 +70,16 @@ class AssociationManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $aclHelperLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclHelperLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->aclHelper);
+
         $this->associationManager = new AssociationManager(
             $this->configManager,
-            $this->aclHelper,
+            $aclHelperLink,
             $this->doctrineHelper,
             $this->entityNameResolver
         );
