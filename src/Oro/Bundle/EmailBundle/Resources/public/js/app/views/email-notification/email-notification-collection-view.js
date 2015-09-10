@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            EmailNotificationCollectionView.__super__.initialize.apply(this, options);
+            EmailNotificationCollectionView.__super__.initialize.call(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
         },
 

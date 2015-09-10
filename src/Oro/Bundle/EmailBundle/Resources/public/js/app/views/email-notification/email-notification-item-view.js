@@ -21,7 +21,8 @@ define(function(require) {
         },
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'addedToParent': 'delegateEvents'
         },
 
         render: function() {
