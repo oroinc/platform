@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestCalendarEventTest extends WebTestCase

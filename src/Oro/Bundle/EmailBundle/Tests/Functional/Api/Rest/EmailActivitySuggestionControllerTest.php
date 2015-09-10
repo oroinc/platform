@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class EmailActivitySuggestionControllerTest extends WebTestCase
@@ -17,7 +16,8 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(
             [
-                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData'
+                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData',
+                'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailSuggestionData'
             ]
         );
     }
@@ -31,7 +31,8 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertCount(3, $entities);
+        //2 not assigned users
+        $this->assertCount(2, $entities);
     }
 
     public function testGetEntitiesWithPaging()
@@ -42,7 +43,7 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         );
         $this->client->request(
             'GET',
-            $url . '?page=3&limit=1',
+            $url . '?page=2&limit=1',
             [],
             [],
             ['HTTP_X-Include' => 'totalCount']
@@ -50,8 +51,8 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $entities = $this->getJsonResponseContent($response, 200);
         $this->assertCount(1, $entities);
-        $this->assertArrayHasKey('assigned', reset($entities));
 
-        $this->assertEquals(3, $response->headers->get('X-Include-Total-Count'));
+        //2 not assigned users
+        $this->assertEquals(2, $response->headers->get('X-Include-Total-Count'));
     }
 }
