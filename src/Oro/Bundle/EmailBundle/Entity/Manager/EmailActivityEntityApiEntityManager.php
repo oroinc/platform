@@ -37,7 +37,7 @@ class EmailActivityEntityApiEntityManager extends ActivityEntityApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
-        $queryBuilder = $this->getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
+        $queryBuilder = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);
 
         /**
          * Need to exclude current user from result because of email context.
