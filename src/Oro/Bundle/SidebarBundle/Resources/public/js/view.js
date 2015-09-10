@@ -116,6 +116,7 @@ define(function(require) {
                 if (!iconView) {
                     return;
                 }
+
                 iconView.render().delegateEvents();
                 $content.append(iconView.$el);
             });

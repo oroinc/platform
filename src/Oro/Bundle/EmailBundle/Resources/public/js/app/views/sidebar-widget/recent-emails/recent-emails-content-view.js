@@ -15,11 +15,11 @@ define(function(require) {
 
             var that = this;
             var options = {
-                _sourceElement: this.$el
+                _sourceElement: this.$el,
+                collection: this.model.collection
             };
-            this.component = new EmailNotificationComponent(options);
 
-            this.component.loadLastEmail(false);
+            this.component = new EmailNotificationComponent(options);
 
             this.component.collection.on('reset', function(collection) {
                 that.model.set('count', collection.length);

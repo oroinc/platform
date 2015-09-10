@@ -23,9 +23,6 @@ define([
         initialize: function() {
             this.stateSnapshot = this.get('state');
             this.isDragged = false;
-            this.loadModule()
-                .done(_.bind(this.createController, this))
-                .fail(_.bind(this.onWidgetLoadError, this));
         },
 
         loadModule: function() {
@@ -38,16 +35,19 @@ define([
                     this.deferredModuleLoad.reject(arguments);
                 }, this));
             }
-            return this.deferredModuleLoad;
+            return this.deferredModuleLoad
+                .then(_.bind(this.createController, this))
+                .fail(_.bind(this.onWidgetLoadError, this));
         },
 
-        createController: function() {
+        createController: function(Widget) {
             if (this.module.Component) {
                 var Component = this.module.Component;
                 this.component = new Component({
                     model: this
                 });
             }
+            return Widget;
         },
 
         onWidgetLoadError: function() {

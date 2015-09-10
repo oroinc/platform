@@ -3,19 +3,34 @@ define(function(require) {
 
     var EmailNotificationCollection;
     var EmailNotificationModel = require('./email-notification-model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    var RoutingCollection = require('oroui/js/app/models/base/routing-collection');
 
     /**
      * @export oroemail/js/app/models/email-notification-collection
      */
-    EmailNotificationCollection = BaseCollection.extend({
+    EmailNotificationCollection = RoutingCollection.extend({
         model: EmailNotificationModel,
+        routeDefaults: {
+            routeName: 'oro_email_last',
+            routeQueryParameters: ['limit']
+        },
+
         markAllAsRead: function() {
             for (var i in this.models) {
                 if (this.models.hasOwnProperty(i)) {
                     this.models[i].set({'seen': 1});
                 }
             }
+        },
+
+        parse: function(response, q) {
+            this.unreadEmailsCount = response.count;
+            // format response to regular backbone one
+            response = {
+                data: response.emails
+            };
+
+            return EmailNotificationCollection.__super__.parse.call(this, response, q);
         }
     });
 

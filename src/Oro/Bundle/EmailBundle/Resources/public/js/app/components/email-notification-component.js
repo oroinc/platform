@@ -2,13 +2,9 @@ define(function(require) {
     'use strict';
 
     var EmailNotification;
-    var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var module = require('module');
-    var routing = require('routing');
     var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
     var tools = require('oroui/js/tools');
     var sync = require('orosync/js/sync');
     var BaseComponent = require('oroui/js/app/components/base/component');
@@ -26,19 +22,21 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            this.initCollection()
-                .initView()
-                .initSync();
+            this.initCollection();
+            this.initView();
+            this.initSync();
         },
 
         initCollection: function() {
+            if (this.options.collection) {
+                this.collection = this.options.collection;
+                return;
+            }
             var emails = this.options.emails || [];
             if (typeof emails === 'string') {
                 emails = JSON.parse(emails);
             }
             this.collection = new EmailNotificationCollection(emails);
-
-            return this;
         },
 
         initView: function() {
@@ -50,8 +48,6 @@ define(function(require) {
                 countNewEmail: this.options.count
             });
             this.view.render();
-
-            return this;
         },
 
         initSync: function() {
@@ -61,7 +57,6 @@ define(function(require) {
             this.once('dispose', function() {
                 sync.unsubscribe(channel, handlerNotification);
             });
-            return this;
         },
 
         handlerNotification: function(response) {
@@ -74,20 +69,13 @@ define(function(require) {
         },
 
         loadLastEmail: function(hasNewEmail) {
-            var self = this;
-            $.ajax({
-                url: routing.generate('oro_email_last'),
-                success: function(response) {
-                    self.collection.reset(response.emails);
-                    self.view.setCount(response.count);
+            this.collection.fetch({
+                success: _.bind(function() {
                     if (hasNewEmail) {
-                        self.view.showNotification();
+                        this.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
-                },
-                error: function(model, response) {
-                    messenger.showErrorMessage(__('oro.email.error.get_email_last'), response.responseJSON || {});
-                }
+                }, this)
             });
         }
     });

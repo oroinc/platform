@@ -1,5 +1,8 @@
 <% if (iconClass) { %>
-    <i class="<%= iconClass %><% if (typeof count !== 'undefined') { %> icon-with-counter<% } %>" title="<%= title %>"><% if (typeof count !== 'undefined') { %><span><%= count %></span><% } %></i>
+    <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %> icon-with-counter new<% } %>"
+       title="<%= title %>">
+        <% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %><span><%= unreadEmailsCount %></span><% } %>
+    </i>
 <% } else { %>
     <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
 <% } %>

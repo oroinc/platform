@@ -4,7 +4,10 @@
             <i class="icon-caret-right"></i>
         </a>
         <% if (iconClass) { %>
-            <i class="<%= iconClass %>" title="<%= title %>"></i>
+            <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %> icon-with-counter new<% } %>"
+               title="<%= title %>">
+                <% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %><span><%= unreadEmailsCount %></span><% } %>
+            </i>
         <% } else { %>
             <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
         <% } %>
