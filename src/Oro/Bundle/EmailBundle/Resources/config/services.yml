@@ -23,6 +23,8 @@ parameters:
     oro_email.autoresponserule_manager.class:     Oro\Bundle\EmailBundle\Manager\AutoResponseManager
     oro_email.manager.email.api.class:            Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager
     oro_email.manager.email_origin.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailOriginApiEntityManager
+    oro_email.manager.email_activity.api.class:   Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
+    oro_email.manager.email_activity_entity.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityEntityApiEntityManager
     oro_email.manager.email_activity_search.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySearchApiEntityManager
     oro_email.manager.email_activity_suggestion.api.class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivitySuggestionApiEntityManager
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
@@ -106,7 +108,6 @@ parameters:
     oro_email.provider.email_attachment_provider.class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
     oro_email.acl.voter.email_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailVoter
     oro_email.acl.voter.email_user_voter.class: Oro\Bundle\EmailBundle\Acl\Voter\EmailUserVoter
-    oro_email.manager.email_activity.api.class:     Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager
 
     # Email DataGrid
     oro_email.datagrid.origin_folder.provider.class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
@@ -758,6 +759,16 @@ services:
             - %oro_email.email.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_activity.manager
+            - @security.token_storage
+
+    oro_email.manager.email_activity_entity.api:
+        class: %oro_email.manager.email_activity_entity.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_email.email.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_activity.manager
+            - @security.token_storage
 
     oro_email.manager.email_activity_search.api:
         class: %oro_email.manager.email_activity_search.api.class%
