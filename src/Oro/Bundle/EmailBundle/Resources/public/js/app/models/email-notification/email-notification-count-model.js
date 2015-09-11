@@ -8,7 +8,9 @@ define(function(require) {
      * @export  oroemail/js/app/models/email-notification-count-model
      */
     EmailNotificationCountModel = BaseModel.extend({
-        'unreadEmailCount': 0
+        defaults: {
+            unreadEmailsCount: 0
+        }
     });
 
     return EmailNotificationCountModel;

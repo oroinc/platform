@@ -30,12 +30,8 @@ define(function(require) {
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
-
-            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                view.$el.addClass('sidebar-icon-active');
-            } else {
-                view.$el.removeClass('sidebar-icon-active');
-            }
+            view.$el.toggleClass('sidebar-icon-active', model.get('state') === constants.WIDGET_MAXIMIZED_HOVER);
+            view.$el.toggleClass('sidebar-icon-with-counter', Boolean(model.get('unreadEmailsCount')));
 
             return view;
         },

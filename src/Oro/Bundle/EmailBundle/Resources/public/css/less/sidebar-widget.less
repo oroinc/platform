@@ -1,11 +1,25 @@
 .sidebar-widget-recent-emails {
+  .sidebar-widget .sidebar-widget-header {
+    background: #eeeeee;
+    .sidebar-widget-header-title .widget-title {
+      width: 85px;
+    }
+  }
   .sidebar-widget-content {
     background: #fff;
     .header {
       display: none;
     }
   }
-  .icon-envelope.new, i.icon-envelope.new:before{
+  .icon-envelope.highlight {
+    margin-right: 18px;
+  }
+  .icon-envelope.highlight, i.icon-envelope.highlight:before{
     color: #fabb18;
+    span {
+      background: #eeeeee;
+      top: 4px;
+      font-size: 8px;
+    }
   }
 }

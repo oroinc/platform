@@ -15,7 +15,7 @@ require([
                     var options = $menu.data('page-component-options');
                     options._sourceElement = $menu.find('.dropdown-menu');
                     options._iconElement = $menu.find('.email-notification-icon');
-                    options.countModel = new EmailNotificationCountModel({'unreadEmailCount': options.count});
+                    options.countModel = new EmailNotificationCountModel({'unreadEmailsCount': options.count});
                     this.component = new EmailNotificationComponent(options);
                 }
             }

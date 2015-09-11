@@ -79,7 +79,7 @@ define(function(require) {
         loadLastEmail: function(hasNewEmail) {
             this.collection.fetch({
                 success: _.bind(function(collection) {
-                    this.options.countModel.set('unreadEmailCount', collection.unreadEmailsCount);
+                    this.options.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
                     if (hasNewEmail) {
                         this.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
