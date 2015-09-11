@@ -46,7 +46,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             }
 
             if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
-                requirejs([model.get('module')], function(Widget) {
+                model.loadModule().then(function(Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {
                         view.contentView = new Widget.ContentView({

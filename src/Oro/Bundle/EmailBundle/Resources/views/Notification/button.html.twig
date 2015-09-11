@@ -48,31 +48,11 @@
         </span>
     </div>
 </script>
-{% if count > 0 %}
-    {%  set classNew = 'new' %}
-{% else %}
-    {%  set classNew = '' %}
-{% endif %}
-
-{% set options = {
-    'emails': emails,
-    'count': count
-} %}
 
 <li class="email-notification-menu dropdown"
-    data-page-component-options="{{ options|json_encode }}"
+    data-page-component-options="{{ {'emails': emails, 'count': count}|json_encode }}"
     data-layout="separate">
-    <a href="#" class="oro-dropdown-toggle">
-        <i class="icon-envelope icon-with-counter {{ classNew }}">
-            <span>
-                {% if (count > 10) %}
-                    10+
-                {% elseif (count > 0 ) %}
-                    {{ count }}
-                {% endif %}
-            </span>
-        </i>
-    </a>
+    <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>
     <div class="dropdown-menu pull-right" tabindex="0"></div>
 </li>
 {% endif %}

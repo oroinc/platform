@@ -96,20 +96,6 @@ define(function(require) {
             this.setCount(0);
         },
 
-        setCount: function(count) {
-            count = parseInt(count);
-            this.countNewEmail = count;
-            if (count > 10) {
-                count = '10+';
-            }
-
-            if (count === 0) {
-                count = '';
-            }
-            this.$el.find('.icon-envelope span').html(count);
-            this.updateViewMode();
-        },
-
         onClickIconEnvelope: function() {
             if (this.isActiveTypeDropDown('notification')) {
                 this.open();
