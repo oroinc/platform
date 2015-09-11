@@ -85,9 +85,6 @@ class OwnershipConditionDataBuilder
             return [];
         }
 
-        // no access
-        $condition = null;
-
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityClassName);
