@@ -178,11 +178,23 @@
     -ms-filter: grayscale(100%);
     filter: grayscale(100%);
   }
-  .icon-with-counter span {
-    background-color: #cccccc;
-    top: 5px;
-    line-height: 8px;
-    padding: 0 2px;
+  .icon-with-counter {
+    span {
+      background-color: #ffffff;
+      top: -3px;
+      left: 3px;
+      padding: 0 2px;
+    }
+    &.highlight {
+      -webkit-filter: none;
+      -moz-filter: none;
+      -o-filter: none;
+      -ms-filter: none;
+      filter: none;
+      &:before, span {
+        color: #fabb18;
+      }
+    }
   }
 }
 .sidebar-widget-header{

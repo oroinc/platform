@@ -1,5 +1,5 @@
 <% if (iconClass) { %>
-    <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %> icon-with-counter new<% } %>"
+    <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %> icon-with-counter highlight<% } %>"
        title="<%= title %>">
         <% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount !== '') { %><span><%= unreadEmailsCount %></span><% } %>
     </i>
