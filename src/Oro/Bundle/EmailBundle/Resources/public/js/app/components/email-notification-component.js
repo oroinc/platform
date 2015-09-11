@@ -49,11 +49,10 @@ define(function(require) {
                 collection: this.collection,
                 countNewEmail: this.options.count
             });
-            this.countModel = this.options.countModel;
             if (this.options._iconElement) {
                 this.countView = new EmailNotificationCountView({
                     el: this.options._iconElement,
-                    model: this.countModel
+                    model: this.options.countModel
                 });
             }
             this.view.render();
