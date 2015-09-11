@@ -67,6 +67,7 @@ class DQLNameFormatter
     private function buildExpression($nameFormat, array $nameParts)
     {
         $parts = [];
+        $separators = [];
         preg_match_all('/%(\w+)%([^%]*)/', $nameFormat, $matches);
         if (!empty($matches[0])) {
             foreach ($matches[0] as $idx => $match) {
@@ -79,17 +80,49 @@ class DQLNameFormatter
                         $value = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
                     }
 
-                    $parts[] = $value;
-                    if (strlen($prependSeparator) !== 0) {
-                        $parts[] = sprintf("'%s'", $prependSeparator);
-                    }
+                    $parts[]            = $value;
+                    $separators[$value] = (strlen($prependSeparator) !== 0)
+                        ? sprintf('%s', $prependSeparator)
+                        : '';
                 }
             }
         } else {
             throw new \LogicException('Unexpected name format given');
         }
 
-        return QueryUtils::buildConcatExpr($parts);
+        return $this->buildConcatExprWithSeparators($parts, $separators);
+    }
+
+    /**
+     * Builds CONCAT(...) DQL expression with separators.
+     * Skip cases with separators in which result is not defined(equals empty string) in the expression.
+     *
+     * @param string[] $parts
+     * @param array    $separators
+     *
+     * @return string
+     */
+    protected function buildConcatExprWithSeparators(array $parts, $separators = [])
+    {
+        $parts = array_map(
+            function ($part) use ($separators) {
+                return sprintf(
+                    'CASE WHEN (%1$s) = \'\' THEN \'\' ELSE CONCAT(%1$s, \'%2$s\') END',
+                    $part,
+                    isset($separators[$part]) ? $separators[$part] : ''
+                );
+            },
+            $parts
+        );
+
+        $expression = QueryUtils::buildConcatExpr($parts);
+
+        $trim = [];
+        foreach (array_values($separators) as $separator) {
+            $trim = array_merge($trim, str_split($separator));
+        }
+
+        return sprintf('TRIM(TRAILING \'%s\' FROM %s)', implode('', array_unique($trim)), $expression);
     }
 
     /**
