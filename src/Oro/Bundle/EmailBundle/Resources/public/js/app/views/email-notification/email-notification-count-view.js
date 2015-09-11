@@ -9,7 +9,7 @@ define(function(require) {
         template: require('tpl!oroemail/templates/email-notification/email-notification-icon-view.html'),
         initialize: function() {
             EmailNotificationCountView.__super__.initialize.apply(this, arguments);
-            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'change:unreadEmailCount', this.render);
         }
     });
 

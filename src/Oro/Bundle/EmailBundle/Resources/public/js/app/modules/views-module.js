@@ -3,13 +3,11 @@ require([
 ], function(BaseController) {
     'use strict';
 
-    /**
-     * Init ShortcutsView
-     */
     BaseController.loadBeforeAction([
         'jquery',
-        'oroemail/js/app/components/email-notification-component'
-    ], function($, EmailNotificationComponent) {
+        'oroemail/js/app/components/email-notification-component',
+        'oroemail/js/app/models/email-notification/email-notification-count-model'
+    ], function($, EmailNotificationComponent, EmailNotificationCountModel) {
         BaseController.addToReuse('emailNotification', {
             compose: function() {
                 var $menu = $('.email-notification-menu');
@@ -17,6 +15,7 @@ require([
                     var options = $menu.data('page-component-options');
                     options._sourceElement = $menu.find('.dropdown-menu');
                     options._iconElement = $menu.find('.email-notification-icon');
+                    options.countModel = new EmailNotificationCountModel({'unreadEmailCount': options.count});
                     this.component = new EmailNotificationComponent(options);
                 }
             }
