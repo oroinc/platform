@@ -16,7 +16,7 @@ define(function(require) {
             var that = this;
             var options = {
                 _sourceElement: this.$el,
-                collection: this.model.collection
+                collection: this.model.emailNotificationCollection
             };
 
             this.component = new EmailNotificationComponent(options);
