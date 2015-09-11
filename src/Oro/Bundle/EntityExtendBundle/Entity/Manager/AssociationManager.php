@@ -167,15 +167,17 @@ class AssociationManager
      * LIMIT {limit} OFFSET {(page - 1) * limit}
      * </code>
      *
-     * @param string      $associationOwnerClass The FQCN of the entity that is the owning side of the association
-     * @param mixed|null  $filters               Criteria is used to filter entities which are association owners
-     *                                           e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins                 Additional associations required to filter owning side entities
-     * @param array       $associationTargets    The list of fields responsible to store associations
-     *                                           Array format: [target_entity_class => field_name]
-     * @param int         $limit                 The maximum number of items per page
-     * @param int         $page                  The page number
-     * @param string|null $orderBy               The ordering expression for the result
+     * @param string        $associationOwnerClass The FQCN of the entity that is the owning side of the association
+     * @param mixed|null    $filters               Criteria is used to filter entities which are association owners
+     *                                             e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins                 Additional associations required to filter owning side entities
+     * @param array         $associationTargets    The list of fields responsible to store associations
+     *                                             Array format: [target_entity_class => field_name]
+     * @param int|null      $limit                 The maximum number of items per page
+     * @param int|null      $page                  The page number
+     * @param string|null   $orderBy               The ordering expression for the result
+     * @param callable|null $callback              A callback function which can be used to modify child queries
+     *                                             function (QueryBuilder $qb, $targetEntityClass)
      *
      * @return SqlQueryBuilder
      */
@@ -186,7 +188,8 @@ class AssociationManager
         $associationTargets,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $em       = $this->doctrineHelper->getEntityManager($associationOwnerClass);
         $criteria = $this->doctrineHelper->normalizeCriteria($filters);
@@ -208,6 +211,9 @@ class AssociationManager
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
             $subQb->addCriteria($criteria);
+            if (null !== $callback && is_callable($callback)) {
+                call_user_func($callback, $subQb, $entityClass);
+            }
 
             $subQuery = $this->getAclHelper()->apply($subQb);
 
@@ -280,16 +286,18 @@ class AssociationManager
      * LIMIT {limit} OFFSET {(page - 1) * limit}
      * </code>
      *
-     * @param string      $associationTargetClass The FQCN of the entity that is the target side of the association
-     * @param mixed|null  $filters                Criteria is used to filter entities which are association owners
-     *                                            e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins                  Additional associations required to filter owning side entities
-     * @param array       $associationOwners      The list of fields responsible to store associations between
-     *                                            the given target and association owners
-     *                                            Array format: [owner_entity_class => field_name]
-     * @param int         $limit                  The maximum number of items per page
-     * @param int         $page                   The page number
-     * @param string|null $orderBy                The ordering expression for the result
+     * @param string        $associationTargetClass The FQCN of the entity that is the target side of the association
+     * @param mixed|null    $filters                Criteria is used to filter entities which are association owners
+     *                                              e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins                  Additional associations required to filter owning side entities
+     * @param array         $associationOwners      The list of fields responsible to store associations between
+     *                                              the given target and association owners
+     *                                              Array format: [owner_entity_class => field_name]
+     * @param int|null      $limit                  The maximum number of items per page
+     * @param int|null      $page                   The page number
+     * @param string|null   $orderBy                The ordering expression for the result
+     * @param callable|null $callback               A callback function which can be used to modify child queries
+     *                                              function (QueryBuilder $qb, $ownerEntityClass)
      *
      * @return SqlQueryBuilder
      */
@@ -300,7 +308,8 @@ class AssociationManager
         $associationOwners,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $em       = $this->doctrineHelper->getEntityManager($associationTargetClass);
         $criteria = $this->doctrineHelper->normalizeCriteria($filters);
@@ -323,6 +332,9 @@ class AssociationManager
             $this->doctrineHelper->applyJoins($subQb, $joins);
 
             $subQb->addCriteria($criteria);
+            if (null !== $callback && is_callable($callback)) {
+                call_user_func($callback, $subQb, $ownerClass);
+            }
 
             $subQuery = $this->getAclHelper()->apply($subQb);
 

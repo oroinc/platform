@@ -82,13 +82,15 @@ After this we can create a method to return a query builder for getting the list
      * Returns a query builder that could be used for fetching the list of entities
      * associated with the given activity
      *
-     * @param string      $activityClassName The FQCN of the activity entity
-     * @param mixed       $filters           Criteria is used to filter activity entities
-     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins             Additional associations required to filter activity entities
-     * @param int|null    $limit             The maximum number of items per page
-     * @param int|null    $page              The page number
-     * @param string|null $orderBy           The ordering expression for the result
+     * @param string        $activityClassName The FQCN of the activity entity
+     * @param mixed         $filters           Criteria is used to filter activity entities
+     *                                         e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins             Additional associations required to filter activity entities
+     * @param int|null      $limit             The maximum number of items per page
+     * @param int|null      $page              The page number
+     * @param string|null   $orderBy           The ordering expression for the result
+     * @param callable|null $callback          A callback function which can be used to modify child queries
+     *                                         function (QueryBuilder $qb, $targetEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -98,7 +100,8 @@ After this we can create a method to return a query builder for getting the list
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $targets = $this->getActivityTargets($activityClassName);
         if (empty($targets)) {
@@ -112,7 +115,8 @@ After this we can create a method to return a query builder for getting the list
             $targets,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 ```
@@ -339,13 +343,15 @@ Having the list of fields we can proceed to creating a query builder that will b
      * Returns a query builder that could be used for fetching the list of activity entities
      * associated with the given target entity
      *
-     * @param string      $targetClassName The FQCN of the activity entity
-     * @param mixed       $filters         Criteria is used to filter activity entities
-     *                                     e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins           Additional associations required to filter activity entities
-     * @param int|null    $limit           The maximum number of items per page
-     * @param int|null    $page            The page number
-     * @param string|null $orderBy         The ordering expression for the result
+     * @param string        $targetClassName The FQCN of the activity entity
+     * @param mixed         $filters         Criteria is used to filter activity entities
+     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins           Additional associations required to filter activity entities
+     * @param int|null      $limit           The maximum number of items per page
+     * @param int|null      $page            The page number
+     * @param string|null   $orderBy         The ordering expression for the result
+     * @param callable|null $callback        A callback function which can be used to modify child queries
+     *                                       function (QueryBuilder $qb, $ownerEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -355,7 +361,8 @@ Having the list of fields we can proceed to creating a query builder that will b
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $activities = $this->getActivities($targetClassName);
         if (empty($activities)) {
@@ -369,7 +376,8 @@ Having the list of fields we can proceed to creating a query builder that will b
             $activities,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 ```
