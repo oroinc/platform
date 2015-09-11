@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
@@ -34,7 +36,7 @@ class EmailActivityApiEntityManager extends ApiEntityManager
         TokenStorageInterface $securityTokenStorage
     ) {
         parent::__construct($class, $om);
-        $this->activityManager = $activityManager;
+        $this->activityManager      = $activityManager;
         $this->securityTokenStorage = $securityTokenStorage;
     }
 
@@ -73,29 +75,28 @@ class EmailActivityApiEntityManager extends ApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
-        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
+        $currentUser = $this->securityTokenStorage->getToken()->getUser();
+        $userClass   = ClassUtils::getClass($currentUser);
+
+        return $this->activityManager->getActivityTargetsQueryBuilder(
             $this->class,
             $criteria,
             $joins,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            function (QueryBuilder $qb, $targetEntityClass) use ($currentUser, $userClass) {
+                if ($targetEntityClass === $userClass) {
+                    // Need to exclude current user from result because of email context
+                    // @see Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager::getEmailContext
+                    $qb->andWhere(
+                        $qb->expr()->neq(
+                            QueryUtils::getSelectExprByAlias($qb, 'entityId'),
+                            $currentUser->getId()
+                        )
+                    );
+                }
+            }
         );
-
-        /**
-         * Need to exclude current user from result because of email context.
-         * @see \Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager::getEmailContext
-         */
-        if ($queryBuilder) {
-            $currentUser = $this->securityTokenStorage->getToken()->getUser();
-            // @todo: Filter aliases should be refactored in BAP-8979.
-            $queryBuilder->andWhere(
-                'NOT (id_1 = :userId AND sclr_2 = :userClass)'
-            );
-            $queryBuilder->setParameter('userId', $currentUser->getId());
-            $queryBuilder->setParameter('userClass', ClassUtils::getClass($currentUser));
-        }
-
-        return $queryBuilder;
     }
 }
