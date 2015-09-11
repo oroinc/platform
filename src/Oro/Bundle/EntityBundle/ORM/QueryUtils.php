@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\ParserResult;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\QueryBuilder;
 
 class QueryUtils
 {
@@ -83,6 +84,32 @@ class QueryUtils
         }
 
         throw new QueryException(sprintf('Unknown column alias: %s', $alias));
+    }
+
+    /**
+     * Returns an expression in SELECT clause by its alias
+     *
+     * @param QueryBuilder $qb
+     * @param string       $alias An alias of an expression in SELECT clause
+     *
+     * @return string|null
+     */
+    public static function getSelectExprByAlias(QueryBuilder $qb, $alias)
+    {
+        /** @var \Doctrine\ORM\Query\Expr\Select $selectPart */
+        foreach ($qb->getDQLPart('select') as $selectPart) {
+            foreach ($selectPart->getParts() as $part) {
+                if (preg_match_all('#(\,\s*)*(?P<expr>.+?)\\s+AS\\s+(?P<alias>\\w+)#i', $part, $matches)) {
+                    foreach ($matches['alias'] as $key => $val) {
+                        if ($val === $alias) {
+                            return $matches['expr'][$key];
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
