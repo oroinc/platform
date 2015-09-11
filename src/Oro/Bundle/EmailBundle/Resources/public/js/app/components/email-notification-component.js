@@ -14,8 +14,6 @@ define(function(require) {
         require('oroemail/js/app/views/email-notification/mobile-email-notification-view');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
-    var EmailNotificationCountModel =
-        require('oroemail/js/app/models/email-notification/email-notification-count-model');
     var EmailNotificationCountView =
         require('oroemail/js/app/views/email-notification/email-notification-count-view');
 
@@ -50,11 +48,13 @@ define(function(require) {
                 collection: this.collection,
                 countNewEmail: this.options.count
             });
-            this.countModel = new EmailNotificationCountModel({'count': this.options.count});
-            this.countView = new EmailNotificationCountView({
-                el: this.options._iconElement,
-                model: this.countModel
-            });
+            this.countModel = this.options.countModel;
+            if (this.options._iconElement) {
+                this.countView = new EmailNotificationCountView({
+                    el: this.options._iconElement,
+                    model: this.countModel
+                });
+            }
             this.view.render();
         },
 
@@ -79,7 +79,7 @@ define(function(require) {
         loadLastEmail: function(hasNewEmail) {
             this.collection.fetch({
                 success: _.bind(function(collection) {
-                    this.countModel.set('count', collection.unreadEmailsCount);
+                    this.countModel.set('unreadEmailCount', collection.unreadEmailsCount);
                     if (hasNewEmail) {
                         this.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
