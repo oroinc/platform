@@ -33,6 +33,7 @@ define(function(require) {
         initCollection: function() {
             if (this.options.collection) {
                 this.collection = this.options.collection;
+                this.usedOutOfScopeCollection = true;
                 return;
             }
             var emails = this.options.emails || [];
@@ -86,6 +87,17 @@ define(function(require) {
                     }
                 }, this)
             });
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return true;
+            }
+            if (this.usedOutOfScopeCollection) {
+                // prevent collection disposing
+                delete this.collection;
+            }
+            EmailNotification.__super__.dispose.call(this);
         }
     });
 

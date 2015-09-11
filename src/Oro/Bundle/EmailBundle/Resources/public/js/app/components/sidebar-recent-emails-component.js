@@ -29,6 +29,8 @@ define(function(require) {
                 return;
             }
             this.model.emailNotificationCollection.off('sync', this.onCollectionSync, this);
+            delete this.model;
+            this.model.emailNotificationCollection.dispose();
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
         }
     });
