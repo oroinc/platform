@@ -13,15 +13,14 @@ define(function(require) {
          */
         initialize: function(options) {
             this.model = options.model;
-            this.model.collection = new EmailNotificationCollection([]);
-            this.model.collection.fetch();
-            this.model.collection.on('sync', this.onCollectionSync, this);
+            this.model.emailNotificationCollection = new EmailNotificationCollection([]);
+            this.model.emailNotificationCollection.fetch();
+            this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
         onCollectionSync: function() {
             this.model.set({
-                unreadEmailsCount: this.model.collection.unreadEmailsCount ?
-                    this.model.collection.unreadEmailsCount : ''
+                unreadEmailsCount: this.model.emailNotificationCollection.unreadEmailsCount || ''
             });
         },
 
@@ -29,7 +28,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.model.collection.off('sync', this.onCollectionSync, this);
+            this.model.emailNotificationCollection.off('sync', this.onCollectionSync, this);
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
         }
     });

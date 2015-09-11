@@ -24,6 +24,10 @@ define(function(require) {
         },
 
         parse: function(response, q) {
+            if (this.disposed) {
+                return;
+            }
+
             this.unreadEmailsCount = response.count;
             // format response to regular backbone one
             response = {

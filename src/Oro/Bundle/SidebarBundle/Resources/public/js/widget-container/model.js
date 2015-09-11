@@ -23,6 +23,7 @@ define([
         initialize: function() {
             this.stateSnapshot = this.get('state');
             this.isDragged = false;
+            this.loadModule();
         },
 
         loadModule: function() {
@@ -34,10 +35,11 @@ define([
                 }, this), _.bind(function() {
                     this.deferredModuleLoad.reject(arguments);
                 }, this));
+                this.deferredModulePromise = this.deferredModuleLoad
+                    .then(_.bind(this.createController, this))
+                    .fail(_.bind(this.onWidgetLoadError, this));
             }
-            return this.deferredModuleLoad
-                .then(_.bind(this.createController, this))
-                .fail(_.bind(this.onWidgetLoadError, this));
+            return this.deferredModulePromise;
         },
 
         createController: function(Widget) {

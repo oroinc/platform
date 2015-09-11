@@ -16,6 +16,7 @@ require([
                 if ($menu.length !== 0) {
                     var options = $menu.data('page-component-options');
                     options._sourceElement = $menu.find('.dropdown-menu');
+                    options._iconElement = $menu.find('.email-notification-icon');
                     this.component = new EmailNotificationComponent(options);
                 }
             }
