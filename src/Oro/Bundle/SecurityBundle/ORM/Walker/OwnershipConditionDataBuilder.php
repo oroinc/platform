@@ -122,6 +122,8 @@ class OwnershipConditionDataBuilder
                 $observer->getAccessLevel(),
                 $this->metadataProvider->getMetadata($entityClassName)
             );
+        } else {
+            $condition = $this->getAccessDeniedCondition();
         }
 
         return $condition;
@@ -377,6 +379,23 @@ class OwnershipConditionDataBuilder
         }
 
         return null;
+    }
+
+    /**
+     * Gets SQL condition that can be used to apply restrictions for all records (e.g. in case of an access is denied)
+     *
+     * @return array
+     */
+    protected function getAccessDeniedCondition()
+    {
+        return [
+            null,
+            null,
+            PathExpression::TYPE_STATE_FIELD,
+            null,
+            null,
+            false
+        ];
     }
 
     /**
