@@ -109,7 +109,10 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit_Framework_Tes
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
-        $this->assertEquals(['activity' => 'calls|tasks'], $route->getRequirements());
+        $this->assertEquals(
+            ['activity' => 'emails|calls|tasks|events'],
+            $route->getRequirements()
+        );
 
         $this->routeCollection->sortByPriority();
         $this->assertEquals(
@@ -127,7 +130,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit_Framework_Tes
         );
 
         $this->assertEquals(
-            'calls|tasks',
+            'emails|calls|tasks|events',
             $this->routeCollection->get('tested_route')->getRequirement('activity')
         );
         $this->assertEquals(
