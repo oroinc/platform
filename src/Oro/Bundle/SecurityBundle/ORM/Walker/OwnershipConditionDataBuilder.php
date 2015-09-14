@@ -4,8 +4,10 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query\AST\PathExpression;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -41,6 +43,9 @@ class OwnershipConditionDataBuilder
     /** @var OwnerTreeProviderInterface */
     protected $treeProvider;
 
+    /** @var AclGroupProviderInterface */
+    protected $aclGroupProvider;
+
     /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
@@ -66,6 +71,14 @@ class OwnershipConditionDataBuilder
     }
 
     /**
+     * @param AclGroupProviderInterface $aclGroupProvider
+     */
+    public function setAclGroupProvider($aclGroupProvider)
+    {
+        $this->aclGroupProvider = $aclGroupProvider;
+    }
+
+    /**
      * Get data for query acl access level check
      * Return empty array if entity has full access, null if user does't have access to the entity
      *  and array with entity field and field values which user have access.
@@ -85,12 +98,20 @@ class OwnershipConditionDataBuilder
             return [];
         }
 
-        // no access
-        $condition = null;
-
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityClassName);
+
+        $groupedEntityClassName = $entityClassName;
+        if ($this->aclGroupProvider) {
+            $group = $this->aclGroupProvider->getGroup();
+            if ($group) {
+                $groupedEntityClassName = sprintf('%s@%s', $this->aclGroupProvider->getGroup(), $entityClassName);
+            }
+        }
+        $isGranted = $this->getSecurityContext()->isGranted(
+            $permissions,
+            new ObjectIdentity('entity', $groupedEntityClassName)
+        );
 
         if ($isGranted) {
             $condition = $this->buildConstraintIfAccessIsGranted(
@@ -98,6 +119,8 @@ class OwnershipConditionDataBuilder
                 $observer->getAccessLevel(),
                 $this->metadataProvider->getMetadata($entityClassName)
             );
+        } else {
+            $condition = $this->getAccessDeniedCondition();
         }
 
         return $condition;
@@ -353,6 +376,23 @@ class OwnershipConditionDataBuilder
         }
 
         return null;
+    }
+
+    /**
+     * Gets SQL condition that can be used to apply restrictions for all records (e.g. in case of an access is denied)
+     *
+     * @return array
+     */
+    protected function getAccessDeniedCondition()
+    {
+        return [
+            null,
+            null,
+            PathExpression::TYPE_STATE_FIELD,
+            null,
+            null,
+            false
+        ];
     }
 
     /**

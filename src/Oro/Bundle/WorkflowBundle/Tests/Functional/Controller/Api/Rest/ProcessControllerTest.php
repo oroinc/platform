@@ -9,7 +9,6 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class ProcessControllerTest extends WebTestCase
 {

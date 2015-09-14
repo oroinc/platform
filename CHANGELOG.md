@@ -1,3 +1,16 @@
+CHANGELOG for 1.8.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.8.0 versions.
+* 1.8.0 (2015-08-26)
+ * Visual workflow configurator
+ * New and extended APIs to work with emails
+ * Segmentation based on Data audit
+ * Improvements to search
+ * Improved filtering on option set attributes, allowing for multiple selections
+ * The application has been upgraded to Symfony 2.7 and migrated to Doctrine 2.5
+ * Select2 component has been improved to automatically initializes select2 widget
+ * Documentation for the new Oro Layout component has been added with examples of use
+
 CHANGELOG for 1.7.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.7.0 versions.
@@ -244,7 +257,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Issue #3916 � Installed application is not working correctly because of knp-menu version
  * Issue #3839 � Cache regeneration is too slow
  * Issue #3525 � Broken filters on Entity Configuration grid
- * Issue #3974 � Settings are not saved in sidebar widgets 
+ * Issue #3974 � Settings are not saved in sidebar widgets
  * Issue #3962 � Workflow window opens with a significant delay
  * Issue #2203 � Incorrect timezone processing in Calendar
  * Issue #3909 � Multi-selection filters might be too long
@@ -319,7 +332,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Form validation improvements
  * Make all entities as Extended
  * JavaScript Tests
- * End support for Internet Explorer 9 
+ * End support for Internet Explorer 9
 
 CHANGELOG for 1.0.0-beta3
 ===================
@@ -393,7 +406,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Multiple Organizations and Business Units
  * Transactional Emails
  * Email Templates
- * Tags Management 
+ * Tags Management
  * Translations JS files
  * Pin tab experience update
  * Redesigned Page Header

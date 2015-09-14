@@ -3,15 +3,17 @@
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 use Doctrine\Common\Inflector\Inflector;
 
 class ResultRecord implements ResultRecordInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $valueContainers = [];
+
+    /** @var PropertyAccessorInterface */
+    private $propertyAccessor;
 
     /**
      * @param mixed $data
@@ -52,14 +54,15 @@ class ResultRecord implements ResultRecordInterface
      */
     public function getValue($name)
     {
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($this->valueContainers as $data) {
-            if (is_array($data) && array_key_exists($name, $data)) {
-                return $data[$name];
-            }
-
-            if (is_object($data)) {
-                return $propertyAccessor->getValue($data, Inflector::camelize($name));
+            if (is_array($data)) {
+                if (strpos($name, '[') === 0) {
+                    return $this->getPropertyAccessor()->getValue($data, $name);
+                } elseif (array_key_exists($name, $data)) {
+                    return $data[$name];
+                }
+            } elseif (is_object($data)) {
+                return $this->getPropertyAccessor()->getValue($data, Inflector::camelize($name));
             }
         }
 
@@ -78,5 +81,17 @@ class ResultRecord implements ResultRecordInterface
         }
 
         return null;
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    protected function getPropertyAccessor()
+    {
+        if (null === $this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

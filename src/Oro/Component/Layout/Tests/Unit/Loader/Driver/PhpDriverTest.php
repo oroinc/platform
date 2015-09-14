@@ -11,10 +11,39 @@ use Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface;
 
 class PhpDriverTest extends \PHPUnit_Framework_TestCase
 {
+    protected $cacheDir;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->cacheDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'layouts';
+
+        $fs = new Filesystem();
+        $fs->remove($this->cacheDir);
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $fs = new Filesystem();
+        $fs->remove($this->cacheDir);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyCacheDirException()
+    {
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $this->getLoader($generator);
+    }
+
     public function testLoadInDebugMode()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, true, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
@@ -27,11 +56,8 @@ class PhpDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInProductionMode()
     {
-        $fs  = new Filesystem();
-        $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . time();
-
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator, false, $dir);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
@@ -40,15 +66,13 @@ class PhpDriverTest extends \PHPUnit_Framework_TestCase
 
         $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
-        $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
-
-        $fs->remove($dir);
+        $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($this->cacheDir)));
     }
 
     public function testProcessSyntaxExceptions()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, true, $this->cacheDir);
 
         $exception = new SyntaxException(
             'Some error found',
@@ -105,7 +129,7 @@ CLASS;
      *
      * @return PhpDriver
      */
-    protected function getLoader($generator = null, $debug = true, $cache = false)
+    protected function getLoader($generator = null, $debug = false, $cache = false)
     {
         $generator = null === $generator
             ? $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface')

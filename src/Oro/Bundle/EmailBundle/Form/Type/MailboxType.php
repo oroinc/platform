@@ -14,6 +14,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class MailboxType extends AbstractType
 {
@@ -22,12 +24,17 @@ class MailboxType extends AbstractType
     /** @var MailboxProcessStorage */
     private $storage;
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
     /**
      * @param MailboxProcessStorage $storage
+     * @param Mcrypt $encryptor
      */
-    public function __construct(MailboxProcessStorage $storage)
+    public function __construct(MailboxProcessStorage $storage, Mcrypt $encryptor)
     {
         $this->storage = $storage;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -72,7 +79,7 @@ class MailboxType extends AbstractType
         ]);
         $builder->add(
             'authorizedUsers',
-            'oro_user_organization_acl_multiselect',
+            'oro_user_multiselect',
             [
                 'label' => 'oro.user.entity_plural_label',
             ]
@@ -81,12 +88,20 @@ class MailboxType extends AbstractType
             'authorizedRoles',
             'oro_role_multiselect',
             [
+                'autocomplete_alias' => 'roles_authenticated',
                 'label' => 'oro.user.role.entity_plural_label',
             ]
         );
+        $builder->add('passwordHolder', 'hidden', [
+            'required' => false,
+            'label' => '',
+            'mapped' => false
+        ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSet']);
+        $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
@@ -110,6 +125,10 @@ class MailboxType extends AbstractType
         $data = $event->getData();
         $form = $event->getForm();
 
+        /*
+         * Process types are selected based on mailbox, some processes are for example not available in some
+         * organizations.
+         */
         FormUtils::replaceField(
             $form,
             'processType',
@@ -122,14 +141,42 @@ class MailboxType extends AbstractType
             return;
         }
 
+        /*
+         * If data has already selected some kind of process type, make it default value for field.
+         */
         $processType = null;
         if (null !== $processEntity = $data->getProcessSettings()) {
             $processType = $processEntity->getType();
         }
-
         FormUtils::replaceField($form, 'processType', ['data' => $processType]);
 
+        /*
+         * Add appropriate field for selected process type to form.
+         */
         $this->addProcessField($form, $processType);
+
+        /*
+         * Configure user field to display only users from organization which mailbox belongs to.
+         */
+        $this->configureUserField($form, $data);
+    }
+
+    /**
+     * Set password on form reload
+     *
+     * @param FormEvent $event
+     */
+    public function postSet(FormEvent $event)
+    {
+        /** @var Mailbox $data */
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if ($data instanceof Mailbox && $data->getOrigin() && $form->has('passwordHolder')) {
+            $form->get('passwordHolder')->setData(
+                $this->encryptor->decryptData($data->getOrigin()->getPassword())
+            );
+        }
     }
 
     /**
@@ -163,6 +210,59 @@ class MailboxType extends AbstractType
     }
 
     /**
+     * Form post submit handler.
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+
+        $this->setOriginOrganizationAndOwner($data);
+        $this->setOriginSyncDate($data);
+    }
+
+    /**
+     * Set origin and folder sync date to prevent sync old emails
+     *
+     * @param Mailbox $data
+     */
+    public function setOriginSyncDate(Mailbox $data = null)
+    {
+        /* @var $origin UserEmailOrigin */
+        if (!$data || !$origin = $data->getOrigin()) {
+            return;
+        }
+
+        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $origin->setSynchronizedAt($currentDate);
+        foreach ($origin->getFolders() as $folder) {
+            if ($folder->isSyncEnabled()) {
+                $folder->setSynchronizedAt($currentDate);
+            }
+        }
+    }
+
+    /**
+     * Sets proper organization to origin. Set owner to null.
+     *
+     * @param Mailbox $data
+     */
+    protected function setOriginOrganizationAndOwner(Mailbox $data = null)
+    {
+        if ($data !== null) {
+            $organization = $data->getOrganization();
+
+            if (null !== $origin = $data->getOrigin()) {
+                if (null !== $origin->getOwner()) {
+                    $origin->setOwner(null);
+                }
+                $origin->setOrganization($organization);
+            }
+        }
+    }
+
+    /**
      * Adds mailbox process form field of proper type
      *
      * @param FormInterface $form
@@ -190,6 +290,36 @@ class MailboxType extends AbstractType
             'hidden',
             [
                 'data' => null,
+            ]
+        );
+    }
+
+    /**
+     * Configures user field so it searches only within mailboxes' organization.
+     *
+     * @param FormInterface $form
+     * @param Mailbox       $data
+     */
+    protected function configureUserField(FormInterface $form, Mailbox $data)
+    {
+        if (!$data->getOrganization()) {
+            return;
+        }
+
+        FormUtils::replaceField(
+            $form,
+            'authorizedUsers',
+            [
+                'configs'            => [
+                    'route_name'              => 'oro_email_mailbox_users_search',
+                    'route_parameters'        => ['organizationId' => $data->getOrganization()->getId()],
+                    'multiple'                => true,
+                    'width'                   => '400px',
+                    'placeholder'             => 'oro.user.form.choose_user',
+                    'allowClear'              => true,
+                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                ]
             ]
         );
     }

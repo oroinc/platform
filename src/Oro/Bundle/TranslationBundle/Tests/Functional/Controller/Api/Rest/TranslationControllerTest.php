@@ -4,9 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @outputBuffering enabled
- */
 class TranslationControllerTest extends WebTestCase
 {
     protected function setUp()

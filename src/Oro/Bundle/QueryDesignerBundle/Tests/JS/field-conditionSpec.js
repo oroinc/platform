@@ -33,7 +33,7 @@ define(function(require) {
         });
 
         function waitForFilter(cb) {
-            var timeout = 20;
+            var timeout = 100;
             var tick = 1;
             var t = timeout;
             var html = $el.find('.active-filter').html();
@@ -109,6 +109,7 @@ define(function(require) {
         });
 
         it('renders choice filter', function(done) {
+            require('oro/filter/choice-filter');
             var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
@@ -201,6 +202,8 @@ define(function(require) {
         });
 
         it('replaces filter', function(done) {
+            require('oro/filter/choice-filter');
+            require('oro/filter/datetime-filter');
             var $fieldsLoader = $('<input id="fields_loader" />');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');

@@ -115,7 +115,10 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
 
         $this->routeOptionsResolver->resolve($route, $this->routeCollectionAccessor);
 
-        $this->assertEquals(['dictionary' => 'priorities|Test_Priority|groups|Test_Group'], $route->getRequirements());
+        $this->assertEquals(
+            ['dictionary' => 'statuses|Test_Status|priorities|Test_Priority|sources|Test_Source|groups|Test_Group'],
+            $route->getRequirements()
+        );
 
         $this->routeCollection->sortByPriority();
         $this->assertEquals(
@@ -135,7 +138,7 @@ class DictionaryEntityRouteOptionsResolverTest extends \PHPUnit_Framework_TestCa
         );
 
         $this->assertEquals(
-            'priorities|Test_Priority|groups|Test_Group',
+            'statuses|Test_Status|priorities|Test_Priority|sources|Test_Source|groups|Test_Group',
             $this->routeCollection->get('tested_route')->getRequirement('dictionary')
         );
         $this->assertEquals(

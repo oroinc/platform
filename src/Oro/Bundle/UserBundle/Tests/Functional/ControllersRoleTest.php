@@ -8,9 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class ControllersRoleTest extends WebTestCase
 {
