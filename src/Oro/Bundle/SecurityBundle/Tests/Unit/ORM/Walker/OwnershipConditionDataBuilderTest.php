@@ -523,6 +523,15 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             'TEST entity with GLOBAL ACL, user1, grant and BUSINESS_UNIT ownerType' => array(
                 'user1', '', true, AccessLevel::GLOBAL_LEVEL, 'BUSINESS_UNIT', self::TEST_ENTITY, null
             ),
+            'access denied' => array(
+                'user4',
+                'org4',
+                false,
+                null,
+                null,
+                self::TEST_ENTITY,
+                [null, null, PathExpression::TYPE_STATE_FIELD, null, null, false]
+            ),
         );
     }
 }
