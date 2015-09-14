@@ -1,5 +1,7 @@
 parameters:
     oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
+    oro_entity_extend.migration.initial_entity_config_state.path: %kernel.cache_dir%/oro_migration/initial_entity_config_state.yml
+
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.datagrid.extension.additional_fields.class:     Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension
     oro_entity_extend.datagrid.extension.dynamic_fields.class:        Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension
@@ -194,7 +196,9 @@ services:
         arguments:
             - @oro_entity_config.tools.command_executor
             - @oro_entity_config.config_manager
+            - %oro_entity_extend.migration.initial_entity_config_state.path%
         tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp, priority: 100 }
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -85 }
 
     oro_entity_extend.migration.update_config.post_up.listener:
@@ -202,6 +206,7 @@ services:
         arguments:
             - @oro_entity_config.tools.command_executor
             - %oro_entity_extend.migration.config_processor.options.path%
+            - %oro_entity_extend.migration.initial_entity_config_state.path%
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
 
