@@ -7,7 +7,7 @@ interface ActivityListDateProviderInterface
     /**
      * Get date from entity. Can be useful on SYNC with external servers
      *
-     * @deprecated method is deprecated
+     * @deprecated 1.8.0:1.10.0 Use getCreatedAt, getUpdatedAt instead
      * @param object $entity
      *
      * @return \DateTime
@@ -17,7 +17,8 @@ interface ActivityListDateProviderInterface
     /**
      * Can be updated date field on update activity entity
      *
-     * @deprecated method is deprecated
+     * @deprecated 1.8.0:1.10.0 Method is deprecated and will be removed
+     * @see https://magecore.atlassian.net/browse/BAP-9014
      * @return bool
      */
     public function isDateUpdatable();

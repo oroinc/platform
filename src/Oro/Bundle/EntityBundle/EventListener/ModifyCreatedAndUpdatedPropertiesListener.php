@@ -22,6 +22,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     /** @var EntityManager */
     protected $entityManager;
 
+    /** @var bool */
+    protected $enabled = true;
+
     /**
      * @param ServiceLink $securityFacadeLink
      */
@@ -43,6 +46,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     public function prePersist(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
         $entity = $args->getEntity();
         $this->entityManager = $args->getEntityManager();
         $this->setCreatedProperties($entity);
@@ -54,6 +60,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
         $entity = $args->getEntity();
         $this->entityManager = $args->getEntityManager();
         $this->setUpdatedProperties($entity);

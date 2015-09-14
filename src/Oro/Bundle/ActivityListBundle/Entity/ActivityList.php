@@ -88,7 +88,7 @@ class ActivityList extends ExtendActivityList implements
 
     /**
      * @var User
-     * @deprecated since 1.8. Rename to updatedBy
+     * @deprecated 1.8.0:1.10.0 Will be renamed to updatedBy
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
@@ -408,7 +408,7 @@ class ActivityList extends ExtendActivityList implements
 
     /**
      * @param User $editor
-     * @deprecated since 1.8. Use $this->setUpdatedBy() instead
+     * @deprecated 1.8.0:1.10.0 Use $this->setUpdatedBy() instead
      *
      * @return self
      */
@@ -465,14 +465,6 @@ class ActivityList extends ExtendActivityList implements
     public function isUpdatedBySetted()
     {
         return $this->isUpdatedBySetted;
-    }
-
-    /**
-     * @param bool $value
-     */
-    public function setUpdatedUpdatedByProperty($value)
-    {
-        $this->isUpdatedBySetted = (bool) $value;
     }
 
     /**

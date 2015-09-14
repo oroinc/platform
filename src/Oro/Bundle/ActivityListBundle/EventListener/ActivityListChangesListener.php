@@ -10,7 +10,6 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener;
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 /**
  * Class ActivityListChangesListener
@@ -19,7 +18,7 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ActivityListChangesListener extends ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
+class ActivityListChangesListener extends ModifyCreatedAndUpdatedPropertiesListener
 {
     /** @var  ActivityListChainProvider */
     protected $activityListChainProvider;
@@ -35,23 +34,18 @@ class ActivityListChangesListener extends ModifyCreatedAndUpdatedPropertiesListe
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
-    }
-
-    /**
      * @param LifecycleEventArgs $args
      */
     public function prePersist(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entity = $args->getEntity();
         if (!$this->isActivityListEntity($entity)) {
             return;
         }
-
         $this->entityManager = $args->getEntityManager();
         $this->setCreatedProperties($entity);
         $this->setUpdatedProperties($entity);
@@ -62,6 +56,9 @@ class ActivityListChangesListener extends ModifyCreatedAndUpdatedPropertiesListe
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
         $entity = $args->getEntity();
         if (!$this->isActivityListEntity($entity)) {
             return;
