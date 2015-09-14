@@ -582,11 +582,37 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Gets an entity full class name by a table name
      *
      * @param string $tableName
+     *
      * @return string|null
      */
     public function getEntityClassByTableName($tableName)
     {
         return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
+    }
+
+    /**
+     * Gets a table name by entity full class name
+     *
+     * @param string $className
+     *
+     * @return string|null
+     */
+    public function getTableNameByEntityClass($className)
+    {
+        return $this->entityMetadataHelper->getTableNameByEntityClass($className);
+    }
+
+    /**
+     * Gets a field name by a table name and a column name
+     *
+     * @param string $tableName
+     * @param string $columnName
+     *
+     * @return string|null
+     */
+    public function getFieldNameByColumnName($tableName, $columnName)
+    {
+        return $this->entityMetadataHelper->getFieldNameByColumnName($tableName, $columnName);
     }
 
     /**
