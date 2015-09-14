@@ -269,9 +269,7 @@ class EntitiesController extends Controller
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $entityConfig         = $entityConfigProvider->getConfig($entityClass);
 
-        $entityRepository = $em->getRepository($entityClass);
-
-        $record = !$id ? new $entityClass : $entityRepository->find($id);
+        $record = !$id ? $this->createEntity($entityClass) : $em->getRepository($entityClass)->find($id);
 
         $form = $this->createForm(
             $this->isEnumClass($entityClass) ? 'custom_enum_type' : 'custom_entity_type',
@@ -290,6 +288,8 @@ class EntitiesController extends Controller
             $form->submit($request);
 
             if ($form->isValid()) {
+                // form processing may change data
+                $record = $form->getData();
                 $em->persist($record);
                 $em->flush();
 
