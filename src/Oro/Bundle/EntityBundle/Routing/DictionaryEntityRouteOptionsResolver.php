@@ -67,7 +67,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      * @param RouteCollectionAccessor $routes
      * @param string[]                $entities
      *
-     * @return string[] The list of entities handled by the default controller
+     * @return string[] Entity rActivityAssociationRouteOptionsResolverTestequirements for the default controller
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
@@ -76,6 +76,9 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
 
         foreach ($entities as $className) {
             $entity = $this->entityAliasResolver->getPluralAlias($className);
+
+            $result[] = $entity;
+            $result[] = $this->entityClassNameHelper->getUrlSafeClassName($className);
 
             $existingRoute = $routes->getByPath(
                 str_replace(self::ENTITY_PLACEHOLDER, $entity, $route->getPath()),
@@ -114,8 +117,6 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
                     $routeName,
                     true
                 );
-                $result[] = $entity;
-                $result[] = $this->entityClassNameHelper->getUrlSafeClassName($className);
             }
         }
 

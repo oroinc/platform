@@ -4,35 +4,36 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
-use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
-use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
 
-class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityManager
+class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
     /**
-     * @param string          $class
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
-     * @param SearchIndexer   $searchIndexer
+     * {@inheritdoc}
      */
-    public function __construct(
-        $class,
-        ObjectManager $om,
-        ActivityManager $activityManager,
-        SearchIndexer $searchIndexer
-    ) {
-        parent::__construct($om, $activityManager, $searchIndexer);
-        $this->setClass($class);
+    public function find($id)
+    {
+        // force load from and to email addresses by one query
+        $object = $this->getRepository()->createQueryBuilder('e')
+            ->select('e, from_addr, recipients, to_addr')
+            ->leftJoin('e.fromEmailAddress', 'from_addr')
+            ->leftJoin('e.recipients', 'recipients')
+            ->leftJoin('recipients.emailAddress', 'to_addr')
+            ->where('e.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($object) {
+            $this->checkFoundEntity($object);
+        }
+
+        return $object;
     }
 
     /**
-     * Gets suggestion result
+     * Gets suggestion result.
      *
      * @param int $emailId
      * @param int $page
@@ -51,25 +52,10 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
             throw new NotFoundHttpException();
         }
 
-        $searchQueryBuilder = $this->searchIndexer->getSimpleSearchQuery(
-            false,
-            0,
-            0,
-            $this->getSearchAliases([])
+        $data = $this->diff(
+            $this->getSuggestionEntities($email),
+            $this->getAssignedEntities($email)
         );
-        $searchCriteria = $searchQueryBuilder->getCriteria();
-        $searchCriteria->andWhere(
-            $searchCriteria->expr()->contains('email', $email->getFromEmailAddress()->getEmail())
-        );
-        $searchResult = $this->searchIndexer->query($searchQueryBuilder);
-
-        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
-            $this->class,
-            ['id' => $email->getId()]
-        );
-        $queryResult = $queryBuilder->getQuery()->getArrayResult();
-
-        $data = $this->mergeResults($searchResult, $queryResult);
 
         $slice = array_slice(
             $data,
@@ -88,44 +74,84 @@ class EmailActivitySuggestionApiEntityManager extends ActivitySearchApiEntityMan
         return $result;
     }
 
+    /**
+     * @param Email $email
+     *
+     * @return array of [id, entity, title]
+     */
+    protected function getSuggestionEntities(Email $email)
+    {
+        $entities = [];
+
+        $filters = [
+            'search' => false,
+            'emails' => $this->getEmails($email),
+        ];
+
+        // Prepare search query builder without limits and offsets
+        $searchQueryBuilder = parent::getListQueryBuilder(0, 0, $filters);
+
+        $searchResult = $this->searchIndexer->query($searchQueryBuilder);
+
+        if ($searchResult->count() > 0) {
+            $entities = $this->getEmailAssociatedEntitiesQueryBuilder($searchResult)->getQuery()->getResult();
+        }
+
+        return $entities;
+    }
 
     /**
-     * Merges results from the search(suggested to assign) and assigned entities to email.
-     * Added assigned flag.
+     * Gets all(FROM, TO, CC, BCC) emails.
      *
-     * @param SearchResult $searchResult
-     * @param array        $queryResult
+     * @param Email $email
      *
-     * @return array
+     * @return string[]
      */
-    protected function mergeResults(SearchResult $searchResult, array $queryResult = [])
+    protected function getEmails(Email $email)
     {
-        $result = array_map(
-            function ($res) {
-                $res['assigned'] = true;
+        $emails = [];
+        foreach ($email->getRecipients() as $recipient) {
+            $emails[] = $recipient->getEmailAddress()->getEmail();
+        }
+        $emails[] = $email->getFromEmailAddress()->getEmail();
 
-                return $res;
-            },
-            $queryResult
+        return array_unique($emails);
+    }
+
+    /**
+     * @param Email $email
+     *
+     * @return array of [id, entity, title]
+     */
+    protected function getAssignedEntities(Email $email)
+    {
+        $queryBuilder = $this->activityManager->getActivityTargetsQueryBuilder(
+            $this->class,
+            ['id' => $email->getId()]
         );
 
-        /** @var SearchResultItem $item */
-        foreach ($searchResult->getElements() as $item) {
-            $id        = $item->getRecordId();
-            $className = $item->getEntityName();
+        return $queryBuilder->getQuery()->getArrayResult();
+    }
 
-            foreach ($queryResult as $res) {
-                if ($res['id'] == $id && $res['entity'] == $className) {
+    /**
+     * Exclude assigned entities from the search(suggested to assign) result.
+     *
+     * @param array $searchResult
+     * @param array $assignedEntities
+     *
+     * @return array of [id, entity, title]
+     */
+    protected function diff($searchResult, array $assignedEntities = [])
+    {
+        $result = [];
+
+        foreach ($searchResult as $item) {
+            foreach ($assignedEntities as $entity) {
+                if ($entity['id'] == $item['id'] && $entity['entity'] == $item['entity']) {
                     continue 2;
                 }
             }
-
-            $result[] = [
-                'id'       => $id,
-                'entity'   => $className,
-                'title'    => $item->getRecordTitle(),
-                'assigned' => false
-            ];
+            $result[] = $item;
         }
 
         return $result;

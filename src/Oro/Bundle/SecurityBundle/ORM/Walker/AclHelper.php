@@ -119,8 +119,8 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission, $query);
-            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : array());
+            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
+            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
                 $this->processSubselects($ast, $conditionStorage, $permission, $query);
             }
@@ -217,7 +217,7 @@ class AclHelper
      * @param Subselect|SelectStatement $select
      * @param string                    $permission
      *
-     * @return array
+     * @return array [whereConditions, joinConditions]
      */
     protected function processSelect($select, $permission)
     {

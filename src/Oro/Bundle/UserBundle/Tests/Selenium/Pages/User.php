@@ -67,6 +67,7 @@ class User extends AbstractPageEntity
             ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_enabled']"));
         $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_firstName']");
         $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_lastName']");
+        $this->middleName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_middleName']");
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
@@ -165,6 +166,13 @@ class User extends AbstractPageEntity
     public function getLastName()
     {
         return $this->lastName->value();
+    }
+
+    public function setMiddleName($name)
+    {
+        $this->middleName->clear();
+        $this->middleName->value($name);
+        return $this;
     }
 
     public function setEmail($email)
