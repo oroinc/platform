@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,7 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareTrait;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -65,8 +68,10 @@ use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
  */
 class CalendarEvent extends ExtendCalendarEvent implements
     RemindableInterface,
-    LifecycleDatesInterface
+    DatesAwareInterface
 {
+    use DatesAwareTrait;
+
     const NOT_RESPONDED        = 'not_responded';
     const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
     const ACCEPTED             = 'accepted';
@@ -238,34 +243,6 @@ class CalendarEvent extends ExtendCalendarEvent implements
     protected $reminders;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="invitation_status", type="string", length=32, nullable=true)
@@ -278,11 +255,6 @@ class CalendarEvent extends ExtendCalendarEvent implements
      * )
      */
     protected $invitationStatus;
-
-    /**
-     * @var bool
-     */
-    protected $isUpdatedUpdatedAt = null;
 
     public function __construct()
     {
@@ -692,50 +664,6 @@ class CalendarEvent extends ExtendCalendarEvent implements
     protected function isValid($invitationStatus)
     {
         return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \DateTime $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        if ($updatedAt !== null) {
-            $this->isUpdatedUpdatedAt = true;
-        }
-
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUpdatedUpdatedAtProperty()
-    {
-        return $this->isUpdatedUpdatedAt;
     }
 
     /**

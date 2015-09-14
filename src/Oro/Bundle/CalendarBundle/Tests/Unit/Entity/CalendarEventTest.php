@@ -294,6 +294,14 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setUpdatedAt($date);
 
-        $this->assertTrue($calendarEvent->isUpdatedUpdatedAtProperty());
+        $this->assertTrue($calendarEvent->isUpdatedAtSetted());
+    }
+
+    public function testIsNotUpdatedFlags()
+    {
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setUpdatedAt(null);
+
+        $this->assertFalse($calendarEvent->isUpdatedAtSetted());
     }
 }

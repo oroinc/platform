@@ -14,9 +14,9 @@ use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedbyInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\Model\UpdatedByAwareInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareTrait;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
@@ -56,11 +56,11 @@ use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
  * )
  */
 class ActivityList extends ExtendActivityList implements
-    LifecycleDatesInterface,
-    LifecycleUpdatedbyInterface,
-    LifecycleOwnerInterface
-
+    DatesAwareInterface,
+    UpdatedByAwareInterface
 {
+    use DatesAwareTrait;
+
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
 
@@ -88,6 +88,7 @@ class ActivityList extends ExtendActivityList implements
 
     /**
      * @var User
+     * @deprecated since 1.8. Rename to updatedBy
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
@@ -144,36 +145,6 @@ class ActivityList extends ExtendActivityList implements
     protected $relatedActivityId;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     * @Soap\ComplexType("dateTime", nillable=true)
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     * @Soap\ComplexType("dateTime", nillable=true)
-     */
-    protected $updatedAt;
-
-    /**
      * @var Organization
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
@@ -191,12 +162,7 @@ class ActivityList extends ExtendActivityList implements
     /**
      * @var bool
      */
-    protected $isUpdatedUpdatedAt = null;
-
-    /**
-     * @var bool
-     */
-    protected $isUpdatedUpdatedBy = null;
+    protected $isUpdatedBySetted = null;
 
     public function __construct()
     {
@@ -442,13 +408,14 @@ class ActivityList extends ExtendActivityList implements
 
     /**
      * @param User $editor
+     * @deprecated since 1.8. Use $this->setUpdatedBy() instead
      *
      * @return self
      */
     public function setEditor(User $editor = null)
     {
         if ($editor !== null) {
-            $this->isUpdatedUpdatedBy = true;
+            $this->isUpdatedBySetted = true;
         }
 
         $this->editor = $editor;
@@ -457,6 +424,7 @@ class ActivityList extends ExtendActivityList implements
     }
 
     /**
+     * @deprecated since 1.8. Use $this->getUpdatedBy() instead
      * @return User
      */
     public function getEditor()
@@ -469,12 +437,15 @@ class ActivityList extends ExtendActivityList implements
      *
      * @return self
      */
-    public function setUpdatedBy($updatedBy = null)
+    public function setUpdatedBy(User $updatedBy = null)
     {
+        $this->isUpdatedBySetted = false;
         if ($updatedBy !== null) {
-            $this->isUpdatedUpdatedBy = true;
+            $this->isUpdatedBySetted = true;
         }
 
+        //@todo rename this field to updatedBy, remove setEditor, getEditor functions.
+        //see https://magecore.atlassian.net/browse/BAP-9004
         $this->editor = $updatedBy;
 
         return $this;
@@ -491,9 +462,9 @@ class ActivityList extends ExtendActivityList implements
     /**
      * @return bool
      */
-    public function isUpdatedUpdatedByProperty()
+    public function isUpdatedBySetted()
     {
-        return $this->isUpdatedUpdatedBy;
+        return $this->isUpdatedBySetted;
     }
 
     /**
@@ -501,7 +472,7 @@ class ActivityList extends ExtendActivityList implements
      */
     public function setUpdatedUpdatedByProperty($value)
     {
-        $this->isUpdatedUpdatedBy = (bool) $value;
+        $this->isUpdatedBySetted = (bool) $value;
     }
 
     /**
@@ -534,66 +505,6 @@ class ActivityList extends ExtendActivityList implements
         $this->relatedActivityId = $relatedActivityId;
 
         return $this;
-    }
-
-    /**
-     * Set creation date
-     *
-     * @param \DateTime %createdAt
-     *
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get creation date
-     *
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Get modification date
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set modification date
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        if ($updatedAt !== null) {
-            $this->isUpdatedUpdatedAt = true;
-        }
-
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUpdatedUpdatedAtProperty()
-    {
-        return $this->isUpdatedUpdatedAt;
     }
 
     /**

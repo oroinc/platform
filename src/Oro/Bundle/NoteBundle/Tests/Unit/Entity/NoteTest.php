@@ -44,7 +44,19 @@ class NoteTest extends \PHPUnit_Framework_TestCase
         $note->setUpdatedBy($user);
         $note->setUpdatedAt($date);
 
-        $this->assertTrue($note->isUpdatedUpdatedByProperty());
-        $this->assertTrue($note->isUpdatedUpdatedAtProperty());
+        $this->assertTrue($note->isUpdatedBySetted());
+        $this->assertTrue($note->isUpdatedAtSetted());
+    }
+
+    public function testIsNotUpdatedFlags()
+    {
+        $user = null;
+        $date = null;
+        $note = new Note();
+        $note->setUpdatedBy($user);
+        $note->setUpdatedAt($date);
+
+        $this->assertFalse($note->isUpdatedBySetted());
+        $this->assertFalse($note->isUpdatedAtSetted());
     }
 }

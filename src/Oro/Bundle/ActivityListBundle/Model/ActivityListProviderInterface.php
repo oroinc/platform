@@ -50,20 +50,6 @@ interface ActivityListProviderInterface
     public function getUpdatedBy($entity);
 
     /**
-     * @param object $entity
-     *
-     * @return \Datetime|null
-     */
-    public function getCreatedAt($entity);
-
-    /**
-     * @param object $entity
-     *
-     * @return \Datetime|null
-     */
-    public function getUpdatedAt($entity);
-
-    /**
      * Get array of ActivityOwners for list entity
      *
      * @param object $entity

@@ -137,24 +137,6 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($unitOfWork));
 
-        if ($entity instanceof ActivityList) {
-            $callIndex = 0;
-            if (null !== $detachedUser) {
-                $unitOfWork->expects($this->at($callIndex++))
-                    ->method('getEntityState')
-                    ->with($newUser)
-                    ->will($this->returnValue($detachedUser ? UnitOfWork::STATE_DETACHED : UnitOfWork::STATE_MANAGED));
-            }
-            $unitOfWork->expects($this->at($callIndex++))
-                ->method('propertyChanged')
-                ->with($entity, 'updatedAt', $oldDate, $this->isInstanceOf('\DateTime'));
-            $unitOfWork->expects($this->at($callIndex++))
-                ->method('propertyChanged')
-                ->with($entity, 'editor', $oldUser, $newUser);
-        } else {
-            $unitOfWork->expects($this->never())->method($this->anything());
-        }
-
         $changeSet = [];
         $args      = new PreUpdateEventArgs($entity, $entityManager, $changeSet);
 
@@ -172,7 +154,8 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
     {
         $date = new \DateTime('2012-12-12 12:12:12');
         $entity = new ActivityList();
-        $newUser = new User();
+        $newUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()->getMock();
         $newUser->setFirstName('newUser');
         $entity->setCreatedAt($date);
         $entity->setOwner($newUser);
@@ -198,7 +181,8 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
     public function testCreateWithDefaultValues()
     {
         $entity = new ActivityList();
-        $newUser = new User();
+        $newUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()->getMock();
         $newUser->setFirstName('newUser');
 
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
@@ -217,14 +201,15 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->listener->prePersist($args);
 
-        $this->assertEquals($newUser, $entity->getOwner());
+        $this->assertContainsOnlyInstancesOf('\DateTime', array($entity->getCreatedAt()));
     }
 
     public function testUpdateWithSettedValues()
     {
         $date = new \DateTime('2012-12-12 12:12:12');
         $entity = new ActivityList();
-        $newUser = new User();
+        $newUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()->getMock();
         $newUser->setFirstName('newUser');
         $entity->setUpdatedAt($date);
         $entity->setUpdatedBy($newUser);
@@ -252,8 +237,8 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new ActivityList();
 
-        $newUser = null;
-        $newUser = new User();
+        $newUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+            ->disableOriginalConstructor()->getMock();
         $newUser->setFirstName('newUser');
 
         $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')

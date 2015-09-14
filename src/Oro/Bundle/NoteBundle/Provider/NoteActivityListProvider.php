@@ -116,6 +116,14 @@ class NoteActivityListProvider implements
     /**
      * {@inheritdoc}
      */
+    public function getDate($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCreatedAt($entity)
     {
         /** @var $entity Note */

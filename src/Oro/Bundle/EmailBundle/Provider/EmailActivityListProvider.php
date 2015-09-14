@@ -203,6 +203,14 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
+    public function getDate($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getCreatedAt($entity)
     {
         /** @var $entity Email */

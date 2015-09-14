@@ -9,12 +9,12 @@ use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleCreatedatInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedatInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedbyInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
+use Oro\Bundle\EntityBundle\Model\CreatedAtAwareInterface;
+use Oro\Bundle\EntityBundle\Model\UpdatedAtAwareInterface;
+use Oro\Bundle\EntityBundle\Model\UpdatedByAwareInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
-class EntityLifecycleListener
+class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
 {
     /** @var ServiceLink */
     protected $securityFacadeLink;
@@ -28,6 +28,14 @@ class EntityLifecycleListener
     public function __construct(ServiceLink $securityFacadeLink)
     {
         $this->securityFacadeLink = $securityFacadeLink;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
     }
 
     /**
@@ -57,7 +65,6 @@ class EntityLifecycleListener
     protected function setCreatedProperties($entity)
     {
         $this->modifyCreatedAt($entity);
-        $this->modifyOwner($entity);
     }
 
     /**
@@ -74,7 +81,7 @@ class EntityLifecycleListener
      */
     protected function modifyCreatedAt($entity)
     {
-        if ($entity instanceof LifecycleCreatedatInterface && !$entity->getCreatedAt()) {
+        if ($entity instanceof CreatedAtAwareInterface && !$entity->getCreatedAt()) {
             $entity->setCreatedAt($this->getNowDate());
         }
     }
@@ -84,18 +91,8 @@ class EntityLifecycleListener
      */
     protected function modifyUpdatedAt($entity)
     {
-        if ($entity instanceof LifecycleUpdatedatInterface && !$entity->isUpdatedUpdatedAtProperty()) {
+        if ($entity instanceof UpdatedAtAwareInterface && !$entity->isUpdatedAtSetted()) {
             $entity->setUpdatedAt($this->getNowDate());
-        }
-    }
-
-    /**
-     * @param object $entity
-     */
-    protected function modifyOwner($entity)
-    {
-        if ($entity instanceof LifecycleOwnerInterface && !$entity->getOwner()) {
-            $entity->setOwner($this->getUser());
         }
     }
 
@@ -104,7 +101,7 @@ class EntityLifecycleListener
      */
     protected function modifyUpdatedBy($entity)
     {
-        if ($entity instanceof LifecycleUpdatedbyInterface && !$entity->isUpdatedUpdatedByProperty()) {
+        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySetted()) {
             $entity->setUpdatedBy($this->getUser());
         }
     }

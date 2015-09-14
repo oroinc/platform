@@ -11,6 +11,7 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventActivityListProvider implements
     ActivityListProviderInterface,
@@ -86,6 +87,14 @@ class CalendarEventActivityListProvider implements
     {
         /** @var $entity CalendarEvent */
         return $entity->getDescription();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDate($entity)
+    {
+        return null;
     }
 
     /**
@@ -207,7 +216,7 @@ class CalendarEventActivityListProvider implements
      * @param CalendarEvent $activityEntity
      * @return null|User
      */
-    public function getOwner($activityEntity)
+    protected function getOwner($activityEntity)
     {
         /** @var $activityEntity CalendarEvent */
         if ($activityEntity->getCalendar()) {

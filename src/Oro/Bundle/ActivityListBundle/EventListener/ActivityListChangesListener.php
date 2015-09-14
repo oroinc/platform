@@ -9,7 +9,8 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\EntityBundle\EventListener\EntityLifecycleListener;
+use Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 /**
  * Class ActivityListChangesListener
@@ -18,7 +19,7 @@ use Oro\Bundle\EntityBundle\EventListener\EntityLifecycleListener;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class ActivityListChangesListener extends EntityLifecycleListener
+class ActivityListChangesListener extends ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
 {
     /** @var  ActivityListChainProvider */
     protected $activityListChainProvider;
@@ -34,12 +35,20 @@ class ActivityListChangesListener extends EntityLifecycleListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * @param LifecycleEventArgs $args
      */
     public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
-        if (!$this->isActivityEntity($entity)) {
+        if (!$this->isActivityListEntity($entity)) {
             return;
         }
 
@@ -54,30 +63,15 @@ class ActivityListChangesListener extends EntityLifecycleListener
     public function preUpdate(PreUpdateEventArgs $args)
     {
         $entity = $args->getEntity();
-        if (!$this->isActivityEntity($entity)) {
+        if (!$this->isActivityListEntity($entity)) {
             return;
         }
 
         $this->entityManager = $args->getEntityManager();
         /** @var ActivityList $entity */
         if ($this->isDateUpdatable($entity)) {
-            $this->setUpdatedProperties($entity, true);
+            $this->setUpdatedProperties($entity);
         }
-    }
-
-    /**
-     * @param object $entity
-     * @param bool $update
-     */
-    protected function setUpdatedProperties($entity, $update = false)
-    {
-        $newUpdatedBy = $this->getUser();
-        $unitOfWork = $this->entityManager->getUnitOfWork();
-        if ($update && $newUpdatedBy != $entity->getEditor()) {
-            $unitOfWork->propertyChanged($entity, 'updatedAt', $entity->getUpdatedAt(), $this->getNowDate());
-            $unitOfWork->propertyChanged($entity, 'editor', $entity->getEditor(), $newUpdatedBy);
-        }
-        parent::setUpdatedProperties($entity);
     }
 
     /**
@@ -85,7 +79,7 @@ class ActivityListChangesListener extends EntityLifecycleListener
      *
      * @return bool
      */
-    protected function isActivityEntity($entity)
+    protected function isActivityListEntity($entity)
     {
         return $entity instanceof ActivityList;
     }

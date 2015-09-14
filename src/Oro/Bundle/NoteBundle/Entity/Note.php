@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -11,9 +13,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleDatesInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleUpdatedbyInterface;
-use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\Model\UpdatedByAwareInterface;
+use Oro\Bundle\EntityBundle\Model\DatesAwareTrait;
+use Oro\Bundle\EntityBundle\Model\UpdatedByAwareTrait;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
@@ -41,10 +44,12 @@ use Oro\Bundle\EntityBundle\Model\Lifecycle\LifecycleOwnerInterface;
  * )
  */
 class Note extends ExtendNote implements
-    LifecycleDatesInterface,
-    LifecycleUpdatedbyInterface,
-    LifecycleOwnerInterface
+    DatesAwareInterface,
+    UpdatedByAwareInterface
 {
+    use DatesAwareTrait;
+    use UpdatedByAwareTrait;
+
     const ENTITY_NAME = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /**
@@ -80,77 +85,11 @@ class Note extends ExtendNote implements
     protected $message;
 
     /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="updated_by_user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $updatedBy;
-
-    /**
-     * @var \Datetime $created
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \Datetime $updated
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
-     * @var bool
-     */
-    protected $isUpdatedUpdatedAt = null;
-
-    /**
-     * @var bool
-     */
-    protected $isUpdatedUpdatedBy = null;
-
-    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param \Datetime $createdAt
-     *
-     * @return Note
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \Datetime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
     }
 
     /**
@@ -174,78 +113,11 @@ class Note extends ExtendNote implements
     }
 
     /**
-     * @param \Datetime $updatedAt
-     *
-     * @return Note
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        if ($updatedAt !== null) {
-            $this->isUpdatedUpdatedAt = true;
-        }
-
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \Datetime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUpdatedUpdatedAtProperty()
-    {
-        return $this->isUpdatedUpdatedAt;
-    }
-
-    /**
-     * Not using type hint due to the fact that entity setter can be called when no logged user available
-     * So $updatedBy will be null
-     *
-     * @param User|null $updatedBy
-     *
-     * @return Note
-     */
-    public function setUpdatedBy($updatedBy)
-    {
-        if ($updatedBy !== null) {
-            $this->isUpdatedUpdatedBy = true;
-        }
-
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    /**
-     * @return UserInterface
-     */
-    public function getUpdatedBy()
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isUpdatedUpdatedByProperty()
-    {
-        return $this->isUpdatedUpdatedBy;
-    }
-
-    /**
      * @param User|null $owningUser
      *
      * @return Note
      */
-    public function setOwner(User $owningUser)
+    public function setOwner(User $owningUser = null)
     {
         $this->owner = $owningUser;
 
