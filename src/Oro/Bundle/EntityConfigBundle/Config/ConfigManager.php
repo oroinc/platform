@@ -908,7 +908,7 @@ class ConfigManager
      * @param string $className
      * @param string $fieldName
      * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
-     * @return bool TRUE if the type was changed; otherwise, FALSE
+     * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
     public function changeFieldMode($className, $fieldName, $mode)
     {
