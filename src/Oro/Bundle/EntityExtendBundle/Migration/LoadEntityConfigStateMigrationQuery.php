@@ -6,18 +6,18 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\MigrationBundle\Migration\DataStorageInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
 {
-    /** @var DataStorageInterface */
+    /** @var DataStorageExtension */
     protected $storage;
 
     /**
-     * @param DataStorageInterface $storage
+     * @param DataStorageExtension $storage
      */
-    public function __construct(DataStorageInterface $storage)
+    public function __construct(DataStorageExtension $storage)
     {
         $this->storage = $storage;
     }
@@ -72,7 +72,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
             }
         }
 
-        $this->storage->set(
+        $this->storage->put(
             'initial_entity_config_state',
             ['entities' => $entityConfigs, 'fields' => $fieldConfigs]
         );
