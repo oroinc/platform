@@ -1824,18 +1824,22 @@ footer {
   border-radius: 0;
   border: solid #ddd;
   border-width: 0 1px 1px;
-  padding: 10px;
+  padding: 5px 10px 10px;
   overflow: hidden;
 }
 .tags-overlay .well{
   -webkit-box-shadow: none;
   box-shadow: none;
+  padding-top: 4px;
 }
 .tags-overlay .tag-list,
 .tag-view  .tag-list {
   margin-bottom: 0;
   li {
-    padding-top: 3px;
+    padding: 5px 5px 0 0;
+  }
+  a:hover span.label {
+    background:#e4e4e4;
   }
   span.label {
     background:#eee;
@@ -1846,19 +1850,11 @@ footer {
     padding:4px 6px;
     border:none;
     color:@bodyColor;
-    &:hover {
-      background:#e4e4e4;
-    }
-    &.with-button {
-      position: relative;
-      padding-right: 20px;
-    }
     .select2-search-choice-close {
-      background:none;
-      width:0;
-      height:0;
-      top:5px;
-      right:15px;
+      position: relative;
+      display: inline-block;
+      right: -2px;
+      top: 0;
       &:before {
         width:20px;
         content: "\f00d";

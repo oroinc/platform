@@ -54,7 +54,7 @@ define(function(require) {
                 mediator.execute('layout:disablePageScroll', $mainEl);
                 $('#page').css('display', 'none');
             } else {
-                mediator.execute('layout:enablePageScroll', $mainEl);
+                mediator.execute('layout:enablePageScroll');
                 $('#page').css('display', '');
             }
         }

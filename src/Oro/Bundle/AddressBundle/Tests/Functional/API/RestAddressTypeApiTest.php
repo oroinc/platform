@@ -4,9 +4,6 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-/**
- * @outputBuffering enabled
- */
 class RestAddressTypeApiTest extends WebTestCase
 {
     protected function setUp()
