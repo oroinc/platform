@@ -28,7 +28,7 @@ class ReportsTest extends Selenium2TestCase
             ->setType('Table')
             ->setOrganization('Main')
             ->addColumn(['First name', 'Last name', 'Username'])
-            ->addFieldCondition('Username', $userName)
+            ->addFilterCondition('Field condition', 'Username', $userName)
             ->save();
         /** @var Reports $login */
         $login->openReports('Oro\Bundle\ReportBundle')
