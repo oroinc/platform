@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
 /**
  * @outputBuffering enabled
@@ -18,8 +19,21 @@ class EmailActivityTest extends WebTestCase
 
     public function testActivityDateIsNotUpdatedAfterUpdateEntity()
     {
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $email = $this->getReference('email_1');
-        $sentAt = $email->getSentAt();
-        $q = 7;
+        $originalSentAt = $email->getSentAt();
+        $email->setSubject('My Web Store Introduction Changed');
+        $em->flush($email);
+
+        $activityList = $em
+            ->getRepository(ActivityList::ENTITY_NAME)
+            ->findOneBy(
+                [
+                    'relatedActivityClass' => 'Oro\Bundle\EmailBundle\Entity\Email',
+                    'relatedActivityId' => $email->getId()
+                ]
+            );
+
+        $this->assertEquals($originalSentAt, $activityList->getUpdatedAt());
     }
 }
