@@ -105,9 +105,9 @@ class ExtendConfigDumper
     /**
      * Update config.
      *
-     * @param array $originsToSkip
+     * @param callable|null $filter function (ConfigInterface $config) : bool
      */
-    public function updateConfig(array $originsToSkip = [])
+    public function updateConfig($filter = null)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
@@ -120,11 +120,13 @@ class ExtendConfigDumper
             }
         }
 
-        $extendConfigs  = $this->configProvider->filter($this->createOriginFilterCallback($originsToSkip), null, true);
+        $extendConfigs = null === $filter
+            ? $this->configProvider->getConfigs(null, true)
+            : $this->configProvider->filter($filter, null, true);
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
-                    $this->checkSchema($extendConfig, $aliases, $originsToSkip);
+                    $this->checkSchema($extendConfig, $aliases, $filter);
                 }
 
                 // some bundles can change configs in pre persist events,
@@ -327,13 +329,14 @@ class ExtendConfigDumper
 
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
      * @param ConfigInterface $extendConfig
-     * @param array|null $aliases
-     * @param array|null $skippedOrigins
+     * @param array|null      $aliases
+     * @param callable|null   $filter       function (ConfigInterface $config) : bool
      */
-    protected function checkSchema(ConfigInterface $extendConfig, $aliases, array $skippedOrigins = null)
+    protected function checkSchema(ConfigInterface $extendConfig, $aliases, $filter = null)
     {
         $className  = $extendConfig->getId()->getClassName();
         $doctrine   = [];
@@ -370,11 +373,9 @@ class ExtendConfigDumper
         $defaultProperties  = [];
         $addRemoveMethods   = [];
 
-        $fieldConfigs = $this->configProvider->filter(
-            $this->createOriginFilterCallback($skippedOrigins),
-            $className,
-            true
-        );
+        $fieldConfigs = null === $filter
+            ? $this->configProvider->getConfigs($className, true)
+            : $this->configProvider->filter($filter, $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
             $this->checkFields(
                 $entityName,
@@ -491,22 +492,5 @@ class ExtendConfigDumper
         if ($hasChanges) {
             $this->configProvider->flush();
         }
-    }
-
-    /**
-     * Return callback that could be used for filtering purposes in order to skip config entries that has origin in list
-     * of currently skipped
-     *
-     * @param array $skippedOrigins
-     *
-     * @return callable
-     */
-    protected function createOriginFilterCallback(array $skippedOrigins)
-    {
-        return function (ConfigInterface $config) use ($skippedOrigins) {
-            return
-                $config->get('state') === ExtendScope::STATE_ACTIVE
-                || !in_array($config->get('origin'), $skippedOrigins, true);
-        };
     }
 }
