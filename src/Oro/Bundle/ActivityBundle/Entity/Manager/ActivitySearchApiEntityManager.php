@@ -45,7 +45,8 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     }
 
     /**
-     * Get search aliases for specified entity class(es). By default returns all associated entities.
+     * Get search aliases for specified entity class(es). By default returns all search aliases
+     * for all entities which can be associated with an activity this manager id work with.
      *
      * @param string[] $entities
      *

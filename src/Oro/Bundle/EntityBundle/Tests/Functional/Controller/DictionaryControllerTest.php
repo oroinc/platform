@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class DictionaryControllerTest extends WebTestCase
