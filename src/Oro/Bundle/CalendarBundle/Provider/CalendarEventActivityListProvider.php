@@ -216,7 +216,7 @@ class CalendarEventActivityListProvider implements
      * @param CalendarEvent $activityEntity
      * @return null|User
      */
-    protected function getOwner($activityEntity)
+    public function getOwner($activityEntity)
     {
         /** @var $activityEntity CalendarEvent */
         if ($activityEntity->getCalendar()) {
