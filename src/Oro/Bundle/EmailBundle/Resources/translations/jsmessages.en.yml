@@ -38,8 +38,14 @@ oro:
             get_email_last: "Getting last emails failed"
             mark_as_read: "Marking all as read failed"
         recent_emails_widget:
+            title_all_folders: RECENT EMEILS
             settings: Recent Emails Widget Settings
-            number_of_emails: Number of emails to show
+            mailbox_folder: Mailbox Folder
+            amount_of_emails: Amount of Emails to Display
+            default_action: Default Action
+            reply_all: Reply All
+            reply: Reply
+            forward: Forward
         notification:
             mark_read.label: Mark all as Read
             user_emails.label: My emails

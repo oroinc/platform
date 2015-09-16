@@ -27,7 +27,6 @@ define(function(require) {
 
         render: function() {
             EmailNotificationView.__super__.render.apply(this, arguments);
-            this.$el.find('.replay a').attr('data-url', this.model.get('route'));
             this.initLayout();
         },
 

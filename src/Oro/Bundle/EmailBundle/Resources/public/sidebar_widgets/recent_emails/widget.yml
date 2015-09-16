@@ -4,4 +4,6 @@ module:    "oroemail/sidebar_widgets/recent_emails/js/widget"
 placement: "both"
 cssClass:  "sidebar-widget-recent-emails"
 settings:
+    folderId: 0
     perPage: 10
+    actionId: 1

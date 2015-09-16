@@ -16,6 +16,7 @@ define(function(require) {
         itemView: EmailNotificationView,
         listSelector: '.items',
         countNewEmail: 0,
+        actionId: 1,
 
         listen: {
             'change:seen collection': 'updateViewMode',
@@ -30,6 +31,9 @@ define(function(require) {
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
+            if (options.actionId) {
+                this.actionId = parseInt(options.actionId);
+            }
         },
 
         render: function() {
@@ -40,6 +44,7 @@ define(function(require) {
         getTemplateData: function() {
             var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
+            data.actionId = this.actionId;
             return data;
         },
 
@@ -48,13 +53,13 @@ define(function(require) {
                 var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .icon-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
-                    $iconEnvelope.removeClass('new');
+                    $iconEnvelope.removeClass('highlight');
                 } else {
                     this.setModeDropDownMenu('content');
                     if (this.countNewEmail > 0) {
-                        $iconEnvelope.addClass('new');
+                        $iconEnvelope.addClass('highlight');
                     } else {
-                        $iconEnvelope.removeClass('new');
+                        $iconEnvelope.removeClass('highlight');
                     }
                 }
             }
