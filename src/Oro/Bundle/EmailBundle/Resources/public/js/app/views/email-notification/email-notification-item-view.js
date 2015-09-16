@@ -12,12 +12,9 @@ define(function(require) {
 
         templateSelector: '#email-notification-item-template',
 
-        className: function() {
-            return this.model.get('seen') ? '' : 'new';
-        },
-
         events: {
-            'click .info': 'onClickOpenEmail'
+            'click .info': 'onClickOpenEmail',
+            'click [data-role=toggle-read-status]': 'onClickReadStatus'
         },
 
         listen: {
@@ -27,6 +24,7 @@ define(function(require) {
 
         render: function() {
             EmailNotificationView.__super__.render.apply(this, arguments);
+            this.$el.toggleClass('highlight', !this.model.get('seen'));
             this.initLayout();
         },
 
@@ -42,6 +40,27 @@ define(function(require) {
             var url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
             this.model.set({'seen': true});
             mediator.execute('redirectTo', {url: url});
+        },
+
+        onClickReadStatus: function(e) {
+            e.stopPropagation();
+            var model = this.model;
+            var status = model.get('seen');
+            console.log(routing)
+            var url = routing.generate('oro_email_mark_seen', {id: model.get('id'), status: status ? 0 : 1});
+            model.set('seen', !status);
+            Backbone.ajax({
+                type: 'GET',
+                url: url,
+                success: function(response) {
+                    if (_.result(response, 'successful') !== true) {
+                        model.set('seen', status);
+                    }
+                },
+                error: function() {
+                    model.set('seen', status);
+                }
+            });
         }
     });
 
