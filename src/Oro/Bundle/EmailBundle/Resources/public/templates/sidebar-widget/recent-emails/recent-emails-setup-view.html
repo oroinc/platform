@@ -4,7 +4,7 @@
             <label class="required"><%= _.__("oro.email.recent_emails_widget.mailbox_folder") %><em>*</em></label>
         </div>
         <div class="controls">
-            <select name="folderId"  class="select2">
+            <select name="folderId"  class="select2" data-page-component-module="oro/select2-component">
                 <option value="0">All</option>
                 <option<% if (+settings.folderId === 1) { %> selected="selected"<% } %> value="1">Inbox</option>
                 <option<% if (+settings.folderId === 2) { %> selected="selected"<% } %> value="2">Spam</option>
@@ -22,7 +22,7 @@
             <label class="required"><%= _.__("oro.email.recent_emails_widget.default_action") %><em>*</em></label>
         </div>
         <div class="controls">
-            <select name="actionId"  class="select2">
+            <select name="actionId"  class="select2" data-page-component-module="oro/select2-component">
                 <option<% if (+settings.actionId === 1) { %> selected="selected"<% } %> value="1"><%= _.__("oro.email.recent_emails_widget.reply_all") %></option>
                 <option<% if (+settings.actionId === 2) { %> selected="selected"<% } %> value="2"><%= _.__("oro.email.recent_emails_widget.reply") %></option>
                 <option<% if (+settings.actionId === 3) { %> selected="selected"<% } %> value="3"><%= _.__("oro.email.recent_emails_widget.forward") %></option>
