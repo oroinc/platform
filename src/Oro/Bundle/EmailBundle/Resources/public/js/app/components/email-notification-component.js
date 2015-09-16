@@ -43,12 +43,16 @@ define(function(require) {
 
         initViews: function() {
             var EmailNotificationView = tools.isMobile() ? MobileEmailNotificationView : DesktopEmailNotificationView;
-
-            this.view = new EmailNotificationView({
+            var options = {
                 el: this.options._sourceElement,
                 collection: this.collection,
                 countNewEmail: this.options.count
-            });
+            };
+            var settings = this.options.countModel.get('settings');
+            if (settings && settings.actionId) {
+                options.actionId = settings.actionId;
+            }
+            this.view = new EmailNotificationView(options);
             if (this.options._iconElement) {
                 this.countView = new EmailNotificationCountView({
                     el: this.options._iconElement,
@@ -79,7 +83,9 @@ define(function(require) {
         loadLastEmail: function(hasNewEmail) {
             this.collection.fetch({
                 success: _.bind(function(collection) {
-                    this.options.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
+                    if ('countModel' in this.options) {
+                        this.options.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
+                    }
                     if (hasNewEmail) {
                         this.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');

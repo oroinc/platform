@@ -1,4 +1,8 @@
-<div class="content short-emails-list">
+<div class="content short-emails-list<% switch(actionId) {
+    case 2: %> reply-action<% ; break;
+    case 3: %> forward-action<% ; break;
+    default: %> reply-all-action<% ; break;
+}%>">
     <div class="header row-fluid">
         <a class="my-emails pull-left" href="/email/user-emails">
             My Emails

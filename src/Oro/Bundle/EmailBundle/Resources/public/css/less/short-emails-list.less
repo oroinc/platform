@@ -97,8 +97,8 @@
           color: #b4b4b4;
           padding: 0;
         }
-        .icon-reply {
-          display: none !important;
+        .reply-action, .reply-all-action, .forward-action {
+          display: none;
         }
       }
     }
@@ -106,4 +106,9 @@
   .empty, .notification {
     display: none;
   }
+}
+.reply-action .items li .footer .reply-action,
+.reply-all-action .items li .footer .reply-all-action,
+.forward-action .items li .footer .forward-action{
+  display: inline;
 }
