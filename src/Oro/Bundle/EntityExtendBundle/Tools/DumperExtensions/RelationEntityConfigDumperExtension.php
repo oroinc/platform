@@ -59,9 +59,10 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
             $fieldConfigs = $this->extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-                if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                     continue;
                 }
+
                 // @todo: we need to find a way to use this extension to process OWNER_SYSTEM relations as well
                 // currently we have several problems here:
                 // - collision with associations
