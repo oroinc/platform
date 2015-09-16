@@ -17,7 +17,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     const ACL_RESOURCE_ID_KEY = 'aclResourceId';
     const ROUTE_CONTROLLER_KEY = '_controller';
     const CONTROLLER_ACTION_DELIMITER = '::';
-    const DEFAULT_ACL_POLICY = true;
+    const DEFAULT_ACL_POLICY = false;
     const ACL_POLICY_KEY = 'acl_policy';
     /**#@-*/
 
