@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+
+use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 
 class UniqueAddressTypesValidator extends ConstraintValidator
 {
@@ -18,9 +19,8 @@ class UniqueAddressTypesValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable and ArrayAccess');
         }
 
-        $typeNamesToLabels = array();
-        $allTypeNames = array();
-        $repeatedTypeNames = array();
+        $repeatedTypes = [];
+        $collectedTypes = [];
 
         /** @var AbstractTypedAddress $address */
         foreach ($value as $address) {
@@ -33,23 +33,18 @@ class UniqueAddressTypesValidator extends ConstraintValidator
             }
 
             foreach ($address->getTypes() as $type) {
-                $typeNamesToLabels[$type->getName()] = $type->getLabel();
+                if (isset($collectedTypes[$type->getName()])) {
+                    $repeatedTypes[] = $type->getLabel();
+                }
+                $collectedTypes[$type->getName()] = true;
             }
-
-            $typeNames = $address->getTypeNames();
-            $repeatedTypeNames = array_merge($repeatedTypeNames, array_intersect($allTypeNames, $typeNames));
-            $allTypeNames = array_merge($allTypeNames, $typeNames);
         }
 
-        if ($repeatedTypeNames) {
-            $repeatedTypeLabels = array();
-            foreach ($repeatedTypeNames as $name) {
-                $repeatedTypeLabels[] = $typeNamesToLabels[$name];
-            }
+        if ($repeatedTypes) {
             /** @var UniqueAddressTypes $constraint */
             $this->context->addViolation(
                 $constraint->message,
-                array('{{ types }}' => '"' . implode('", "', $repeatedTypeLabels) . '"')
+                ['{{ types }}' => '"'.implode('", "', $repeatedTypes).'"']
             );
         }
     }
