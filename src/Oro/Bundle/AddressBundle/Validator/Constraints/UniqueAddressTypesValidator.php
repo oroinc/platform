@@ -44,7 +44,7 @@ class UniqueAddressTypesValidator extends ConstraintValidator
             /** @var UniqueAddressTypes $constraint */
             $this->context->addViolation(
                 $constraint->message,
-                ['{{ types }}' => '"'.implode('", "', $repeatedTypes).'"']
+                ['{{ types }}' => '"' . implode('", "', $repeatedTypes) . '"']
             );
         }
     }
