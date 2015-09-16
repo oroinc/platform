@@ -20,6 +20,9 @@ class EntityProcessor
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Profiler  */
+    protected $profiler;
+
     /** @var array */
     protected $commands = [
         'oro:entity-extend:update-config' => [],
@@ -30,7 +33,7 @@ class EntityProcessor
     /** @var array */
     protected $updateRoutingCommands = [
         'router:cache:clear'  => [],
-        'fos:js-routing:dump' => ['--target' => 'web/js/routes.js']
+        'fos:js-routing:dump' => []
     ];
 
     /**

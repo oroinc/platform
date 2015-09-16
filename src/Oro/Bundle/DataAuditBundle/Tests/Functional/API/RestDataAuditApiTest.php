@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestDataAuditApiTest extends WebTestCase

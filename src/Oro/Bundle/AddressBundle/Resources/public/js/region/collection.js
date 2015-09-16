@@ -1,8 +1,9 @@
 define([
     'backbone',
     'routing',
-    'oroaddress/js/region/model'
-], function(Backbone, routing, RegionModel) {
+    'oroaddress/js/region/model',
+    'underscore'
+], function(Backbone, routing, RegionModel, _) {
     'use strict';
 
     /**
@@ -11,15 +12,18 @@ define([
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
-        route: 'oro_api_country_get_regions',
+        defaultOptions: {
+            route: 'oro_api_country_get_regions'
+        },
         url: null,
         model: RegionModel,
 
         /**
          * Constructor
          */
-        initialize: function() {
-            this.url = routing.generate(this.route);
+        initialize: function(models, options) {
+            this.options = _.extend({}, this.defaultOptions, options);
+            this.url = routing.generate(this.options.route);
         },
 
         /**
@@ -28,7 +32,7 @@ define([
          * @param id {string}
          */
         setCountryId: function(id) {
-            this.url = routing.generate(this.route, {country: id});
+            this.url = routing.generate(this.options.route, {country: id});
         }
     });
 });

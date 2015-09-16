@@ -1,0 +1,2 @@
+Oro Entity Serializer Component
+===============================
