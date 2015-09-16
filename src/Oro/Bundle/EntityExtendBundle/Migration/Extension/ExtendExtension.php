@@ -59,6 +59,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * @return ExtendDbIdentifierNameGenerator
+     */
+    public function getNameGenerator()
+    {
+        return $this->nameGenerator;
+    }
+
+    /**
      * Creates a table for a custom entity.
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
      * created automatically in Symfony cache
@@ -266,6 +274,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                       public flag is allowed or not. More details can be found
      *                                       in entity_config.yml
      * @param array         $options
+     *
+     * @return Table A table that is used to store enum values
      */
     public function addEnumField(
         Schema $schema,
@@ -278,10 +288,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $selfTable     = $this->getTable($table, $schema);
+        $enumTable     = null;
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+        } else {
+            $enumTable = $this->getTable($enumTableName, $schema);
         }
 
         // create appropriate relation
@@ -320,32 +333,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
                 'enum'
             );
         }
-    }
 
-    /**
-     * Adds OptionSet column
-     *
-     * @param Schema       $schema
-     * @param Table|string $table A Table object or table name
-     * @param string       $optionSetName
-     * @param array        $options
-     *
-     * @deprecated since 1.4. Will be removed in 2.0
-     */
-    public function addOptionSet(
-        Schema $schema,
-        $table,
-        $optionSetName,
-        array $options = []
-    ) {
-        $this->ensureExtendFieldSet($options);
-
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'optionSet';
-        $this->extendOptionsManager->setColumnOptions(
-            $this->getTableName($table),
-            $optionSetName,
-            $options
-        );
+        return $enumTable;
     }
 
     /**
@@ -593,11 +582,37 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * Gets an entity full class name by a table name
      *
      * @param string $tableName
+     *
      * @return string|null
      */
     public function getEntityClassByTableName($tableName)
     {
         return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
+    }
+
+    /**
+     * Gets a table name by entity full class name
+     *
+     * @param string $className
+     *
+     * @return string|null
+     */
+    public function getTableNameByEntityClass($className)
+    {
+        return $this->entityMetadataHelper->getTableNameByEntityClass($className);
+    }
+
+    /**
+     * Gets a field name by a table name and a column name
+     *
+     * @param string $tableName
+     * @param string $columnName
+     *
+     * @return string|null
+     */
+    public function getFieldNameByColumnName($tableName, $columnName)
+    {
+        return $this->entityMetadataHelper->getFieldNameByColumnName($tableName, $columnName);
     }
 
     /**
