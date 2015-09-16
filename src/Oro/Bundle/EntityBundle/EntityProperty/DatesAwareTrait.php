@@ -4,6 +4,6 @@ namespace Oro\Bundle\EntityBundle\EntityProperty;
 
 trait DatesAwareTrait
 {
-   use CreatedAtAwareTrait;
-   use UpdatedAtAwareTrait;
+    use CreatedAtAwareTrait;
+    use UpdatedAtAwareTrait;
 }

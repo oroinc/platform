@@ -37,7 +37,6 @@ class FieldTypeHelper
                 RelationType::ONE_TO_MANY,
                 RelationType::MANY_TO_ONE,
                 RelationType::MANY_TO_MANY,
-                'optionSet'
             ]
         );
     }
