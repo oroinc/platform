@@ -16,7 +16,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
-use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
@@ -55,12 +54,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      }
  * )
  */
-class ActivityList extends ExtendActivityList implements
-    DatesAwareInterface,
-    UpdatedByAwareInterface
+class ActivityList extends ExtendActivityList implements DatesAwareInterface, UpdatedByAwareInterface
 {
-    use DatesAwareTrait;
-
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
 
@@ -145,6 +140,36 @@ class ActivityList extends ExtendActivityList implements
     protected $relatedActivityId;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     * @Soap\ComplexType("dateTime", nillable=true)
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     * @Soap\ComplexType("dateTime", nillable=true)
+     */
+    protected $updatedAt;
+
+    /**
      * @var Organization
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
@@ -158,6 +183,11 @@ class ActivityList extends ExtendActivityList implements
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      */
     protected $activityOwners;
+
+    /**
+     * @var bool
+     */
+    protected $updatedAtSet;
 
     /**
      * @var bool
@@ -497,6 +527,58 @@ class ActivityList extends ExtendActivityList implements
         $this->relatedActivityId = $relatedActivityId;
 
         return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(\DateTime $createdAt = null)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     *
+     * @return $this
+     */
+    public function setUpdatedAt(\DateTime $updatedAt = null)
+    {
+        $this->updatedAtSet = false;
+        if ($updatedAt !== null) {
+            $this->updatedAtSet = true;
+        }
+
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUpdatedAtSet()
+    {
+        return $this->updatedAtSet;
     }
 
     /**

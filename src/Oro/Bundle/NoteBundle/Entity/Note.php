@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NoteBundle\Entity;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -43,9 +41,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
  *      }
  * )
  */
-class Note extends ExtendNote implements
-    DatesAwareInterface,
-    UpdatedByAwareInterface
+class Note extends ExtendNote implements DatesAwareInterface, UpdatedByAwareInterface
 {
     use DatesAwareTrait;
     use UpdatedByAwareTrait;

@@ -17,7 +17,6 @@ trait UpdatedAtAwareTrait
      *          }
      *      }
      * )
-     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $updatedAt;
 
