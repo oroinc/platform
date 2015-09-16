@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Model;
+namespace Oro\Bundle\EntityBundle\EntityProperty;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -17,7 +17,7 @@ trait UpdatedByAwareTrait
     /**
      * @var bool
      */
-    protected $isUpdatedBySetted;
+    protected $isUpdatedBySet;
 
     /**
      * @param User|null $updatedBy
@@ -26,9 +26,9 @@ trait UpdatedByAwareTrait
      */
     public function setUpdatedBy(User $updatedBy = null)
     {
-        $this->isUpdatedBySetted = false;
+        $this->isUpdatedBySet = false;
         if ($updatedBy !== null) {
-            $this->isUpdatedBySetted = true;
+            $this->isUpdatedBySet = true;
         }
 
         $this->updatedBy = $updatedBy;
@@ -47,8 +47,8 @@ trait UpdatedByAwareTrait
     /**
      * @return bool
      */
-    public function isUpdatedBySetted()
+    public function isUpdatedBySet()
     {
-        return $this->isUpdatedBySetted;
+        return $this->isUpdatedBySet;
     }
 }

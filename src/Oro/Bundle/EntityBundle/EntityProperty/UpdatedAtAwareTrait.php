@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Model;
+namespace Oro\Bundle\EntityBundle\EntityProperty;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 trait UpdatedAtAwareTrait
 {
@@ -22,7 +24,7 @@ trait UpdatedAtAwareTrait
     /**
      * @var bool
      */
-    protected $isUpdatedAtSetted;
+    protected $updatedAtSet;
 
     /**
      * @return \DateTime
@@ -39,9 +41,9 @@ trait UpdatedAtAwareTrait
      */
     public function setUpdatedAt(\DateTime $updatedAt = null)
     {
-        $this->isUpdatedAtSetted = false;
+        $this->updatedAtSet = false;
         if ($updatedAt !== null) {
-            $this->isUpdatedAtSetted = true;
+            $this->updatedAtSet = true;
         }
 
         $this->updatedAt = $updatedAt;
@@ -52,8 +54,8 @@ trait UpdatedAtAwareTrait
     /**
      * @return bool
      */
-    public function isUpdatedAtSetted()
+    public function isUpdatedAtSet()
     {
-        return $this->isUpdatedAtSetted;
+        return $this->updatedAtSet;
     }
 }

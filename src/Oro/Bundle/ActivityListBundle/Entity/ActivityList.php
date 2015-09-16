@@ -14,9 +14,9 @@ use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityBundle\Model\DatesAwareInterface;
-use Oro\Bundle\EntityBundle\Model\UpdatedByAwareInterface;
-use Oro\Bundle\EntityBundle\Model\DatesAwareTrait;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
@@ -162,7 +162,7 @@ class ActivityList extends ExtendActivityList implements
     /**
      * @var bool
      */
-    protected $isUpdatedBySetted = null;
+    protected $updatedBySet = null;
 
     public function __construct()
     {
@@ -415,7 +415,7 @@ class ActivityList extends ExtendActivityList implements
     public function setEditor(User $editor = null)
     {
         if ($editor !== null) {
-            $this->isUpdatedBySetted = true;
+            $this->updatedBySet = true;
         }
 
         $this->editor = $editor;
@@ -439,9 +439,9 @@ class ActivityList extends ExtendActivityList implements
      */
     public function setUpdatedBy(User $updatedBy = null)
     {
-        $this->isUpdatedBySetted = false;
+        $this->updatedBySet = false;
         if ($updatedBy !== null) {
-            $this->isUpdatedBySetted = true;
+            $this->updatedBySet = true;
         }
 
         //@todo rename this field to updatedBy, remove setEditor, getEditor functions.
@@ -462,9 +462,9 @@ class ActivityList extends ExtendActivityList implements
     /**
      * @return bool
      */
-    public function isUpdatedBySetted()
+    public function isUpdatedBySet()
     {
-        return $this->isUpdatedBySetted;
+        return $this->updatedBySet;
     }
 
     /**

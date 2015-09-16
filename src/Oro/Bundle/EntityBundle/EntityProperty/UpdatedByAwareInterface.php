@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Model;
+namespace Oro\Bundle\EntityBundle\EntityProperty;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -20,5 +20,5 @@ interface UpdatedByAwareInterface
     /**
      * @return bool
      */
-    public function isUpdatedBySetted();
+    public function isUpdatedBySet();
 }

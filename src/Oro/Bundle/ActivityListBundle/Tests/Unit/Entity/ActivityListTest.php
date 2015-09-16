@@ -146,8 +146,8 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $activityList->setUpdatedBy($user);
         $activityList->setUpdatedAt($date);
 
-        $this->assertTrue($activityList->isUpdatedBySetted());
-        $this->assertTrue($activityList->isUpdatedAtSetted());
+        $this->assertTrue($activityList->isUpdatedBySet());
+        $this->assertTrue($activityList->isUpdatedAtSet());
     }
 
     public function testIsNotUpdatedFlags()
@@ -156,7 +156,7 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $activityList->setUpdatedBy(null);
         $activityList->setUpdatedAt(null);
 
-        $this->assertFalse($activityList->isUpdatedBySetted());
-        $this->assertFalse($activityList->isUpdatedAtSetted());
+        $this->assertFalse($activityList->isUpdatedBySet());
+        $this->assertFalse($activityList->isUpdatedAtSet());
     }
 }

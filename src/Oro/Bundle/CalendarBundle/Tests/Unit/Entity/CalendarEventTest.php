@@ -294,7 +294,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setUpdatedAt($date);
 
-        $this->assertTrue($calendarEvent->isUpdatedAtSetted());
+        $this->assertTrue($calendarEvent->isUpdatedAtSet());
     }
 
     public function testIsNotUpdatedFlags()
@@ -302,6 +302,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setUpdatedAt(null);
 
-        $this->assertFalse($calendarEvent->isUpdatedAtSetted());
+        $this->assertFalse($calendarEvent->isUpdatedAtSet());
     }
 }

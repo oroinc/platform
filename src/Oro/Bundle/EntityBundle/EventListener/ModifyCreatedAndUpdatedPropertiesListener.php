@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EntityBundle\Model\CreatedAtAwareInterface;
-use Oro\Bundle\EntityBundle\Model\UpdatedAtAwareInterface;
-use Oro\Bundle\EntityBundle\Model\UpdatedByAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
@@ -19,11 +20,18 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
-    /** @var EntityManager */
-    protected $entityManager;
-
     /** @var bool */
     protected $enabled = true;
+
+    /**
+     * @var ClassMetadata[]
+     */
+    protected $metadataCache = [];
+
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
 
     /**
      * @param ServiceLink $securityFacadeLink
@@ -42,77 +50,118 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * @param OnFlushEventArgs $args
      */
-    public function prePersist(LifecycleEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args)
     {
         if (!$this->enabled) {
             return;
         }
-        $entity = $args->getEntity();
-        $this->entityManager = $args->getEntityManager();
-        $this->setCreatedProperties($entity);
-        $this->setUpdatedProperties($entity);
-    }
 
-    /**
-     * @param PreUpdateEventArgs $args
-     */
-    public function preUpdate(PreUpdateEventArgs $args)
-    {
-        if (!$this->enabled) {
-            return;
+        $this->entityManager = $args->getEntityManager();
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+
+        $newEntities = $unitOfWork->getScheduledEntityInsertions();
+        $updateEntities = $unitOfWork->getScheduledEntityUpdates();
+
+        foreach ($newEntities as $entity) {
+            $isCreatedAtUpdated = $this->updateCreatedAt($entity);
+            $isUpdatedPropertiesUpdated = $this->setUpdatedProperties($entity);
+            if ($isCreatedAtUpdated || $isUpdatedPropertiesUpdated) {
+                $this->updateChangeSets($entity);
+            }
         }
-        $entity = $args->getEntity();
-        $this->entityManager = $args->getEntityManager();
-        $this->setUpdatedProperties($entity);
+        foreach ($updateEntities as $entity) {
+            if ($this->setUpdatedProperties($entity)) {
+                $this->updateChangeSets($entity);
+            }
+        }
     }
 
     /**
-     * @param object $entity
+     * @param object                 $entity
      */
-    protected function setCreatedProperties($entity)
+    protected function updateChangeSets($entity)
     {
-        $this->modifyCreatedAt($entity);
+        $metadata = $this->getMetadataForEntity($entity);
+        $this->entityManager->getUnitOfWork()
+            ->recomputeSingleEntityChangeSet($metadata, $entity);
     }
 
     /**
-     * @param object $entity
+     * @param object                 $entity
+     *
+     * @return ClassMetadata
+     */
+    protected function getMetadataForEntity($entity)
+    {
+        $class = ClassUtils::getClass($entity);
+        if (!isset($this->metadataCache[$class])) {
+            $this->metadataCache[$class] = $this->entityManager->getClassMetadata($class);
+        }
+
+        return $this->metadataCache[$class];
+    }
+
+    /**
+     * @param object                 $entity
+     *
+     * @return bool
      */
     protected function setUpdatedProperties($entity)
     {
-        $this->modifyUpdatedAt($entity);
-        $this->modifyUpdatedBy($entity);
+        $isUpdatedAtUpdated = $this->updateUpdatedAt($entity);
+        $isUpdatedByUpdated = $this->updateUpdatedBy($entity);
+
+        return $isUpdatedAtUpdated || $isUpdatedByUpdated;
     }
 
     /**
      * @param object $entity
+     *
+     * @return bool
      */
-    protected function modifyCreatedAt($entity)
+    protected function updateCreatedAt($entity)
     {
         if ($entity instanceof CreatedAtAwareInterface && !$entity->getCreatedAt()) {
             $entity->setCreatedAt($this->getNowDate());
+
+            return true;
         }
+
+        return false;
     }
 
     /**
      * @param object $entity
+     *
+     * @return bool
      */
-    protected function modifyUpdatedAt($entity)
+    protected function updateUpdatedAt($entity)
     {
-        if ($entity instanceof UpdatedAtAwareInterface && !$entity->isUpdatedAtSetted()) {
+        if ($entity instanceof UpdatedAtAwareInterface && !$entity->isUpdatedAtSet()) {
             $entity->setUpdatedAt($this->getNowDate());
+
+            return true;
         }
+
+        return false;
     }
 
     /**
-     * @param object $entity
+     * @param object                 $entity
+     *
+     * @return bool
      */
-    protected function modifyUpdatedBy($entity)
+    protected function updateUpdatedBy($entity)
     {
-        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySetted()) {
+        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet()) {
             $entity->setUpdatedBy($this->getUser());
+
+            return true;
         }
+
+        return false;
     }
 
     /**

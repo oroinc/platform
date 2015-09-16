@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Model;
+namespace Oro\Bundle\EntityBundle\EntityProperty;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 trait CreatedAtAwareTrait
 {
@@ -15,7 +17,6 @@ trait CreatedAtAwareTrait
      *          }
      *      }
      * )
-     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $createdAt;
 

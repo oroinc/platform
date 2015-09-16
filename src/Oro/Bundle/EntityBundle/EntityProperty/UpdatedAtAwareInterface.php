@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Model;
+namespace Oro\Bundle\EntityBundle\EntityProperty;
 
 interface UpdatedAtAwareInterface
 {
@@ -18,5 +18,5 @@ interface UpdatedAtAwareInterface
     /**
      * @return bool
      */
-    public function isUpdatedAtSetted();
+    public function isUpdatedAtSet();
 }
