@@ -5,7 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 interface DataStorageExtensionAwareInterface
 {
     /**
-     * @param DataStorageExtension $storage
+     * @param DataStorageExtension $dataStorageExtension
      */
-    public function setDataStorageExtension(DataStorageExtension $storage);
+    public function setDataStorageExtension(DataStorageExtension $dataStorageExtension);
 }
