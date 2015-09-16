@@ -474,8 +474,9 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
             $this->updatedBySet = true;
         }
 
-        //@todo rename this field to updatedBy, remove setEditor, getEditor functions.
-        //see https://magecore.atlassian.net/browse/BAP-9004
+        /**
+         * @TODO will be renamed after BAP-9004
+         */
         $this->editor = $updatedBy;
 
         return $this;

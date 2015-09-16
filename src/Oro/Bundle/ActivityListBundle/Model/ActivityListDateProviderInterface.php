@@ -18,7 +18,7 @@ interface ActivityListDateProviderInterface
      * Can be updated date field on update activity entity
      *
      * @deprecated 1.8.0:1.10.0 Method is deprecated and will be removed
-     * @see https://magecore.atlassian.net/browse/BAP-9014
+     * @TODO will be removed in BAP-9014
      * @return bool
      */
     public function isDateUpdatable();
