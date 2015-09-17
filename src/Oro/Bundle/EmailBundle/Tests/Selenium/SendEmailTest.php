@@ -43,9 +43,9 @@ class SendEmailTest extends Selenium2TestCase
     public function testUserImap()
     {
     $imapSetting = array(
-        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL,
+        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
         'port' => '143',
-        'user' => 'mailbox1@example.com',
+        'user' => 'mailbox1',
         'password' => 'eF3ar4ic'
     );
 
