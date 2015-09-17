@@ -13,13 +13,6 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
  */
 class SendEmailTest extends Selenium2TestCase
 {
-    protected $imapSetting = array(
-        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL,
-        'port' => '143',
-        'user' => 'mailbox1@example.com',
-        'password' => 'eF3ar4ic'
-    );
-
     /**
      * @return string
      */
@@ -49,7 +42,19 @@ class SendEmailTest extends Selenium2TestCase
      */
     public function testUserImap()
     {
-        $imapSetting = array();
+    $imapSetting = array(
+        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL,
+        'port' => '143',
+        'user' => 'mailbox1@example.com',
+        'password' => 'eF3ar4ic'
+    );
+
+//        $imapSetting = array(
+//        'host' => 'imap.gmail.com',
+//        'port' => '993',
+//        'user' => 'qa@magecore.com ',
+//        'password' => 'OroQA2014'
+//    );
         $username = 'user_' . mt_rand();
 
         $login = $this->login();
@@ -69,7 +74,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setRoles(array('Administrator'), true)
             ->setBusinessUnit(array ('OroCRM'))
             ->uncheckInviteUser()
-            ->setImap($this->$imapSetting)
+            ->setImap($imapSetting)
             ->save()
             ->logout()
             ->setUsername($username)
@@ -92,7 +97,6 @@ class SendEmailTest extends Selenium2TestCase
      */
     public function testEmailReceive($username)
     {
-        $imapSetting = array();
         $subject = 'Email for ' . $username;
 
         $login = $this->login();
@@ -100,7 +104,7 @@ class SendEmailTest extends Selenium2TestCase
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->add()
             ->setSubject($subject)
-            ->setTo($this->$imapSetting['user'])
+            ->setTo($username.'@mail.com')
             ->setBody('Email body text for ' . $username)
             ->send()
             ->assertMessage('The email was sent')
