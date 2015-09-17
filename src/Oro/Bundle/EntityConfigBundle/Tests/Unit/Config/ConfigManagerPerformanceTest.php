@@ -7,7 +7,7 @@ use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 
-use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
+use Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
@@ -404,7 +404,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             $configProviderBagLink,
             new ConfigModelManager($emLink),
-            new AuditManager($securityTokenStorage),
+            new AuditEntityBuilder($securityTokenStorage),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );
     }

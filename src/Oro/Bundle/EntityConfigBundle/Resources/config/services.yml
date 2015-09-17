@@ -1,7 +1,6 @@
 parameters:
     oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
-    oro_entity_config.config_audit_mamanger.class:              Oro\Bundle\EntityConfigBundle\Audit\AuditManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
     oro_entity_config.provider_bag.class:                       Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag
@@ -34,7 +33,7 @@ services:
             - @event_dispatcher
             - @oro_entity_config.link.provider_bag
             - @oro_entity_config.config_model_manager
-            - @oro_entity_config.config_audit_mamanger
+            - @oro_entity_config.config_audit_entity_builder
             - @oro_entity_config.cache
 
     oro_entity_config.config_model_manager:
@@ -43,9 +42,9 @@ services:
         arguments:
             - @oro_entity_config.link.entity_manager
 
-    oro_entity_config.config_audit_mamanger:
+    oro_entity_config.config_audit_entity_builder:
         public: false
-        class: %oro_entity_config.config_audit_mamanger.class%
+        class: Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder
         arguments:
             - @security.token_storage
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Audit;
+namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
@@ -8,16 +8,14 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
  * Audit entity config changes
  */
-class AuditManager
+class AuditEntityBuilder
 {
     /** @var TokenStorageInterface */
     protected $securityTokenStorage;
@@ -31,13 +29,13 @@ class AuditManager
     }
 
     /**
-     * Creates a log entry contains all changed configs
+     * Creates an audit entity contains all changed configs
      *
      * @param ConfigManager $configManager
      *
      * @return ConfigLog|null
      */
-    public function buildLogEntry(ConfigManager $configManager)
+    public function buildEntity(ConfigManager $configManager)
     {
         $user = $this->getUser($configManager->getEntityManager());
         if (null === $user) {

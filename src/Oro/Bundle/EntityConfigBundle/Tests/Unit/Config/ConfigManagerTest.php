@@ -50,7 +50,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $modelManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $auditManager;
+    protected $auditEntityBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configCache;
@@ -91,19 +91,19 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
+        $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->modelManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
+        $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->auditManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Audit\AuditManager')
+        $this->auditEntityBuilder = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configCache     = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
+        $this->configCache        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -112,7 +112,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->eventDispatcher,
             new ServiceLink($this->container, 'ConfigProviderBag'),
             $this->modelManager,
-            $this->auditManager,
+            $this->auditEntityBuilder,
             $this->configCache
         );
     }
