@@ -116,17 +116,31 @@ class EmailFolder
      */
     protected $outdatedAt;
 
+//    /**
+//     * @var ArrayCollection|EmailUser[]
+//     *
+//     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
+//     *      cascade={"persist", "remove"}, orphanRemoval=true)
+//     */
+//    protected $emailUsers;
+
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|EmailUser[]
      *
-     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(
+     *      targetEntity="EmailUser",
+     *      mappedBy="folders",
+     *      cascade={"persist", "remove"},
+     *      orphanRemoval=true
+     * )
+     * @JMS\Exclude
      */
     protected $emailUsers;
 
     public function __construct()
     {
         $this->subFolders = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
     }
 
     /**
