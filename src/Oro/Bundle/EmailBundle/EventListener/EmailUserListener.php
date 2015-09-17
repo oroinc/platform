@@ -42,8 +42,10 @@ class EmailUserListener
 
     /**
      * Send notification to clank that user have new emails
+     *
+     * @param PostFlushEventArgs $args
      */
-    public function postFlush()
+    public function postFlush(PostFlushEventArgs $args)
     {
         $usersWithNewEmails = [];
         if (!$this->processEmailUsersEntities) {
@@ -54,21 +56,46 @@ class EmailUserListener
         foreach ($this->processEmailUsersEntities as $entity) {
             $status = $entity['status'];
             $entity = $entity['entity'];
-            if (!$entity->getOwner()) {
-                continue;
-            }
 
-            $ownerId = $entity->getOwner()->getId();
-            if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
-                $new = $usersWithNewEmails[$ownerId]['new'];
-                if ($status === self::ENTITY_STATUS_NEW) {
-                    $usersWithNewEmails[$ownerId]['new'] = $new + 1;
-                }
+            $ownerIds = [];
+            if ($entity->getOwner() !== null) {
+                $ownerIds[] = $entity->getOwner()->getId();
             } else {
-                $usersWithNewEmails[$ownerId] = [
-                    'entity' => $entity,
-                    'new' => $status === self::ENTITY_STATUS_NEW ? 1 : 0
-                ];
+                $em = $args->getEntityManager();
+                $mailbox = $entity->getMailboxOwner();
+                if ($mailbox !== null) {
+                    $authorizedUsers = $mailbox->getAuthorizedUsers();
+
+                    foreach ($authorizedUsers as $user) {
+                        $ownerIds[] = $user->getId();
+                    }
+
+                    $authorizedRoles = $mailbox->getAuthorizedRoles();
+                    foreach ($authorizedRoles as $role) {
+                        $users = $em->getRepository('OroUserBundle:Role')
+                            ->getUserQueryBuilder($role)
+                            ->getQuery()->getResult();
+
+                        foreach ($users as $user) {
+                            $ownerIds[] = $user->getId();
+                        }
+                    }
+                }
+            }
+            $ownerIds = array_unique($ownerIds);
+
+            foreach ($ownerIds as $ownerId) {
+                if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
+                    $new = $usersWithNewEmails[$ownerId]['new'];
+                    if ($status === self::ENTITY_STATUS_NEW) {
+                        $usersWithNewEmails[$ownerId]['new'] = $new + 1;
+                    }
+                } else {
+                    $usersWithNewEmails[$ownerId] = [
+                        'entity' => $entity,
+                        'new' => $status === self::ENTITY_STATUS_NEW ? 1 : 0,
+                    ];
+                }
             }
         }
 
