@@ -8,9 +8,9 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -54,11 +54,11 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      */
     private function mergeConfigIntoOne(ContainerBuilder $container, $name, array $config = [])
     {
-        if (!$container instanceof OroContainerBuilder) {
+        if (!$container instanceof ExtendedContainerBuilder) {
             throw new \RuntimeException(
                 sprintf(
                     '%s is expected to be passed into OroPlatformExtension',
-                    'Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder'
+                    'Oro\Component\DependencyInjection\ExtendedContainerBuilder'
                 )
             );
         }

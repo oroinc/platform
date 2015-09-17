@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures;
+namespace Oro\Component\DependencyInjection\Tests\Unit\Fixtures;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CompilerPass1 implements CompilerPassInterface
+class CompilerPass3 implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}

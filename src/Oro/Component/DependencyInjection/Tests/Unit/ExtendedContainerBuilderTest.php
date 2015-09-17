@@ -1,19 +1,19 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Component\DependencyInjection\Tests\Unit;
 
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
-use Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass1;
-use Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass2;
-use Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass3;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass1;
+use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass2;
+use Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass3;
 
-class OroContainerBuilderTest extends \PHPUnit_Framework_TestCase
+class ExtendedContainerBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const EXTENSION = 'ext';
 
-    /** @var OroContainerBuilder */
+    /** @var ExtendedContainerBuilder */
     private $builder;
 
     public function setUp()
@@ -24,7 +24,7 @@ class OroContainerBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getAlias')
             ->will($this->returnValue(static::EXTENSION));
 
-        $this->builder = new OroContainerBuilder();
+        $this->builder = new ExtendedContainerBuilder();
         $this->builder->registerExtension($extension);
     }
 
@@ -131,7 +131,7 @@ class OroContainerBuilderTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unknown compiler pass "Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass1"
+     * @expectedExceptionMessage Unknown compiler pass "Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass1"
      */
     // @codingStandardsIgnoreEnd
     public function testMoveCompilerPassBeforeForEmptyPasses()
@@ -144,7 +144,7 @@ class OroContainerBuilderTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unknown compiler pass "Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass1"
+     * @expectedExceptionMessage Unknown compiler pass "Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass1"
      */
     // @codingStandardsIgnoreEnd
     public function testMoveCompilerPassBeforeWhenSrcPassDoesNotExist()
@@ -158,7 +158,7 @@ class OroContainerBuilderTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Unknown compiler pass "Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Fixtures\CompilerPass2"
+     * @expectedExceptionMessage Unknown compiler pass "Oro\Component\DependencyInjection\Tests\Unit\Fixtures\CompilerPass2"
      */
     // @codingStandardsIgnoreEnd
     public function testMoveCompilerPassBeforeWhenTargetPassDoesNotExist()

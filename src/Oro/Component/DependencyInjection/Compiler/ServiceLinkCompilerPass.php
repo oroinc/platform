@@ -1,31 +1,46 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
+namespace Oro\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-
-class ServiceLinkPass implements CompilerPassInterface
+class ServiceLinkCompilerPass implements CompilerPassInterface
 {
-    const TAG_NAME = 'oro_service_link';
+    /** @var string */
+    private $tagName;
+
+    /** @var string */
+    private $decoratorClass;
+
+    /**
+     * @param string $tagName
+     * @param string $decoratorClass
+     */
+    public function __construct(
+        $tagName = 'service_link',
+        $decoratorClass = 'Oro\Component\DependencyInjection\ServiceLink'
+    ) {
+        $this->tagName        = $tagName;
+        $this->decoratorClass = $decoratorClass;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $tags = $container->findTaggedServiceIds(self::TAG_NAME);
+        $tags = $container->findTaggedServiceIds($this->tagName);
         foreach ($tags as $id => $tag) {
             /** @var Definition $serviceLinkDef */
             $serviceLinkDef = $container->getDefinition($id);
 
             if (!isset($tag[0]['service'])) {
-                throw new RuntimeException(
-                    sprintf('Tag "%s" for service "%s" does not have required param "service"', self::TAG_NAME, $id)
+                throw new InvalidArgumentException(
+                    sprintf('Tag "%s" for service "%s" does not have required param "service"', $this->tagName, $id)
                 );
             }
 
@@ -49,19 +64,19 @@ class ServiceLinkPass implements CompilerPassInterface
                     $serviceAlias->setPublic(true);
                 }
             } elseif (!$isOptional) {
-                throw new RuntimeException(
+                throw new InvalidArgumentException(
                     sprintf(
                         'Target service "%s" is undefined. The service link "%s" with tag "%s" and tag-service "%s"',
                         $serviceId,
                         $id,
-                        self::TAG_NAME,
+                        $this->tagName,
                         $serviceId
                     )
                 );
             }
 
             $serviceLinkDef
-                ->setClass('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->setClass($this->decoratorClass)
                 ->setPublic(false)
                 ->setArguments([new Reference('service_container'), $serviceId, $isOptional]);
         }
