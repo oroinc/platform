@@ -89,7 +89,9 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedBy')
             ->with($currentUser);
 
-        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
+        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
+            'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
+        );
         $alreadyUpdatedUpdatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(true);
@@ -139,7 +141,9 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedBy')
             ->with($currentUser);
 
-        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
+        $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
+            'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
+        );
         $alreadyUpdatedUpdatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(true);
