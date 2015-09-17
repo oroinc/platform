@@ -92,14 +92,6 @@ class CalendarEventActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getDate($entity)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getCreatedAt($entity)
     {
         /** @var $entity CalendarEvent */
@@ -113,14 +105,6 @@ class CalendarEventActivityListProvider implements
     {
         /** @var $entity CalendarEvent */
         return $entity->getUpdatedAt();
-    }
-
-    /**
-     *  {@inheritdoc}
-     */
-    public function isDateUpdatable()
-    {
-        return true;
     }
 
     /**

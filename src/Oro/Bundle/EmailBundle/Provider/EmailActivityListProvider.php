@@ -203,14 +203,6 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getDate($entity)
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getCreatedAt($entity)
     {
         /** @var $entity Email */
@@ -233,14 +225,6 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         return $entity->isHead();
-    }
-
-    /**
-     *  {@inheritdoc}
-     */
-    public function isDateUpdatable()
-    {
-        return false;
     }
 
     /**
