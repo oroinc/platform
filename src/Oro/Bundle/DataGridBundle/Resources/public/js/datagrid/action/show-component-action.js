@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ShowColumnManagerAction;
+    var ShowComponentAction;
     var AbstractAction = require('./abstract-action');
     var ActionComponentDropDownLauncher = require('orodatagrid/js/datagrid/action-component-dropdown-launcher');
 
-    ShowColumnManagerAction = AbstractAction.extend({
+    ShowComponentAction = AbstractAction.extend({
         launcher: ActionComponentDropDownLauncher,
 
         /**
@@ -16,5 +16,5 @@ define(function(require) {
         }
     });
 
-    return ShowColumnManagerAction;
+    return ShowComponentAction;
 });
