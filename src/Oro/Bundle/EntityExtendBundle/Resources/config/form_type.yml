@@ -4,9 +4,6 @@ parameters:
     oro_entity_extend.type.relation.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
     oro_entity_extend.type.target_field_type.class:             Oro\Bundle\EntityExtendBundle\Form\Type\TargetFieldType
 
-    oro_entity_extend.type.option_set.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetType
-    oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
-
     oro_entity_extend.type.integer.class:                       Oro\Bundle\EntityExtendBundle\Form\Type\IntegerType
     oro_entity_extend.type.text.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\TextType
     oro_entity_extend.type.textarea.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType
@@ -68,18 +65,6 @@ services:
             - @oro_entity.entity_field_provider
         tags:
             - { name: form.type, alias: oro_entity_target_field_type}
-
-    oro_entity_extend.type.option_set:
-        class:                                                  %oro_entity_extend.type.option_set.class%
-        tags:
-            - { name: form.type, alias: oro_entity_option_set }
-
-    oro_entity_extend.type.option_set_collection:
-        class:                                                  %oro_entity_extend.type.option_set_collection.class%
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: form.type, alias: oro_entity_option_set_collection }
 
     oro_entity_extend.type.integer:
         class: %oro_entity_extend.type.integer.class%
@@ -281,7 +266,6 @@ services:
             - [addExtendTypeMapping, ["manyToOne", "oro_entity_select"]]
             - [addExtendTypeMapping, ["oneToMany", "oro_entity_extend_multiple_entity"]]
             - [addExtendTypeMapping, ["manyToMany", "oro_entity_extend_multiple_entity"]]
-            - [addExtendTypeMapping, ["optionSet", "oro_option_select"]]
             - [addExtendTypeMapping, ["enum", "oro_enum_select"]]
             - [addExtendTypeMapping, ["multiEnum", "oro_enum_choice"]]
         tags:

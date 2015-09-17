@@ -7,6 +7,7 @@ use Knp\Menu\Twig\Helper;
 use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
 class MenuExtension extends \Twig_Extension
 {
@@ -30,7 +31,7 @@ class MenuExtension extends \Twig_Extension
     protected $menuConfiguration;
 
     /**
-     * @var BreadcrumbManager
+     * @var BreadcrumbManagerInterface
      */
     protected $breadcrumbManager;
 
@@ -38,6 +39,9 @@ class MenuExtension extends \Twig_Extension
      * @param Helper $helper
      * @param MenuProviderInterface $provider
      * @param BreadcrumbManager $breadcrumbManager
+     *
+     * @deprecated since 1.8 $breadcrumbManager argument will be replaced with BreadcrumbManagerInterface
+     * @see \Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface
      */
     public function __construct(
         Helper $helper,
@@ -203,5 +207,15 @@ class MenuExtension extends \Twig_Extension
         }
 
         return $menu;
+    }
+
+    /**
+     * @param BreadcrumbManagerInterface $breadcrumbManager
+     *
+     * @deprecated since 1.8 will be moved to constructor
+     */
+    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
+    {
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 }

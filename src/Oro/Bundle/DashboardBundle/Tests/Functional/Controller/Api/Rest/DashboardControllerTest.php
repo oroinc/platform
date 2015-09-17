@@ -8,9 +8,7 @@ use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class DashboardControllerTest extends WebTestCase
 {
