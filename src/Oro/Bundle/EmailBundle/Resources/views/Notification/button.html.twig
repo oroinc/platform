@@ -5,11 +5,7 @@
             <div class="title nowrap-ellipsis"><%= subject %></div>
             <div class="description nowrap-ellipsis"><%= bodyContent %></div>
         </div>
-        <% if (seen) {  %>
-        <i class="icon-envelope"></i>
-        <% } else { %>
-        <i class="icon-envelope new"></i>
-        <% }  %>
+        <i class="icon-envelope<% if (!seen) {  %> highlight<% }  %>" data-role="toggle-read-status"></i>
     </div>
     <div class="footer row-fluid">
         <span class="pull-left fromName">
