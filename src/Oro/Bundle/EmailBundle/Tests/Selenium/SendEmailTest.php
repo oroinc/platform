@@ -14,7 +14,7 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 class SendEmailTest extends Selenium2TestCase
 {
     protected $imapSetting = array(
-        'host' => 'localhost.com',
+        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL,
         'port' => '143',
         'user' => 'mailbox1@example.com',
         'password' => 'eF3ar4ic'
@@ -84,7 +84,6 @@ class SendEmailTest extends Selenium2TestCase
 
         return $username;
     }
-
 
     /**
      * Test to check that
