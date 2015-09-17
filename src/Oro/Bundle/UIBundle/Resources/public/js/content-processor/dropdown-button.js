@@ -1,4 +1,4 @@
-define(['jquery', 'jquery-ui'], function($) {
+define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
     /**
@@ -13,6 +13,7 @@ define(['jquery', 'jquery-ui'], function($) {
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             useMainButtonsClone: false,
+            truncateMain: false,
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
@@ -34,6 +35,14 @@ define(['jquery', 'jquery-ui'], function($) {
             var $main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
                 $main = $main.clone(true);
+                if (this.options.truncateMain) {
+                    var self = this;
+                    $main.contents().each(function(){
+                        if (this.nodeType === 3) {
+                            this.nodeValue = _.trunc(this.nodeValue, self.options.truncateMain, false, '...');
+                        }
+                    })
+                }
             }
             $group.append($main);
 
