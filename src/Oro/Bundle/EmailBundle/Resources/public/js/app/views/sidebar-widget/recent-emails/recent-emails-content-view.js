@@ -25,9 +25,6 @@ define(function(require) {
                 collection: collection,
                 countModel: this.model
             };
-            if ('limit' in settings) {
-                collection.setLimit(settings.limit);
-            }
 
             this.component = new EmailNotificationComponent(options);
 
