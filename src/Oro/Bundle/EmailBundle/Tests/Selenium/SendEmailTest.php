@@ -13,6 +13,13 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
  */
 class SendEmailTest extends Selenium2TestCase
 {
+    protected $imapSetting = array(
+        'host' => 'localhost.com',
+        'port' => '143',
+        'user' => 'mailbox1@example.com',
+        'password' => 'eF3ar4ic'
+    );
+
     /**
      * @return string
      */
@@ -38,51 +45,11 @@ class SendEmailTest extends Selenium2TestCase
     }
 
     /**
-     * Test to check that
-     * @depends testSendEmail
-     * @param $subject
+     * @return string
      */
-    public function testEmailReceive($subject)
-    {
-        $username = 'user_' . mt_rand();
-
-        $login = $this->login();
-        /** @var Users $login */
-        $login->openUsers('Oro\Bundle\UserBundle')
-            ->assertTitle('All - Users - User Management - System')
-            ->add()
-            ->assertTitle('Create User - Users - User Management - System')
-            ->setUsername($username)
-            ->enable()
-            ->setOwner('Main')
-            ->setFirstPassword('123123q')
-            ->setSecondPassword('123123q')
-            ->setFirstName('First_'.$username)
-            ->setLastName('Last_'.$username)
-            ->setEmail('mailbox1@example.com')
-            ->setRoles(array('Manager', 'Marketing Manager'), true)
-            ->setOrganization('OroCRM')
-            ->uncheckInviteUser()
-            ->save()
-            ->assertMessage('User saved')
-            ->logout()
-            ->setUsername($username)
-            ->setPassword('123123q')
-            ->submit();
-        /** @var Emails $login */
-        $login->openEmails('Oro\Bundle\EmailBundle')
-            ->filterBy('Subject', $subject)
-            ->entityExists([$subject]);
-    }
-
     public function testUserImap()
     {
-        $imapSetting = array(
-            'host' => 'localhost.com',
-            'port' => '143',
-            'user' => 'mailbox1@example.com',
-            'password' => 'eF3ar4ic'
-        );
+        $imapSetting = array();
         $username = 'user_' . mt_rand();
 
         $login = $this->login();
@@ -102,7 +69,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setRoles(array('Administrator'), true)
             ->setBusinessUnit(array ('OroCRM'))
             ->uncheckInviteUser()
-            ->setImap($imapSetting)
+            ->setImap($this->$imapSetting)
             ->save()
             ->logout()
             ->setUsername($username)
@@ -114,5 +81,38 @@ class SendEmailTest extends Selenium2TestCase
             ->assertElementNotPresent(
                 "//div[@class='no-data-visible floatThead-fixed floatThead']//span[contains(., 'No records found')]"
             );
+
+        return $username;
+    }
+
+
+    /**
+     * Test to check that
+     * @depends testUserImap
+     * @param $username
+     */
+    public function testEmailReceive($username)
+    {
+        $imapSetting = array();
+        $subject = 'Email for ' . $username;
+
+        $login = $this->login();
+        /** @var Emails $login */
+        $login->openEmails('Oro\Bundle\EmailBundle')
+            ->add()
+            ->setSubject($subject)
+            ->setTo($this->$imapSetting['user'])
+            ->setBody('Email body text for ' . $username)
+            ->send()
+            ->assertMessage('The email was sent')
+            ->logout()
+            ->setUsername($username)
+            ->setPassword('123123q')
+            ->submit();
+        exec("app/console oro:cron:imap-sync --env prod");
+        /** @var Emails $login */
+        $login->openEmails('Oro\Bundle\EmailBundle')
+            ->filterBy('Subject', $subject)
+            ->entityExists([$subject]);
     }
 }
