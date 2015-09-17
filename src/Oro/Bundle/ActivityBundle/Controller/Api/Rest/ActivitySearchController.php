@@ -12,6 +12,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 /**
@@ -72,7 +74,12 @@ class ActivitySearchController extends RestGetController
         ];
         $from    = $this->getRequest()->get('from', null);
         if ($from) {
-            $filter          = new StringToArrayParameterFilter();
+            $filter          = new ChainParameterFilter(
+                [
+                    new StringToArrayParameterFilter(),
+                    new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                ]
+            );
             $filters['from'] = $filter->filter($from, null);
         }
 

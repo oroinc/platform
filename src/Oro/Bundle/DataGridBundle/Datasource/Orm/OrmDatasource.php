@@ -8,7 +8,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;

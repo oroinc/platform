@@ -413,10 +413,11 @@ class ConfigurationType extends AbstractType
             'validation_groups' => function (FormInterface $form) {
                 $groups = [];
 
-                if ($form->has('useImap') && $form->get('useImap')->getData() === true) {
+                $isSubmitted = $form->isSubmitted() === true;
+                if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Imap';
                 }
-                if ($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) {
+                if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
                     $groups[] = 'Smtp';
                 }
 

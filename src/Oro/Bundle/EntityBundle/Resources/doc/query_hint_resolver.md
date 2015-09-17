@@ -1,6 +1,6 @@
 ## Resolving of ORM query hints ##
 
-The [Query Hint Resolver](./../../ORM/QueryHintResolver.php) service has been introduced to make the building of a configuration based queries (like grids, API, etc) easier and more flexible.
+The [Query Hint Resolver](./../../../../Component/DoctrineUtils/ORM/QueryHintResolver.php) service has been introduced to make the building of a configuration based queries (like grids, API, etc) easier and more flexible.
 
 To map a hint to a custom tree walker you can use DI container configuration, for example:
 
@@ -17,7 +17,7 @@ To map a hint to a custom tree walker you can use DI container configuration, fo
                 walker_hint_provider: oro_security.walker_hint_provider.current_user
 ```
 
-Please pay attention on `walker_hint_provider` attribute. It is optional and can be used to provide a service to be used to set additional query hints required to work the walker specified in the attribute `tree_walker`. This service must implement [QueryWalkerHintProviderInterface](./../../ORM/QueryWalkerHintProviderInterface.php) and must be registered in DI container, for example:
+Please pay attention on `walker_hint_provider` attribute. It is optional and can be used to provide a service to be used to set additional query hints required to work the walker specified in the attribute `tree_walker`. This service must implement [QueryWalkerHintProviderInterface](./../../../../Component/DoctrineUtils/ORM/QueryWalkerHintProviderInterface.php) and must be registered in DI container, for example:
 
 ```yaml
     oro_security.walker_hint_provider.current_user:
