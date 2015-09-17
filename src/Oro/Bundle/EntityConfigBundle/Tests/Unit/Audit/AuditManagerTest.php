@@ -21,6 +21,9 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $em;
+
     /** @var AuditManager */
     private $auditManager;
 
@@ -33,6 +36,13 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configManager->expects($this->any())
+            ->method('getEntityManager')
+            ->willReturn($this->em);
 
         $this->auditManager = new AuditManager($this->tokenStorage);
     }
@@ -122,6 +132,21 @@ class AuditManagerTest extends \PHPUnit_Framework_TestCase
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
             ->willReturn($token);
+
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($this->identicalTo($user))
+            ->willReturn(['id' => 123]);
+        $this->em->expects($this->once())
+            ->method('getReference')
+            ->with(get_class($user), 123)
+            ->willReturn($user);
 
         return $user;
     }

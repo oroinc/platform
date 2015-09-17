@@ -353,7 +353,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->em->expects($this->any())
             ->method('getRepository')
-            ->with(EntityConfigModel::ENTITY_NAME)
+            ->with('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->willReturn($repo);
         $repo->expects($this->any())
             ->method('findAll')

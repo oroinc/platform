@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -36,7 +39,7 @@ class AuditManager
      */
     public function buildLogEntry(ConfigManager $configManager)
     {
-        $user = $this->getUser();
+        $user = $this->getUser($configManager->getEntityManager());
         if (null === $user) {
             return null;
         }
@@ -91,7 +94,7 @@ class AuditManager
     /**
      * @return UserInterface|null
      */
-    protected function getUser()
+    protected function getUser(EntityManager $em)
     {
         $token = $this->securityTokenStorage->getToken();
         if (null === $token) {
@@ -102,6 +105,10 @@ class AuditManager
             return null;
         }
 
-        return $user;
+        $className = ClassUtils::getClass($user);
+        $id = $em->getClassMetadata($className)->getIdentifierValues($user);
+        $id = reset($id);
+
+        return $em->getReference($className, $id);
     }
 }

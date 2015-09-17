@@ -14,8 +14,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class ConfigLog
 {
-    const ENTITY_NAME = 'OroEntityConfigBundle:ConfigLog';
-
     /**
      * @var integer
      * @ORM\Column(name="id", type="integer")

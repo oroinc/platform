@@ -82,6 +82,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $loader->load('services.yml');
+        $loader->load('doctrine.yml');
         $loader->load('session.yml');
     }
 }

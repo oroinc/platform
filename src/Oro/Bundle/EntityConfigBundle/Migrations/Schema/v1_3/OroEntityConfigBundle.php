@@ -35,5 +35,7 @@ class OroEntityConfigBundle implements Migration
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
+
+        $queries->addQuery(new UpdateModuleAndEntityFieldsQuery());
     }
 }

@@ -1,0 +1,5 @@
+services:
+    doctrine.metadata.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ doctrine.metadata.cache ] ]
