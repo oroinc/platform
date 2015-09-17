@@ -892,8 +892,10 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         _unpackColumnsStateData: function(packedState) {
             // takes order of columns from initial state as columns identifiers
-            var columnIdToName = _.object(_.map(this.initialState.columns, function(item, columnName) {
-                return [item.order, columnName];
+            var columnNames = _.keys(this.initialState.columns);
+            columnNames.sort();
+            var columnIdToName = _.object(_.map(columnNames, function(item, id) {
+                return [id, item];
             }));
 
             return _.object(_.map(packedState.split('.'), function(value, index) {
