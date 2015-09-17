@@ -389,10 +389,10 @@ class User extends AbstractPageEntity
             "//input[@data-ftid='oro_user_user_form_imapConfiguration_password']"
         )->value($imapSetting['password']);
 //      This is an encryption selection functionality
-        $this->encryption = $this->test
-            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
-
-        $this->encryption->selectOptionByLabel('SSL');
+//        $this->encryption = $this->test
+//            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
+//
+//        $this->encryption->selectOptionByLabel('SSL');
         $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
         $this->waitForAjax();
         $this->waitPageToLoad();
