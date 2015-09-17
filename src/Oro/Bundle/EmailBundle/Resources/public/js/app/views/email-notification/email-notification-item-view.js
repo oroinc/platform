@@ -3,6 +3,8 @@ define(function(require) {
 
     var EmailNotificationView;
     var $ = require('jquery');
+    var __ = require('orotranslation/js/translator');
+    var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var BaseView = require('oroui/js/app/views/base/view');
@@ -46,7 +48,6 @@ define(function(require) {
             e.stopPropagation();
             var model = this.model;
             var status = model.get('seen');
-            console.log(routing)
             var url = routing.generate('oro_email_mark_seen', {id: model.get('id'), status: status ? 0 : 1});
             model.set('seen', !status);
             Backbone.ajax({
@@ -55,10 +56,12 @@ define(function(require) {
                 success: function(response) {
                     if (_.result(response, 'successful') !== true) {
                         model.set('seen', status);
+                        mediator.execute('showErrorMessage', __('Sorry, unexpected error was occurred'), 'error');
                     }
                 },
-                error: function() {
+                error: function(xhr, err, message) {
                     model.set('seen', status);
+                    mediator.execute('showErrorMessage', message, err);
                 }
             });
         }

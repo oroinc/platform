@@ -46,7 +46,7 @@ define(function(require) {
             var options = {
                 el: this.options._sourceElement,
                 collection: this.collection,
-                countNewEmail: this.options.count
+                countNewEmail: this.options.countModel.get('unreadEmailsCount')
             };
             var settings = this.options.countModel.get('settings');
             if (settings && settings.actionId) {

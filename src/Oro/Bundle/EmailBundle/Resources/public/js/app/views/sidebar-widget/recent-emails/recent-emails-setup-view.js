@@ -2,8 +2,6 @@ define(function(require) {
     'use strict';
 
     var RecentEmailsContentView;
-    var $ = require('jquery');
-    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
 
@@ -15,7 +13,7 @@ define(function(require) {
         },
 
         validation: {
-            perPage: {
+            limit: {
                 NotBlank: {},
                 Regex: {pattern: '/^\\d+$/'},
                 Number: {min: 1, max: 20}
@@ -29,7 +27,7 @@ define(function(require) {
 
         fetchFromData: function() {
             var data = RecentEmailsContentView.__super__.fetchFromData.call(this);
-            data.perPage = Number(data.perPage);
+            data.limit = Number(data.limit);
             return data;
         },
 

@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
                 template = view.templateMax;
             }
 
-            view.$el.html(template(model.toJSON()));
+            view.$el.html(template(_.extend(model.toJSON(), {showRefreshButton: !model.module.HIDE_REFRESH_BUTTON})));
             view.$el.attr('data-cid', model.cid);
 
             if (view.model.get('cssClass')) {

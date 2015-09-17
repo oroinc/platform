@@ -5,5 +5,5 @@ placement: "both"
 cssClass:  "sidebar-widget-recent-emails"
 settings:
     folderId: 0
-    perPage: 10
+    limit: 4
     actionId: 1
