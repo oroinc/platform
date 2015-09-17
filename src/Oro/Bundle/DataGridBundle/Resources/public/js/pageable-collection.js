@@ -850,26 +850,20 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         _packColumnsStateData: function(state) {
             // takes order of columns from initial state as columns identifiers
-            var columnNames = _.keys(this.initialState.columns);
-            columnNames.sort();
-            var columnNameToId = _.object(_.map(columnNames, function(item, id) {
-                return [item, id];
-            }));
-
-            // convert columns state to array
-            var packedState = _.map(state, function(item, columnName) {
-                return _.extend({name: columnName}, item);
+            var columnNames = _.map(this.initialState.columns, function(item, name) {
+                return {
+                    order: item.order,
+                    name: name
+                };
             });
+            columnNames.sort();
+            var packedState = [];
+            for (var i = 0; i < columnNames.length; i++) {
+                var key = columnNames[i].name;
+                packedState.push(state[key].order.toString() + (state[key].renderable ? 1 : 0).toString());
+            }
 
-            // sort columns by their order
-            packedState = _.sortBy(packedState, 'order');
-
-            // stringify state parts
-            packedState = _.map(packedState, function(item) {
-                return String(columnNameToId[item.name]) + String(Number(item.renderable));
-            }).join('.');
-
-            return packedState;
+            return packedState.join('.');
         },
 
         /**
@@ -892,10 +886,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         _unpackColumnsStateData: function(packedState) {
             // takes order of columns from initial state as columns identifiers
-            var columnNames = _.keys(this.initialState.columns);
-            columnNames.sort();
-            var columnIdToName = _.object(_.map(columnNames, function(item, id) {
-                return [id, item];
+            var columnIdToName = _.object(_.map(this.initialState.columns, function(item, columnName) {
+                return [item.order, columnName];
             }));
 
             return _.object(_.map(packedState.split('.'), function(value, index) {
