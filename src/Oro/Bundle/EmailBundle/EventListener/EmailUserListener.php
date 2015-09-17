@@ -53,9 +53,9 @@ class EmailUserListener
         }
 
         /** @var EmailUser $entity */
-        foreach ($this->processEmailUsersEntities as $entity) {
-            $status = $entity['status'];
-            $entity = $entity['entity'];
+        foreach ($this->processEmailUsersEntities as $item) {
+            $status = $item['status'];
+            $entity = $item['entity'];
 
             $ownerIds = [];
             if ($entity->getOwner() !== null) {
