@@ -13,6 +13,9 @@ define(function(require) {
          */
         initialize: function(options) {
             this.model = options.model;
+            this.model.on('change:settings', function(model, settings) {
+                model.emailNotificationCollection.setLimit(settings.limit);
+            });
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
             this.model.emailNotificationCollection.fetch();
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);

@@ -12,7 +12,12 @@ define(function(require) {
         model: EmailNotificationModel,
         routeDefaults: {
             routeName: 'oro_email_last',
-            routeQueryParameters: ['limit']
+            routeQueryParameterNames: ['limit'],
+            limit: 10
+        },
+
+        setLimit: function(limit) {
+            this._route.set({limit: limit});
         },
 
         markAllAsRead: function() {

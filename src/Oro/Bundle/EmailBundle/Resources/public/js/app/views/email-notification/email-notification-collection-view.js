@@ -10,17 +10,21 @@ define(function(require) {
     var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var messenger = require('oroui/js/messenger');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
         template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
         listSelector: '.items',
         countNewEmail: 0,
+        loadingMask: null,
         actionId: 1,
 
         listen: {
             'change:seen collection': 'updateViewMode',
-            'reset collection': 'onResetCollection'
+            'reset collection': 'onResetCollection',
+            'request collection': 'onCollectionRequest',
+            'sync collection': 'onCollectionSync'
         },
 
         events: {
@@ -98,7 +102,7 @@ define(function(require) {
         },
 
         onResetCollection: function() {
-            this.setCount(0);
+            this.collection.countNewEmail = 0;
         },
 
         onClickIconEnvelope: function() {
@@ -126,6 +130,20 @@ define(function(require) {
 
         open: function() {
             this.$el.addClass('open');
+        },
+
+        onCollectionRequest: function() {
+            this.loadingMask = new LoadingMask({
+                container: this.$el
+            });
+            this.loadingMask.show();
+        },
+
+        onCollectionSync: function() {
+            if (this.loadingMask) {
+                this.loadingMask.dispose();
+            }
+            this.render();
         }
     });
 
