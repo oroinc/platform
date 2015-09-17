@@ -3,10 +3,10 @@ define(function(require) {
 
     var ShowColumnManagerAction;
     var AbstractAction = require('./abstract-action');
-    var ColumnManagerLauncher = require('orodatagrid/js/datagrid/column-manager-launcher');
+    var ActionComponentDropDownLauncher = require('orodatagrid/js/datagrid/action-component-dropdown-launcher');
 
     ShowColumnManagerAction = AbstractAction.extend({
-        launcher: ColumnManagerLauncher,
+        launcher: ActionComponentDropDownLauncher,
 
         /**
          * @inheritDoc

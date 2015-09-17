@@ -243,12 +243,14 @@ class ColumnsExtension extends AbstractExtension
 
         //For minified colimn params
         $columns = explode('.', $columns);
-        $order = 0;
-        foreach ($columnsData as $columnName => $columnData) {
-            $options = str_split($columns[$order]);
+        $columnNames = array_keys($columnsData);
+        sort($columnNames);
+
+        for ($i = 0; $i < count($columnNames); $i++) {
+            $options = str_split($columns[$i]);
+            $columnName = $columnNames[$i];
             $columnsData[$columnName][self::ORDER_FIELD_NAME] = (int)$options[0];
             $columnsData[$columnName][self::RENDER_FIELD_NAME] = (bool)((int)$options[1]);
-            $order++;
         }
 
         return  $columnsData;
