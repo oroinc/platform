@@ -156,20 +156,28 @@ class ColumnsExtension extends AbstractExtension
 
             $columns = $data->offsetGetOr(self::COLUMNS_PATH, []);
             foreach ($columns as $key => $column) {
-                if (isset($column['name']) && isset($minifiedColumnsState[$column['name']])) {
-                    $columnData = $minifiedColumnsState[$column['name']];
+                if (isset($column['name'])) {
+                    $name = $column['name'];
+                } else {
+                    $name = $key;
+                }
+                if ($name && isset($minifiedColumnsState[$name])) {
+                    $columnData = $minifiedColumnsState[$name];
                     if (array_key_exists(self::ORDER_FIELD_NAME, $columnData)) {
                         $columns[$key][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
-                        $columnsData[$column['name']][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
+                        $columnsData[$name][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
                     }
 
                     if (array_key_exists(self::RENDER_FIELD_NAME, $columnData)) {
                         $columns[$key][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
-                        $columnsData[$column['name']][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
+                        $columnsData[$name][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
                     }
                 }
             }
             $data->offsetSetByPath(self::COLUMNS_PATH, $columns);
+            if (!empty($columnsData)) {
+                $this->setState($data, $columnsData);
+            }
         }
 
         return $columnsData;
@@ -241,14 +249,17 @@ class ColumnsExtension extends AbstractExtension
             return $columns;
         }
 
-        //For minified colimn params
+        //For minified column params
         $columns = explode('.', $columns);
-        $order = 0;
+        $index = 0;
         foreach ($columnsData as $columnName => $columnData) {
-            $options = str_split($columns[$order]);
-            $columnsData[$columnName][self::ORDER_FIELD_NAME] = (int)$options[0];
-            $columnsData[$columnName][self::RENDER_FIELD_NAME] = (bool)((int)$options[1]);
-            $order++;
+            if (isset($columns[$index])) {
+                $render = substr($columns[$index], -1);
+                $order = substr($columns[$index], 0, -1);
+                $columnsData[$columnName][self::ORDER_FIELD_NAME] = (int)$order;
+                $columnsData[$columnName][self::RENDER_FIELD_NAME] = (bool)((int)$render);
+            }
+            $index++;
         }
 
         return  $columnsData;
@@ -367,7 +378,7 @@ class ColumnsExtension extends AbstractExtension
             }
         }
 
-        $iteration  = 1;
+        $iteration  = 0;
         $ignoreList = [];
 
         foreach ($orders as $name => &$order) {
