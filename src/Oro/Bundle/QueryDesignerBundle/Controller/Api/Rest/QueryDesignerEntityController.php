@@ -11,6 +11,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -34,6 +35,15 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      *      description="Indicates whether association fields should be returned as well."
      * )
      *
+     * @QueryParam(
+     *      name="apply=exclusions",
+     *      nullable=true,
+     *      requirements="true|false",
+     *      default="true",
+     *      strict=true,
+     *      description="Indicates whether to apply excluded entities."
+     * )
+     *
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
@@ -41,15 +51,16 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      *
      * @return Response
      */
-    public function fieldsAction()
+    public function fieldsAction(Request $request)
     {
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
-        $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions = filter_var($request->get('apply-exclusions', true), FILTER_VALIDATE_BOOLEAN);
         $statusCode = Codes::HTTP_OK;
 
         try {
-            $result = $provider->getFields(true, true, $withRelations);
+            $result = $provider->getFields(true, true, $withRelations, $applyExclusions);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
