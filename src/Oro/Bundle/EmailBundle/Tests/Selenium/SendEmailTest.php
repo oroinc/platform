@@ -81,7 +81,8 @@ class SendEmailTest extends Selenium2TestCase
         /** @var Emails $login */
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->assertElementNotPresent(
-                "//div[@class='no-data-visible floatThead-fixed floatThead']//span[contains(., 'No records found')]"
+                "//div[@class='no-data-visible floatThead-fixed floatThead']//span[contains(., 'No records found')]",
+                'No emails were synced'
             );
 
         return $username;

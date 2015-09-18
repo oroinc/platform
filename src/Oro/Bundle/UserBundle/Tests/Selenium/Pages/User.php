@@ -366,6 +366,7 @@ class User extends AbstractPageEntity
     }
 
     /**
+     * Method configure user IMAP sync
      * @param array $imapSetting
      * @return $this
      */
@@ -390,7 +391,6 @@ class User extends AbstractPageEntity
         )->value($imapSetting['password']);
         $this->encryption = $this->test
             ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
-
         $this->encryption->selectOptionByLabel($imapSetting['encryption']);
         $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
         $this->waitForAjax();
