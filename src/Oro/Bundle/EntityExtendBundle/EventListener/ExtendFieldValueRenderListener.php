@@ -11,8 +11,6 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FormBundle\Entity\PriorityItem;
@@ -94,14 +92,6 @@ class ExtendFieldValueRenderListener
             return;
         }
 
-        /** Prepare OptionSet field type */
-        if ($type == 'optionSet') {
-            $viewData = $this->getValueForOptionSet($event->getEntity(), $event->getFieldConfigId());
-            $event->setFieldViewValue($viewData);
-
-            return;
-        }
-
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($value && $underlyingFieldType === RelationType::MANY_TO_ONE) {
             $viewData = $this->getValueForManyToOne(
@@ -176,37 +166,6 @@ class ExtendFieldValueRenderListener
             'route'        => false,
             'route_params' => false
         ];
-    }
-
-    /**
-     * @param object $entity
-     * @param FieldConfigId $fieldConfig
-     *
-     * @return OptionSetRelation[]
-     */
-    protected function getValueForOptionSet($entity, FieldConfigId $fieldConfig)
-    {
-        /** @var $optionSetRepository OptionSetRelationRepository */
-        $optionSetRepository = $this->configManager
-            ->getEntityManager()
-            ->getRepository(OptionSetRelation::ENTITY_NAME);
-
-        $model = $this->configManager->getConfigFieldModel(
-            $fieldConfig->getClassName(),
-            $fieldConfig->getFieldName()
-        );
-
-        $value = $optionSetRepository->findByFieldId($model->getId(), $entity->getId());
-        array_walk(
-            $value,
-            function (OptionSetRelation &$item) {
-                $item = array('title' => $item->getOption()->getLabel());
-            }
-        );
-
-        $value['values'] = $value;
-
-        return $value;
     }
 
     /**
