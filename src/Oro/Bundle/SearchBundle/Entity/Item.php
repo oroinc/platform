@@ -549,7 +549,7 @@ class Item
      * @param Collection $fields
      * @param string $fieldName
      */
-    protected function deleteArrayFields($fields, $fieldName)
+    protected function deleteArrayFields(Collection $fields, $fieldName)
     {
         $fieldsToDelete = $fields->filter(
             function ($valueEntity) use ($fieldName) {
