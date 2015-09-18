@@ -388,14 +388,13 @@ class User extends AbstractPageEntity
         $this->test->byXPath(
             "//input[@data-ftid='oro_user_user_form_imapConfiguration_password']"
         )->value($imapSetting['password']);
-//      This is an encryption selection functionality
-//        $this->encryption = $this->test
-//            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
-//
-//        $this->encryption->selectOptionByLabel('SSL');
+        $this->encryption = $this->test
+            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
+
+        $this->encryption->selectOptionByLabel($imapSetting['encryption']);
         $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
-//        $this->waitForAjax();
-//        $this->waitPageToLoad();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
         $this->test->byXPath("//div[@class='control-group folder-tree']//input[@id='check-all']")->click();
 
         return $this;

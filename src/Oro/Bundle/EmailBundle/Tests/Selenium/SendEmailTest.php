@@ -14,6 +14,7 @@ use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 class SendEmailTest extends Selenium2TestCase
 {
     /**
+     * Test to check that email can be sent
      * @return string
      */
     public function testSendEmail()
@@ -38,23 +39,19 @@ class SendEmailTest extends Selenium2TestCase
     }
 
     /**
+     * Test to check that user IMAP sync works
      * @return string
      */
-    public function testUserImap()
+    public function testUserImapSync()
     {
     $imapSetting = array(
         'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
         'port' => '143',
+        'encryption' => '',
         'user' => 'mailbox1',
         'password' => 'eF3ar4ic'
     );
 
-//        $imapSetting = array(
-//        'host' => 'imap.gmail.com',
-//        'port' => '993',
-//        'user' => 'qa@magecore.com ',
-//        'password' => 'OroQA2014'
-//    );
         $username = 'user_' . mt_rand();
 
         $login = $this->login();
@@ -71,8 +68,8 @@ class SendEmailTest extends Selenium2TestCase
             ->setFirstName('First_'.$username)
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@example.com')
-            ->setRoles(array('Administrator'), true)
-            ->setBusinessUnit(array ('OroCRM'))
+            ->setRoles(['Administrator'], true)
+            ->setBusinessUnit(['OroCRM'])
             ->uncheckInviteUser()
             ->setImap($imapSetting)
             ->save()
@@ -91,7 +88,7 @@ class SendEmailTest extends Selenium2TestCase
     }
 
     /**
-     * Test to check that
+     * Test to check that sent email received by user
      * @depends testUserImap
      * @param $username
      */
