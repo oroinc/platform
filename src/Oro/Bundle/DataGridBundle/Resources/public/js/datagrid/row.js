@@ -57,7 +57,7 @@ define([
          * @param {Event} e
          */
         onClick: function(e) {
-            var exclude = 'a, .dropdown, .editable, .skip-row-click';
+            var exclude = 'a, .dropdown, .skip-row-click';
             var $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {

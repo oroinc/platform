@@ -1,0 +1,51 @@
+.grid {
+  .editable {
+    &.edit-mode {
+      position: relative;
+    }
+    &.view-mode {
+      > .icon-edit {
+        display: none !important;
+      }
+    }
+    &.view-mode:hover {
+      background: #F4EFD4;
+      position: relative;
+      > .icon-edit {
+        display: block !important;
+        position: absolute;
+        right: -3px;
+        height: 29px;
+        line-height: 39px;
+        top: 0;
+        background: rgba(244,239,212,0.7);
+        width: 29px;
+        text-align: center;
+        &:hover {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+.icon-times:before {
+  content: "\f00d";
+}
+
+.inline-editor-wrapper {
+  position: absolute;
+  padding: 7px;
+  background-color: white;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  z-index: 1200;
+  top: -9px;
+  left: -5px;
+  .input-append {
+    margin: 0;
+  }
+  .icon-check:before {
+    content: "\f00c";
+  }
+}

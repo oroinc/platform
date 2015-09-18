@@ -25,7 +25,8 @@ define([
         /** @property */
         events: {
             'change :checkbox': 'onChange',
-            click: 'enterEditMode'
+            'click :checkbox': 'stopPropagation',
+            'click': 'stopPropagation'
         },
 
         /**
@@ -60,16 +61,6 @@ define([
         },
 
         /**
-         * Focuses the checkbox.
-         */
-        enterEditMode: function(e) {
-            if (this.$checkbox[0] !== e.target) {
-                this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
-            }
-            e.stopPropagation();
-        },
-
-        /**
          * When the checkbox's value changes, this method will trigger a Backbone
          * `backgrid:selected` event with a reference of the model and the
          * checkbox's `checked` value.
@@ -91,6 +82,10 @@ define([
                 this.$checkbox.prop('checked', 'checked');
             }
             return this;
+        },
+
+        stopPropagation: function(e) {
+            e.stopPropagation();
         }
     });
 

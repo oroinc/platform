@@ -168,6 +168,9 @@ define(function(require) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
 
+            opts.columns[2].editable = true;
+            opts.columns[6].editable = true;
+
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
             Grid.__super__.initialize.apply(this, arguments);
@@ -243,8 +246,8 @@ define(function(require) {
          * @private
          */
         _createSelectRowColumn: function() {
-            var coulmn;
-            coulmn = new Backgrid.Column({
+            var column;
+            column = new Backgrid.Column({
                 name:       'massAction',
                 label:      __('Selected Rows'),
                 renderable: true,
@@ -253,7 +256,7 @@ define(function(require) {
                 cell:       SelectRowCell,
                 headerCell: SelectAllHeaderCell
             });
-            return coulmn;
+            return column;
         },
 
         /**
