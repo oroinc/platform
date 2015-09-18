@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SearchBundle\Query\Result as SearchResult;
-use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 
 class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEntityManager
 {
@@ -78,10 +77,12 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
     /**
      * @param Email $email
      *
-     * @return SearchResult
+     * @return array of [id, entity, title]
      */
     protected function getSuggestionEntities(Email $email)
     {
+        $entities = [];
+
         $filters = [
             'search' => false,
             'emails' => $this->getEmails($email),
@@ -90,7 +91,13 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
         // Prepare search query builder without limits and offsets
         $searchQueryBuilder = parent::getListQueryBuilder(0, 0, $filters);
 
-        return $this->searchIndexer->query($searchQueryBuilder);
+        $searchResult = $this->searchIndexer->query($searchQueryBuilder);
+
+        if ($searchResult->count() > 0) {
+            $entities = $this->getEmailAssociatedEntitiesQueryBuilder($searchResult)->getQuery()->getResult();
+        }
+
+        return $entities;
     }
 
     /**
@@ -129,31 +136,22 @@ class EmailActivitySuggestionApiEntityManager extends EmailActivitySearchApiEnti
     /**
      * Exclude assigned entities from the search(suggested to assign) result.
      *
-     * @param SearchResult $searchResult
-     * @param array        $assignedEntities
+     * @param array $searchResult
+     * @param array $assignedEntities
      *
      * @return array of [id, entity, title]
      */
-    protected function diff(SearchResult $searchResult, array $assignedEntities = [])
+    protected function diff($searchResult, array $assignedEntities = [])
     {
         $result = [];
 
-        /** @var SearchResultItem $item */
-        foreach ($searchResult->getElements() as $item) {
-            $id        = $item->getRecordId();
-            $className = $item->getEntityName();
-
+        foreach ($searchResult as $item) {
             foreach ($assignedEntities as $entity) {
-                if ($entity['id'] == $id && $entity['entity'] == $className) {
+                if ($entity['id'] == $item['id'] && $entity['entity'] == $item['entity']) {
                     continue 2;
                 }
             }
-
-            $result[] = [
-                'id'     => $id,
-                'entity' => $className,
-                'title'  => $item->getRecordTitle(),
-            ];
+            $result[] = $item;
         }
 
         return $result;

@@ -71,7 +71,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-                if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                     continue;
                 }
 

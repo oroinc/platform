@@ -336,7 +336,7 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
-     * Get column number by hedaer name
+     * Get column number by header name
      *
      * @param string $headerName
      * @return int

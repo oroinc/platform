@@ -7,7 +7,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener;
 
@@ -179,89 +178,6 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
 
             next($expectedValues);
         }
-    }
-
-    public function testBeforeValueRenderProceedOptionSets()
-    {
-        $value = null;
-        $className = 'expectedClass';
-        $fieldName = 'expectedField';
-        $entityConfigFieldId = 42;
-        $entityId = 21;
-        $label = 'label';
-
-        $entity = $this->getMock('\StdClass', array('getId'));
-        $entity->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($entityId));
-
-        //setup field config mock
-        $fieldConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldConfig->expects($this->once())
-            ->method('getFieldType')
-            ->will($this->returnValue('optionSet'));
-        $fieldConfig->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue($className));
-        $fieldConfig->expects($this->once())
-            ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-        //setup repository mock
-        $repository = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository'
-        )
-            ->setMethods(array('findByFieldId'))
-            ->disableOriginalConstructor()
-            ->getMock();
-        $option = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\OptionSet')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $option->expects($this->once())
-            ->method('getLabel')
-            ->will($this->returnValue($label));
-        $optionSet = $this->getMock('Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation');
-        $optionSet->expects($this->once())
-            ->method('getOption')
-            ->will($this->returnValue($option));
-        $optionSets = array(
-            $optionSet
-        );
-        $repository->expects($this->once())
-            ->method('findByFieldId')
-            ->will($this->returnValue($optionSets));
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with(OptionSetRelation::ENTITY_NAME)
-            ->will($this->returnValue($repository));
-        $this->configManger->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-
-        //setup model mock
-        $model = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $model->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($entityConfigFieldId));
-        $this->configManger->expects($this->once())
-            ->method('getConfigFieldModel')
-            ->with($className, $fieldName)
-            ->will($this->returnValue($model));
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        //assertions
-        $this->assertArrayHasKey('values', $value);
-        $actual = current($value['values']);
-        $this->assertEquals(array('title' => $label), $actual);
     }
 
     public function testBeforeValueRenderProceedManyToOneReturnEmptyStingIfEntityClassNotFound()
