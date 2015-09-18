@@ -104,7 +104,7 @@ class SendEmailTest extends Selenium2TestCase
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->add()
             ->setSubject($subject)
-            ->setTo($username.'@example.com')
+            ->setTo('mailbox1@example.com')
             ->setBody('Email body text for ' . $username)
             ->send()
             ->assertMessage('The email was sent')
