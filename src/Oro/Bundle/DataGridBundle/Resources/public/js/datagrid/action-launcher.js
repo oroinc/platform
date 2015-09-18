@@ -139,18 +139,11 @@ define(function(require) {
             ActionLauncher.__super__.dispose.apply(this, arguments);
         },
 
-        /**
-         * Render actions
-         *
-         * @return {*}
-         */
-        render: function() {
-            this.$el.empty();
-
+        getTemplateData: function() {
             var label = this.label || this.action.label;
 
-            var $el = $(this.template({
-                label: this.label || this.action.label,
+            return {
+                label: label,
                 icon: this.icon,
                 title: this.title || label,
                 className: this.className,
@@ -161,8 +154,17 @@ define(function(require) {
                 attributes: this.attributes,
                 enabled: this.enabled,
                 tagName: this.tagName
-            }));
+            };
+        },
 
+        /**
+         * Render actions
+         *
+         * @return {*}
+         */
+        render: function() {
+            this.$el.empty();
+            var $el = $(this.template(this.getTemplateData()));
             this.setElement($el);
             return this;
         },

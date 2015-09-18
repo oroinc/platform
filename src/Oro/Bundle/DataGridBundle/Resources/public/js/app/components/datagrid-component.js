@@ -15,6 +15,7 @@ define(function(require) {
     var gridContentManager = require('orodatagrid/js/content-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
 
     helpers = {
         cellType: function(type) {
@@ -250,6 +251,10 @@ define(function(require) {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
+            }
+
+            if (metadata.options.toolbarOptions.addColumnManager) {
+                plugins.push(ColumnManagerPlugin);
             }
 
             return {

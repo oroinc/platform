@@ -5,7 +5,6 @@ define(function(require) {
     var _ = require('underscore');
     var Backgrid = require('backgrid');
     var tools = require('oroui/js/tools');
-    var ColumnsCollection = require('orodatagrid/js/app/models/column-manager/columns-collection');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ColumnManagerView = require('orodatagrid/js/app/views/column-manager/column-manager-view');
 
@@ -24,7 +23,7 @@ define(function(require) {
          * Collection of manageable columns
          * @type {Backgrid.Columns}
          */
-        manageableColumns: null,
+        managedColumns: null,
 
         /**
          * Instance of grid
@@ -46,7 +45,8 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['columns', 'grid']));
 
-            this._createManageableCollection(options);
+            this.managedColumns = options.managedColumns;
+
             this._createColumnManagerView(options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);
@@ -75,8 +75,8 @@ define(function(require) {
         delegateListeners: function() {
             this.listenTo(this.grid.collection, 'updateState', this._applyState);
             this.listenTo(this.columnManagerView, 'reordered', this._pushState);
-            this.listenTo(this.manageableColumns, 'change:renderable', this._pushState);
-            this.listenTo(this.manageableColumns, 'sort', function() {
+            this.listenTo(this.managedColumns, 'change:renderable', this._pushState);
+            this.listenTo(this.managedColumns, 'sort', function() {
                 this.columns.sort();
             });
 
@@ -91,35 +91,13 @@ define(function(require) {
          */
         _createColumnManagerView: function(options) {
             // index of first manageable column
-            var orderShift = this.manageableColumns[0] ? this.manageableColumns[0].get('order') : 0;
+            var orderShift = this.managedColumns[0] ? this.managedColumns[0].get('order') : 0;
 
             this.columnManagerView = new ColumnManagerView({
                 el: options._sourceElement,
-                collection: this.manageableColumns,
+                collection: this.managedColumns,
                 orderShift: orderShift
             });
-        },
-
-        /**
-         * Create collection with manageable columns
-         *
-         * @param {Object} options
-         * @protected
-         */
-        _createManageableCollection: function(options) {
-            var manageableColumns = [];
-
-            this.columns.each(function(column, i) {
-                // set initial order
-                column.set('order', i, {silent: true});
-                // collect manageable columns
-                if (column.get('manageable') !== false) {
-                    manageableColumns.push(column);
-                }
-            });
-
-            this.manageableColumns = new ColumnsCollection(manageableColumns,
-                _.pick(options, ['minVisibleColumnsQuantity']));
         },
 
         /**
@@ -155,7 +133,7 @@ define(function(require) {
 
             this._applyingState = true;
 
-            this.manageableColumns.each(function(column, i) {
+            this.managedColumns.each(function(column, i) {
                 var name = column.get('name');
                 if (columnsState[name]) {
                     attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
@@ -164,7 +142,7 @@ define(function(require) {
                 }
                 column.set(attrs);
             });
-            this.manageableColumns.sort();
+            this.managedColumns.sort();
 
             this._applyingState = false;
         },
@@ -179,7 +157,7 @@ define(function(require) {
         _createState: function() {
             var state = {};
 
-            this.manageableColumns.each(function(column) {
+            this.managedColumns.each(function(column) {
                 var name = column.get('name');
                 var order = column.get('order');
 

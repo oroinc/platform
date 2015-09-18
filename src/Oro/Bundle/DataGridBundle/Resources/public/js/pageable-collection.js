@@ -850,24 +850,22 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         _packColumnsStateData: function(state) {
             // takes order of columns from initial state as columns identifiers
-            var columnNameToId = _.object(_.map(this.initialState.columns, function(item, columnName) {
-                return [columnName, item.order];
-            }));
-
-            // convert columns state to array
-            var packedState = _.map(state, function(item, columnName) {
-                return _.extend({name: columnName}, item);
+            var sortedColumns = _.map(this.initialState.columns, function(item, name) {
+                return {
+                    order: item.order,
+                    name: name
+                };
             });
+            sortedColumns.sort(function(a, b) {
+                return a.order - b.order;
+            });
+            var packedState = [];
+            for (var i = 0; i < sortedColumns.length; i++) {
+                var key = sortedColumns[i].name;
+                packedState.push(state[key].order.toString() + (state[key].renderable ? 1 : 0).toString());
+            }
 
-            // sort columns by their order
-            packedState = _.sortBy(packedState, 'order');
-
-            // stringify state parts
-            packedState = _.map(packedState, function(item) {
-                return String(columnNameToId[item.name]) + String(Number(item.renderable));
-            }).join('.');
-
-            return packedState;
+            return packedState.join('.');
         },
 
         /**
@@ -889,17 +887,31 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @protected
          */
         _unpackColumnsStateData: function(packedState) {
-            // takes order of columns from initial state as columns identifiers
-            var columnIdToName = _.object(_.map(this.initialState.columns, function(item, columnName) {
-                return [item.order, columnName];
-            }));
+            var sortedColumns = _.map(this.initialState.columns, function(item, name) {
+                return {
+                    order: item.order,
+                    name: name
+                };
+            });
+            sortedColumns.sort(function(a, b) {
+                return a.order - b.order;
+            });
 
-            return _.object(_.map(packedState.split('.'), function(value, index) {
-                return [columnIdToName[Number(value.substr(0, value.length - 1))], {
-                    renderable: Boolean(Number(value.substr(-1))),
-                    order: index
-                }];
-            }));
+            var result = {};
+            var stateSplitted = packedState.split('.');
+
+            if (stateSplitted.length !== sortedColumns.length) {
+                throw new Error('Packed state cannot be applied to columns');
+            }
+
+            for (var i = 0; i < sortedColumns.length; i++) {
+                result[sortedColumns[i].name] = {
+                    renderable: Boolean(Number(stateSplitted[i].substr(-1))),
+                    order: Number(stateSplitted[i].substr(0, stateSplitted[i].length - 1))
+                };
+            }
+
+            return result;
         }
     });
 
