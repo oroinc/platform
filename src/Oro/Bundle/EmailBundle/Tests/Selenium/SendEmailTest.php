@@ -44,13 +44,13 @@ class SendEmailTest extends Selenium2TestCase
      */
     public function testUserImapSync()
     {
-    $imapSetting = array(
-        'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
-        'port' => '143',
-        'encryption' => '',
-        'user' => 'mailbox1',
-        'password' => 'eF3ar4ic'
-    );
+        $imapSetting = array(
+            'host' => PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+            'port' => '143',
+            'encryption' => '',
+            'user' => 'mailbox1',
+            'password' => 'eF3ar4ic'
+        );
 
         $username = 'user_' . mt_rand();
 
@@ -115,5 +115,39 @@ class SendEmailTest extends Selenium2TestCase
         $login->openEmails('Oro\Bundle\EmailBundle')
             ->filterBy('Subject', $subject)
             ->entityExists([$subject]);
+    }
+
+    /**
+     * Test to check that select2 drop-down returns correct first name and username
+     */
+    public function testSuggestionsList()
+    {
+        $firstName = 'First name_'.mt_rand();
+        $lastName = 'Last name_'.mt_rand();
+        $username = 'username_'.mt_rand();
+
+        $login = $this->login();
+        /** @var Users $login */
+        $login->openUsers('Oro\Bundle\UserBundle')
+            ->assertTitle('All - Users - User Management - System')
+            ->add()
+            ->assertTitle('Create User - Users - User Management - System')
+            ->setUsername($username)
+            ->setOwner('Main')
+            ->enable()
+            ->setFirstPassword('123123q')
+            ->setSecondPassword('123123q')
+            ->setFirstName($firstName)
+            ->setLastName($lastName)
+            ->setEmail($username.'@example.com')
+            ->setRoles(['Administrator'], true)
+            ->setBusinessUnit(['OroCRM'])
+            ->uncheckInviteUser()
+            ->save();
+        /** @var Emails $login */
+        $login->openEmails('Oro\Bundle\EmailBundle')
+            ->add()
+            ->checkSendToList($firstName)
+            ->checkContextSuggestionList($username);
     }
 }
