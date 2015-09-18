@@ -71,11 +71,66 @@ class Email extends AbstractPageEntity
         return $this;
     }
 
+    /**
+     * Method clicks Send button on compose email widget-window
+     * @return $this
+     */
     public function send()
     {
         $this->test->byXPath("//div[@class='widget-actions-section']//button[contains(., 'Send')]")->click();
         $this->waitForAjax();
         $this->waitPageToLoad();
+        return $this;
+    }
+
+    /**
+     * Method clicks Cancel button on compose email widget-window
+     * @return $this
+     */
+    public function cancel()
+    {
+        $this->test->byXPath("//div[@class='widget-actions-section']//button[contains(., 'Cancel')]")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
+        $this->assertElementNotPresent(
+            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix ui-draggable-handle']"
+        );
+        return $this;
+    }
+
+    /**
+     * Method to check that Context field suggestion list contains needed data
+     * @param $value
+     * @return $this
+     */
+    public function checkContextSuggestionList($value)
+    {
+        $this->test->byXPath("//div[starts-with(@id,'s2id_oro_email_email_contexts')]")->click();
+        $this->waitForAjax();
+        $this->test->byXPath("//div[starts-with(@id,'s2id_oro_email_email_contexts')]//input")->value($value);
+        $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$value}')]",
+            "Context field suggestion list doesn't contains search value"
+        );
+        return $this;
+    }
+
+    /**
+     * Method to check that Send to field suggestion list contains needed data
+     * @param $value
+     * @return $this
+     */
+    public function checkSendToList($value)
+    {
+        $this->test->byXPath("//div[starts-with(@id,'s2id_oro_email_email_to')]")->click();
+        $this->waitForAjax();
+        $this->test->byXPath("//div[starts-with(@id,'s2id_oro_email_email_to')]//input")->value($value);
+        $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$value}')]",
+            "Send to field suggestion list doesn't contains search value"
+        );
         return $this;
     }
 }
