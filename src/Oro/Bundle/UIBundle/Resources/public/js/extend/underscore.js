@@ -7,7 +7,8 @@ define(['underscore'], function(_) {
             return String(str).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
         },
 
-        trunc: function(str, maxLength, useWordBoundary) {
+        trunc: function(str, maxLength, useWordBoundary, hellip) {
+            hellip = hellip || '&hellip;';
             var toLong = str.length > maxLength;
             str = toLong ? str.substr(0, maxLength - 1) : str;
             var lastSpace = str.lastIndexOf(' ');
@@ -20,6 +21,7 @@ define(['underscore'], function(_) {
             return elem && (' ' + elem.className + ' ')
                 .replace(/[\t\r\n\f]/g, ' ')
                 .indexOf(' mobile-version ') !== -1;
+            return toLong ? str + hellip : str;
         }
     });
 
