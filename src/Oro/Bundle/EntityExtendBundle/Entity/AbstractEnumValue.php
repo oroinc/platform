@@ -74,6 +74,18 @@ abstract class AbstractEnumValue implements Translatable, PriorityItem
     }
 
     /**
+     * @param string $id
+     *
+     * @return AbstractEnumValue
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      *
      * @return AbstractEnumValue

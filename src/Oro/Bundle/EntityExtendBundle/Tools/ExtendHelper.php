@@ -181,7 +181,7 @@ class ExtendHelper
      */
     public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
-        if (empty($enumValueName)) {
+        if (empty($enumValueName) && !(isset($enumValueName) && $enumValueName === '0')) {
             if (!$throwExceptionIfInvalidName) {
                 return '';
             }
@@ -206,7 +206,9 @@ class ExtendHelper
             $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
 
-        if (empty($result) && $throwExceptionIfInvalidName) {
+        if ((empty($result) && !(isset($enumValueName) && $enumValueName === '0')) &&
+            $throwExceptionIfInvalidName
+        ) {
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
             );
