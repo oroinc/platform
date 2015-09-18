@@ -396,8 +396,8 @@ class ConfigController extends Controller
     {
         if (class_exists($entity->getClassName())) {
             /** @var QueryBuilder $qb */
-            $qb = $this->getConfigManager()
-                ->getEntityManager()
+            $qb = $this->getDoctrine()
+                ->getManagerForClass($entity->getClassName())
                 ->createQueryBuilder();
             $qb->select('entity');
             $qb->from($entity->getClassName(), 'entity');
