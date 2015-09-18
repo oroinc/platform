@@ -43,6 +43,10 @@ oro:
         settings:
             repositories: Repositories
             add_repository: 'Add a repository'
+            recommendation: |
+                To increase chance of successful installation of additional packages we recommend to increase web server timeout to 5 minutes or more
+                 and set <a class="alert-link" target="_blank" href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" class="alert-link">max_execution_time</a> to 5 minutes or more
+                 and <a class="alert-link" target="_blank" href="http://php.net/manual/en/ini.core.php#ini.memory-limit" class="alert-link">memory_limit</a> to 1024M or more in PHP settings.
         installer: 'Oro Installer'
 
 'ORO Business Application Platform': 'ORO Business Application Platform'

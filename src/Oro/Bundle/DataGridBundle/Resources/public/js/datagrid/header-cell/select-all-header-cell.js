@@ -80,7 +80,12 @@ define([
          */
         initialState: function(inset) {
             this.selectedModels = {};
-            this.inset = _.isUndefined(inset) ? true : inset;
+            /**
+             * While using "grid views" functionality,
+             *   e.g. switching between views can cause an Object arriving in "inset" property.
+             * So, we should add additional check and such case should be perceived the same way as "undefined".
+             */
+            this.inset = (_.isUndefined(inset) || _.isObject(inset)) ? true : inset;
             this.updateState();
         },
 
