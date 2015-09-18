@@ -3,19 +3,16 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Table(name="oro_entity_config_index_value", indexes={
- *  @Index(name="idx_entity_config_index_entity", columns={"scope", "code", "value", "entity_id"}),
- *  @Index(name="idx_entity_config_index_field", columns={"scope", "code", "value", "field_id"})
+ *  @ORM\Index(name="idx_entity_config_index_entity", columns={"scope", "code", "value", "entity_id"}),
+ *  @ORM\Index(name="idx_entity_config_index_field", columns={"scope", "code", "value", "field_id"})
  * })
  * @ORM\Entity
  */
 class ConfigModelIndexValue
 {
-    const ENTITY_NAME = 'OroEntityConfigBundle:ConfigModelIndexValue';
-
     /**
      * @var integer
      * @ORM\Column(name="id", type="integer")

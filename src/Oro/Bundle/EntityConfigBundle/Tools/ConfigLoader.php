@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -9,10 +10,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigLoader
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
+
+    /** @var EntityManager */
+    protected $entityManager;
 
     /**
      * @var LoggerInterface
@@ -21,10 +23,12 @@ class ConfigLoader
 
     /**
      * @param ConfigManager $configManager
+     * @param EntityManager $entityManager
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, EntityManager $entityManager)
     {
         $this->configManager = $configManager;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -45,8 +49,7 @@ class ConfigLoader
         $this->logger = $logger ? : new NullLogger();
         try {
             /** @var ClassMetadataInfo[] $doctrineAllMetadata */
-            $doctrineAllMetadata = $this->configManager
-                ->getEntityManager()
+            $doctrineAllMetadata = $this->entityManager
                 ->getMetadataFactory()
                 ->getAllMetadata();
             if (null !== $filter) {

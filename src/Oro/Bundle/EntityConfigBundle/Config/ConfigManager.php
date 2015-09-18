@@ -9,7 +9,6 @@ use Metadata\MetadataFactory;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -55,9 +54,9 @@ class ConfigManager
     protected $cache;
 
     /**
-     * @var AuditManager
+     * @var AuditEntityBuilder
      */
-    protected $auditManager;
+    protected $auditEntityBuilder;
 
     /**
      * @var ConfigModelManager
@@ -96,7 +95,7 @@ class ConfigManager
      * @param EventDispatcherInterface $eventDispatcher
      * @param ServiceLink              $providerBagLink
      * @param ConfigModelManager       $modelManager
-     * @param AuditManager             $auditManager
+     * @param AuditEntityBuilder       $auditEntityBuilder
      * @param ConfigCache              $cache
      */
     public function __construct(
@@ -104,7 +103,7 @@ class ConfigManager
         EventDispatcherInterface $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager,
+        AuditEntityBuilder $auditEntityBuilder,
         ConfigCache $cache
     ) {
         $this->metadataFactory = $metadataFactory;
@@ -115,9 +114,9 @@ class ConfigManager
         $this->originalConfigs  = [];
         $this->configChangeSets = [];
 
-        $this->modelManager = $modelManager;
-        $this->auditManager = $auditManager;
-        $this->cache        = $cache;
+        $this->modelManager       = $modelManager;
+        $this->auditEntityBuilder = $auditEntityBuilder;
+        $this->cache              = $cache;
     }
 
     /**
@@ -496,7 +495,7 @@ class ConfigManager
 
         $em = $this->getEntityManager();
 
-        $logEntry = $this->auditManager->buildLogEntry($this);
+        $logEntry = $this->auditEntityBuilder->buildEntity($this);
         if (null !== $logEntry) {
             $em->persist($logEntry);
         }

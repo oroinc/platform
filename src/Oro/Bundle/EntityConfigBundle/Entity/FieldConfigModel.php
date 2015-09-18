@@ -14,8 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
  */
 class FieldConfigModel extends AbstractConfigModel
 {
-    const ENTITY_NAME = 'OroEntityConfigBundle:FieldConfigModel';
-
     /**
      * @var integer
      * @ORM\Column(type="integer")

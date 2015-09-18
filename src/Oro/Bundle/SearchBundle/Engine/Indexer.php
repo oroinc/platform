@@ -219,7 +219,8 @@ class Indexer
         foreach ($entityDescriptions as $description) {
             $classNames[] = $description['name'];
         }
-        $entities = $this->em->getRepository(EntityConfigModel::ENTITY_NAME)->findEntitiesByClassNames($classNames);
+        $entities = $this->em->getRepository('OroEntityConfigBundle:EntityConfigModel')
+            ->findEntitiesByClassNames($classNames);
 
         $tables = [];
         foreach ($entities as $entity) {

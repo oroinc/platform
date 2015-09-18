@@ -460,7 +460,7 @@ class ConfigModelManager
 
             /** @var EntityConfigModel[] $models */
             $models = $this->getEntityManager()
-                ->getRepository(EntityConfigModel::ENTITY_NAME)
+                ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
                 ->findAll();
             foreach ($models as $model) {
                 $this->entities[$model->getClassName()] = $model;
@@ -496,7 +496,7 @@ class ConfigModelManager
     protected function loadEntityModel($className)
     {
         $result = $this->getEntityManager()
-            ->getRepository(EntityConfigModel::ENTITY_NAME)
+            ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->findOneBy(['className' => $className]);
 
         $this->entities[$className] = $result;

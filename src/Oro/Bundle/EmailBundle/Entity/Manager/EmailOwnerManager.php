@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Util\ClassUtils;
@@ -30,6 +31,11 @@ class EmailOwnerManager
      * @var EmailAddressManager
      */
     protected $emailAddressManager;
+
+    /**
+     * @var EntityRepository|null
+     */
+    private $emailAddressRepository;
 
     /**
      * Constructor.
@@ -173,12 +179,10 @@ class EmailOwnerManager
      */
     protected function persistBindings(array &$bindings, EntityManager $em)
     {
-        $repository = $this->emailAddressManager->getEmailAddressRepository($em);
-
         foreach ($bindings['changes'] as $item) {
             $email = $item['email'];
             $owner = false === $item['owner'] ? null : $item['owner'];
-            $emailAddress = $repository->findOneBy(['email' => $email]);
+            $emailAddress = $this->getEmailAddressRepository($em)->findOneBy(['email' => $email]);
             if ($emailAddress === null) {
                 $emailAddress = $this->emailAddressManager->newEmailAddress()
                     ->setEmail($email)
@@ -196,7 +200,7 @@ class EmailOwnerManager
                 if (is_a($owner, $ownerClass)) {
                     $condition = array($fieldName => $owner);
                     /** @var EmailAddress[] $emailAddresses */
-                    $emailAddresses = $repository->findBy($condition);
+                    $emailAddresses = $this->getEmailAddressRepository($em)->findBy($condition);
                     foreach ($emailAddresses as $emailAddress) {
                         $emailAddress->setOwner(null);
                         $this->computeEntityChangeSet($em, $emailAddress);
@@ -216,5 +220,19 @@ class EmailOwnerManager
         $classMetadata = $entityManager->getClassMetadata($entityClass);
         $unitOfWork    = $entityManager->getUnitOfWork();
         $unitOfWork->computeChangeSet($classMetadata, $entity);
+    }
+
+    /**
+     * @param EntityManager $em
+     *
+     * @return EntityRepository
+     */
+    protected function getEmailAddressRepository(EntityManager $em)
+    {
+        if (null === $this->emailAddressRepository) {
+            $this->emailAddressRepository = $this->emailAddressManager->getEmailAddressRepository($em);
+        }
+
+        return $this->emailAddressRepository;
     }
 }
