@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             useMainButtonsClone: false,
-            truncateMain: false,
+            truncateLength: null,
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
@@ -35,13 +35,14 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             var $main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
                 $main = $main.clone(true);
-                if (this.options.truncateMain) {
+                if (this.options.truncateLength) {
                     var self = this;
-                    $main.contents().each(function(){
-                        if (this.nodeType === 3) {
-                            this.nodeValue = _.trunc(this.nodeValue, self.options.truncateMain, false, '...');
+                    // set text value string
+                    $main.contents().each(function() {
+                        if (this.nodeType === Node.TEXT_NODE) {
+                            this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
                         }
-                    })
+                    });
                 }
             }
             $group.append($main);
