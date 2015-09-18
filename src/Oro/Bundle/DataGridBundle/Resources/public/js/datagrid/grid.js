@@ -19,7 +19,6 @@ define(function(require) {
     var RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action');
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
-    var ShowColumnManagerAction = require('oro/datagrid/action/show-column-manager-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
 
     /**
@@ -113,6 +112,12 @@ define(function(require) {
         },
 
         /**
+         * Column indexing starts from this valus in case when 'order' is not specified in column config.
+         * This start index required to display new columns at end of already sorted columns set
+         */
+        DEFAULT_COLUMN_START_INDEX: 1000,
+
+        /**
          * Initialize grid
          *
          * @param {Object} options
@@ -171,20 +176,13 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
-            }
-
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
-            }
-
-            this.columns = opts.columns = new GridColumns(opts.columns);
-            this.columns.sort();
+            this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
+            this.trigger('beforeBackgridInitialize');
             Grid.__super__.initialize.apply(this, arguments);
+            this.trigger('afterBackgridInitialize');
 
             // Listen and proxy events
             this._listenToCollectionEvents();
@@ -222,6 +220,37 @@ define(function(require) {
         },
 
         /**
+         * Initializes columns collection required to draw grid
+         *
+         * @param {Object} opts
+         * @private
+         */
+        _initColumns: function(opts) {
+            // console.log(opts.columns);
+            // console.log(_.pluck(_.sortBy(opts.columns, 'order'), 'name'));
+
+            if (Object.keys(this.rowActions).length > 0) {
+                opts.columns.push(this._createActionsColumn());
+            }
+
+            if (opts.multiSelectRowEnabled) {
+                opts.columns.unshift(this._createSelectRowColumn());
+            }
+
+            for (var i = 0; i < opts.columns.length; i++) {
+                var column = opts.columns[i];
+                if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
+                    column.order = i + this.DEFAULT_COLUMN_START_INDEX;
+                }
+            }
+
+            this.columns = opts.columns = new GridColumns(opts.columns);
+            this.columns.sort();
+
+            // console.log(_.pluck(_.sortBy(this.columns.toJSON(), 'order'), 'name'));
+        },
+
+        /**
          * Init this.rowActions and this.rowClickAction
          *
          * @private
@@ -246,7 +275,8 @@ define(function(require) {
                 datagrid: this,
                 actions:  this.rowActions,
                 massActions: this.massActions,
-                manageable: false
+                manageable: false,
+                order: Infinity
             });
             return column;
         },
@@ -267,7 +297,8 @@ define(function(require) {
                 editable:   false,
                 manageable: false,
                 cell:       SelectRowCell,
-                headerCell: SelectAllHeaderCell
+                headerCell: SelectAllHeaderCell,
+                order: -Infinity
             });
             return coulmn;
         },
@@ -304,7 +335,9 @@ define(function(require) {
             };
             _.defaults(toolbarOptions, options);
 
+            this.trigger('beforeToolbarInit', toolbarOptions);
             toolbar = new this.toolbar(toolbarOptions);
+            this.trigger('afterToolbarInit', toolbar);
             return toolbar;
         },
 
@@ -321,9 +354,6 @@ define(function(require) {
             }
             if (this.toolbarOptions.addResetAction) {
                 actions.push(this.getResetAction());
-            }
-            if (this.toolbarOptions.addColumnManager) {
-                actions.push(this.getColumnManager());
             }
             return actions;
         },
@@ -400,21 +430,6 @@ define(function(require) {
             }
 
             return this.resetAction;
-        },
-
-        /**
-         * Creates and returns component that implements ActionInterface
-         *
-         * @returns {ColumnManagerComponent}
-         */
-        getColumnManager: function() {
-            var options = {
-                datagrid: this,
-                launcherOptions: _.extend({
-                    columns: this.columns
-                }, this.toolbarOptions.columnManager)
-            };
-            return new ShowColumnManagerAction(options);
         },
 
         /**

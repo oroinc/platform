@@ -37,15 +37,15 @@ define(function(require) {
                         e: {order: 4, renderable: true}   // e -> 4
                     }
                 });
-                expect(this.collection.stateHashValue()).toBe('i=1&p=25&c=30.10.01.21.41');
+                expect(this.collection.stateHashValue()).toBe('i=1&p=25&c=21.10.31.00.41');
             });
 
             it('have to extract state from hash value', function() {
-                var state = PageableCollection.decodeStateData('i=1&p=25&c=30.10.01.21.41');
+                var state = PageableCollection.decodeStateData('i=1&p=25&c=21.10.31.00.41');
                 expect(state).toEqual({
                     currentPage: '1',
                     pageSize: '25',
-                    columns: '30.10.01.21.41'
+                    columns: '21.10.31.00.41'
                 });
 
                 this.collection._unpackStateData(state);
