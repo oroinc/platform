@@ -351,7 +351,7 @@ class ConfigCache
                     ? $configId->getFieldType()
                     : null;
             }
-            $packed[$scope] = $config->all();
+            $packed[$scope] = $config->getValues();
         }
         if ($fieldType) {
             $packed = [self::VALUES_KEY => $packed, self::FIELD_TYPE_KEY => $fieldType];

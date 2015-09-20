@@ -22,7 +22,7 @@ class ConfigProvider implements ConfigProviderInterface
     protected $configManager;
 
     /** @var PropertyConfigContainer */
-    protected $propertyConfigContainer;
+    protected $propertyConfig;
 
     /** @var string */
     protected $scope;
@@ -34,9 +34,9 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function __construct(ConfigManager $configManager, $scope, array $config)
     {
-        $this->scope                   = $scope;
-        $this->configManager           = $configManager;
-        $this->propertyConfigContainer = new PropertyConfigContainer($config);
+        $this->scope          = $scope;
+        $this->configManager  = $configManager;
+        $this->propertyConfig = new PropertyConfigContainer($config);
     }
 
     /**
@@ -44,7 +44,7 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getPropertyConfig()
     {
-        return $this->propertyConfigContainer;
+        return $this->propertyConfig;
     }
 
     /**

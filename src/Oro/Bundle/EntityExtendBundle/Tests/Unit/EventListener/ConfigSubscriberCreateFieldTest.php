@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 
-class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberCreateFieldTest extends ConfigSubscriberTestCase
 {
     const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
@@ -22,41 +21,22 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
         //value of Config should be empty
         $this->assertEmpty($entityConfig->all());
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
-        $configProvider
-            ->expects($this->never())
+        $this->configProvider->expects($this->never())
             ->method('persist');
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
+        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
-
-        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
+        $configSubscriber = new ConfigSubscriber();
         $configSubscriber->newFieldConfig($event);
 
-        /** @var ConfigManager $cm */
-        $cm = $event->getConfigManager();
-
-        $this->assertObjectHasAttribute('persistConfigs', $cm);
-        $this->assertAttributeSame(null, 'persistConfigs', $cm);
+        $this->assertEquals(
+            [],
+            $this->configManager->getUpdateConfig()
+        );
     }
 
 
@@ -72,44 +52,26 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             $entityConfig->all()
         );
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
-        $configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('persist');
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
+        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
-
-        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
+        $configSubscriber = new ConfigSubscriber();
         $configSubscriber->newFieldConfig($event);
-
-        /** @var ConfigManager $cm */
-        $cm = $event->getConfigManager();
 
         $this->assertEquals(
             ['upgradeable' => true],
             $entityConfig->all()
         );
-        $this->assertObjectHasAttribute('persistConfigs', $cm);
+        $this->assertEquals(
+            [],
+            $this->configManager->getUpdateConfig()
+        );
     }
 
     /**
@@ -127,31 +89,14 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider
-            ->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
+        $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $this->configManager);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $configManager);
-
-        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
+        $configSubscriber = new ConfigSubscriber();
         $configSubscriber->renameField($event);
 
 

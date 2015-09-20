@@ -111,6 +111,14 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setValues($values)
     {
         $this->values = $values;
