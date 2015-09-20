@@ -3,13 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 
-class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberCreateEntityTest extends ConfigSubscriberTestCase
 {
     /**
      * Test class is extend and persisted
@@ -26,43 +25,14 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        /**
-         * value of NEW Config should be empty
-         */
-        $this->assertEquals(
-            [],
-            $entityConfig->all()
-        );
-
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider
-            ->expects($this->any())
+        $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($entityConfig));
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getProvider'])
-            ->getMock();
-        $configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
+        $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $event = new EntityConfigEvent($configModel->getClassName(), $configManager);
-
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
+        $configSubscriber = new ConfigSubscriber();
         $configSubscriber->updateEntityConfig($event);
-
-        /** @var ConfigManager $cm */
-        $cm = $event->getConfigManager();
 
         $this->assertEquals(
             [
@@ -72,11 +42,9 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
             $entityConfig->all()
         );
 
-        $this->assertObjectHasAttribute('persistConfigs', $cm);
-        $this->assertAttributeSame(
-            ['extend.Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass' => $entityConfig],
-            'persistConfigs',
-            $cm
+        $this->assertEquals(
+            [$entityConfig],
+            $this->configManager->getUpdateConfig()
         );
     }
 
@@ -103,40 +71,18 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
             $entityConfig->all()
         );
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider
-            ->expects($this->any())
+        $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($entityConfig));
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getProvider'])
-            ->getMock();
-        $configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
+        $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $event = new EntityConfigEvent($configModel->getClassName(), $configManager);
-
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configSubscriber = new ConfigSubscriber($extendConfigProvider);
+        $configSubscriber = new ConfigSubscriber();
         $configSubscriber->updateEntityConfig($event);
 
-        /** @var ConfigManager $cm */
-        $cm = $event->getConfigManager();
-        $this->assertObjectHasAttribute('persistConfigs', $cm);
-        $this->assertAttributeEquals(
-            null,
-            'persistConfigs',
-            $cm
+        $this->assertEquals(
+            [],
+            $this->configManager->getUpdateConfig()
         );
     }
 }

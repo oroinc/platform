@@ -3,7 +3,6 @@ parameters:
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
     oro_entity_config.config_loader.class:                      Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader
-    oro_entity_config.provider_bag.class:                       Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag
     oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
@@ -22,16 +21,11 @@ services:
         tags:
             - { name: oro_service_link,  service: security.context }
 
-    oro_entity_config.link.provider_bag:
-        tags:
-            - { name: oro_service_link,  service: oro_entity_config.provider_bag }
-
     oro_entity_config.config_manager:
         class: %oro_entity_config.config_manager.class%
         arguments:
             - @oro_entity_config.metadata.annotation_metadata_factory
             - @event_dispatcher
-            - @oro_entity_config.link.provider_bag
             - @oro_entity_config.config_model_manager
             - @oro_entity_config.config_audit_entity_builder
             - @oro_entity_config.cache
@@ -60,9 +54,6 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @doctrine.orm.entity_manager
-
-    oro_entity_config.provider_bag:
-        class: %oro_entity_config.provider_bag.class%
 
     oro_entity_config.cache:
         public: false

@@ -52,8 +52,9 @@ class EntityConfigModel extends AbstractConfigModel
         $this->mode          = ConfigModelManager::MODE_DEFAULT;
         $this->fields        = new ArrayCollection();
         $this->indexedValues = new ArrayCollection();
-
-        $this->setClassName($className);
+        if (!empty($className)) {
+            $this->setClassName($className);
+        }
     }
 
     /**

@@ -140,8 +140,6 @@ services:
 
     oro_entity_extend.listener.config_subscriber:
         class: %oro_entity_extend.listener.config_subscriber.class%
-        arguments:
-            - @oro_entity_config.provider.extend
         tags:
             - { name: kernel.event_subscriber}
 

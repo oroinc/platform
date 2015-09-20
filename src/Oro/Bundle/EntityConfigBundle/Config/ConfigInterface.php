@@ -82,6 +82,13 @@ interface ConfigInterface extends \Serializable
     public function all(\Closure $filter = null);
 
     /**
+     * Returns all parameters.
+     *
+     * @return array
+     */
+    public function getValues();
+
+    /**
      * Replace all parameters with parameters specified in $values argument.
      *
      * @param array $values

@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
-
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
 {
     /** @var  ConfigSubscriber */
     protected $configSubscriber;
@@ -40,23 +38,14 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongConfigId()
     {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider->expects($this->never())
-            ->method($this->anything());
-
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->expects($this->never())
+        $this->configProvider->expects($this->never())
             ->method($this->anything());
 
         $entityConfigId = new EntityConfigId('extend', 'TestClass');
         $eventConfig    = new Config($entityConfigId);
 
-        $event = new PersistConfigEvent($eventConfig, $configManager);
-        $configSubscriber = new ConfigSubscriber($configProvider);
+        $event = new PersistConfigEvent($eventConfig, $this->configManager);
+        $configSubscriber = new ConfigSubscriber();
 
         $configSubscriber->persistConfig($event);
     }
@@ -67,16 +56,36 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testScopeExtendNewFieldNewEntity()
     {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField(),
-            $this->getEntityConfig(),
-            $this->getChangeSet()
+        $entityConfig = $this->getEntityConfig();
+        $fieldConfig = $this->getEventConfigNewField();
+
+        // add to originalConfigs
+        $this->configCache->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn(clone $entityConfig);
+        $this->configManager->getEntityConfig(
+            $entityConfig->getId()->getScope(),
+            $entityConfig->getId()->getClassName()
         );
 
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
+        $this->configManager->persist($entityConfig);
+        $this->configManager->persist($fieldConfig);
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+        $this->configManager->calculateConfigChangeSet($fieldConfig);
 
-        $this->assertAttributeSame(null, 'persistConfigs', $cm);
+        $this->configProvider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($entityConfig));
+
+        $this->event = new PersistConfigEvent($fieldConfig, $this->configManager);
+
+        $this->configSubscriber = new ConfigSubscriber();
+        $this->configSubscriber->persistConfig($this->event);
+
+        $this->assertEquals(
+            [],
+            $this->configManager->getConfigChangeSet($entityConfig)
+        );
     }
 
     /**
@@ -85,18 +94,35 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testScopeExtendNewFieldActiveEntity()
     {
-        $this->runPersistConfig(
-            $this->getEventConfigNewField(),
-            $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]),
-            $this->getChangeSet()
+        $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $fieldConfig = $this->getEventConfigNewField();
+
+        // add to originalConfigs
+        $this->configCache->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn(clone $entityConfig);
+        $this->configManager->getEntityConfig(
+            $entityConfig->getId()->getScope(),
+            $entityConfig->getId()->getClassName()
         );
 
-        /** @var ConfigManager $cm */
-        $cm = $this->event->getConfigManager();
-        $this->assertAttributeEquals(
-            ['extend.TestClass' => $this->getEntityConfig(['state' => ExtendScope::STATE_UPDATE])],
-            'persistConfigs',
-            $cm
+        $this->configManager->persist($entityConfig);
+        $this->configManager->persist($fieldConfig);
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+        $this->configManager->calculateConfigChangeSet($fieldConfig);
+
+        $this->configProvider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($entityConfig));
+
+        $this->event = new PersistConfigEvent($fieldConfig, $this->configManager);
+
+        $this->configSubscriber = new ConfigSubscriber();
+        $this->configSubscriber->persistConfig($this->event);
+
+        $this->assertEquals(
+            ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],
+            $this->configManager->getConfigChangeSet($entityConfig)
         );
     }
 
@@ -149,7 +175,7 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
             'index'       => []
         ];
 
-        if (count($values)) {
+        if (!empty($values)) {
             $resultValues = array_merge($resultValues, $values);
         }
 
@@ -158,59 +184,5 @@ class ConfigSubscriberPersistConfigTest extends \PHPUnit_Framework_TestCase
         $entityConfig->setValues($resultValues);
 
         return $entityConfig;
-    }
-
-    protected function getChangeSet($values = [])
-    {
-        return array_merge(
-            [
-                'owner'     => [0 => null, 1 => ExtendScope::OWNER_CUSTOM],
-                'is_extend' => [0 => null, 1 => true],
-                'state'     => [0 => null, 1 => ExtendScope::STATE_NEW]
-            ],
-            $values
-        );
-    }
-
-    protected function runPersistConfig($eventConfig, $entityConfig, $changeSet)
-    {
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configProvider
-            ->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($entityConfig));
-        $configProvider
-            ->expects($this->any())
-            ->method('getConfigById')
-            ->will($this->returnValue($eventConfig));
-
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getProviderBag', 'getProvider', 'getConfigChangeSet'])
-            ->getMock();
-        $configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
-        $configManager
-            ->expects($this->any())
-            ->method('getConfigChangeSet')
-            ->with($eventConfig)
-            ->will($this->returnValue($changeSet));
-
-        $this->event = new PersistConfigEvent($eventConfig, $configManager);
-
-        $extendConfigProvider = clone $configProvider;
-        $extendConfigProvider
-            ->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($eventConfig));
-
-        $this->configSubscriber = new ConfigSubscriber($extendConfigProvider);
-        $this->configSubscriber->persistConfig($this->event);
     }
 }

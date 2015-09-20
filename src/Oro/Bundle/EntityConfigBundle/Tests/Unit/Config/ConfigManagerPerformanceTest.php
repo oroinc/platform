@@ -15,7 +15,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 
 /**
  * Contains tests for a performance crucial parts of entity configs
@@ -38,9 +37,6 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
     /** @var Stopwatch */
     protected static $stopwatch;
-
-    /** @var ConfigProviderBag */
-    protected $configProviderBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -329,15 +325,6 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConfigManager()
     {
-        $this->configProviderBag = new ConfigProviderBag();
-        $configProviderBagLink   = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProviderBagLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->configProviderBag);
-
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -402,7 +389,6 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         return new ConfigManager(
             $this->metadataFactory,
             $this->eventDispatcher,
-            $configProviderBagLink,
             new ConfigModelManager($emLink),
             new AuditEntityBuilder($securityTokenStorage),
             new ConfigCache(new ArrayCache(), new ArrayCache())

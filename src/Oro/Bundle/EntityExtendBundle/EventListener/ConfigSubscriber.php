@@ -18,19 +18,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var ConfigProvider
-     */
-    protected $extendConfigProvider;
-
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     */
-    public function __construct(ConfigProvider $extendConfigProvider)
-    {
-        $this->extendConfigProvider = $extendConfigProvider;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
