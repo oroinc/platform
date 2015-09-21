@@ -222,32 +222,27 @@ define(function(require) {
         /**
          * Initializes columns collection required to draw grid
          *
-         * @param {Object} opts
+         * @param {Object} options
          * @private
          */
-        _initColumns: function(opts) {
-            // console.log(opts.columns);
-            // console.log(_.pluck(_.sortBy(opts.columns, 'order'), 'name'));
-
+        _initColumns: function(options) {
             if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
+                options.columns.push(this._createActionsColumn());
             }
 
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
+            if (options.multiSelectRowEnabled) {
+                options.columns.unshift(this._createSelectRowColumn());
             }
 
-            for (var i = 0; i < opts.columns.length; i++) {
-                var column = opts.columns[i];
+            for (var i = 0; i < options.columns.length; i++) {
+                var column = options.columns[i];
                 if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
                     column.order = i + this.DEFAULT_COLUMN_START_INDEX;
                 }
             }
 
-            this.columns = opts.columns = new GridColumns(opts.columns);
+            this.columns = options.columns = new GridColumns(options.columns);
             this.columns.sort();
-
-            // console.log(_.pluck(_.sortBy(this.columns.toJSON(), 'order'), 'name'));
         },
 
         /**

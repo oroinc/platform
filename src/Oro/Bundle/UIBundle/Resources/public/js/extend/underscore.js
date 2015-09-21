@@ -13,7 +13,7 @@ define(['underscore'], function(_) {
             str = toLong ? str.substr(0, maxLength - 1) : str;
             var lastSpace = str.lastIndexOf(' ');
             str = useWordBoundary && toLong && lastSpace > 0 ? str.substr(0, lastSpace) : str;
-            return toLong ? str + '&hellip;' : str;
+            return toLong ? str + hellip : str;
         },
 
         isMobile: function() {
@@ -21,7 +21,6 @@ define(['underscore'], function(_) {
             return elem && (' ' + elem.className + ' ')
                 .replace(/[\t\r\n\f]/g, ' ')
                 .indexOf(' mobile-version ') !== -1;
-            return toLong ? str + hellip : str;
         }
     });
 
