@@ -113,6 +113,22 @@ class EmailController extends Controller
     }
 
     /**
+     * Get count of unread emails
+     *
+     * @Route("/recent_email_count", name="oro_email_unread_emails_count")
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @return Response
+     */
+    public function unreadEmailsCountAction()
+    {
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $emailNotificationManager = $this->get('oro_email.manager.notification');
+
+        return new Response($emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization));
+    }
+
+    /**
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")

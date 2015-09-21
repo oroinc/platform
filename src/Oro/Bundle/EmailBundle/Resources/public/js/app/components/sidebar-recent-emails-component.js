@@ -13,6 +13,9 @@ define(function(require) {
          */
         initialize: function(options) {
             this.model = options.model;
+            if ('unreadEmailsCount' in this.model.module) {
+                this.model.set({unreadEmailsCount: this.model.module.unreadEmailsCount});
+            }
             this.model.on('change:settings', function(model, settings) {
                 model.emailNotificationCollection.setLimit(settings.limit);
             });
