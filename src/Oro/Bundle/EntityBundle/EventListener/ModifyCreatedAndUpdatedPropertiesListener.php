@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +17,7 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
 {
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var bool */
@@ -34,9 +34,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     protected $entityManager;
 
     /**
-     * @param TokenStorage $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(TokenStorage $tokenStorage)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
     }
@@ -79,7 +79,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      */
     protected function updateChangeSets($entity)
     {
@@ -89,7 +89,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return ClassMetadata
      */
@@ -104,7 +104,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return bool
      */
@@ -149,7 +149,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return bool
      */
@@ -176,7 +176,8 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
         $user = $token->getUser();
 
         /**
-         * Check situations when user is not in entity manager (after clear or if it is different entity manager)
+         * Check cases when user is not in the entity manager
+         * (e.g. after clear or if it is in the different entity manager)
          */
         if ($user instanceof User && !$this->entityManager->contains($user)) {
             $user = $this->entityManager->find('OroUserBundle:User', $user->getId());
