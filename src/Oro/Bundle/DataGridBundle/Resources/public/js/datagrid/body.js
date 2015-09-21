@@ -124,6 +124,9 @@ define([
             this.listenTo(row, 'clicked', function(row, e) {
                 this.trigger('rowClicked', row, e);
             });
+            this.listenTo(row, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
         },
 
         /**

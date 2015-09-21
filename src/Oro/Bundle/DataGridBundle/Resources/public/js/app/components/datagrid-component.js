@@ -251,7 +251,9 @@ define(function(require) {
                 }
             }
 
-            plugins.push(InlineEditingPlugin);
+            if (!tools.isMobile() && (this.metadata.inline_editing && this.metadata.inline_editing.enabled)) {
+                plugins.push(InlineEditingPlugin);
+            }
 
             return {
                 name: this.gridName,

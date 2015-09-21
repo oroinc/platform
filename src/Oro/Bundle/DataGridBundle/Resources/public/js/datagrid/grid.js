@@ -130,6 +130,11 @@ define(function(require) {
                 this.pluginManager.enable(options.plugins);
             }
 
+            this.trigger('beforeParseOptions', options);
+
+            this.filteredOptions = _.omit(options, ['el', 'id', 'attributes',
+                'className', 'tagName', 'events']);
+
             // Check required options
             if (!opts.collection) {
                 throw new TypeError('"collection" is required');
@@ -169,6 +174,12 @@ define(function(require) {
             }
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
+
+            // use columns collection as event bus since there is no alternatives
+            options.columns = new Backgrid.Columns(options.columns);
+            this.listenTo(options.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
 
             Grid.__super__.initialize.apply(this, arguments);
 

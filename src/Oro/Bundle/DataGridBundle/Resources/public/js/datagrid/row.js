@@ -109,6 +109,10 @@ define([
                 cell.$el.addClass('skip-row-click');
             }
             this._listenToCellEvents(cell);
+
+            // use columns collection as event bus since there is no alternatives
+            this.columns.trigger('afterMakeCell', this, cell);
+
             return cell;
         },
 

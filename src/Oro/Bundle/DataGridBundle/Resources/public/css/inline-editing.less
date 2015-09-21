@@ -1,5 +1,8 @@
 .grid {
   .editable {
+    &.successfully-saved {
+      background: #F4FEE2;
+    }
     &.edit-mode {
       position: relative;
       > .icon-edit {
@@ -17,16 +20,31 @@
       > .icon-edit {
         display: block !important;
         position: absolute;
+        top: 0;
         right: -3px;
+        width: 29px;
         height: 29px;
         line-height: 39px;
-        top: 0;
         background: rgba(244,239,212,0.7);
-        width: 29px;
         text-align: center;
         &:hover {
           font-weight: bold;
         }
+      }
+    }
+    &.loading{
+      &.view-mode > .icon-edit {
+        display: none !important;
+      }
+      &:before {
+        background: url('../../oroui/img/loader-16.gif') no-repeat center center;
+        display: block !important;
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -3px;
+        width: 29px;
+        height: 29px;
       }
     }
   }
@@ -42,13 +60,13 @@
   border-radius: 3px;
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  z-index: 1200;
-  top: -9px;
-  left: -5px;
   .input-append {
     margin: 0;
   }
   .icon-check:before {
     content: "\f00c";
+  }
+  .validation-failed:last-child {
+    margin-bottom: 0px
   }
 }

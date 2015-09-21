@@ -1,36 +1,34 @@
 define(function(require) {
     'use strict';
 
-    var CommentComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
+    var TextEditorComponent;
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var TemplateView = require('oroui/js/app/views/base/template-view');
+    var TextEditorView = require('../../views/editor/text-editor-view');
 
-    CommentComponent = BaseComponent.extend({
-
+    TextEditorComponent = BaseComponent.extend({
         initialize: function(options) {
             this.options = options || {};
 
-            this.view = new TemplateView({
+            this.view = new TextEditorView({
                 autoRender: true,
                 el: options._sourceElement,
-                data: options.data,
-                template: require('tpl!../../../../templates/text-editor.html'),
-                events: {
-                    'click [data-action]': _.bind(this.rethrowAction, this)
-                }
+                model: options.model
             });
 
-            CommentComponent.__super__.initialize.apply(this, arguments);
+            this.listenTo(this.view, 'saveAction', this.onSave);
+            this.listenTo(this.view, 'cancelAction', this.onCancel);
+
+            TextEditorComponent.__super__.initialize.apply(this, arguments);
         },
 
-        rethrowAction: function(e) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            _.this.trigger($(e.target).attr('data-action') + 'Action');
+        onSave: function() {
+            this.trigger('saveAction');
+        },
+
+        onCancel: function() {
+            this.trigger('cancelAction');
         }
     });
 
-    return CommentComponent;
+    return TextEditorComponent;
 });
