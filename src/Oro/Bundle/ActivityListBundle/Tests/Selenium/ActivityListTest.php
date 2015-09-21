@@ -81,4 +81,10 @@ class ActivityListTest extends Selenium2TestCase
             ->assertMessage('The email was sent')
             ->verifyActivity('Email', $subject);
     }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
+    }
 }
