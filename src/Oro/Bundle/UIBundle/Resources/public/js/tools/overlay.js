@@ -12,6 +12,11 @@ define(function(require) {
             if (options.position) {
                 $overlayContent.position(options.position);
             }
+            $overlayContent.data('interval', setInterval(function() {
+                if (options.position) {
+                    $overlayContent.position(options.position);
+                }
+            }, 400));
             return {
                 remove: function() {
                     _this.removeOverlay($overlayContent);
@@ -20,6 +25,9 @@ define(function(require) {
         },
 
         removeOverlay: function($overlayContent) {
+            if ($overlayContent.data('interval')) {
+                clearInterval($overlayContent.data('interval'));
+            }
             $overlayContent.remove();
             $('body').removeClass('backdrop');
         }
