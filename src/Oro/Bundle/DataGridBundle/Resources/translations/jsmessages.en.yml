@@ -66,3 +66,4 @@ oro:
     datagrid:
         inlineEditing:
             successMessage: "Record has been succesfully updated"
+            helpMessage: "Double click on cell to edit"

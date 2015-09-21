@@ -42,6 +42,14 @@ define(function(require) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
                 }
+                this.$el.popover({
+                    content: __('oro.datagrid.inlineEditing.helpMessage'),
+                    container: document.body,
+                    placement: 'bottom',
+                    delay: {show: 1400, hide: 0},
+                    trigger: 'hover',
+                    animation: false
+                });
                 return result;
             };
             cell.events = _.extend({}, cell.events, {
@@ -109,6 +117,8 @@ define(function(require) {
                     collision: 'flipfit'
                 }
             });
+
+            editorComponent.view.focus();
 
             editorComponent.on('saveAction', function() {
                 cell.$el.addClass('loading');
