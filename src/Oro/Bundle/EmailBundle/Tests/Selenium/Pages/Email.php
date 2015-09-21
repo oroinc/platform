@@ -84,21 +84,6 @@ class Email extends AbstractPageEntity
     }
 
     /**
-     * Method clicks Cancel button on compose email widget-window
-     * @return $this
-     */
-    public function cancel()
-    {
-        $this->test->byXPath("//div[@class='widget-actions-section']//button[contains(., 'Cancel')]")->click();
-        $this->waitForAjax();
-        $this->waitPageToLoad();
-        $this->assertElementNotPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix ui-draggable-handle']"
-        );
-        return $this;
-    }
-
-    /**
      * Method to check that Context field suggestion list contains needed data
      * @param $value
      * @return $this
