@@ -59,7 +59,7 @@ class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
         $entityConfig = $this->getEntityConfig();
         $fieldConfig = $this->getEventConfigNewField();
 
-        // add to originalConfigs
+        // add to originalValues
         $this->configCache->expects($this->once())
             ->method('getEntityConfig')
             ->willReturn(clone $entityConfig);
@@ -97,7 +97,7 @@ class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
 
-        // add to originalConfigs
+        // add to originalValues
         $this->configCache->expects($this->once())
             ->method('getEntityConfig')
             ->willReturn(clone $entityConfig);
