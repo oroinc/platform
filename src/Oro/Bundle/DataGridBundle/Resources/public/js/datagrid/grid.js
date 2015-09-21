@@ -168,9 +168,6 @@ define(function(require) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
 
-            opts.columns[2].editable = true;
-            opts.columns[6].editable = true;
-
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
             Grid.__super__.initialize.apply(this, arguments);

@@ -3,8 +3,12 @@ define(function(require) {
 
     var InlineEditingPlugin;
     var _ = require('underscore');
+    var $ = require('jquery');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var Row = require('orodatagrid/js/datagrid/row');
+    var TextEditorComponent = require('orodatagrid/js/app/components/editor/text-editor-component');
+
+    require('oroui/lib/jquery/jquery.disablescroll');
 
     InlineEditingPlugin = BasePlugin.extend({
         enable: function() {
@@ -47,18 +51,44 @@ define(function(require) {
         },
 
         enterEditMode: function(cell) {
+            var _this = this;
+            this.prepareEnvironmentForEditing(cell);
+            cell.$el.prepend(
+                '<div class="inline-editor-wrapper"></div>'
+            );
+            var editorComponent = new TextEditorComponent({
+                data: {
+                    value: cell.model.get(cell.column.get('name'))
+                },
+                _sourceElement: cell.$('.inline-editor-wrapper')
+            });
+
+            editorComponent.on('saveAction', function() {
+                _this.restoreEnvironment(cell);
+            });
+            editorComponent.on('cancelAction', function() {
+                _this.restoreEnvironment(cell);
+            });
+        },
+
+        prepareEnvironmentForEditing: function(cell) {
+            $('body').addClass('backdrop');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
-            cell.$el.prepend(
-                '<div class="inline-editor-wrapper">' +
-                    '<div class="input-append">' +
-                        '<input type="text" class="form-control">' +
-                        '<button class="add-on btn entity-select-btn"><i class="icon-check"></i></button>' +
-                        '<button class="add-on btn entity-select-btn"><i class="icon-times"></i></button>' +
-                    '</div>' +
-                '</div>'
-            );
-            cell.$('input').val(cell.model.get(cell.column.get('name'))).focus();
+            cell.$('.inline-editor-wrapper').click(function(e) {
+                e.stopPropagation();
+            });
+            cell.$el.parents('.grid-scrollable-container').disablescroll();
+            cell.$el.parents('.grid').removeClass('table-hover');
+        },
+
+        restoreEnvironment: function(cell) {
+            $('body').removeClass('backdrop');
+            cell.$el.addClass('view-mode');
+            cell.$el.removeClass('edit-mode');
+            cell.$('.inline-editor-wrapper').remove();
+            cell.$el.parents('.grid-scrollable-container').disablescroll('undo');
+            cell.$el.parents('.grid').addClass('table-hover');
         }
     });
 

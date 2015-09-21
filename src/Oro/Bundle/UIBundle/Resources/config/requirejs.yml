@@ -56,6 +56,9 @@ config:
             deps:
                 - 'cryptojs/core'
             exports: 'CryptoJS'
+        'oroui/lib/jquery/jquery.disablescroll':
+            deps:
+                - 'jquery'
         'cryptojs/sha256':
             deps:
                 - 'cryptojs/core'
