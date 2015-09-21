@@ -4,11 +4,13 @@
             <label class="required"><%= _.__("oro.email.recent_emails_widget.mailbox_folder") %><em>*</em></label>
         </div>
         <div class="controls">
-            <select name="folderId"  class="select2" data-page-component-module="oro/select2-component">
-                <option value="0">All</option>
-                <option<% if (+settings.folderId === 1) { %> selected="selected"<% } %> value="1">Inbox</option>
-                <option<% if (+settings.folderId === 2) { %> selected="selected"<% } %> value="2">Spam</option>
-            </select>
+            <% if (foldersData === '[]') { %>
+            <input name="folderId" type="text" placeholder="<%= _.__('Loading...') %>" disabled="disabled">
+            <% } else { %>
+            <input name="folderId" type="hidden" value="<%= settings.folderId %>"
+                    data-page-component-module="oro/select2-component"
+                    data-page-component-options='{"configs": {"data":<%= foldersData %>}}' />
+            <% } %>
         </div>
     </div>
     <div class="control-group">
