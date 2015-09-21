@@ -82,10 +82,13 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     {
         $this->processAcl($options);
 
-        $hasNonAuth = array_key_exists('showNonAuthorized', $options['extras']);
-        if ($options['extras']['isAllowed']
-            || ($hasNonAuth && $options['extras']['showNonAuthorized'])
-        ) {
+        $checkAccess = !isset($options['check_access']) || $options['check_access'] === true;
+        if (!$this->securityFacade->hasLoggedUser() && $checkAccess) {
+            $hasNonAuth = array_key_exists('showNonAuthorized', $options['extras']);
+            $options['extras']['isAllowed'] = $hasNonAuth && $options['extras']['showNonAuthorized'];
+        }
+
+        if ($options['extras']['isAllowed']) {
             $this->processRoute($options);
         }
 
@@ -99,7 +102,8 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function processAcl(array &$options = array())
     {
-        $needCheck = !isset($options['check_access']) || $options['check_access'] === true;
+        $needCheck = (!isset($options['check_access']) || $options['check_access'] === true)
+            && $this->securityFacade->hasLoggedUser();
 
         $isAllowed = self::DEFAULT_ACL_POLICY;
         if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
