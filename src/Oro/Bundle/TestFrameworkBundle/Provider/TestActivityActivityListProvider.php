@@ -68,6 +68,22 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getOwner($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedBy($entity)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity TestActivity */

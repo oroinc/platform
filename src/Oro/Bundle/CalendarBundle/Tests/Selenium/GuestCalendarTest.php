@@ -70,4 +70,10 @@ class GuestCalendarTest extends Selenium2TestCase
             ->openCalendars('Oro\Bundle\CalendarBundle')
             ->checkEventPresent($eventName);
     }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
+    }
 }

@@ -141,4 +141,10 @@ class NotesTest extends Selenium2TestCase
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();
     }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
+    }
 }
