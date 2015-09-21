@@ -50,8 +50,8 @@ class ConfigManager
     /** @var ConfigProvider[] */
     protected $providers = [];
 
-    /** @var ConfigInterface[] */
-    protected $originalConfigs = [];
+    /** @var array */
+    protected $originalValues = [];
 
     /** @var ConfigInterface[] */
     protected $persistConfigs = [];
@@ -246,8 +246,8 @@ class ConfigManager
 
         // for calculate change set
         $configKey = $scope . '.' . $className;
-        if (!isset($this->originalConfigs[$configKey])) {
-            $this->originalConfigs[$configKey] = clone $config;
+        if (!isset($this->originalValues[$configKey])) {
+            $this->originalValues[$configKey] = $config->getValues();
         }
 
         return $config;
@@ -291,8 +291,8 @@ class ConfigManager
 
         // for calculate change set
         $configKey = $scope . '.' . $className . '.' . $fieldName;
-        if (!isset($this->originalConfigs[$configKey])) {
-            $this->originalConfigs[$configKey] = clone $config;
+        if (!isset($this->originalValues[$configKey])) {
+            $this->originalValues[$configKey] = $config->getValues();
         }
 
         return $config;
@@ -494,7 +494,7 @@ class ConfigManager
     protected function prepareFlush(&$models)
     {
         /** @var ConfigInterface $config */
-        foreach (new ConfigIterator($this->persistConfigs) as $config) {
+        foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
             $this->eventDispatcher->dispatch(
@@ -538,8 +538,8 @@ class ConfigManager
     {
         $configKey = $this->buildConfigKey($config->getId());
 
-        $diff = isset($this->originalConfigs[$configKey])
-            ? $this->getDiff($config->getValues(), $this->originalConfigs[$configKey]->getValues())
+        $diff = isset($this->originalValues[$configKey])
+            ? $this->getDiff($config->getValues(), $this->originalValues[$configKey])
             : $this->getDiff($config->getValues(), []);
         if (!empty($diff)) {
             $this->configChangeSets[$configKey] = isset($this->configChangeSets[$configKey])
@@ -645,8 +645,8 @@ class ConfigManager
                     $this->cache->saveConfigurable(true, $className, null, true);
                     // for calculate change set
                     $configKey = $scope . '.' . $className;
-                    if (!isset($this->originalConfigs[$configKey])) {
-                        $this->originalConfigs[$configKey] = clone $config;
+                    if (!isset($this->originalValues[$configKey])) {
+                        $this->originalValues[$configKey] = $config->getValues();
                     }
                 }
 
@@ -690,8 +690,8 @@ class ConfigManager
                 $this->cache->saveConfigurable(true, $className, $fieldName, true);
                 // for calculate change set
                 $configKey = $scope . '.' . $className . '.' . $fieldName;
-                if (!isset($this->originalConfigs[$configKey])) {
-                    $this->originalConfigs[$configKey] = clone $config;
+                if (!isset($this->originalValues[$configKey])) {
+                    $this->originalValues[$configKey] = $config->getValues();
                 }
             }
 
@@ -809,12 +809,9 @@ class ConfigManager
                     );
                     unset($this->persistConfigs[$configKey]);
                 }
-                if (isset($this->originalConfigs[$configKey])) {
-                    $this->originalConfigs[$newConfigKey] = $this->changeConfigFieldName(
-                        $this->originalConfigs[$configKey],
-                        $newFieldName
-                    );
-                    unset($this->originalConfigs[$configKey]);
+                if (isset($this->originalValues[$configKey])) {
+                    $this->originalValues[$newConfigKey] = $this->originalValues[$configKey];
+                    unset($this->originalValues[$configKey]);
                 }
                 if (isset($this->configChangeSets[$configKey])) {
                     $this->configChangeSets[$newConfigKey] = $this->configChangeSets[$configKey];
