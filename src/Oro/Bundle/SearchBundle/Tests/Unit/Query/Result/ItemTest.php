@@ -30,7 +30,6 @@ class ItemTest extends \PHPUnit_Framework_TestCase
             1,
             'test title',
             'http://example.com',
-            'test text',
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -91,12 +90,6 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     {
         $this->item->setRecordUrl('http://example.com');
         $this->assertEquals('http://example.com', $this->item->getRecordUrl());
-    }
-
-    public function testRecordText()
-    {
-        $this->item->setRecordText('test text');
-        $this->assertEquals('test text', $this->item->getRecordText());
     }
 
     public function testGetEntityConfig()
