@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
                 template = view.templateMax;
             }
 
-            view.$el.html(template(model.toJSON()));
+            view.$el.html(template(_.extend(model.toJSON(), {showRefreshButton: !model.module.HIDE_REFRESH_BUTTON})));
             view.$el.attr('data-cid', model.cid);
 
             if (view.model.get('cssClass')) {
@@ -46,7 +46,7 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             }
 
             if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
-                requirejs([model.get('module')], function(Widget) {
+                model.loadModule().then(function(Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {
                         view.contentView = new Widget.ContentView({

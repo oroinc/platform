@@ -5,16 +5,21 @@
                 <i class="icon-caret-down"></i>
             </a>
             <% if (iconClass) { %>
-                <i class="<%= iconClass %>" title="<%= title %>"></i>
+                <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount > 0) { %> icon-with-counter highlight<% } %>"
+                   title="<%= title %>">
+                    <% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount > 0) { %><span><%=(unreadEmailsCount > 10 ? '10+' : unreadEmailsCount) %></span><% } %>
+                </i>
             <% } else { %>
                 <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
             <% } %>
             <span class="widget-title"><%= title %></span>
         </span>
         <span class="sidebar-widget-header-wrap">
+            <% if (showRefreshButton) { %>
             <a href="#" class="sidebar-widget-refresh">
                 <i class="icon-refresh"></i>
             </a>
+            <% } %>
             <a href="#" class="sidebar-widget-settings">
                 <i class="icon-cog"></i>
             </a>

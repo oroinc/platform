@@ -1,0 +1,3 @@
+<i class="icon-envelope<% if (unreadEmailsCount !== undefined && unreadEmailsCount > 0) { %>  icon-with-counter highlight<% } %>">
+    <% if (unreadEmailsCount !== undefined && unreadEmailsCount > 0) { %><span><%=(unreadEmailsCount > 10 ? '10+' : unreadEmailsCount) %></span><% } %>
+</i>

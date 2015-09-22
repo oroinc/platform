@@ -10,16 +10,21 @@ define(function(require) {
     var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var messenger = require('oroui/js/messenger');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
         template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
         listSelector: '.items',
         countNewEmail: 0,
+        loadingMask: null,
+        actionId: 1,
 
         listen: {
             'change:seen collection': 'updateViewMode',
-            'reset collection': 'onResetCollection'
+            'reset collection': 'onResetCollection',
+            'request collection': 'onCollectionRequest',
+            'sync collection': 'onCollectionSync'
         },
 
         events: {
@@ -28,8 +33,11 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            EmailNotificationCollectionView.__super__.initialize.apply(this, options);
+            EmailNotificationCollectionView.__super__.initialize.call(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
+            if (options.actionId) {
+                this.actionId = parseInt(options.actionId);
+            }
         },
 
         render: function() {
@@ -40,6 +48,7 @@ define(function(require) {
         getTemplateData: function() {
             var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
+            data.actionId = this.actionId;
             return data;
         },
 
@@ -48,13 +57,13 @@ define(function(require) {
                 var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .icon-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
-                    $iconEnvelope.removeClass('new');
+                    $iconEnvelope.removeClass('highlight');
                 } else {
                     this.setModeDropDownMenu('content');
                     if (this.countNewEmail > 0) {
-                        $iconEnvelope.addClass('new');
+                        $iconEnvelope.addClass('highlight');
                     } else {
-                        $iconEnvelope.removeClass('new');
+                        $iconEnvelope.removeClass('highlight');
                     }
                 }
             }
@@ -93,21 +102,7 @@ define(function(require) {
         },
 
         onResetCollection: function() {
-            this.setCount(0);
-        },
-
-        setCount: function(count) {
-            count = parseInt(count);
-            this.countNewEmail = count;
-            if (count > 10) {
-                count = '10+';
-            }
-
-            if (count === 0) {
-                count = '';
-            }
-            this.$el.find('.icon-envelope span').html(count);
-            this.updateViewMode();
+            this.collection.countNewEmail = 0;
         },
 
         onClickIconEnvelope: function() {
@@ -135,6 +130,20 @@ define(function(require) {
 
         open: function() {
             this.$el.addClass('open');
+        },
+
+        onCollectionRequest: function() {
+            this.loadingMask = new LoadingMask({
+                container: this.$el
+            });
+            this.loadingMask.show();
+        },
+
+        onCollectionSync: function() {
+            if (this.loadingMask) {
+                this.loadingMask.dispose();
+            }
+            this.render();
         }
     });
 

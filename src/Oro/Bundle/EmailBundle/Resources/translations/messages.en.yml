@@ -63,6 +63,9 @@ oro:
                 label: System Mailboxes
                 add_mailbox.label: Add Mailbox
 
+            show_recent_emails_in_user_bar:
+                label: Show recent emails
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates

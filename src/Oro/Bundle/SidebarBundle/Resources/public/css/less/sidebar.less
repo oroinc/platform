@@ -1,9 +1,10 @@
+@import "../../../oroui/lib/bootstrap/variables";
 .sidebar {
-    background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
+    background: #e0e0e0 url("../../images/divider.png") repeat-x 0 0;
     float: left;
     height: 100%;
     position: relative;
-    z-index: 750;
+    z-index: @zindexFixedNavbar;
     overflow: visible;
 
     -webkit-touch-callout: none;
@@ -95,7 +96,6 @@
 .sidebar-toggle a {
     position: absolute;
     height: 22px;
-
     width: 30px;
     bottom: 0;
 }
@@ -103,18 +103,18 @@
 .sidebar-left .sidebar-toggle a {
     right: 5px;
     bottom: -1px;
-}
-.sidebar-left .sidebar-toggle a i{
-    right: 7px;
-    bottom: 4px;
+    i {
+        right: 7px;
+        bottom: 4px;
+    }
 }
 .sidebar-right .sidebar-toggle a {
     bottom: -1px;
     left: 5px;
-}
-.sidebar-right .sidebar-toggle a i{
-    left: 7px;
-    bottom: 4px;
+    i {
+        left: 7px;
+        bottom: 4px;
+    }
 }
 .sidebar-left i.icon-backward{
     display: none !important;
@@ -154,7 +154,7 @@
 }
 
 .sidebar-widget, .sidebar-icon {
-    background: #e0e0e0 url('../images/divider.png') repeat-x 0 100%;
+    background: #e0e0e0 url('../../images/divider.png') repeat-x 0 100%;
     width: 100%;
     padding-bottom: 1px;
 }
@@ -165,7 +165,8 @@
     cursor: pointer;
 }
 
-.sidebar-icon img, .sidebar-icon i {
+.sidebar-icon {
+  img, i {
     font-size: 12pt;
     height: 16px;
     width: 16px;
@@ -176,6 +177,25 @@
     -o-filter: grayscale(100%);
     -ms-filter: grayscale(100%);
     filter: grayscale(100%);
+  }
+  .icon-with-counter {
+    span {
+      background-color: #ffffff;
+      top: -3px;
+      left: 3px;
+      padding: 0 2px;
+    }
+    &.highlight {
+      -webkit-filter: none;
+      -moz-filter: none;
+      -o-filter: none;
+      -ms-filter: none;
+      filter: none;
+      &:before, span {
+        color: #fabb18;
+      }
+    }
+  }
 }
 .sidebar-widget-header{
     width: 100%;
@@ -187,6 +207,9 @@
 }
 .sidebar-icon-active{
     background-color: #cccccc;
+}
+.sidebar-icon-with-counter {
+    background-color: white;
 }
 .sidebar-icon:hover i,
 .sidebar-icon:hover img,
@@ -305,6 +328,10 @@
 }
 .sidebar i[class^="icon-"]:before,
 .sidebar i[class*=" icon-"]:before{
+    color: #444444;
+}
+.sidebar i[class^="icon-"].new:before,
+.sidebar i[class*=" icon-"].new:before{
     color: #444444;
 }
 .sidebar-add i[class^="icon-"]:before,

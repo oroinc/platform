@@ -88,9 +88,12 @@ class EmailNotificationManager
                 // no content
             }
 
+            $emailId = $email->getId();
             $emailsData[] = [
-                'route' => $this->router->generate('oro_email_email_reply', ['id' => $email->getId()]),
-                'id' => $email->getId(),
+                'replyRoute' => $this->router->generate('oro_email_email_reply', ['id' => $emailId]),
+                'replyAllRoute' => $this->router->generate('oro_email_email_reply_all', ['id' => $emailId]),
+                'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
+                'id' => $emailId,
                 'seen' => $isSeen,
                 'subject' => $email->getSubject(),
                 'bodyContent' => $bodyContent,

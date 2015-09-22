@@ -20,7 +20,7 @@ define([
      * var CommentCollection = RoutingCollection.extend({
      *     routeDefaults: {
      *         routeName: 'oro_api_comment_get_items',
-     *         routeQueryParameters: ['page', 'limit']
+     *         routeQueryParameterNames: ['page', 'limit']
      *     },
      *
      *     stateDefaults: {

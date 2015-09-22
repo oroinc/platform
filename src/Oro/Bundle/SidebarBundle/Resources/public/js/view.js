@@ -116,6 +116,7 @@ define(function(require) {
                 if (!iconView) {
                     return;
                 }
+
                 iconView.render().delegateEvents();
                 $content.append(iconView.$el);
             });
@@ -379,7 +380,7 @@ define(function(require) {
                 return;
             }
 
-            requirejs([widgetModel.get('module')], function(widgetModule) {
+            widgetModel.loadModule().then(function(widgetModule) {
                 var widgetSetupModal = new WidgetSetupModalView({
                     model: widgetModel,
                     contentView: widgetModule.SetupView,
