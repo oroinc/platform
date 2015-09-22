@@ -71,6 +71,8 @@ trait FilteredGridTrait
             )->click();
             $this->waitForAjax();
         }
+        $this->test->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::ESCAPE);
+
         return $this;
     }
 }
