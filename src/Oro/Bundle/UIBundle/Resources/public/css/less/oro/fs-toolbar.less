@@ -25,6 +25,28 @@
   .sf-toolbar-block .sf-toolbar-icon > a:link{
     color: #dfe9f6 !important;
   }
+  .sf-toolbar-block {
+    .sf-toolbar-icon {
+      img, svg {
+        filter: invert(100%) opacity(80%);
+        -webkit-filter: invert(100%) opacity(80%);
+        -moz-filter: invert(100%) opacity(80%);
+        -o-filter: invert(100%) opacity(80%);
+        -ms-filter: invert(100%) opacity(80%);
+      }
+    }
+  }
+  .sf-toolbar-block:hover {
+    .sf-toolbar-icon {
+      img, svg {
+        filter: none;
+        -webkit-filter: none;
+        -moz-filter: none;
+        -o-filter: none;
+        -ms-filter: none;
+      }
+    }
+  }
   .sf-toolbar-block:hover .sf-toolbar-icon *,
   .sf-toolbar-block:hover .sf-toolbar-icon > a,
   .sf-toolbar-block .sf-toolbar-icon > a:hover{

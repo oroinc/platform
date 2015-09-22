@@ -149,11 +149,15 @@ define(function(require) {
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
             this.initLayout().done(_.bind(function() {
                 // if the activity has an EmailTreadView -- handle comment count change in own way
-                var view = this.getEmailThreadView();
-                if (view) {
-                    this.listenTo(view, 'commentCountChanged', function(diff) {
+                var emailTreadView = this.getEmailThreadView();
+                if (emailTreadView) {
+                    this.listenTo(emailTreadView, 'commentCountChanged', function(diff) {
                         this.model.set('commentCount', this.model.get('commentCount') + diff);
                     });
+                }
+                var loadingView = this.subview('loading');
+                if (loadingView) {
+                    loadingView.hide();
                 }
             }, this));
         },
@@ -171,8 +175,6 @@ define(function(require) {
                     container: this.$el
                 }));
                 this.subview('loading').show();
-            } else {
-                this.removeSubview('loading');
             }
         },
 

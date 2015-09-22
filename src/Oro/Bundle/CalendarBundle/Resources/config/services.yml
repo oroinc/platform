@@ -101,6 +101,7 @@ services:
             - oro_assign_calendar_event_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
+            - { name: oro_ui.update_action_provider, group: activity }
 
     oro_calendar.calendar_event_manager:
         class: %oro_calendar.calendar_event_manager.class%

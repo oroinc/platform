@@ -2,23 +2,23 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Bundle\EntityBundle\ORM\QueryWalkerHintProviderInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryWalkerHintProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class CurrentUserWalkerHintProvider implements QueryWalkerHintProviderInterface
 {
-    /** @var SecurityContextInterface */
-    protected $securityContext;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(SecurityContextInterface $securityContext)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -28,7 +28,7 @@ class CurrentUserWalkerHintProvider implements QueryWalkerHintProviderInterface
     {
         $securityContext = [];
 
-        $token = $this->securityContext->getToken();
+        $token = $this->tokenStorage->getToken();
         if ($token) {
             $user = $token->getUser();
             if ($user instanceof AbstractUser) {

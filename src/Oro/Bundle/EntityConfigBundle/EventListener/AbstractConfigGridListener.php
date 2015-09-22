@@ -144,41 +144,34 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     continue;
                 }
 
-                if (!isset($item['options']['indexed']) || $item['options']['indexed'] === false) {
+                $indexed = isset($item['options']['indexed']) && $item['options']['indexed'];
+                if ($indexed
+                    && isset($item['options']['indexed_type'])
+                    && $item['options']['indexed_type'] !== 'scalar'
+                    && ($item['grid']['type'] !== 'html' || !isset($item['grid']['template']))
+                ) {
                     throw new LogicException(
                         sprintf(
-                            'Option "indexed" should be set to TRUE for property "%s" in scope "%s".',
+                            'If the value of option "indexed_type" not "scalar" grid type should'
+                            . ' be set to "html" and grid template for rendering such value should be defined'
+                            . ' for property "%s" in scope "%s".',
                             $code,
                             $provider->getScope()
                         )
                     );
                 }
 
-                if (isset($item['options']['indexed_type']) && $item['options']['indexed_type'] !== 'scalar') {
-                    if ($item['grid']['type'] !== 'html' || !isset($item['grid']['template'])) {
-                        throw new LogicException(
-                            sprintf(
-                                'If the value of option "indexed_type" not "scalar" grid type should ' .
-                                'be set to "html" and grid template for rendering such value should be defined ' .
-                                'for property "%s" in scope "%s".',
-                                $code,
-                                $provider->getScope()
-                            )
-                        );
-                    }
-                }
-
                 $fieldName    = $provider->getScope() . '_' . $code;
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);
 
+                $attributes = ['field_name' => $fieldName];
+                if ($indexed) {
+                    $attributes['expression'] = $alias . $provider->getScope() . '_' . $code . '.value';
+                } else {
+                    $attributes['data_name'] = '[data][' . $provider->getScope() . '][' . $code . ']';
+                }
                 $field = [
-                    $fieldName => array_merge(
-                        $item['grid'],
-                        [
-                            'expression' => $alias . $provider->getScope() . '_' . $code . '.value',
-                            'field_name' => $fieldName,
-                        ]
-                    )
+                    $fieldName => array_merge($item['grid'], $attributes)
                 ];
 
                 if (isset($item['options']['priority']) && !isset($fields[$item['options']['priority']])) {
@@ -374,6 +367,9 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
                 if (!isset($item['grid'])) {
+                    continue;
+                }
+                if (!isset($item['options']['indexed']) || !$item['options']['indexed']) {
                     continue;
                 }
 

@@ -6,69 +6,49 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class McryptTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_KEY = 'someKey';
-
-    /** @var Mcrypt */
-    protected $encryptor;
-
-    protected function setUp()
-    {
-        $this->encryptor = $this->getInstance();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->encryptor);
-    }
-
     /**
      * Test two way encoding/decoding
+     *
+     * @dataProvider keyDataProvider
+     * @param string $key
      */
-    public function testEncodeDecode()
+    public function testEncodeDecode($key)
     {
         $someData = 'someValue';
 
-        $encrypted = $this->encryptor->encryptData($someData);
+        $encryptor = new Mcrypt($key);
+
+        $encrypted = $encryptor->encryptData($someData);
         $this->assertInternalType('string', $encrypted);
+        $this->assertNotEquals($someData, $encrypted);
 
-        $this->assertEquals($someData, $this->encryptor->decryptData($encrypted));
-    }
-
-    public function testEncodeDecodeDifferentInstances()
-    {
-        $someData = 'someValue';
-
-        $encrypted = $this->encryptor->encryptData($someData);
-
-        $newInstance = $this->getInstance();
-        $this->assertEquals($someData, $newInstance->decryptData($encrypted));
+        $this->assertEquals($someData, $encryptor->decryptData($encrypted));
     }
 
     /**
      * @dataProvider keyDataProvider
      * @param string $key
      */
-    public function testKeyLengthChecks($key)
+    public function testEncodeDecodeDifferentInstances($key)
     {
-        new Mcrypt($key);
+        $someData = 'someValue';
+
+        $encryptor = new Mcrypt($key);
+        $encrypted = $encryptor->encryptData($someData);
+        $this->assertNotEquals($someData, $encrypted);
+
+        $newInstance = new Mcrypt($key);
+        $this->assertEquals($someData, $newInstance->decryptData($encrypted));
     }
 
     public function keyDataProvider()
     {
         return array(
-            'null key' => array(null),
             '0 length' => array(''),
             '1 length' => array('a'),
+            'test key' => array('someKey'),
             '32 length' => array('1234567890123456789012'),
             '33 length' => array('12345678901234567890123')
         );
-    }
-
-    /**
-     * @return Mcrypt
-     */
-    protected function getInstance()
-    {
-        return new Mcrypt(self::TEST_KEY);
     }
 }

@@ -19,24 +19,16 @@ class OroRichTextType extends AbstractType
     const TOOLBAR_SMALL   = 'small';
     const TOOLBAR_LARGE   = 'large';
 
-    /**
-     * @var AssetHelper
-     */
+    /** @var AssetHelper */
     protected $assetHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var HtmlTagProvider
-     */
+    /** @var HtmlTagProvider */
     protected $htmlTagProvider;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
     /**
@@ -97,6 +89,18 @@ class OroRichTextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $assetsVersionBaseUrl   = '';
+        $assetsVersionFormatted = '';
+        if ($this->assetHelper) {
+            /**
+             * As we can't get "assets_version_format" parameter and method "getVersion" returns only version value
+             * without any formatting - we have to calculate formatted version url's parameter to be used inside
+             * WYSIWYG editor.
+             */
+            $assetsVersionBaseUrl   = $this->assetHelper->getUrl('/');
+            $assetsVersionFormatted = substr($assetsVersionBaseUrl, strrpos($assetsVersionBaseUrl, '/') + 1);
+        }
+
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
@@ -107,10 +111,12 @@ class OroRichTextType extends AbstractType
             'relative_urls'      => false,
             'remove_script_host' => false,
             'convert_urls'       => true,
+            'cache_suffix'       => $assetsVersionFormatted,
+            'document_base_url'  => $assetsVersionBaseUrl
         ];
 
         $defaults = [
-            'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
+            'wysiwyg_enabled' => (bool) $this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => $defaultWysiwygOptions,
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
@@ -148,19 +154,10 @@ class OroRichTextType extends AbstractType
                 },
                 'attr'            => function (Options $options, $attr) {
                     $pageComponent  = $options->get('page-component');
-                    $wysiwygOptions = (array)$options->get('wysiwyg_options');
+                    $wysiwygOptions = (array) $options->get('wysiwyg_options');
 
-                    if ($this->assetHelper) {
-                        if (!empty($pageComponent['options']['content_css'])) {
-                            $pageComponent['options']['content_css'] = $this->assetHelper
-                                ->getUrl($pageComponent['options']['content_css']);
-                        }
-                        if (!empty($wysiwygOptions['skin_url'])) {
-                            $wysiwygOptions['skin_url'] = $this->assetHelper->getUrl($wysiwygOptions['skin_url']);
-                        }
-                    }
                     $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
-                    $pageComponent['options']['enabled'] = (bool)$options->get('wysiwyg_enabled');
+                    $pageComponent['options']['enabled'] = (bool) $options->get('wysiwyg_enabled');
 
                     $attr['data-page-component-module']  = $pageComponent['module'];
                     $attr['data-page-component-options'] = json_encode($pageComponent['options']);

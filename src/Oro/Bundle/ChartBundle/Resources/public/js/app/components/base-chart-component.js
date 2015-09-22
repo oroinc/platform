@@ -15,6 +15,7 @@ define(function(require) {
     BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
 
+        aspectRatio: 0.4,
         /**
          *
          * @constructor
@@ -87,7 +88,7 @@ define(function(require) {
 
             if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
-                $chart.height(Math.min(Math.round(chartWidth * 0.4), 350));
+                $chart.height(Math.min(Math.round(chartWidth * this.aspectRatio), 350));
                 return true;
             }
             return false;

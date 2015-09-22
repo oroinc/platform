@@ -267,11 +267,10 @@ define([
             var calendarUid = calendarAlias + '_' + calendarId;
             var el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
             if (el.length > 0) {
-                messenger.notificationFlashMessage('warning', __('This calendar already exists.'), {
-                    namespace: 'calendar-ns'
-                });
+                messenger.notificationFlashMessage('warning',
+                    __('oro.calendar.flash_message.calendar_already_exists'), {namespace: 'calendar-ns'});
             } else {
-                savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
+                savingMsg = messenger.notificationMessage('warning', __('oro.calendar.flash_message.calendar_adding'));
                 try {
                     model = new ConnectionModel({
                         targetCalendar: this.options.calendar,
@@ -285,9 +284,8 @@ define([
                         wait: true,
                         success: _.bind(function() {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was added.'), {
-                                namespace: 'calendar-ns'
-                            });
+                            messenger.notificationFlashMessage('success',
+                                __('oro.calendar.flash_message.calendar_added'), {namespace: 'calendar-ns'});
                         }, this),
                         error: _.bind(function(collection, response) {
                             savingMsg.close();
@@ -318,7 +316,8 @@ define([
         },
 
         _showItem: function(model, visible) {
-            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+            var savingMsg = messenger.notificationMessage('warning',
+                __('oro.calendar.flash_message.calendar_updating'));
             var $connection = this.findItem(model);
             this._removeVisibilityButtonEventListener($connection, model);
             this.setItemVisibility($connection, visible ? model.get('backgroundColor') : '');
@@ -327,9 +326,8 @@ define([
                     wait: true,
                     success: _.bind(function() {
                         savingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was updated.'), {
-                            namespace: 'calendar-ns'
-                        });
+                        messenger.notificationFlashMessage('success',
+                            __('oro.calendar.flash_message.calendar_updated'), {namespace: 'calendar-ns'});
                         this._addVisibilityButtonEventListener($connection, model);
                         if (this._actionSyncObject) {
                             this._actionSyncObject.resolve();

@@ -21,6 +21,7 @@ parameters:
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.autocomplete.user.organization_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
     oro_user.autocomplete.role.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+    oro_user.autocomplete.role.authenticated_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\AuthenticatedRolesHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
     oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.email_recipients_provider.class:     Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider
@@ -185,6 +186,16 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
 
+    # Autocomplete role search handler for authenticated roles
+    oro_user.autocomplete.role.authenticated_search_handler:
+        class: %oro_user.autocomplete.role.authenticated_search_handler.class%
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_user.role.entity.class%
+            - ["label"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
+
     oro_user.gender_provider:
         class: %oro_user.gender_provider.class%
         arguments:
@@ -262,6 +273,7 @@ services:
             - oro_user_password_change_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 100 }
+            - { name: oro_ui.update_action_provider, group: activity, priority: 100 }
 
     oro_user.password_reset.widget_provider.actions:
         parent: oro_ui.widget_provider.action_button.abstract
@@ -270,6 +282,7 @@ services:
             - oro_user_password_reset_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 110 }
+            - { name: oro_ui.update_action_provider, group: activity, priority: 110 }
 
     security.user_checker:
         class: %oro_user.security.user_checker.class%

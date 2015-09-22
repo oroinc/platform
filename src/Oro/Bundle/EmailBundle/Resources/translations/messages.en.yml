@@ -165,6 +165,8 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        message_type:
+            label:                Message type
         folder_type:
             label:                Folder type
             sent:                 Sent
