@@ -49,7 +49,6 @@ class FieldTypeTest extends TypeTestCase
             'integer'   => 'oro.entity_extend.form.data_type.integer',
             'money'     => 'oro.entity_extend.form.data_type.money',
             'multiEnum' => 'oro.entity_extend.form.data_type.multiEnum',
-            'optionSet' => 'oro.entity_extend.form.data_type.optionSet',
             'percent'   => 'oro.entity_extend.form.data_type.percent',
             'smallint'  => 'oro.entity_extend.form.data_type.smallint',
             'string'    => 'oro.entity_extend.form.data_type.string',

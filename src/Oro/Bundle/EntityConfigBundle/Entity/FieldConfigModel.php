@@ -42,12 +42,6 @@ class FieldConfigModel extends AbstractConfigModel
     protected $indexedValues;
 
     /**
-     * @var ArrayCollection|OptionSet[]
-     * @ORM\OneToMany(targetEntity="OptionSet", mappedBy="field", cascade={"all"})
-     */
-    protected $options;
-
-    /**
      * @var string
      * @ORM\Column(name="field_name", type="string", length=255)
      */
@@ -135,25 +129,6 @@ class FieldConfigModel extends AbstractConfigModel
     public function getEntity()
     {
         return $this->entity;
-    }
-
-    /**
-     * @return ArrayCollection|OptionSet[]
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param ArrayCollection $options
-     * @return $this
-     */
-    public function setOptions($options)
-    {
-        $this->options = $options;
-
-        return $this;
     }
 
     /**

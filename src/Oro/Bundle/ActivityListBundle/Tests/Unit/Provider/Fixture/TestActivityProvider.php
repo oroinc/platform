@@ -130,4 +130,36 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        return $entity->createdAt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
+    {
+        return $entity->updatedAt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedBy($entity)
+    {
+        return $entity->updatedBy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOwner($entity)
+    {
+        return $entity->owner;
+    }
 }

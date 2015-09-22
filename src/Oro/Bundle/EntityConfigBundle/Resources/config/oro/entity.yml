@@ -5,5 +5,3 @@ oro_entity:
         - Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue
         - Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel
         - Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
-        - Oro\Bundle\EntityConfigBundle\Entity\OptionSet
-        - Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation

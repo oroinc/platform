@@ -2,38 +2,56 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 
-class DataStorageExtension
+use Oro\Bundle\MigrationBundle\Migration\DataStorageInterface;
+
+/**
+ * This extension can be used if you need to exchange data between different migrations
+ */
+class DataStorageExtension implements DataStorageInterface
 {
     /** @var array */
-    protected $storage = [];
+    protected $data = [];
 
     /**
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    public function get($key, $default = null)
-    {
-        return $this->has($key) ? $this->storage[$key] : $default;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function has($key)
     {
-        return array_key_exists($key, $this->storage);
+        return array_key_exists($key, $this->data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key, $default = null)
+    {
+        return $this->has($key) ? $this->data[$key] : $default;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value)
+    {
+        $this->data[$key] = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        unset($this->data[$key]);
     }
 
     /**
      * @param string $key
      * @param mixed  $value
+     *
+     * @deprecated since 1.9. use {@see set} method instead
      */
     public function put($key, $value)
     {
-        $this->storage[$key] = $value;
+        $this->data[$key] = $value;
     }
 }
