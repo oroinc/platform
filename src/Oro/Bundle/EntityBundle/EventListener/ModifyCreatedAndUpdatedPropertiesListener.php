@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
@@ -17,8 +17,8 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
 {
-    /** @var ServiceLink */
-    protected $securityFacadeLink;
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
 
     /** @var bool */
     protected $enabled = true;
@@ -34,11 +34,11 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     protected $entityManager;
 
     /**
-     * @param ServiceLink $securityFacadeLink
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(ServiceLink $securityFacadeLink)
+    public function __construct(TokenStorageInterface $tokenStorage)
     {
-        $this->securityFacadeLink = $securityFacadeLink;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -79,7 +79,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      */
     protected function updateChangeSets($entity)
     {
@@ -89,7 +89,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return ClassMetadata
      */
@@ -104,7 +104,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return bool
      */
@@ -149,7 +149,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @param object                 $entity
+     * @param object $entity
      *
      * @return bool
      */
@@ -169,9 +169,17 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     protected function getUser()
     {
-        /** @var User $user */
-        $user = $this->securityFacadeLink->getService()->getLoggedUser();
-        if ($user && $this->entityManager->getUnitOfWork()->getEntityState($user) === UnitOfWork::STATE_DETACHED) {
+        if (!$token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        $user = $token->getUser();
+
+        /**
+         * Check cases when user is not in the entity manager
+         * (e.g. after clear or if it is in the different entity manager)
+         */
+        if ($user instanceof User && !$this->entityManager->contains($user)) {
             $user = $this->entityManager->find('OroUserBundle:User', $user->getId());
         }
 

@@ -43,13 +43,6 @@ interface ActivityListProviderInterface
     public function getOwner($entity);
 
     /**
-     * @param object $entity
-     *
-     * @return User|null
-     */
-    public function getUpdatedBy($entity);
-
-    /**
      * Get array of ActivityOwners for list entity
      *
      * @param object $entity

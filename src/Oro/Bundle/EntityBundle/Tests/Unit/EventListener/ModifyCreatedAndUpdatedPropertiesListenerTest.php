@@ -14,25 +14,17 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityFacade;
+    protected $tokenStorage;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $securityFacadeLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+        $this->tokenStorage = $this->getMockBuilder(
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage'
         )
             ->disableOriginalConstructor()
             ->getMock();
 
-        $securityFacadeLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->securityFacade);
-
-        $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($securityFacadeLink);
+        $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($this->tokenStorage);
     }
 
     public function testOptionalListenerInterfaceImplementation()
@@ -77,9 +69,13 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $currentToken->expects($this->once())
+            ->method('getUser')
             ->willReturn($currentUser);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($currentToken);
 
         $updatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
         $updatedByAwareEntity->expects($this->once())
@@ -129,9 +125,13 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
+        $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $currentToken->expects($this->once())
+            ->method('getUser')
             ->willReturn($currentUser);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($currentToken);
 
         $updatedByAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface');
         $updatedByAwareEntity->expects($this->once())
@@ -179,6 +179,9 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadataStub);
+        $entityManager->expects($this->once())
+            ->method('contains')
+            ->willReturn(true);
 
         $args->expects($this->any())
             ->method('getEntityManager')
