@@ -7,8 +7,9 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\EntityBundle\ORM\QueryHintResolver;
 
 class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
 {

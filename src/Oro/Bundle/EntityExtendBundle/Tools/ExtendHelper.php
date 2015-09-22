@@ -124,12 +124,13 @@ class ExtendHelper
      *
      * @param string $entityClassName
      * @param string $fieldName
+     * @param string $maxEnumCodeSize
      *
      * @return string The enum code.
      *
      * @throws \InvalidArgumentException
      */
-    public static function generateEnumCode($entityClassName, $fieldName)
+    public static function generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize = null)
     {
         if (empty($entityClassName)) {
             throw new \InvalidArgumentException('$entityClassName must not be empty.');
@@ -137,13 +138,35 @@ class ExtendHelper
         if (empty($fieldName)) {
             throw new \InvalidArgumentException('$fieldName must not be empty.');
         }
+        if (null !== $maxEnumCodeSize && $maxEnumCodeSize < 21) {
+            throw new \InvalidArgumentException('$maxEnumCodeSize must be greater or equal than 21 chars.');
+        }
 
-        return sprintf(
+        $shortClassName = self::getShortClassName($entityClassName);
+
+        $enumCode = sprintf(
             '%s_%s_%s',
-            Inflector::tableize(self::getShortClassName($entityClassName)),
+            Inflector::tableize($shortClassName),
             Inflector::tableize($fieldName),
             dechex(crc32($entityClassName . '::' . $fieldName))
         );
+
+        if (null !== $maxEnumCodeSize && strlen($enumCode) > $maxEnumCodeSize) {
+            $enumCode = sprintf(
+                '%s_%s',
+                Inflector::tableize($shortClassName),
+                dechex(crc32($entityClassName . '::' . $fieldName))
+            );
+            if (strlen($enumCode) > $maxEnumCodeSize) {
+                $enumCode = sprintf(
+                    'enum_%s_%s',
+                    dechex(crc32($shortClassName)),
+                    dechex(crc32($entityClassName . '::' . $fieldName))
+                );
+            }
+        }
+
+        return $enumCode;
     }
 
     /**

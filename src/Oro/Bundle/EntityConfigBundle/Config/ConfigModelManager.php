@@ -291,7 +291,7 @@ class ConfigModelManager
      * @param string $mode Can be the value of one of ConfigModelManager::MODE_* constants
      *
      * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
-     * @return bool TRUE if the type was changed; otherwise, FALSE
+     * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
     public function changeFieldMode($className, $fieldName, $mode)
     {

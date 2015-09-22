@@ -48,7 +48,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setId(1);
 
-        $this->emailUser->expects($this->exactly(2))
+        $this->emailUser->expects($this->exactly(1))
             ->method('getOwner')
             ->willReturn($user);
 
@@ -63,7 +63,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 json_encode(['hasNewEmail' => true])
             );
 
-        $this->processor->send([['entity' => $this->emailUser, 'new' => 1]]);
+        $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 1]]);
     }
 
     public function testSendNotNewEntity()
@@ -73,7 +73,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->setId(1);
 
-        $this->emailUser->expects($this->exactly(2))
+        $this->emailUser->expects($this->exactly(1))
             ->method('getOwner')
             ->willReturn($user);
 
@@ -88,7 +88,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 json_encode(['hasNewEmail' => false])
             );
 
-        $this->processor->send([['entity' => $this->emailUser, 'new' => 0]]);
+        $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 0]]);
     }
 
     public function testSendFailure()

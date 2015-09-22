@@ -53,6 +53,8 @@ class User extends AbstractPageEntity
     protected $tags;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $inviteUser;
+    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $encryption;
 
     public function init($new = false)
     {
@@ -67,6 +69,7 @@ class User extends AbstractPageEntity
             ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_enabled']"));
         $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_firstName']");
         $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_lastName']");
+        $this->middleName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_middleName']");
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
@@ -165,6 +168,13 @@ class User extends AbstractPageEntity
     public function getLastName()
     {
         return $this->lastName->value();
+    }
+
+    public function setMiddleName($name)
+    {
+        $this->middleName->clear();
+        $this->middleName->value($name);
+        return $this;
     }
 
     public function setEmail($email)
@@ -351,6 +361,41 @@ class User extends AbstractPageEntity
             "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
             "ui-dialog-normal']"
         );
+
+        return $this;
+    }
+
+    /**
+     * Method configure user IMAP sync
+     * @param array $imapSetting
+     * @return $this
+     */
+    public function setImap($imapSetting)
+    {
+        $this->test->byXpath(
+            "//div[@class='control-group imap-config check-connection']" .
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_useImap']"
+        )->click();
+        $this->waitForAjax();
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapHost']"
+        )->value($imapSetting['host']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapPort']"
+        )->value($imapSetting['port']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_user']"
+        )->value($imapSetting['user']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_password']"
+        )->value($imapSetting['password']);
+        $this->encryption = $this->test
+            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
+        $this->encryption->selectOptionByLabel($imapSetting['encryption']);
+        $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
+        $this->test->byXPath("//div[@class='control-group folder-tree']//input[@id='check-all']")->click();
 
         return $this;
     }

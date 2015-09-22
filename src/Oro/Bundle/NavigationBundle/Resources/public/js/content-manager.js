@@ -311,6 +311,15 @@ define([
         },
 
         /**
+         * Return information about current page
+         *
+         * @return {Object}
+         */
+        getCurrent: function() {
+            return current;
+        },
+
+        /**
          * Saves state of a page component in a cache
          *
          * @param {string} key

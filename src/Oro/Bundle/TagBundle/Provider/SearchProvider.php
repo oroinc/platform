@@ -83,7 +83,6 @@ class SearchProvider extends ResultStatisticsProvider
                 $item['recordId'],
                 null,
                 null,
-                null,
                 $this->mapper->getEntityConfig($entityName)
             );
         }
