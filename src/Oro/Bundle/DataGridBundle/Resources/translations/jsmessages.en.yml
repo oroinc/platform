@@ -67,3 +67,4 @@ oro:
         inlineEditing:
             successMessage: "Record has been succesfully updated"
             helpMessage: "Double click on cell to edit"
+            loadingError: "Cannot load component or view for inline grid editor"

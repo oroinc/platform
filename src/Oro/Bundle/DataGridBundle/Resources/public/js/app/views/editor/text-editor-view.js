@@ -9,10 +9,26 @@ define(function(require) {
     TextEditorView = BaseView.extend({
         autoRender: true,
         template: require('tpl!../../../../templates/text-editor.html'),
+        className: 'text-editor',
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
             'click [data-action]': 'rethrowAction'
+        },
+
+        initialize: function(options) {
+            this.options = options;
+            this.cell = options.cell;
+            this.column = options.column;
+            TextEditorView.__super__.initialize.apply(this, arguments);
+        },
+
+        getTemplateData: function() {
+            var data = {};
+            data.data = this.model.toJSON();
+            data.column = this.column.toJSON();
+            data.value = this.getModelValue();
+            return data;
         },
 
         /**
@@ -20,10 +36,11 @@ define(function(require) {
          */
         render: function() {
             TextEditorView.__super__.render.call(this);
+            this.$el.addClass(_.result(this, 'className'));
             this.validator = this.$el.validate({
                 submitHandler: _.bind(this.onSave, this),
                 rules: {
-                    value: this.model.get('validationRules') || {}
+                    value: this.getValidationRules()
                 }
             });
             this.onChange();
@@ -33,22 +50,27 @@ define(function(require) {
             this.$('input[name=value]').focus();
         },
 
-        updateModel: function() {
-            this.model.set({
-                value: this.$('input[name=value]').val(),
-                valid: this.$('input[name=value]').valid()
-            });
+        getValidationRules: function() {
+            return this.column.get('validationRules') || {};
+        },
+
+        getModelValue: function() {
+            return this.model.get(this.column.get('name'));
+        },
+
+        getValue: function() {
+            var data = {};
+            data[this.column.get('name')] = this.$('input[name=value]').val();
+            return data;
         },
 
         onSave: function() {
-            this.updateModel();
-            this.trigger('saveAction');
+            this.trigger('saveAction', this.getValue());
         },
 
         rethrowAction: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            this.updateModel();
             this.trigger($(e.currentTarget).attr('data-action') + 'Action');
         },
 

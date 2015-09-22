@@ -5,14 +5,11 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var $ = require('jquery');
-    var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var RouteModel = require('oroui/js/app/models/route-model');
-    var TextEditorComponent = require('orodatagrid/js/app/components/editor/text-editor-component');
-    var overlayTool = require('oroui/js/tools/overlay');
-
-    require('oroui/lib/jquery/jquery.disablescroll');
+    require('orodatagrid/js/app/components/cell-popup-editor-component');
+    require('orodatagrid/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
 
@@ -22,6 +19,16 @@ define(function(require) {
          * @type {boolean}
          */
         editModeEnabled: false,
+
+        /**
+         * This component is used by default for inline editing
+         */
+        DEFAULT_COMPONENT: 'orodatagrid/js/app/components/cell-popup-editor-component',
+
+        /**
+         * This view is used by default for editing
+         */
+        DEFAULT_VIEW: 'orodatagrid/js/app/views/editor/text-editor-view',
 
         initialize: function() {
             this.listenTo(this.main, 'beforeParseOptions', this.onBeforeParseOptions);
@@ -41,27 +48,31 @@ define(function(require) {
                 if (this.column.get('editable')) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    this.$el.popover({
+                        content: __('oro.datagrid.inlineEditing.helpMessage'),
+                        container: document.body,
+                        placement: 'bottom',
+                        delay: {show: 1400, hide: 0},
+                        trigger: 'hover',
+                        animation: false
+                    });
                 }
-                this.$el.popover({
-                    content: __('oro.datagrid.inlineEditing.helpMessage'),
-                    container: document.body,
-                    placement: 'bottom',
-                    delay: {show: 1400, hide: 0},
-                    trigger: 'hover',
-                    animation: false
-                });
                 return result;
             };
             cell.events = _.extend({}, cell.events, {
                 'dblclick': function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    _this.enterEditMode(cell);
+                    if (this.column.get('editable')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        _this.enterEditMode(cell);
+                    }
                 },
                 'click .icon-edit': function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    _this.enterEditMode(cell);
+                    if (this.column.get('editable')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        _this.enterEditMode(cell);
+                    }
                 }
             });
 
@@ -76,13 +87,31 @@ define(function(require) {
         onBeforeParseOptions: function(options) {
             var columnsMetadata = options.metadata.columns;
             var columns = options.columns;
+            var preloadList = [];
             for (var i = 0; i < columns.length; i++) {
                 var column = columns[i];
                 var columnMetadata = _.findWhere(columnsMetadata, {name: column.name});
                 if (columnMetadata) {
                     column.validationRules = columnMetadata.validation_rules;
+                    if (columnMetadata.cell_editor) {
+                        column.cellEditorComponent = columnMetadata.cell_editor.component ||
+                            this.DEFAULT_COMPONENT;
+                        column.cellEditorView = columnMetadata.cell_editor.view ||
+                            this.DEFAULT_VIEW;
+                        column.cellEditorOptions = columnMetadata.cell_editor.options || {};
+                        preloadList.push(column.cellEditorComponent);
+                        preloadList.push(column.cellEditorView);
+                    } else {
+                        column.cellEditorComponent = this.DEFAULT_COMPONENT;
+                        column.cellEditorView = this.DEFAULT_VIEW;
+                        column.cellEditorOptions = {};
+                    }
                 }
             }
+
+            require(_.uniq(preloadList), _.noop, this._onRequireJsError);
+
+            // initialize route which will be used for saving
             this.route = new RouteModel({
                 routeName: options.metadata.inline_editing.route_name
             });
@@ -94,62 +123,57 @@ define(function(require) {
                 this.exitEditMode();
             }
             this.editModeEnabled = true;
+            this.currentCell = cell;
             var _this = this;
+            cell.$el.parent('tr:first').addClass('row-edit-mode');
+            cell.$el.removeClass('view-mode');
+            cell.$el.addClass('edit-mode');
 
-            var dataModel = new Backbone.Model({
-                value: cell.model.get(cell.column.get('name')),
-                validationRules: cell.column.get('validationRules')
-            });
+            require([
+                cell.column.get('cellEditorComponent'),
+                cell.column.get('cellEditorView')
+            ], function(CellEditorComponent, CellEditorView) {
+                var editorComponent = new CellEditorComponent({
+                    cell: cell,
+                    view: CellEditorView,
+                    viewOptions: cell.column.get('cellEditorOptions')
+                });
 
-            var editorComponent = new TextEditorComponent({
-                model: dataModel,
-                _sourceElement: $('<form class="inline-editor-wrapper"></form>')
-            });
+                _this.editorComponent = editorComponent;
 
-            this.dataModel = dataModel;
-            this.editorComponent = editorComponent;
-
-            overlayTool.createOverlay(editorComponent.view.$el, {
-                position: {
-                    my: 'left top',
-                    at: 'left-5 top-8',
-                    of: cell.$el,
-                    collision: 'flipfit'
-                }
-            });
-
-            editorComponent.view.focus();
-
-            editorComponent.on('saveAction', function() {
-                cell.$el.addClass('loading');
-                var ctx = {
-                    cell: cell
-                };
-                _this.sendRequest(dataModel, cell)
-                    .done(_.bind(_this.onSaveSuccess, ctx))
-                    .fail(_.bind(_this.onSaveError, ctx))
-                    .always(function() {
-                        cell.$el.removeClass('loading');
-                    });
-                _this.exitEditMode();
-            });
-            editorComponent.on('cancelAction', function() {
-                _this.exitEditMode();
+                editorComponent.on('saveAction', function(data) {
+                    cell.$el.addClass('loading');
+                    var ctx = {
+                        cell: cell,
+                        oldValue: cell.model.get(cell.column.get('name'))
+                    };
+                    _this.sendRequest(data, cell)
+                        .done(_.bind(_this.onSaveSuccess, ctx))
+                        .fail(_.bind(_this.onSaveError, ctx))
+                        .always(function() {
+                            cell.$el.removeClass('loading');
+                        });
+                    _this.exitEditMode(cell);
+                });
+                editorComponent.on('cancelAction', function() {
+                    _this.exitEditMode(cell);
+                });
             });
         },
 
         exitEditMode: function() {
             this.editModeEnabled = false;
-            overlayTool.removeOverlay(this.editorComponent.view.$el);
-            this.dataModel.dispose();
+            if (this.currentCell.$el) {
+                this.currentCell.$el.parent('tr:first').removeClass('row-edit-mode');
+                this.currentCell.$el.addClass('view-mode');
+                this.currentCell.$el.removeClass('edit-mode');
+            }
             this.editorComponent.dispose();
             delete this.dataModel;
             delete this.editorComponent;
         },
 
-        sendRequest: function(dataModel, cell) {
-            var data = {};
-            data[cell.column.get('name')] = dataModel.get('value');
+        sendRequest: function(data, cell) {
             cell.model.set(data);
             return $.ajax({
                 headers: {
@@ -165,17 +189,28 @@ define(function(require) {
         onSaveSuccess: function() {
             if (!this.cell.disposed && this.cell.$el) {
                 var _this = this;
-                this.cell.$el.addClass('successfully-saved');
+                this.cell.$el.addClass('save-success');
                 _.delay(function() {
-                    _this.cell.$el.removeClass('successfully-saved');
+                    _this.cell.$el.removeClass('save-success');
                 }, 2000);
             }
             mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.successMessage'));
         },
 
         onSaveError: function() {
-            // placeholder for now
+            if (!this.cell.disposed && this.cell.$el) {
+                var _this = this;
+                this.cell.$el.addClass('save-fail');
+                _.delay(function() {
+                    _this.cell.$el.removeClass('save-fail');
+                }, 2000);
+            }
+            this.cell.model.set(this.cell.column.get('name'), this.oldValue);
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+        },
+
+        _onRequireJsError: function() {
+            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
         }
     });
 

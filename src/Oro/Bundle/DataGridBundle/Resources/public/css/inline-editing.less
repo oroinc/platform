@@ -1,10 +1,17 @@
 .grid {
+  .row-edit-mode {
+    background: #FFFCEC;
+  }
   .editable {
-    &.successfully-saved {
+    &.save-success {
       background: #F4FEE2;
+    }
+    &.save-fail {
+      background: #FFEEEE;
     }
     &.edit-mode {
       position: relative;
+      background: #F4EFD4;
       > .icon-edit {
         display: none !important;
       }
@@ -41,12 +48,12 @@
         display: none !important;
       }
       &:before {
-        background: url('../../oroui/img/loader-16.gif') no-repeat center center;
+        background: url('../../oroui/img/loader-16.gif') no-repeat center center #f5f5f5;
         display: block !important;
         content: "";
         position: absolute;
         top: 0;
-        right: -3px;
+        right: 1px;
         width: 29px;
         height: 29px;
       }
@@ -72,5 +79,18 @@
   }
   .validation-failed:last-child {
     margin-bottom: 0px
+  }
+  &.text-editor {
+    width: 349px;
+    input[name=value] {
+      width: 260px;
+    }
+  }
+  &.number-editor {
+    width: 189px;
+    input[name=value] {
+      // about 10+2 digits
+      width: 100px;
+    }
   }
 }
