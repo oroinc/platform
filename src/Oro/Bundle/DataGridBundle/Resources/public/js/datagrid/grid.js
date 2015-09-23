@@ -19,6 +19,7 @@ define(function(require) {
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     /**
      * Basic grid class.
@@ -709,13 +710,42 @@ define(function(require) {
             }
         },
 
+        /**
+         * Ensure that cell is visible. Works like cell.el.scrollIntoView, but in more appropriate way
+         *
+         * @param cell
+         */
         ensureCellIsVisible: function(cell) {
             var e = $.Event('ensureCellIsVisible');
             this.trigger('ensureCellIsVisible', e, cell);
             if (e.isDefaultPrevented()) {
                 return;
             }
-            cell.el.scrollIntoView();
+            scrollHelper.scrollIntoView(cell.el);
+        },
+
+        /**
+         * Finds cell by corresponding model and column
+         *
+         * @param model
+         * @param column
+         * @return {Backgrid.Cell}
+         */
+        findCell: function(model, column) {
+            var rows = this.body.rows;
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.model === model) {
+                    var cells = row.cells;
+                    for (var j = 0; j < cells.length; j++) {
+                        var cell = cells[j];
+                        if (cell.column === column) {
+                            return cell;
+                        }
+                    }
+                }
+            }
+            return null;
         }
     });
 

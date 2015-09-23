@@ -183,7 +183,12 @@ define(function(require) {
         },
 
         editNextCell: function() {
-            // console.log('edit next');
+            var nextCell = this.findNextEditableCell(this.currentCell);
+            if (nextCell) {
+                this.enterEditMode(nextCell);
+            } else {
+                this.exitEditMode();
+            }
         },
 
         saveCurrentCellAndEditNext: function(data) {
@@ -205,7 +210,28 @@ define(function(require) {
         },
 
         findNextEditableCell: function(cell) {
-            // console.log(cell);
+            function next(model) {
+                var index = 1 + model.collection.indexOf(model);
+                if (index < model.collection.length) {
+                    return model.collection.at(index);
+                }
+                return null;
+            }
+            var row = cell.model;
+            var column = cell.column;
+            var columns = column.collection;
+            do {
+                column = next(column);
+                while (column) {
+                    if (column.get('editable')) {
+                        return this.main.findCell(row, column);
+                    }
+                    column = next(column);
+                }
+                column = columns.at(0);
+                row = next(row);
+            } while (row);
+            return null;
         },
 
         onSaveSuccess: function() {

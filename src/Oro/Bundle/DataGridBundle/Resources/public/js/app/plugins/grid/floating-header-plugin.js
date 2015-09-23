@@ -44,6 +44,7 @@ define(function(require) {
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
             this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
             this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
+            this.listenTo(this.grid, 'ensureCellIsVisible', this.ensureCellIsVisible);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
             FloatingHeaderPlugin.__super__.enable.call(this);
@@ -399,6 +400,23 @@ define(function(require) {
                 }
             }
             this._lastClientRect = scrollContainerRect;
+        },
+
+        ensureCellIsVisible: function(e, cell) {
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+            if (this.currentFloatTheadMode in {relative: true, fixed: true}) {
+                var _this = this;
+                scrollHelper.scrollIntoView(cell.el, function(el, rect) {
+                    if (_this.domCache.gridScrollableContainer &&
+                        _this.domCache.gridScrollableContainer.length &&
+                        el === _this.domCache.gridScrollableContainer[0]) {
+                        rect.top += _this.headerHeight;
+                    }
+                });
+                e.preventDefault();
+            }
         }
     });
 
