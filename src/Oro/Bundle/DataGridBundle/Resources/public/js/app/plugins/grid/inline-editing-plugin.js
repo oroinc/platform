@@ -60,7 +60,7 @@ define(function(require) {
                 return result;
             };
             function enterEditModeIfNeeded(e) {
-                if (_this.column.get('editable')) {
+                if (cell.column.get('editable')) {
                     _this.enterEditMode(cell);
                 }
                 e.preventDefault();
