@@ -3,35 +3,53 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class UpdateExtendConfigMigration implements Migration
+class UpdateExtendConfigMigration implements Migration, DataStorageExtensionAwareInterface
 {
-    /**
-     * @var CommandExecutor
-     */
+    /** @var CommandExecutor */
     protected $commandExecutor;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $configProcessorOptionsPath;
+
+    /** @var string */
+    protected $initialEntityConfigStatePath;
+
+    /** @var DataStorageExtension */
+    protected $dataStorageExtension;
 
     /**
      * @param CommandExecutor $commandExecutor
      * @param string          $configProcessorOptionsPath
+     * @param string          $initialEntityConfigStatePath
      */
-    public function __construct(CommandExecutor $commandExecutor, $configProcessorOptionsPath)
-    {
-        $this->commandExecutor            = $commandExecutor;
-        $this->configProcessorOptionsPath = $configProcessorOptionsPath;
+    public function __construct(
+        CommandExecutor $commandExecutor,
+        $configProcessorOptionsPath,
+        $initialEntityConfigStatePath
+    ) {
+        $this->commandExecutor              = $commandExecutor;
+        $this->configProcessorOptionsPath   = $configProcessorOptionsPath;
+        $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     */
+    public function setDataStorageExtension(DataStorageExtension $dataStorageExtension)
+    {
+        $this->dataStorageExtension = $dataStorageExtension;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
@@ -41,6 +59,13 @@ class UpdateExtendConfigMigration implements Migration
                     $schema->getExtendOptions(),
                     $this->commandExecutor,
                     $this->configProcessorOptionsPath
+                )
+            );
+            $queries->addQuery(
+                new RefreshExtendConfigMigrationQuery(
+                    $this->commandExecutor,
+                    $this->dataStorageExtension->get('initial_entity_config_state', []),
+                    $this->initialEntityConfigStatePath
                 )
             );
             $queries->addQuery(

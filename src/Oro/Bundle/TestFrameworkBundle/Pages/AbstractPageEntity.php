@@ -260,6 +260,8 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function verifyActivity($activityType, $activityName)
     {
+        $this->test->moveto($this->test->byXPath("//*[@class='container-fluid accordion']"));
+        $this->filterByMultiselect('Activity Type', [$activityType]);
         $this->assertElementPresent(
             "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$activityName}')]".

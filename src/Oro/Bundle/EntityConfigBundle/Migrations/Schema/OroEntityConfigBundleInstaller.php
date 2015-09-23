@@ -14,7 +14,7 @@ class OroEntityConfigBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -65,12 +65,8 @@ class OroEntityConfigBundleInstaller implements Installation
 
         OroEntityConfigBundle::oroEntityConfigLogTable($schema);
         OroEntityConfigBundle::oroEntityConfigLogDiffTable($schema);
-        OroEntityConfigBundle::oroEntityConfigOptionsetTable($schema);
-        OroEntityConfigBundle::oroEntityConfigOptionsetRelationTable($schema, 'oro_entity_config_optset_rel');
 
         OroEntityConfigBundle::oroEntityConfigLogDiffForeignKeys($schema);
-        OroEntityConfigBundle::oroEntityConfigOptionsetForeignKeys($schema);
-        OroEntityConfigBundle::oroEntityConfigOptionsetRelationForeignKeys($schema, 'oro_entity_config_optset_rel');
         OroEntityConfigBundle::oroEntityConfigFieldForeignKeys($schema);
         OroEntityConfigBundle::oroEntityConfigLogForeignKeys($schema);
     }

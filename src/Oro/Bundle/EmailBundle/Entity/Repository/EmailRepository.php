@@ -14,9 +14,9 @@ class EmailRepository extends EntityRepository
     /**
      * Gets emails by ids
      *
-     * @param array $ids
+     * @param int[] $ids
      *
-     * @return array
+     * @return Email[]
      */
     public function findEmailsByIds($ids)
     {
@@ -49,9 +49,9 @@ class EmailRepository extends EntityRepository
     /**
      * Get $limit last emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
-     * @param $limit
+     * @param int          $limit
      *
      * @return mixed
      */
@@ -73,7 +73,7 @@ class EmailRepository extends EntityRepository
     /**
      * Get count new emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
      *
      * @return mixed
@@ -97,6 +97,7 @@ class EmailRepository extends EntityRepository
      *
      * @param object $entity
      * @param string $ownerColumnName
+     *
      * @return array
      */
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)

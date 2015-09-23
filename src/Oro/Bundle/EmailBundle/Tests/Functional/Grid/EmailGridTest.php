@@ -8,7 +8,6 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class EmailGridTest extends AbstractDatagridTestCase

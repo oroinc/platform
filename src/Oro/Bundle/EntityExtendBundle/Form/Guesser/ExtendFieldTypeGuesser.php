@@ -121,10 +121,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 $options['empty_value'] = false;
                 $options['choices'] = ['No', 'Yes'];
                 break;
-            case 'optionSet':
-                $options['entityClassName'] = $className;
-                $options['entityFieldName'] = $fieldName;
-                break;
             case 'enum':
                 $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
                     ->get('enum_code');

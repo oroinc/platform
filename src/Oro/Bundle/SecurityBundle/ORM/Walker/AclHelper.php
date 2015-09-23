@@ -243,7 +243,7 @@ class AclHelper
      * @param Subselect|SelectStatement $select
      * @param string                    $permission
      *
-     * @return array
+     * @return array [whereConditions, joinConditions, shareCondition]
      */
     protected function processSelect($select, $permission)
     {
