@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -19,6 +20,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
@@ -77,23 +79,29 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // ask an email server to select the current folder
             $folderName = $folder->getFullName();
-            $this->manager->selectFolder($folderName);
+            try {
+                $this->manager->selectFolder($folderName);
+                $this->logger->notice(sprintf('The folder "%s" is selected.', $folderName));
 
-            // register the current folder in the entity builder
-            $this->emailEntityBuilder->setFolder($folder);
+                // register the current folder in the entity builder
+                $this->emailEntityBuilder->setFolder($folder);
 
-            // sync emails using this search query
-            $lastSynchronizedAt = $this->syncEmails($origin, $imapFolder);
-            $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
+                // sync emails using this search query
+                $lastSynchronizedAt = $this->syncEmails($origin, $imapFolder);
+                $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
 
-            $startDate = $folder->getSynchronizedAt();
-            $checkStartDate = clone $startDate;
-            $checkStartDate->modify('-1 month');
+                $startDate = $folder->getSynchronizedAt();
+                $checkStartDate = clone $startDate;
+                $checkStartDate->modify('-1 month');
 
-            // set seen flags from previously synchronized emails
-            $this->checkFlags($imapFolder, $checkStartDate);
+                // set seen flags from previously synchronized emails
+                $this->checkFlags($imapFolder, $checkStartDate);
 
-            $this->em->flush($folder);
+                $this->em->flush($folder);
+            } catch (UnselectableFolderException $e) {
+                $this->logger->notice(sprintf('The folder "%s" cannot be selected and was skipped.', $folderName));
+            }
+
             $this->cleanUp(true, $imapFolder->getFolder());
         }
 
