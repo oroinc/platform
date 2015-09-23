@@ -106,8 +106,8 @@ class EmailController extends Controller
     public function lastAction()
     {
         $request = $this->container->get('request_stack')->getCurrentRequest();
-        $maxEmailsDisplay = $request->get('limit');
-        $folderId = $request->get('folderId');
+        $maxEmailsDisplay = (int)$request->get('limit');
+        $folderId = (int)$request->get('folderId');
 
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
 

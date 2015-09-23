@@ -69,7 +69,7 @@ class EmailRepository extends EntityRepository
             ->setParameter('owner', $user)
             ->setMaxResults($limit);
 
-        if ($folderId) {
+        if ($folderId > 0) {
             $qb->leftJoin('eu.folder', 'f')
                ->andWhere('f.id = :folderId')
                ->setParameter('folderId', $folderId);
