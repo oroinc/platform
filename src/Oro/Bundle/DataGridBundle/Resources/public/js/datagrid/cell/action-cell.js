@@ -23,6 +23,9 @@ define([
         actions: undefined,
 
         /** @property {Array} */
+        actionsHideCount: 3,
+
+        /** @property {Array} */
         launchers: undefined,
 
         /** @property */
@@ -36,11 +39,28 @@ define([
         ),
 
         /** @property */
+        templateRow: _.template(
+            '<div class="more-bar-holder"></div>'
+        ),
+
+        /** @property */
+        listsContainerName: '.launchers-dropdown-menu',
+
+        /** @property */
         launchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
                 '<li><ul class="nav nav-pills icons-holder launchers-list"></ul></li>' +
             '<% } else { %>' +
                 '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+            '<% } %>'
+        ),
+
+        /** @property */
+        launchersListTemplateRow: _.template(
+            '<% if (withIcons) { %>' +
+                '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
+            '<% } else { %>' +
+                '<ul class="unstyled launchers-list"></ul>' +
             '<% } %>'
         ),
 
@@ -59,8 +79,13 @@ define([
         /**
          * Initialize cell actions and launchers
          */
-        initialize: function() {
+        initialize: function(options) {
+            var opts = options || {};
             this.subviews = [];
+
+            if (opts.actionsHideCount) {
+                this.actionsHideCount = opts.actionsHideCount;
+            }
 
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
@@ -157,10 +182,17 @@ define([
 
                 return this;
             }
+
+            if (this.launchers.length < this.actionsHideCount) {
+                this.template = this.templateRow;
+                this.launchersListTemplate = this.launchersListTemplateRow;
+                this.listsContainerName = '.more-bar-holder';
+            }
+
             this.$el.empty().append(this.template());
 
             launchers = this.getLaunchersByIcons();
-            $listsContainer = this.$('.launchers-dropdown-menu');
+            $listsContainer = this.$(this.listsContainerName);
 
             if (launchers.withIcons.length) {
                 this.renderLaunchersList(launchers.withIcons, {withIcons: true})
