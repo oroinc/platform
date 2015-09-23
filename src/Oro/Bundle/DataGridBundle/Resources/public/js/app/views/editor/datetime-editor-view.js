@@ -5,6 +5,8 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var moment = require('moment');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var TextEditorView = require('./text-editor-view');
     var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
@@ -44,6 +46,24 @@ define(function(require) {
 
         focus: function() {
             this.$('input.hasDatepicker').focus();
+        },
+
+        getModelValue: function() {
+            var raw = this.model.get(this.column.get('name'));
+            return datetimeFormatter.getMomentForBackendDateTime(raw);
+        },
+
+        getFormattedValue: function() {
+            return this.getModelValue().format(datetimeFormatter.backendFormats.datetime);
+        },
+
+        getValue: function() {
+            var raw = this.$('input[name=value]').val();
+            return moment.utc(raw, datetimeFormatter.backendFormats.datetime);
+        },
+
+        isChanged: function() {
+            return this.getValue().diff(this.getModelValue());
         }
     });
 
