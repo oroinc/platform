@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -154,6 +155,26 @@ class BusinessUnitController extends Controller
         return array(
             'entity' => $entity,
         );
+    }
+
+    /**
+     * @Route("/list", name="oro_business_unit_list")
+     */
+    public function listActin()
+    {
+        $results = $this->getDoctrine()->getManager()
+            ->getRepository('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')->findAll();
+
+        $response = [];
+        foreach ($results as $result) {
+            $response[] = [
+                'id' => $result->getId(),
+                'name' => $result->getName(),
+                'owner_id' => $result->getOwner() ? $result->getOwner()->getId() : null
+            ];
+        }
+
+        return new JsonResponse($response);
     }
 
     /**

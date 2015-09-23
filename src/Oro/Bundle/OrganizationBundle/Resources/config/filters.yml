@@ -1,0 +1,11 @@
+parameters:
+    oro_organization_filter.filter_business_unit.class:  Oro\Bundle\OrganizationBundle\Filter\BusinessUnitChoiceFilter
+
+services:
+    oro_organization_filter.filter_business_unit:
+        class: %oro_organization_filter.filter_business_unit.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }
