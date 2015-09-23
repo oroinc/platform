@@ -61,10 +61,10 @@ define(function(require) {
             };
             function enterEditModeIfNeeded(e) {
                 if (_this.column.get('editable')) {
-                    e.preventDefault();
-                    e.stopPropagation();
                     _this.enterEditMode(cell);
                 }
+                e.preventDefault();
+                e.stopPropagation();
             }
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
