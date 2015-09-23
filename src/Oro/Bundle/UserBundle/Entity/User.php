@@ -40,8 +40,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      defaultValues={
  *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
  *          "grouping"={
- *              "groups"={"dictionary"},
- *              "dictionaryValueField"="username"
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "search_field"={"username"}
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

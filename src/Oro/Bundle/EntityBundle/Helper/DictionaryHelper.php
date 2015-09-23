@@ -11,6 +11,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DictionaryHelper
 {
+    const DEFAULT_SEARCH_FIELD = 'label';
+
     /** @var \Symfony\Component\PropertyAccess\PropertyAccessor */
     protected $accessor;
 
@@ -29,6 +31,7 @@ class DictionaryHelper
         if (count($idNames) !== 1) {
             throw new Exception('Primary key for this entity is absent or contains few fields');
         }
+
         return $idNames[0];
     }
 
@@ -43,27 +46,17 @@ class DictionaryHelper
     {
         $fieldNames = $doctrineMetadata->getFieldNames();
 
-        if (isset($entityMetadata->defaultValues['grouping']['dictionaryValueField'])) {
-            $fieldName = $entityMetadata->defaultValues['grouping']['dictionaryValueField'];
+        if (isset($entityMetadata->defaultValues['dictionary']['search_field'])) {
+            $fieldName = $entityMetadata->defaultValues['dictionary']['search_field'];
             if (in_array($fieldName, $fieldNames)) {
                 return $fieldName;
             }
         }
 
-        foreach ($this->getDefaultValueFields() as $fieldName) {
-            if (in_array($fieldName, $fieldNames)) {
-                return $fieldName;
-            }
+        if (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
+            return self::DEFAULT_SEARCH_FIELD;
         }
 
         throw new \LogicException(sprintf('Value field is not configured for class %s', $doctrineMetadata->getName()));
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDefaultValueFields()
-    {
-        return ['label', 'name'];
     }
 }
