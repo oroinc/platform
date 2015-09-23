@@ -145,6 +145,7 @@ define(function(require) {
          */
         updateOrigin: function(e) {
             this.$el.val(this.getBackendFormattedValue());
+            this.$el.trigger('change');
         },
 
         /**

@@ -8,9 +8,7 @@ define(function(require) {
         className: 'number-editor',
 
         getValue: function() {
-            var data = {};
-            data[this.column.get('name')] = parseFloat(this.$('input[name=value]').val());
-            return data;
+            return parseFloat(this.$('input[name=value]').val());
         },
 
         getValidationRules: function() {
@@ -19,13 +17,17 @@ define(function(require) {
             return rules;
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.column.get('name'));
-            raw = parseFloat(raw);
+        getFormattedValue: function() {
+            var raw = this.getModelValue();
             if (isNaN(raw)) {
                 return '';
             }
             return this.options.decimalPlaces !== void 0 ? raw.toFixed(this.options.decimalPlaces) : raw;
+        },
+
+        getModelValue: function() {
+            var raw = this.model.get(this.column.get('name'));
+            return parseFloat(raw);
         }
     });
 

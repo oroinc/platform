@@ -29,7 +29,7 @@ define(function(require) {
             data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.column = this.column.toJSON();
-            data.value = this.getModelValue();
+            data.value = this.getFormattedValue();
             return data;
         },
 
@@ -59,18 +59,22 @@ define(function(require) {
             return this.column.get('validationRules') || {};
         },
 
+        getFormattedValue: function() {
+            return this.getModelValue();
+        },
+
         getModelValue: function() {
             return this.model.get(this.column.get('name'));
         },
 
         getValue: function() {
-            var data = {};
-            data[this.column.get('name')] = this.$('input[name=value]').val();
-            return data;
+            return this.$('input[name=value]').val();
         },
 
         onSave: function() {
-            this.trigger('saveAction', this.getValue());
+            var data = {};
+            data[this.column.get('name')] = this.getValue();
+            this.trigger('saveAction', data);
         },
 
         rethrowAction: function(e) {
@@ -79,10 +83,12 @@ define(function(require) {
             this.trigger($(e.currentTarget).attr('data-action') + 'Action');
         },
 
+        isChanged: function() {
+            return this.getValue() !== this.getModelValue();
+        },
+
         onChange: function() {
-            var currentValue = this.$('input[name=value]').val();
-            var disableSubmit = currentValue === (this.model.get('value') ? this.model.get('value') : '');
-            if (disableSubmit) {
+            if (!this.isChanged()) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
             } else {
                 this.$('[type=submit]').removeAttr('disabled');

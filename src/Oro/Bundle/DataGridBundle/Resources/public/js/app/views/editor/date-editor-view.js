@@ -5,6 +5,8 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var moment = require('moment');
+    var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var TextEditorView = require('./text-editor-view');
     var DatepickerView = require('oroui/js/app/views/datepicker/datepicker-view');
 
@@ -30,14 +32,40 @@ define(function(require) {
          */
         render: function() {
             DateEditorView.__super__.render.call(this);
-            this.view = new DatepickerView($.extend(true, {}, this.DEFAULT_OPTIONS,
+            this.view = new DatepickerView(this.getDatepickerViewOptions());
+        },
+
+        getDatepickerViewOptions: function() {
+            return $.extend(true, {}, this.DEFAULT_OPTIONS,
                 _.pick(this.options, ['dateInputAttrs', 'datePickerOptions']), {
                     el: this.$('input[name=value]')
-                }));
+                });
         },
 
         focus: function() {
             this.$('input.hasDatepicker').focus();
+        },
+
+        getModelValue: function() {
+            var raw = this.model.get(this.column.get('name'));
+            try {
+                return datetimeFormatter.getMomentForBackendDate(raw);
+            } catch (e) {
+                return datetimeFormatter.getMomentForBackendDateTime(raw);
+            }
+        },
+
+        getFormattedValue: function() {
+            return this.getModelValue().format(datetimeFormatter.backendFormats.date);
+        },
+
+        getValue: function() {
+            var raw = this.$('input[name=value]').val();
+            return moment.utc(raw, datetimeFormatter.backendFormats.date);
+        },
+
+        isChanged: function() {
+            return this.getValue().diff(this.getModelValue());
         }
     });
 
