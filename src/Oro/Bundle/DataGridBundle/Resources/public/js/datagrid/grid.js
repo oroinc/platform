@@ -133,9 +133,6 @@ define(function(require) {
 
             this.trigger('beforeParseOptions', options);
 
-            this.filteredOptions = _.omit(options, ['el', 'id', 'attributes',
-                'className', 'tagName', 'events']);
-
             // Check required options
             if (!opts.collection) {
                 throw new TypeError('"collection" is required');
