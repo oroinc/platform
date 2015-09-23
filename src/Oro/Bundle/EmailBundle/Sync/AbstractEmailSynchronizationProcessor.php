@@ -360,6 +360,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected function entitiesToClear()
     {
         return [
+            'Oro\Bundle\EmailBundle\Entity\Email',
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
         ];
