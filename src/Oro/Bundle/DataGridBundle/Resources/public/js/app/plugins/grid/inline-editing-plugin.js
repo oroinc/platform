@@ -59,21 +59,16 @@ define(function(require) {
                 }
                 return result;
             };
-            cell.events = _.extend({}, cell.events, {
-                'dblclick': function(e) {
-                    if (this.column.get('editable')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        _this.enterEditMode(cell);
-                    }
-                },
-                'click .icon-edit': function(e) {
-                    if (this.column.get('editable')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        _this.enterEditMode(cell);
-                    }
+            function enterEditModeIfNeeded(e) {
+                if (_this.column.get('editable')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    _this.enterEditMode(cell);
                 }
+            }
+            cell.events = _.extend({}, cell.events, {
+                'dblclick': enterEditModeIfNeeded,
+                'click .icon-edit': enterEditModeIfNeeded
             });
 
             delete cell.events.click;
@@ -163,8 +158,8 @@ define(function(require) {
                 oldValue: cell.model.get(cell.column.get('name'))
             };
             this.sendRequest(data, cell)
-                .done(_.bind(this.onSaveSuccess, ctx))
-                .fail(_.bind(this.onSaveError, ctx))
+                .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
+                .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
                     cell.$el.removeClass('loading');
                 });
@@ -180,6 +175,7 @@ define(function(require) {
                 this.currentCell.$el.addClass('view-mode');
                 this.currentCell.$el.removeClass('edit-mode');
             }
+            this.stopListening(this.editorComponent);
             this.editorComponent.dispose();
             delete this.dataModel;
             delete this.editorComponent;
@@ -276,6 +272,10 @@ define(function(require) {
             return null;
         },
 
+        _onRequireJsError: function() {
+            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
+        }
+    }, {
         onSaveSuccess: function() {
             if (!this.cell.disposed && this.cell.$el) {
                 var _this = this;
@@ -297,10 +297,6 @@ define(function(require) {
             }
             this.cell.model.set(this.cell.column.get('name'), this.oldValue);
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
-        },
-
-        _onRequireJsError: function() {
-            mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
         }
     });
 

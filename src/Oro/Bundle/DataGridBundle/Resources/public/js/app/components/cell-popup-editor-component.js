@@ -35,11 +35,12 @@ define(function(require) {
             var View = options.view;
             var viewInstance = new View(_.extend({}, options.viewOptions, {
                 autoRender: true,
-                el: $('<form class="inline-editor-wrapper"></form>'),
                 model: options.cell.model,
                 cell: options.cell,
                 column: options.cell.column
             }));
+
+            viewInstance.$el.addClass('inline-editor-wrapper');
 
             var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
                 position: {

@@ -32,10 +32,10 @@ define(function(require) {
          */
         render: function() {
             DateEditorView.__super__.render.call(this);
-            this.view = new DatepickerView(this.getDatepickerViewOptions());
+            this.view = new DatepickerView(this.getViewOptions());
         },
 
-        getDatepickerViewOptions: function() {
+        getViewOptions: function() {
             return $.extend(true, {}, this.DEFAULT_OPTIONS,
                 _.pick(this.options, ['dateInputAttrs', 'datePickerOptions']), {
                     el: this.$('input[name=value]')

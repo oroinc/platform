@@ -43,10 +43,14 @@ define(function(require) {
          */
         render: function() {
             DateEditorView.__super__.render.call(this);
-            this.view = new DatetimepickerView($.extend(true, {}, this.DEFAULT_OPTIONS,
+            this.view = new DatetimepickerView(this.getViewOptions());
+        },
+
+        getViewOptions: function() {
+            return $.extend(true, {}, this.DEFAULT_OPTIONS,
                 _.pick(this.options, ['dateInputAttrs', 'datePickerOptions', 'timeInputAttrs', 'timePickerOptions']), {
                     el: this.$('input[name=value]')
-                }));
+                });
         },
 
         focus: function(atEnd) {

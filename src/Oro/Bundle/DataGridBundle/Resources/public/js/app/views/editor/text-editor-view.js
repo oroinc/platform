@@ -8,6 +8,7 @@ define(function(require) {
 
     TextEditorView = BaseView.extend({
         autoRender: true,
+        tagName: 'form',
         template: require('tpl!../../../../templates/text-editor.html'),
         className: 'text-editor',
         inputType: 'text',
@@ -26,7 +27,7 @@ define(function(require) {
             this.options = options;
             this.cell = options.cell;
             this.column = options.column;
-            $(document).on('keydown.' + this.cid, _.bind(this.onKeyDown, this));
+            $(document).on('keydown' + this.eventNamespace(), _.bind(this.onKeyDown, this));
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -34,7 +35,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            $(document).off('.' + this.cid);
+            $(document).off(this.eventNamespace());
             TextEditorView.__super__.dispose.call(this);
         },
 
