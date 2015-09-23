@@ -1,13 +1,17 @@
 html& {
   overflow-x: hidden;
   overflow-y: auto;
-  &.disable-scroll {
+  &.lock-page-scroll {
     overflow: hidden;
   }
 }
 & {
   min-width: inherit;
   font-size: @baseFontSize;
+}
+
+#page.hidden-page {
+  display: none;
 }
 
 .btn-group > .dropdown-menu li a {
