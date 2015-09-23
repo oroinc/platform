@@ -134,10 +134,14 @@ class EmailModelBuilder
 
         $fromAddress = $parentEmailEntity->getFromEmailAddress();
         if ($fromAddress->getOwner() === $this->helper->getUser()) {
-            $emailModel->setTo([$parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail()]);
+            $toEmail = $parentEmailEntity->getTo()->first()->getEmailAddress()->getEmail();
+            $this->helper->preciseFullEmailAddress($toEmail);
+            $emailModel->setTo([$toEmail]);
             $emailModel->setFrom($fromAddress->getEmail());
         } else {
-            $emailModel->setTo([$fromAddress->getEmail()]);
+            $toEmail = $fromAddress->getEmail();
+            $this->helper->preciseFullEmailAddress($toEmail);
+            $emailModel->setTo([$toEmail]);
             $this->initReplyFrom($emailModel, $parentEmailEntity);
         }
 
@@ -165,17 +169,25 @@ class EmailModelBuilder
         if ($fromAddress->getOwner() === $this->helper->getUser()) {
             $toList = [];
             foreach ($parentEmailEntity->getTo() as $toRecipient) {
-                $toList[] = $toRecipient->getEmailAddress()->getEmail();
+                $toEmail = $toRecipient->getEmailAddress()->getEmail();
+                $this->helper->preciseFullEmailAddress($toEmail);
+                $toList[] = $toEmail;
             }
             $ccList = [];
             foreach ($parentEmailEntity->getCc() as $ccRecipient) {
-                $ccList[] = $ccRecipient->getEmailAddress()->getEmail();
+                $toEmail = $ccRecipient->getEmailAddress()->getEmail();
+                $this->helper->preciseFullEmailAddress($toEmail);
+                $ccList[] = $toEmail;
             }
+
+
             $emailModel->setTo($toList);
             $emailModel->setCc($ccList);
             $emailModel->setFrom($fromAddress->getEmail());
         } else {
-            $emailModel->setTo([$fromAddress->getEmail()]);
+            $toEmail = $fromAddress->getEmail();
+            $this->helper->preciseFullEmailAddress($toEmail);
+            $emailModel->setTo([$toEmail]);
             $this->initReplyAllFrom($emailModel, $parentEmailEntity);
         }
 
