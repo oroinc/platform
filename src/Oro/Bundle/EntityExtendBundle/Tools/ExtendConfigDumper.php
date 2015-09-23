@@ -406,9 +406,10 @@ class ExtendConfigDumper
                 continue;
             }
 
-            $fieldName   = $fieldId->getFieldName();
-            $fieldConfig = $this->configProvider->getConfig($fieldId->getClassName(), $fieldName);
-            $isDeleted   = $fieldConfig->is('is_deleted');
+            $fieldName = $fieldId->getFieldName();
+            $isDeleted = $this->configProvider->hasConfig($fieldId->getClassName(), $fieldName)
+                ? $this->configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
+                : false;
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
