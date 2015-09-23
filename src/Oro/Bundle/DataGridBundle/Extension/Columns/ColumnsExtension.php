@@ -91,10 +91,12 @@ class ColumnsExtension extends AbstractExtension
 
         /** Get columns data from grid view */
         $gridViewColumnsData = null;
-        foreach ($gridViews as $gridView) {
-            if ((int)$currentState['gridView'] === $gridView->getId()) {
-                /** Get columns state from current view */
-                $gridViewColumnsData = $gridView->getColumnsData();
+        if (isset($currentState['gridView'])) {
+            foreach ($gridViews as $gridView) {
+                if ((int)$currentState['gridView'] === $gridView->getId()) {
+                    /** Get columns state from current view */
+                    $gridViewColumnsData = $gridView->getColumnsData();
+                }
             }
         }
 
@@ -374,7 +376,7 @@ class ColumnsExtension extends AbstractExtension
      */
     protected function setGridViewDefaultOrder(MetadataObject $data, $columnsData)
     {
-        $gridViews = $data->offsetGet('gridViews');
+        $gridViews = $data->offsetGetOr('gridViews');
 
         if ($gridViews && isset($gridViews['views'])) {
             foreach ($gridViews['views'] as &$gridView) {
