@@ -317,8 +317,9 @@ class ExtendConfigDumper
             $relation['assign'] = true;
             if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
                 $fieldName = $relation['field_id']->getFieldName();
-                $fieldConfig = $extendProvider->getConfig($relation['field_id']->getClassName(), $fieldName);
-                $isDeleted   = $fieldConfig->is('is_deleted');
+                $isDeleted = $extendProvider->hasConfig($relation['field_id']->getClassName(), $fieldName)
+                    ? $extendProvider->getConfig($relation['field_id']->getClassName(), $fieldName)->is('is_deleted')
+                    : false;
 
                 if (!$isDeleted) {
                     $addRemoveMethods[$fieldName]['self'] = $fieldName;
