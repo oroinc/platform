@@ -52,20 +52,28 @@ class EmailRepository extends EntityRepository
      * @param User         $user
      * @param Organization $organization
      * @param int          $limit
+     * @param int|null     $folderId
      *
      * @return mixed
      */
-    public function getNewEmails(User $user, Organization $organization, $limit)
+    public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, eu.seen')
             ->leftJoin('e.emailUsers', 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->groupBy('e, eu.seen')
-            ->orderBy('e.sentAt', 'DESC')
+            ->orderBy('eu.seen', 'ASC')
+            ->addOrderBy('e.sentAt', 'DESC')
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
             ->setMaxResults($limit);
+
+        if ($folderId) {
+            $qb->leftJoin('eu.folder', 'f')
+               ->andWhere('f.id = :folderId')
+               ->setParameter('folderId', $folderId);
+        }
 
         return $qb->getQuery()->getResult();
     }
