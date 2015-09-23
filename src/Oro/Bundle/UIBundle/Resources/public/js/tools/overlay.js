@@ -2,10 +2,10 @@ define(function(require) {
     'use strict';
     var $ = require('jquery');
     var _ = require('underscore');
-    return {
+    var overlayTool = {
         hasBackdrop: false,
+
         createOverlay: function($overlayContent, options) {
-            var _this = this;
             this.hasBackdrop = true;
             $('body').addClass('backdrop');
             $(document.body).append($overlayContent);
@@ -14,11 +14,11 @@ define(function(require) {
             });
             this.updatePosition($overlayContent, options);
             $overlayContent.data('interval', setInterval(function() {
-                _this.updatePosition($overlayContent, options);
+                overlayTool.updatePosition($overlayContent, options);
             }, 400));
             return {
                 remove: function() {
-                    _this.removeOverlay($overlayContent);
+                    overlayTool.removeOverlay($overlayContent);
                 }
             };
         },
@@ -28,6 +28,7 @@ define(function(require) {
                 var _new;
                 var old;
                 var iterations = 5;
+                // try to find position for overlay in several iterations
                 do {
                     old = _new || ($overlayContent.css('top') + '.' + $overlayContent.css('left'));
                     $overlayContent.position(options.position);
@@ -52,4 +53,5 @@ define(function(require) {
             }
         }, 50)
     };
+    return overlayTool;
 });

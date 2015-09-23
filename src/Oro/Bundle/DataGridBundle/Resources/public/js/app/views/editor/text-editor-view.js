@@ -14,7 +14,8 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
-            'click [data-action]': 'rethrowAction'
+            'click [data-action]': 'rethrowAction',
+            'submit': 'onSave'
         },
 
         TAB_KEY_CODE: 9,
@@ -65,7 +66,7 @@ define(function(require) {
         },
 
         focus: function() {
-            this.$('input[name=value]').focus();
+            this.$('input[name=value]').setCursorToEnd().focus();
         },
 
         getValidationRules: function() {
@@ -77,7 +78,8 @@ define(function(require) {
         },
 
         getModelValue: function() {
-            return this.model.get(this.column.get('name'));
+            var raw = this.model.get(this.column.get('name'));
+            return raw ? raw : '';
         },
 
         getValue: function() {
@@ -97,7 +99,7 @@ define(function(require) {
         },
 
         isChanged: function() {
-            return this.getValue() !== this.getModelValue() ? this.getModelValue() : '';
+            return this.getValue() !== this.getModelValue();
         },
 
         onChange: function() {

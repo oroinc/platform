@@ -43,7 +43,7 @@ define(function(require) {
         },
 
         focus: function() {
-            this.$('input.hasDatepicker').focus();
+            this.$('input.hasDatepicker').setCursorToEnd().focus();
         },
 
         getModelValue: function() {
@@ -51,21 +51,34 @@ define(function(require) {
             try {
                 return datetimeFormatter.getMomentForBackendDate(raw);
             } catch (e) {
-                return datetimeFormatter.getMomentForBackendDateTime(raw);
+                try {
+                    return datetimeFormatter.getMomentForBackendDateTime(raw);
+                } catch (e2) {
+                    return null;
+                }
             }
         },
 
         getFormattedValue: function() {
-            return this.getModelValue().format(datetimeFormatter.backendFormats.date);
+            var value = this.getModelValue();
+            if (value === null) {
+                return '';
+            }
+            return value.format(datetimeFormatter.backendFormats.date);
         },
 
         getValue: function() {
             var raw = this.$('input[name=value]').val();
-            return moment.utc(raw, datetimeFormatter.backendFormats.date);
+            return !raw ? null : moment.utc(raw, datetimeFormatter.backendFormats.date);
         },
 
         isChanged: function() {
-            return this.getValue().diff(this.getModelValue());
+            var value = this.getValue();
+            var modelValue = this.getModelValue();
+            if (value !== null && modelValue !== null) {
+                return value.diff(modelValue);
+            }
+            return value !== modelValue;
         }
     });
 

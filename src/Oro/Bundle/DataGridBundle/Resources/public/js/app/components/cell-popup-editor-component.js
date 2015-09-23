@@ -28,7 +28,7 @@ define(function(require) {
 
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
 
-            this.view.focus();
+            this.view.focus(!!options.fromPreviousCell);
         },
 
         createView: function(options) {

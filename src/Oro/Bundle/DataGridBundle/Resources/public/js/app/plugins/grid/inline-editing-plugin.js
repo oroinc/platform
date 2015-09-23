@@ -118,7 +118,7 @@ define(function(require) {
             this.httpMethod = options.metadata.inline_editing.http_method || 'PATCH';
         },
 
-        enterEditMode: function(cell) {
+        enterEditMode: function(cell, fromPreviousCell) {
             if (this.editModeEnabled) {
                 this.exitEditMode();
             }
@@ -137,7 +137,8 @@ define(function(require) {
                 var editorComponent = new CellEditorComponent({
                     cell: cell,
                     view: CellEditorView,
-                    viewOptions: cell.column.get('cellEditorOptions')
+                    viewOptions: cell.column.get('cellEditorOptions'),
+                    fromPreviousCell: fromPreviousCell
                 });
 
                 _this.editorComponent = editorComponent;
@@ -201,7 +202,7 @@ define(function(require) {
         editPrevCell: function() {
             var nextCell = this.findPrevEditableCell(this.currentCell);
             if (nextCell) {
-                this.enterEditMode(nextCell);
+                this.enterEditMode(nextCell, true);
             } else {
                 this.exitEditMode();
             }

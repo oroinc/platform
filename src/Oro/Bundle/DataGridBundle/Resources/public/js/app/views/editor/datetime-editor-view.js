@@ -33,6 +33,11 @@ define(function(require) {
             }
         },
 
+        events: {
+            'keydown .hasDatepicker': 'onDateEditorKeydown',
+            'keydown .timepicker-input': 'onTimeEditorKeydown'
+        },
+
         /**
          * @inheritDoc
          */
@@ -44,26 +49,61 @@ define(function(require) {
                 }));
         },
 
-        focus: function() {
-            this.$('input.hasDatepicker').focus();
+        focus: function(atEnd) {
+            if (!atEnd) {
+                this.$('input.hasDatepicker').setCursorToEnd().focus();
+            } else {
+                this.$('input.timepicker-input').setCursorToEnd().focus();
+            }
         },
 
         getModelValue: function() {
             var raw = this.model.get(this.column.get('name'));
-            return datetimeFormatter.getMomentForBackendDateTime(raw);
+            var parsed;
+            try {
+                parsed = datetimeFormatter.getMomentForBackendDateTime(raw);
+            } catch (e) {
+                return null;
+            }
+            // ignore seconds to avoid excessive server requests
+            parsed.seconds(0);
+            return parsed;
         },
 
         getFormattedValue: function() {
-            return this.getModelValue().format(datetimeFormatter.backendFormats.datetime);
+            var value = this.getModelValue();
+            if (value === null) {
+                return '';
+            }
+            return value.format(datetimeFormatter.backendFormats.datetime);
         },
 
         getValue: function() {
             var raw = this.$('input[name=value]').val();
-            return moment.utc(raw, datetimeFormatter.backendFormats.datetime);
+            return !raw ? null : moment.utc(raw, datetimeFormatter.backendFormats.datetime);
         },
 
         isChanged: function() {
-            return this.getValue().diff(this.getModelValue());
+            var value = this.getValue();
+            var modelValue = this.getModelValue();
+            if (value !== null && modelValue !== null) {
+                return value.diff(modelValue);
+            }
+            return value !== modelValue;
+        },
+
+        onDateEditorKeydown: function(e) {
+            // stop propagation to prevent default behaviour
+            if (!e.shiftKey) {
+                e.stopPropagation();
+            }
+        },
+
+        onTimeEditorKeydown: function(e) {
+            // stop propagation to prevent default behaviour
+            if (e.shiftKey) {
+                e.stopPropagation();
+            }
         }
     });
 

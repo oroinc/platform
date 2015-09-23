@@ -37,7 +37,7 @@ define(function(require) {
             };
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                    (resultRect.top > $(document).height() && forceInvisible) // grid is invisible
+                    (resultRect.top > $(document).height() && forceInvisible)
                 ) {
                 // no need to calculate anything
                 return resultRect;
