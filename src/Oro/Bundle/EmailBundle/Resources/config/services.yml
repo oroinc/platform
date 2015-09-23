@@ -49,9 +49,6 @@ parameters:
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
-    # Entity config event listener
-    oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
-
     # Entity email user listener
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
 
@@ -336,11 +333,13 @@ services:
               - [setNamespace, ['oro_email.cache']]
 
     # Available variables services
-    oro_email.listener.config_subscriber:
-        class:      %oro_email.listener.config_subscriber.class%
-        arguments:  [@oro_email.cache, %oro_email.cache.available_in_template_key%]
+    oro_email.listener.config_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\ConfigListener
+        arguments:
+            - @oro_email.cache
+            - %oro_email.cache.available_in_template_key%
         tags:
-            - { name: kernel.event_subscriber}
+            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush }
 
     # email template twig instance
     oro_email.twig.string_loader:

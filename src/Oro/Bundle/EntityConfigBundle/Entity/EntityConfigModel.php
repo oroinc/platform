@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\EntityConfigRepository")
  * @ORM\Table(name="oro_entity_config",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="oro_entity_config_uq", columns={"class_name"})})
- * @ORM\HasLifecycleCallbacks()
  */
 class EntityConfigModel extends AbstractConfigModel
 {
@@ -34,7 +33,7 @@ class EntityConfigModel extends AbstractConfigModel
 
     /**
      * @var ArrayCollection|FieldConfigModel[]
-     * @ORM\OneToMany(targetEntity="FieldConfigModel", mappedBy="entity", cascade={"all"})
+     * @ORM\OneToMany(targetEntity="FieldConfigModel", mappedBy="entity")
      */
     protected $fields;
 

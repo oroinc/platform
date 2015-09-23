@@ -6,9 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
+use Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener;
 
-class ConfigSubscriberCreateFieldTest extends ConfigSubscriberTestCase
+class ConfigListenerCreateFieldTest extends ConfigListenerTestCase
 {
     const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
@@ -30,8 +30,8 @@ class ConfigSubscriberCreateFieldTest extends ConfigSubscriberTestCase
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $configSubscriber = new ConfigSubscriber();
-        $configSubscriber->newFieldConfig($event);
+        $listener = new ConfigListener();
+        $listener->newFieldConfig($event);
 
         $this->assertEquals(
             [],
@@ -56,20 +56,18 @@ class ConfigSubscriberCreateFieldTest extends ConfigSubscriberTestCase
             ->method('getConfig')
             ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
-        $this->configProvider->expects($this->once())
-            ->method('persist');
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $configSubscriber = new ConfigSubscriber();
-        $configSubscriber->newFieldConfig($event);
+        $listener = new ConfigListener();
+        $listener->newFieldConfig($event);
 
         $this->assertEquals(
             ['upgradeable' => true],
             $entityConfig->all()
         );
         $this->assertEquals(
-            [],
+            [$entityConfig],
             $this->configManager->getUpdateConfig()
         );
     }
@@ -96,9 +94,8 @@ class ConfigSubscriberCreateFieldTest extends ConfigSubscriberTestCase
 
         $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $this->configManager);
 
-        $configSubscriber = new ConfigSubscriber();
-        $configSubscriber->renameField($event);
-
+        $listener = new ConfigListener();
+        $listener->renameField($event);
 
         $this->assertEquals(
             ['newName' => ['testField']],

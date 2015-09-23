@@ -10,7 +10,6 @@ parameters:
     oro_entity_extend.entity_config_dumper.extension.index.class:     Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension
     oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension
     oro_entity_extend.entity_config_dumper.extension.enum.class:      Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension
-    oro_entity_extend.listener.config_subscriber.class:       Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.extend.entity_processor.class:          Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
     oro_entity_extend.extend.entity_proxy_generator.class:    Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator
     oro_entity_extend.extend.field_type_helper.class:         Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper
@@ -42,7 +41,6 @@ parameters:
     oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
     oro_entity_extend.importexport.normalizer.enum.class:     Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer
     oro_entity_extend.listener.before_map_object_search_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\BeforeMapObjectSearchListener
-    oro_entity_extend.listener.search_entity_config_listener.class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
     oro_entity_extend.association_manager.class:              Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager
     oro_entity_extend.entity_alias_provider.class:            Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider
     oro_entity_extend.entity_class_name_provider.enum.class:  Oro\Bundle\EntityExtendBundle\Provider\EnumEntityClassNameProvider
@@ -138,10 +136,14 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_entity_extend.listener.config_subscriber:
-        class: %oro_entity_extend.listener.config_subscriber.class%
+    oro_entity_extend.listener.config_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener
         tags:
-            - { name: kernel.event_subscriber}
+            - { name: kernel.event_listener, event: entity_config.new.entity.config, method: updateEntityConfig }
+            - { name: kernel.event_listener, event: entity_config.update.entity.config, method: updateEntityConfig }
+            - { name: kernel.event_listener, event: entity_config.new.field.config, method: newFieldConfig }
+            - { name: kernel.event_listener, event: entity_config.rename.field, method: renameField }
+            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush }
 
     oro_entity_extend.db_id_name_generator:
         alias: oro_migration.db_id_name_generator
@@ -360,11 +362,11 @@ services:
             - { name: kernel.event_listener, event: oro_search.search_mapping_collect, method: prepareEntityMapEvent }
 
     oro_entity_extend.listener.search_entity_config_listener:
-        class: %oro_entity_extend.listener.search_entity_config_listener.class%
+        class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
         arguments:
             - @doctrine
         tags:
-            - { name: kernel.event_listener, event: entity_config.persist.config, method: persistConfig, priority: -255 }
+            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush, priority: -255 }
 
     oro_entity_extend.association_manager:
         class: %oro_entity_extend.association_manager.class%

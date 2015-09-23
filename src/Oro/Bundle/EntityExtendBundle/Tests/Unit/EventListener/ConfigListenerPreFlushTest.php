@@ -5,35 +5,14 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
+class ConfigListenerPreFlushTest extends ConfigListenerTestCase
 {
-    /** @var  ConfigSubscriber */
-    protected $configSubscriber;
-
-    /** @var PersistConfigEvent */
-    protected $event;
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            [
-                Events::PRE_PERSIST_CONFIG   => 'persistConfig',
-                Events::NEW_ENTITY_CONFIG    => 'updateEntityConfig',
-                Events::UPDATE_ENTITY_CONFIG => 'updateEntityConfig',
-                Events::NEW_FIELD_CONFIG     => 'newFieldConfig',
-                Events::RENAME_FIELD         => 'renameField',
-            ],
-            ConfigSubscriber::getSubscribedEvents()
-        );
-    }
-
     /**
-     * Test that persistConfig called with event
+     * Test that preFlush called with event
      * that has config id something other than FieldConfigId
      */
     public function testWrongConfigId()
@@ -44,10 +23,10 @@ class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
         $entityConfigId = new EntityConfigId('extend', 'TestClass');
         $eventConfig    = new Config($entityConfigId);
 
-        $event = new PersistConfigEvent($eventConfig, $this->configManager);
-        $configSubscriber = new ConfigSubscriber();
+        $event = new PreFlushConfigEvent(['extend' => $eventConfig], $this->configManager);
+        $listener = new ConfigListener();
 
-        $configSubscriber->persistConfig($event);
+        $listener->preFlush($event);
     }
 
     /**
@@ -77,10 +56,10 @@ class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
             ->method('getConfig')
             ->will($this->returnValue($entityConfig));
 
-        $this->event = new PersistConfigEvent($fieldConfig, $this->configManager);
+        $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $this->configSubscriber = new ConfigSubscriber();
-        $this->configSubscriber->persistConfig($this->event);
+        $listener = new ConfigListener();
+        $listener->preFlush($event);
 
         $this->assertEquals(
             [],
@@ -115,10 +94,10 @@ class ConfigSubscriberPersistConfigTest extends ConfigSubscriberTestCase
             ->method('getConfig')
             ->will($this->returnValue($entityConfig));
 
-        $this->event = new PersistConfigEvent($fieldConfig, $this->configManager);
+        $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $this->configSubscriber = new ConfigSubscriber();
-        $this->configSubscriber->persistConfig($this->event);
+        $listener = new ConfigListener();
+        $listener->preFlush($event);
 
         $this->assertEquals(
             ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],

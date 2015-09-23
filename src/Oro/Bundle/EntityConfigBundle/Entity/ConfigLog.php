@@ -10,7 +10,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Table(name="oro_entity_config_log")
  * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
  */
 class ConfigLog
 {
@@ -24,7 +23,7 @@ class ConfigLog
 
     /**
      * @var UserInterface
-     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Symfony\Component\Security\Core\User\UserInterface")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $user;
@@ -123,13 +122,5 @@ class ConfigLog
     public function getDiffs()
     {
         return $this->diffs;
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->loggedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

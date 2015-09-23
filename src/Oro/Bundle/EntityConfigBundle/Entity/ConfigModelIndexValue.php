@@ -23,14 +23,14 @@ class ConfigModelIndexValue
 
     /**
      * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="indexedValues", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="indexedValues")
      * @ORM\JoinColumn(name="entity_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $entity;
 
     /**
      * @var FieldConfigModel
-     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="indexedValues", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="FieldConfigModel", inversedBy="indexedValues")
      * @ORM\JoinColumn(name="field_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $field;

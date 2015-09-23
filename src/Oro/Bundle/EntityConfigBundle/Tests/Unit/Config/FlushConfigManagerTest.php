@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
@@ -136,12 +137,12 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->setFlushExpectations($em, [$model]);
 
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with(Events::PRE_PERSIST_CONFIG, new PersistConfigEvent($entityConfig, $this->configManager));
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(Events::PRE_PERSIST_CONFIG, new PersistConfigEvent($testConfig, $this->configManager));
+            ->with(
+                Events::PRE_FLUSH_CONFIG,
+                new PreFlushConfigEvent(['entity' => $entityConfig, 'test' => $testConfig], $this->configManager)
+            );
 
         $this->configManager->persist($entityConfig);
         $this->configManager->persist($testConfig);

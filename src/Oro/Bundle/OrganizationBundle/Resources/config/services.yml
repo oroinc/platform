@@ -11,7 +11,6 @@ parameters:
     oro_organization.twig.business_units.class:                Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
-    oro_organization.listener.config_subscriber.class:         Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
@@ -120,10 +119,10 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preRemove }
 
-    oro_organization.listener.config_subscriber:
-        class: %oro_organization.listener.config_subscriber.class%
+    oro_organization.listener.config_listener:
+        class: Oro\Bundle\OrganizationBundle\Event\ConfigListener
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush, priority: 100 }
 
     oro_organization.import_strategy.listener:
         class: %oro_organization.import_strategy.listener.class%

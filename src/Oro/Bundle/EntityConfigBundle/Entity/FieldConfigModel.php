@@ -10,7 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 /**
  * @ORM\Table(name="oro_entity_config_field")
  * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
  */
 class FieldConfigModel extends AbstractConfigModel
 {
@@ -24,10 +23,8 @@ class FieldConfigModel extends AbstractConfigModel
 
     /**
      * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields", cascade={"persist"})
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields")
+     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $entity;
 
