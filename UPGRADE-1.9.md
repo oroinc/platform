@@ -7,6 +7,5 @@ UPGRADE FROM 1.8 to 1.9
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::isDateUpdatable` removed. It is not needed.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::getOwner` added.
-- `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::getUpdatedBy` added.
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
