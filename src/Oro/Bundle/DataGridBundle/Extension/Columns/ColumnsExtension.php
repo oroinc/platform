@@ -253,16 +253,42 @@ class ColumnsExtension extends AbstractExtension
         $columns = explode('.', $columns);
         $index = 0;
         foreach ($columnsData as $columnName => $columnData) {
-            if (isset($columns[$index])) {
-                $render = substr($columns[$index], -1);
-                $order = substr($columns[$index], 0, -1);
-                $columnsData[$columnName][self::ORDER_FIELD_NAME] = (int)$order;
-                $columnsData[$columnName][self::RENDER_FIELD_NAME] = (bool)((int)$render);
+            $newColumnData = $this->getColumnData($index, $columns);
+            if (!empty($newColumnData)) {
+                $columnsData[$columnName][self::ORDER_FIELD_NAME] = $newColumnData['order'];
+                $columnsData[$columnName][self::RENDER_FIELD_NAME] = $newColumnData['renderable'];
             }
             $index++;
         }
 
         return  $columnsData;
+    }
+
+    /**
+     * Get new columns data
+     *
+     * @param int $index
+     * @param array $columns
+     * @return array
+     */
+    protected function getColumnData($index, $columns)
+    {
+        $result = array();
+
+        if (!isset($columns[$index])) {
+            return $result;
+        }
+
+        foreach ($columns as $key => $value) {
+            $render = (bool)((int)(substr($value, -1)));
+            $columnNumber = (int)(substr($value, 0, -1));
+            if ($index === $columnNumber) {
+                $result['order'] = $key;
+                $result['renderable'] = $render;
+                return $result;
+            }
+        }
+        return $result;
     }
 
     /**
