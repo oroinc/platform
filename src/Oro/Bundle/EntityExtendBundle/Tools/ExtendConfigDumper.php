@@ -292,22 +292,37 @@ class ExtendConfigDumper
         array &$properties,
         array &$doctrine
     ) {
+        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+            $fieldConfig->set('is_deleted', true);
+        } else {
+            $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
+        }
         if ($fieldConfig->is('is_extend')) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
+            $isDeleted     = $fieldConfig->is('is_deleted');
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
+                if ($isDeleted) {
+                    $relationProperties[$fieldName]['private'] = true;
+                }
                 if ($underlyingFieldType !== RelationType::MANY_TO_ONE && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldName;
 
-                    $defaultProperties[$defaultName] = $defaultName;
+                    $defaultProperties[$defaultName] = [];
+                    if ($isDeleted) {
+                        $defaultProperties[$defaultName]['private'] = true;
+                    }
                 }
             } else {
-                $properties[$fieldName] = $fieldName;
+                $properties[$fieldName] = [];
+                if ($isDeleted) {
+                    $properties[$fieldName]['private'] = true;
+                }
 
                 $doctrine[$entityName]['fields'][$fieldName] = [
                     'column'    => $fieldName,
@@ -318,12 +333,6 @@ class ExtendConfigDumper
                     'scale'     => $fieldConfig->get('scale'),
                 ];
             }
-        }
-
-        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
-            $fieldConfig->set('is_deleted', true);
-        } else {
-            $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
     }
 
@@ -397,11 +406,16 @@ class ExtendConfigDumper
                 continue;
             }
 
-            $fieldName = $fieldId->getFieldName();
+            $fieldName   = $fieldId->getFieldName();
+            $fieldConfig = $this->configProvider->getConfig($fieldId->getClassName(), $fieldName);
+            $isDeleted   = $fieldConfig->is('is_deleted');
             if (!isset($relationProperties[$fieldName])) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
+                if ($isDeleted) {
+                    $relationProperties[$fieldName]['private'] = true;
+                }
             }
-            if ($fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
+            if (!$isDeleted && $fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
 
                 /** @var FieldConfigId $targetFieldId */
