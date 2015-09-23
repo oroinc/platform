@@ -39,6 +39,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeView="oro_user_view",
  *      defaultValues={
  *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
+ *          "grouping"={
+ *              "groups"={"dictionary"},
+ *              "dictionaryValueField"="username"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",

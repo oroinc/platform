@@ -6,9 +6,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
@@ -18,19 +19,24 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var DictionaryHelper */
     protected $dictionaryHelper;
 
+    protected $entityConfigManager;
+
     /**
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param DictionaryHelper $dictionaryHelper
+     * @param ConfigManager $entityConfigManager
      */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
-        DictionaryHelper $dictionaryHelper
+        DictionaryHelper $dictionaryHelper,
+        ConfigManager $entityConfigManager
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
+        $this->entityConfigManager = $entityConfigManager;
     }
 
     /**
@@ -77,7 +83,10 @@ class DictionaryApiEntityManager extends ApiEntityManager
     public function findValueBySearchQuery($searchQuery)
     {
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField(
+            $this->getMetadata(),
+            $this->entityConfigManager->getEntityMetadata($this->class)
+        );
 
         $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
@@ -105,7 +114,10 @@ class DictionaryApiEntityManager extends ApiEntityManager
     public function findValueByPrimaryKey($keys)
     {
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+        $labelField = $this->dictionaryHelper->getNameLabelField(
+            $this->getMetadata(),
+            $this->entityConfigManager->getEntityMetadata($this->class)
+        );
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         $qb->andWhere('e.' . $keyField . ' in (:keys)')
