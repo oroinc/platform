@@ -707,6 +707,15 @@ define(function(require) {
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
             }
+        },
+
+        ensureCellIsVisible: function(cell) {
+            var e = $.Event('ensureCellIsVisible');
+            this.trigger('ensureCellIsVisible', e, cell);
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+            cell.el.scrollIntoView();
         }
     });
 

@@ -7,8 +7,7 @@ define(function(require) {
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
-    var tools = require('oroui/js/tools');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -158,7 +157,9 @@ define(function(require) {
         selectMode: function() {
             // get gridRect
             var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
-            var visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
+            var visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+                top: -this.headerHeight
+            }, this.currentFloatTheadMode === 'default');
             var mode = 'default';
             if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
                 mode = 'fixed';
@@ -181,7 +182,9 @@ define(function(require) {
             var sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
-                visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
+                visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+                    top: -this.headerHeight
+                }, this.currentFloatTheadMode === 'default');
             }
             if (!tableRect) {
                 tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
@@ -396,69 +399,6 @@ define(function(require) {
                 }
             }
             this._lastClientRect = scrollContainerRect;
-        },
-
-        /**
-         * Returns visible rect of DOM element
-         *
-         * @param el
-         * @returns {{top: number, left: Number, bottom: Number, right: Number}}
-         */
-        getVisibleRect: function(el) {
-            var current = el;
-            var midRect = current.getBoundingClientRect();
-            var borders;
-            var resultRect = {
-                top: midRect.top - this.headerHeight,
-                left: midRect.left,
-                bottom: midRect.bottom,
-                right: midRect.right
-            };
-            if (
-                (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
-            ) {
-                // no need to calculate anything
-                return resultRect;
-            }
-            current = current.parentNode;
-            while (current && current.getBoundingClientRect) {
-                midRect = current.getBoundingClientRect();
-                borders = $.fn.getBorders(current);
-
-                if (tools.isMobile()) {
-                    /**
-                     * Equals header height. Cannot calculate dynamically due to issues on ipad
-                     */
-                    if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && current.id === 'top-page' &&
-                        !this.domCache.body.hasClass('input-focused')) {
-                        resultRect.top = layout.MOBILE_HEADER_HEIGHT;
-                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT &&
-                        current.className === 'widget-content') {
-                        resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
-                    }
-                }
-
-                if (resultRect.top < midRect.top + borders.top) {
-                    resultRect.top = midRect.top + borders.top;
-                }
-                if (resultRect.bottom > midRect.bottom - borders.bottom) {
-                    resultRect.bottom = midRect.bottom - borders.bottom;
-                }
-                if (resultRect.left < midRect.left + borders.left) {
-                    resultRect.left = midRect.left + borders.left;
-                }
-                if (resultRect.right > midRect.right - borders.right) {
-                    resultRect.right = midRect.right - borders.right;
-                }
-                current = current.parentNode;
-            }
-
-            if (resultRect.top < 0) {
-                resultRect.top = 0;
-            }
-
-            return resultRect;
         }
     });
 

@@ -17,11 +17,24 @@ define(function(require) {
             'click [data-action]': 'rethrowAction'
         },
 
+        TAB_KEY_CODE: 9,
+        ENTER_KEY_CODE: 13,
+        ESCAPE_KEY_CODE: 27,
+
         initialize: function(options) {
             this.options = options;
             this.cell = options.cell;
             this.column = options.column;
+            $(document).on('keydown.' + this.cid, _.bind(this.onKeyDown, this));
             TextEditorView.__super__.initialize.apply(this, arguments);
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            $(document).off('.' + this.cid);
+            TextEditorView.__super__.dispose.call(this);
         },
 
         getTemplateData: function() {
@@ -71,10 +84,10 @@ define(function(require) {
             return this.$('input[name=value]').val();
         },
 
-        onSave: function() {
+        onSave: function(e, navigateNextCell) {
             var data = {};
             data[this.column.get('name')] = this.getValue();
-            this.trigger('saveAction', data);
+            this.trigger('save' + (navigateNextCell ? 'AndEditNext' : '') + 'Action', data);
         },
 
         rethrowAction: function(e) {
@@ -92,6 +105,39 @@ define(function(require) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
             } else {
                 this.$('[type=submit]').removeAttr('disabled');
+            }
+        },
+
+        onKeyDown: function(e) {
+            switch (e.keyCode) {
+                case this.TAB_KEY_CODE:
+                    if (this.isChanged()) {
+                        if (this.validator.form()) {
+                            this.onSave(null, true);
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancelAndEditNextAction');
+                    }
+                    e.preventDefault();
+                    break;
+                case this.ENTER_KEY_CODE:
+                    if (this.isChanged()) {
+                        if (this.validator.form()) {
+                            this.onSave(null, false);
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancelAction');
+                    }
+                    e.preventDefault();
+                    break;
+                case this.ESCAPE_KEY_CODE:
+                    this.trigger('cancelAction');
+                    e.preventDefault();
+                    break;
             }
         }
     });

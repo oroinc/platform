@@ -21,8 +21,10 @@ define(function(require) {
 
             this.view = this.createView(options);
 
-            this.listenTo(this.view, 'saveAction', this.onSave);
-            this.listenTo(this.view, 'cancelAction', this.onCancel);
+            // rethrow view events on component
+            this.listenTo(this.view, 'all', function() {
+                this.trigger.apply(this, arguments);
+            }, this);
 
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
 
@@ -58,14 +60,6 @@ define(function(require) {
             }
             this.removeView();
             CellPopupEditorComponent.__super__.dispose.call(this);
-        },
-
-        onSave: function(data) {
-            this.trigger('saveAction', data);
-        },
-
-        onCancel: function() {
-            this.trigger('cancelAction');
         }
     });
 

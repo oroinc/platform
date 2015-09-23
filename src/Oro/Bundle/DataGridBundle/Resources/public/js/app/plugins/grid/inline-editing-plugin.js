@@ -125,6 +125,7 @@ define(function(require) {
             this.editModeEnabled = true;
             this.currentCell = cell;
             var _this = this;
+            this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
@@ -141,24 +142,32 @@ define(function(require) {
 
                 _this.editorComponent = editorComponent;
 
-                editorComponent.on('saveAction', function(data) {
-                    cell.$el.addClass('loading');
-                    var ctx = {
-                        cell: cell,
-                        oldValue: cell.model.get(cell.column.get('name'))
-                    };
-                    _this.sendRequest(data, cell)
-                        .done(_.bind(_this.onSaveSuccess, ctx))
-                        .fail(_.bind(_this.onSaveError, ctx))
-                        .always(function() {
-                            cell.$el.removeClass('loading');
-                        });
-                    _this.exitEditMode(cell);
-                });
-                editorComponent.on('cancelAction', function() {
-                    _this.exitEditMode(cell);
-                });
+                _this.listenTo(editorComponent, 'saveAction', _this.saveCurrentCell);
+                _this.listenTo(editorComponent, 'cancelAction', _this.exitEditMode);
+                _this.listenTo(editorComponent, 'saveAndEditNextAction', _this.saveCurrentCellAndEditNext);
+                _this.listenTo(editorComponent, 'cancelAndEditNextAction', _this.editNextCell);
             });
+        },
+
+        saveCurrentCell: function(data, exit) {
+            if (!this.editModeEnabled) {
+                throw Error('Edit mode disabled');
+            }
+            var cell = this.currentCell;
+            cell.$el.addClass('loading');
+            var ctx = {
+                cell: cell,
+                oldValue: cell.model.get(cell.column.get('name'))
+            };
+            this.sendRequest(data, cell)
+                .done(_.bind(this.onSaveSuccess, ctx))
+                .fail(_.bind(this.onSaveError, ctx))
+                .always(function() {
+                    cell.$el.removeClass('loading');
+                });
+            if (exit !== false) {
+                this.exitEditMode(cell);
+            }
         },
 
         exitEditMode: function() {
@@ -173,6 +182,15 @@ define(function(require) {
             delete this.editorComponent;
         },
 
+        editNextCell: function() {
+            // console.log('edit next');
+        },
+
+        saveCurrentCellAndEditNext: function(data) {
+            this.saveCurrentCell(data, false);
+            this.editNextCell();
+        },
+
         sendRequest: function(data, cell) {
             cell.model.set(data);
             return $.ajax({
@@ -184,6 +202,10 @@ define(function(require) {
                 url: this.route.getUrl(cell.model.toJSON()),
                 data: JSON.stringify(data)
             });
+        },
+
+        findNextEditableCell: function(cell) {
+            // console.log(cell);
         },
 
         onSaveSuccess: function() {
