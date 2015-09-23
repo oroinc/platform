@@ -9,6 +9,15 @@ define(function(require) {
         component: null,
 
         initialize: function() {
+            var title = this.model.get('title');
+            var settings = this.model.get('settings');
+            if (settings.folderName) {
+                title = settings.folderName;
+                if (settings.mailboxName) {
+                    title += ' - ' + settings.mailboxName;
+                }
+                this.model.set('title', title);
+            }
             this.on('refresh', this.onRefresh);
             RecentEmailsContentView.__super__.initialize.apply(this, arguments);
         },
@@ -18,7 +27,6 @@ define(function(require) {
                 this.component.dispose();
             }
 
-            var settings = this.model.get('settings');
             var collection = this.model.emailNotificationCollection;
             var options = {
                 _sourceElement: this.$el,

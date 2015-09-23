@@ -1,16 +1,10 @@
-<fieldset>
+<fieldset class="recent-emails-setup">
     <div class="control-group">
         <div class="control-label wrap">
             <label class="required"><%= _.__("oro.email.recent_emails_widget.mailbox_folder") %><em>*</em></label>
         </div>
         <div class="controls">
-            <% if (foldersData === '[]') { %>
-            <input name="folderId" type="text" placeholder="<%= _.__('Loading...') %>" disabled="disabled">
-            <% } else { %>
-            <input name="folderId" type="hidden" value="<%= settings.folderId %>"
-                    data-page-component-module="oro/select2-component"
-                    data-page-component-options='{"configs": {"data":<%= foldersData %>}}' />
-            <% } %>
+            <input name="folderId" type="hidden" value="<%= settings.folderId %>" />
         </div>
     </div>
     <div class="control-group">
