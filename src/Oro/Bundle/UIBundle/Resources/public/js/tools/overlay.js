@@ -1,9 +1,12 @@
 define(function(require) {
     'use strict';
     var $ = require('jquery');
+    var _ = require('underscore');
     return {
+        hasBackdrop: false,
         createOverlay: function($overlayContent, options) {
             var _this = this;
+            this.hasBackdrop = true;
             $('body').addClass('backdrop');
             $(document.body).append($overlayContent);
             $overlayContent.css({
@@ -39,7 +42,14 @@ define(function(require) {
                 clearInterval($overlayContent.data('interval'));
             }
             $overlayContent.remove();
-            $('body').removeClass('backdrop');
-        }
+            this.hasBackdrop = false;
+            this.removeBackdrop();
+        },
+
+        removeBackdrop: _.debounce(function() {
+            if (!this.hasBackdrop) {
+                $('body').removeClass('backdrop');
+            }
+        }, 50)
     };
 });

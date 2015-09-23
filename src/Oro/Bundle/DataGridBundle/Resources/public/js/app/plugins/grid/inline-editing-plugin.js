@@ -146,6 +146,8 @@ define(function(require) {
                 _this.listenTo(editorComponent, 'cancelAction', _this.exitEditMode);
                 _this.listenTo(editorComponent, 'saveAndEditNextAction', _this.saveCurrentCellAndEditNext);
                 _this.listenTo(editorComponent, 'cancelAndEditNextAction', _this.editNextCell);
+                _this.listenTo(editorComponent, 'saveAndEditPrevAction', _this.saveCurrentCellAndEditPrev);
+                _this.listenTo(editorComponent, 'cancelAndEditPrevAction', _this.editPrevCell);
             });
         },
 
@@ -196,6 +198,20 @@ define(function(require) {
             this.editNextCell();
         },
 
+        editPrevCell: function() {
+            var nextCell = this.findPrevEditableCell(this.currentCell);
+            if (nextCell) {
+                this.enterEditMode(nextCell);
+            } else {
+                this.exitEditMode();
+            }
+        },
+
+        saveCurrentCellAndEditPrev: function(data) {
+            this.saveCurrentCell(data, false);
+            this.editPrevCell();
+        },
+
         sendRequest: function(data, cell) {
             cell.model.set(data);
             return $.ajax({
@@ -230,6 +246,31 @@ define(function(require) {
                 }
                 column = columns.at(0);
                 row = next(row);
+            } while (row);
+            return null;
+        },
+
+        findPrevEditableCell: function(cell) {
+            function prev(model) {
+                var index = -1 + model.collection.indexOf(model);
+                if (index >= 0) {
+                    return model.collection.at(index);
+                }
+                return null;
+            }
+            var row = cell.model;
+            var column = cell.column;
+            var columns = column.collection;
+            do {
+                column = prev(column);
+                while (column) {
+                    if (column.get('editable')) {
+                        return this.main.findCell(row, column);
+                    }
+                    column = prev(column);
+                }
+                column = columns.last();
+                row = prev(row);
             } while (row);
             return null;
         },

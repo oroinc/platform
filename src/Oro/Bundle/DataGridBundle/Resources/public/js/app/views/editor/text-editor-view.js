@@ -84,10 +84,10 @@ define(function(require) {
             return this.$('input[name=value]').val();
         },
 
-        onSave: function(e, navigateNextCell) {
+        onSave: function(e, postfix) {
             var data = {};
             data[this.column.get('name')] = this.getValue();
-            this.trigger('save' + (navigateNextCell ? 'AndEditNext' : '') + 'Action', data);
+            this.trigger('save' + (postfix ? postfix : '') + 'Action', data);
         },
 
         rethrowAction: function(e) {
@@ -97,7 +97,7 @@ define(function(require) {
         },
 
         isChanged: function() {
-            return this.getValue() !== this.getModelValue();
+            return this.getValue() !== this.getModelValue() ? this.getModelValue() : '';
         },
 
         onChange: function() {
@@ -111,14 +111,15 @@ define(function(require) {
         onKeyDown: function(e) {
             switch (e.keyCode) {
                 case this.TAB_KEY_CODE:
+                    var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
                     if (this.isChanged()) {
                         if (this.validator.form()) {
-                            this.onSave(null, true);
+                            this.onSave(null, postfix);
                         } else {
                             this.focus();
                         }
                     } else {
-                        this.trigger('cancelAndEditNextAction');
+                        this.trigger('cancel' + postfix + 'Action');
                     }
                     e.preventDefault();
                     break;
