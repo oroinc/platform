@@ -10,6 +10,7 @@ define(function(require) {
         autoRender: true,
         template: require('tpl!../../../../templates/text-editor.html'),
         className: 'text-editor',
+        inputType: 'text',
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
@@ -25,6 +26,7 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = {};
+            data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.column = this.column.toJSON();
             data.value = this.getModelValue();
@@ -39,6 +41,9 @@ define(function(require) {
             this.$el.addClass(_.result(this, 'className'));
             this.validator = this.$el.validate({
                 submitHandler: _.bind(this.onSave, this),
+                errorPlacement: function(error, element) {
+                    error.appendTo(element.closest('.inline-editor-wrapper'));
+                },
                 rules: {
                     value: this.getValidationRules()
                 }

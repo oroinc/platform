@@ -91,6 +91,27 @@
     input[name=value] {
       // about 10+2 digits
       width: 100px;
+      text-align: right;
+    }
+  }
+  &.date-editor {
+    .hasDatepicker {
+      width: 95px;
+    }
+  }
+  &.datetime-editor {
+    width: 260px;
+    .fields-row {
+      display: inline-block
+    }
+    .hasDatepicker {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: none;
+      width: 95px;
+    }
+    .timepicker-input {
+      border-radius: 0;
     }
   }
 }
