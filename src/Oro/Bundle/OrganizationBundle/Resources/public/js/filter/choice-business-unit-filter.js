@@ -30,6 +30,10 @@ define(function(require) {
             'change input[type="checkbox"]': '_onChangeBusinessUnit'
         },
 
+        emptyValue: {
+            type: 1,
+            value: ""
+        },
         /**
          * Initialize.
          *
@@ -80,10 +84,10 @@ define(function(require) {
                 $filter.find('.list').html(list);
 
             this._appendFilter($filter);
-
             this._updateDOMValue();
 
             this._criteriaRenderd = true;
+            this.$el.find('.list').find('input:first').focus();
         },
 
         _getListTemplate: function(businessUnit) {
@@ -152,6 +156,7 @@ define(function(require) {
             });
 
             values = values.join(',');
+            //values = 'Acme, West1';
             this.setValue({value: values});
         },
 
@@ -162,11 +167,15 @@ define(function(require) {
          * @return {*}
          */
         setValue: function(value) {
-            var oldValue = this.value;
             this.value = tools.deepClone(value);
             this._updateDOMValue();
 
             return this;
+        },
+
+        getValue: function(value) {
+            var value = ChoiceBusinessUnitFilter.__super__.getValue.apply(this, arguments);
+            return value;
         },
 
         _onClickUpdateCriteria: function() {
@@ -178,17 +187,48 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        _readDOMValue: function() {
+            var values  = this._getInputValue(this.criteriaValueSelectors.value);
+
+            return {
+                value: values,
+                type: 1 //this._getInputValue(this.criteriaValueSelectors.type)
+            };
+        },
+
+        /**
+         * @inheritDoc
+         */
         _getCriteriaHint: function() {
+            var self = this;
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             var option = null;
 
             if (!value.value) {
                 return this.placeholder;
             }
-            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+
+            var values = value.value.split(',');
+            var label = [];
+            for (var i in values) {
+                for (var j in self.businesUnit) {
+                    if (values[i] == this.businesUnit[j].id) {
+                        label.push(this.businesUnit[j].name);
+                    }
+                }
+            }
+
+            var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
 
             return (option ? option.label + ' ' : '') + hintValue;
-       }
+       },
+
+        _onClickResetFilter: function() {
+            ChoiceBusinessUnitFilter.__super__._onClickResetFilter.apply(this, arguments);
+            this._updateCriteriaHint();
+            this.trigger('update');
+            this.$el.find('input:checked').removeAttr('checked');
+        }
     });
 
     return ChoiceBusinessUnitFilter;

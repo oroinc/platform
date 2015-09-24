@@ -5,10 +5,21 @@ namespace Oro\Bundle\OrganizationBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\OrganizationBundle\Form\Type\Filter\BusinessUnitChoiceFilterType;
 
-class BusinessUnitChoiceFilter extends ChoiceFilter
+class BusinessUnitChoiceFilter extends AbstractFilter
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFormType()
+    {
+        return BusinessUnitChoiceFilterType::NAME;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,6 +59,11 @@ class BusinessUnitChoiceFilter extends ChoiceFilter
         }
 
         return true;
+    }
+
+    public function parseData($data) {
+        $data['value'] = explode(',', $data['value']);
+        return $data;
     }
 
     /**
