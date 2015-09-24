@@ -2,7 +2,9 @@ define(function(require) {
     'use strict';
 
     var SidebarRecentEmailsComponent;
+    var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var module = require('module');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
 
@@ -12,9 +14,17 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
+            var count;
+            var config = module.config();
+            var settings = options.model.get('settings');
             this.model = options.model;
-            if ('unreadEmailsCount' in this.model.module) {
-                this.model.set({unreadEmailsCount: this.model.module.unreadEmailsCount});
+            if ('unreadEmailsCount' in config) {
+                count = _.find(config.unreadEmailsCount, function(item) {
+                    return Number(item.id) === Number(settings.folderId);
+                });
+                if (count !== void 0) {
+                    this.model.set({unreadEmailsCount: count.num});
+                }
             }
             this.model.on('change:settings', function(model, settings) {
                 model.emailNotificationCollection.setLimit(settings.limit);

@@ -18,7 +18,6 @@ define(function(require) {
                 this.component.dispose();
             }
 
-            var settings = this.model.get('settings');
             var collection = this.model.emailNotificationCollection;
             var options = {
                 _sourceElement: this.$el,

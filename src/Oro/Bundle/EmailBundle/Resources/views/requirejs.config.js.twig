@@ -3,8 +3,8 @@ require({
         'oroemail/js/app/components/email-notification-component': {
             clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
         },
-        'oroemail/sidebar_widgets/recent_emails/js/widget': {
-            unreadEmailsCount: '{{ render(path('oro_email_unread_emails_count')) }}'
+        'oroemail/js/app/components/sidebar-recent-emails-component': {
+            unreadEmailsCount: {{ oro_get_unread_emails_count()|json_encode|raw }}
         }
     }
 });
