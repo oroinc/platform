@@ -49,7 +49,7 @@ define(function(require) {
                     url: routing.generate('oro_business_unit_list'),
                     success: function(reposne) {
                         self.businessUnit = reposne;
-
+                        self._updateCriteriaHint();
                     },
                     error: function(jqXHR) {
                         messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
@@ -59,12 +59,18 @@ define(function(require) {
             ChoiceBusinessUnitFilter.__super__.initialize.apply(this, arguments);
         },
 
+        _onClickCriteriaSelector: function() {
+            ChoiceBusinessUnitFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
+            this.$el.find('.list').find('input:first').focus();
+        },
+
         /**
          * @inheritDoc
          */
         _renderCriteria: function() {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
+            var self = this;
 
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
@@ -91,7 +97,6 @@ define(function(require) {
             this._updateDOMValue();
 
             this._criteriaRenderd = true;
-            this.$el.find('.list').find('input:first').focus();
         },
 
         _getListTemplate: function(businessUnit) {
@@ -163,7 +168,6 @@ define(function(require) {
             });
 
             values = values.join(',');
-            //values = 'Acme, West1';
             this.setValue({value: values});
         },
 
