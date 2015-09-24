@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -346,13 +347,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folder        = $imapFolder->getFolder();
         $existingUids  = $this->getExistingUids($folder, $emails);
         $isMultiFolder = $this->manager->hasCapability(Imap::CAPABILITY_MSG_MULTI_FOLDERS);
-        $messageIds         = $this->getMessageIds($emails, $existingUids);
+        $messageIds         = $this->getMessageIds($emails);
         $existingImapEmails = $this->getExistingImapEmails($folder->getOrigin(), $messageIds);
         $existingEmailUsers = $this->getExistingEmailUsers($folder, $messageIds);
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
         foreach ($emails as $email) {
-            if ($folder->getOrigin()->getMailbox() && !$this->allowSaveEmail($folder, $email, $existingUids)) {
+            if (!$this->checkOnOldEmailForMailbox($folder, $email, $folder->getOrigin()->getMailbox())) {
+                continue;
+            }
+            if (!$this->checkOnExistsSavedEmail($email, $existingUids)) {
                 continue;
             }
 
@@ -419,15 +423,17 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * Check allowing to save email by date
+     *
      * @param EmailFolder $folder
      * @param Email $email
-     * @param array $existingUids
+     * @param Mailbox $mailbox
      *
      * @return bool
      */
-    protected function allowSaveEmail(EmailFolder $folder, Email $email, array $existingUids)
+    protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
-        if ($folder->getSynchronizedAt() > $email->getSentAt()) {
+        if ($mailbox && $folder->getSynchronizedAt() > $email->getSentAt()) {
             $this->logger->info(
                 sprintf(
                     'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
@@ -439,6 +445,19 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Check allowing to save email by uid
+     *
+     * @param Email $email
+     * @param array $existingUids
+     *
+     * @return bool
+     */
+    protected function checkOnExistsSavedEmail(Email $email, array $existingUids)
+    {
         if (in_array($email->getId()->getUid(), $existingUids)) {
             $this->logger->info(
                 sprintf(
@@ -677,7 +696,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         } else {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
             $this->logger->notice(sprintf('Previous max email UID "%s"', $lastUid));
-            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', $lastUid));
+            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', ++$lastUid));
         }
 
         return $emails;
@@ -692,7 +711,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function isMovableToOtherFolder($existingImapEmail, $isMultiFolder, $email)
     {
-        return $existingImapEmail
-            && (!$isMultiFolder || $email->getId()->getUid() === $existingImapEmail->getUid());
+        return !$isMultiFolder
+            && $existingImapEmail
+            && $email->getId()->getUid() === $existingImapEmail->getUid();
     }
 }
