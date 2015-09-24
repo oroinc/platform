@@ -13,9 +13,9 @@ define(function(require) {
     /**
      * Number filter: formats value as a number
      *
-     * @export  oro/filter/number-filter
-     * @class   oro.filter.NumberFilter
-     * @extends oro.filter.ChoiceFilter
+     * @export  oro/filter/choice-business-unit-filter
+     * @class   oro.filter.ChoiceBusinessUnitFilter
+     * @extends oro.filter.TextFilter
      */
     ChoiceBusinessUnitFilter = TextFilter.extend({
         templateSelector: '#choice-business-unit-template',

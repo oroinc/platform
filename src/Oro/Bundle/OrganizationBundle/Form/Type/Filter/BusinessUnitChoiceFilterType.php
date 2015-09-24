@@ -2,15 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractChoiceType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Symfony\Component\Form\AbstractType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
 class BusinessUnitChoiceFilterType extends AbstractType
 {
@@ -64,27 +58,4 @@ class BusinessUnitChoiceFilterType extends AbstractType
             )
         );
     }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public function setDefaultOptions(OptionsResolverInterface $resolver)
-//    {
-//        $choices = array(
-//            self::TYPE_CONTAINS     => $this->translator->trans('oro.filter.form.label_type_contains'),
-//            self::TYPE_NOT_CONTAINS => $this->translator->trans('oro.filter.form.label_type_not_contains'),
-//        );
-//
-//        $resolver->setDefaults(
-//            array(
-//                'field_type'       => 'text',
-//                'field_options'    => array(),
-//                'operator_choices' => $choices,
-//                'populate_default' => false,
-//                'default_value'    => null,
-//                'null_value'       => null,
-//                'class'            => null
-//            )
-//        );
-//    }
 }
