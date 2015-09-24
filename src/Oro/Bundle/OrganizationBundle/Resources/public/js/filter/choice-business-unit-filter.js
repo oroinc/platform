@@ -3,10 +3,12 @@ define(function(require) {
 
     var ChoiceBusinessUnitFilter;
     var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var TextFilter = require('oro/filter/choice-filter');
     var $ = require('jquery');
     var routing = require('routing');
     var tools = require('oroui/js/tools');
+    var messenger = require('oroui/js/messenger');
 
     /**
      * Number filter: formats value as a number
@@ -32,8 +34,9 @@ define(function(require) {
 
         emptyValue: {
             type: 1,
-            value: ""
+            value: ''
         },
+
         /**
          * Initialize.
          *
@@ -41,15 +44,15 @@ define(function(require) {
          */
         initialize: function(options) {
             var self = this;
-            if (!self.businesUnit) {
+            if (!self.businessUnit) {
                 $.ajax({
                     url: routing.generate('oro_business_unit_list'),
-                    success: function (reposne) {
-                        self.businesUnit = reposne;
+                    success: function(reposne) {
+                        self.businessUnit = reposne;
 
                     },
-                    error: function (jqXHR) {
-                        //messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                    error: function(jqXHR) {
+                        messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
                     }
                 });
             }
@@ -80,8 +83,9 @@ define(function(require) {
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value
             }));
-            var list = this._getListTemplate(this.businesUnit);
-                $filter.find('.list').html(list);
+
+            var list = this._getListTemplate(this.businessUnit);
+            $filter.find('.list').html(list);
 
             this._appendFilter($filter);
             this._updateDOMValue();
@@ -94,7 +98,7 @@ define(function(require) {
             var self = this;
             var template;
             var response = [];
-            $.each(businessUnit, function (key, value) {
+            _.each(businessUnit, function(value) {
                 if (!value['owner_id']) {
                     response.push({
                         value: value,
@@ -103,8 +107,8 @@ define(function(require) {
                 }
             });
 
-            $.each(response, function(key1, value1) {
-                response[key1]['children'] = self.findChild(value1, businessUnit);
+            _.each(response, function(value, key) {
+                response[key]['children'] = self.findChild(value, businessUnit);
             });
 
             template = this.getTemplate(response);
@@ -115,7 +119,10 @@ define(function(require) {
             var self = this;
             var template = '<ul>';
             $.each(items, function(key, value) {
-                template += '<li>' + '<label for="business-unit-' + value.value.id + '"><input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox">' + value.value.name + '</label>';
+                template += '<li>' + '<label for="business-unit-' + value.value.id + '">' +
+                '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox">' +
+                    value.value.name +
+                '</label>';
                 if (value.children.length > 0) {
                     template += self.getTemplate(value.children);
                 }
@@ -173,11 +180,6 @@ define(function(require) {
             return this;
         },
 
-        getValue: function(value) {
-            var value = ChoiceBusinessUnitFilter.__super__.getValue.apply(this, arguments);
-            return value;
-        },
-
         _onClickUpdateCriteria: function() {
             ChoiceBusinessUnitFilter.__super__._onClickUpdateCriteria.apply(this, arguments);
             this.trigger('update');
@@ -211,9 +213,9 @@ define(function(require) {
             var values = value.value.split(',');
             var label = [];
             for (var i in values) {
-                for (var j in self.businesUnit) {
-                    if (values[i] == this.businesUnit[j].id) {
-                        label.push(this.businesUnit[j].name);
+                for (var j in self.businessUnit) {
+                    if (values[i] == this.businessUnit[j].id) {
+                        label.push(this.businessUnit[j].name);
                     }
                 }
             }
@@ -221,7 +223,7 @@ define(function(require) {
             var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
 
             return (option ? option.label + ' ' : '') + hintValue;
-       },
+        },
 
         _onClickResetFilter: function() {
             ChoiceBusinessUnitFilter.__super__._onClickResetFilter.apply(this, arguments);
