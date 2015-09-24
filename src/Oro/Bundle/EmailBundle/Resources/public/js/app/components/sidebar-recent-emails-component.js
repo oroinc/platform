@@ -20,8 +20,7 @@ define(function(require) {
         initialize: function(options) {
             var count;
             var config = module.config();
-            var settings = options.model.get('settings');
-            this.model = options.model;
+            var settings = this.model.get('settings');
             if ('unreadEmailsCount' in config) {
                 count = _.find(config.unreadEmailsCount, function(item) {
                     return Number(item.id) === Number(settings.folderId);
@@ -30,8 +29,8 @@ define(function(require) {
                     this.model.set({unreadEmailsCount: count.num});
                 }
             }
-            this.model.emailNotificationCollection.setRouteParams(settings);
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
+            this.model.emailNotificationCollection.setRouteParams(settings);
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
@@ -50,8 +49,8 @@ define(function(require) {
                 return;
             }
             this.model.emailNotificationCollection.off('sync', this.onCollectionSync, this);
-            delete this.model;
             this.model.emailNotificationCollection.dispose();
+            delete this.model;
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
         }
     });
