@@ -52,7 +52,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'iconClass' => null,
                         'module' => 'widget/foo',
                         'placement' => 'left',
-                        'settings' => array('test' => 'Hello')
+                        'settings' => array('test' => 'Hello'),
+                        'showRefreshButton' => true
                     ),
                     'bar' => array(
                         'title' => 'Bar',
@@ -60,7 +61,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
-                        'settings' => null
+                        'settings' => null,
+                        'showRefreshButton' => true
                     )
                 ),
             ),
@@ -84,7 +86,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'iconClass' => 'test2',
                         'module' => 'widget/foo',
                         'placement' => 'left',
-                        'settings' => array('test2' => 'Rewritten')
+                        'settings' => array('test2' => 'Rewritten'),
+                        'showRefreshButton' => true
 
                     ),
                     'bar' => array(
@@ -93,7 +96,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'iconClass' => 'test',
                         'module' => 'widget/bar',
                         'placement' => 'both',
-                        'settings' => null
+                        'settings' => null,
+                        'showRefreshButton' => true
                     )
                 ),
             )

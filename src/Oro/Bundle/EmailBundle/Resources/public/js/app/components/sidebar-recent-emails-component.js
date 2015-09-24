@@ -8,7 +8,7 @@ define(function(require) {
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
         listen: {
-            'change:settings model': 'update'
+            'change:settings model': 'updateRoute'
         },
 
         /**
@@ -18,7 +18,7 @@ define(function(require) {
         initialize: function(options) {
             this.model = options.model;
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
-            this.update(this.model, this.model.get('settings'));
+            this.updateRoute();
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
@@ -28,16 +28,8 @@ define(function(require) {
             });
         },
 
-        update: function(model, settings) {
-            var title;
-            if (settings.folderName) {
-                title = settings.folderName;
-                if (settings.mailboxName) {
-                    title += ' - ' + settings.mailboxName;
-                }
-                this.model.set({'title': title}, {silent: true});
-            }
-            model.emailNotificationCollection.setRouteParams(settings);
+        updateRoute: function() {
+            this.model.emailNotificationCollection.setRouteParams(this.model.get('settings'));
         },
 
         dispose: function() {

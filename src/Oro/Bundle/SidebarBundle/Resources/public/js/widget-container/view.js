@@ -28,43 +28,52 @@ define(['jquery', 'underscore', 'backbone', '../constants',
         },
 
         render: function() {
-            var view = this;
-            var model = view.model;
-            var template = null;
+            this.$el.attr('data-cid', this.model.cid);
 
-            if (model.get('state') === constants.WIDGET_MINIMIZED) {
-                template = view.templateMin;
+            if (this.model.get('cssClass')) {
+                this.$el.attr('class', this.model.get('cssClass'));
+            }
+
+            if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                this.$el.addClass('sidebar-widget-popup');
             } else {
-                template = view.templateMax;
+                this.$el.addClass('sidebar-widget-embedded');
             }
 
-            view.$el.html(template(_.extend(model.toJSON(), {showRefreshButton: !model.module.HIDE_REFRESH_BUTTON})));
-            view.$el.attr('data-cid', model.cid);
+            this.model.loadModule().then(_.bind(this._render, this));
 
-            if (view.model.get('cssClass')) {
-                view.$el.attr('class', view.model.get('cssClass'));
+            return this;
+        },
+
+        /**
+         * Renders the widget content once widget module is loaded
+         *
+         * @param {Object} module
+         * @protected
+         */
+        _render: function(module) {
+            var template = this.templateMax;
+            if (this.model.get('state') === constants.WIDGET_MINIMIZED) {
+                template = this.templateMin;
             }
 
-            if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
-                model.loadModule().then(function(Widget) {
-                    var $widgetContent = view.$el.find('.sidebar-widget-content');
-                    if (!view.contentView) {
-                        view.contentView = new Widget.ContentView({
-                            model: model
-                        });
-                    }
-                    view.contentView.setElement($widgetContent);
-                    view.contentView.render();
+            var data = this.model.toJSON();
+            if (module.titleTemplate) {
+                data.title = module.titleTemplate(data);
+            }
+
+            this.$el.html(template(data));
+
+            if (this.model.get('state') !== constants.WIDGET_MINIMIZED) {
+                if (this.contentView) {
+                    this.contentView.dispose();
+                }
+                this.contentView = new module.ContentView({
+                    autoRender: true,
+                    model: this.model,
+                    el: this.$('.sidebar-widget-content')
                 });
             }
-
-            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                view.$el.removeClass('sidebar-widget-embedded').addClass('sidebar-widget-popup');
-            } else {
-                view.$el.addClass('sidebar-widget-embedded').removeClass('sidebar-widget-popup');
-            }
-
-            return view;
         },
 
         setOffset: function(cord) {
