@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 /**
  * Contains tests for a performance crucial parts of entity configs
  * By default all tests are disabled and they are enabled only during
- * modification of entity configs.
+ * modification of ConfigManager and related classes.
  * To enable tests use ENABLE_TESTS constant.
  */
 class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase

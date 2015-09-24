@@ -36,10 +36,6 @@ class ConfigLogTest extends \PHPUnit_Framework_TestCase
         $this->configLog->setLoggedAt($data);
         $this->assertEquals($data, $this->configLog->getLoggedAt());
 
-        $this->configLog->setLoggedAt(null);
-        $this->configLog->prePersist();
-        $this->assertInstanceOf('\DateTime', $this->configLog->getLoggedAt());
-
         $this->configLog->setUser($userMock);
         $this->assertEquals($userMock, $this->configLog->getUser());
 

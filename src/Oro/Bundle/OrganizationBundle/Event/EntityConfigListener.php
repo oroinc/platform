@@ -2,35 +2,20 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
-class ConfigSubscriber implements EventSubscriberInterface
+class EntityConfigListener
 {
     /**
-     * {@inheritdoc}
+     * @param PreFlushConfigEvent $event
      */
-    public static function getSubscribedEvents()
+    public function preFlush(PreFlushConfigEvent $event)
     {
-        return [
-            Events::PRE_PERSIST_CONFIG => ['prePersistEntityConfig', 100]
-        ];
-    }
-
-    /**
-     * @param PersistConfigEvent $event
-     */
-    public function prePersistEntityConfig(PersistConfigEvent $event)
-    {
-        $config   = $event->getConfig();
-        $configId = $config->getId();
-
-        if ($configId->getScope() !== 'ownership') {
+        $config = $event->getConfig('ownership');
+        if (null === $config || $event->isFieldConfig()) {
             return;
         }
 
@@ -41,7 +26,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             $config->remove('owner_type');
             $haveChanges = true;
         }
-        if ($ownerType && $this->isCustomEntity($configId->getClassName(), $event->getConfigManager())) {
+        if ($ownerType && $this->isCustomEntity($config->getId()->getClassName(), $event->getConfigManager())) {
             if (!$config->has('owner_field_name')) {
                 // update 'ownership' config for entity
                 $config->set('owner_field_name', 'owner');

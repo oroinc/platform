@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\MappedSuperclass
- * @ORM\HasLifecycleCallbacks
  */
 abstract class AbstractConfigModel
 {
@@ -48,6 +47,13 @@ abstract class AbstractConfigModel
      * @var array key = scope!code, value = true
      */
     private $indexedValueMap;
+
+    /**
+     * Gets a model id
+     *
+     * @return int|null
+     */
+    abstract public function getId();
 
     /**
      * @param string $mode
@@ -162,22 +168,6 @@ abstract class AbstractConfigModel
     }
 
     /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->created = $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
-    }
-
-    /**
      * Creates an instance of ConfigModelIndexValue
      *
      * @param string $scope
@@ -206,7 +196,7 @@ abstract class AbstractConfigModel
 
         $indexedValues = $this->getIndexedValues();
         $this->ensureIndexedValueMapInitialized($indexedValues);
-        $mapKey = sprintf('%s!%s', $scope, $code);
+        $mapKey = $scope . '!' . $code;
         if (isset($this->indexedValueMap[$mapKey])) {
             foreach ($indexedValues as $indexedValue) {
                 if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
@@ -235,7 +225,7 @@ abstract class AbstractConfigModel
     {
         $indexedValues = $this->getIndexedValues();
         $this->ensureIndexedValueMapInitialized($indexedValues);
-        $mapKey = sprintf('%s!%s', $scope, $code);
+        $mapKey = $scope . '!' . $code;
         if (isset($this->indexedValueMap[$mapKey])) {
             foreach ($indexedValues as $indexKey => $indexedValue) {
                 if ($indexedValue->getScope() === $scope && $indexedValue->getCode() === $code) {
@@ -260,7 +250,7 @@ abstract class AbstractConfigModel
             $this->indexedValueMap = [];
             /** @var ConfigModelIndexValue[] $indexedValues */
             foreach ($indexedValues as $indexedValue) {
-                $this->indexedValueMap[sprintf('%s!%s', $indexedValue->getScope(), $indexedValue->getCode())] = true;
+                $this->indexedValueMap[$indexedValue->getScope() . '!' . $indexedValue->getCode()] = true;
             }
         }
     }

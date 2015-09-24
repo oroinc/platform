@@ -4,18 +4,17 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber;
+use Oro\Bundle\OrganizationBundle\Event\EntityConfigListener;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /** @var ConfigSubscriber */
-    protected $subscriber;
+    /** @var EntityConfigListener */
+    protected $listener;
 
     public function setUp()
     {
@@ -23,17 +22,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->subscriber = new ConfigSubscriber();
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            [
-                Events::PRE_PERSIST_CONFIG => ['prePersistEntityConfig', 100]
-            ],
-            $this->subscriber->getSubscribedEvents()
-        );
+        $this->listener = new EntityConfigListener();
     }
 
     public function testPrePersistEntityConfigForSystemEntityWithNotNoneOwnership()
@@ -62,7 +51,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('calculateConfigChangeSet');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
     public function testPrePersistEntityConfigForCustomEntityDoesNotRequireUpdate()
@@ -95,7 +84,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('calculateConfigChangeSet');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
     public function testPrePersistEntityConfigForCustomEntityWithNotNoneOwnership()
@@ -132,7 +121,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('calculateConfigChangeSet')
             ->with($expectedConfig);
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
     public function testPrePersistEntityConfigWithNoneOwnership()
@@ -149,7 +138,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('calculateConfigChangeSet')
             ->with($expectedConfig);
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent(['ownership' => $config], $this->configManager));
     }
 
     public function testPrePersistEntityConfigNotOwnershipScope()
@@ -159,6 +148,6 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        $this->subscriber->prePersistEntityConfig(new PersistConfigEvent($config, $this->configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent(['test' => $config], $this->configManager));
     }
 }

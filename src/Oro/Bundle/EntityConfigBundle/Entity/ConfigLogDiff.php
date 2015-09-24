@@ -21,7 +21,7 @@ class ConfigLogDiff
     /**
      * @var ConfigLog
      *
-     * @ORM\ManyToOne(targetEntity="ConfigLog", inversedBy="diffs", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="ConfigLog", inversedBy="diffs")
      * @ORM\JoinColumn(name="log_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $log;

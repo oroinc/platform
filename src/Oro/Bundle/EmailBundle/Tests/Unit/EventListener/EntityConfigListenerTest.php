@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber;
+use Oro\Bundle\EmailBundle\EventListener\EntityConfigListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
-class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_CACHE_KEY = 'testCache.Key';
     const TEST_CLASS_NAME = 'someClassName';
 
-    /** @var ConfigSubscriber */
-    protected $subscriber;
+    /** @var EntityConfigListener */
+    protected $listener;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $cache;
@@ -26,33 +23,25 @@ class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
             ->disableOriginalConstructor()->getMock();
 
-        $this->subscriber = new ConfigSubscriber($this->cache, self::TEST_CACHE_KEY);
+        $this->listener = new EntityConfigListener($this->cache, self::TEST_CACHE_KEY);
     }
 
     protected function tearDown()
     {
         unset($this->cache);
-        unset($this->subscriber);
-    }
-
-    public function testGetSubscribedEvents()
-    {
-        $this->assertEquals(
-            array(Events::PRE_PERSIST_CONFIG => 'persistConfig'),
-            ConfigSubscriber::getSubscribedEvents()
-        );
+        unset($this->listener);
     }
 
     /**
      * @dataProvider changeSetProvider
      *
      * @param $scope
-     * @param $change
+     * @param $changeSet
      * @param $shouldClearCache
      */
-    public function testPersistConfig($scope, $change, $shouldClearCache)
+    public function testPreFlush($scope, $changeSet, $shouldClearCache)
     {
-        $config = new Config(new EntityConfigId($scope, 'Test\Entity'));
+        $config = new Config(new FieldConfigId($scope, 'Test\Entity', 'testField'));
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
@@ -60,13 +49,13 @@ class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
         $configManager->expects($this->exactly($scope === 'email' ? 1 : 0))
             ->method('getConfigChangeSet')
             ->with($this->identicalTo($config))
-            ->will($this->returnValue($change));
+            ->will($this->returnValue($changeSet));
 
         $this->cache->expects($this->exactly($shouldClearCache ? 1 : 0))
             ->method('delete')
             ->with(self::TEST_CACHE_KEY);
 
-        $this->subscriber->persistConfig(new PersistConfigEvent($config, $configManager));
+        $this->listener->preFlush(new PreFlushConfigEvent([$scope => $config], $configManager));
     }
 
     /**

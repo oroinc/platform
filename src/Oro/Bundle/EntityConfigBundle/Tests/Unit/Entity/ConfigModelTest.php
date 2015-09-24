@@ -34,16 +34,6 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($model->getUpdated());
         $model->setUpdated(new \DateTime('2013-01-01'));
         $this->assertEquals('2013-01-01', $model->getUpdated()->format('Y-m-d'));
-
-        // test prePersist
-        $model->prePersist();
-        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->assertEquals($currentDate->format('Y-m-d'), $model->getCreated()->format('Y-m-d'));
-
-        // test preUpdate
-        $model->preUpdate();
-        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->assertEquals($currentDate->format('Y-m-d'), $model->getUpdated()->format('Y-m-d'));
     }
 
     public function testEntityConfigModel()

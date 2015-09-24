@@ -209,12 +209,14 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getClassName($object)
     {
-        if ($object instanceof PersistentCollection) {
-            $className = $object->getTypeClass()->getName();
-        } elseif (is_string($object)) {
+        if (is_string($object)) {
             $className = ClassUtils::getRealClass($object);
         } elseif (is_object($object)) {
-            $className = ClassUtils::getClass($object);
+            if ($object instanceof PersistentCollection) {
+                $className = $object->getTypeClass()->getName();
+            } else {
+                $className = ClassUtils::getClass($object);
+            }
         } elseif (is_array($object) && count($object) && is_object(reset($object))) {
             $className = ClassUtils::getClass(reset($object));
         } else {
