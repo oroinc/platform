@@ -84,7 +84,7 @@ services:
     oro_entity.event_listener.entity_modify_created_updated_properties_listener:
         class:  %oro_entity.event_listener.entity_modify_created_updated_properties_listener.class%
         arguments:
-            - @oro_security.security_facade.link
+            - @security.token_storage
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
