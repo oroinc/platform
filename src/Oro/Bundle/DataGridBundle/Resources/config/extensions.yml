@@ -101,6 +101,6 @@ services:
             - @doctrine
             - @oro_security.security_facade
             - @oro_security.acl_helper
-            - @event_dispatcher
+            - @oro_datagrid.columns.helper
         tags:
             - { name: oro_datagrid.extension }
