@@ -108,6 +108,29 @@ class EmailRepository extends EntityRepository
     }
 
     /**
+     * Get count new emails per folders
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @return array
+     */
+    public function getCountNewEmailsPerFolders(User $user, Organization $organization)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(DISTINCT e) num, f.id')
+            ->leftJoin('e.emailUsers', 'eu')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
+            ->setParameter('seen', false)
+            ->leftJoin('eu.folder', 'f')
+            ->groupBy('f.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * Get email entities by owner entity
      *
      * @param object $entity

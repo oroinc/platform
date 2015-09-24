@@ -2,13 +2,15 @@ define(function(require) {
     'use strict';
 
     var SidebarRecentEmailsComponent;
+    var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
+    var module = require('module');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
         listen: {
-            'change:settings model': 'updateRoute'
+            'change:settings model': 'updateCollectionRouteParams'
         },
 
         /**
@@ -16,9 +18,19 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            this.model = options.model;
+            var count;
+            var config = module.config();
+            var settings = this.model.get('settings');
+            if ('unreadEmailsCount' in config) {
+                count = _.find(config.unreadEmailsCount, function(item) {
+                    return Number(item.id) === Number(settings.folderId);
+                });
+                if (count !== void 0) {
+                    this.model.set({unreadEmailsCount: count.num});
+                }
+            }
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
-            this.updateRoute();
+            this.model.emailNotificationCollection.setRouteParams(settings);
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
@@ -28,8 +40,8 @@ define(function(require) {
             });
         },
 
-        updateRoute: function() {
-            this.model.emailNotificationCollection.setRouteParams(this.model.get('settings'));
+        updateCollectionRouteParams: function(model, settings) {
+            model.emailNotificationCollection.setRouteParams(settings);
         },
 
         dispose: function() {
@@ -37,8 +49,8 @@ define(function(require) {
                 return;
             }
             this.model.emailNotificationCollection.off('sync', this.onCollectionSync, this);
-            delete this.model;
             this.model.emailNotificationCollection.dispose();
+            delete this.model;
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
         }
     });

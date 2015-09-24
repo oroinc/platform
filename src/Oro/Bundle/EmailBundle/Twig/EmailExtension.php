@@ -75,7 +75,8 @@ class EmailExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_get_email_thread_attachments', [$this, 'getEmailThreadAttachments']),
             new \Twig_SimpleFunction('oro_can_attache', [$this, 'canReAttach']),
             new \Twig_SimpleFunction('oro_get_mailbox_process_label', [$this, 'getMailboxProcessLabel']),
-            new \Twig_SimpleFunction('oro_get_email_clank_event', [$this, 'getEmailClankEvent'])
+            new \Twig_SimpleFunction('oro_get_email_clank_event', [$this, 'getEmailClankEvent']),
+            new \Twig_SimpleFunction('oro_get_unread_emails_count', [$this, 'getUnreadEmailsCount'])
         ];
     }
 
@@ -183,6 +184,23 @@ class EmailExtension extends \Twig_Extension
         $currentOrganization = $this->securityFacade->getOrganization();
         $currentUser = $this->securityFacade->getLoggedUser();
         return  WebSocketSendProcessor::getUserTopic($currentUser, $currentOrganization);
+    }
+
+    /**
+     * Return array of numbers unread emails per folder
+     *
+     * @return array
+     */
+    public function getUnreadEmailsCount()
+    {
+        $currentOrganization = $this->securityFacade->getOrganization();
+        $currentUser = $this->securityFacade->getLoggedUser();
+        $result = $this->em->getRepository("OroEmailBundle:Email")
+            ->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
+        $total = $this->em->getRepository("OroEmailBundle:Email")
+            ->getCountNewEmails($currentUser, $currentOrganization, 0);
+        $result[] = array('num' => $total, 'id' => 0);
+        return $result;
     }
 
     /**
