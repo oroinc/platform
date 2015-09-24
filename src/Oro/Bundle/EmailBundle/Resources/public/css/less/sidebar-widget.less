@@ -22,4 +22,29 @@
       font-size: 8px;
     }
   }
+  &.sidebar-widget-popup {
+    .sidebar-widget {
+      width: 360px;
+    }
+    .short-emails-list .items li .footer .reply-all-action,
+    .short-emails-list .items li .footer .reply-action,
+    .short-emails-list .items li .footer .forward-action {
+      display: inline;
+    }
+  }
+  &.sidebar-widget-embedded {
+    .sidebar-widget-content {
+      .short-emails-list {
+        .items {
+          li {
+            padding: 9px 10px 5px;
+            .icon-envelope {
+              right: 7px;
+              top: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
 }
