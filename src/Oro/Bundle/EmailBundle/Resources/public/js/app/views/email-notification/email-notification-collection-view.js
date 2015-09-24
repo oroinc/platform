@@ -15,6 +15,7 @@ define(function(require) {
     EmailNotificationCollectionView = BaseCollectionView.extend({
         template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
+        animationDuration: 0,
         listSelector: '.items',
         countNewEmail: 0,
         loadingMask: null,

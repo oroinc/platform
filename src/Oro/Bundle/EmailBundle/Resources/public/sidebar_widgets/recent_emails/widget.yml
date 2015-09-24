@@ -3,6 +3,7 @@ iconClass: "icon-envelope"
 module:    "oroemail/sidebar_widgets/recent_emails/js/widget"
 placement: "both"
 cssClass:  "sidebar-widget-recent-emails"
+showRefreshButton: false
 settings:
     folderId: 0
     limit: 4
