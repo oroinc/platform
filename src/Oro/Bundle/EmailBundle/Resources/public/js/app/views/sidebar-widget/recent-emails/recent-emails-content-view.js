@@ -8,18 +8,8 @@ define(function(require) {
     RecentEmailsContentView = BaseView.extend({
         component: null,
 
-        initialize: function() {
-            var title = this.model.get('title');
-            var settings = this.model.get('settings');
-            if (settings.folderName) {
-                title = settings.folderName;
-                if (settings.mailboxName) {
-                    title += ' - ' + settings.mailboxName;
-                }
-                this.model.set('title', title);
-            }
-            this.on('refresh', this.onRefresh);
-            RecentEmailsContentView.__super__.initialize.apply(this, arguments);
+        listen: {
+            'refresh': 'onRefresh'
         },
 
         render: function() {

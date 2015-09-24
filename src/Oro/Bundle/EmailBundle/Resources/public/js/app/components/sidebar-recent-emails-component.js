@@ -7,18 +7,18 @@ define(function(require) {
         require('oroemail/js/app/models/email-notification/email-notification-collection');
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
+        listen: {
+            'change:settings model': 'update'
+        },
+
         /**
          * @constructor
          * @param {Object} options
          */
         initialize: function(options) {
             this.model = options.model;
-            this.model.on('change:settings', function(model, settings) {
-                model.emailNotificationCollection.setRouteParams(settings);
-            });
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
-            this.model.emailNotificationCollection.setRouteParams(this.model.get('settings'));
-            this.model.emailNotificationCollection.fetch();
+            this.update(this.model, this.model.get('settings'));
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
@@ -26,6 +26,18 @@ define(function(require) {
             this.model.set({
                 unreadEmailsCount: this.model.emailNotificationCollection.unreadEmailsCount || ''
             });
+        },
+
+        update: function(model, settings) {
+            var title;
+            if (settings.folderName) {
+                title = settings.folderName;
+                if (settings.mailboxName) {
+                    title += ' - ' + settings.mailboxName;
+                }
+                this.model.set({'title': title}, {silent: true});
+            }
+            model.emailNotificationCollection.setRouteParams(settings);
         },
 
         dispose: function() {

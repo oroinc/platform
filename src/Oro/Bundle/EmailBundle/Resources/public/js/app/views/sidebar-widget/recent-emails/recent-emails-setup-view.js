@@ -9,6 +9,7 @@ define(function(require) {
     var routing = require('routing');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     var BaseWidgetSetupView = require('orosidebar/js/app/views/base-widget/base-widget-setup-view');
+    require('jquery.select2');
 
     RecentEmailsContentView = BaseWidgetSetupView.extend({
         template: require('tpl!oroemail/templates/sidebar-widget/recent-emails/recent-emails-setup-view.html'),
@@ -29,25 +30,22 @@ define(function(require) {
             var mailboxes = [];
             _.each(data, function(mailbox) {
                 var text;
+                var folders;
                 if (mailbox.active) {
                     text = mailbox.properties.user;
+                    folders = mailbox.folders.map(function(folder) {
+                        return {
+                            id: Number(folder.id),
+                            text: folder.fullName
+                        };
+                    });
                     if (text) {
                         mailboxes.push({
                             text: text,
-                            children: mailbox.folders.map(function(folder) {
-                                return {
-                                    id: folder.id,
-                                    text: folder.fullName
-                                };
-                            })
+                            children: folders
                         });
                     } else {
-                        mailboxes = mailboxes.concat(mailbox.folders.map(function(folder) {
-                            return {
-                                id: folder.id,
-                                text: folder.fullName
-                            };
-                        }));
+                        mailboxes = mailboxes.concat(folders);
                     }
                 }
             });
@@ -59,19 +57,20 @@ define(function(require) {
                 name: '',
                 mailbox: ''
             };
+            id = Number(id);
             if (this.foldersData !== null && id) {
                 _.each(this.foldersData, function(mailbox) {
                     var folder;
                     if (info.name.length === 0) {
                         if ('children' in mailbox) {
                             folder = _.find(mailbox.children, function(folder) {
-                                return +folder.id === +id;
+                                return folder.id === id;
                             });
                             if (folder !== void 0) {
                                 info.name = folder.text;
                                 info.mailbox = mailbox.text;
                             }
-                        } else if (+mailbox.id === +id) {
+                        } else if (mailbox.id === id) {
                             info.name = mailbox.text;
                         }
                     }
@@ -124,22 +123,12 @@ define(function(require) {
         },
 
         onSubmit: function() {
-            var title = __('oro.email.recent_emails_widget.title_all_folders');
             var settings = this.fetchFromData();
             var folderInfo = this.getFolderInfo(settings.folderId);
             settings.folderName = folderInfo.name;
             settings.mailboxName = folderInfo.mailbox;
-            if (settings.folderName) {
-                title = settings.folderName;
-                if (settings.mailboxName) {
-                    title += ' - ' + settings.mailboxName;
-                }
-            }
             if (!tools.isEqualsLoosely(settings, this.model.get('settings'))) {
-                this.model.set({
-                    'title': title,
-                    'settings': settings
-                });
+                this.model.set('settings', settings);
             }
             this.trigger('close');
         }
