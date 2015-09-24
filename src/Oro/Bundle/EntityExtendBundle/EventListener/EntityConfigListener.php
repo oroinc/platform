@@ -9,7 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ConfigListener
+class EntityConfigListener
 {
     /**
      * @param PreFlushConfigEvent $event
@@ -39,7 +39,7 @@ class ConfigListener
     /**
      * @param EntityConfigEvent $event
      */
-    public function updateEntityConfig(EntityConfigEvent $event)
+    public function updateEntity(EntityConfigEvent $event)
     {
         $className       = $event->getClassName();
         $parentClassName = get_parent_class($className);
@@ -78,7 +78,7 @@ class ConfigListener
     /**
      * @param FieldConfigEvent $event
      */
-    public function newFieldConfig(FieldConfigEvent $event)
+    public function createField(FieldConfigEvent $event)
     {
         $configManager = $event->getConfigManager();
         $entityConfig  = $configManager->getProvider('extend')->getConfig($event->getClassName());

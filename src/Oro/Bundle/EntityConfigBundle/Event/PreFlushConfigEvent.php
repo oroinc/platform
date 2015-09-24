@@ -3,8 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -13,9 +11,6 @@ class PreFlushConfigEvent extends Event
     /** @var ConfigInterface[] */
     private $configs;
 
-    /** @var ConfigManager */
-    private $configManager;
-
     /** @var string */
     private $className;
 
@@ -23,21 +18,13 @@ class PreFlushConfigEvent extends Event
     private $fieldConfig;
 
     /**
-     * @param ConfigInterface[] $configs
-     * @param ConfigManager     $configManager
+     * @param ConfigInterface[] $configs       Entity or field configs to be flushed
+     * @param ConfigManager     $configManager The entity config manager
      */
     public function __construct($configs, ConfigManager $configManager)
     {
         $this->configs       = $configs;
         $this->configManager = $configManager;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
-    {
-        return $this->configManager;
     }
 
     /**

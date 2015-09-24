@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
-class ConfigListener
+class EntityConfigListener
 {
     /**
      * @param PreFlushConfigEvent $event

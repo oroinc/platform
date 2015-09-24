@@ -288,7 +288,7 @@ services:
         arguments:
             - @oro_security.entity_security_metadata_provider
         tags:
-            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     oro_security.acl.annotation_provider.cache.warmer:
         public: false

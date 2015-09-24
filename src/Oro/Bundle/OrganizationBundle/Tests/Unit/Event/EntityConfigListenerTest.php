@@ -6,14 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\OrganizationBundle\Event\ConfigListener;
+use Oro\Bundle\OrganizationBundle\Event\EntityConfigListener;
 
-class ConfigListenerTest extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    /** @var ConfigListener */
+    /** @var EntityConfigListener */
     protected $listener;
 
     public function setUp()
@@ -22,7 +22,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new ConfigListener();
+        $this->listener = new EntityConfigListener();
     }
 
     public function testPrePersistEntityConfigForSystemEntityWithNotNoneOwnership()

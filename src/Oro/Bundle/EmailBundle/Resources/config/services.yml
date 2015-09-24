@@ -334,12 +334,12 @@ services:
 
     # Available variables services
     oro_email.listener.config_listener:
-        class: Oro\Bundle\EmailBundle\EventListener\ConfigListener
+        class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
         arguments:
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
         tags:
-            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     # email template twig instance
     oro_email.twig.string_loader:

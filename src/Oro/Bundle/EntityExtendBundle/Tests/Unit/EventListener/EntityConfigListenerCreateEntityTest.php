@@ -6,9 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener;
+use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 
-class ConfigListenerCreateEntityTest extends ConfigListenerTestCase
+class EntityConfigListenerCreateEntityTest extends EntityConfigListenerTestCase
 {
     /**
      * Test class is extend and persisted
@@ -31,8 +31,8 @@ class ConfigListenerCreateEntityTest extends ConfigListenerTestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new ConfigListener();
-        $listener->updateEntityConfig($event);
+        $listener = new EntityConfigListener();
+        $listener->updateEntity($event);
 
         $this->assertEquals(
             [
@@ -77,8 +77,8 @@ class ConfigListenerCreateEntityTest extends ConfigListenerTestCase
 
         $event = new EntityConfigEvent($configModel->getClassName(), $this->configManager);
 
-        $listener = new ConfigListener();
-        $listener->updateEntityConfig($event);
+        $listener = new EntityConfigListener();
+        $listener->updateEntity($event);
 
         $this->assertEquals(
             [],

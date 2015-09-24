@@ -64,6 +64,13 @@ class ConfigManager
     protected $configChangeSets = [];
 
     /**
+     * @deprecated since 1.9. Should be removed together with deprecated events
+     * @see Oro\Bundle\EntityConfigBundle\Event\Events
+     * @var array
+     */
+    private $hasListenersCache = [];
+
+    /**
      * @param MetadataFactory          $metadataFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param ConfigModelManager       $modelManager
@@ -478,9 +485,16 @@ class ConfigManager
         // @todo: need investigation if we can call this flush only if !empty($models)
         $em->flush();
 
+        // @todo: Should be removed together with deprecated events
+        if ($this->hasListeners(Events::POST_FLUSH_CONFIG)) {
+            $this->eventDispatcher->dispatch(
+                Events::POST_FLUSH_CONFIG,
+                new Event\FlushConfigEvent($models, $this)
+            );
+        }
         $this->eventDispatcher->dispatch(
-            Events::POST_FLUSH_CONFIG,
-            new Event\FlushConfigEvent($models, $this)
+            Events::POST_FLUSH,
+            new Event\PostFlushConfigEvent($models, $this)
         );
 
         if (!empty($models)) {
@@ -498,15 +512,12 @@ class ConfigManager
      */
     protected function prepareFlush(&$models)
     {
-        // @todo: should be removed together with Events::PRE_PERSIST_CONFIG
-        $hasPrePersistListeners = $this->eventDispatcher->hasListeners(Events::PRE_PERSIST_CONFIG);
-
         $groupedConfigs = [];
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
-            // @todo: should be removed together with Events::PRE_PERSIST_CONFIG
-            if ($hasPrePersistListeners) {
+            // @todo: Should be removed together with deprecated events
+            if ($this->hasListeners(Events::PRE_PERSIST_CONFIG)) {
                 $this->eventDispatcher->dispatch(
                     Events::PRE_PERSIST_CONFIG,
                     new Event\PersistConfigEvent($config, $this)
@@ -524,7 +535,7 @@ class ConfigManager
         /** @var ConfigInterface[] $configs */
         foreach ($groupedConfigs as $modelKey => $configs) {
             $this->eventDispatcher->dispatch(
-                Events::PRE_FLUSH_CONFIG,
+                Events::PRE_FLUSH,
                 new Event\PreFlushConfigEvent($configs, $this)
             );
             foreach ($configs as $scope => $config) {
@@ -685,8 +696,15 @@ class ConfigManager
                     }
                 }
 
+                // @todo: Should be removed together with deprecated events
+                if ($this->hasListeners(Events::NEW_ENTITY_CONFIG)) {
+                    $this->eventDispatcher->dispatch(
+                        Events::NEW_ENTITY_CONFIG,
+                        new Event\EntityConfigEvent($className, $this)
+                    );
+                }
                 $this->eventDispatcher->dispatch(
-                    Events::NEW_ENTITY_CONFIG,
+                    Events::CREATE_ENTITY,
                     new Event\EntityConfigEvent($className, $this)
                 );
             }
@@ -730,8 +748,15 @@ class ConfigManager
                 }
             }
 
+            // @todo: Should be removed together with deprecated events
+            if ($this->hasListeners(Events::NEW_FIELD_CONFIG)) {
+                $this->eventDispatcher->dispatch(
+                    Events::NEW_FIELD_CONFIG,
+                    new Event\FieldConfigEvent($className, $fieldName, $this)
+                );
+            }
             $this->eventDispatcher->dispatch(
-                Events::NEW_FIELD_CONFIG,
+                Events::CREATE_FIELD,
                 new Event\FieldConfigEvent($className, $fieldName, $this)
             );
         }
@@ -765,8 +790,16 @@ class ConfigManager
                 $this->persistConfigs[$configKey] = $config;
             }
         }
+
+        // @todo: Should be removed together with deprecated events
+        if ($this->hasListeners(Events::UPDATE_ENTITY_CONFIG)) {
+            $this->eventDispatcher->dispatch(
+                Events::UPDATE_ENTITY_CONFIG,
+                new Event\EntityConfigEvent($className, $this)
+            );
+        }
         $this->eventDispatcher->dispatch(
-            Events::UPDATE_ENTITY_CONFIG,
+            Events::UPDATE_ENTITY,
             new Event\EntityConfigEvent($className, $this)
         );
     }
@@ -804,8 +837,16 @@ class ConfigManager
                 $this->persistConfigs[$configKey] = $config;
             }
         }
+
+        // @todo: Should be removed together with deprecated events
+        if ($this->hasListeners(Events::UPDATE_FIELD_CONFIG)) {
+            $this->eventDispatcher->dispatch(
+                Events::UPDATE_FIELD_CONFIG,
+                new Event\FieldConfigEvent($className, $fieldName, $this)
+            );
+        }
         $this->eventDispatcher->dispatch(
-            Events::UPDATE_FIELD_CONFIG,
+            Events::UPDATE_FIELD,
             new Event\FieldConfigEvent($className, $fieldName, $this)
         );
     }
@@ -823,6 +864,13 @@ class ConfigManager
     {
         $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
         if ($result) {
+            // @todo: Should be removed together with deprecated events
+            if ($this->hasListeners(Events::RENAME_FIELD_OLD)) {
+                $this->eventDispatcher->dispatch(
+                    Events::RENAME_FIELD_OLD,
+                    new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
+                );
+            }
             $this->eventDispatcher->dispatch(
                 Events::RENAME_FIELD,
                 new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
@@ -1168,5 +1216,22 @@ class ConfigManager
             'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
             . ' check it by ConfigManager::modelManager::checkDatabase'
         );
+    }
+
+    /**
+     * @deprecated since 1.9. Should be removed together with deprecated events
+     * @see Oro\Bundle\EntityConfigBundle\Event\Events
+     *
+     * @param string $eventName
+     *
+     * @return bool
+     */
+    private function hasListeners($eventName)
+    {
+        if (!isset($this->hasListenersCache[$eventName])) {
+            $this->hasListenersCache[$eventName] = $this->eventDispatcher->hasListeners($eventName);
+        }
+
+        return $this->hasListenersCache[$eventName];
     }
 }

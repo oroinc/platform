@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Oro\Bundle\EmailBundle\EventListener\ConfigListener;
+use Oro\Bundle\EmailBundle\EventListener\EntityConfigListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
-class ConfigListenerTest extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_CACHE_KEY = 'testCache.Key';
     const TEST_CLASS_NAME = 'someClassName';
 
-    /** @var ConfigListener */
+    /** @var EntityConfigListener */
     protected $listener;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
@@ -23,7 +23,7 @@ class ConfigListenerTest extends \PHPUnit_Framework_TestCase
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')
             ->disableOriginalConstructor()->getMock();
 
-        $this->listener = new ConfigListener($this->cache, self::TEST_CACHE_KEY);
+        $this->listener = new EntityConfigListener($this->cache, self::TEST_CACHE_KEY);
     }
 
     protected function tearDown()

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Event;
 
-use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 
-class FlushConfigEventTest extends \PHPUnit_Framework_TestCase
+class PostFlushConfigEventTest extends \PHPUnit_Framework_TestCase
 {
     public function testEvent()
     {
@@ -13,7 +13,7 @@ class FlushConfigEventTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $event = new FlushConfigEvent($models, $configManager);
+        $event = new PostFlushConfigEvent($models, $configManager);
         $this->assertSame($models, $event->getModels());
         $this->assertSame($configManager, $event->getConfigManager());
     }

@@ -6,10 +6,10 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener;
+use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
-class ConfigListenerPreFlushTest extends ConfigListenerTestCase
+class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 {
     /**
      * Test that preFlush called with event
@@ -24,7 +24,7 @@ class ConfigListenerPreFlushTest extends ConfigListenerTestCase
         $eventConfig    = new Config($entityConfigId);
 
         $event = new PreFlushConfigEvent(['extend' => $eventConfig], $this->configManager);
-        $listener = new ConfigListener();
+        $listener = new EntityConfigListener();
 
         $listener->preFlush($event);
     }
@@ -58,7 +58,7 @@ class ConfigListenerPreFlushTest extends ConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new ConfigListener();
+        $listener = new EntityConfigListener();
         $listener->preFlush($event);
 
         $this->assertEquals(
@@ -96,7 +96,7 @@ class ConfigListenerPreFlushTest extends ConfigListenerTestCase
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
-        $listener = new ConfigListener();
+        $listener = new EntityConfigListener();
         $listener->preFlush($event);
 
         $this->assertEquals(

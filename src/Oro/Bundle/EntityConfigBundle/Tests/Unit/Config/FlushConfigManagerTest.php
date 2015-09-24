@@ -137,10 +137,10 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->setFlushExpectations($em, [$model]);
 
-        $this->eventDispatcher->expects($this->at(1))
+        $this->eventDispatcher->expects($this->at(2))
             ->method('dispatch')
             ->with(
-                Events::PRE_FLUSH_CONFIG,
+                Events::PRE_FLUSH,
                 new PreFlushConfigEvent(['entity' => $entityConfig, 'test' => $testConfig], $this->configManager)
             );
 

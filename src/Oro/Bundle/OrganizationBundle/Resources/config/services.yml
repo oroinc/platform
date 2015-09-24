@@ -120,9 +120,9 @@ services:
             - { name: doctrine.event_listener, event: preRemove }
 
     oro_organization.listener.config_listener:
-        class: Oro\Bundle\OrganizationBundle\Event\ConfigListener
+        class: Oro\Bundle\OrganizationBundle\Event\EntityConfigListener
         tags:
-            - { name: kernel.event_listener, event: entity_config.pre_flush.config, method: preFlush, priority: 100 }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush, priority: 100 }
 
     oro_organization.import_strategy.listener:
         class: %oro_organization.import_strategy.listener.class%

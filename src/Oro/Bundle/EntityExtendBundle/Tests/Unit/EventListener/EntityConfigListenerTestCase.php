@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class ConfigListenerTestCase extends \PHPUnit_Framework_TestCase
+class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigManager */
     protected $configManager;

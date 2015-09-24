@@ -6,9 +6,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\RenameFieldEvent;
-use Oro\Bundle\EntityExtendBundle\EventListener\ConfigListener;
+use Oro\Bundle\EntityExtendBundle\EventListener\EntityConfigListener;
 
-class ConfigListenerCreateFieldTest extends ConfigListenerTestCase
+class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
 {
     const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
@@ -30,8 +30,8 @@ class ConfigListenerCreateFieldTest extends ConfigListenerTestCase
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $listener = new ConfigListener();
-        $listener->newFieldConfig($event);
+        $listener = new EntityConfigListener();
+        $listener->createField($event);
 
         $this->assertEquals(
             [],
@@ -59,8 +59,8 @@ class ConfigListenerCreateFieldTest extends ConfigListenerTestCase
 
         $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $this->configManager);
 
-        $listener = new ConfigListener();
-        $listener->newFieldConfig($event);
+        $listener = new EntityConfigListener();
+        $listener->createField($event);
 
         $this->assertEquals(
             ['upgradeable' => true],
@@ -94,7 +94,7 @@ class ConfigListenerCreateFieldTest extends ConfigListenerTestCase
 
         $event = new RenameFieldEvent(self::ENTITY_CLASS_NAME, 'testField', 'newName', $this->configManager);
 
-        $listener = new ConfigListener();
+        $listener = new EntityConfigListener();
         $listener->renameField($event);
 
         $this->assertEquals(

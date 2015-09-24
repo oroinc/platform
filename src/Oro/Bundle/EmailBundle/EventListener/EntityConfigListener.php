@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\Cache;
 
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 
-class ConfigListener
+class EntityConfigListener
 {
     /** @var Cache */
     protected $cache;
