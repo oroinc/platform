@@ -560,8 +560,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'property' => [
-                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') =>
-                        ExtendHelper::getMultiEnumSnapshotFieldName('field1')
+                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') => []
                 ]
             ],
             $entityConfig1->get('schema')
@@ -636,11 +635,85 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'property' => [
-                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') =>
-                        ExtendHelper::getMultiEnumSnapshotFieldName('field1')
+                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') => []
                 ]
             ],
             $entityConfig1->get('schema')
+        );
+    }
+
+    public function testPostUpdateForDeletedMultiEnumField()
+    {
+        $entityConfig = new Config(new EntityConfigId('extend', 'Extend\EnumValue1'));
+        $entityConfig->set('owner', ExtendScope::OWNER_CUSTOM);
+        $entityConfig->set('is_extend', true);
+        $entityConfig->set(
+            'schema',
+            [
+                'doctrine' => [
+                    'Extend\EnumValue1' => [
+                        'fields' => [
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field2') => [
+                                'column' => 'field2'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $fieldConfig = new Config(new FieldConfigId('extend', 'Extend\EnumValue1', 'field1', 'multiEnum'));
+        $fieldConfig->set('is_deleted', true);
+
+        $entityConfigs = [$entityConfig];
+        $fieldConfigs  = [$fieldConfig];
+
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+        $extendConfigProvider->expects($this->at(0))
+            ->method('getConfigs')
+            ->with(null, true)
+            ->will($this->returnValue($entityConfigs));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('getConfigs')
+            ->with($entityConfig->getId()->getClassName())
+            ->will($this->returnValue($fieldConfigs));
+
+        $this->configManager->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($entityConfig));
+
+        $this->extension->postUpdate();
+
+        $this->assertEquals(
+            [
+                'doctrine' => [
+                    'Extend\EnumValue1' => [
+                        'fields' => [
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field1') => [
+                                'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName('field1'),
+                                'type'     => 'string',
+                                'nullable' => true,
+                                'length'   => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
+                            ],
+                            ExtendHelper::getMultiEnumSnapshotFieldName('field2') => [
+                                'column' => 'field2'
+                            ]
+                        ]
+                    ]
+                ],
+                'property' => [
+                    ExtendHelper::getMultiEnumSnapshotFieldName('field1') => [
+                        'private' => true
+                    ]
+                ]
+            ],
+            $entityConfig->get('schema')
         );
     }
 }
