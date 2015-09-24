@@ -88,7 +88,7 @@ class EmailController extends Controller
                 $maxEmailsDisplay,
                 null
             )),
-            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, null)
         ];
     }
 
@@ -114,7 +114,7 @@ class EmailController extends Controller
         }
         $emailNotificationManager = $this->get('oro_email.manager.notification');
         $result = [
-            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization),
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
             'emails' => $emailNotificationManager->getEmails(
                 $this->getUser(),
                 $currentOrganization,

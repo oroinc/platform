@@ -125,7 +125,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();
-        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization);
+        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization, null);
         $this->assertEquals(1, $count);
     }
 
