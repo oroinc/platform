@@ -6,7 +6,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 
 class GridEntityNameProvider
@@ -21,7 +21,7 @@ class GridEntityNameProvider
     protected $relatedEntities = array();
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
@@ -36,12 +36,12 @@ class GridEntityNameProvider
     protected $translator;
 
     /**
-     * @param ConfigProviderInterface $configProvider
-     * @param EntityManager $entityManager
+     * @param ConfigProvider      $configProvider
+     * @param EntityManager       $entityManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        ConfigProviderInterface $configProvider,
+        ConfigProvider $configProvider,
         EntityManager $entityManager,
         TranslatorInterface $translator
     ) {

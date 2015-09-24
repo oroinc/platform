@@ -44,11 +44,13 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->managerRegistry
             = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
 
-        $this->entityConfigProvider
-            = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->formConfigProvider
-            = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->guesser = new AttributeGuesser(
             $this->formRegistry,

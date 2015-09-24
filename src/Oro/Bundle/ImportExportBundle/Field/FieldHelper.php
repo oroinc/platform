@@ -9,12 +9,12 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FieldHelper
 {
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /** @var EntityFieldProvider */
@@ -30,13 +30,13 @@ class FieldHelper
     protected $fieldsCache = [];
 
     /**
-     * @param EntityFieldProvider     $fieldProvider
-     * @param ConfigProviderInterface $configProvider
-     * @param FieldTypeHelper         $fieldTypeHelper
+     * @param EntityFieldProvider $fieldProvider
+     * @param ConfigProvider      $configProvider
+     * @param FieldTypeHelper     $fieldTypeHelper
      */
     public function __construct(
         EntityFieldProvider $fieldProvider,
-        ConfigProviderInterface $configProvider,
+        ConfigProvider $configProvider,
         FieldTypeHelper $fieldTypeHelper
     ) {
         $this->fieldProvider   = $fieldProvider;

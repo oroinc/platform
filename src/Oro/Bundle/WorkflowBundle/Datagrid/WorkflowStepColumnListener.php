@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Field\FieldGenerator;
 
@@ -20,7 +20,7 @@ class WorkflowStepColumnListener
     protected $doctrineHelper;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
@@ -35,13 +35,13 @@ class WorkflowStepColumnListener
     protected $workflowStepColumns = array(self::WORKFLOW_STEP_COLUMN);
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigProviderInterface $configProvider
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ConfigProvider  $configProvider
      * @param WorkflowManager $workflowManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ConfigProviderInterface $configProvider,
+        ConfigProvider $configProvider,
         WorkflowManager $workflowManager
     ) {
         $this->doctrineHelper = $doctrineHelper;
