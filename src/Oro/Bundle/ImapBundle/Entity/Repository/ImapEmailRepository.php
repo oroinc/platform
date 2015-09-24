@@ -51,8 +51,7 @@ class ImapEmailRepository extends EntityRepository
 
             return $lastUid;
         } catch (NoResultException $e) {
-
-            return 1;
+            return 0;
         }
     }
 

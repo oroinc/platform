@@ -362,6 +362,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         return [
             'Oro\Bundle\EmailBundle\Entity\Email',
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
+            'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
         ];
     }
