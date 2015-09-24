@@ -58,17 +58,20 @@ class EmailNotificationManager
     }
 
     /**
-     * @param User $user
-     * @param $maxEmailsDisplay
+     * @param User          $user
+     * @param Organization  $organization
+     * @param int           $maxEmailsDisplay
+     * @param int|null      $folderId
      *
      * @return array
      */
-    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay)
+    public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
         $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
             $user,
             $organization,
-            $maxEmailsDisplay
+            $maxEmailsDisplay,
+            $folderId
         );
 
         $emailsData = [];
@@ -109,12 +112,14 @@ class EmailNotificationManager
      * Get count new emails
      *
      * @param User $user
+     * @param Organization  $organization
+     * @param int|null      $folderId
      *
      * @return integer
      */
-    public function getCountNewEmails(User $user, Organization $organization)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization);
+        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
     }
 
     /**

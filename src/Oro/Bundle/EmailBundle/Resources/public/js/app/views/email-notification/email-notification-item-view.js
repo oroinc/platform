@@ -3,6 +3,7 @@ define(function(require) {
 
     var EmailNotificationView;
     var $ = require('jquery');
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');

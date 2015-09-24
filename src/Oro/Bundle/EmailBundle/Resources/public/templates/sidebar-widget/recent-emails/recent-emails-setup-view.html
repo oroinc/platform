@@ -1,14 +1,10 @@
-<fieldset>
+<fieldset class="recent-emails-setup">
     <div class="control-group">
         <div class="control-label wrap">
             <label class="required"><%= _.__("oro.email.recent_emails_widget.mailbox_folder") %><em>*</em></label>
         </div>
         <div class="controls">
-            <select name="folderId"  class="select2" data-page-component-module="oro/select2-component">
-                <option value="0">All</option>
-                <option<% if (+settings.folderId === 1) { %> selected="selected"<% } %> value="1">Inbox</option>
-                <option<% if (+settings.folderId === 2) { %> selected="selected"<% } %> value="2">Spam</option>
-            </select>
+            <input name="folderId" type="hidden" value="<%= settings.folderId %>" />
         </div>
     </div>
     <div class="control-group">

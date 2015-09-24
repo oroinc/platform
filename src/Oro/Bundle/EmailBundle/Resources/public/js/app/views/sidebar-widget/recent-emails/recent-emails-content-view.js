@@ -8,9 +8,8 @@ define(function(require) {
     RecentEmailsContentView = BaseView.extend({
         component: null,
 
-        initialize: function() {
-            this.on('refresh', this.onRefresh);
-            RecentEmailsContentView.__super__.initialize.apply(this, arguments);
+        listen: {
+            'refresh': 'onRefresh'
         },
 
         render: function() {
@@ -18,7 +17,6 @@ define(function(require) {
                 this.component.dispose();
             }
 
-            var settings = this.model.get('settings');
             var collection = this.model.emailNotificationCollection;
             var options = {
                 _sourceElement: this.$el,
