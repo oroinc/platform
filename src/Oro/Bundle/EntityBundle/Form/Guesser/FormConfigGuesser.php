@@ -7,24 +7,24 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class FormConfigGuesser extends AbstractFormGuesser
 {
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $formConfigProvider;
 
     /**
-     * @param ManagerRegistry         $managerRegistry
-     * @param ConfigProviderInterface $entityConfigProvider
-     * @param ConfigProviderInterface $formConfigProvider
+     * @param ManagerRegistry $managerRegistry
+     * @param ConfigProvider  $entityConfigProvider
+     * @param ConfigProvider  $formConfigProvider
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
-        ConfigProviderInterface $entityConfigProvider,
-        ConfigProviderInterface $formConfigProvider
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $formConfigProvider
     ) {
         parent::__construct($managerRegistry, $entityConfigProvider);
         $this->formConfigProvider = $formConfigProvider;

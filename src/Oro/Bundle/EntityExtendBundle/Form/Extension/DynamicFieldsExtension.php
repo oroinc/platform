@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -214,12 +214,12 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param ConfigInterface         $extendConfig
-     * @param ConfigProviderInterface $extendConfigProvider
+     * @param ConfigInterface $extendConfig
+     * @param ConfigProvider  $extendConfigProvider
      *
      * @return bool
      */
-    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProviderInterface $extendConfigProvider)
+    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
         return
             !$extendConfig->is('is_deleted')

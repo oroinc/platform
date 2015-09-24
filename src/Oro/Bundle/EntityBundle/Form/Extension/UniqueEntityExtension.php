@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class UniqueEntityExtension extends AbstractTypeExtension
 {
@@ -23,19 +23,19 @@ class UniqueEntityExtension extends AbstractTypeExtension
     protected $translator;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $entityConfigProvider;
 
     /**
-     * @param ValidatorInterface      $validator
-     * @param TranslatorInterface     $translator
-     * @param ConfigProviderInterface $entityConfigProvider
+     * @param ValidatorInterface  $validator
+     * @param TranslatorInterface $translator
+     * @param ConfigProvider      $entityConfigProvider
      */
     public function __construct(
         ValidatorInterface $validator,
         TranslatorInterface $translator,
-        ConfigProviderInterface $entityConfigProvider
+        ConfigProvider $entityConfigProvider
     ) {
         $this->validator            = $validator;
         $this->translator           = $translator;

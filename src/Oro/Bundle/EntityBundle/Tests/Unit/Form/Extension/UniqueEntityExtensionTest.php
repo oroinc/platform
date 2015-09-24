@@ -50,8 +50,8 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->config = $this
