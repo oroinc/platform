@@ -30,6 +30,7 @@ define(function(require) {
                     this.model.set({unreadEmailsCount: count.num});
                 }
             }
+            this.model.emailNotificationCollection.setRouteParams(settings);
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
