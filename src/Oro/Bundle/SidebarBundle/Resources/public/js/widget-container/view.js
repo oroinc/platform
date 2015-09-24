@@ -59,9 +59,9 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             }
 
             if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                view.$el.addClass('sidebar-widget-popup');
+                view.$el.removeClass('sidebar-widget-embedded').addClass('sidebar-widget-popup');
             } else {
-                view.$el.removeClass('sidebar-widget-popup');
+                view.$el.addClass('sidebar-widget-embedded').removeClass('sidebar-widget-popup');
             }
 
             return view;

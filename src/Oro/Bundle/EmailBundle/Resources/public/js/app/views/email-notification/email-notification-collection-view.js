@@ -143,7 +143,6 @@ define(function(require) {
             if (this.loadingMask) {
                 this.loadingMask.dispose();
             }
-            this.render();
         }
     });
 

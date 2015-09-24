@@ -9,6 +9,10 @@ define(function(require) {
         require('oroemail/js/app/models/email-notification/email-notification-collection');
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
+        listen: {
+            'change:settings model': 'updateCollectionRouteParams'
+        },
+
         /**
          * @constructor
          * @param {Object} options
@@ -26,11 +30,7 @@ define(function(require) {
                     this.model.set({unreadEmailsCount: count.num});
                 }
             }
-            this.model.on('change:settings', function(model, settings) {
-                model.emailNotificationCollection.setLimit(settings.limit);
-            });
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
-            this.model.emailNotificationCollection.fetch();
             this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
@@ -38,6 +38,10 @@ define(function(require) {
             this.model.set({
                 unreadEmailsCount: this.model.emailNotificationCollection.unreadEmailsCount || ''
             });
+        },
+
+        updateCollectionRouteParams: function(model, settings) {
+            model.emailNotificationCollection.setRouteParams(settings);
         },
 
         dispose: function() {
