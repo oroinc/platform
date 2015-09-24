@@ -150,4 +150,10 @@ class SendEmailTest extends Selenium2TestCase
             ->checkSendToList($firstName)
             ->checkContextSuggestionList($username);
     }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
+    }
 }
