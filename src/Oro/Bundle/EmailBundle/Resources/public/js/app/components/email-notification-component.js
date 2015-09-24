@@ -59,7 +59,6 @@ define(function(require) {
                     model: this.options.countModel
                 });
             }
-            this.view.render();
         },
 
         initSync: function() {
