@@ -43,7 +43,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *              "groups"={"dictionary"}
  *          },
  *          "dictionary"={
- *              "search_field"={"username"}
+ *              "search_field"="username",
+ *              "virtual_fields"={"id"}
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
