@@ -81,18 +81,23 @@ class EmailController extends Controller
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
+
         return [
             'emails' => json_encode($emailNotificationManager->getEmails(
                 $this->getUser(),
                 $currentOrganization,
-                $maxEmailsDisplay
+                $maxEmailsDisplay,
+                null
             )),
-            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization)
+            'count'=> $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, null)
         ];
     }
 
     /**
      * Get last N user emails (N - can be configured by application config)
+     * Extra GET params for Route:
+     *  "limit" - It defines amount of returned values.
+     *  "folderId" -  It defines folder id.
      *
      * @Route("/last", name="oro_email_last")
      * @AclAncestor("oro_email_email_view")
@@ -101,12 +106,22 @@ class EmailController extends Controller
      */
     public function lastAction()
     {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $maxEmailsDisplay = (int)$request->get('limit');
+        $folderId = (int)$request->get('folderId');
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
-        $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        if (!$maxEmailsDisplay) {
+            $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
+        }
         $emailNotificationManager = $this->get('oro_email.manager.notification');
         $result = [
-            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization),
-            'emails' => $emailNotificationManager->getEmails($this->getUser(), $currentOrganization, $maxEmailsDisplay)
+            'count' => $emailNotificationManager->getCountNewEmails($this->getUser(), $currentOrganization, $folderId),
+            'emails' => $emailNotificationManager->getEmails(
+                $this->getUser(),
+                $currentOrganization,
+                $maxEmailsDisplay,
+                $folderId
+            )
         ];
 
         return new JsonResponse($result);

@@ -83,7 +83,7 @@ class DebugAsseticNode extends \Twig_Node
     protected function compileAssetUrl(\Twig_Compiler $compiler, AssetInterface $asset)
     {
         $compiler
-            ->raw('$this->env->getExtension(\'assets\')->getAssetUrl(')
+            ->raw('$this->env->getExtension(\'asset\')->getAssetUrl(')
             ->repr($asset->getSourcePath())
             ->raw(')');
 
