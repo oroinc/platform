@@ -1,0 +1,4 @@
+config:
+    paths:
+        # filters
+        'oro/filter/choice-business-unit-filter': 'bundles/oroorganization/js/filter/choice-business-unit-filter.js'

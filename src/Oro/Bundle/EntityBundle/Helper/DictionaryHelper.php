@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Rhumsaa\Uuid\Console\Exception;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -32,16 +33,37 @@ class DictionaryHelper
     }
 
     /**
-     * @param ClassMetadata $meteData
+     * @param ClassMetadata  $doctrineMetadata
+     * @param EntityMetadata $entityMetadata
+     *
      * @return string
+     * @throws \LogicException
      */
-    public function getNameLabelField(ClassMetadata $meteData)
+    public function getNameLabelField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
-        $fieldNames = $meteData->getFieldNames();
-        if (in_array('label', $fieldNames)) {
-            return 'label';
+        $fieldNames = $doctrineMetadata->getFieldNames();
+
+        if (isset($entityMetadata->defaultValues['grouping']['dictionaryValueField'])) {
+            $fieldName = $entityMetadata->defaultValues['grouping']['dictionaryValueField'];
+            if (in_array($fieldName, $fieldNames)) {
+                return $fieldName;
+            }
         }
 
-        return 'name';
+        foreach ($this->getDefaultValueFields() as $fieldName) {
+            if (in_array($fieldName, $fieldNames)) {
+                return $fieldName;
+            }
+        }
+
+        throw new \LogicException(sprintf('Value field is not configured for class %s', $doctrineMetadata->getName()));
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultValueFields()
+    {
+        return ['label', 'name'];
     }
 }
