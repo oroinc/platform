@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tools;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 
 class ColumnsHelper
@@ -50,8 +49,12 @@ class ColumnsHelper
     /**
      * Get Columns State from ColumnsParam string
      *
-     * @param array  $columnsData
-     * @param string $columns like '51.11.21.30.40.61.71'
+     * @param array        $columnsData
+     * @param string|array $columns
+     *
+     * Example $columns:
+     * default: name1.contactName1.contactEmail1.contactPhone1.ownerName1.createdAt0.updatedAt1
+     * modified: updatedAt1.name1.contactName1.contactEmail1.contactPhone1.ownerName0.createdAt1
      *
      * @return array $columnsData
      */
@@ -74,14 +77,12 @@ class ColumnsHelper
 
         //For minified column params
         $columns = explode('.', $columns);
-        $index = 0;
         foreach ($columnsData as $columnName => $columnData) {
-            $newColumnData = $this->findColumnData($index, $columns);
+            $newColumnData = $this->findColumnData($columns, $columnName);
             if (!empty($newColumnData)) {
                 $columnsData[$columnName][ColumnsExtension::ORDER_FIELD_NAME] = $newColumnData['order'];
                 $columnsData[$columnName][ColumnsExtension::RENDER_FIELD_NAME] = $newColumnData['renderable'];
             }
-            $index++;
         }
 
         return  $columnsData;
@@ -90,22 +91,19 @@ class ColumnsHelper
     /**
      * Get new columns data from parsed URL columns params
      *
-     * @param int $index
      * @param array $columns
+     * @param string $name
+     *
      * @return array
      */
-    protected function findColumnData($index, $columns)
+    protected function findColumnData($columns, $name)
     {
         $result = array();
 
-        if (!isset($columns[$index])) {
-            return $result;
-        }
-
         foreach ($columns as $key => $value) {
             $render = (bool)((int)(substr($value, -1)));
-            $columnNumber = (int)(substr($value, 0, -1));
-            if ($index === $columnNumber) {
+            $columnNameParam = substr($value, 0, -1);
+            if ($columnNameParam === $name) {
                 $result[ColumnsExtension::ORDER_FIELD_NAME] = $key;
                 $result[ColumnsExtension::RENDER_FIELD_NAME] = $render;
                 return $result;

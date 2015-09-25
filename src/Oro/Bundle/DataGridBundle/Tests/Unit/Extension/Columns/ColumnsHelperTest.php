@@ -23,18 +23,7 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testPrepareColumnsParam($columnsConfigArray, $columns, $result)
     {
-        $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $quantity = 1;
-        $config
-            ->expects(static::exactly($quantity))
-            ->method('offsetGet')
-            ->with('columns')
-            ->will(static::returnValue($columnsConfigArray));
-
-        $columnsData = $this->columnsHelper->prepareColumnsParam($config, $columns);
+        $columnsData = $this->columnsHelper->prepareColumnsParam($columnsConfigArray, $columns);
         static::assertEquals($columnsData, $result);
     }
 
@@ -50,9 +39,9 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
             'city'  => ['order' => 3,'renderable' => true, 'name' => 'City']
         ];
 
-        $columnsString1 = '01.11.21.31';
-        $columnsString2 = '31.01.11.21';
-        $columnsString3 = '31.00.11.21';
+        $columnsString1 = 'name1.email1.data1.city1';
+        $columnsString2 = 'city1.name1.email1.data1';
+        $columnsString3 = 'city1.name0.email1.data1';
 
         $columnsArray = [
             'name'  => ['order' => '2','renderable' => 'true', 'name' => 'Name'],
