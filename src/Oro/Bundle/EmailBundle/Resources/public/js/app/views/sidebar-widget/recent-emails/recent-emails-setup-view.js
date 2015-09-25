@@ -100,7 +100,7 @@ define(function(require) {
         render: function() {
             RecentEmailsContentView.__super__.render.apply(this, arguments);
             var loadingView = this.subview('loading');
-            this.$el.find('[name=actionId]').select2();
+            this.$el.find('[name=defaultActionId]').select2();
             if (this.foldersData !== null) {
                 if (loadingView) {
                     loadingView.hide();
