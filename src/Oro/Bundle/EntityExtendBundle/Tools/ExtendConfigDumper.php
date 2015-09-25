@@ -306,7 +306,7 @@ class ExtendConfigDumper
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }
