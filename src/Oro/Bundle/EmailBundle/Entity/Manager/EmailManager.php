@@ -152,7 +152,6 @@ class EmailManager
             ->findUnseenUserEmail($user, $organization, $ids);
         $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
 
-
         foreach ($unseenUserEmails as $userEmail) {
             $this->setEmailUserSeen($userEmail);
         }
