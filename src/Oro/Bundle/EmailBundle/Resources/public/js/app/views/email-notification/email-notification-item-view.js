@@ -16,7 +16,7 @@ define(function(require) {
         templateSelector: '#email-notification-item-template',
 
         events: {
-            'click .info': 'onClickOpenEmail',
+            'click .title': 'onClickOpenEmail',
             'click [data-role=toggle-read-status]': 'onClickReadStatus'
         },
 
