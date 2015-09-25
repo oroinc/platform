@@ -149,8 +149,8 @@ define(function(require) {
                         case 'scroll':
                             if (this.clientWidth < this.scrollWidth) {
                                 var oldScrollLeft = this.scrollLeft;
-                                this.scrollLeft = this.scrollLeft - scrolls.vertical;
-                                scrolls.vertical += this.scrollLeft - oldScrollLeft;
+                                this.scrollLeft = this.scrollLeft - scrolls.horizontal;
+                                scrolls.horizontal += this.scrollLeft - oldScrollLeft;
                             }
                             break;
                         default:
