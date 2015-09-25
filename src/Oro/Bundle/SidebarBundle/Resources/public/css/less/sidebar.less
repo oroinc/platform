@@ -163,6 +163,11 @@
     height: 28px;
     width: 28px;
     cursor: pointer;
+    .icon-with-counter {
+        span {
+            position: absolute;
+        }
+    }
 }
 
 .sidebar-icon {
@@ -204,9 +209,6 @@
 }
 .sidebar-icon-active{
     background-color: #cccccc;
-}
-.sidebar-icon-with-counter {
-    background-color: white;
 }
 .sidebar-icon:hover i,
 .sidebar-icon:hover img,
@@ -275,10 +277,15 @@
         left: 0;
         position: absolute;
     }
-    & > i, & > img {
-        font-size: 12pt;
-        margin: 2px 5px 0 0;
-        position: absolute;
+    .sidebar-widget-header-icon {
+        display: inline-block;
+        vertical-align: bottom;
+        margin-right: 5px;
+        margin-bottom: -1px;
+        & > i, & > img {
+            font-size: 12pt;
+            margin: 0 2px;
+        }
     }
     .widget-title {
         display: inline-block;
@@ -286,20 +293,29 @@
         overflow: hidden;
         white-space: nowrap;
         width: 100%;
-        padding-left: 21px;
     }
 }
-.sidebar-widget-popup .sidebar-widget-header-title {
-    width: calc(~"100% - 65px");
-    padding-left: 0;
-    .sidebar-widget-header-toggle {
+.sidebar-widget-popup {
+    .sidebar-widget-header-icon {
         display: none;
+    }
+    .sidebar-widget-header-title {
+        width: calc(~"100% - 65px");
+        padding-left: 0;
+        .sidebar-widget-header-toggle {
+            display: none;
+        }
+    }
+}
+.sidebar-widget-embedded .sidebar-widget-collapsed {
+    .sidebar-widget-header-title {
+        width: 100%;
     }
 }
 .sidebar-widget-header {
     color: #555;
     font-weight: bolder;
-    padding: 3px 5px 5px;
+    padding: 4px 5px 4px;
 }
 
 .sidebar-widget-header img {
@@ -328,7 +344,7 @@
     color: #444;
     text-transform: uppercase;
     font-size: 11px;
-    margin-top: 3px;
+    margin-top: 2px
 }
 .sidebar-widget-header-toggle > i {
     height: 16px;
