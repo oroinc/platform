@@ -655,37 +655,42 @@ datagrid:
             query:
                 select:
                     - u.id
-                    - u.username
-                    - u.email
                     - u.firstName
                     - u.lastName
+                    - u.email
+                    - u.username
                     - u.enabled
-                    - bu.name as fromName
+                    - bu.name as businessUnit
+                    - org.name as organization
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
                 join:
                     inner:
                         - { join: u.owner, alias: bu }
+                        - { join: bu.organization, alias: org }
+
                 where:
                     and:
                         - u.id != @oro_security.security_facade->getLoggedUserId
         columns:
-            id:
-                label:         oro.user.id.label
-            username:
-                label:         oro.user.username.label
-            email:
-                label:         oro.user.email.label
             firstName:
                 label:         oro.user.first_name.label
             lastName:
                 label:         oro.user.last_name.label
+            email:
+                label:         oro.user.email.label
+            username:
+                label:         oro.user.username.label
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
                    - Inactive
                    - Active
+            businessUnit:
+                label:         oro.user.business_unit.label
+            organization:
+                label:         oro.user.organization.label
         properties:
             id: ~
             entity:
@@ -695,33 +700,37 @@ datagrid:
                 data_name: u
         sorters:
             columns:
-                username:
-                    data_name: u.username
-                email:
-                    data_name: u.email
                 firstName:
                     data_name: u.firstName
                 lastName:
                     data_name: u.lastName
+                email:
+                    data_name: u.email
+                username:
+                    data_name: u.username
                 enabled:
                     data_name: u.enabled
+                businessUnit:
+                    data_name: bu.name
+                organization:
+                    data_name: org.name
             default:
-                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+                enabled: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         filters:
             columns:
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
                 enabled:
                     type: choice
                     data_name: u.enabled

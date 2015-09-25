@@ -34,5 +34,9 @@ oro:
             shared_with: Shared with {{ name }}
             shared_with_plural: Shared with {{ name }} and +{{ count }} more
         datagrid:
-            shared_datagrid.title: Who Has Access
+            shared_datagrid.title: Already shared with
             share_grid_row_details_from: from
+            actions:
+                remove.label: Remove
+            mass_actions:
+                remove.label: Remove
