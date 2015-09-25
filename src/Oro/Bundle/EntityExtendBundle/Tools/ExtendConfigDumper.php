@@ -218,7 +218,7 @@ class ExtendConfigDumper
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }
@@ -253,8 +253,8 @@ class ExtendConfigDumper
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
      * @param ConfigInterface $extendConfig
-     * @param array|null $aliases
-     * @param array|null $skippedOrigins
+     * @param array|null      $aliases
+     * @param array|null      $skippedOrigins
      */
     protected function checkSchema(ConfigInterface $extendConfig, $aliases, array $skippedOrigins = null)
     {
@@ -288,11 +288,12 @@ class ExtendConfigDumper
             ];
         }
 
-        $schema             = $extendConfig->get('schema');
-        $properties         = [];
-        $relationProperties = $schema ? $schema['relation'] : [];
-        $defaultProperties  = [];
-        $addRemoveMethods   = [];
+        $schema     = $extendConfig->get('schema', false, []);
+        $properties = isset($schema['property']) && !empty($skippedOrigins) ? $schema['property'] : [];
+        // Need to check if relations already exists cause we can update them in updateRelationValues.
+        $relationProperties = isset($schema['relation']) ? $schema['relation'] : [];
+        $defaultProperties  = isset($schema['default']) && !empty($skippedOrigins) ? $schema['default'] : [];
+        $addRemoveMethods   = isset($schema['addremove']) && !empty($skippedOrigins) ? $schema['addremove'] : [];
 
         $fieldConfigs = $extendProvider->filter($this->createOriginFilterCallback($skippedOrigins), $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
@@ -310,29 +311,33 @@ class ExtendConfigDumper
 
         $relations = $extendConfig->get('relation', false, []);
         foreach ($relations as &$relation) {
-            if (!$relation['field_id']) {
+            /** @var FieldConfigId $fieldId */
+            $fieldId = $relation['field_id'];
+            if (!$fieldId) {
                 continue;
             }
 
             $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
-                $fieldName = $relation['field_id']->getFieldName();
-                $isDeleted = $extendProvider->hasConfig($relation['field_id']->getClassName(), $fieldName)
-                    ? $extendProvider->getConfig($relation['field_id']->getClassName(), $fieldName)->is('is_deleted')
+            if ($fieldId->getFieldType() !== RelationType::MANY_TO_ONE) {
+                $fieldName = $fieldId->getFieldName();
+                $isDeleted = $extendProvider->hasConfig($fieldId->getClassName(), $fieldName)
+                    ? $extendProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
                     : false;
 
                 if (!$isDeleted) {
                     $addRemoveMethods[$fieldName]['self'] = $fieldName;
-                    if ($relation['target_field_id']) {
+                    /** @var FieldConfigId $targetFieldId */
+                    $targetFieldId = $relation['target_field_id'];
+                    if ($targetFieldId) {
                         $addRemoveMethods[$fieldName]['target']              =
-                            $relation['target_field_id']->getFieldName();
+                            $targetFieldId->getFieldName();
                         $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                            $relation['field_id']->getFieldType() === RelationType::MANY_TO_MANY;
+                            $targetFieldId->getFieldType() === RelationType::MANY_TO_MANY;
                     }
                 }
             }
 
-            $this->updateRelationValues($relation['target_entity'], $relation['field_id']);
+            $this->updateRelationValues($relation['target_entity'], $fieldId);
         }
         $extendConfig->set('relation', $relations);
 
@@ -437,7 +442,7 @@ class ExtendConfigDumper
                 /** @var FieldConfigId $relationFieldId */
                 $relationFieldId = $relation['field_id'];
                 if ($relationFieldId) {
-                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
+                    $schema['relation'][$relationFieldId->getFieldName()] = [];
                 }
             }
         }
