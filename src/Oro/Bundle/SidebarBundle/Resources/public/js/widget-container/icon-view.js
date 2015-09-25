@@ -1,39 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    var WidgetContainerIconView;
     var Backbone = require('backbone');
-    var iconTemplate = require('text!./templates/icon-template.html');
+    var iconTemplate = require('tpl!./templates/icon-template.html');
     var constants = require('../constants');
+    var BaseView = require('oroui/js/app/views/base/view');
 
-    /**
-     * @export  orosidebar/js/widget-container/icon-view
-     * @class   orosidebar.widgetContainer.IconView
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    WidgetContainerIconView = BaseView.extend({
         className: 'sidebar-icon',
+        template: iconTemplate,
 
         events: {
             'click': 'onClick'
         },
 
-        initialize: function() {
-            var view = this;
-            view.template = _.template(iconTemplate);
-            view.listenTo(view.model, 'change', view.render);
+        listen: {
+            'change model': 'render'
         },
 
         render: function() {
-            var view = this;
-            var model = view.model;
+            WidgetContainerIconView.__super__.render.call(this);
 
-            view.$el.html(view.template(model.toJSON()));
-            view.$el.attr('data-cid', model.cid);
-            view.$el.toggleClass('sidebar-icon-active', model.get('state') === constants.WIDGET_MAXIMIZED_HOVER);
-            view.$el.toggleClass('sidebar-icon-with-counter', Boolean(model.get('unreadEmailsCount')));
+            this.$el.attr('data-cid', this.model.cid);
+            this.$el.toggleClass('sidebar-icon-active', this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER);
+            this.$el.toggleClass('sidebar-icon-with-counter', Boolean(this.model.get('unreadEmailsCount')));
 
-            return view;
+            return this;
         },
 
         onClick: function(e) {
@@ -49,4 +42,6 @@ define(function(require) {
             Backbone.trigger('showWidgetHover', this.model.cid, cord);
         }
     });
+
+    return WidgetContainerIconView;
 });

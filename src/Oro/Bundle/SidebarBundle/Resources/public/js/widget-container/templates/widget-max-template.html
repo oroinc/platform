@@ -4,14 +4,7 @@
             <a href="#" class="sidebar-widget-header-toggle">
                 <i class="icon-caret-down"></i>
             </a>
-            <% if (iconClass) { %>
-                <i class="<%= iconClass %><% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount > 0) { %> icon-with-counter highlight<% } %>"
-                   title="<%= title %>">
-                    <% if (typeof unreadEmailsCount !== 'undefined' && unreadEmailsCount > 0) { %><span><%=(unreadEmailsCount > 10 ? '10+' : unreadEmailsCount) %></span><% } %>
-                </i>
-            <% } else { %>
-                <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
-            <% } %>
+            <%= icon %>
             <span class="widget-title" title="<%= title %>"><%= title %></span>
         </span>
         <span class="sidebar-widget-header-wrap">
