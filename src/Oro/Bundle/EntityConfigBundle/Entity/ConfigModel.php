@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\MappedSuperclass
  */
-abstract class AbstractConfigModel
+abstract class ConfigModel
 {
     /**
      * @var \DateTime
