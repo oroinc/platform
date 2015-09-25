@@ -44,7 +44,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          },
  *          "dictionary"={
  *              "virtual_fields"={"id"},
- *              "search_fields"={"firstName", "lastName"}
+ *              "search_fields"={"firstName", "lastName"},
+ *              "representation_field"="fullName"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
