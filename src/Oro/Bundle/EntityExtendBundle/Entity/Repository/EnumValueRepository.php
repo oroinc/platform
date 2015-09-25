@@ -29,7 +29,7 @@ class EnumValueRepository extends EntityRepository
      */
     public function createEnumValue($name, $priority, $default, $id = null)
     {
-        if (empty($name) && !(isset($name) && $name === '0')) {
+        if (strlen($name) === 0) {
             throw new \InvalidArgumentException('$name must not be empty.');
         }
         if (empty($id)) {

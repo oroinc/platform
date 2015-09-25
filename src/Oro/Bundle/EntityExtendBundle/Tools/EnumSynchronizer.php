@@ -15,7 +15,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
-use Oro\Bundle\EntityExtendBundle\Exception\EnumDuplicateException;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
@@ -119,10 +118,10 @@ class EnumSynchronizer
      */
     public function applyEnumNameTrans($enumCode, $enumName, $locale)
     {
-        if (empty($enumCode)) {
+        if (strlen($enumCode) === 0) {
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
-        if (empty($enumName)) {
+        if (strlen($enumName) === 0) {
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
         if (empty($locale)) {
@@ -223,11 +222,14 @@ class EnumSynchronizer
             ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
             ->getResult();
 
+        $ids = [];
         /** @var AbstractEnumValue[] $changes */
         $changes = [];
         foreach ($values as $value) {
-            $optionKey = $this->getEnumOptionKey($value->getId(), $options);
+            $id        = $value->getId();
+            $optionKey = $this->getEnumOptionKey($id, $options);
             if ($optionKey !== null) {
+                $ids[] = $id;
                 if ($this->setEnumValueProperties($value, $options[$optionKey])) {
                     $changes[] = $value;
                 }
@@ -238,19 +240,18 @@ class EnumSynchronizer
             }
         }
 
-        $enums = [];
         foreach ($options as $option) {
+            $id    = $this->generateEnumValueId($option['label'], $ids);
+            $ids[] = $id;
             $value = $enumRepo->createEnumValue(
                 $option['label'],
                 $option['priority'],
-                $option['is_default']
+                $option['is_default'],
+                $id
             );
             $em->persist($value);
-            $enums[]   = $value;
             $changes[] = $value;
         }
-
-        $this->resolveEnumDuplicates($values, $enums);
 
         if (!empty($changes)) {
             if ($locale !== Translation::DEFAULT_LOCALE) {
@@ -265,61 +266,25 @@ class EnumSynchronizer
     }
 
     /**
-     * @param AbstractEnumValue[] $savedEnums
-     * @param AbstractEnumValue[] $newEnums
+     * @param string   $name
+     * @param string[] $existingIds
      *
-     * @throws EnumDuplicateException
+     * @return string
      */
-    protected function resolveEnumDuplicates($savedEnums, $newEnums)
+    protected function generateEnumValueId($name, array $existingIds)
     {
-        // Array with stored enum ids.
-        $saved = array_map(
-            function (AbstractEnumValue $enum) {
-                return $enum->getId();
-            },
-            $savedEnums
-        );
-
-        // Array with new enum ids.
-        $new =  array_map(
-            function (AbstractEnumValue $enum) {
-                return $enum->getId();
-            },
-            $newEnums
-        );
-
-        // Array with all enum ids.
-        $all = array_merge($new, $saved);
-
-        // Array with all unique enum ids.
-        $unique = array_unique($all);
-
-        $duplicates = array_diff_assoc($all, $unique);
-        foreach ($duplicates as $duplicate) {
-            // Flag for skip first enum.
-            $skip = (array_search($duplicate, $saved) === false);
-            foreach ($newEnums as $enum) {
-                if ($enum->getId() == $duplicate) {
-                    if ($skip) {
-                        $skip = false;
-                        continue;
-                    }
-
-                    // Try to generate unique id for new enum and change it.
-                    for ($attempt = 1; $attempt <= 10; $attempt++) {
-                        $id = ExtendHelper::buildEnumValueId($enum->getId() . $attempt);
-                        if (array_search($id, $unique) === false) {
-                            $enum->setId($id);
-                            $unique[] = $id;
-                            continue 2;
-                        }
-                    }
-
-                    // Otherwise
-                    throw new EnumDuplicateException(sprintf('Duplicate enum value: %s.', $enum->getId()));
-                }
+        $id = ExtendHelper::buildEnumValueId($name);
+        if (in_array($id, $existingIds, true)) {
+            $prefix  = substr($id, 0, ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH - 6) . '_';
+            $counter = 1;
+            $id = $prefix . $counter;
+            while (in_array($id, $existingIds, true)) {
+                $counter++;
+                $id = $prefix . $counter;
             }
         }
+
+        return $id;
     }
 
     /**
