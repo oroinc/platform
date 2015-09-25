@@ -26,7 +26,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "groups"={"dictionary"}
  *          },
  *          "dictionary"={
- *              "search_field"="name"
+ *              "search_fields"={"name"}
  *          }
  *      }
  * )

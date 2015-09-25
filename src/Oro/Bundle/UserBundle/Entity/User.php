@@ -43,8 +43,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *              "groups"={"dictionary"}
  *          },
  *          "dictionary"={
- *              "search_field"="username",
- *              "virtual_fields"={"id"}
+ *              "virtual_fields"={"id"},
+ *              "search_fields"={"firstName", "lastName"}
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
@@ -1153,5 +1153,15 @@ class User extends ExtendUser implements
     public function getCurrentOrganization()
     {
         return $this->currentOrganization;
+    }
+
+    /**
+     * Get user full name
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
     }
 }

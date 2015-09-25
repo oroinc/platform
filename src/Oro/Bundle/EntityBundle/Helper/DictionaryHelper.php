@@ -29,7 +29,9 @@ class DictionaryHelper
     {
         $idNames = $metadata->getIdentifierFieldNames();
         if (count($idNames) !== 1) {
-            throw new Exception('Primary key for this entity is absent or contains few fields');
+            throw new Exception(
+                sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
+            );
         }
 
         return $idNames[0];
@@ -39,24 +41,50 @@ class DictionaryHelper
      * @param ClassMetadata  $doctrineMetadata
      * @param EntityMetadata $entityMetadata
      *
-     * @return string
+     * @return array
      * @throws \LogicException
      */
-    public function getNameLabelField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
+    public function getSearchFields(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
         $fieldNames = $doctrineMetadata->getFieldNames();
 
-        if (isset($entityMetadata->defaultValues['dictionary']['search_field'])) {
-            $fieldName = $entityMetadata->defaultValues['dictionary']['search_field'];
-            if (in_array($fieldName, $fieldNames)) {
-                return $fieldName;
+        if (isset($entityMetadata->defaultValues['dictionary']['search_fields'])) {
+            $searchFields = $entityMetadata->defaultValues['dictionary']['search_fields'];
+            foreach ($searchFields as $key => $searchField) {
+                if (!in_array($searchField, $fieldNames)) {
+                    unset($fieldNames[$key]);
+                }
             }
         }
 
-        if (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
-            return self::DEFAULT_SEARCH_FIELD;
+        if (!empty($searchFields)) {
+            return $searchFields;
+        } elseif (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
+            return [self::DEFAULT_SEARCH_FIELD];
         }
 
-        throw new \LogicException(sprintf('Value field is not configured for class %s', $doctrineMetadata->getName()));
+        throw new \LogicException(
+            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName())
+        );
+    }
+
+    /**
+     * @param ClassMetadata  $doctrineMetadata
+     * @param EntityMetadata $entityMetadata
+     *
+     * @return string|null
+     */
+    public function getRepresentationField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
+    {
+        $fieldNames = $doctrineMetadata->getFieldNames();
+
+        if (isset($entityMetadata->defaultValues['dictionary']['representation_field'])) {
+            $representationField = $entityMetadata->defaultValues['dictionary']['representation_field'];
+            if (in_array($representationField, $fieldNames)) {
+                return $representationField;
+            }
+        }
+
+        return null;
     }
 }

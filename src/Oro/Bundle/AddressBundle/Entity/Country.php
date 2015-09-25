@@ -29,7 +29,7 @@ use Oro\Bundle\AddressBundle\Model\ExtendCountry;
  *          },
  *          "dictionary"={
  *              "virtual_fields"={"iso2Code", "iso3Code", "name"},
- *              "search_field"="name"
+ *              "search_fields"={"name"}
  *          }
  *      }
  * )
