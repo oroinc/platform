@@ -306,7 +306,7 @@ class ExtendConfigDumper
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']), true)) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }
@@ -376,11 +376,11 @@ class ExtendConfigDumper
             ];
         }
 
-        $schema             = $extendConfig->get('schema');
-        $properties         = [];
-        $relationProperties = $schema ? $schema['relation'] : [];
-        $defaultProperties  = [];
-        $addRemoveMethods   = [];
+        $schema             = $extendConfig->get('schema', false, []);
+        $properties         = isset($schema['property']) && null !== $filter ? $schema['property'] : [];
+        $relationProperties = isset($schema['relation']) && null !== $filter ? $schema['relation'] : [];
+        $defaultProperties  = isset($schema['default']) && null !== $filter ? $schema['default'] : [];
+        $addRemoveMethods   = isset($schema['addremove']) && null !== $filter ? $schema['addremove'] : [];
 
         $fieldConfigs = null === $filter
             ? $this->configProvider->getConfigs($className, true)
