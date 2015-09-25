@@ -8,7 +8,6 @@ parameters:
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
-    oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
     oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
     oro_activity_list.provider.email_recipients.class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
     oro_activity_list.event_listener.segment_widget_options_listener.class: Oro\Bundle\ActivityListBundle\EventListener\SegmentWidgetOptionsListener
@@ -73,15 +72,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
-
-    oro_activity_list.event_listener.actitity_list_changes_listener:
-        class:  %oro_activity_list.event_listener.actitity_list_changes_listener.class%
-        arguments:
-            - @oro_security.security_facade.link
-            - @oro_activity_list.provider.chain
-        tags:
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
 
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%

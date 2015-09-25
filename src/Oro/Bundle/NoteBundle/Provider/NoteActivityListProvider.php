@@ -5,6 +5,8 @@ namespace Oro\Bundle\NoteBundle\Provider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -12,7 +14,11 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
 
-class NoteActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
+class NoteActivityListProvider implements
+    ActivityListProviderInterface,
+    CommentProviderInterface,
+    ActivityListDateProviderInterface,
+    ActivityListUpdatedByProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
     const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
@@ -89,6 +95,42 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     public function getDescription($entity)
     {
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOwner($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getOwner();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedBy($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getUpdatedBy();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getCreatedAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getUpdatedAt();
     }
 
     /**

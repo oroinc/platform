@@ -69,7 +69,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
-            ->setBusinessUnit(['OroCRM'])
+            ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->setImap($imapSetting)
             ->save()
@@ -141,7 +141,7 @@ class SendEmailTest extends Selenium2TestCase
             ->setLastName($lastName)
             ->setEmail($username.'@example.com')
             ->setRoles(['Administrator'], true)
-            ->setBusinessUnit(['OroCRM'])
+            ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save();
         /** @var Emails $login */
@@ -149,5 +149,11 @@ class SendEmailTest extends Selenium2TestCase
             ->add()
             ->checkSendToList($firstName)
             ->checkContextSuggestionList($username);
+    }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
     }
 }
