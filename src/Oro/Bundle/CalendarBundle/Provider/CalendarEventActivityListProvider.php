@@ -208,12 +208,4 @@ class CalendarEventActivityListProvider implements
         }
         return null;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getUpdatedBy($entity)
-    {
-        return null;
-    }
 }

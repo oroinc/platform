@@ -190,7 +190,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $schema['property'][$snapshotFieldName] = $snapshotFieldName;
+                    $schema['property'][$snapshotFieldName] = [];
+                    if ($fieldConfig->is('is_deleted')) {
+                        $schema['property'][$snapshotFieldName]['private'] = true;
+                    }
 
                     $schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName] = [
                         'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
