@@ -490,10 +490,11 @@ class EmailController extends Controller
     {
         $loggedUser = $this->get('oro_security.security_facade')->getLoggedUser();
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $ids = $this->container->get('request_stack')->getCurrentRequest()->query->get('ids', []);
         $result = false;
 
         if ($loggedUser) {
-            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization);
+            $result = $this->getEmailManager()->markAllEmailsAsSeen($loggedUser, $currentOrganization, $ids);
         }
 
         return new JsonResponse(['successful' => (bool)$result]);

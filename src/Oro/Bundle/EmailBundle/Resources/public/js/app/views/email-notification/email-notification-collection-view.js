@@ -55,6 +55,7 @@ define(function(require) {
             data.actionId = this.actionId;
             data.countNewEmail = this.countNewEmail;
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
+            data.isEmpty = this.collection.length === 0;
             return data;
         },
 
@@ -76,9 +77,16 @@ define(function(require) {
         },
 
         onClickMarkAsRead: function() {
+            var ids = [];
             var self = this;
+            this.collection.each(function(email) {
+                if (email.get('seen') === false) {
+                    ids.push(email.get('id'));
+                }
+            });
             $.ajax({
                 url: routing.generate('oro_email_mark_all_as_seen'),
+                data: $.param({'ids': ids}),
                 success: function(response) {
                     self.collection.markAllAsRead();
                     self.collection.unreadEmailsCount = 0;
@@ -150,17 +158,29 @@ define(function(require) {
         },
 
         onCollectionRequest: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+                this.loadingMask.dispose();
+            }
             this.loadingMask = new LoadingMask({
-                container: this.$el
+                container: this.$('.content')
             });
             this.loadingMask.show();
         },
 
         onCollectionSync: function() {
             if (this.loadingMask) {
+                this.loadingMask.hide();
                 this.loadingMask.dispose();
             }
-            this.render();
+        },
+
+        dispose: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+                this.loadingMask.dispose();
+            }
+            EmailNotificationCollectionView.__super__.dispose.call(this);
         }
     });
 

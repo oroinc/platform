@@ -3,6 +3,7 @@
     case 3: %>forward-action<% ; break;
     default: %>reply-all-action<% ; break;
 }%>">
+    <% if (!isEmpty) { %>
     <div class="header row-fluid">
         <a class="my-emails pull-left" href="<%=userEmailsUrl %>">
             My Emails
@@ -18,6 +19,8 @@
     <% if (moreUnreadEmails) { %>
     <div class="more-unread">+ <%=moreUnreadEmails %> More Unread</div>
     <% } %>
+    <% } else { %>
     <div class="empty">You don't have any emails yet</div>
+    <% } %>
     <div class="notification">You have a new email</div>
 </div>
