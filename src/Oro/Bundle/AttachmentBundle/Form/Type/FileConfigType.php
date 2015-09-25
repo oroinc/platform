@@ -50,8 +50,9 @@ class FileConfigType extends AbstractType
                     && !$this->hasRelation($entityConfig, $this->getRelationKey($fieldConfigId))
                 ) {
                     $entityConfig->set('state', ExtendScope::STATE_UPDATE);
-                    $this->extendConfigProvider->persist($entityConfig);
-                    $this->extendConfigProvider->flush();
+                    $configManager = $this->extendConfigProvider->getConfigManager();
+                    $configManager->persist($entityConfig);
+                    $configManager->flush();
                 }
             }
         );

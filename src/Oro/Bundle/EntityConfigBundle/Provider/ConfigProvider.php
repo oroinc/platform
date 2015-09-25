@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
- * The configuration provider can be used to manage configuration data inside particular configuration scope.
+ * The configuration provider can be used to get configuration data inside particular configuration scope.
  */
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -28,9 +28,9 @@ class ConfigProvider implements ConfigProviderInterface
     protected $scope;
 
     /**
-     * @param ConfigManager $configManager
-     * @param string        $scope
-     * @param array         $config
+     * @param ConfigManager $configManager The configuration manager
+     * @param string        $scope         The configuration scope this provider works with
+     * @param array         $config        The scope configuration
      */
     public function __construct(ConfigManager $configManager, $scope, array $config)
     {
@@ -40,6 +40,8 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Gets a configuration the scope this provider works with.
+     *
      * @return PropertyConfigContainer
      */
     public function getPropertyConfig()
@@ -48,6 +50,8 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Gets the configuration manager.
+     *
      * @return ConfigManager
      */
     public function getConfigManager()
@@ -61,6 +65,7 @@ class ConfigProvider implements ConfigProviderInterface
      * @param string|null $className
      * @param string|null $fieldName
      * @param string|null $fieldType
+     *
      * @return ConfigIdInterface
      */
     public function getId($className = null, $fieldName = null, $fieldType = null)
@@ -81,7 +86,12 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Determines if this provider has configuration data for the given entity or field.
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     *
+     * @return bool
      */
     public function hasConfig($className, $fieldName = null)
     {
@@ -89,7 +99,10 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Determines if this provider has configuration data for an entity or a field represents the given id.
+     *
      * @param ConfigIdInterface $configId
+     *
      * @return bool
      */
     public function hasConfigById(ConfigIdInterface $configId)
@@ -100,7 +113,12 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets configuration data for the given entity or field.
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     *
+     * @return ConfigInterface
      */
     public function getConfig($className, $fieldName = null)
     {
@@ -118,7 +136,11 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets configuration data for the given entity or field.
+     *
+     * @param ConfigIdInterface $configId
+     *
+     * @return ConfigInterface
      */
     public function getConfigById(ConfigIdInterface $configId)
     {
@@ -134,13 +156,13 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * Gets a list of ids for all configurable entities (if $className is not specified)
-     * or all configurable fields of the given $className, which can be managed by this provider.
+     * or all configurable fields of the given entity, which can be managed by this provider.
      *
      * @param string|null $className
      * @param bool        $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as mode="hidden"
      *
-     * @return array|ConfigIdInterface[]
+     * @return ConfigIdInterface[]
      */
     public function getIds($className = null, $withHidden = false)
     {
@@ -153,13 +175,13 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * Gets configuration data for all configurable entities (if $className is not specified)
-     * or all configurable fields of the given $className.
+     * or all configurable fields of the given entity.
      *
      * @param string|null $className
      * @param bool        $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as mode="hidden"
      *
-     * @return array|ConfigInterface[]
+     * @return ConfigInterface[]
      */
     public function getConfigs($className = null, $withHidden = false)
     {
@@ -171,14 +193,14 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Applies the callback to configuration data of all classes (if $className is not specified)
-     * or all fields of the given $className.
+     * Applies the callback to configuration data to all configurable entities (if $className is not specified)
+     * or all configurable fields of the given entity.
      *
      * @param callable    $callback The callback function to run for configuration data for each object
      * @param string|null $className
      * @param bool        $withHidden
      *
-     * @return array|\Oro\Bundle\EntityConfigBundle\Config\ConfigInterface[]
+     * @return array
      */
     public function map(\Closure $callback, $className = null, $withHidden = false)
     {
@@ -186,14 +208,14 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Applies the filtering callback to configuration data of all classes (if $className is not specified)
-     * or all fields of the given $className.
+     * Gets configuration data filtered by the given callback of all configurable entities
+     * (if $className is not specified) or all fields of the given entities.
      *
      * @param callable    $callback The callback function to run for configuration data for each object
      * @param string|null $className
      * @param bool        $withHidden
      *
-     * @return array|\Oro\Bundle\EntityConfigBundle\Config\ConfigInterface[]
+     * @return ConfigInterface[]
      */
     public function filter($callback, $className = null, $withHidden = false)
     {
@@ -204,8 +226,10 @@ class ConfigProvider implements ConfigProviderInterface
      * Gets the real fully-qualified class name of the given object (even if its a proxy).
      *
      * @param string|object|array|PersistentCollection $object
+     *
      * @return string
-     * @throws RuntimeException
+     *
+     * @throws RuntimeException if a class name cannot be retrieved
      */
     public function getClassName($object)
     {
@@ -241,6 +265,8 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @param string      $className
      * @param string|null $fieldName
+     *
+     * @deprecated since 1.9. Use ConfigManager::clearCache instead
      */
     public function clearCache($className, $fieldName = null)
     {
@@ -251,6 +277,8 @@ class ConfigProvider implements ConfigProviderInterface
      * Tells the ConfigManager to make the given configuration data managed and persistent.
      *
      * @param ConfigInterface $config
+     *
+     * @deprecated since 1.9. Use ConfigManager::persist instead
      */
     public function persist(ConfigInterface $config)
     {
@@ -259,6 +287,8 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * @param ConfigInterface $config
+     *
+     * @deprecated since 1.9. Use ConfigManager::merge instead
      */
     public function merge(ConfigInterface $config)
     {
@@ -267,6 +297,8 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * Flushes all changes to configuration data that have been queued up to now to the database.
+     *
+     * @deprecated since 1.9. Use ConfigManager::flush instead
      */
     public function flush()
     {
@@ -274,7 +306,9 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the name of the scope this provider works with.
+     *
+     * @return string
      */
     public function getScope()
     {

@@ -153,7 +153,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $selfRelations               = $selfConfig->get('relation', false, []);
         $selfRelations[$relationKey] = $selfRelationConfig;
         $selfConfig->set('relation', $selfRelations);
-        $this->extendConfigProvider->persist($selfConfig);
+        $this->configManager->persist($selfConfig);
 
         $targetConfig                  = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelationConfig          = [
@@ -165,10 +165,10 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $targetRelations               = $targetConfig->get('relation', false, []);
         $targetRelations[$relationKey] = $targetRelationConfig;
         $targetConfig->set('relation', $targetRelations);
-        $this->extendConfigProvider->persist($targetConfig);
+        $this->configManager->persist($targetConfig);
 
         $fieldConfig->set('relation_key', $relationKey);
-        $this->extendConfigProvider->persist($fieldConfig);
+        $this->configManager->persist($fieldConfig);
     }
 
     /**
@@ -207,7 +207,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $selfConfig->set('relation', $selfRelations);
         $targetConfig->set('relation', $targetRelations);
 
-        $this->extendConfigProvider->persist($selfConfig);
-        $this->extendConfigProvider->persist($targetConfig);
+        $this->configManager->persist($selfConfig);
+        $this->configManager->persist($targetConfig);
     }
 }

@@ -120,6 +120,7 @@ class ExtendConfigDumper
             }
         }
 
+        $configManager = $this->configProvider->getConfigManager();
         $extendConfigs = null === $filter
             ? $this->configProvider->getConfigs(null, true)
             : $this->configProvider->filter($filter, null, true);
@@ -132,9 +133,9 @@ class ExtendConfigDumper
                 // some bundles can change configs in pre persist events,
                 // and other bundles can produce more changes depending on already made, it's a bit hacky,
                 // but it's a service operation so called inevitable evil
-                $this->configProvider->flush();
+                $configManager->flush();
                 // the clearing of an entity manager gives a performance gain of 4 times
-                $this->configProvider->getConfigManager()->getEntityManager()->clear();
+                $configManager->getEntityManager()->clear();
 
                 $this->updateStateValues($extendConfig);
             }
@@ -146,7 +147,7 @@ class ExtendConfigDumper
             }
         }
         // do one more flush to make sure changes made by post update extensions are saved
-        $this->configProvider->flush();
+        $configManager->flush();
 
         $this->clear();
     }
@@ -190,6 +191,7 @@ class ExtendConfigDumper
             return;
         }
 
+        $configManager = $this->configProvider->getConfigManager();
         $hasChanges    = false;
         $extendConfigs = $this->configProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
@@ -217,14 +219,14 @@ class ExtendConfigDumper
                     if ($hasSchemaChanges) {
                         $hasChanges = true;
                         $extendConfig->set('schema', $schema);
-                        $this->configProvider->persist($extendConfig);
+                        $configManager->persist($extendConfig);
                     }
                 }
             }
         }
 
         if ($hasChanges) {
-            $this->configProvider->flush();
+            $configManager->flush();
         }
     }
 
@@ -382,6 +384,8 @@ class ExtendConfigDumper
         $defaultProperties  = [];
         $addRemoveMethods   = [];
 
+        $configManager = $this->configProvider->getConfigManager();
+
         $fieldConfigs = null === $filter
             ? $this->configProvider->getConfigs($className, true)
             : $this->configProvider->filter($filter, $className, true);
@@ -395,7 +399,7 @@ class ExtendConfigDumper
                 $doctrine
             );
 
-            $this->configProvider->persist($fieldConfig);
+            $configManager->persist($fieldConfig);
         }
 
         $relations = $extendConfig->get('relation', false, []);
@@ -454,7 +458,7 @@ class ExtendConfigDumper
 
         $extendConfig->set('schema', $schema);
 
-        $this->configProvider->persist($extendConfig);
+        $configManager->persist($extendConfig);
     }
 
     /**
@@ -472,7 +476,7 @@ class ExtendConfigDumper
             // mark entity as deleted
             if (!$extendConfig->is('is_deleted')) {
                 $extendConfig->set('is_deleted', true);
-                $this->configProvider->persist($extendConfig);
+                $this->configProvider->getConfigManager()->persist($extendConfig);
                 $hasChanges = true;
             }
 
@@ -480,7 +484,7 @@ class ExtendConfigDumper
             foreach ($fieldConfigs as $fieldConfig) {
                 if (!$fieldConfig->is('is_deleted')) {
                     $fieldConfig->set('is_deleted', true);
-                    $this->configProvider->persist($fieldConfig);
+                    $this->configProvider->getConfigManager()->persist($fieldConfig);
                     $hasChanges = true;
                 }
             }
@@ -498,14 +502,14 @@ class ExtendConfigDumper
             // Set entity state to active if all fields are active or deleted
             if (!$hasNotActiveFields) {
                 $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-                $this->configProvider->persist($extendConfig);
+                $this->configProvider->getConfigManager()->persist($extendConfig);
             }
 
             $hasChanges = true;
         }
 
         if ($hasChanges) {
-            $this->configProvider->flush();
+            $this->configProvider->getConfigManager()->flush();
         }
     }
 }

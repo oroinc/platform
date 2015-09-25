@@ -407,7 +407,7 @@ class ConfigManager
     }
 
     /**
-     * Clears entity config cache
+     * Removes all configuration data or for the given object (if $configId is specified) from a cache.
      *
      * @param ConfigIdInterface|null $configId
      */
@@ -442,6 +442,8 @@ class ConfigManager
     }
 
     /**
+     * Makes the given configuration object managed and persistent.
+     *
      * @param ConfigInterface $config
      */
     public function persist(ConfigInterface $config)
@@ -452,6 +454,9 @@ class ConfigManager
     }
 
     /**
+     * Merges configuration data from the given configuration object with existing
+     * managed configuration object.
+     *
      * @param ConfigInterface $config
      */
     public function merge(ConfigInterface $config)
@@ -459,6 +464,9 @@ class ConfigManager
         $this->mergeConfigValues($config, $this->buildConfigKey($config->getId()));
     }
 
+    /**
+     * Flushes all changes that have been queued up to now to a database.
+     */
     public function flush()
     {
         /** @var AbstractConfigModel[] $models */
