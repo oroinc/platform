@@ -58,6 +58,8 @@ define(function(require) {
                     if (_.result(response, 'successful') !== true) {
                         model.set('seen', status);
                         mediator.execute('showErrorMessage', __('Sorry, unexpected error was occurred'), 'error');
+                    } else {
+                        model.collection.fetch();
                     }
                 },
                 error: function(xhr, err, message) {

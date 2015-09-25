@@ -4,15 +4,20 @@
     default: %>reply-all-action<% ; break;
 }%>">
     <div class="header row-fluid">
-        <a class="my-emails pull-left" href="/email/user-emails">
+        <a class="my-emails pull-left" href="<%=userEmailsUrl %>">
             My Emails
         </a>
+        <% if (countNewEmail) { %>
         <button class="mark-as-read pull-right btn btn-primary">
             <i class="icon-check"></i>
             Mark all as Read
         </button>
+        <% } %>
     </div>
     <ul class="items"></ul>
+    <% if (moreUnreadEmails) { %>
+    <div class="more-unread">+ <%=moreUnreadEmails %> More Unread</div>
+    <% } %>
     <div class="empty">You don't have any emails yet</div>
     <div class="notification">You have a new email</div>
 </div>

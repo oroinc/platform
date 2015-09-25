@@ -30,6 +30,7 @@ define(function(require) {
                     this.models[i].set({'seen': 1});
                 }
             }
+            this.unreadEmailsCount = 0;
         },
 
         parse: function(response, q) {

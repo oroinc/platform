@@ -22,7 +22,7 @@ define(function(require) {
         actionId: 1,
 
         listen: {
-            'change:seen collection': 'updateViewMode',
+            'change:seen collection': 'onSeenStatusChange',
             'reset collection': 'onResetCollection',
             'request collection': 'onCollectionRequest',
             'sync collection': 'onCollectionSync'
@@ -48,8 +48,13 @@ define(function(require) {
 
         getTemplateData: function() {
             var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
+            var visibleUnreadEmails = this.collection.filter(function(item) {
+                return item.get('seen') === false;
+            }).length;
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
             data.actionId = this.actionId;
+            data.countNewEmail = this.countNewEmail;
+            data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             return data;
         },
 
@@ -76,7 +81,9 @@ define(function(require) {
                 url: routing.generate('oro_email_mark_all_as_seen'),
                 success: function(response) {
                     self.collection.markAllAsRead();
-                    self.setCount(0);
+                    self.collection.unreadEmailsCount = 0;
+                    self.countNewEmail = 0;
+                    self.render();
                     if (response.successful) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
@@ -85,6 +92,15 @@ define(function(require) {
                     messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
                 }
             });
+        },
+
+        onSeenStatusChange: function(model, isSeen) {
+            if (isSeen && this.countNewEmail > 0) {
+                this.countNewEmail--;
+            } else {
+                this.countNewEmail++;
+            }
+            //this.collection.fetch();
         },
 
         resetModeDropDownMenu: function() {
@@ -103,7 +119,7 @@ define(function(require) {
         },
 
         onResetCollection: function() {
-            this.collection.countNewEmail = 0;
+            this.collection.unreadEmailsCount = 0;
         },
 
         onClickIconEnvelope: function() {
@@ -144,6 +160,7 @@ define(function(require) {
             if (this.loadingMask) {
                 this.loadingMask.dispose();
             }
+            this.render();
         }
     });
 
