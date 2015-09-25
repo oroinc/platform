@@ -7,5 +7,6 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @doctrine
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }
