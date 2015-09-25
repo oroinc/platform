@@ -7,6 +7,7 @@ oro:
         organization.label:   Organization
 
     business_unit:
+        label: Business Unit
         menu:
             list.description: List of business units
         controller:
