@@ -48,7 +48,7 @@ class OptionSetListener
             return;
         }
 
-        foreach ($schema['relation'] as $fieldName) {
+        foreach ($schema['relation'] as $fieldName => $fieldOptions) {
             if (!$configProvider->hasConfig($className, $fieldName)) {
                 continue;
             }
