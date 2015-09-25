@@ -1,17 +1,19 @@
-define(['jquery', 'underscore', 'backbone', '../constants',
-    'text!./templates/widget-min-template.html',
-    'text!./templates/widget-max-template.html'
-    ], function($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  orosidebar/js/widget-container/view
-     * @class   orosidebar.widgetContainer.View
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
-        templateMin: _.template(widgetMinTemplate),
-        templateMax: _.template(widgetMaxTemplate),
+    var WidgetContainerView;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var constants = require('../constants');
+    var widgetMinTemplate = require('tpl!./templates/widget-min-template.html');
+    var widgetMaxTemplate = require('tpl!./templates/widget-max-template.html');
+    var widgetIconTemplate = require('tpl!./templates/icon-template.html');
+    var BaseView = require('oroui/js/app/views/base/view');
+
+    WidgetContainerView = BaseView.extend({
+        templateMin: widgetMinTemplate,
+        templateMax: widgetMaxTemplate,
+        templateIcon: widgetIconTemplate,
 
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
@@ -21,10 +23,8 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             'click .sidebar-widget-close': 'onClickClose'
         },
 
-        initialize: function() {
-            var view = this;
-            view.stopListening(view.model, 'change');
-            view.listenTo(view.model, 'change', view.render);
+        listen: {
+            'change model': 'render'
         },
 
         render: function() {
@@ -40,35 +40,43 @@ define(['jquery', 'underscore', 'backbone', '../constants',
                 this.$el.addClass('sidebar-widget-embedded');
             }
 
-            this.model.loadModule().then(_.bind(this._render, this));
+            this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
+
+            this.model.loadModule().then(_.bind(this._deferredRender, this));
 
             return this;
+        },
+
+        getTemplateFunction: function() {
+            var template = this.templateMax;
+            if (this.model.get('state') === constants.WIDGET_MINIMIZED) {
+                template = this.templateMin;
+            }
+            return template;
+        },
+
+        getTemplateData: function() {
+            var data = WidgetContainerView.__super__.getTemplateData.call(this);
+            if (this.model.module.titleTemplate) {
+                data.title = this.model.module.titleTemplate(data);
+            }
+            data.icon = this.templateIcon(data);
+            return data;
         },
 
         /**
          * Renders the widget content once widget module is loaded
          *
-         * @param {Object} module
          * @protected
          */
-        _render: function(module) {
-            var template = this.templateMax;
-            if (this.model.get('state') === constants.WIDGET_MINIMIZED) {
-                template = this.templateMin;
-            }
-
-            var data = this.model.toJSON();
-            if (module.titleTemplate) {
-                data.title = module.titleTemplate(data);
-            }
-
-            this.$el.html(template(data));
+        _deferredRender: function() {
+            WidgetContainerView.__super__.render.call(this);
 
             if (this.model.get('state') !== constants.WIDGET_MINIMIZED) {
                 if (this.contentView) {
                     this.contentView.dispose();
                 }
-                this.contentView = new module.ContentView({
+                this.contentView = new this.model.module.ContentView({
                     autoRender: true,
                     model: this.model,
                     el: this.$('.sidebar-widget-content')
@@ -115,4 +123,6 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             Backbone.trigger('closeWidget', this.model.cid);
         }
     });
+
+    return WidgetContainerView;
 });

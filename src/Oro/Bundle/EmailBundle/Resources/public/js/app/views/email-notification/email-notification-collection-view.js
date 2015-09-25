@@ -19,7 +19,13 @@ define(function(require) {
         listSelector: '.items',
         countNewEmail: 0,
         loadingMask: null,
-        actionId: 1,
+        /**
+         * Id of default action
+         *  1 - reply all
+         *  2 - reply
+         *  3 - forward
+         */
+        defaultActionId: 1,
 
         listen: {
             'change:seen collection': 'onSeenStatusChange',
@@ -36,8 +42,8 @@ define(function(require) {
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
-            if (options.actionId) {
-                this.actionId = parseInt(options.actionId);
+            if (options.defaultActionId) {
+                this.defaultActionId = parseInt(options.defaultActionId);
             }
         },
 
@@ -52,7 +58,7 @@ define(function(require) {
                 return item.get('seen') === false;
             }).length;
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
-            data.actionId = this.actionId;
+            data.defaultActionId = this.defaultActionId;
             data.countNewEmail = this.countNewEmail;
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             data.isEmpty = this.collection.length === 0;

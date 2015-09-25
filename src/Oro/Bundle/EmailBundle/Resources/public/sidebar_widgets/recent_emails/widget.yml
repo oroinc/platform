@@ -7,4 +7,4 @@ showRefreshButton: false
 settings:
     folderId: 0
     limit: 4
-    actionId: 1
+    defaultActionId: 1
