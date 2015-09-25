@@ -42,7 +42,6 @@ class FieldType extends AbstractType
             'percent',
             'file',
             'image',
-            'optionSet',
             'enum',
             'multiEnum',
         ],

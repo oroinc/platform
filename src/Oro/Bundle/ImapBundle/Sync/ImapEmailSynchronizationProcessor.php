@@ -343,6 +343,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $count = $processed = $invalid = $totalInvalid = 0;
 
         $emails = $this->manager->getEmails($searchQuery);
+        $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setBatchCallback(
             function ($batch) {
@@ -416,10 +417,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param Email[]         $emails
      * @param ImapEmailFolder $imapFolder
      */
-    protected function saveEmails(
-        array $emails,
-        ImapEmailFolder $imapFolder
-    ) {
+    protected function saveEmails(array $emails, ImapEmailFolder $imapFolder)
+    {
         $this->emailEntityBuilder->removeEmails();
 
         $folder        = $imapFolder->getFolder();
@@ -432,21 +431,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $messageIds,
             $isMultiFolder
         );
-
         $existingEmailUsers = $this->getExistingEmailUsers($folder, $messageIds);
-
         /** @var ImapEmail[] $newImapEmails */
         $newImapEmails = [];
-
         foreach ($emails as $email) {
-            if (in_array($email->getId()->getUid(), $existingUids)) {
-                $this->logger->info(
-                    sprintf(
-                        'Skip "%s" (UID: %d) email, because it is already synchronised.',
-                        $email->getSubject(),
-                        $email->getId()->getUid()
-                    )
-                );
+            if (!$this->allowSaveEmail($folder, $email, $existingUids)) {
                 continue;
             }
 
@@ -477,11 +466,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                             $this->currentOrganization
                         );
 
-                    $imapEmail = $this->createImapEmail(
-                        $email->getId()->getUid(),
-                        $emailUser->getEmail(),
-                        $imapFolder
-                    );
+                    $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
                     $this->em->persist($imapEmail);
                     $this->logger->notice(
@@ -520,6 +505,41 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->em->flush();
 
         $this->cleanUp();
+    }
+
+    /**
+     * @param EmailFolder $folder
+     * @param Email $email
+     * @param array $existingUids
+     *
+     * @return bool
+     */
+    protected function allowSaveEmail(EmailFolder $folder, Email $email, array $existingUids)
+    {
+        if ($folder->getSynchronizedAt() > $email->getSentAt()) {
+            $this->logger->info(
+                sprintf(
+                    'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
+                    $email->getSubject(),
+                    $email->getId()->getUid()
+                )
+            );
+
+            return false;
+        }
+
+        if (in_array($email->getId()->getUid(), $existingUids)) {
+            $this->logger->info(
+                sprintf(
+                    'Skip "%s" (UID: %d) email, because it is already synchronised.',
+                    $email->getSubject(),
+                    $email->getId()->getUid()
+                )
+            );
+            return false;
+        }
+
+        return true;
     }
 
     /**

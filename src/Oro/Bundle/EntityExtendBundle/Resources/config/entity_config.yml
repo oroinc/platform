@@ -348,39 +348,6 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                # OptionSet form type fields
-                # @deprecated since 1.4, will be removed in 2.0
-                set_expanded:
-                    options:
-                        allowed_type:       [optionSet]
-                        create_only:        true
-                    form:
-                        type:               choice
-                        options:
-                            required:       false
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
-                            label:          oro.entity_extend.entity_config.extend.field.items.set_expanded
-                            attr:
-                                class:      is-option-set-expanded
-                            block:          general
-                            subblock:       properties
-
-                # @deprecated since 1.4, will be removed in 2.0
-                set_options:
-                    options:
-                        allowed_type:       [optionSet]
-                        auditable:          false
-                    form:
-                        type:               oro_entity_option_set_collection
-                        options:
-                            required:       false
-                            label:          oro.entity_extend.entity_config.extend.field.items.set_options
-                            block:          general
-                            subblock:       properties
-                            type:           oro_entity_option_set
-                            tooltip:        oro.entity_extend.field.option_set.option.tooltip
-
     enum:
         entity:
             items:

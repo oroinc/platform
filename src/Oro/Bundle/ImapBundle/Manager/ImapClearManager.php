@@ -98,10 +98,11 @@ class ImapClearManager implements LoggerAwareInterface
 
         foreach ($folders as $folder) {
             $imapFolder = $folderRepository->findOneBy(['folder' => $folder]);
-            if (!$origin->isActive()) {
+            if ($imapFolder && !$origin->isActive()) {
                 $this->clearFolder($imapFolder);
                 $this->em->remove($imapFolder);
-            } elseif (!$folder->isSyncEnabled()) {
+                $this->logger->notice(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
+            } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
@@ -109,11 +110,13 @@ class ImapClearManager implements LoggerAwareInterface
         foreach ($folders as $folder) {
             if (!$origin->isActive()) {
                 $this->em->remove($folder);
+                $this->logger->notice(sprintf('Folder with ID %s removed', $folder->getId()));
             }
         }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
+            $this->logger->notice(sprintf('Origin with ID %s removed', $origin->getId()));
         }
 
         $this->em->flush();
@@ -137,11 +140,11 @@ class ImapClearManager implements LoggerAwareInterface
             $email = $emailUser->getEmail();
             $this->em->remove($emailUser);
 
-            $imapEmail = $this->em->getRepository('OroImapBundle:ImapEmail')->findOneBy([
+            $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
                 'email' => $email,
                 'imapFolder' => $imapFolder,
             ]);
-            if ($imapEmail !== null) {
+            foreach ($imapEmails as $imapEmail) {
                 $this->em->remove($imapEmail);
             }
 
@@ -151,6 +154,15 @@ class ImapClearManager implements LoggerAwareInterface
                 $this->em->clear('OroImapBundle:ImapEmail');
             }
             ++$i;
+        }
+        if ($i > 0) {
+            $this->logger->notice(
+                sprintf(
+                    'ImapFolder with ID %s cleared. Removed %d emails.',
+                    $imapFolder->getId(),
+                    $i
+                )
+            );
         }
 
         $this->em->flush();

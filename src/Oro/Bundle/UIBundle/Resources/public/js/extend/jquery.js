@@ -17,7 +17,7 @@ define(['jquery'], function($) {
         setCursorPosition: function(index) {
             return this.each(function() {
                 var el = this;
-                if ('selectionStart' in el) {
+                if ('selectionStart' in el && el.type !== 'number') {
                     el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
                 }
             });
@@ -37,7 +37,9 @@ define(['jquery'], function($) {
             var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
             var $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            if ($autoFocus.length || $input.length) {
+                ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            }
         },
 
         focus: (function(orig) {

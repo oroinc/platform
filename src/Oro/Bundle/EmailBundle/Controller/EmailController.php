@@ -81,6 +81,7 @@ class EmailController extends Controller
         $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
         $maxEmailsDisplay = $this->container->getParameter('oro_email.flash_notification.max_emails_display');
         $emailNotificationManager = $this->get('oro_email.manager.notification');
+
         return [
             'clank_event' => WebSocketSendProcessor::getUserTopic($this->getUser(), $currentOrganization),
             'emails' => json_encode($emailNotificationManager->getEmails(
@@ -518,18 +519,18 @@ class EmailController extends Controller
     {
         $query = $request->query->get('query');
         if ($request->query->get('search_by_id', false)) {
-            $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($query);
+            $emails = explode(',', $query);
+            $results = array_map(function ($email) {
+                $recipient = $this->getEmailRecipientsHelper()->createRecipientFromEmail($email);
+                if ($recipient) {
+                    return $this->getEmailRecipientsHelper()->createRecipientData($recipient);
+                }
 
-            if ($recipient) {
-                $results = [$this->getEmailRecipientsHelper()->createRecipientData($recipient)];
-            } else {
-                $results = [
-                    [
-                        'id'   => $query,
-                        'text' => $query,
-                    ],
+                return [
+                    'id'   => $email,
+                    'text' => $email,
                 ];
-            }
+            }, $emails);
         } else {
             $organization = $request->query->get('organization');
             if ($organization) {

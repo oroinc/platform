@@ -20,9 +20,15 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         /** @var Expr\Select $select */
         foreach ($selects as $select) {
             foreach ($select->getParts() as $part) {
-                $part = preg_replace('/ as /i', ' as ', $part);
-                if (strpos($part, ' as ') !== false) {
-                    list($field, $alias) = explode(' as ', $part, 2);
+                /**
+                 *  Only last 'AS' part should be used in case of sub selects
+                 */
+                $part = strrev(trim($part));
+                $part = preg_split('/ sa /im', $part, 2);
+                if (count($part) > 1) {
+                    $field = strrev($part[1]);
+                    $alias = strrev($part[0]);
+
                     $this->fieldAliases[trim($alias)] = trim($field);
                 }
             }
@@ -164,7 +170,17 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
     {
         $condition = (string)$condition;
         foreach ($this->fieldAliases as $alias => $field) {
-            $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
+            $pattern = $this->getRegExpQueryForAlias($alias);
+            $preparedCondition = preg_replace($pattern, $field, $condition);
+
+            /**
+             * In case of pattern is incorrect preg_replace return NULL
+             */
+            if ($preparedCondition === null) {
+                throw new \RuntimeException("Alias pattern {$pattern} is incorrect");
+            }
+
+            $condition = $preparedCondition;
         }
 
         return trim($condition);

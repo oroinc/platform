@@ -204,7 +204,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     /**
      * In case when user or host field was changed new configuration should be created
-     * and old one will be not active
+     * and old one will be not active.
      */
     public function testCreatingNewConfiguration()
     {
@@ -218,6 +218,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $form->setData($entity);
         $form->submit(
             array(
+                'useImap'        => 1,
                 'imapHost'       => 'someHost',
                 'imapPort'       => '123',
                 'smtpHost'       => '',
@@ -233,6 +234,39 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->assertInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertTrue($form->getData()->isActive());
+    }
+
+    /**
+     * In case when user or host field was changed new configuration should NOT be created if imap and smtp
+     * are inactive.
+     */
+    public function testNotCreatingNewConfigurationWhenImapInactive()
+    {
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $form = $this->factory->create($type);
+
+        $entity = new UserEmailOrigin();
+        $entity->setImapHost('someHost');
+        $this->assertTrue($entity->isActive());
+
+        $form->setData($entity);
+        $form->submit(
+            array(
+                'useImap'        => 0,
+                'useSmtp'        => 0,
+                'imapHost'       => 'someHost',
+                'imapPort'       => '123',
+                'smtpHost'       => '',
+                'smtpPort'       => '',
+                'imapEncryption' => 'ssl',
+                'smtpEncryption' => 'ssl',
+                'user'           => 'someUser',
+                'password'       => 'somPassword'
+            )
+        );
+
+        $this->assertNotSame($entity, $form->getData());
+        $this->assertNull($form->getData());
     }
 
     /**

@@ -11,6 +11,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NoteBundle\Model\ExtendNote;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
+use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareTrait;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
@@ -33,15 +37,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          },
  *          "activity"={
  *              "immutable"=true
- *          },
- *          "comment"={
- *              "applicable"=true
  *          }
  *      }
  * )
  */
-class Note extends ExtendNote
+class Note extends ExtendNote implements DatesAwareInterface, UpdatedByAwareInterface
 {
+    use DatesAwareTrait;
+    use UpdatedByAwareTrait;
+
     const ENTITY_NAME = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /**
@@ -77,67 +81,11 @@ class Note extends ExtendNote
     protected $message;
 
     /**
-     * @var User
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="updated_by_user_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $updatedBy;
-
-    /**
-     * @var \Datetime $created
-     *
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \Datetime $updated
-     *
-     * @ORM\Column(name="updated_at", type="datetime", nullable=false)
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
-
-    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param \Datetime $createdAt
-     *
-     * @return Note
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \Datetime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
     }
 
     /**
@@ -161,54 +109,11 @@ class Note extends ExtendNote
     }
 
     /**
-     * @param \Datetime $updatedAt
+     * @param User|null $owningUser
      *
      * @return Note
      */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return \Datetime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Not using type hint due to the fact that entity setter can be called when no logged user available
-     * So $updatedBy will be null
-     *
-     * @param UserInterface|null $updatedBy
-     *
-     * @return Note
-     */
-    public function setUpdatedBy($updatedBy)
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    /**
-     * @return UserInterface
-     */
-    public function getUpdatedBy()
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * @param UserInterface|null $owningUser
-     *
-     * @return Note
-     */
-    public function setOwner($owningUser)
+    public function setOwner(User $owningUser = null)
     {
         $this->owner = $owningUser;
 

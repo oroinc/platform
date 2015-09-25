@@ -389,6 +389,8 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.ownership_tree_provider.chain
             - @?security.acl.voter.basic_permissions
+        calls:
+            - [setAclGroupProvider, [@oro_security.acl.group_provider.chain]]
 
     oro_security.abstract_ownership_tree_provider:
         public: false
@@ -503,10 +505,10 @@ services:
     oro_security.listener.refresh_context_listener:
         class: %oro_security.listener.refresh_context_listener.class%
         arguments:
-            - @security.context.link
+            - @security.token_storage
             - @doctrine
-            - @oro_entity.doctrine_helper
         tags:
+            - { name: doctrine.event_listener, event: preClose }
             - { name: doctrine.event_listener, event: onClear }
 
     oro_security.listener.console_context_listener:
@@ -548,7 +550,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
         arguments:
-             - @security.context
+             - @security.token_storage
 
     oro_security.query_hint.filter_by_current_user:
         public: false

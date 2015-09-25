@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
@@ -15,6 +14,7 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -270,13 +270,15 @@ class ActivityManager
      * Returns a query builder that could be used for fetching the list of entities
      * associated with the given activity
      *
-     * @param string      $activityClassName The FQCN of the activity entity
-     * @param mixed       $filters           Criteria is used to filter activity entities
-     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins             Additional associations required to filter activity entities
-     * @param int|null    $limit             The maximum number of items per page
-     * @param int|null    $page              The page number
-     * @param string|null $orderBy           The ordering expression for the result
+     * @param string        $activityClassName The FQCN of the activity entity
+     * @param mixed         $filters           Criteria is used to filter activity entities
+     *                                         e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins             Additional associations required to filter activity entities
+     * @param int|null      $limit             The maximum number of items per page
+     * @param int|null      $page              The page number
+     * @param string|null   $orderBy           The ordering expression for the result
+     * @param callable|null $callback          A callback function which can be used to modify child queries
+     *                                         function (QueryBuilder $qb, $targetEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -286,7 +288,8 @@ class ActivityManager
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $targets = $this->getActivityTargets($activityClassName);
         if (empty($targets)) {
@@ -300,7 +303,8 @@ class ActivityManager
             $targets,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 
@@ -328,13 +332,15 @@ class ActivityManager
      * Returns a query builder that could be used for fetching the list of activity entities
      * associated with the given target entity
      *
-     * @param string      $targetClassName The FQCN of the activity entity
-     * @param mixed       $filters         Criteria is used to filter activity entities
-     *                                     e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins           Additional associations required to filter activity entities
-     * @param int|null    $limit           The maximum number of items per page
-     * @param int|null    $page            The page number
-     * @param string|null $orderBy         The ordering expression for the result
+     * @param string        $targetClassName The FQCN of the activity entity
+     * @param mixed         $filters         Criteria is used to filter activity entities
+     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins           Additional associations required to filter activity entities
+     * @param int|null      $limit           The maximum number of items per page
+     * @param int|null      $page            The page number
+     * @param string|null   $orderBy         The ordering expression for the result
+     * @param callable|null $callback        A callback function which can be used to modify child queries
+     *                                       function (QueryBuilder $qb, $ownerEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -344,7 +350,8 @@ class ActivityManager
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $activities = $this->getActivities($targetClassName);
         if (empty($activities)) {
@@ -358,7 +365,8 @@ class ActivityManager
             $activities,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 

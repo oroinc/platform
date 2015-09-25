@@ -7,7 +7,6 @@ use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestCalendarTest extends WebTestCase

@@ -71,7 +71,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-                if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                     continue;
                 }
 
@@ -190,7 +190,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $schema['property'][$snapshotFieldName] = $snapshotFieldName;
+                    $schema['property'][$snapshotFieldName] = [];
+                    if ($fieldConfig->is('is_deleted')) {
+                        $schema['property'][$snapshotFieldName]['private'] = true;
+                    }
 
                     $schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName] = [
                         'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),

@@ -87,6 +87,9 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Removed `Oro\Component\PropertyAccess\PropertyPath` and `Oro\Component\PropertyAccess\PropertyPathInterface`, `Symfony\Component\PropertyAccess\PropertyPath` and `Symfony\Component\PropertyAccess\PropertyPathInterface` should be used instead
 - Removed `Oro\Component\PropertyAccess\Exception` namespace, `Symfony\Component\PropertyAccess\Exception` is used
 
+####CommentBundle
+- Removed `applicable` attribute from `comment` scope of entity configs. Now comments can be enabled for most entities, except dictionaries and some internal entities, like Attachment, File, etc.
+
 ####EmailBundle
 - The format of object returned by GET /api/rest/{version}/emails and GET /api/rest/{version}/emails resources was changed. Not a email body is returned as "body" and "bodyType" properties rather than "emailBody" object. Possible values for "bodyType" are "text" and "html". Possible values for the "importance" property are "low", "normal" and "high" rather than -1, 0 and 1. The "recipients" property was removed and three new properties were added instead: "to", "cc" and "bcc". The format of "folders" collection was changed as well, now each folder can have the following properties: "origin", "fullName", "name" and "type". Possible values for "type" property are "inbox", "sent", "trash", "drafts", "spam" and "other".   
 
@@ -121,6 +124,7 @@ For the functional tests we recommend to call `parent::tearDown()` when `tearDow
 - Added [Query Hint Resolver](./src/Oro/Bundle/EntityBundle/Resources/doc/query_hint_resolver.md)
 - Removed `Oro\Bundle\EntityBundle\ORM\EntityConfigAwareRepositoryInterface` interface
 - Removed `Oro\Bundle\EntityBundle\ORM\Query\FilterCollection` class and `oro_entity.orm.sql_filter` DIC tag
+- The `Oro\Bundle\EntityBundle\ORM\OroEntityManager` triggers `preClose` event occurs when the EntityManager#close() operation is invoked, before EntityManager#clear() is invoked. 
 
 ####EntityConfigBundle
 - The DI container tag `oro_service_method` and the class `Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceMethod` are deprecated and will be removed soon.
@@ -250,11 +254,13 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
 
 ####DataAuditBundle
 - `Oro\Bundle\DataAuditBundle\Loggable\LoggableManager` `logEntityClass` and `logEntityFieldClass` parameters replaced by `oro_dataaudit.loggable.audit_entity_mapper` service `getAuditEntryClass` and `getAuditEntryFieldClass` methods
+- Removed `$entityClass` parameter from `isEntityAuditable` method of `Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter`.
 
 ####SearchBundle
 
  - Added brackets for search queries. Now user available to do queries like 'from oro_test where all_text ~ test and (integer count > 10 or float price = 10)'
  - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
+ - Every Search request now is ACL protected. So, search results will contain only records what current user can see.
 
 ####ActivirtBundle
  - Added entity config parameter `show_on_page` to `Oro/Bundle/ActivityBundle/Resources/config/entity_config.yml`

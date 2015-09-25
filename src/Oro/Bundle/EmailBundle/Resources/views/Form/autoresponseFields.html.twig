@@ -1,0 +1,57 @@
+{% extends 'OroFormBundle:Form:fields.html.twig' %}
+
+{% block oro_collection_widget %}
+    {% spaceless %}
+        {% if prototype is defined %}
+            {% set prototype_html = _self.oro_collection_item_prototype(form) %}
+        {% endif %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
+        {% set id = id ~ '_collection' %}
+        <div class="row-oro">
+            {% set prototype_name = form.vars.prototype_name %}
+            <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+                {% if form.children|length %}
+                    {% for child in form.children %}
+                        {{ _self.oro_collection_item_prototype(child) }}
+                    {% endfor %}
+                {% elseif show_form_when_empty and prototype_html is defined %}
+                    {{ prototype_html|replace({(prototype_name): '0'})|raw }}
+                {% endif %}
+            </div>
+            {% if allow_add %}
+            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ form.vars.add_label|default('oro.form.collection.add')|trans }}</a>
+            {% endif %}
+        </div>
+        {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
+            {{ _self.oro_collection_validate_primary_js(_context) }}
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
+
+{% macro oro_collection_item_prototype(widget) %}
+    {% if 'collection' in widget.vars.block_prefixes %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.prototype.vars.name %}
+        {% set disabled = widget.vars.disabled %}
+        {% set allow_delete = widget.vars.allow_delete %}
+        {% set allow_add_after = widget.vars.allow_add_after %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+        {% set disabled = widget.parent.vars.disabled %}
+        {% set allow_delete = widget.parent.vars.allow_delete %}
+        {% set allow_add_after = widget.parent.vars.allow_add_after %}
+    {% endif %}
+    <div data-content="{{ name }}" data-validation-optional-group>
+        <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
+            {{ form_widget(form, {disabled: disabled}) }}
+            {% if allow_delete %}
+            <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
+            {% if allow_add_after %}
+            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
+            {% endif %}
+        </div>
+        {{ form_errors(form) }}
+    </div>
+{% endmacro %}

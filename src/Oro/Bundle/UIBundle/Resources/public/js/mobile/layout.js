@@ -46,30 +46,55 @@ define(function(require) {
      * Binds to dialog state change events and locks/unlocks page scroll
      */
     function initDialogStateTracker() {
-        var  dialogs = {};
+        var dialogs = {};
+        var modals = {};
 
         function scrollUpdate() {
             var $mainEl = $('#container').find('>:first-child');
-            if (_.some(dialogs)) {
+            if (_.some(dialogs) || _.some(modals)) {
                 mediator.execute('layout:disablePageScroll', $mainEl);
-                $('#page').css('display', 'none');
             } else {
-                mediator.execute('layout:enablePageScroll', $mainEl);
-                $('#page').css('display', '');
+                mediator.execute('layout:enablePageScroll');
+            }
+
+            // any dialog is opened -- hide page under dialog window (increases performance)
+            if (_.some(dialogs)) {
+                $('#page').addClass('hidden-page');
+            } else {
+                $('#page').removeClass('hidden-page');
+            }
+
+            // any modal is opened  -- prevent page scrolling under the modal window
+            if (_.some(modals)) {
+                $('html').addClass('lock-page-scroll');
+            } else {
+                $('html').removeClass('lock-page-scroll');
             }
         }
 
-        mediator.on('widget_dialog:open', function(dialog) {
-            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
-            scrollUpdate();
-        });
-        mediator.on('widget_dialog:close', function(dialog) {
-            delete dialogs[dialog.cid];
-            scrollUpdate();
-        });
-        mediator.on('widget_dialog:stateChange', function(dialog) {
-            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
-            scrollUpdate();
+        mediator.on({
+            // widget dialogs
+            'widget_dialog:open': function(dialog) {
+                dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+                scrollUpdate();
+            },
+            'widget_dialog:close': function(dialog) {
+                delete dialogs[dialog.cid];
+                scrollUpdate();
+            },
+            'widget_dialog:stateChange': function(dialog) {
+                dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+                scrollUpdate();
+            },
+            // modals
+            'modal:open': function(modal) {
+                modals[modal.cid] = true;
+                scrollUpdate();
+            },
+            'modal:close': function(modal) {
+                delete modals[modal.cid];
+                scrollUpdate();
+            }
         });
     }
 
