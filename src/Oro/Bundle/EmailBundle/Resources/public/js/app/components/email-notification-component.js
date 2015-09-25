@@ -1,8 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotification;
+    var EmailNotificationComponent;
     var _ = require('underscore');
+    var Backbone = require('backbone');
     var module = require('module');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
@@ -17,46 +18,45 @@ define(function(require) {
     var EmailNotificationCountView =
         require('oroemail/js/app/views/email-notification/email-notification-count-view');
 
-    EmailNotification = BaseComponent.extend({
+    EmailNotificationComponent = BaseComponent.extend({
         view: null,
         collection: null,
+        countModel: null,
 
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            this.initCollection();
-            this.initViews();
+            if (!options || !(options.countModel instanceof Backbone.Model)) {
+                throw new TypeError('Invalid "countModel" option of EmailNotificationComponent');
+            }
+            _.extend(this, _.pick(options, ['countModel']));
+            this.initCollection(options);
+            this.initViews(options);
             this.initSync();
         },
 
-        initCollection: function() {
-            if (this.options.collection) {
-                this.collection = this.options.collection;
+        initCollection: function(options) {
+            if (this.collection) {
                 this.usedOutOfScopeCollection = true;
                 return;
             }
-            var emails = this.options.emails || [];
+            var emails = options.emails || [];
             if (typeof emails === 'string') {
                 emails = JSON.parse(emails);
             }
             this.collection = new EmailNotificationCollection(emails);
         },
 
-        initViews: function() {
+        initViews: function(options) {
             var EmailNotificationView = tools.isMobile() ? MobileEmailNotificationView : DesktopEmailNotificationView;
-            var options = {
-                el: this.options._sourceElement,
+            this.view = new EmailNotificationView({
+                el: options._sourceElement,
                 collection: this.collection,
-                countNewEmail: this.options.countModel.get('unreadEmailsCount')
-            };
-            var settings = this.options.countModel.get('settings');
-            if (settings && settings.actionId) {
-                options.actionId = settings.actionId;
-            }
-            this.view = new EmailNotificationView(options);
-            if (this.options._iconElement) {
+                countNewEmail: this.countModel.get('unreadEmailsCount'),
+                defaultActionId: options.defaultActionId
+            });
+            if (options._iconElement) {
                 this.countView = new EmailNotificationCountView({
-                    el: this.options._iconElement,
-                    model: this.options.countModel
+                    el: options._iconElement,
+                    model: this.countModel
                 });
             }
         },
@@ -82,9 +82,7 @@ define(function(require) {
         loadLastEmail: function(hasNewEmail) {
             this.collection.fetch({
                 success: _.bind(function(collection) {
-                    if ('countModel' in this.options) {
-                        this.options.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
-                    }
+                    this.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
                     if (hasNewEmail) {
                         this.view.showNotification();
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
@@ -101,9 +99,9 @@ define(function(require) {
                 // prevent collection disposing
                 delete this.collection;
             }
-            EmailNotification.__super__.dispose.call(this);
+            EmailNotificationComponent.__super__.dispose.call(this);
         }
     });
 
-    return EmailNotification;
+    return EmailNotificationComponent;
 });

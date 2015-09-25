@@ -24,7 +24,7 @@ define(function(require) {
 
             this.$el.attr('data-cid', this.model.cid);
             this.$el.toggleClass('sidebar-icon-active', this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER);
-            this.$el.toggleClass('sidebar-icon-with-counter', Boolean(this.model.get('unreadEmailsCount')));
+            this.$el.toggleClass('sidebar-icon-with-counter', Boolean(this.model.get('itemsCounter')));
 
             return this;
         },

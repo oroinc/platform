@@ -17,21 +17,21 @@ define(function(require) {
                 this.component.dispose();
             }
 
-            var collection = this.model.emailNotificationCollection;
             var options = {
                 _sourceElement: this.$el,
-                collection: collection,
-                countModel: this.model
+                collection: this.model.emailNotificationCollection,
+                countModel: this.model.emailNotificationCountModel,
+                defaultActionId: this.model.get('settings').defaultActionId
             };
 
             this.component = new EmailNotificationComponent(options);
 
             return this;
         },
+
         onRefresh: function() {
             this.model.emailNotificationCollection.fetch();
         }
-
     });
 
     return RecentEmailsContentView;

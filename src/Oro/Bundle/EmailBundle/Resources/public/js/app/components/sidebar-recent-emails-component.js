@@ -7,6 +7,8 @@ define(function(require) {
     var module = require('module');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
+    var EmailNotificationCountModel =
+        require('oroemail/js/app/models/email-notification/email-notification-count-model');
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
         listen: {
@@ -26,17 +28,21 @@ define(function(require) {
                     return Number(item.id) === Number(settings.folderId);
                 });
                 if (count !== void 0) {
-                    this.model.set({unreadEmailsCount: count.num});
+                    this.model.set({itemsCounter: count.num});
                 }
             }
+            this.model.emailNotificationCountModel = new EmailNotificationCountModel({
+                unreadEmailsCount: options.count
+            });
+            this.listenTo(this.model.emailNotificationCountModel, 'change:unreadEmailsCount', this.updateCount);
+
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
             this.model.emailNotificationCollection.setRouteParams(settings);
-            this.model.emailNotificationCollection.on('sync', this.onCollectionSync, this);
         },
 
-        onCollectionSync: function() {
+        updateCount: function() {
             this.model.set({
-                unreadEmailsCount: this.model.emailNotificationCollection.unreadEmailsCount || ''
+                itemsCounter: this.model.emailNotificationCountModel.get('unreadEmailsCount')
             });
         },
 
@@ -48,7 +54,6 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.model.emailNotificationCollection.off('sync', this.onCollectionSync, this);
             this.model.emailNotificationCollection.dispose();
             delete this.model;
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
