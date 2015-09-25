@@ -218,7 +218,7 @@ class ExtendConfigDumper
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
-                $relationProperties[$fieldName] = $fieldName;
+                $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
                     $relationProperties[$fieldName]['private'] = true;
                 }
@@ -289,10 +289,10 @@ class ExtendConfigDumper
         }
 
         $schema             = $extendConfig->get('schema', false, []);
-        $properties         = isset($schema['property']) && null !== $filter ? $schema['property'] : [];
-        $relationProperties = isset($schema['relation']) && null !== $filter ? $schema['relation'] : [];
-        $defaultProperties  = isset($schema['default']) && null !== $filter ? $schema['default'] : [];
-        $addRemoveMethods   = isset($schema['addremove']) && null !== $filter ? $schema['addremove'] : [];
+        $properties         = isset($schema['property']) ? $schema['property'] : [];
+        $relationProperties = isset($schema['relation']) ? $schema['relation'] : [];
+        $defaultProperties  = isset($schema['default']) ? $schema['default'] : [];
+        $addRemoveMethods   = isset($schema['addremove']) ? $schema['addremove'] : [];
 
         $fieldConfigs = $extendProvider->filter($this->createOriginFilterCallback($skippedOrigins), $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
@@ -437,7 +437,7 @@ class ExtendConfigDumper
                 /** @var FieldConfigId $relationFieldId */
                 $relationFieldId = $relation['field_id'];
                 if ($relationFieldId) {
-                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
+                    $schema['relation'][$relationFieldId->getFieldName()] = [];
                 }
             }
         }
