@@ -2,16 +2,37 @@
 
 namespace Oro\Bundle\OrganizationBundle\Filter;
 
-use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
-use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Symfony\Component\Form\FormFactoryInterface;
+
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Form\Type\Filter\BusinessUnitChoiceFilterType;
 
 class BusinessUnitChoiceFilter extends AbstractFilter
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /**
+     * Constructor
+     *
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     */
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        ManagerRegistry $registry
+    ) {
+        parent::__construct($factory, $util);
+        $this->registry = $registry;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -44,14 +65,17 @@ class BusinessUnitChoiceFilter extends AbstractFilter
         $type =  $data['type'];
         $parameterName = $ds->generateParameterName($this->getName());
 
+        $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
+            ->createQueryBuilder('u')
+            ->select('u.id')
+            ->leftJoin('u.businessUnits', 'bu')
+            ->where('bu.id in (:'.$parameterName.')')
+            ->getQuery()
+          ->getDQL();
+
         $this->applyFilterToClause(
             $ds,
-            $this->buildComparisonExpr(
-                $ds,
-                $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                $parameterName
-            )
+            $this->get(FilterUtility::DATA_NAME_KEY) . ' in ('.$qb2.')'
         );
 
         if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
@@ -61,31 +85,9 @@ class BusinessUnitChoiceFilter extends AbstractFilter
         return true;
     }
 
-    public function parseData($data) {
+    public function parseData($data)
+    {
         $data['value'] = explode(',', $data['value']);
         return $data;
-    }
-
-    /**
-     * Build an expression used to filter data
-     *
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param int                              $comparisonType
-     * @param string                           $fieldName
-     * @param string                           $parameterName
-     *
-     * @return mixed
-     */
-    protected function buildComparisonExpr(
-        FilterDatasourceAdapterInterface $ds,
-        $comparisonType,
-        $fieldName,
-        $parameterName
-    ) {
-        switch ($comparisonType) {
-            default:
-                return $ds->expr()->in($fieldName, $parameterName, true);
-                break;
-        }
     }
 }
