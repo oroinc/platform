@@ -23,6 +23,7 @@ define(function(require) {
         events: {
             'keyup input': '_onReadCriteriaInputKey',
             'keydown [type="text"]': '_preventEnterProcessing',
+            'keyup input[name="search"]': '_onChangeSearchQuery',
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
@@ -69,6 +70,7 @@ define(function(require) {
          */
         _renderCriteria: function() {
             var value = _.extend({}, this.emptyValue, this.value);
+            var searchQuery = this.SearchQuery ? this.SearchQuery : undefined;
             var selectedChoiceLabel = '';
             var self = this;
 
@@ -90,7 +92,7 @@ define(function(require) {
                 value: value.value
             }));
 
-            var list = this._getListTemplate(this.businessUnit);
+            var list = this._getListTemplate(this.businessUnit, searchQuery);
             $filter.find('.list').html(list);
 
             this._appendFilter($filter);
@@ -99,11 +101,68 @@ define(function(require) {
             this._criteriaRenderd = true;
         },
 
-        _getListTemplate: function(businessUnit) {
+        _getListTemplate: function(businessUnit, searchQuery) {
             var self = this;
             var template;
             var response = [];
+            var chain;
+
             _.each(businessUnit, function(value) {
+                value.result = false;
+            });
+
+            if (searchQuery) {
+                response = this.searchItems(searchQuery, businessUnit);
+                response = this._calculateChain(response, businessUnit);
+                chain = this._prepareItems(response, businessUnit);
+                businessUnit = chain;
+            }
+
+            response = this._convertToTree(businessUnit);
+
+            template = this.getTemplate(response);
+            return template;
+        },
+
+        _prepareItems: function(response, businessUnit) {
+            var root = {};
+            _.each(response, function(value) {
+                root[value.value.id] = value.value;
+                root[value.value.id].result = true;
+                _.each(value.value.chain, function(item) {
+                    _.each(businessUnit, function(bu) {
+                        if (bu['id'] == item) {
+                            if (!root[bu['id']]) {
+                                root[bu['id']] = bu;
+                            }
+                        }
+                    });
+                });
+            });
+
+            var rootArray = [];
+            for (var i in root) {
+                rootArray.push(root[i]);
+            }
+
+            return rootArray;
+        },
+
+        _calculateChain: function(response, businessUnit) {
+            var self = this;
+            _.each(response, function(value, key) {
+                var chain = [];
+                chain = self.findChainToRoot(chain, value, businessUnit);
+                response[key].value.chain = chain;
+            });
+
+            return response;
+        },
+
+        _convertToTree: function(data) {
+            var self = this;
+            var response = [];
+            _.each(data, function (value) {
                 if (!value['owner_id']) {
                     response.push({
                         value: value,
@@ -112,20 +171,60 @@ define(function(require) {
                 }
             });
 
-            _.each(response, function(value, key) {
-                response[key]['children'] = self.findChild(value, businessUnit);
+            _.each(response, function (value, key) {
+                response[key]['children'] = self.findChild(value, data);
             });
 
-            template = this.getTemplate(response);
-            return template;
+            return response;
+        },
+
+        searchItems: function(searchQuery, businessUnit) {
+            var response = [];
+            _.each(businessUnit, function (value) {
+                var retusl = value['name'].indexOf(searchQuery);
+                if (retusl >= 0) {
+                    response.push({
+                        value: value,
+                        children: []
+                    });
+                }
+            });
+
+            return response;
+        },
+
+        findChainToRoot: function(chain, value, businessUnit) {
+            var self = this;
+            var parent;
+            _.each(businessUnit, function(item) {
+                if (value.value.owner_id && item['id'] == value.value.owner_id) {
+                    parent = {
+                        value: item,
+                        children: []
+                    };
+                }
+            });
+
+            if (parent) {
+                chain.push(parent.value.id);
+                self.findChainToRoot(chain, parent, businessUnit);
+            }
+
+            return chain;
         },
 
         getTemplate: function(items) {
             var self = this;
             var template = '<ul>';
             $.each(items, function(key, value) {
-                template += '<li>' + '<label for="business-unit-' + value.value.id + '">' +
-                '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox">' +
+                var classSearchResult = '';
+                if (value.value.result) {
+                    classSearchResult = 'search-result';
+                }
+
+                template += '<li>' +
+                '<label for="business-unit-' + value.value.id + '" class="' + classSearchResult + '">' +
+                    '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox">' +
                     value.value.name +
                 '</label>';
                 if (value.children.length > 0) {
@@ -234,6 +333,12 @@ define(function(require) {
             this._updateCriteriaHint();
             this.trigger('update');
             this.$el.find('input:checked').removeAttr('checked');
+        },
+
+        _onChangeSearchQuery: function(event) {
+            var searchQuery = $(event.target).val();
+            var list = this._getListTemplate(this.businessUnit, searchQuery);
+            this.$el.find('.list').html(list);
         }
     });
 
