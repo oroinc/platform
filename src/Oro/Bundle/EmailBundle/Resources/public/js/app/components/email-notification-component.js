@@ -53,7 +53,7 @@ define(function(require) {
                 options.actionId = settings.actionId;
             }
             this.view = new EmailNotificationView(options);
-            if (this.options._iconElement) {
+            if (this.options._iconElement && this.options._iconElement.length) {
                 this.countView = new EmailNotificationCountView({
                     el: this.options._iconElement,
                     model: this.options.countModel
