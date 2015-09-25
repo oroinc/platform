@@ -20,29 +20,28 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var count;
+            var count = 0;
             var config = module.config();
             var settings = this.model.get('settings');
             if ('unreadEmailsCount' in config) {
                 count = _.find(config.unreadEmailsCount, function(item) {
                     return Number(item.id) === Number(settings.folderId);
                 });
-                if (count !== void 0) {
-                    this.model.set({itemsCounter: count.num});
-                }
+                count = count !== void 0 ? count.num : 0;
             }
-            this.model.emailNotificationCountModel = new EmailNotificationCountModel({
-                unreadEmailsCount: options.count
-            });
+            this.model.emailNotificationCountModel = new EmailNotificationCountModel({unreadEmailsCount: count});
             this.listenTo(this.model.emailNotificationCountModel, 'change:unreadEmailsCount', this.updateCount);
+            this.updateCount();
 
             this.model.emailNotificationCollection = new EmailNotificationCollection([]);
             this.model.emailNotificationCollection.setRouteParams(settings);
         },
 
         updateCount: function() {
+            var itemsCounter = Number(this.model.emailNotificationCountModel.get('unreadEmailsCount'));
             this.model.set({
-                itemsCounter: this.model.emailNotificationCountModel.get('unreadEmailsCount')
+                itemsCounter: itemsCounter,
+                highlighted: Boolean(itemsCounter)
             });
         },
 

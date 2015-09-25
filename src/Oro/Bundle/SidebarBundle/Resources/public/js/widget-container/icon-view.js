@@ -23,7 +23,7 @@ define(function(require) {
             WidgetContainerIconView.__super__.render.call(this);
 
             this.$el.attr('data-cid', this.model.cid);
-            this.$el.toggleClass('sidebar-icon-active', this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER);
+            this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
 
             return this;
         },

@@ -17,7 +17,8 @@ define([
             title:      '',
             settings:   {},
             state:      constants.WIDGET_MINIMIZED,
-            widgetName: ''
+            widgetName: '',
+            highlighted: false
         },
 
         initialize: function() {

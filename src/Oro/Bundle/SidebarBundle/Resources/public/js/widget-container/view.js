@@ -40,6 +40,8 @@ define(function(require) {
                 this.$el.addClass('sidebar-widget-embedded');
             }
 
+            this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
+
             this.model.loadModule().then(_.bind(this._deferredRender, this));
 
             return this;
