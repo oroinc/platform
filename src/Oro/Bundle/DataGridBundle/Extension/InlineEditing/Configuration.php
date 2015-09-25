@@ -30,8 +30,12 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
 
         $builder->root($this->root)
-            ->useAttributeAsKey('name')
-            ->prototype('scalar')
+            ->children()
+                ->booleanNode('enabled')->end()
+                ->scalarNode('behaviour')->end() //  Possible values: enable_all, enable_selected
+                ->scalarNode('plugin')->end()
+                ->scalarNode('default_editors')->end()
+                ->arrayNode('save_api_accessor')->prototype('scalar')->end()
             ->end();
 
         return $builder;

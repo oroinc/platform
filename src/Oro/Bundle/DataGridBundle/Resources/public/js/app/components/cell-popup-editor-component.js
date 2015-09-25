@@ -53,6 +53,7 @@ define(function(require) {
 
         removeView: function() {
             overlayTool.removeOverlay(this.view.$el);
+            this.view.dispose();
         },
 
         dispose: function() {

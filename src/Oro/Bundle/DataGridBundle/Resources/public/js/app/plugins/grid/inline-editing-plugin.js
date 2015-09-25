@@ -7,7 +7,6 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var RouteModel = require('oroui/js/app/models/route-model');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('orodatagrid/js/app/views/editor/text-editor-view');
 
@@ -30,14 +29,26 @@ define(function(require) {
          */
         DEFAULT_VIEW: 'orodatagrid/js/app/views/editor/text-editor-view',
 
-        initialize: function() {
-            this.listenTo(this.main, 'beforeParseOptions', this.onBeforeParseOptions);
-            InlineEditingPlugin.__super__.initialize.apply(this, arguments);
-        },
+        /**
+         * This view is used by default for editing
+         */
+        DEFAULT_COLUMN_TYPE: 'text',
 
         enable: function() {
             this.listenTo(this.main, 'afterMakeCell', this.onAfterMakeCell);
+            if (!this.options.metadata.inline_editing.save_api_accessor) {
+                throw new Error('"save_api_accessor" option is required');
+            }
+            var ApiAccesor = this.options.metadata.inline_editing.save_api_accessor['class'];
+            this.save_api_accessor = new ApiAccesor(
+                _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
+            this.main.body.refresh();
             InlineEditingPlugin.__super__.enable.call(this);
+        },
+
+        disable: function() {
+            InlineEditingPlugin.__super__.enable.call(this);
+            this.main.body.refresh();
         },
 
         onAfterMakeCell: function(row, cell) {
@@ -45,7 +56,7 @@ define(function(require) {
             var _this = this;
             cell.render = function() {
                 var result = originalRender.apply(this, arguments);
-                if (this.column.get('editable')) {
+                if (_this.isEditable(cell)) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
                     this.$el.popover({
@@ -60,7 +71,8 @@ define(function(require) {
                 return result;
             };
             function enterEditModeIfNeeded(e) {
-                if (cell.column.get('editable')) {
+                /*jshint validthis:true */
+                if (_this.isEditable(this)) {
                     _this.enterEditMode(cell);
                 }
                 e.preventDefault();
@@ -74,43 +86,67 @@ define(function(require) {
             delete cell.events.click;
         },
 
-        /**
-         * Copies validation options to columns from metadata
-         *
-         * @param options
-         */
-        onBeforeParseOptions: function(options) {
-            var columnsMetadata = options.metadata.columns;
-            var columns = options.columns;
-            var preloadList = [];
-            for (var i = 0; i < columns.length; i++) {
-                var column = columns[i];
-                var columnMetadata = _.findWhere(columnsMetadata, {name: column.name});
-                if (columnMetadata) {
-                    column.validationRules = columnMetadata.validation_rules;
-                    if (columnMetadata.cell_editor) {
-                        column.cellEditorComponent = columnMetadata.cell_editor.component ||
-                            this.DEFAULT_COMPONENT;
-                        column.cellEditorView = columnMetadata.cell_editor.view ||
-                            this.DEFAULT_VIEW;
-                        column.cellEditorOptions = columnMetadata.cell_editor.options || {};
-                        preloadList.push(column.cellEditorComponent);
-                        preloadList.push(column.cellEditorView);
-                    } else {
-                        column.cellEditorComponent = this.DEFAULT_COMPONENT;
-                        column.cellEditorView = this.DEFAULT_VIEW;
-                        column.cellEditorOptions = {};
-                    }
+        getColumnMetadata: function(name) {
+            var columnsMeta = this.options.metadata.columns;
+            for (var i = 0; i < columnsMeta.length; i++) {
+                if (columnsMeta[i].name === name) {
+                    return columnsMeta[i];
                 }
             }
+        },
 
-            require(_.uniq(preloadList), _.noop, this._onRequireJsError);
+        isEditable: function(cell) {
+            var columnMetadata = this.getColumnMetadata(cell.column.get('name'));
+            if (!columnMetadata) {
+                return false;
+            }
+            switch (this.options.metadata.inline_editing.behaviour) {
+                case 'enable_all':
+                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enabled === false) {
+                        return false;
+                    }
+                    return (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                        this.options.metadata.inline_editing.default_editors;
+                case 'enable_selected':
+                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enabled === true) {
+                        return true;
+                    }
+                    break;
+                default:
+                    throw new Error('Unknown behaviour');
+            }
+            return false;
+        },
 
-            // initialize route which will be used for saving
-            this.route = new RouteModel({
-                routeName: options.metadata.inline_editing.route_name
-            });
-            this.httpMethod = options.metadata.inline_editing.http_method || 'PATCH';
+        getCellEditorOptions: function(cell) {
+            var columnMetadata = this.getColumnMetadata(cell.column.get('name'));
+            var editor = (columnMetadata && columnMetadata.editor) ? $.extend(true, {}, columnMetadata.editor) : {};
+
+            if (!editor.component) {
+                editor.component = this.options.metadata.inline_editing.cell_editor.component;
+            }
+            if (!editor.view) {
+                editor.view = this.options.metadata.inline_editing
+                    .default_editors[(columnMetadata.type || this.DEFAULT_COLUMN_TYPE)];
+            }
+            if (!editor.options) {
+                editor.options = {};
+            }
+
+            if (!editor.save_api_accessor) {
+                // use main
+                editor.save_api_accessor = this.save_api_accessor;
+            } else {
+                var ApiAccesor = editor.save_api_accessor.class;
+                editor.save_api_accessor = new ApiAccesor(_.omit(editor.save_api_accessor, 'class'));
+            }
+
+            editor.validation_rules = (columnMetadata.inline_editing &&
+                columnMetadata.inline_editing.validation_rules) ?
+                columnMetadata.inline_editing.validation_rules :
+                {};
+
+            return editor;
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
@@ -119,32 +155,34 @@ define(function(require) {
             }
             this.editModeEnabled = true;
             this.currentCell = cell;
-            var _this = this;
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
 
-            require([
-                cell.column.get('cellEditorComponent'),
-                cell.column.get('cellEditorView')
-            ], function(CellEditorComponent, CellEditorView) {
-                var editorComponent = new CellEditorComponent({
-                    cell: cell,
-                    view: CellEditorView,
-                    viewOptions: cell.column.get('cellEditorOptions'),
-                    fromPreviousCell: fromPreviousCell
-                });
+            var editor = this.getCellEditorOptions(cell);
+            this.editor = editor;
 
-                _this.editorComponent = editorComponent;
+            var CellEditorComponent = editor.component;
+            var CellEditorView = editor.view;
 
-                _this.listenTo(editorComponent, 'saveAction', _this.saveCurrentCell);
-                _this.listenTo(editorComponent, 'cancelAction', _this.exitEditMode);
-                _this.listenTo(editorComponent, 'saveAndEditNextAction', _this.saveCurrentCellAndEditNext);
-                _this.listenTo(editorComponent, 'cancelAndEditNextAction', _this.editNextCell);
-                _this.listenTo(editorComponent, 'saveAndEditPrevAction', _this.saveCurrentCellAndEditPrev);
-                _this.listenTo(editorComponent, 'cancelAndEditPrevAction', _this.editPrevCell);
-            });
+            var editorComponent = new CellEditorComponent(_.extend({}, editor.options, {
+                cell: cell,
+                view: CellEditorView,
+                viewOptions: _.extend({
+                    validationRules: editor.validation_rules
+                }, editor.options),
+                fromPreviousCell: fromPreviousCell
+            }));
+
+            this.editorComponent = editorComponent;
+
+            this.listenTo(editorComponent, 'saveAction', this.saveCurrentCell);
+            this.listenTo(editorComponent, 'cancelAction', this.exitEditMode);
+            this.listenTo(editorComponent, 'saveAndEditNextAction', this.saveCurrentCellAndEditNext);
+            this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
+            this.listenTo(editorComponent, 'saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
+            this.listenTo(editorComponent, 'cancelAndEditPrevAction', this.editPrevCell);
         },
 
         saveCurrentCell: function(data, exit) {
@@ -157,7 +195,7 @@ define(function(require) {
                 cell: cell,
                 oldValue: cell.model.get(cell.column.get('name'))
             };
-            this.sendRequest(data, cell)
+            this.editor.save_api_accessor.send(cell.model.toJSON(), data)
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
@@ -177,7 +215,6 @@ define(function(require) {
             }
             this.stopListening(this.editorComponent);
             this.editorComponent.dispose();
-            delete this.dataModel;
             delete this.editorComponent;
         },
 
@@ -209,19 +246,6 @@ define(function(require) {
             this.editPrevCell();
         },
 
-        sendRequest: function(data, cell) {
-            cell.model.set(data);
-            return $.ajax({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                type: this.httpMethod,
-                url: this.route.getUrl(cell.model.toJSON()),
-                data: JSON.stringify(data)
-            });
-        },
-
         findNextEditableCell: function(cell) {
             function next(model) {
                 var index = 1 + model.collection.indexOf(model);
@@ -231,13 +255,13 @@ define(function(require) {
                 return null;
             }
             var row = cell.model;
-            var column = cell.column;
+            var column = next(cell.column);
             var columns = column.collection;
             do {
-                column = next(column);
                 while (column) {
-                    if (column.get('editable')) {
-                        return this.main.findCell(row, column);
+                    var currentCell = this.main.findCell(row, column);
+                    if (this.isEditable(currentCell)) {
+                        return currentCell;
                     }
                     column = next(column);
                 }
@@ -256,13 +280,13 @@ define(function(require) {
                 return null;
             }
             var row = cell.model;
-            var column = cell.column;
+            var column = prev(cell.column);
             var columns = column.collection;
             do {
-                column = prev(column);
                 while (column) {
-                    if (column.get('editable')) {
-                        return this.main.findCell(row, column);
+                    var currentCell = this.main.findCell(row, column);
+                    if (this.isEditable(currentCell)) {
+                        return currentCell;
                     }
                     column = prev(column);
                 }
@@ -296,6 +320,7 @@ define(function(require) {
                 }, 2000);
             }
             this.cell.model.set(this.cell.column.get('name'), this.oldValue);
+            // @TODO update message
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
         }
     });

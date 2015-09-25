@@ -15,7 +15,6 @@ define(function(require) {
     var gridContentManager = require('orodatagrid/js/content-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
-    var InlineEditingPlugin = require('orodatagrid/js/app/plugins/grid/inline-editing-plugin');
 
     helpers = {
         cellType: function(type) {
@@ -48,6 +47,7 @@ define(function(require) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
+            options.builders.push('orodatagrid/js/inline-editing/builder');
 
             var self = this;
             this._deferredInit();
@@ -218,7 +218,7 @@ define(function(require) {
             };
             var modules = this.modules;
             var metadata = this.metadata;
-            var plugins = [];
+            var plugins = this.metadata.plugins || [];
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
@@ -249,10 +249,6 @@ define(function(require) {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
-            }
-
-            if (!tools.isMobile() && (this.metadata.inline_editing && this.metadata.inline_editing.enabled)) {
-                plugins.push(InlineEditingPlugin);
             }
 
             return {

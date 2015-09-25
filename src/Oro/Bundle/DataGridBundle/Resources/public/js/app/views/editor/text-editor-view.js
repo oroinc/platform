@@ -15,8 +15,7 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
-            'click [data-action]': 'rethrowAction',
-            'submit': 'onSave'
+            'click [data-action]': 'rethrowAction'
         },
 
         TAB_KEY_CODE: 9,
@@ -27,6 +26,7 @@ define(function(require) {
             this.options = options;
             this.cell = options.cell;
             this.column = options.column;
+            this.validationRules = options.validationRules || {};
             $(document).on('keydown' + this.eventNamespace(), _.bind(this.onKeyDown, this));
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
@@ -55,7 +55,9 @@ define(function(require) {
             TextEditorView.__super__.render.call(this);
             this.$el.addClass(_.result(this, 'className'));
             this.validator = this.$el.validate({
-                submitHandler: _.bind(this.onSave, this),
+                submitHandler: _.bind(function(form, e) {
+                    this.onSave(e);
+                }, this),
                 errorPlacement: function(error, element) {
                     error.appendTo(element.closest('.inline-editor-wrapper'));
                 },
@@ -71,7 +73,7 @@ define(function(require) {
         },
 
         getValidationRules: function() {
-            return this.column.get('validationRules') || {};
+            return this.validationRules;
         },
 
         getFormattedValue: function() {
@@ -88,6 +90,9 @@ define(function(require) {
         },
 
         onSave: function(e, postfix) {
+            if (e && e.preventDefault) {
+                e.preventDefault();
+            }
             var data = {};
             data[this.column.get('name')] = this.getValue();
             this.trigger('save' + (postfix ? postfix : '') + 'Action', data);

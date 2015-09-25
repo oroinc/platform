@@ -28,6 +28,13 @@ define(function(require) {
         getModelValue: function() {
             var raw = this.model.get(this.column.get('name'));
             return parseFloat(raw);
+        },
+
+        isChanged: function() {
+            var valueChanged = this.getValue() !== this.getModelValue();
+            return isNaN(this.getValue()) ?
+                this.$('input[name=value]').val() !== '' :
+                valueChanged;
         }
     });
 
