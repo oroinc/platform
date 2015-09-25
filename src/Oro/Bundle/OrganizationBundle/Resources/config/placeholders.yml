@@ -1,0 +1,9 @@
+placeholders:
+    scripts_before:
+        items:
+            organization_filter_templates:
+                order: 5
+
+items:
+    organization_filter_templates:
+        template: OroOrganizationBundle:Js:default_templates.js.twig
