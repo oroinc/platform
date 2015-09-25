@@ -135,9 +135,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
-        foreach ($searchFields as $searchField) {
-            $qb->orWhere('e.' . $searchField . ' in (:keys)');
-        }
+        $qb->andWhere('e.' . $keyField . ' in (:keys)');
         $qb->setParameter('keys', $keys);
 
         $query = $qb->getQuery();
