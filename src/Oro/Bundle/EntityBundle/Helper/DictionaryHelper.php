@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Rhumsaa\Uuid\Console\Exception;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
