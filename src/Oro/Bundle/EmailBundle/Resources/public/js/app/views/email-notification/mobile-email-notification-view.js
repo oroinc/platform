@@ -6,6 +6,8 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     MobileEmailNotificationView = BaseView.extend({
+        autoRender: true,
+
         /**
          * @type {number}
          */
