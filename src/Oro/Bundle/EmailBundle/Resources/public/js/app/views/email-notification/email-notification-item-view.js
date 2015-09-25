@@ -16,7 +16,7 @@ define(function(require) {
         templateSelector: '#email-notification-item-template',
 
         events: {
-            'click .info': 'onClickOpenEmail',
+            'click .title': 'onClickOpenEmail',
             'click [data-role=toggle-read-status]': 'onClickReadStatus'
         },
 
@@ -58,8 +58,6 @@ define(function(require) {
                     if (_.result(response, 'successful') !== true) {
                         model.set('seen', status);
                         mediator.execute('showErrorMessage', __('Sorry, unexpected error was occurred'), 'error');
-                    } else {
-                        model.collection.fetch();
                     }
                 },
                 error: function(xhr, err, message) {

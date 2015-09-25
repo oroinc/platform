@@ -56,7 +56,7 @@
           }
         }
       }
-      .info {
+      .info .title {
         cursor: pointer;
       }
       .body {
@@ -92,8 +92,13 @@
       }
     }
   }
-  .empty, .notification, .more-unread {
+  .notification, .more-unread {
     display: none;
+  }
+  .empty {
+    text-align: center;
+    padding: 4px 0;
+    color: #666;
   }
 }
 .default-reply-action .items li .footer .reply-action,
