@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -26,9 +27,7 @@ class WidgetUserMultiselectConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * @param array $converterAttributes
-     * @param mixed $value
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getFormValue(array $converterAttributes, $value)
     {
@@ -36,8 +35,7 @@ class WidgetUserMultiselectConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * @param mixed $value
-     * @return string
+     * {@inheritdoc}
      */
     public function getViewValue($value)
     {
