@@ -87,7 +87,9 @@ define(function(require) {
          * @param {string} value
          */
         setValue: function(value) {
-            this.$el.val(value).trigger('change');
+            if (this.$el.val() !== value) {
+                this.$el.val(value).trigger('change');
+            }
         },
 
         /**
@@ -144,8 +146,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            this.$el.val(this.getBackendFormattedValue());
-            this.$el.trigger('change');
+            if (this.$el.val() !== this.getBackendFormattedValue()) {
+                this.$el.val(this.getBackendFormattedValue());
+                this.$el.trigger('change');
+            }
         },
 
         /**
