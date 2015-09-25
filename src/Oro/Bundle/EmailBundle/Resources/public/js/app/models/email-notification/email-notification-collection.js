@@ -34,6 +34,7 @@ define(function(require) {
         },
 
         parse: function(response, q) {
+            this.checkServerResponse(response, q);
             if (this.disposed) {
                 return;
             }
@@ -45,6 +46,22 @@ define(function(require) {
             };
 
             return EmailNotificationCollection.__super__.parse.call(this, response, q);
+        },
+
+        //TODO: remove after server side gets work correctly
+        checkServerResponse: function(response) {
+            var length = response.emails.length;
+            var count = Number(response.count);
+            var limit = this._route.get('limit');
+            if (length > limit || length < Math.min(limit, count)) {
+                throw new Error('Wrong server response', response);
+            } else {
+                response.emails.forEach(function(element, index) {
+                    if (element.seen && index < count || !element.seen && index >= count) {
+                        throw new Error('Wrong server response', response);
+                    }
+                });
+            }
         }
     });
 

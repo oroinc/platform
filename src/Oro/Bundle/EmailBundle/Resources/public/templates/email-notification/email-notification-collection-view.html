@@ -3,24 +3,28 @@
     case 3: %>forward-action<% ; break;
     default: %>reply-all-action<% ; break;
 }%>">
-    <% if (!isEmpty) { %>
+<% if (length > 0) { %>
     <div class="header row-fluid">
         <a class="my-emails pull-left" href="<%=userEmailsUrl %>">
-            My Emails
+            <%=_.__('oro.email.notification.user_emails.label') %>
         </a>
         <% if (countNewEmail) { %>
         <button class="mark-as-read pull-right btn btn-primary">
             <i class="icon-check"></i>
-            Mark all as Read
+            <% if (isSidebarWidget) { %>
+            <%=_.__('oro.email.recent_emails_widget.mark_visible_read.label') %>
+            <% } else { %>
+            <%=_.__('oro.email.notification.mark_read.label') %>
+            <% } %>
         </button>
         <% } %>
     </div>
     <ul class="items"></ul>
     <% if (moreUnreadEmails) { %>
-    <div class="more-unread">+ <%=moreUnreadEmails %> More Unread</div>
+    <div class="more-unread">+<%=moreUnreadEmails %> <%=_.__('oro.email.notification.more_unread') %></div>
     <% } %>
-    <% } else { %>
-    <div class="empty">You don't have any emails yet</div>
-    <% } %>
-    <div class="notification">You have a new email</div>
+<% } else { %>
+    <div class="empty"><%=_.__('oro.email.notification.empty') %></div>
+<% } %>
+    <div class="notification"><%=_.__('oro.email.notification.new_email') %></div>
 </div>

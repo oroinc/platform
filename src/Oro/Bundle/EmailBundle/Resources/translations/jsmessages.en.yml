@@ -41,6 +41,8 @@ oro:
             title_all_folders: RECENT EMEILS
             settings: Recent Emails Widget Settings
             mailbox_folder: Mailbox Folder
+            all_folders: ALL
+            mark_visible_read.label: Mark Visible as Read
             amount_of_emails: Amount of Emails to Display
             default_action: Default Action
             reply_all: Reply All
@@ -51,6 +53,7 @@ oro:
             user_emails.label: My emails
             empty: You don't have any emails yet
             new_email: You have a new email
+            more_unread: More Unread
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"

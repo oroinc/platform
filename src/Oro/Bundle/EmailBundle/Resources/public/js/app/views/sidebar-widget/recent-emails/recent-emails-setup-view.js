@@ -21,7 +21,7 @@ define(function(require) {
             $.getJSON(routing.generate('oro_api_get_emailorigins'),
                 _.bind(function(data) {
                     this.foldersData = this.parseFoldersData(data);
-                    this.foldersData.unshift({id: 0, text: 'All'});
+                    this.foldersData.unshift({id: 0, text: __('oro.email.recent_emails_widget.all_folders')});
                     this.render();
                 }, this)
             );
