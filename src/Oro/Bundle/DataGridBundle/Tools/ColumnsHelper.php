@@ -50,15 +50,13 @@ class ColumnsHelper
     /**
      * Get Columns State from ColumnsParam string
      *
-     * @param DatagridConfiguration $config
+     * @param array  $columnsData
      * @param string $columns like '51.11.21.30.40.61.71'
      *
      * @return array $columnsData
      */
-    public function prepareColumnsParam(DatagridConfiguration $config, $columns)
+    public function prepareColumnsParam($columnsData, $columns)
     {
-        $columnsData = $config->offsetGet(ColumnsExtension::COLUMNS_PATH);
-
         //For non-minified saved grid views
         if (is_array($columns)) {
             foreach ($columns as $key => $value) {

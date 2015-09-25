@@ -161,8 +161,10 @@ class ColumnsExtension extends AbstractExtension
             /** Get columns data parameters from URL */
             $columnsParam = $this->getParameters()->get(self::MINIFIED_COLUMNS_PARAM, []);
 
+            /** @var array $columnsConfigData */
+            $columnsConfigData = $this->getColumnsWithOrder($config);
             /** @var array $minifiedColumnsState */
-            $minifiedColumnsState = $this->columnsHelper->prepareColumnsParam($config, $columnsParam);
+            $minifiedColumnsState = $this->columnsHelper->prepareColumnsParam($columnsConfigData, $columnsParam);
 
             $columns = $data->offsetGetOr(self::COLUMNS_PATH, []);
             foreach ($columns as $key => $column) {
