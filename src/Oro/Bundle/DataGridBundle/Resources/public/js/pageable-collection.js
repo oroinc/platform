@@ -849,11 +849,6 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @protected
          */
         _packColumnsStateData: function(state) {
-            // takes order of columns from initial state as columns identifiers
-            var columnNameToId = _.object(_.map(this.initialState.columns, function(item, columnName) {
-                return [columnName, item.order];
-            }));
-
             // convert columns state to array
             var packedState = _.map(state, function(item, columnName) {
                 return _.extend({name: columnName}, item);
@@ -864,7 +859,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
 
             // stringify state parts
             packedState = _.map(packedState, function(item) {
-                return String(columnNameToId[item.name]) + String(Number(item.renderable));
+                return item.name + String(Number(item.renderable));
             }).join('.');
 
             return packedState;
@@ -889,16 +884,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * @protected
          */
         _unpackColumnsStateData: function(packedState) {
-            // takes order of columns from initial state as columns identifiers
-            var columnIdToName = _.object(_.map(this.initialState.columns, function(item, columnName) {
-                return [item.order, columnName];
-            }));
-
             return _.object(_.map(packedState.split('.'), function(value, index) {
-                var columnName = columnIdToName[Number(value.substr(0, value.length - 1))];
-                if (columnName === void 0) {
-                    throw new Error('Packed state cannot be applied to columns');
-                }
+                var columnName = value.substr(0, value.length - 1);
                 return [columnName, {
                     renderable: Boolean(Number(value.substr(-1))),
                     order: index
