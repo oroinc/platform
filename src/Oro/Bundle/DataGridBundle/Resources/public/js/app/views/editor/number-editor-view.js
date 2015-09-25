@@ -3,9 +3,15 @@ define(function(require) {
 
     var NumberEditorView;
     var TextEditorView = require('./text-editor-view');
+    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
 
     NumberEditorView = TextEditorView.extend({
         className: 'number-editor',
+
+        initialize: function(options) {
+            this.formatter = new NumberFormatter(options);
+            NumberEditorView.__super__.initialize.apply(this, arguments);
+        },
 
         getValue: function() {
             return parseFloat(this.$('input[name=value]').val());
@@ -22,7 +28,8 @@ define(function(require) {
             if (isNaN(raw)) {
                 return '';
             }
-            return this.options.decimalPlaces !== void 0 ? raw.toFixed(this.options.decimalPlaces) : raw;
+
+            return this.formatter.fromRaw(raw);
         },
 
         getModelValue: function() {
