@@ -160,7 +160,7 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @param string|null $className
      * @param bool        $withHidden Set true if you need ids of all configurable entities,
-     *                                including entities marked as mode="hidden"
+     *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
      * @return ConfigIdInterface[]
      */
@@ -179,7 +179,7 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @param string|null $className
      * @param bool        $withHidden Set true if you need ids of all configurable entities,
-     *                                including entities marked as mode="hidden"
+     *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
      * @return ConfigInterface[]
      */

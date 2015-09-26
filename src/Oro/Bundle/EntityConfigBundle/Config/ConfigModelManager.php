@@ -355,27 +355,24 @@ class ConfigModelManager
 
     /**
      * @param string|null $className
-     * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
      *
      * @return ConfigModel[]
      */
-    public function getModels($className = null, $withHidden = false)
+    public function getModels($className = null)
     {
         $result = [];
 
         if ($className) {
             $this->ensureFieldCacheWarmed($className);
-            /** @var FieldConfigModel $model */
             foreach ($this->fields[$className] as $model) {
-                if ($model && ($withHidden || $model->getMode() !== ConfigModel::MODE_HIDDEN)) {
+                if ($model) {
                     $result[] = $model;
                 }
             }
         } else {
             $this->ensureEntityCacheWarmed();
-            /** @var EntityConfigModel $model */
             foreach ($this->entities as $model) {
-                if ($model && ($withHidden || $model->getMode() !== ConfigModel::MODE_HIDDEN)) {
+                if ($model) {
                     $result[] = $model;
                 }
             }

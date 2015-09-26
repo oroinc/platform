@@ -467,11 +467,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -479,7 +481,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
 
         $result = $this->configManager->getIds($scope, $className, $withHidden);
@@ -496,6 +498,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new EntityConfigId('entity', 'EntityClass1'),
                     new EntityConfigId('entity', 'EntityClass2'),
+                    new EntityConfigId('entity', 'HiddenEntity'),
                 ]
             ],
             [
@@ -514,6 +517,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new FieldConfigId('entity', 'EntityClass1', 'f1', 'int'),
                     new FieldConfigId('entity', 'EntityClass1', 'f2', 'int'),
+                    new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int'),
                 ]
             ],
             [
@@ -536,11 +540,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -551,7 +557,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
         if ($className) {
             $this->modelManager->expects($this->any())
@@ -560,6 +566,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         [$className, 'f1', $fieldModels[0]],
                         [$className, 'f2', $fieldModels[1]],
+                        [$className, 'hiddenField', $fieldModels[2]],
                     ]
                 );
         } else {
@@ -569,6 +576,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         ['EntityClass1', $models[0]],
                         ['EntityClass2', $models[1]],
+                        ['HiddenEntity', $models[2]],
                     ]
                 );
         }
@@ -587,6 +595,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass1')),
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass2')),
+                    $this->getConfig(new EntityConfigId('entity', 'HiddenEntity')),
                 ]
             ],
             [
@@ -605,6 +614,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f1', 'int')),
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f2', 'int')),
+                    $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int')),
                 ]
             ],
             [

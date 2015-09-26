@@ -315,7 +315,7 @@ class ConfigManager
      * @param string      $scope
      * @param string|null $className
      * @param bool        $withHidden Set true if you need ids of all configurable entities,
-     *                                including entities marked as mode="hidden"
+     *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
      * @return ConfigInterface[]
      */
@@ -325,18 +325,22 @@ class ConfigManager
             return [];
         }
 
-        $models = $this->modelManager->getModels($className, $withHidden);
+        $models = $this->modelManager->getModels($className);
 
         $configs = [];
         if ($className) {
             /** @var FieldConfigModel $model */
             foreach ($models as $model) {
-                $configs[] = $this->getFieldConfig($scope, $className, $model->getFieldName(), $model->getType());
+                if ($withHidden || !$model->isHidden()) {
+                    $configs[] = $this->getFieldConfig($scope, $className, $model->getFieldName(), $model->getType());
+                }
             }
         } else {
             /** @var EntityConfigModel $model */
             foreach ($models as $model) {
-                $configs[] = $this->getEntityConfig($scope, $model->getClassName());
+                if ($withHidden || !$model->isHidden()) {
+                    $configs[] = $this->getEntityConfig($scope, $model->getClassName());
+                }
             }
         }
 
@@ -350,7 +354,7 @@ class ConfigManager
      * @param string $scope
      * @param string|null $className
      * @param bool $withHidden Set true if you need ids of all configurable entities,
-     *                                including entities marked as mode="hidden"
+     *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
      * @return array
      */
@@ -360,18 +364,22 @@ class ConfigManager
             return [];
         }
 
-        $models = $this->modelManager->getModels($className, $withHidden);
+        $models = $this->modelManager->getModels($className);
 
         $ids = [];
         if ($className) {
             /** @var FieldConfigModel $model */
             foreach ($models as $model) {
-                $ids[] = new FieldConfigId($scope, $className, $model->getFieldName(), $model->getType());
+                if ($withHidden || !$model->isHidden()) {
+                    $ids[] = new FieldConfigId($scope, $className, $model->getFieldName(), $model->getType());
+                }
             }
         } else {
             /** @var EntityConfigModel $model */
             foreach ($models as $model) {
-                $ids[] = new EntityConfigId($scope, $model->getClassName());
+                if ($withHidden || !$model->isHidden()) {
+                    $ids[] = new EntityConfigId($scope, $model->getClassName());
+                }
             }
         }
 
