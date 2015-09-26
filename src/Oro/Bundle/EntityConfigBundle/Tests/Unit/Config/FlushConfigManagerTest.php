@@ -5,11 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
@@ -173,7 +172,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $em
-     * @param AbstractConfigModel[]                    $models
+     * @param ConfigModel[]                            $models
      */
     protected function setFlushExpectations($em, $models)
     {

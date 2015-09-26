@@ -4,10 +4,10 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
@@ -744,7 +744,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findEntityModel');
         $this->modelManager->expects($this->once())
             ->method('createEntityModel')
-            ->with($className, ConfigModelManager::MODE_DEFAULT)
+            ->with($className, ConfigModel::MODE_DEFAULT)
             ->willReturn($model);
 
         $result = $this->configManager->createConfigEntityModel($className);
@@ -781,7 +781,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
         $this->modelManager->expects($this->once())
             ->method('createEntityModel')
-            ->with(self::ENTITY_CLASS, ConfigModelManager::MODE_DEFAULT)
+            ->with(self::ENTITY_CLASS, ConfigModel::MODE_DEFAULT)
             ->willReturn($model);
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
@@ -864,7 +864,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
         $this->modelManager->expects($this->once())
             ->method('createFieldModel')
-            ->with(self::ENTITY_CLASS, 'id', 'int', ConfigModelManager::MODE_DEFAULT)
+            ->with(self::ENTITY_CLASS, 'id', 'int', ConfigModel::MODE_DEFAULT)
             ->willReturn($model);
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
@@ -1389,7 +1389,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function createEntityConfigModel(
         $className,
-        $mode = ConfigModelManager::MODE_DEFAULT
+        $mode = ConfigModel::MODE_DEFAULT
     ) {
         $result = new EntityConfigModel($className);
         $result->setMode($mode);
@@ -1401,7 +1401,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         EntityConfigModel $entityConfigModel,
         $fieldName,
         $fieldType,
-        $mode = ConfigModelManager::MODE_DEFAULT
+        $mode = ConfigModel::MODE_DEFAULT
     ) {
         $result = new FieldConfigModel($fieldName, $fieldType);
         $result->setEntity($entityConfigModel);
@@ -1419,7 +1419,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEntityMetadata($className, $defaultValues = null)
     {
         $metadata       = new EntityMetadata($className);
-        $metadata->mode = ConfigModelManager::MODE_DEFAULT;
+        $metadata->mode = ConfigModel::MODE_DEFAULT;
         if (null !== $defaultValues) {
             $metadata->defaultValues['entity'] = $defaultValues;
         }

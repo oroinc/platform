@@ -5,13 +5,11 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-
 /**
  * @ORM\Table(name="oro_entity_config_field")
  * @ORM\Entity
  */
-class FieldConfigModel extends AbstractConfigModel
+class FieldConfigModel extends ConfigModel
 {
     /**
      * @var integer
@@ -56,7 +54,7 @@ class FieldConfigModel extends AbstractConfigModel
     {
         $this->fieldName     = $fieldName;
         $this->type          = $type;
-        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->mode          = self::MODE_DEFAULT;
         $this->indexedValues = new ArrayCollection();
         $this->options       = new ArrayCollection();
     }

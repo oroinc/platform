@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 abstract class ConfigModel
 {
+    const MODE_DEFAULT = 'default';
+    const MODE_HIDDEN = 'hidden';
+    const MODE_READONLY = 'readonly';
+
     /**
      * @var \DateTime
      * @ORM\Column(type="datetime")
@@ -72,6 +76,30 @@ abstract class ConfigModel
     public function getMode()
     {
         return $this->mode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDefault()
+    {
+        return $this->mode === self::MODE_DEFAULT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->mode === self::MODE_HIDDEN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReadOnly()
+    {
+        return $this->mode === self::MODE_READONLY;
     }
 
     /**

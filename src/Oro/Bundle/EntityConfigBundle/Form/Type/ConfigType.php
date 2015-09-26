@@ -142,7 +142,7 @@ class ConfigType extends AbstractType
 
         $resolver->setAllowedTypes(
             array(
-                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'
+                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'
             )
         );
     }

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -243,7 +243,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         }
 
         // create entity
-        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModelManager::MODE_HIDDEN);
+        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModel::MODE_HIDDEN);
         $this->relationBuilder->updateEntityConfigs(
             $enumValueClassName,
             [

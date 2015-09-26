@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
@@ -596,7 +596,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array                                    $data
-     * @param AbstractConfigModel                      $model
+     * @param ConfigModel                              $model
      * @param \PHPUnit_Framework_MockObject_MockObject $form
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

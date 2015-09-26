@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event;
@@ -469,7 +469,7 @@ class ConfigManager
      */
     public function flush()
     {
-        /** @var AbstractConfigModel[] $models */
+        /** @var ConfigModel[] $models */
         $models = [];
         $this->prepareFlush($models);
 
@@ -677,7 +677,7 @@ class ConfigManager
      *
      * @return EntityConfigModel
      */
-    public function createConfigEntityModel($className = null, $mode = ConfigModelManager::MODE_DEFAULT)
+    public function createConfigEntityModel($className = null, $mode = ConfigModel::MODE_DEFAULT)
     {
         if (empty($className)) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
@@ -733,7 +733,7 @@ class ConfigManager
         $className,
         $fieldName,
         $fieldType,
-        $mode = ConfigModelManager::MODE_DEFAULT
+        $mode = ConfigModel::MODE_DEFAULT
     ) {
         $fieldModel = $this->modelManager->findFieldModel($className, $fieldName);
         if (null === $fieldModel) {
@@ -932,7 +932,7 @@ class ConfigManager
      *
      * @param string $className
      * @param string $fieldName
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
      *
      * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
@@ -945,7 +945,7 @@ class ConfigManager
      * Changes a mode of an entity
      *
      * @param string $className
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
      *
      * @return bool TRUE if the type was changed; otherwise, FALSE
      */
@@ -957,8 +957,8 @@ class ConfigManager
     /**
      * Gets config id for the given model
      *
-     * @param AbstractConfigModel $model
-     * @param string              $scope
+     * @param ConfigModel $model
+     * @param string      $scope
      *
      * @return ConfigIdInterface
      */
@@ -981,7 +981,7 @@ class ConfigManager
      *
      * @param ConfigIdInterface $configId
      *
-     * @return AbstractConfigModel
+     * @return ConfigModel
      */
     protected function getModelByConfigId(ConfigIdInterface $configId)
     {

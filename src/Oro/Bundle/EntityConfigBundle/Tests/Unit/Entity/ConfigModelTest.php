@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -18,12 +18,12 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testBaseProperties(AbstractConfigModel $model)
+    public function testBaseProperties(ConfigModel $model)
     {
         // test get/set mode
-        $this->assertEquals(ConfigModelManager::MODE_DEFAULT, $model->getMode());
-        $model->setMode(ConfigModelManager::MODE_READONLY);
-        $this->assertEquals(ConfigModelManager::MODE_READONLY, $model->getMode());
+        $this->assertEquals(ConfigModel::MODE_DEFAULT, $model->getMode());
+        $model->setMode(ConfigModel::MODE_READONLY);
+        $this->assertEquals(ConfigModel::MODE_READONLY, $model->getMode());
 
         // test get/set created
         $this->assertNull($model->getCreated());
@@ -106,7 +106,7 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testFromArrayAndToArray(AbstractConfigModel $model)
+    public function testFromArrayAndToArray(ConfigModel $model)
     {
         $values  = [
             'is_searchable' => true,
@@ -158,7 +158,7 @@ class ConfigModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider modelProvider
      */
-    public function testFromArray(AbstractConfigModel $model)
+    public function testFromArray(ConfigModel $model)
     {
         $values  = [
             'value1'   => 1,
