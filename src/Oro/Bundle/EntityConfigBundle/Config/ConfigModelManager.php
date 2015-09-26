@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -34,7 +34,7 @@ class ConfigModelManager
     private $dbCheck;
 
     /** @var ServiceLink */
-    protected $proxyEm;
+    protected $emLink;
 
     private $requiredTables = [
         'oro_entity_config',
@@ -43,11 +43,11 @@ class ConfigModelManager
     ];
 
     /**
-     * @param ServiceLink $proxyEm
+     * @param ServiceLink $emLink A link to EntityManager
      */
-    public function __construct(ServiceLink $proxyEm)
+    public function __construct(ServiceLink $emLink)
     {
-        $this->proxyEm = $proxyEm;
+        $this->emLink = $emLink;
     }
 
     /**
@@ -55,7 +55,7 @@ class ConfigModelManager
      */
     public function getEntityManager()
     {
-        return $this->proxyEm->getService();
+        return $this->emLink->getService();
     }
 
     /**
@@ -166,6 +166,7 @@ class ConfigModelManager
      * @param string $className
      *
      * @return EntityConfigModel
+     *
      * @throws \InvalidArgumentException if $className is empty
      * @throws RuntimeException if a model was not found
      */
@@ -190,6 +191,7 @@ class ConfigModelManager
      * @param string $fieldName
      *
      * @return FieldConfigModel
+     *
      * @throws \InvalidArgumentException if $className or $fieldName is empty
      * @throws RuntimeException if a model was not found
      */
@@ -220,8 +222,9 @@ class ConfigModelManager
      * @param string $fieldName
      * @param string $newFieldName
      *
-     * @throws \InvalidArgumentException if $className, $fieldName or $newFieldName is empty
      * @return bool TRUE if the name was changed; otherwise, FALSE
+     *
+     * @throws \InvalidArgumentException if $className, $fieldName or $newFieldName is empty
      */
     public function changeFieldName($className, $fieldName, $newFieldName)
     {
@@ -257,8 +260,9 @@ class ConfigModelManager
      * @param string $fieldName
      * @param string $fieldType
      *
-     * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
+     *
+     * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
      */
     public function changeFieldType($className, $fieldName, $fieldType)
     {
@@ -293,8 +297,9 @@ class ConfigModelManager
      * @param string $fieldName
      * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      *
-     * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
      * @return bool TRUE if the mode was changed; otherwise, FALSE
+     *
+     * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
      */
     public function changeFieldMode($className, $fieldName, $mode)
     {
@@ -328,8 +333,9 @@ class ConfigModelManager
      * @param string $className
      * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      *
-     * @throws \InvalidArgumentException if $className or $mode is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
+     *
+     * @throws \InvalidArgumentException if $className or $mode is empty
      */
     public function changeEntityMode($className, $mode)
     {
@@ -386,6 +392,7 @@ class ConfigModelManager
      * @param string|null $mode
      *
      * @return EntityConfigModel
+     *
      * @throws \InvalidArgumentException
      */
     public function createEntityModel($className = null, $mode = ConfigModel::MODE_DEFAULT)
@@ -412,6 +419,7 @@ class ConfigModelManager
      * @param string $mode
      *
      * @return FieldConfigModel
+     *
      * @throws \InvalidArgumentException
      */
     public function createFieldModel($className, $fieldName, $fieldType, $mode = ConfigModel::MODE_DEFAULT)
