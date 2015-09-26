@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -265,7 +265,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
     protected function addHideAssertions($entityClass, $fieldName, $iteration)
     {
         $fieldModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')->getMock();
-        $fieldModel->expects($this->once())->method('setType')->with(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel->expects($this->once())->method('setType')->with(ConfigModel::MODE_HIDDEN);
 
         $this->configManager->expects($this->at(17 + $iteration))->method('getConfigFieldModel')
             ->with($entityClass, $fieldName)

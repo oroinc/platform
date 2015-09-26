@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
@@ -17,9 +17,12 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
  */
 class ConfigModelManager
 {
-    const MODE_DEFAULT = 'default';
-    const MODE_HIDDEN = 'hidden';
-    const MODE_READONLY = 'readonly';
+    /** @deprecated since 1.9. Use ConfigModel::MODE_DEFAULT instead */
+    const MODE_DEFAULT = ConfigModel::MODE_DEFAULT;
+    /** @deprecated since 1.9. Use ConfigModel::MODE_HIDDEN instead */
+    const MODE_HIDDEN = ConfigModel::MODE_HIDDEN;
+    /** @deprecated since 1.9. Use ConfigModel::MODE_READONLY instead */
+    const MODE_READONLY = ConfigModel::MODE_READONLY;
 
     /** @var EntityConfigModel[] [{class name} => EntityConfigModel, ...] */
     private $entities;
@@ -288,7 +291,7 @@ class ConfigModelManager
      *
      * @param string $className
      * @param string $fieldName
-     * @param string $mode Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      *
      * @throws \InvalidArgumentException if $className, $fieldName or $mode is empty
      * @return bool TRUE if the mode was changed; otherwise, FALSE
@@ -323,7 +326,7 @@ class ConfigModelManager
      * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
      *
      * @param string $className
-     * @param string $mode Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode Can be the value of one of ConfigModel::MODE_* constants
      *
      * @throws \InvalidArgumentException if $className or $mode is empty
      * @return bool TRUE if the type was changed; otherwise, FALSE
@@ -354,7 +357,7 @@ class ConfigModelManager
      * @param string|null $className
      * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
      *
-     * @return AbstractConfigModel[]
+     * @return ConfigModel[]
      */
     public function getModels($className = null, $withHidden = false)
     {
@@ -364,7 +367,7 @@ class ConfigModelManager
             $this->ensureFieldCacheWarmed($className);
             /** @var FieldConfigModel $model */
             foreach ($this->fields[$className] as $model) {
-                if ($model && ($withHidden || $model->getMode() !== self::MODE_HIDDEN)) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModel::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
@@ -372,7 +375,7 @@ class ConfigModelManager
             $this->ensureEntityCacheWarmed();
             /** @var EntityConfigModel $model */
             foreach ($this->entities as $model) {
-                if ($model && ($withHidden || $model->getMode() !== self::MODE_HIDDEN)) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModel::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
@@ -388,9 +391,9 @@ class ConfigModelManager
      * @return EntityConfigModel
      * @throws \InvalidArgumentException
      */
-    public function createEntityModel($className = null, $mode = self::MODE_DEFAULT)
+    public function createEntityModel($className = null, $mode = ConfigModel::MODE_DEFAULT)
     {
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
+        if (!$this->isValidMode($mode)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -414,12 +417,12 @@ class ConfigModelManager
      * @return FieldConfigModel
      * @throws \InvalidArgumentException
      */
-    public function createFieldModel($className, $fieldName, $fieldType, $mode = self::MODE_DEFAULT)
+    public function createFieldModel($className, $fieldName, $fieldType, $mode = ConfigModel::MODE_DEFAULT)
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
         }
-        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY], true)) {
+        if (!$this->isValidMode($mode)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -502,6 +505,20 @@ class ConfigModelManager
         $this->entities[$className] = $result;
 
         return $result;
+    }
+
+    /**
+     * @param string $mode
+     *
+     * @return bool
+     */
+    protected function isValidMode($mode)
+    {
+        return in_array(
+            $mode,
+            [ConfigModel::MODE_DEFAULT, ConfigModel::MODE_HIDDEN, ConfigModel::MODE_READONLY],
+            true
+        );
     }
 
     /**

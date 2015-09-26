@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
@@ -13,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
  * @ORM\Table(name="oro_entity_config",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="oro_entity_config_uq", columns={"class_name"})})
  */
-class EntityConfigModel extends AbstractConfigModel
+class EntityConfigModel extends ConfigModel
 {
     /**
      * @var integer
@@ -48,7 +47,7 @@ class EntityConfigModel extends AbstractConfigModel
      */
     public function __construct($className = null)
     {
-        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->mode          = self::MODE_DEFAULT;
         $this->fields        = new ArrayCollection();
         $this->indexedValues = new ArrayCollection();
         if (!empty($className)) {

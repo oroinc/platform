@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
@@ -404,7 +405,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         for ($i = 1; $i <= self::NUMBER_OF_ENTITIES; $i++) {
             $model = new EntityConfigModel('Entity' . $i);
             if ($i % 20 === 0) {
-                $model->setMode(ConfigModelManager::MODE_HIDDEN);
+                $model->setMode(ConfigModel::MODE_HIDDEN);
             }
 
             foreach ($this->getFieldConfigModels() as $field) {
@@ -426,7 +427,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         for ($i = 1; $i <= self::NUMBER_OF_FIELDS; $i++) {
             $model = new FieldConfigModel('field' . $i, 'string');
             if ($i % 5 === 0) {
-                $model->setMode(ConfigModelManager::MODE_HIDDEN);
+                $model->setMode(ConfigModel::MODE_HIDDEN);
             }
 
             $models[] = $model;

@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class PostFlushConfigEvent extends Event
 {
-    /** @var AbstractConfigModel[] */
+    /** @var ConfigModel[] */
     protected $models;
 
     /**
-     * @param AbstractConfigModel[] $models        Flushed entity and field config models
-     * @param ConfigManager         $configManager The entity config manager
+     * @param ConfigModel[] $models        Flushed entity and field config models
+     * @param ConfigManager $configManager The entity config manager
      */
     public function __construct(array $models, ConfigManager $configManager)
     {
@@ -21,7 +21,7 @@ class PostFlushConfigEvent extends Event
     }
 
     /**
-     * @return AbstractConfigModel[]
+     * @return ConfigModel[]
      */
     public function getModels()
     {

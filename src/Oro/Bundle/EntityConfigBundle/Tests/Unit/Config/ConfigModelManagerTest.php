@@ -7,6 +7,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
@@ -170,7 +171,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function ignoredEntitiesProvider()
     {
         return [
-            ['Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'],
+            ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue'],
@@ -504,7 +505,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
         $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
-        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $entityModel2->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock([$entityModel1, $entityModel2]);
 
         $this->assertEquals(
@@ -517,7 +518,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
         $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
-        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $entityModel2->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock([$entityModel1, $entityModel2]);
 
         $this->assertEquals(
@@ -531,7 +532,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
-        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel2->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
@@ -548,7 +549,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
-        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel2->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
@@ -589,7 +590,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntityModelEmptyClassName($className)
     {
         $expectedResult = new EntityConfigModel($className);
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
 
         $result = $this->configModelManager->createEntityModel($className);
         $this->assertEquals($expectedResult, $result);
@@ -605,7 +606,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntityModel()
     {
         $expectedResult = new EntityConfigModel(self::TEST_ENTITY);
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
 
         $this->createRepositoryMock([], [UnitOfWork::STATE_MANAGED]);
 
@@ -634,7 +635,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
         $expectedResult = new FieldConfigModel($fieldName, 'int');
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
         $expectedResult->setEntity($entityModel);
 
         $this->createRepositoryMock(
@@ -646,7 +647,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             self::TEST_ENTITY,
             $fieldName,
             'int',
-            ConfigModelManager::MODE_DEFAULT
+            ConfigModel::MODE_DEFAULT
         );
         $this->assertEquals($expectedResult, $result);
 
@@ -663,7 +664,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
         $expectedResult = new FieldConfigModel(self::TEST_FIELD, 'int');
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
         $expectedResult->setEntity($entityModel);
 
         $this->createRepositoryMock(
@@ -679,7 +680,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             self::TEST_ENTITY,
             self::TEST_FIELD,
             'int',
-            ConfigModelManager::MODE_DEFAULT
+            ConfigModel::MODE_DEFAULT
         );
         $this->assertEquals($expectedResult, $result);
 
@@ -913,7 +914,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->configModelManager->changeFieldMode(
             $className,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -927,7 +928,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             $fieldName,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -949,7 +950,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $fieldModel->setMode(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock(
             [$entityModel],
             [
@@ -967,7 +968,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertFalse($result);
 
@@ -999,12 +1000,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertTrue($result);
 
         $this->assertEquals(
-            ConfigModelManager::MODE_HIDDEN,
+            ConfigModel::MODE_HIDDEN,
             $this->configModelManager->getFieldModel(self::TEST_ENTITY, self::TEST_FIELD)->getMode()
         );
     }
@@ -1018,7 +1019,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configModelManager->changeEntityMode(
             $className,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -1038,7 +1039,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testChangeEntityModeWithTheSameMode()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $entityModel->setMode(ConfigModelManager::MODE_HIDDEN);
+        $entityModel->setMode(ConfigModel::MODE_HIDDEN);
         $this->createRepositoryMock(
             [$entityModel],
             [
@@ -1054,7 +1055,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->configModelManager->changeEntityMode(
             self::TEST_ENTITY,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertFalse($result);
 
@@ -1083,12 +1084,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->configModelManager->changeEntityMode(
             self::TEST_ENTITY,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertTrue($result);
 
         $this->assertEquals(
-            ConfigModelManager::MODE_HIDDEN,
+            ConfigModel::MODE_HIDDEN,
             $this->configModelManager->getEntityModel(self::TEST_ENTITY)->getMode()
         );
     }

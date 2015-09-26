@@ -9,7 +9,7 @@ use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 class ConfigHelper
 {
     private static $configModelClasses = [
-        'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'   => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'           => true,
         'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'     => true,
         'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'      => true,
         'Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue' => true,
