@@ -6,11 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManagerBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -29,6 +31,10 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->entityManagerBag = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -43,6 +49,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
         $this->dumper = new ExtendConfigDumper(
+            $this->entityManagerBag,
             $this->configProvider,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),
@@ -66,6 +73,11 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->never())
             ->method('flush');
+
+        $this->configManager->expects($this->once())
+            ->method('disableEntityCheck');
+        $this->configManager->expects($this->once())
+            ->method('enableEntityCheck');
 
         $this->dumper->checkConfig();
     }
@@ -103,6 +115,11 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->once())
             ->method('flush');
+
+        $this->configManager->expects($this->once())
+            ->method('disableEntityCheck');
+        $this->configManager->expects($this->once())
+            ->method('enableEntityCheck');
 
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();
@@ -163,6 +180,11 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->never())
             ->method('flush');
+
+        $this->configManager->expects($this->once())
+            ->method('disableEntityCheck');
+        $this->configManager->expects($this->once())
+            ->method('enableEntityCheck');
 
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();

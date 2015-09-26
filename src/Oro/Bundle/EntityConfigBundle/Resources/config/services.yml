@@ -11,21 +11,28 @@ parameters:
 services:
     oro_entity_config.link.entity_manager:
         tags:
-            - { name: oro_service_link,  service: doctrine.orm.config_entity_manager }
+            - { name: oro_service_link, service: doctrine.orm.config_entity_manager }
 
     oro_entity_config.link.config_manager:
         tags:
-            - { name: oro_service_link,  service: oro_entity_config.config_manager }
+            - { name: oro_service_link, service: oro_entity_config.config_manager }
 
     oro_entity_config.link.security_context:
         tags:
-            - { name: oro_service_link,  service: security.context }
+            - { name: oro_service_link, service: security.context }
+
+    oro_entity_config.entity_manager_bag:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag
+        arguments:
+            - @doctrine
 
     oro_entity_config.config_manager:
         class: %oro_entity_config.config_manager.class%
         arguments:
-            - @oro_entity_config.metadata.annotation_metadata_factory
             - @event_dispatcher
+            - @oro_entity_config.metadata.annotation_metadata_factory
+            - @oro_entity_config.config_entity_checker
             - @oro_entity_config.config_model_manager
             - @oro_entity_config.config_audit_entity_builder
             - @oro_entity_config.cache
@@ -53,7 +60,7 @@ services:
         class: %oro_entity_config.config_loader.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @doctrine.orm.entity_manager
+            - @oro_entity_config.entity_manager_bag
 
     oro_entity_config.cache:
         public: false
@@ -74,6 +81,43 @@ services:
         parent: oro.cache.abstract
         calls:
             - [setNamespace, ['oro_entity_config.model']]
+
+    oro_entity_config.config_entity_checker:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Config\EntityChecker
+        arguments:
+            - @oro_entity_config.entity_manager_bag
+
+    oro_entity_config.config_cache_warmer:
+        class: Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_config.cache
+            - @oro_entity_config.entity_manager_bag
+
+    oro_entity_config.cache.warmer:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\Cache\CacheWarmer
+        arguments:
+            - @oro_entity_config.config_cache_warmer
+        tags:
+            - { name: kernel.cache_warmer, priority: 28 }
+
+    oro_entity_config.doctrine_listener.pre_load_class_metadata:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\EventListener\PreLoadClassMetadataDoctrineListener
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, priority: 1000 }
+
+    oro_entity_config.doctrine_listener.post_load_class_metadata:
+        public: false
+        class: Oro\Bundle\EntityConfigBundle\EventListener\PostLoadClassMetadataDoctrineListener
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, priority: -1000 }
 
     oro_entity_config.event_listener.entityconfig_grid_listener:
         class: %oro_entity_config.event_listener.entityconfig_grid_listener.class%

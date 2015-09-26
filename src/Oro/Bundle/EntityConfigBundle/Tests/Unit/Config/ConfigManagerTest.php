@@ -30,10 +30,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $eventDispatcher;
+    protected $entityChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
@@ -54,10 +57,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScope')
             ->willReturn('entity');
 
+        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
             ->disableOriginalConstructor()
             ->getMock();
         $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
@@ -71,8 +77,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager = new ConfigManager(
-            $this->metadataFactory,
             $this->eventDispatcher,
+            $this->metadataFactory,
+            $this->entityChecker,
             $this->modelManager,
             $this->auditEntityBuilder,
             $this->configCache
@@ -140,6 +147,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $expectedResult,
         $checkDatabaseResult,
         $cachedResult,
+        $entityCheckerResult,
         $findModelResult,
         $className,
         $fieldName
@@ -157,11 +165,19 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     ->method('saveConfigurable')
                     ->with($expectedResult, $className, $fieldName);
                 if ($fieldName) {
+                    $this->entityChecker->expects($this->once())
+                        ->method('isField')
+                        ->with($className, $fieldName)
+                        ->willReturn($entityCheckerResult);
                     $this->modelManager->expects($this->once())
                         ->method('findFieldModel')
                         ->with($className, $fieldName)
                         ->willReturn($findModelResult);
                 } else {
+                    $this->entityChecker->expects($this->once())
+                        ->method('isEntity')
+                        ->with($className)
+                        ->willReturn($entityCheckerResult);
                     $this->modelManager->expects($this->once())
                         ->method('findEntityModel')
                         ->with($className)
@@ -177,33 +193,99 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function hasConfigProvider()
     {
         return [
-            'no database'          => [false, false, null, null, self::ENTITY_CLASS, null],
-            'no database (field)'  => [false, false, null, null, self::ENTITY_CLASS, 'id'],
-            'cached false'         => [false, true, false, null, self::ENTITY_CLASS, null],
-            'cached false (field)' => [false, true, false, null, self::ENTITY_CLASS, 'id'],
-            'cached true'          => [true, true, true, null, self::ENTITY_CLASS, null],
-            'cached true (field)'  => [true, true, true, null, self::ENTITY_CLASS, 'id'],
-            'no model'             => [false, true, null, null, self::ENTITY_CLASS, null],
-            'no model (field)'     => [false, true, null, null, self::ENTITY_CLASS, 'id'],
+            'no database'          => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => false,
+                'cachedResult'        => null,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'no database (field)'  => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => false,
+                'cachedResult'        => null,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'cached false'         => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => false,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'cached false (field)' => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => false,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'cached true'          => [
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => true,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'cached true (field)'  => [
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => true,
+                'entityCheckerResult' => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'no model'             => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'entityCheckerResult' => true,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'no model (field)'     => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'entityCheckerResult' => true,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
             'has model'            => [
-                true,
-                true,
-                null,
-                $this->createEntityConfigModel(self::ENTITY_CLASS),
-                self::ENTITY_CLASS,
-                null
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'entityCheckerResult' => true,
+                'findModelResult'     => $this->createEntityConfigModel(self::ENTITY_CLASS),
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
             ],
             'has model (field)'    => [
-                true,
-                true,
-                null,
-                $this->createFieldConfigModel(
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'entityCheckerResult' => true,
+                'findModelResult'     => $this->createFieldConfigModel(
                     $this->createEntityConfigModel(self::ENTITY_CLASS),
                     'id',
                     'int'
                 ),
-                self::ENTITY_CLASS,
-                'id'
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
             ],
         ];
     }
@@ -313,11 +395,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function getConfigCacheProvider()
     {
         return [
-            [
+            'entity' => [
                 new EntityConfigId('entity', self::ENTITY_CLASS),
                 $this->getConfig(new EntityConfigId('entity', self::ENTITY_CLASS))
             ],
-            [
+            'field'  => [
                 new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'),
                 $this->getConfig(new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'))
             ],
@@ -332,16 +414,24 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
             ->willReturn(true);
-        $this->configCache->expects($this->once())
-            ->method('getConfigurable')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(true);
         if ($configId instanceof FieldConfigId) {
+            $this->configCache->expects($this->exactly(2))
+                ->method('getConfigurable')
+                ->willReturnMap(
+                    [
+                        [$configId->getClassName(), null, true],
+                        [$configId->getClassName(), $configId->getFieldName(), true],
+                    ]
+                );
             $this->configCache->expects($this->once())
                 ->method('getFieldConfig')
                 ->with($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
                 ->willReturn(null);
         } else {
+            $this->configCache->expects($this->once())
+                ->method('getConfigurable')
+                ->with($configId->getClassName())
+                ->willReturn(true);
             $this->configCache->expects($this->once())
                 ->method('getEntityConfig')
                 ->with($configId->getScope(), $configId->getClassName())
@@ -379,12 +469,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function getConfigNotCachedProvider()
     {
         return [
-            [
+            'entity' => [
                 new EntityConfigId('entity', self::ENTITY_CLASS),
                 $this->createEntityConfigModel(self::ENTITY_CLASS),
                 $this->getConfig(new EntityConfigId('entity', self::ENTITY_CLASS))
             ],
-            [
+            'field'  => [
                 new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'),
                 $this->createFieldConfigModel(
                     $this->createEntityConfigModel(self::ENTITY_CLASS),
@@ -467,11 +557,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -479,7 +571,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
 
         $result = $this->configManager->getIds($scope, $className, $withHidden);
@@ -496,6 +588,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new EntityConfigId('entity', 'EntityClass1'),
                     new EntityConfigId('entity', 'EntityClass2'),
+                    new EntityConfigId('entity', 'HiddenEntity'),
                 ]
             ],
             [
@@ -514,6 +607,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new FieldConfigId('entity', 'EntityClass1', 'f1', 'int'),
                     new FieldConfigId('entity', 'EntityClass1', 'f2', 'int'),
+                    new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int'),
                 ]
             ],
             [
@@ -536,11 +630,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -551,7 +647,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
         if ($className) {
             $this->modelManager->expects($this->any())
@@ -560,6 +656,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         [$className, 'f1', $fieldModels[0]],
                         [$className, 'f2', $fieldModels[1]],
+                        [$className, 'hiddenField', $fieldModels[2]],
                     ]
                 );
         } else {
@@ -569,6 +666,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         ['EntityClass1', $models[0]],
                         ['EntityClass2', $models[1]],
+                        ['HiddenEntity', $models[2]],
                     ]
                 );
         }
@@ -587,6 +685,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass1')),
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass2')),
+                    $this->getConfig(new EntityConfigId('entity', 'HiddenEntity')),
                 ]
             ],
             [
@@ -605,6 +704,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f1', 'int')),
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f2', 'int')),
+                    $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int')),
                 ]
             ],
             [

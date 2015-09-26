@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+
+use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ConfigLoader
@@ -13,8 +15,8 @@ class ConfigLoader
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var EntityManager */
-    protected $entityManager;
+    /** @var EntityManagerBag */
+    protected $entityManagerBag;
 
     /**
      * @var LoggerInterface
@@ -22,22 +24,23 @@ class ConfigLoader
     protected $logger;
 
     /**
-     * @param ConfigManager $configManager
-     * @param EntityManager $entityManager
+     * @param ConfigManager    $configManager
+     * @param EntityManagerBag $entityManagerBag
      */
-    public function __construct(ConfigManager $configManager, EntityManager $entityManager)
+    public function __construct(ConfigManager $configManager, EntityManagerBag $entityManagerBag)
     {
-        $this->configManager = $configManager;
-        $this->entityManager = $entityManager;
+        $this->configManager    = $configManager;
+        $this->entityManagerBag = $entityManagerBag;
     }
 
     /**
      * Load entity configs from annotations to a database
      *
      * @param bool                 $force  Force overwrite config's option values
-     * @param callable|null        $filter function (ClassMetadataInfo[] $doctrineAllMetadata)
+     * @param callable|null        $filter function (ClassMetadata[] $doctrineAllMetadata)
      * @param LoggerInterface|null $logger
      * @param bool                 $dryRun Log modifications without apply them
+     *
      * @throws \Exception
      */
     public function load(
@@ -46,20 +49,19 @@ class ConfigLoader
         LoggerInterface $logger = null,
         $dryRun = false
     ) {
-        $this->logger = $logger ? : new NullLogger();
+        $this->logger = $logger ?: new NullLogger();
         try {
-            /** @var ClassMetadataInfo[] $doctrineAllMetadata */
-            $doctrineAllMetadata = $this->entityManager
-                ->getMetadataFactory()
-                ->getAllMetadata();
-            if (null !== $filter) {
-                $doctrineAllMetadata = $filter($doctrineAllMetadata);
-            }
+            foreach ($this->entityManagerBag->getEntityManagers() as $em) {
+                /** @var ClassMetadata[] $doctrineAllMetadata */
+                $doctrineAllMetadata = $em->getMetadataFactory()->getAllMetadata();
+                if (null !== $filter) {
+                    $doctrineAllMetadata = $filter($doctrineAllMetadata);
+                }
 
-            foreach ($doctrineAllMetadata as $metadata) {
-                $this->loadEntityConfigs($metadata, $force);
+                foreach ($doctrineAllMetadata as $metadata) {
+                    $this->loadEntityConfigs($metadata, $force);
+                }
             }
-
             if ($dryRun) {
                 $this->configManager->clear();
             } else {
@@ -74,10 +76,10 @@ class ConfigLoader
     }
 
     /**
-     * @param ClassMetadataInfo $metadata
-     * @param bool              $force
+     * @param ClassMetadata $metadata
+     * @param bool          $force
      */
-    protected function loadEntityConfigs(ClassMetadataInfo $metadata, $force)
+    protected function loadEntityConfigs(ClassMetadata $metadata, $force)
     {
         if ($this->hasEntityConfigs($metadata)) {
             $className = $metadata->getName();
@@ -135,10 +137,11 @@ class ConfigLoader
     }
 
     /**
-     * @param ClassMetadataInfo $metadata
+     * @param ClassMetadata $metadata
+     *
      * @return bool
      */
-    protected function hasEntityConfigs(ClassMetadataInfo $metadata)
+    protected function hasEntityConfigs(ClassMetadata $metadata)
     {
         $classMetadata = $this->configManager->getEntityMetadata($metadata->getName());
 
@@ -146,21 +149,23 @@ class ConfigLoader
     }
 
     /**
-     * @param ClassMetadataInfo $metadata
-     * @param string $fieldName
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
+     *
      * @return bool
      */
-    protected function hasFieldConfigs(ClassMetadataInfo $metadata, $fieldName)
+    protected function hasFieldConfigs(ClassMetadata $metadata, $fieldName)
     {
         return true;
     }
 
     /**
-     * @param ClassMetadataInfo $metadata
-     * @param string $associationName
+     * @param ClassMetadata $metadata
+     * @param string        $associationName
+     *
      * @return bool
      */
-    protected function hasAssociationConfigs(ClassMetadataInfo $metadata, $associationName)
+    protected function hasAssociationConfigs(ClassMetadata $metadata, $associationName)
     {
         return true;
     }

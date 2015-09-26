@@ -2,7 +2,6 @@ parameters:
     oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
     oro_entity_extend.migration.initial_entity_config_state.path: %kernel.cache_dir%/oro_migration/initial_entity_config_state.yml
 
-    oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.datagrid.extension.additional_fields.class:     Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension
     oro_entity_extend.datagrid.extension.dynamic_fields.class:        Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension
     oro_entity_extend.form.extension.dynamic_fields.class:            Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension
@@ -50,12 +49,12 @@ parameters:
 services:
     oro_entity_extend.entity.cache.warmer:
         public: false
-        class: %oro_entity_extend.entity.cache.warmer.class%
+        class: Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
         arguments:
             - @oro_entity_extend.tools.dumper
             - @oro_entity_config.config_manager
         tags:
-            - { name: kernel.cache_warmer,  priority: 30 }
+            - { name: kernel.cache_warmer, priority: 30 }
 
     oro_entity_extend.datagrid.extension.additional_fields:
         class: %oro_entity_extend.datagrid.extension.additional_fields.class%
@@ -98,6 +97,7 @@ services:
     oro_entity_extend.tools.dumper:
         class: %oro_entity_extend.tools.dumper.class%
         arguments:
+            - @oro_entity_config.entity_manager_bag
             - @oro_entity_config.provider.extend
             - @oro_entity_extend.db_id_name_generator
             - @oro_entity_extend.extend.field_type_helper

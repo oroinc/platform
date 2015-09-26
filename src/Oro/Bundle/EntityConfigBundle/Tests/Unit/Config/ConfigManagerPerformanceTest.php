@@ -374,12 +374,21 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityState')
             ->willReturn(UnitOfWork::STATE_MANAGED);
 
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityChecker         = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityChecker->expects($this->any())
+            ->method('isEntity')
+            ->willReturn(true);
+        $entityChecker->expects($this->any())
+            ->method('isField')
+            ->willReturn(true);
 
         $securityTokenStorage = $this
             ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
@@ -388,8 +397,9 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         return new ConfigManager(
-            $this->metadataFactory,
             $this->eventDispatcher,
+            $this->metadataFactory,
+            $entityChecker,
             new ConfigModelManager($emLink),
             new AuditEntityBuilder($securityTokenStorage),
             new ConfigCache(new ArrayCache(), new ArrayCache())

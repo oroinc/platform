@@ -20,10 +20,13 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $eventDispatcher;
+    protected $entityChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
@@ -56,10 +59,13 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScope')
             ->will($this->returnValue('test'));
 
+        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
             ->disableOriginalConstructor()
             ->getMock();
         $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
@@ -73,8 +79,9 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager = new ConfigManager(
-            $this->metadataFactory,
             $this->eventDispatcher,
+            $this->metadataFactory,
+            $this->entityChecker,
             $this->modelManager,
             $this->auditEntityBuilder,
             $this->configCache

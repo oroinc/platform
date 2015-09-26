@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class CacheClearCommand extends ContainerAwareCommand
@@ -35,7 +36,9 @@ class CacheClearCommand extends ContainerAwareCommand
         $configManager->clearConfigurableCache();
 
         if (!$input->getOption('no-warmup')) {
-            // @todo: add the warming up of the entity config cache here
+            /** @var ConfigCacheWarmer $configCacheWarmer */
+            $configCacheWarmer = $this->getContainer()->get('oro_entity_config.config_cache_warmer');
+            $configCacheWarmer->warmUpCache();
         }
     }
 }
