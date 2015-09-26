@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -43,7 +43,7 @@ class ConfigModelManager
     ];
 
     /**
-     * @param ServiceLink $emLink A link to EntityManager
+     * @param ServiceLink $emLink A link to the EntityManager
      */
     public function __construct(ServiceLink $emLink)
     {
@@ -51,7 +51,7 @@ class ConfigModelManager
     }
 
     /**
-     * @return EntityManager
+     * @return EntityManagerInterface
      */
     public function getEntityManager()
     {

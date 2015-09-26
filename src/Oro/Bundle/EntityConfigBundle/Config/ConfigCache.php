@@ -9,6 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
  * A cache for entity configs
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigCache
 {
@@ -16,6 +18,9 @@ class ConfigCache
     const FIELDS_KEY = 1;
     const VALUES_KEY = 0;
     const FIELD_TYPE_KEY = 1;
+
+    const ENTITY_CLASSES_KEY = '_entities';
+    const FIELD_NAMES_KEY = '_fields_';
 
     /** @var CacheProvider */
     protected $cache;
@@ -42,6 +47,71 @@ class ConfigCache
         $this->cache      = $cache;
         $this->modelCache = $modelCache;
         $this->isDebug    = $isDebug;
+    }
+
+    /**
+     * @param bool $localCacheOnly
+     *
+     * @return array|null
+     */
+    public function getEntities($localCacheOnly = false)
+    {
+        return $this->getList(self::ENTITY_CLASSES_KEY, $localCacheOnly);
+    }
+
+    /**
+     * @param string $className
+     * @param bool   $localCacheOnly
+     *
+     * @return array|null
+     */
+    public function getFields($className, $localCacheOnly = false)
+    {
+        return $this->getList(self::FIELD_NAMES_KEY . $className, $localCacheOnly);
+    }
+
+    /**
+     * @param array $entities
+     * @param bool  $localCacheOnly
+     *
+     * @return bool
+     */
+    public function saveEntities(array $entities, $localCacheOnly = false)
+    {
+        return $this->saveList(self::ENTITY_CLASSES_KEY, $entities, $localCacheOnly);
+    }
+
+    /**
+     * @param string $className
+     * @param array  $fields
+     * @param bool   $localCacheOnly
+     *
+     * @return bool
+     */
+    public function saveFields($className, array $fields, $localCacheOnly = false)
+    {
+        return $this->saveList(self::FIELD_NAMES_KEY . $className, $fields, $localCacheOnly);
+    }
+
+    /**
+     * @param bool $localCacheOnly
+     *
+     * @return bool
+     */
+    public function deleteEntities($localCacheOnly = false)
+    {
+        return $this->deleteList(self::ENTITY_CLASSES_KEY, $localCacheOnly);
+    }
+
+    /**
+     * @param string $className
+     * @param bool   $localCacheOnly
+     *
+     * @return bool
+     */
+    public function deleteFields($className, $localCacheOnly = false)
+    {
+        return $this->deleteList(self::FIELD_NAMES_KEY . $className, $localCacheOnly);
     }
 
     /**
@@ -144,6 +214,9 @@ class ConfigCache
      */
     public function deleteEntityConfig($className, $localCacheOnly = false)
     {
+        $this->deleteEntities($localCacheOnly);
+        $this->deleteFields($className, $localCacheOnly);
+
         unset($this->localCache[$className]);
 
         return $localCacheOnly
@@ -160,6 +233,8 @@ class ConfigCache
      */
     public function deleteFieldConfig($className, $fieldName, $localCacheOnly = false)
     {
+        $this->deleteFields($className, $localCacheOnly);
+
         $cacheKey = $className . '.' . $fieldName;
 
         unset($this->localCache[$cacheKey]);
@@ -270,6 +345,66 @@ class ConfigCache
         $this->localModelCache = [];
 
         return $this->modelCache->flushAll();
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param bool   $localCacheOnly
+     *
+     * @return array|null
+     */
+    protected function getList($cacheKey, $localCacheOnly)
+    {
+        if (isset($this->localCache[$cacheKey])) {
+            $result = $this->localCache[$cacheKey];
+
+            return $result === false
+                ? null
+                : $result;
+        }
+
+        if ($localCacheOnly) {
+            return null;
+        }
+
+        $result = $this->cache->fetch($cacheKey);
+
+        $this->localCache[$cacheKey] = $result;
+
+        return $result === false
+            ? null
+            : $result;
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param array  $items
+     * @param bool   $localCacheOnly
+     *
+     * @return bool
+     */
+    protected function saveList($cacheKey, $items, $localCacheOnly)
+    {
+        $this->localCache[$cacheKey] = $items;
+
+        return $localCacheOnly
+            ? true
+            : $this->cache->save($cacheKey, $items);
+    }
+
+    /**
+     * @param string $cacheKey
+     * @param bool   $localCacheOnly
+     *
+     * @return bool
+     */
+    protected function deleteList($cacheKey, $localCacheOnly)
+    {
+        unset($this->localCache[$cacheKey]);
+
+        return $localCacheOnly
+            ? true
+            : $this->cache->delete($cacheKey);
     }
 
     /**

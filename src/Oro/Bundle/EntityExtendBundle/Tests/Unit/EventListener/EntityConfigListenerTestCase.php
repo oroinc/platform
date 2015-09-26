@@ -17,10 +17,13 @@ class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
         $metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
             ->disableOriginalConstructor()
             ->getMock();
         $modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
@@ -35,8 +38,9 @@ class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager = new ConfigManager(
-            $metadataFactory,
             $eventDispatcher,
+            $metadataFactory,
+            $entityChecker,
             $modelManager,
             $auditEntityBuilder,
             $this->configCache

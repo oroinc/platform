@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 use Metadata\MetadataFactory;
 
@@ -33,11 +33,14 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 class ConfigManager
 {
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var MetadataFactory */
     protected $metadataFactory;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    /** @var EntityChecker */
+    protected $entityChecker;
 
     /** @var ConfigCache */
     protected $cache;
@@ -63,6 +66,9 @@ class ConfigManager
     /** @var array */
     protected $configChangeSets = [];
 
+    /** @var int */
+    protected $entityCheck = 0;
+
     /**
      * @deprecated since 1.9. Should be removed together with deprecated events
      * @see Oro\Bundle\EntityConfigBundle\Event\Events
@@ -71,28 +77,34 @@ class ConfigManager
     private $hasListenersCache = [];
 
     /**
-     * @param MetadataFactory          $metadataFactory
      * @param EventDispatcherInterface $eventDispatcher
+     * @param MetadataFactory          $metadataFactory
+     * @param EntityChecker $entityChecker
      * @param ConfigModelManager       $modelManager
      * @param AuditEntityBuilder       $auditEntityBuilder
      * @param ConfigCache              $cache
      */
     public function __construct(
-        MetadataFactory $metadataFactory,
         EventDispatcherInterface $eventDispatcher,
+        MetadataFactory $metadataFactory,
+        EntityChecker $entityChecker,
         ConfigModelManager $modelManager,
         AuditEntityBuilder $auditEntityBuilder,
         ConfigCache $cache
     ) {
-        $this->metadataFactory    = $metadataFactory;
         $this->eventDispatcher    = $eventDispatcher;
+        $this->metadataFactory    = $metadataFactory;
+        $this->entityChecker      = $entityChecker;
         $this->modelManager       = $modelManager;
         $this->auditEntityBuilder = $auditEntityBuilder;
         $this->cache              = $cache;
     }
 
     /**
-     * @return EntityManager
+     * Gets the EntityManager responsible to work with configuration entities
+     * IMPORTANT: configuration entities may use own entity manager which may be not equal the default entity manager
+     *
+     * @return EntityManagerInterface
      */
     public function getEntityManager()
     {
@@ -161,6 +173,28 @@ class ConfigManager
     }
 
     /**
+     * Allows to use Doctrine metadata to check whether an entity or a field might be configurable.
+     * This makes the check a bit faster, but Doctrine metadata must be completely ready for it.
+     * For example an access to Doctrine metadata must be disabled during they are being loaded.
+     * Please note that this operation is incremental. It means that if {@see disableEntityCheck}
+     * are called N times the {@see enableEntityCheck} must be called N times as well to unblock
+     * usage of Doctrine metadata.
+     */
+    public function enableEntityCheck()
+    {
+        $this->entityCheck--;
+    }
+
+    /**
+     * Disables to use Doctrine metadata to check whether an entity or a field might be configurable.
+     * See {@see enableEntityCheck} for more details.
+     */
+    public function disableEntityCheck()
+    {
+        $this->entityCheck++;
+    }
+
+    /**
      * @param string      $className
      * @param string|null $fieldName
      *
@@ -172,17 +206,9 @@ class ConfigManager
             return false;
         }
 
-        $result = $this->cache->getConfigurable($className, $fieldName);
-        if (null === $result) {
-            $model  = $fieldName
-                ? $this->modelManager->findFieldModel($className, $fieldName)
-                : $this->modelManager->findEntityModel($className);
-            $result = (null !== $model);
-
-            $this->cache->saveConfigurable($result, $className, $fieldName);
-        }
-
-        return $result;
+        return $fieldName
+            ? $this->isConfigurableField($className, $fieldName)
+            : $this->isConfigurableEntity($className);
     }
 
     /**
@@ -236,12 +262,7 @@ class ConfigManager
                 throw $this->createDatabaseNotSyncedException();
             }
 
-            $isConfigurableEntity = $this->cache->getConfigurable($className);
-            if (null === $isConfigurableEntity) {
-                $isConfigurableEntity = (null !== $this->modelManager->findEntityModel($className));
-                $this->cache->saveConfigurable($isConfigurableEntity, $className);
-            }
-            if (!$isConfigurableEntity) {
+            if (!$this->isConfigurableEntity($className)) {
                 throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
             }
 
@@ -280,13 +301,11 @@ class ConfigManager
                 throw $this->createDatabaseNotSyncedException();
             }
 
-            $isConfigurableEntity = $this->cache->getConfigurable($className);
-            if (null === $isConfigurableEntity) {
-                $isConfigurableEntity = (null !== $this->modelManager->findEntityModel($className));
-                $this->cache->saveConfigurable($isConfigurableEntity, $className);
-            }
-            if (!$isConfigurableEntity) {
+            if (!$this->isConfigurableEntity($className)) {
                 throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
+            }
+            if (!$this->isConfigurableField($className, $fieldName)) {
+                throw new RuntimeException(sprintf('Field "%s::%s" is not configurable', $className, $fieldName));
             }
 
             $model = $this->modelManager->getFieldModel($className, $fieldName);
@@ -321,30 +340,24 @@ class ConfigManager
      */
     public function getConfigs($scope, $className = null, $withHidden = false)
     {
-        if (!$this->modelManager->checkDatabase()) {
-            return [];
-        }
-
-        $models = $this->modelManager->getModels($className);
-
-        $configs = [];
         if ($className) {
-            /** @var FieldConfigModel $model */
-            foreach ($models as $model) {
-                if ($withHidden || !$model->isHidden()) {
-                    $configs[] = $this->getFieldConfig($scope, $className, $model->getFieldName(), $model->getType());
-                }
-            }
+            return $this->mapFields(
+                function ($scope, $class, $field, $type) {
+                    return $this->getFieldConfig($scope, $class, $field, $type);
+                },
+                $scope,
+                $className,
+                $withHidden
+            );
         } else {
-            /** @var EntityConfigModel $model */
-            foreach ($models as $model) {
-                if ($withHidden || !$model->isHidden()) {
-                    $configs[] = $this->getEntityConfig($scope, $model->getClassName());
-                }
-            }
+            return $this->mapEntities(
+                function ($scope, $class) {
+                    return $this->getEntityConfig($scope, $class);
+                },
+                $scope,
+                $withHidden
+            );
         }
-
-        return $configs;
     }
 
     /**
@@ -356,34 +369,28 @@ class ConfigManager
      * @param bool $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as ConfigModel::MODE_HIDDEN
      *
-     * @return array
+     * @return ConfigIdInterface[]
      */
     public function getIds($scope, $className = null, $withHidden = false)
     {
-        if (!$this->modelManager->checkDatabase()) {
-            return [];
-        }
-
-        $models = $this->modelManager->getModels($className);
-
-        $ids = [];
         if ($className) {
-            /** @var FieldConfigModel $model */
-            foreach ($models as $model) {
-                if ($withHidden || !$model->isHidden()) {
-                    $ids[] = new FieldConfigId($scope, $className, $model->getFieldName(), $model->getType());
-                }
-            }
+            return $this->mapFields(
+                function ($scope, $class, $field, $type) {
+                    return new FieldConfigId($scope, $class, $field, $type);
+                },
+                $scope,
+                $className,
+                $withHidden
+            );
         } else {
-            /** @var EntityConfigModel $model */
-            foreach ($models as $model) {
-                if ($withHidden || !$model->isHidden()) {
-                    $ids[] = new EntityConfigId($scope, $model->getClassName());
-                }
-            }
+            return $this->mapEntities(
+                function ($scope, $class) {
+                    return new EntityConfigId($scope, $class);
+                },
+                $scope,
+                $withHidden
+            );
         }
-
-        return $ids;
     }
 
     /**
@@ -439,6 +446,7 @@ class ConfigManager
     {
         $this->modelManager->clearCheckDatabase();
         $this->cache->deleteAllConfigurable();
+        $this->entityChecker->clear();
     }
 
     /**
@@ -1200,6 +1208,123 @@ class ConfigManager
         $this->propertyConfigs[$scope] = $propertyConfig;
 
         return $propertyConfig;
+    }
+
+    /**
+     * @param callable $callback
+     * @param string   $scope
+     * @param bool     $withHidden
+     *
+     * @return array
+     */
+    protected function mapEntities($callback, $scope, $withHidden)
+    {
+        $result = [];
+
+        $entities = $this->cache->getEntities();
+        if (null !== $entities) {
+            foreach ($entities as $class => $isHidden) {
+                if ($withHidden || !$isHidden) {
+                    $result[] = $callback($scope, $class);
+                }
+            }
+        } elseif ($this->modelManager->checkDatabase()) {
+            $models   = $this->modelManager->getModels();
+            $entities = [];
+            /** @var EntityConfigModel $model */
+            foreach ($models as $model) {
+                $isHidden = $model->isHidden();
+                $class    = $model->getClassName();
+
+                $entities[$class] = $isHidden;
+                if ($withHidden || !$isHidden) {
+                    $result[] = $callback($scope, $class);
+                }
+            }
+            $this->cache->saveEntities($entities);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param callable $callback
+     * @param string   $scope
+     * @param string   $className
+     * @param bool     $withHidden
+     *
+     * @return array
+     */
+    protected function mapFields($callback, $scope, $className, $withHidden)
+    {
+        $result = [];
+
+        $fields = $this->cache->getFields($className);
+        if (null !== $fields) {
+            foreach ($fields as $field => $data) {
+                if ($withHidden || !$data['h']) {
+                    $result[] = $callback($scope, $className, $field, $data['t']);
+                }
+            }
+        } elseif ($this->modelManager->checkDatabase()) {
+            $models = $this->modelManager->getModels($className);
+            $fields = [];
+            /** @var FieldConfigModel $model */
+            foreach ($models as $model) {
+                $isHidden = $model->isHidden();
+                $field    = $model->getFieldName();
+                $type     = $model->getType();
+
+                $fields[$field] = ['t' => $type, 'h' => $isHidden];
+                if ($withHidden || !$isHidden) {
+                    $result[] = $callback($scope, $className, $field, $type);
+                }
+            }
+            $this->cache->saveFields($className, $fields);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Checks whether an entity is configurable.
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    protected function isConfigurableEntity($className)
+    {
+        $isConfigurable = $this->cache->getConfigurable($className);
+        if (null === $isConfigurable) {
+            $isConfigurable = $this->entityCheck !== 0 || $this->entityChecker->isEntity($className)
+                ? (null !== $this->modelManager->findEntityModel($className))
+                : false;
+            $this->cache->saveConfigurable($isConfigurable, $className);
+        }
+
+        return $isConfigurable;
+    }
+
+    /**
+     * Checks whether a field is configurable.
+     *
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isConfigurableField($className, $fieldName)
+    {
+        $isConfigurable = $this->cache->getConfigurable($className, $fieldName);
+        if (null === $isConfigurable) {
+            $isConfigurable = $this->entityCheck !== 0 || $this->entityChecker->isField($className, $fieldName)
+                ? (null !== $this->modelManager->findFieldModel($className, $fieldName))
+                : false;
+            $this->cache->saveConfigurable($isConfigurable, $className, $fieldName);
+        }
+
+        return $isConfigurable;
     }
 
     /**
