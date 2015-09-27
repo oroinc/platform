@@ -207,43 +207,6 @@ class ConfigCache
     }
 
     /**
-     * Saves all config attributes for the given entity or field
-     *
-     * @param array       $values    [{scope} => [{name} => {value}, ...], ...]
-     * @param string      $className The class name of an entity
-     * @param string|null $fieldName The name of a field
-     * @param string|null $fieldType The data type of a field
-     *
-     * @return bool
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function saveConfigValues(array $values, $className, $fieldName = null, $fieldType = null)
-    {
-        if ($this->isDebug && $fieldName && !$fieldType) {
-            // undefined field type can cause unpredictable logical bugs
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'A field config "%s::%s" with undefined field type cannot be cached.'
-                    . ' It seems that there is some critical bug in entity config core functionality.'
-                    . ' Please contact ORO team if you see this error.',
-                    $className,
-                    $fieldName
-                )
-            );
-        }
-
-        if ($fieldName) {
-            return $this->cache->save(
-                $className . '.' . $fieldName,
-                [self::VALUES_KEY => $values, self::FIELD_TYPE_KEY => $fieldType]
-            );
-        } else {
-            return $this->cache->save($className, $values);
-        }
-    }
-
-    /**
      * @param string $className
      * @param bool   $localCacheOnly
      *
@@ -279,6 +242,52 @@ class ConfigCache
         return $localCacheOnly
             ? true
             : $this->cache->delete($cacheKey);
+    }
+
+    /**
+     * Saves all config attributes for the given entity or field
+     *
+     * @param array  $values    [{scope} => [{name} => {value}, ...], ...]
+     * @param string $className The class name of an entity
+     *
+     * @return bool
+     */
+    public function saveEntityConfigValues(array $values, $className)
+    {
+        return $this->cache->save($className, $values);
+    }
+
+    /**
+     * Saves all config attributes for the given entity or field
+     *
+     * @param array  $values    [{scope} => [{name} => {value}, ...], ...]
+     * @param string $className The class name of an entity
+     * @param string $fieldName The name of a field
+     * @param string $fieldType The data type of a field
+     *
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function saveFieldConfigValues(array $values, $className, $fieldName, $fieldType)
+    {
+        if ($this->isDebug && !$fieldType) {
+            // undefined field type can cause unpredictable logical bugs
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'A field config "%s::%s" with undefined field type cannot be cached.'
+                    . ' It seems that there is some critical bug in entity config core functionality.'
+                    . ' Please contact ORO team if you see this error.',
+                    $className,
+                    $fieldName
+                )
+            );
+        }
+
+        return $this->cache->save(
+            $className . '.' . $fieldName,
+            [self::VALUES_KEY => $values, self::FIELD_TYPE_KEY => $fieldType]
+        );
     }
 
     /**

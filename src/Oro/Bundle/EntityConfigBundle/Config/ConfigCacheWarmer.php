@@ -71,7 +71,7 @@ class ConfigCacheWarmer
             $entities[$className] = $isHidden;
 
             $this->cache->saveConfigurable(true, $className);
-            $this->cache->saveConfigValues($data, $className);
+            $this->cache->saveEntityConfigValues($data, $className);
         }
         foreach ($fieldRows as $row) {
             $entityId = $row['entityId'];
@@ -87,7 +87,7 @@ class ConfigCacheWarmer
             $fields[$className][$fieldName] = ['t' => $fieldType, 'h' => $isHidden];
 
             $this->cache->saveConfigurable(true, $className, $fieldName);
-            $this->cache->saveConfigValues($data, $className, $fieldName, $fieldType);
+            $this->cache->saveFieldConfigValues($data, $className, $fieldName, $fieldType);
         }
 
         $this->cache->saveEntities($entities);

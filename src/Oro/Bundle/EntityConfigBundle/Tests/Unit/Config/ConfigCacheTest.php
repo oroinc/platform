@@ -501,7 +501,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->assertTrue(
-            $this->configCache->saveConfigValues(
+            $this->configCache->saveEntityConfigValues(
                 [
                     $config1->getId()->getScope() => $config1->getValues(),
                     $config2->getId()->getScope() => $config2->getValues()
@@ -552,7 +552,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->assertTrue(
-            $this->configCache->saveConfigValues(
+            $this->configCache->saveFieldConfigValues(
                 [
                     $config1->getId()->getScope() => $config1->getValues(),
                     $config2->getId()->getScope() => $config2->getValues()
