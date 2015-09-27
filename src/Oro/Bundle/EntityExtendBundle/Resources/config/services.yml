@@ -256,6 +256,7 @@ services:
     oro_entity_extend.association_builder:
         class: %oro_entity_extend.association_builder.class%
         arguments:
+            - @doctrine
             - @oro_entity_config.config_manager
             - @oro_entity_extend.relation_builder
 

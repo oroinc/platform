@@ -34,7 +34,7 @@ services:
             - @oro_entity_config.metadata.annotation_metadata_factory
             - @oro_entity_config.config_entity_checker
             - @oro_entity_config.config_model_manager
-            - @oro_entity_config.config_audit_entity_builder
+            - @oro_entity_config.audit_manager
             - @oro_entity_config.cache
 
     oro_entity_config.config_model_manager:
@@ -43,11 +43,12 @@ services:
         arguments:
             - @oro_entity_config.link.entity_manager
 
-    oro_entity_config.config_audit_entity_builder:
+    oro_entity_config.audit_manager:
         public: false
-        class: Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder
+        class: Oro\Bundle\EntityConfigBundle\Audit\AuditManager
         arguments:
             - @security.token_storage
+            - @doctrine
 
     oro_entity_config.tools.command_executor:
         class: %oro_entity_config.tools.command_executor.class%

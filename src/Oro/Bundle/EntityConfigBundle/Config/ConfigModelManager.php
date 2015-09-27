@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -51,7 +51,7 @@ class ConfigModelManager
     }
 
     /**
-     * @return EntityManagerInterface
+     * @return EntityManager
      */
     public function getEntityManager()
     {

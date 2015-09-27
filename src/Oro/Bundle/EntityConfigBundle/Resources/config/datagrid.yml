@@ -141,7 +141,7 @@ datagrid:
                         CONCAT(' - ', u.email)
                       ) as author
                 from:
-                    - { table: OroEntityConfigBundle:ConfigLog, alias: log }
+                    - { table: Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog, alias: log }
                 join:
                     left:
                         user:

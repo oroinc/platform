@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
+class AuditManagerTest extends \PHPUnit_Framework_TestCase
 {
     const SCOPE = 'testScope';
     const ENTITY_CLASS = 'Test\Entity';
@@ -24,8 +24,8 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
-    /** @var AuditEntityBuilder */
-    private $auditEntityBuilder;
+    /** @var AuditManager */
+    private $auditManager;
 
     protected function setUp()
     {
@@ -40,16 +40,21 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configManager->expects($this->any())
-            ->method('getEntityManager')
+
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManager')
+            ->with(null)
             ->willReturn($this->em);
 
-        $this->auditEntityBuilder = new AuditEntityBuilder($this->tokenStorage);
+        $this->auditManager = new AuditManager($this->tokenStorage, $doctrine);
     }
 
     protected function tearDown()
     {
-        unset($this->tokenStorage, $this->configManager, $this->auditEntityBuilder);
+        unset($this->tokenStorage, $this->configManager, $this->auditManager);
     }
 
     public function testBuildEntity()
@@ -74,7 +79,7 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigChangeSet')
             ->willReturn(['old_val', 'new_value']);
 
-        $result = $this->auditEntityBuilder->buildEntity($this->configManager);
+        $result = $this->auditManager->buildEntity($this->configManager);
 
         $this->assertSame($user, $result->getUser());
         $this->assertCount(2, $result->getDiffs());
@@ -88,7 +93,7 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getUpdateConfig')
             ->willReturn([]);
 
-        $this->assertNull($this->auditEntityBuilder->buildEntity($this->configManager));
+        $this->assertNull($this->auditManager->buildEntity($this->configManager));
     }
 
     public function testBuildEntityWithoutSecurityToken()
@@ -99,7 +104,7 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getUpdateConfig');
 
-        $this->auditEntityBuilder->buildEntity($this->configManager);
+        $this->auditManager->buildEntity($this->configManager);
     }
 
     public function testBuildEntityWithUnsupportedSecurityToken()
@@ -114,7 +119,7 @@ class AuditEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getUpdateConfig');
 
-        $this->auditEntityBuilder->buildEntity($this->configManager);
+        $this->auditManager->buildEntity($this->configManager);
     }
 
     /**

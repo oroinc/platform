@@ -23,7 +23,9 @@ class EntityManagerBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityManagersWithoutAdditionalEntityManagers()
     {
-        $defaultEm = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $defaultEm = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->doctrine->expects($this->once())
             ->method('getManager')
@@ -37,8 +39,12 @@ class EntityManagerBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntityManagers()
     {
-        $defaultEm = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $anotherEm = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $defaultEm = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $anotherEm = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->doctrine->expects($this->at(0))
             ->method('getManager')

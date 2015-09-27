@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle;
 
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -19,5 +21,12 @@ class OroEntityConfigBundle extends Bundle
 
         $container->addCompilerPass(new ServiceMethodPass);
         $container->addCompilerPass(new EntityConfigPass);
+
+        $container->addCompilerPass(
+            DoctrineOrmMappingsPass::createAnnotationMappingDriver(
+                ['Oro\Bundle\EntityConfigBundle\Audit\Entity'],
+                [__DIR__ . DIRECTORY_SEPARATOR . 'Audit' . DIRECTORY_SEPARATOR . 'Entity']
+            )
+        );
     }
 }

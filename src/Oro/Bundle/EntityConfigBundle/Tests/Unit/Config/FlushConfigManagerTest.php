@@ -38,7 +38,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $modelManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $auditEntityBuilder;
+    protected $auditManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configCache;
@@ -71,7 +71,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->auditEntityBuilder = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder')
+        $this->auditManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Audit\AuditManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->configCache        = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
@@ -83,7 +83,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
             $this->metadataFactory,
             $this->entityChecker,
             $this->modelManager,
-            $this->auditEntityBuilder,
+            $this->auditManager,
             $this->configCache
         );
 
@@ -185,7 +185,7 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
-        $this->auditEntityBuilder->expects($this->once())
+        $this->auditManager->expects($this->once())
             ->method('buildEntity')
             ->with($this->identicalTo($this->configManager))
             ->willReturn(null);

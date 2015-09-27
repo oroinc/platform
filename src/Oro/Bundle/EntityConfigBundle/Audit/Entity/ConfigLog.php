@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Entity;
+namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ORM\Table(name="oro_entity_config_log")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class ConfigLog
 {
@@ -122,5 +123,13 @@ class ConfigLog
     public function getDiffs()
     {
         return $this->diffs;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->loggedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

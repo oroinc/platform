@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Entity;
+namespace Oro\Bundle\EntityConfigBundle\Audit\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
