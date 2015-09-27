@@ -370,8 +370,7 @@ services:
     oro_navigation.content.doctrine_tag_generator:
         class: %oro_navigation.content.doctrine_tag_generator.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity.orm.entity_class_resolver
+            - @doctrine
         tags:
             - { name: oro_navigation.tag_generator }
 

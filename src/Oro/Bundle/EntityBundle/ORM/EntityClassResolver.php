@@ -10,14 +10,10 @@ use Doctrine\ORM\EntityManager;
  */
 class EntityClassResolver
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /**
-     * Constructor
-     *
      * @param ManagerRegistry $doctrine
      */
     public function __construct(ManagerRegistry $doctrine)
@@ -58,8 +54,7 @@ class EntityClassResolver
      */
     public function isKnownEntityClassNamespace($namespace)
     {
-        foreach (array_keys($this->doctrine->getManagers()) as $name) {
-            $manager = $this->doctrine->getManager($name);
+        foreach ($this->doctrine->getManagers() as $name => $manager) {
             if ($manager instanceof EntityManager) {
                 $namespaces = $manager->getConfiguration()->getEntityNamespaces();
                 if (in_array($namespace, $namespaces, true)) {
@@ -79,6 +74,6 @@ class EntityClassResolver
      */
     public function isEntity($className)
     {
-        return (!is_null($this->doctrine->getManagerForClass($className)));
+        return null !== $this->doctrine->getManagerForClass($className);
     }
 }
