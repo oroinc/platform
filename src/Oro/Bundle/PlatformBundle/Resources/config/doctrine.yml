@@ -3,3 +3,8 @@ services:
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ doctrine.metadata.cache ] ]
+
+    doctrine.metadata.cache.config:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ doctrine.metadata.cache.config ] ]

@@ -13,8 +13,8 @@ class ConfigHelper
         'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'     => true,
         'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'      => true,
         'Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue' => true,
-        'Oro\Bundle\EntityConfigBundle\Entity\ConfigLog'             => true,
-        'Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff'         => true
+        'Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog'       => true,
+        'Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff'   => true
     ];
 
     /**

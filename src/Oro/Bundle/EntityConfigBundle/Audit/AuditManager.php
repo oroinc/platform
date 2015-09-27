@@ -1,31 +1,39 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Config;
+namespace Oro\Bundle\EntityConfigBundle\Audit;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
  * Audit entity config changes
  */
-class AuditEntityBuilder
+class AuditManager
 {
     /** @var TokenStorageInterface */
     protected $securityTokenStorage;
 
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /**
      * @param TokenStorageInterface $securityTokenStorage
+     * @param ManagerRegistry       $doctrine
      */
-    public function __construct(TokenStorageInterface $securityTokenStorage)
+    public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
     {
         $this->securityTokenStorage = $securityTokenStorage;
+        $this->doctrine               = $doctrine;
     }
 
     /**
@@ -37,7 +45,7 @@ class AuditEntityBuilder
      */
     public function buildEntity(ConfigManager $configManager)
     {
-        $user = $this->getUser($configManager->getEntityManager());
+        $user = $this->getUser();
         if (null === $user) {
             return null;
         }
@@ -57,6 +65,15 @@ class AuditEntityBuilder
         $log->setUser($user);
 
         return $log;
+    }
+
+    /**
+     * @param ConfigLog $entity
+     */
+    public function save(ConfigLog $entity)
+    {
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
     }
 
     /**
@@ -92,7 +109,7 @@ class AuditEntityBuilder
     /**
      * @return UserInterface|null
      */
-    protected function getUser(EntityManager $em)
+    protected function getUser()
     {
         $token = $this->securityTokenStorage->getToken();
         if (null === $token) {
@@ -104,9 +121,18 @@ class AuditEntityBuilder
         }
 
         $className = ClassUtils::getClass($user);
-        $id = $em->getClassMetadata($className)->getIdentifierValues($user);
+
+        $id = $this->getEntityManager()->getClassMetadata($className)->getIdentifierValues($user);
         $id = reset($id);
 
-        return $em->getReference($className, $id);
+        return $this->getEntityManager()->getReference($className, $id);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrine->getManager();
     }
 }

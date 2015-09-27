@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -45,8 +46,8 @@ class ConfigManager
     /** @var ConfigCache */
     protected $cache;
 
-    /** @var AuditEntityBuilder */
-    protected $auditEntityBuilder;
+    /** @var AuditManager */
+    protected $auditManager;
 
     /** @var ConfigModelManager */
     protected $modelManager;
@@ -81,7 +82,7 @@ class ConfigManager
      * @param MetadataFactory          $metadataFactory
      * @param EntityChecker $entityChecker
      * @param ConfigModelManager       $modelManager
-     * @param AuditEntityBuilder       $auditEntityBuilder
+     * @param AuditManager             $auditManager
      * @param ConfigCache              $cache
      */
     public function __construct(
@@ -89,22 +90,22 @@ class ConfigManager
         MetadataFactory $metadataFactory,
         EntityChecker $entityChecker,
         ConfigModelManager $modelManager,
-        AuditEntityBuilder $auditEntityBuilder,
+        AuditManager $auditManager,
         ConfigCache $cache
     ) {
-        $this->eventDispatcher    = $eventDispatcher;
-        $this->metadataFactory    = $metadataFactory;
-        $this->entityChecker      = $entityChecker;
-        $this->modelManager       = $modelManager;
-        $this->auditEntityBuilder = $auditEntityBuilder;
-        $this->cache              = $cache;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->metadataFactory = $metadataFactory;
+        $this->entityChecker   = $entityChecker;
+        $this->modelManager    = $modelManager;
+        $this->auditManager    = $auditManager;
+        $this->cache           = $cache;
     }
 
     /**
      * Gets the EntityManager responsible to work with configuration entities
      * IMPORTANT: configuration entities may use own entity manager which may be not equal the default entity manager
      *
-     * @return EntityManagerInterface
+     * @return EntityManager
      */
     public function getEntityManager()
     {
@@ -492,11 +493,7 @@ class ConfigManager
         $em  = $this->getEntityManager();
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        $logEntry = $this->auditEntityBuilder->buildEntity($this);
-        if (null !== $logEntry) {
-            $logEntry->setLoggedAt($now);
-            $em->persist($logEntry);
-        }
+        $logEntry = $this->auditManager->buildEntity($this);
 
         foreach ($models as $model) {
             if (null === $model->getId()) {
@@ -506,8 +503,13 @@ class ConfigManager
             $em->persist($model);
         }
 
-        // @todo: need investigation if we can call this flush only if !empty($models)
-        $em->flush();
+        if (!empty($models)) {
+            $em->flush();
+        }
+
+        if (null !== $logEntry) {
+            $this->auditManager->save($logEntry);
+        }
 
         // @todo: Should be removed together with deprecated events
         if ($this->hasListeners(Events::POST_FLUSH_CONFIG)) {

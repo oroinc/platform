@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuilder
 {
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -18,13 +22,16 @@ class AssociationBuilder
     protected $relationBuilder;
 
     /**
+     * @param ManagerRegistry $doctrine
      * @param ConfigManager   $configManager
      * @param RelationBuilder $relationBuilder
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         RelationBuilder $relationBuilder
     ) {
+        $this->doctrine        = $doctrine;
         $this->configManager   = $configManager;
         $this->relationBuilder = $relationBuilder;
     }
@@ -127,10 +134,10 @@ class AssociationBuilder
     protected function getPrimaryKeyColumnNames($entityClass)
     {
         try {
-            return $this->configManager
-                ->getEntityManager()
-                ->getClassMetadata($entityClass)
-                ->getIdentifierColumnNames();
+            /** @var EntityManager $em */
+            $em = $this->doctrine->getManagerForClass($entityClass);
+
+            return $em->getClassMetadata($entityClass)->getIdentifierColumnNames();
         } catch (\ReflectionException $e) {
             // ignore entity not found exception
             return ['id'];

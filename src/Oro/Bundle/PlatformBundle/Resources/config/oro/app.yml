@@ -48,4 +48,4 @@ doctrine:
                 mappings: ~
                 metadata_cache_driver:
                     type: service
-                    id:   doctrine.metadata.cache
+                    id:   doctrine.metadata.cache.config

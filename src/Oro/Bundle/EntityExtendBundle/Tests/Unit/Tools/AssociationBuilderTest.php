@@ -16,6 +16,9 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     const TARGET_CLASS = 'Test\TargetEntity';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -23,6 +26,9 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->doctrine        = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -37,7 +43,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->configManager, $this->relationBuilder]
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
         );
 
         $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
@@ -106,7 +112,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->configManager, $this->relationBuilder]
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
         );
 
         $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
@@ -175,6 +181,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($em);
+
         $em->expects($this->once())
             ->method('getClassMetadata')
             ->with($entityClass)
@@ -184,11 +195,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierColumnNames')
             ->will($this->returnValue(['id', 'name']));
 
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -201,11 +208,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithReflectionException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new \ReflectionException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -218,11 +225,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithORMMappingException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new ORMMappingException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -235,11 +242,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithPersistenceMappingException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new PersistenceMappingException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityManager;
 
 /**
  * This class provides an access to entity managers that may contain configurable entities.
@@ -40,7 +40,7 @@ class EntityManagerBag
     /**
      * Gets all entity managers that may contain configurable entities.
      *
-     * @return EntityManagerInterface[]
+     * @return EntityManager[]
      */
     public function getEntityManagers()
     {

@@ -7,7 +7,7 @@ use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 
-use Oro\Bundle\EntityConfigBundle\Config\AuditEntityBuilder;
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
@@ -326,6 +326,10 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConfigManager()
     {
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -401,7 +405,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             $this->metadataFactory,
             $entityChecker,
             new ConfigModelManager($emLink),
-            new AuditEntityBuilder($securityTokenStorage),
+            new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );
     }
