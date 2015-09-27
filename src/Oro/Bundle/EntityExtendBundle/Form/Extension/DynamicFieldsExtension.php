@@ -48,9 +48,9 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         TranslatorInterface $translator,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->configManager = $configManager;
-        $this->router        = $router;
-        $this->translator    = $translator;
+        $this->configManager  = $configManager;
+        $this->router         = $router;
+        $this->translator     = $translator;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -59,21 +59,18 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+        if (!$this->isApplicable($options)) {
             return;
         }
 
         $className = $options['data_class'];
-        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
-            return;
-        }
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
-        $formConfigs          = $this->configManager->getProvider('form')->getConfigs($className);
 
-        $priorities = [];
-        $fields = [];
+        $priorities  = [];
+        $fields      = [];
+        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -88,7 +85,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $fields[] = $fieldName;
+            $fields[]     = $fieldName;
             $priorities[] = $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0);
         }
 
@@ -106,16 +103,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $className = $options['data_class'];
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) ||
-            !$this->configManager->getProvider('extend')->hasConfig($className)) {
+        if (!$this->isApplicable($options)) {
             return;
         }
 
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $formConfigProvider   = $this->configManager->getProvider('form');
+        $className = $options['data_class'];
 
-        $formConfigs = $formConfigProvider->getConfigs($className);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+
+        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -137,7 +133,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $view->children[$fieldName]->vars['extra_field'] = true;
 
-            if (!in_array($fieldConfigId->getFieldType(), RelationType::$toManyRelations)) {
+            if (!in_array($fieldConfigId->getFieldType(), RelationType::$toManyRelations, true)) {
                 continue;
             }
 
@@ -214,6 +210,28 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     }
 
     /**
+     * @param array $options
+     *
+     * @return bool
+     */
+    protected function isApplicable(array $options)
+    {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+            return false;
+        }
+
+        $className = $options['data_class'];
+        if (!$this->doctrineHelper->isManageableEntity($className)) {
+            return false;
+        }
+        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param ConfigInterface $extendConfig
      * @param ConfigProvider  $extendConfigProvider
      *
@@ -225,7 +243,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             !$extendConfig->is('is_deleted')
             && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations)
+            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations, true)
             && (
                 !$extendConfig->has('target_entity')
                 || !$extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
