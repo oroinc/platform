@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 
 class ConfigCacheWarmer
@@ -17,16 +19,31 @@ class ConfigCacheWarmer
     /** @var EntityManagerBag */
     protected $entityManagerBag;
 
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
+
+    /** @var VirtualRelationProviderInterface */
+    protected $virtualRelationProvider;
+
     /**
-     * @param ConfigManager    $configManager
-     * @param ConfigCache      $cache
-     * @param EntityManagerBag $entityManagerBag
+     * @param ConfigManager                    $configManager
+     * @param ConfigCache                      $cache
+     * @param EntityManagerBag                 $entityManagerBag
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
-    public function __construct(ConfigManager $configManager, ConfigCache $cache, EntityManagerBag $entityManagerBag)
-    {
-        $this->configManager    = $configManager;
-        $this->cache            = $cache;
-        $this->entityManagerBag = $entityManagerBag;
+    public function __construct(
+        ConfigManager $configManager,
+        ConfigCache $cache,
+        EntityManagerBag $entityManagerBag,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider
+    ) {
+        $this->configManager           = $configManager;
+        $this->cache                   = $cache;
+        $this->entityManagerBag        = $entityManagerBag;
+        $this->virtualFieldProvider    = $virtualFieldProvider;
+        $this->virtualRelationProvider = $virtualRelationProvider;
     }
 
     /**
@@ -36,6 +53,7 @@ class ConfigCacheWarmer
     {
         $this->loadConfigurable();
         $this->loadNonConfigurable();
+        $this->loadVirtualFields();
     }
 
     protected function loadConfigurable()
@@ -113,6 +131,28 @@ class ConfigCacheWarmer
                         $this->cache->saveConfigurable(false, $className, $fieldName);
                     }
                     foreach ($metadata->getAssociationNames() as $fieldName) {
+                        $this->cache->saveConfigurable(false, $className, $fieldName);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function loadVirtualFields()
+    {
+        foreach ($this->cache->getEntities() as $className => $isHidden) {
+            $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
+            if (!empty($virtualFields)) {
+                foreach ($virtualFields as $fieldName) {
+                    if (null === $this->cache->getConfigurable($className, $fieldName)) {
+                        $this->cache->saveConfigurable(false, $className, $fieldName);
+                    }
+                }
+            }
+            $virtualRelations = $this->virtualRelationProvider->getVirtualRelations($className);
+            if (!empty($virtualRelations)) {
+                foreach ($virtualRelations as $fieldName => $config) {
+                    if (null === $this->cache->getConfigurable($className, $fieldName)) {
                         $this->cache->saveConfigurable(false, $className, $fieldName);
                     }
                 }

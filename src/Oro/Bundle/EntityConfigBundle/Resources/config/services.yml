@@ -88,6 +88,8 @@ services:
             - @oro_entity_config.config_manager
             - @oro_entity_config.cache
             - @oro_entity_config.entity_manager_bag
+            - @oro_entity.virtual_field_provider.chain
+            - @oro_entity.virtual_relation_provider.chain
 
     oro_entity_config.cache.warmer:
         public: false
