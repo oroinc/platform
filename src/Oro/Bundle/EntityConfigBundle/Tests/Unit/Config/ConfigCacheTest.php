@@ -476,6 +476,112 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSaveEntityConfigValues()
+    {
+        $config1 = new Config(
+            new EntityConfigId('scope1', self::ENTITY_CLASS),
+            ['key1' => 'val1']
+        );
+        $config2 = new Config(
+            new EntityConfigId('scope2', self::ENTITY_CLASS),
+            ['key2' => 'val2']
+        );
+
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->willReturnCallback(
+                function ($key, $data) {
+                    $this->cache->expects($this->once())
+                        ->method('fetch')
+                        ->with($key)
+                        ->willReturn($data);
+
+                    return true;
+                }
+            );
+
+        $this->assertTrue(
+            $this->configCache->saveConfigValues(
+                [
+                    $config1->getId()->getScope() => $config1->getValues(),
+                    $config2->getId()->getScope() => $config2->getValues()
+                ],
+                self::ENTITY_CLASS
+            )
+        );
+
+        // test that configs saved right
+        $this->assertEquals(
+            $config1,
+            $this->configCache->getEntityConfig(
+                $config1->getId()->getScope(),
+                self::ENTITY_CLASS
+            )
+        );
+        $this->assertEquals(
+            $config2,
+            $this->configCache->getEntityConfig(
+                $config2->getId()->getScope(),
+                self::ENTITY_CLASS
+            )
+        );
+    }
+
+    public function testSaveFieldConfigValues()
+    {
+        $config1 = new Config(
+            new FieldConfigId('scope1', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE),
+            ['key1' => 'val1']
+        );
+        $config2 = new Config(
+            new FieldConfigId('scope2', self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE),
+            ['key2' => 'val2']
+        );
+
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->willReturnCallback(
+                function ($key, $data) {
+                    $this->cache->expects($this->once())
+                        ->method('fetch')
+                        ->with($key)
+                        ->willReturn($data);
+
+                    return true;
+                }
+            );
+
+        $this->assertTrue(
+            $this->configCache->saveConfigValues(
+                [
+                    $config1->getId()->getScope() => $config1->getValues(),
+                    $config2->getId()->getScope() => $config2->getValues()
+                ],
+                self::ENTITY_CLASS,
+                self::FIELD_NAME,
+                self::FIELD_TYPE
+            )
+        );
+
+        // test that configs saved right
+        $this->assertEquals(
+            $config1,
+            $this->configCache->getFieldConfig(
+                $config1->getId()->getScope(),
+                self::ENTITY_CLASS,
+                self::FIELD_NAME
+            )
+        );
+        $this->assertEquals(
+            $config2,
+            $this->configCache->getFieldConfig(
+                $config2->getId()->getScope(),
+                self::ENTITY_CLASS,
+                self::FIELD_NAME
+            )
+        );
+    }
+
     public function testGetEntityConfig()
     {
         $configId     = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
