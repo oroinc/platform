@@ -23,9 +23,6 @@ class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
         $metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
         $modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -40,7 +37,6 @@ class EntityConfigListenerTestCase extends \PHPUnit_Framework_TestCase
         $this->configManager = new ConfigManager(
             $eventDispatcher,
             $metadataFactory,
-            $entityChecker,
             $modelManager,
             $auditManager,
             $this->configCache

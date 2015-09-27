@@ -40,9 +40,6 @@ class ConfigManager
     /** @var MetadataFactory */
     protected $metadataFactory;
 
-    /** @var EntityChecker */
-    protected $entityChecker;
-
     /** @var ConfigCache */
     protected $cache;
 
@@ -67,9 +64,6 @@ class ConfigManager
     /** @var array */
     protected $configChangeSets = [];
 
-    /** @var int */
-    protected $entityCheck = 0;
-
     /**
      * @deprecated since 1.9. Should be removed together with deprecated events
      * @see Oro\Bundle\EntityConfigBundle\Event\Events
@@ -80,7 +74,6 @@ class ConfigManager
     /**
      * @param EventDispatcherInterface $eventDispatcher
      * @param MetadataFactory          $metadataFactory
-     * @param EntityChecker $entityChecker
      * @param ConfigModelManager       $modelManager
      * @param AuditManager             $auditManager
      * @param ConfigCache              $cache
@@ -88,14 +81,12 @@ class ConfigManager
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         MetadataFactory $metadataFactory,
-        EntityChecker $entityChecker,
         ConfigModelManager $modelManager,
         AuditManager $auditManager,
         ConfigCache $cache
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->metadataFactory = $metadataFactory;
-        $this->entityChecker   = $entityChecker;
         $this->modelManager    = $modelManager;
         $this->auditManager    = $auditManager;
         $this->cache           = $cache;
@@ -171,28 +162,6 @@ class ConfigManager
         return $metadata && isset($metadata->propertyMetadata[$fieldName])
             ? $metadata->propertyMetadata[$fieldName]
             : null;
-    }
-
-    /**
-     * Allows to use Doctrine metadata to check whether an entity or a field might be configurable.
-     * This makes the check a bit faster, but Doctrine metadata must be completely ready for it.
-     * For example an access to Doctrine metadata must be disabled during they are being loaded.
-     * Please note that this operation is incremental. It means that if {@see disableEntityCheck}
-     * are called N times the {@see enableEntityCheck} must be called N times as well to unblock
-     * usage of Doctrine metadata.
-     */
-    public function enableEntityCheck()
-    {
-        $this->entityCheck--;
-    }
-
-    /**
-     * Disables to use Doctrine metadata to check whether an entity or a field might be configurable.
-     * See {@see enableEntityCheck} for more details.
-     */
-    public function disableEntityCheck()
-    {
-        $this->entityCheck++;
     }
 
     /**
@@ -447,7 +416,6 @@ class ConfigManager
     {
         $this->modelManager->clearCheckDatabase();
         $this->cache->deleteAllConfigurable();
-        $this->entityChecker->clear();
     }
 
     /**
@@ -1299,9 +1267,7 @@ class ConfigManager
     {
         $isConfigurable = $this->cache->getConfigurable($className);
         if (null === $isConfigurable) {
-            $isConfigurable = $this->entityCheck !== 0 || $this->entityChecker->isEntity($className)
-                ? (null !== $this->modelManager->findEntityModel($className))
-                : false;
+            $isConfigurable = (null !== $this->modelManager->findEntityModel($className));
             $this->cache->saveConfigurable($isConfigurable, $className);
         }
 
@@ -1320,9 +1286,7 @@ class ConfigManager
     {
         $isConfigurable = $this->cache->getConfigurable($className, $fieldName);
         if (null === $isConfigurable) {
-            $isConfigurable = $this->entityCheck !== 0 || $this->entityChecker->isField($className, $fieldName)
-                ? (null !== $this->modelManager->findFieldModel($className, $fieldName))
-                : false;
+            $isConfigurable = (null !== $this->modelManager->findFieldModel($className, $fieldName));
             $this->cache->saveConfigurable($isConfigurable, $className, $fieldName);
         }
 

@@ -32,7 +32,6 @@ services:
         arguments:
             - @event_dispatcher
             - @oro_entity_config.metadata.annotation_metadata_factory
-            - @oro_entity_config.config_entity_checker
             - @oro_entity_config.config_model_manager
             - @oro_entity_config.audit_manager
             - @oro_entity_config.cache
@@ -83,12 +82,6 @@ services:
         calls:
             - [setNamespace, ['oro_entity_config.model']]
 
-    oro_entity_config.config_entity_checker:
-        public: false
-        class: Oro\Bundle\EntityConfigBundle\Config\EntityChecker
-        arguments:
-            - @oro_entity_config.entity_manager_bag
-
     oro_entity_config.config_cache_warmer:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer
         arguments:
@@ -103,22 +96,6 @@ services:
             - @oro_entity_config.config_cache_warmer
         tags:
             - { name: kernel.cache_warmer, priority: 28 }
-
-    oro_entity_config.doctrine_listener.pre_load_class_metadata:
-        public: false
-        class: Oro\Bundle\EntityConfigBundle\EventListener\PreLoadClassMetadataDoctrineListener
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, priority: 1000 }
-
-    oro_entity_config.doctrine_listener.post_load_class_metadata:
-        public: false
-        class: Oro\Bundle\EntityConfigBundle\EventListener\PostLoadClassMetadataDoctrineListener
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, priority: -1000 }
 
     oro_entity_config.event_listener.entityconfig_grid_listener:
         class: %oro_entity_config.event_listener.entityconfig_grid_listener.class%

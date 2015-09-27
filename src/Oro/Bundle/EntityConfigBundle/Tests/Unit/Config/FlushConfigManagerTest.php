@@ -26,9 +26,6 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $metadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityChecker;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -65,9 +62,6 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -81,7 +75,6 @@ class FlushConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager = new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            $this->entityChecker,
             $this->modelManager,
             $this->auditManager,
             $this->configCache

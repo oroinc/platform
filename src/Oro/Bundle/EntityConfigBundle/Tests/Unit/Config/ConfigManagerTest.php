@@ -36,9 +36,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $metadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityChecker;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -63,9 +60,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityChecker      = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,7 +73,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->configManager = new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            $this->entityChecker,
             $this->modelManager,
             $this->auditManager,
             $this->configCache
@@ -147,7 +140,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $expectedResult,
         $checkDatabaseResult,
         $cachedResult,
-        $entityCheckerResult,
         $findModelResult,
         $className,
         $fieldName
@@ -165,19 +157,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     ->method('saveConfigurable')
                     ->with($expectedResult, $className, $fieldName);
                 if ($fieldName) {
-                    $this->entityChecker->expects($this->once())
-                        ->method('isField')
-                        ->with($className, $fieldName)
-                        ->willReturn($entityCheckerResult);
                     $this->modelManager->expects($this->once())
                         ->method('findFieldModel')
                         ->with($className, $fieldName)
                         ->willReturn($findModelResult);
                 } else {
-                    $this->entityChecker->expects($this->once())
-                        ->method('isEntity')
-                        ->with($className)
-                        ->willReturn($entityCheckerResult);
                     $this->modelManager->expects($this->once())
                         ->method('findEntityModel')
                         ->with($className)
@@ -197,7 +181,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => false,
                 'cachedResult'        => null,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => null
@@ -206,7 +189,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => false,
                 'cachedResult'        => null,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => 'id'
@@ -215,7 +197,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => false,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => null
@@ -224,7 +205,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => false,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => 'id'
@@ -233,7 +213,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => true,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => true,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => null
@@ -242,7 +221,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => true,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => true,
-                'entityCheckerResult' => false,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => 'id'
@@ -251,7 +229,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => null,
-                'entityCheckerResult' => true,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => null
@@ -260,7 +237,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => false,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => null,
-                'entityCheckerResult' => true,
                 'findModelResult'     => null,
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => 'id'
@@ -269,7 +245,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => true,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => null,
-                'entityCheckerResult' => true,
                 'findModelResult'     => $this->createEntityConfigModel(self::ENTITY_CLASS),
                 'className'           => self::ENTITY_CLASS,
                 'fieldName'           => null
@@ -278,7 +253,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedResult'      => true,
                 'checkDatabaseResult' => true,
                 'cachedResult'        => null,
-                'entityCheckerResult' => true,
                 'findModelResult'     => $this->createFieldConfigModel(
                     $this->createEntityConfigModel(self::ENTITY_CLASS),
                     'id',

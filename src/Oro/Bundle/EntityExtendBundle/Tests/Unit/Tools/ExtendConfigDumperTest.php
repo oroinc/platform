@@ -74,11 +74,6 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('flush');
 
-        $this->configManager->expects($this->once())
-            ->method('disableEntityCheck');
-        $this->configManager->expects($this->once())
-            ->method('enableEntityCheck');
-
         $this->dumper->checkConfig();
     }
 
@@ -115,11 +110,6 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->once())
             ->method('flush');
-
-        $this->configManager->expects($this->once())
-            ->method('disableEntityCheck');
-        $this->configManager->expects($this->once())
-            ->method('enableEntityCheck');
 
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();
@@ -180,11 +170,6 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->never())
             ->method('flush');
-
-        $this->configManager->expects($this->once())
-            ->method('disableEntityCheck');
-        $this->configManager->expects($this->once())
-            ->method('enableEntityCheck');
 
         $this->dumper->setCacheDir($this->cacheDir . '_other');
         $this->dumper->checkConfig();

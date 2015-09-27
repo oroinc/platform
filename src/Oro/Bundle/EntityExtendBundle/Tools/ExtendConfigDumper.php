@@ -117,20 +117,6 @@ class ExtendConfigDumper
      */
     public function updateConfig($filter = null)
     {
-        $this->executeWithoutEntityCheck(
-            function () use ($filter) {
-                $this->doUpdateConfig($filter);
-            }
-        );
-    }
-
-    /**
-     * Update config.
-     *
-     * @param callable|null $filter function (ConfigInterface $config) : bool
-     */
-    protected function doUpdateConfig($filter = null)
-    {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
 
@@ -176,15 +162,6 @@ class ExtendConfigDumper
 
     public function dump()
     {
-        $this->executeWithoutEntityCheck(
-            function () {
-                $this->doDump();
-            }
-        );
-    }
-
-    protected function doDump()
-    {
         $schemas = [];
         $extendConfigs = $this->configProvider->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
@@ -216,18 +193,6 @@ class ExtendConfigDumper
      * Makes sure that extended entity configs are ready to be processing by other config related commands
      */
     public function checkConfig()
-    {
-        $this->executeWithoutEntityCheck(
-            function () {
-                $this->doCheckConfig();
-            }
-        );
-    }
-
-    /**
-     * Makes sure that extended entity configs are ready to be processing by other config related commands
-     */
-    protected function doCheckConfig()
     {
         $hasAliases = file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir));
         if ($hasAliases) {
@@ -317,32 +282,6 @@ class ExtendConfigDumper
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
         return $this->sortedExtensions;
-    }
-
-    /**
-     * Executes a function without using Doctrine metadata during a check whether
-     * an entity or a field might be configurable.
-     *
-     * @param callable $func The function to execute.
-     *
-     * @return mixed A value returned from the closure.
-     *
-     * @throws \Exception An exception fired by the closure.
-     */
-    public function executeWithoutEntityCheck($func)
-    {
-        $configManager = $this->configProvider->getConfigManager();
-        $configManager->disableEntityCheck();
-        try {
-            $result = call_user_func($func);
-            $configManager->enableEntityCheck();
-
-            return $result;
-        } catch (\Exception $e) {
-            $configManager->enableEntityCheck();
-
-            throw $e;
-        }
     }
 
     /**
