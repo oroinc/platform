@@ -22,7 +22,7 @@ define([
         /** @property {Array} */
         actions: undefined,
 
-        /** @property {Array} */
+        /** @property Integer */
         actionsHideCount: 3,
 
         /** @property {Array} */
@@ -39,12 +39,12 @@ define([
         ),
 
         /** @property */
-        templateRow: _.template(
+        simpleTemplate: _.template(
             '<div class="more-bar-holder"></div>'
         ),
 
         /** @property */
-        listsContainerName: '.launchers-dropdown-menu',
+        launchersContainerSelector: '.launchers-dropdown-menu',
 
         /** @property */
         launchersListTemplate: _.template(
@@ -56,7 +56,7 @@ define([
         ),
 
         /** @property */
-        launchersListTemplateRow: _.template(
+        simpleLaunchersListTemplate: _.template(
             '<% if (withIcons) { %>' +
                 '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
             '<% } else { %>' +
@@ -83,7 +83,7 @@ define([
             var opts = options || {};
             this.subviews = [];
 
-            if (opts.actionsHideCount) {
+            if (!_.isEmpty(opts.actionsHideCount)) {
                 this.actionsHideCount = opts.actionsHideCount;
             }
 
@@ -184,15 +184,15 @@ define([
             }
 
             if (this.launchers.length < this.actionsHideCount) {
-                this.template = this.templateRow;
-                this.launchersListTemplate = this.launchersListTemplateRow;
-                this.listsContainerName = '.more-bar-holder';
+                this.template = this.simpleTemplate;
+                this.launchersListTemplate = this.simpleLaunchersListTemplate;
+                this.launchersContainerSelector = '.more-bar-holder';
             }
 
             this.$el.empty().append(this.template());
 
             launchers = this.getLaunchersByIcons();
-            $listsContainer = this.$(this.listsContainerName);
+            $listsContainer = this.$(this.launchersContainerSelector);
 
             if (launchers.withIcons.length) {
                 this.renderLaunchersList(launchers.withIcons, {withIcons: true})
