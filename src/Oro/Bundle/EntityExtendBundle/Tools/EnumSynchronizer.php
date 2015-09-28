@@ -19,6 +19,9 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EnumSynchronizer
 {
     /** @var ConfigManager */
