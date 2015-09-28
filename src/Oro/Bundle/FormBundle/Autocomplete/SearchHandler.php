@@ -230,7 +230,6 @@ class SearchHandler implements SearchHandlerInterface
         return $this->getEntitiesByIds(explode(',', $query));
     }
 
-
     /**
      * @param array $items
      * @return array
