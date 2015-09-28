@@ -283,13 +283,16 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                         'getResult',
                         array(),
                         array(
+                            /**
+                             * test sorting works correct
+                             */
+                            array(self::TEST_ID_FIELD => 3,'name' => 'Jack'),
                             $this->createMockEntity(
                                 array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com')
                             ),
                             $this->createMockEntity(
                                 array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
                             ),
-                            array(self::TEST_ID_FIELD => 3,'name' => 'Jack'),
                             $this->createStubEntityWithProperties(
                                 array(
                                     self::TEST_ID_FIELD => 4,
@@ -337,11 +340,14 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                         'getResult',
                         array(),
                         array(
-                            $this->createMockEntity(
-                                array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com')
-                            ),
+                            /**
+                             * test sorting works correct
+                             */
                             $this->createMockEntity(
                                 array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
+                            ),
+                            $this->createMockEntity(
+                                array(self::TEST_ID_FIELD => 1, 'name' => 'John', 'email' => 'john@example.com')
                             )
                         )
                     ),
