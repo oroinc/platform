@@ -292,7 +292,7 @@ class SearchHandlerTest extends \PHPUnit_Framework_TestCase
                             ),
                             $this->createMockEntity(
                                 array(self::TEST_ID_FIELD => 2, 'name' => 'Jane', 'email' => 'jane@example.com')
-                            ),                            
+                            ),
                             $this->createStubEntityWithProperties(
                                 array(
                                     self::TEST_ID_FIELD => 4,
