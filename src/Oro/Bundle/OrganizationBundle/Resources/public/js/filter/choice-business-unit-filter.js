@@ -142,7 +142,7 @@ define(function(require) {
                 response = this._convertToTree(businessUnit);
             }
 
-            template = this.getTemplate(response);
+            template = this.getListTemplate(response);
             return template;
         },
 
@@ -273,7 +273,7 @@ define(function(require) {
             return response;
         },
 
-        getTemplate: function(items) {
+        getListTemplate: function(items) {
             var self = this;
             var template = '<ul>';
             $.each(items, function(key, value) {
@@ -293,7 +293,7 @@ define(function(require) {
                     value.value.name +
                 '</label>';
                 if (value.children.length > 0) {
-                    template += self.getTemplate(value.children);
+                    template += self.getListTemplate(value.children);
                 }
                 template += '</li>';
             });
