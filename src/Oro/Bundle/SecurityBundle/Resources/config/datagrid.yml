@@ -12,17 +12,17 @@ datagrid:
                 frontend_type: html
                 template: OroSecurityBundle:Share:Property/entity.html.twig
         actions:
-            delete:
+            remove:
                 type: frontend
-                label: delete
+                label: oro.security.datagrid.actions.remove.label
                 icon: trash
-                selector: share-item-delete
+                selector: share-item-remove
         mass_actions:
-            delete:
+            remove:
                 type: frontend
-                label: delete
+                label: oro.security.datagrid.mass_actions.remove.label
                 icon: trash
-                selector: share-items-delete
+                selector: share-items-remove
         options:
             toolbarOptions:
                 hide: true
