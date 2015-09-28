@@ -68,11 +68,12 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * Should be applied before formatter extension
+     *
      * {@inheritDoc}
      */
     public function getPriority()
     {
-        // should  be applied before formatter extension
         return -10;
     }
 
@@ -108,6 +109,8 @@ class ColumnsExtension extends AbstractExtension
         $newGridView = $this->createNewGridView($config, $data);
         $currentState = $data->offsetGet('state');
 
+        /** Get columns data from config */
+        $columnsData = $this->getColumnsWithOrder($config);
         /** Get columns data from grid view */
         $gridViewColumnsData = null;
         if (isset($currentState['gridView'])) {
@@ -115,21 +118,20 @@ class ColumnsExtension extends AbstractExtension
                 if ((int)$currentState['gridView'] === $gridView->getId()) {
                     /** Get columns state from current view */
                     $gridViewColumnsData = $gridView->getColumnsData();
+                    /** Get columns data from current view */
+                    $columnsData = $gridViewColumnsData;
                     break;
                 }
             }
         }
 
         /** Get columns data from config or current view if no data in URL */
-        $columnsData = $this->getColumnsWithOrder($config);
         if (!empty($urlColumnsData)) {
             if ($this->columnsHelper->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
                 $columnsData = $gridViewColumnsData;
             } else {
                 $columnsData = $urlColumnsData;
             }
-        } elseif ($gridViewColumnsData !== null) {
-            $columnsData = $gridViewColumnsData;
         }
 
         /** Save current columns state or restore to default view __all__ setting config columns data */
@@ -180,12 +182,8 @@ class ColumnsExtension extends AbstractExtension
 
             $columns = $data->offsetGetOr(self::COLUMNS_PATH, []);
             foreach ($columns as $key => $column) {
-                if (isset($column['name'])) {
+                if (isset($column['name']) && isset($minifiedColumnsState[$column['name']])) {
                     $name = $column['name'];
-                } else {
-                    $name = $key;
-                }
-                if ($name && isset($minifiedColumnsState[$name])) {
                     $columnData = $minifiedColumnsState[$name];
                     if (array_key_exists(self::ORDER_FIELD_NAME, $columnData)) {
                         $columns[$key][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
