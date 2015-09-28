@@ -70,6 +70,15 @@ class ColumnsExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
+    public function getPriority()
+    {
+        // should  be applied before formatter extension
+        return -10;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $currentUser = $this->getCurrentUser();
@@ -80,8 +89,11 @@ class ColumnsExtension extends AbstractExtension
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
 
-        /** Set default columns data from config */
+        /** Set default columns data to initial state from config */
         $this->setInitialStateColumnsOrder($config, $data);
+        /** Set default columns data to metadata */
+        $this->setColumnsOrder($config, $data);
+
         if (!$gridViews) {
             $this->setStateColumnsOrder($config, $data);
         }
@@ -218,6 +230,31 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * Set default columns order to Metadata
+     * Fill order for not configured fields
+     *
+     * @param DatagridConfiguration $config
+     * @param MetadataObject        $data
+     */
+    protected function setColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $columnsOrdered = $this->getColumnsWithOrder($config);
+        $columns  = $data->offsetGetOr(self::COLUMNS_PATH, []);
+        foreach ($columns as $key => $column) {
+            if (isset($column['name']) && isset($columnsOrdered[$column['name']])) {
+                if (isset($columnsOrdered[$column['name']]['order'])) {
+                    $order = $columnsOrdered[$column['name']]['order'];
+                    $data->offsetSetByPath(sprintf('[columns][%s][order]', $key), $order);
+                }
+                if (isset($columnsOrdered[$column['name']]['renderable'])) {
+                    $renderable = $columnsOrdered[$column['name']]['renderable'];
+                    $data->offsetSetByPath(sprintf('[columns][%s][renderable]', $key), $renderable);
+                }
+            }
+        }
+    }
+
+    /**
      * @param DatagridConfiguration $config
      *
      * @return array
@@ -225,7 +262,7 @@ class ColumnsExtension extends AbstractExtension
     protected function getColumnsWithOrder(DatagridConfiguration $config)
     {
         $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
-        $columnsOrder = $this->buildColumnsOrder($columnsData);
+        $columnsOrder = $this->columnsHelper->buildColumnsOrder($columnsData);
         $columns      = $this->applyColumnsOrderAndRender($columnsData, $columnsOrder);
 
         return $columns;
@@ -271,6 +308,15 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * @param MetadataObject $data
+     * @param array          $columnsData
+     */
+    protected function setColumns(MetadataObject $data, array $columnsData)
+    {
+        $data->offsetAddToArray('columns', $columnsData);
+    }
+
+    /**
      * Set Default columns data for default grid view __all__
      *
      * @param MetadataObject $data
@@ -289,42 +335,6 @@ class ColumnsExtension extends AbstractExtension
             unset($gridView);
             $data->offsetSet('gridViews', $gridViews);
         }
-    }
-
-    /**
-     * @param array $columns
-     *
-     * @return array
-     */
-    protected function buildColumnsOrder(array $columns = [])
-    {
-        $orders = [];
-
-        foreach ($columns as $name => $column) {
-            if (array_key_exists(self::ORDER_FIELD_NAME, $column)) {
-                $orders[$name] = (int)$column[self::ORDER_FIELD_NAME];
-            } else {
-                $orders[$name] = 0;
-            }
-        }
-
-        $iteration  = 0;
-        $ignoreList = [];
-
-        foreach ($orders as $name => &$order) {
-            $iteration = $this->columnsHelper->getFirstFreeOrder($iteration, $ignoreList);
-
-            if (0 === $order) {
-                $order = $iteration;
-                $iteration++;
-            } else {
-                array_push($ignoreList, $order);
-            }
-        }
-
-        unset($order);
-
-        return $orders;
     }
 
     /**

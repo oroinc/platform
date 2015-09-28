@@ -114,6 +114,41 @@ class ColumnsHelper
     }
 
     /**
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function buildColumnsOrder(array $columns = [])
+    {
+        $orders = [];
+
+        $ignoreList = [];
+        foreach ($columns as $name => $column) {
+            if (array_key_exists(ColumnsExtension::ORDER_FIELD_NAME, $column)) {
+                $orders[$name] = (int)$column[ColumnsExtension::ORDER_FIELD_NAME];
+                array_push($ignoreList, $orders[$name]);
+            } else {
+                $orders[$name] = 0;
+            }
+        }
+
+        $iteration  = 0;
+        foreach ($orders as $name => &$order) {
+            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
+            if (0 === $order) {
+                $order = $iteration;
+                $iteration++;
+            } else {
+                array_push($ignoreList, $order);
+            }
+        }
+        unset($order);
+
+        return $orders;
+    }
+
+
+    /**
      * Get first number which is not in ignore list
      *
      * @param int   $iteration
@@ -121,7 +156,7 @@ class ColumnsHelper
      *
      * @return int
      */
-    public function getFirstFreeOrder($iteration, array $ignoreList = [])
+    protected function getFirstFreeOrder($iteration, array $ignoreList = [])
     {
         if (in_array($iteration, $ignoreList, true)) {
             ++$iteration;

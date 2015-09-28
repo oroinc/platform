@@ -162,4 +162,62 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @param array $columnsArray
+     * @param array $result
+     *
+     * @dataProvider buildColumnsOrderProvider
+     */
+    public function testBuildColumnsOrder($columnsArray, $result)
+    {
+        $isEqual = $this->columnsHelper->buildColumnsOrder($columnsArray);
+        static::assertEquals(
+            $isEqual,
+            $result
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function buildColumnsOrderProvider()
+    {
+        $columns1 = [
+            'name'  => ['order' => 3, 'name' => 'Name'],
+            'email' => ['name' => 'Email'],
+            'data'  => ['name' => 'Data'],
+            'city'  => ['name' => 'City']
+        ];
+        $columns2 = [
+            'name'  => ['name' => 'Name'],
+            'email' => ['name' => 'Email'],
+            'data'  => ['name' => 'Data'],
+            'city'  => ['name' => 'City']
+        ];
+
+        $result1 = [
+            'name'  => 3,
+            'email' => 0,
+            'data'  => 1,
+            'city'  => 2
+        ];
+        $result2 = [
+            'name'  => 0,
+            'email' => 1,
+            'data'  => 2,
+            'city'  => 3
+        ];
+
+        return [
+            'columns have default config'          => [
+                'columnsArray' => $columns1,
+                'result'       => $result1
+            ],
+            'columns does not have default config' => [
+                'columnsArray' => $columns2,
+                'result'       => $result2
+            ]
+        ];
+    }
 }
