@@ -1,0 +1,4 @@
+oro:
+    security:
+        organization:
+            access_denied: You have lost your access to organization "%organization_name%". Please relogin.
