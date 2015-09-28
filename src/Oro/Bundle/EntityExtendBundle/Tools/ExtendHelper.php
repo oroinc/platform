@@ -181,7 +181,7 @@ class ExtendHelper
      */
     public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
-        if (empty($enumValueName)) {
+        if (strlen($enumValueName) === 0) {
             if (!$throwExceptionIfInvalidName) {
                 return '';
             }
@@ -190,7 +190,9 @@ class ExtendHelper
         }
 
         $tr = \Transliterator::create('Latin; Latin-ASCII; Lower');
-        $enumValueName = $tr->transliterate($enumValueName);
+        if ($tr) {
+            $enumValueName = $tr->transliterate($enumValueName);
+        }
 
         $result = preg_replace(
             ['/ +/', '/-+/', '/[^a-z0-9_]+/i', '/_{2,}/'],
@@ -206,7 +208,7 @@ class ExtendHelper
             $result = substr($result, 0, self::MAX_ENUM_VALUE_ID_LENGTH - strlen($hash) - 1) . '_' . $hash;
         }
 
-        if (empty($result) && $throwExceptionIfInvalidName) {
+        if ($throwExceptionIfInvalidName && strlen($result) === 0) {
             throw new \InvalidArgumentException(
                 sprintf('The conversion of "%s" to enum value id produces empty string.', $enumValueName)
             );

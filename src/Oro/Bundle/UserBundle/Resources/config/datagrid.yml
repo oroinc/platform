@@ -103,8 +103,8 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                false: Inactive
-                                true:  Active
+                                'false': Inactive
+                                'true':  Active
 
         actions:
             view:
@@ -483,8 +483,8 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                false: Inactive
-                                true:  Active
+                                'false': Inactive
+                                'true':  Active
 
     owner-users-select-grid:
         extended_entity_name: %oro_user.entity.class%
@@ -547,8 +547,8 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                false: Inactive
-                                true:  Active
+                                'false': Inactive
+                                'true':  Active
 
     users-select-grid-exclude-owner:
         extends: users-select-grid
@@ -636,5 +636,5 @@ datagrid:
                     options:
                         field_options:
                             choices:
-                                false: Inactive
-                                true:  Active
+                                'false': Inactive
+                                'true':  Active

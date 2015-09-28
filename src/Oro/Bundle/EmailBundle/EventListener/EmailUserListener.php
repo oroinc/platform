@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -57,32 +58,8 @@ class EmailUserListener
             $status = $item['status'];
             $entity = $item['entity'];
 
-            $ownerIds = [];
-            if ($entity->getOwner() !== null) {
-                $ownerIds[] = $entity->getOwner()->getId();
-            } else {
-                $em = $args->getEntityManager();
-                $mailbox = $entity->getMailboxOwner();
-                if ($mailbox !== null) {
-                    $authorizedUsers = $mailbox->getAuthorizedUsers();
-
-                    foreach ($authorizedUsers as $user) {
-                        $ownerIds[] = $user->getId();
-                    }
-
-                    $authorizedRoles = $mailbox->getAuthorizedRoles();
-                    foreach ($authorizedRoles as $role) {
-                        $users = $em->getRepository('OroUserBundle:Role')
-                            ->getUserQueryBuilder($role)
-                            ->getQuery()->getResult();
-
-                        foreach ($users as $user) {
-                            $ownerIds[] = $user->getId();
-                        }
-                    }
-                }
-            }
-            $ownerIds = array_unique($ownerIds);
+            $em = $args->getEntityManager();
+            $ownerIds = $this->determineOwners($entity, $em);
 
             foreach ($ownerIds as $ownerId) {
                 if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
@@ -105,7 +82,41 @@ class EmailUserListener
         $this->processEmailUsersEntities = [];
     }
 
+    /**
+     * @param EmailUser     $entity
+     * @param EntityManager $em
+     *
+     * @return array
+     */
+    protected function determineOwners(EmailUser $entity, EntityManager $em)
+    {
+        $ownerIds = [];
+        if ($entity->getOwner() !== null) {
+            $ownerIds[] = $entity->getOwner()->getId();
+        } else {
+            $mailbox = $entity->getMailboxOwner();
+            if ($mailbox !== null) {
+                $authorizedUsers = $mailbox->getAuthorizedUsers();
 
+                foreach ($authorizedUsers as $user) {
+                    $ownerIds[] = $user->getId();
+                }
+
+                $authorizedRoles = $mailbox->getAuthorizedRoles();
+                foreach ($authorizedRoles as $role) {
+                    $users = $em->getRepository('OroUserBundle:Role')
+                        ->getUserQueryBuilder($role)
+                        ->getQuery()->getResult();
+
+                    foreach ($users as $user) {
+                        $ownerIds[] = $user->getId();
+                    }
+                }
+            }
+        }
+
+        return array_unique($ownerIds);
+    }
 
     /**
      * Collect new EmailUser entities
