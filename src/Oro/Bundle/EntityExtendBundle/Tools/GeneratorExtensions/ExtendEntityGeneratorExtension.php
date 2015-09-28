@@ -89,15 +89,15 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     {
         $toString = [];
         foreach ($schema['property'] as $fieldName => $config) {
-            if ($schema['doctrine'][$schema['entity']]['fields'][$fieldName]['type'] == 'string') {
+            $isPrivate = is_array($config) && isset($config['private']) && $config['private'];
+            if (!$isPrivate && $schema['doctrine'][$schema['entity']]['fields'][$fieldName]['type'] === 'string') {
                 $toString[] = '$this->' . $this->generateGetMethodName($fieldName) . '()';
             }
         }
 
-        $toStringBody = 'return (string) $this->getId();';
-        if (count($toString) > 0) {
-            $toStringBody = 'return (string)' . implode(' . ', $toString) . ';';
-        }
+        $toStringBody = empty($toString)
+            ? 'return (string) $this->getId();'
+            : 'return (string)' . implode(' . ', $toString) . ';';
         $class->setMethod($this->generateClassMethod('__toString', $toStringBody));
     }
 
@@ -109,21 +109,25 @@ class ExtendEntityGeneratorExtension extends AbstractEntityGeneratorExtension
     protected function generateProperties($propertyType, array $schema, PhpClass $class)
     {
         foreach ($schema[$propertyType] as $fieldName => $config) {
-            $class
-                ->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'))
-                ->setMethod(
-                    $this->generateClassMethod(
-                        $this->generateGetMethodName($fieldName),
-                        'return $this->' . $fieldName . ';'
+            $class->setProperty(PhpProperty::create($fieldName)->setVisibility('protected'));
+
+            $isPrivate = is_array($config) && isset($config['private']) && $config['private'];
+            if (!$isPrivate) {
+                $class
+                    ->setMethod(
+                        $this->generateClassMethod(
+                            $this->generateGetMethodName($fieldName),
+                            'return $this->' . $fieldName . ';'
+                        )
                     )
-                )
-                ->setMethod(
-                    $this->generateClassMethod(
-                        $this->generateSetMethodName($fieldName),
-                        $this->getSetterBody($fieldName, $schema),
-                        ['value']
-                    )
-                );
+                    ->setMethod(
+                        $this->generateClassMethod(
+                            $this->generateSetMethodName($fieldName),
+                            $this->getSetterBody($fieldName, $schema),
+                            ['value']
+                        )
+                    );
+            }
         }
     }
 
