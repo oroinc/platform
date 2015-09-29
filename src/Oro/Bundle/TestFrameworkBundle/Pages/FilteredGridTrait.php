@@ -71,6 +71,9 @@ trait FilteredGridTrait
             )->click();
             $this->waitForAjax();
         }
+        $this->test->byXPath(
+            "//div[@class='ui-corner-all ui-multiselect-header ui-helper-clearfix ui-multiselect-hasfilter']//input"
+        )->click();
         $this->test->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::ESCAPE);
 
         return $this;

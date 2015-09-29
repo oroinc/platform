@@ -136,7 +136,9 @@ class Notes extends AbstractPageEntity
             "//*[@class='message-item message'][contains(., '{$note}')]".
             "/parent::*/*[@class='actions']//a[contains(., '{$action}')]";
 
-        $this->test->moveto($this->test->byXPath($actionMenu));
+//        $this->test->moveto($this->test->byXPath($actionMenu));
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($actionMenu)->click();
         $this->test->byXPath($selectedAction)->click();
 
         switch ($action) {
@@ -144,7 +146,8 @@ class Notes extends AbstractPageEntity
                 $this->assertElementPresent(
                     "//div[contains(@class,'ui-dialog-titlebar')]".
                     "/span[normalize-space(.)='{$note}']",
-                    'Update Note window is not opened');
+                    'Update Note window is not opened'
+                );
                 break;
             case 'Delete Note':
                 $this->test->byXpath(
