@@ -142,7 +142,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         $result = $this->checkAclGroup($group);
 
         if ($result !== self::ACCESS_DENIED) {
-            $result = parent::vote($token, $this->object, $attributes);
+            $result = parent::vote($token, $object, $attributes);
 
             //check organization context
             $result = $this->checkOrganizationContext($result);
