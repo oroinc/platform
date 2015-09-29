@@ -201,6 +201,9 @@ define(function(require) {
             };
             cell.model.set(data);
             if (this.editor.save_api_accessor.initialOptions.field_name) {
+                if (_.keys(data) > 1) {
+                    throw new Error('Only single field editors are supported with field_name option');
+                }
                 var newData = {};
                 newData[this.editor.save_api_accessor.initialOptions.field_name] = data[cell.column.get('name')];
                 data = newData;
