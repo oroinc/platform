@@ -26,12 +26,16 @@ define(function(require) {
 
         DEFAULT_HTTP_METHOD: 'POST',
 
+        formName: void 0,
+
         initialize: function(options) {
             if (!options) {
                 options = {};
             }
+            this.initialOptions = options;
             this.httpMethod = options.http_method || this.DEFAULT_HTTP_METHOD;
             this.headers = _.extend({}, this.DEFAULT_HEADERS, options.headers || {});
+            this.formName = options.form_name;
             // init route model
             if (!options.route) {
                 throw Error('"route" is a required option');
@@ -50,12 +54,23 @@ define(function(require) {
             return this.route.getUrl(urlParameters);
         },
 
+        formatBody: function(body) {
+            var formattedBody;
+            if (this.formName) {
+                formattedBody = {};
+                formattedBody[this.formName] = body;
+            } else {
+                formattedBody = body;
+            }
+            return formattedBody;
+        },
+
         send: function(urlParameters, body, headers) {
             return $.ajax({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
-                data: JSON.stringify(body)
+                data: JSON.stringify(this.formatBody(body))
             });
         }
     });

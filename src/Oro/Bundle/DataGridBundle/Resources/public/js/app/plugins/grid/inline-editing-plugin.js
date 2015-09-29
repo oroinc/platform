@@ -40,7 +40,7 @@ define(function(require) {
                 throw new Error('"save_api_accessor" option is required');
             }
             var ApiAccesor = this.options.metadata.inline_editing.save_api_accessor['class'];
-            this.save_api_accessor = new ApiAccesor(
+            this.saveApiAccessor = new ApiAccesor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
             InlineEditingPlugin.__super__.enable.call(this);
@@ -120,7 +120,9 @@ define(function(require) {
 
         getCellEditorOptions: function(cell) {
             var columnMetadata = this.getColumnMetadata(cell.column.get('name'));
-            var editor = (columnMetadata && columnMetadata.editor) ? $.extend(true, {}, columnMetadata.editor) : {};
+            var editor = (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.editor) ?
+                $.extend(true, {}, columnMetadata.inline_editing.editor) :
+                {};
 
             if (!editor.component) {
                 editor.component = this.options.metadata.inline_editing.cell_editor.component;
@@ -133,12 +135,14 @@ define(function(require) {
                 editor.options = {};
             }
 
-            if (!editor.save_api_accessor) {
-                // use main
-                editor.save_api_accessor = this.save_api_accessor;
+            if (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.save_api_accessor) {
+                var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
+                    columnMetadata.inline_editing.save_api_accessor);
+                var ApiAccesor = saveApiOptions.class;
+                editor.save_api_accessor = new ApiAccesor(_.omit(saveApiOptions, 'class'));
             } else {
-                var ApiAccesor = editor.save_api_accessor.class;
-                editor.save_api_accessor = new ApiAccesor(_.omit(editor.save_api_accessor, 'class'));
+                // use main
+                editor.save_api_accessor = this.saveApiAccessor;
             }
 
             editor.validation_rules = (columnMetadata.inline_editing &&
@@ -193,8 +197,14 @@ define(function(require) {
             cell.$el.addClass('loading');
             var ctx = {
                 cell: cell,
-                oldValue: cell.model.get(cell.column.get('name'))
+                oldState: cell.model.toJSON()
             };
+            cell.model.set(data);
+            if (this.editor.save_api_accessor.initialOptions.field_name) {
+                var newData = {};
+                newData[this.editor.save_api_accessor.initialOptions.field_name] = data[cell.column.get('name')];
+                data = newData;
+            }
             this.editor.save_api_accessor.send(cell.model.toJSON(), data)
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
@@ -319,7 +329,7 @@ define(function(require) {
                     _this.cell.$el.removeClass('save-fail');
                 }, 2000);
             }
-            this.cell.model.set(this.cell.column.get('name'), this.oldValue);
+            this.cell.model.set(this.oldState);
             // @TODO update message
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
         }
