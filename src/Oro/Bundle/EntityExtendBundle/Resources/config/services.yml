@@ -183,7 +183,7 @@ services:
     oro_entity_extend.extend.entity_proxy_generator:
         class: %oro_entity_extend.extend.entity_proxy_generator.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity_config.entity_manager_bag
             - @oro_entity_config.provider.extend
             - %kernel.cache_dir%
 
