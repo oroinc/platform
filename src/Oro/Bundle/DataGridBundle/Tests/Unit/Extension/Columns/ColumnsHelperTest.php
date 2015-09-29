@@ -23,18 +23,7 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testPrepareColumnsParam($columnsConfigArray, $columns, $result)
     {
-        $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $quantity = 1;
-        $config
-            ->expects(static::exactly($quantity))
-            ->method('offsetGet')
-            ->with('columns')
-            ->will(static::returnValue($columnsConfigArray));
-
-        $columnsData = $this->columnsHelper->prepareColumnsParam($config, $columns);
+        $columnsData = $this->columnsHelper->prepareColumnsParam($columnsConfigArray, $columns);
         static::assertEquals($columnsData, $result);
     }
 
@@ -50,9 +39,9 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
             'city'  => ['order' => 3,'renderable' => true, 'name' => 'City']
         ];
 
-        $columnsString1 = '01.11.21.31';
-        $columnsString2 = '31.01.11.21';
-        $columnsString3 = '31.00.11.21';
+        $columnsString1 = 'name1.email1.data1.city1';
+        $columnsString2 = 'city1.name1.email1.data1';
+        $columnsString3 = 'city1.name0.email1.data1';
 
         $columnsArray = [
             'name'  => ['order' => '2','renderable' => 'true', 'name' => 'Name'],
@@ -170,6 +159,64 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
                 'viewData'  => $array3,
                 'urlData'  => $array4,
                 'result' => false
+            ]
+        ];
+    }
+
+    /**
+     * @param array $columnsArray
+     * @param array $result
+     *
+     * @dataProvider buildColumnsOrderProvider
+     */
+    public function testBuildColumnsOrder($columnsArray, $result)
+    {
+        $isEqual = $this->columnsHelper->buildColumnsOrder($columnsArray);
+        static::assertEquals(
+            $isEqual,
+            $result
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function buildColumnsOrderProvider()
+    {
+        $columns1 = [
+            'name'  => ['order' => 3, 'name' => 'Name'],
+            'email' => ['name' => 'Email'],
+            'data'  => ['name' => 'Data'],
+            'city'  => ['name' => 'City']
+        ];
+        $columns2 = [
+            'name'  => ['name' => 'Name'],
+            'email' => ['name' => 'Email'],
+            'data'  => ['name' => 'Data'],
+            'city'  => ['name' => 'City']
+        ];
+
+        $result1 = [
+            'name'  => 3,
+            'email' => 0,
+            'data'  => 1,
+            'city'  => 2
+        ];
+        $result2 = [
+            'name'  => 0,
+            'email' => 1,
+            'data'  => 2,
+            'city'  => 3
+        ];
+
+        return [
+            'columns have default config'          => [
+                'columnsArray' => $columns1,
+                'result'       => $result1
+            ],
+            'columns does not have default config' => [
+                'columnsArray' => $columns2,
+                'result'       => $result2
             ]
         ];
     }

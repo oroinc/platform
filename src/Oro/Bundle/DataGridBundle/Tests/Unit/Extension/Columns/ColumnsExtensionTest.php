@@ -129,7 +129,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
-        $quantity = ($isGridView) ? 3 : 2;
+        $quantity = ($isGridView) ? 4 : 3;
         $config
             ->expects(static::exactly($quantity))
             ->method('offsetGet')
