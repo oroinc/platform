@@ -16,14 +16,12 @@ define(function(require) {
          */
         initialize: function(options) {
             if (options.elementNamePrototype) {
-                var modelOptions = {
+                var viewOptions = {
+                    'model': new CheckConnectionModel({}),
+                    'el': $(options._sourceElement).closest(options.parentElementSelector),
                     'entity': options.forEntity || 'user',
                     'entityId': options.id,
                     'organization': options.organization || ''
-                };
-                var viewOptions = {
-                    'model': new CheckConnectionModel({}, modelOptions),
-                    'el': $(options._sourceElement).closest(options.parentElementSelector)
                 };
                 if (/^.+\[\w+]$/i.test(options.elementNamePrototype)) {
                     viewOptions.formPrefix = options.elementNamePrototype.match(/(.+)\[\w+]$/i)[1];
