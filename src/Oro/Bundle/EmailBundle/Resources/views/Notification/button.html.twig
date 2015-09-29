@@ -85,7 +85,7 @@
 </script>
 {% if oro_config_value('oro_email.show_recent_emails_in_user_bar') %}
 <li class="email-notification-menu dropdown"
-    data-page-component-options="{{ {'emails': emails, 'count': count}|json_encode }}"
+    data-page-component-options="{{ {'emails': emails, 'count': count, 'hasMarkAllButton': true}|json_encode }}"
     data-layout="separate">
     {% if isDesktopVersion() %}
     <a href="#" class="oro-dropdown-toggle email-notification-icon"></a>

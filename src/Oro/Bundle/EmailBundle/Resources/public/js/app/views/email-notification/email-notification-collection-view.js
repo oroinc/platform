@@ -20,7 +20,8 @@ define(function(require) {
         listSelector: '.items',
         countNewEmail: 0,
         folderId: 0,
-        isSidebarWidget: false,
+        hasMarkAllButton: true,
+        hasMarkVisibleButton: false,
         loadingMask: null,
         /**
          * Id of default action
@@ -44,9 +45,8 @@ define(function(require) {
 
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
+            _.extend(this, _.pick(options, ['folderId', 'hasMarkAllButton', 'hasMarkVisibleButton']));
             this.countNewEmail = parseInt(options.countNewEmail);
-            this.folderId = options.folderId;
-            this.isSidebarWidget = options.isSidebarWidget;
             if (options.defaultActionId) {
                 this.defaultActionId = parseInt(options.defaultActionId);
             }
@@ -62,7 +62,13 @@ define(function(require) {
             var visibleUnreadEmails = this.collection.filter(function(item) {
                 return item.get('seen') === false;
             }).length;
-            _.extend(data, _.pick(this, ['defaultActionId', 'countNewEmail', 'folderId', 'isSidebarWidget', 'length']));
+            _.extend(data, _.pick(this, [
+                'defaultActionId',
+                'countNewEmail',
+                'folderId',
+                'hasMarkAllButton',
+                'hasMarkVisibleButton',
+                'length']));
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             return data;

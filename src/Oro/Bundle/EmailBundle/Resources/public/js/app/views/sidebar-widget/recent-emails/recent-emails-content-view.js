@@ -23,7 +23,8 @@ define(function(require) {
                 countModel: this.model.emailNotificationCountModel,
                 defaultActionId: settings.defaultActionId,
                 folderId: settings.folderId,
-                isSidebarWidget: true
+                hasMarkAllButton: false,
+                hasMarkVisibleButton: true
             };
 
             this.component = new EmailNotificationComponent(options);

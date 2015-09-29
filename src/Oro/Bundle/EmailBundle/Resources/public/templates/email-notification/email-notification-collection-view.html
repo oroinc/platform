@@ -9,14 +9,18 @@
             <%=_.__('oro.email.notification.user_emails.label') %>
         </a>
         <% if (countNewEmail) { %>
-        <button class="mark-as-read pull-right btn btn-primary">
-            <i class="icon-check"></i>
-            <% if (isSidebarWidget) { %>
-            <%=_.__('oro.email.recent_emails_widget.mark_visible_read.label') %>
-            <% } else { %>
-            <%=_.__('oro.email.notification.mark_read.label') %>
+            <% if (hasMarkVisibleButton) { %>
+            <button class="mark-as-read pull-right btn btn-primary">
+                <i class="icon-check"></i>
+                <%=_.__('oro.email.recent_emails_widget.mark_visible_read.label') %>
+            </button>
             <% } %>
-        </button>
+            <% if (hasMarkAllButton) { %>
+            <button class="mark-as-read pull-right btn btn-primary">
+                <i class="icon-check"></i>
+                <%=_.__('oro.email.notification.mark_read.label') %>
+            </button>
+            <% } %>
         <% } %>
     </div>
     <ul class="items"></ul>
