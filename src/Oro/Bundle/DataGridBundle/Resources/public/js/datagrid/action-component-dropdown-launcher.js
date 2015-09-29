@@ -38,7 +38,7 @@ define(function(require) {
             }
             ActionComponentDropdownLauncher.__super__.initialize.call(this, options);
             this.events = {
-                'click .dropdown-menu': 'onDropdownClick'
+                'click .dropdown-menu': 'onDropdownClick',
             };
         },
 
@@ -81,7 +81,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onDropdownClick: function(e) {
-            e.stopPropagation();
+            if (!this.$(e.target).is('.close')) {
+                e.stopPropagation();
+            }
         }
     });
 

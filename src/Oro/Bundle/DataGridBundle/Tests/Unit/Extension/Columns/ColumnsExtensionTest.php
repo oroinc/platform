@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Columns;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 
 class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,6 +20,9 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockBuilder */
     protected $aclHelper;
+
+    /** @var   ColumnsHelper*/
+    protected $columnsHelper;
 
     protected function setUp()
     {
@@ -39,7 +43,14 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new ColumnsExtension($this->registry, $this->securityFacade, $this->aclHelper);
+        $this->columnsHelper = new ColumnsHelper();
+
+        $this->extension = new ColumnsExtension(
+            $this->registry,
+            $this->securityFacade,
+            $this->aclHelper,
+            $this->columnsHelper
+        );
     }
 
     /**
@@ -118,7 +129,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
-        $quantity = ($isGridView) ? 3 : 2;
+        $quantity = ($isGridView) ? 4 : 3;
         $config
             ->expects(static::exactly($quantity))
             ->method('offsetGet')
@@ -193,6 +204,9 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @return array
+     */
     public function configDataProvider()
     {
         return [

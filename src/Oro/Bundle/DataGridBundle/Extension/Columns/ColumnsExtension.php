@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,19 +35,25 @@ class ColumnsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var ColumnsHelper */
+    protected $columnsHelper;
+
     /**
      * @param Registry       $registry
      * @param SecurityFacade $securityFacade
      * @param AclHelper      $aclHelper
+     * @param ColumnsHelper  $columnsHelper
      */
     public function __construct(
         Registry $registry,
         SecurityFacade $securityFacade,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ColumnsHelper $columnsHelper
     ) {
         $this->registry       = $registry;
         $this->securityFacade = $securityFacade;
         $this->aclHelper      = $aclHelper;
+        $this->columnsHelper  = $columnsHelper;
     }
 
     /**
@@ -58,6 +65,16 @@ class ColumnsExtension extends AbstractExtension
         $this->processConfigs($config);
 
         return count($columns) > 0;
+    }
+
+    /**
+     * Should be applied before formatter extension
+     *
+     * {@inheritDoc}
+     */
+    public function getPriority()
+    {
+        return -10;
     }
 
     /**
@@ -73,8 +90,11 @@ class ColumnsExtension extends AbstractExtension
         $gridName  = $config->getName();
         $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
 
-        /** Set default columns data from config */
+        /** Set default columns data to initial state from config */
         $this->setInitialStateColumnsOrder($config, $data);
+        /** Set default columns data to metadata */
+        $this->setColumnsOrder($config, $data);
+
         if (!$gridViews) {
             $this->setStateColumnsOrder($config, $data);
         }
@@ -89,6 +109,8 @@ class ColumnsExtension extends AbstractExtension
         $newGridView = $this->createNewGridView($config, $data);
         $currentState = $data->offsetGet('state');
 
+        /** Get columns data from config */
+        $columnsData = $this->getColumnsWithOrder($config);
         /** Get columns data from grid view */
         $gridViewColumnsData = null;
         if (isset($currentState['gridView'])) {
@@ -96,20 +118,20 @@ class ColumnsExtension extends AbstractExtension
                 if ((int)$currentState['gridView'] === $gridView->getId()) {
                     /** Get columns state from current view */
                     $gridViewColumnsData = $gridView->getColumnsData();
+                    /** Get columns data from current view */
+                    $columnsData = $gridViewColumnsData;
+                    break;
                 }
             }
         }
 
         /** Get columns data from config or current view if no data in URL */
-        $columnsData = $this->getColumnsWithOrder($config);
         if (!empty($urlColumnsData)) {
-            if ($this->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
+            if ($this->columnsHelper->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
                 $columnsData = $gridViewColumnsData;
             } else {
                 $columnsData = $urlColumnsData;
             }
-        } elseif ($gridViewColumnsData !== null) {
-            $columnsData = $gridViewColumnsData;
         }
 
         /** Save current columns state or restore to default view __all__ setting config columns data */
@@ -153,25 +175,23 @@ class ColumnsExtension extends AbstractExtension
             /** Get columns data parameters from URL */
             $columnsParam = $this->getParameters()->get(self::MINIFIED_COLUMNS_PARAM, []);
 
+            /** @var array $columnsConfigData */
+            $columnsConfigData = $this->getColumnsWithOrder($config);
             /** @var array $minifiedColumnsState */
-            $minifiedColumnsState = $this->prepareColumnsParam($config, $columnsParam);
+            $minifiedColumnsState = $this->columnsHelper->prepareColumnsParam($columnsConfigData, $columnsParam);
 
             $columns = $data->offsetGetOr(self::COLUMNS_PATH, []);
             foreach ($columns as $key => $column) {
-                if (isset($column['name'])) {
+                if (isset($column['name']) && isset($minifiedColumnsState[$column['name']])) {
                     $name = $column['name'];
-                } else {
-                    $name = $key;
-                }
-                if ($name && isset($minifiedColumnsState[$name])) {
                     $columnData = $minifiedColumnsState[$name];
                     if (array_key_exists(self::ORDER_FIELD_NAME, $columnData)) {
-                        $columns[$key][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
+                        $columns[$key][self::ORDER_FIELD_NAME]      = $columnData[self::ORDER_FIELD_NAME];
                         $columnsData[$name][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
                     }
 
                     if (array_key_exists(self::RENDER_FIELD_NAME, $columnData)) {
-                        $columns[$key][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
+                        $columns[$key][self::RENDER_FIELD_NAME]      = $columnData[self::RENDER_FIELD_NAME];
                         $columnsData[$name][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
                     }
                 }
@@ -183,114 +203,6 @@ class ColumnsExtension extends AbstractExtension
         }
 
         return $columnsData;
-    }
-
-    /**
-     * Check if data changed
-     *
-     * @param array $viewData
-     * @param array $urlData
-     *
-     * @return bool
-     */
-    protected function compareColumnsData($viewData, $urlData)
-    {
-        if (!is_array($viewData) || !is_array($urlData) || empty($viewData) || empty($urlData)) {
-            return false;
-        }
-
-        $diff = array_diff_key($viewData, $urlData);
-        if (!empty($diff)) {
-            return false;
-        }
-        $diff = array_diff_key($urlData, $viewData);
-        if (!empty($diff)) {
-            return false;
-        }
-
-        foreach ($viewData as $columnName => $columnData) {
-            if (!isset($urlData[$columnName])) {
-                return false;
-            }
-            $diff = array_diff_assoc($viewData[$columnName], $urlData[$columnName]);
-            if (!empty($diff)) {
-                return false;
-            }
-            $diff = array_diff_assoc($urlData[$columnName], $viewData[$columnName]);
-            if (!empty($diff)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Get Columns State from ColumnsParam string
-     *
-     * @param DatagridConfiguration $config
-     * @param string $columns like '51.11.21.30.40.61.71'
-     *
-     * @return array $columnsData
-     */
-    protected function prepareColumnsParam(DatagridConfiguration $config, $columns)
-    {
-        $columnsData = $config->offsetGet(self::COLUMNS_PATH);
-
-        //For non-minified saved grid views
-        if (is_array($columns)) {
-            foreach ($columns as $key => $value) {
-                if (isset($value[self::ORDER_FIELD_NAME])) {
-                    $columns[$key][self::ORDER_FIELD_NAME] = (int)$columns[$key][self::ORDER_FIELD_NAME];
-                }
-                if (isset($value[self::RENDER_FIELD_NAME])) {
-                    $renderable = filter_var($value[self::RENDER_FIELD_NAME], FILTER_VALIDATE_BOOLEAN);
-                    $columns[$key][self::RENDER_FIELD_NAME] = $renderable;
-                }
-            }
-            return $columns;
-        }
-
-        //For minified column params
-        $columns = explode('.', $columns);
-        $index = 0;
-        foreach ($columnsData as $columnName => $columnData) {
-            $newColumnData = $this->getColumnData($index, $columns);
-            if (!empty($newColumnData)) {
-                $columnsData[$columnName][self::ORDER_FIELD_NAME] = $newColumnData['order'];
-                $columnsData[$columnName][self::RENDER_FIELD_NAME] = $newColumnData['renderable'];
-            }
-            $index++;
-        }
-
-        return  $columnsData;
-    }
-
-    /**
-     * Get new columns data
-     *
-     * @param int $index
-     * @param array $columns
-     * @return array
-     */
-    protected function getColumnData($index, $columns)
-    {
-        $result = array();
-
-        if (!isset($columns[$index])) {
-            return $result;
-        }
-
-        foreach ($columns as $key => $value) {
-            $render = (bool)((int)(substr($value, -1)));
-            $columnNumber = (int)(substr($value, 0, -1));
-            if ($index === $columnNumber) {
-                $result['order'] = $key;
-                $result['renderable'] = $render;
-                return $result;
-            }
-        }
-        return $result;
     }
 
     /**
@@ -316,6 +228,31 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * Set default columns order to Metadata
+     * Fill order for not configured fields
+     *
+     * @param DatagridConfiguration $config
+     * @param MetadataObject        $data
+     */
+    protected function setColumnsOrder(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $columnsOrdered = $this->getColumnsWithOrder($config);
+        $columns  = $data->offsetGetOr(self::COLUMNS_PATH, []);
+        foreach ($columns as $key => $column) {
+            if (isset($column['name']) && isset($columnsOrdered[$column['name']])) {
+                if (isset($columnsOrdered[$column['name']]['order'])) {
+                    $order = $columnsOrdered[$column['name']]['order'];
+                    $data->offsetSetByPath(sprintf('[columns][%s][order]', $key), $order);
+                }
+                if (isset($columnsOrdered[$column['name']]['renderable'])) {
+                    $renderable = $columnsOrdered[$column['name']]['renderable'];
+                    $data->offsetSetByPath(sprintf('[columns][%s][renderable]', $key), $renderable);
+                }
+            }
+        }
+    }
+
+    /**
      * @param DatagridConfiguration $config
      *
      * @return array
@@ -323,7 +260,7 @@ class ColumnsExtension extends AbstractExtension
     protected function getColumnsWithOrder(DatagridConfiguration $config)
     {
         $columnsData  = $config->offsetGet(self::COLUMNS_PATH);
-        $columnsOrder = $this->buildColumnsOrder($columnsData);
+        $columnsOrder = $this->columnsHelper->buildColumnsOrder($columnsData);
         $columns      = $this->applyColumnsOrderAndRender($columnsData, $columnsOrder);
 
         return $columns;
@@ -369,6 +306,15 @@ class ColumnsExtension extends AbstractExtension
     }
 
     /**
+     * @param MetadataObject $data
+     * @param array          $columnsData
+     */
+    protected function setColumns(MetadataObject $data, array $columnsData)
+    {
+        $data->offsetAddToArray('columns', $columnsData);
+    }
+
+    /**
      * Set Default columns data for default grid view __all__
      *
      * @param MetadataObject $data
@@ -391,42 +337,6 @@ class ColumnsExtension extends AbstractExtension
 
     /**
      * @param array $columns
-     *
-     * @return array
-     */
-    protected function buildColumnsOrder(array $columns = [])
-    {
-        $orders = [];
-
-        foreach ($columns as $name => $column) {
-            if (array_key_exists(self::ORDER_FIELD_NAME, $column)) {
-                $orders[$name] = (int)$column[self::ORDER_FIELD_NAME];
-            } else {
-                $orders[$name] = 0;
-            }
-        }
-
-        $iteration  = 0;
-        $ignoreList = [];
-
-        foreach ($orders as $name => &$order) {
-            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
-
-            if (0 === $order) {
-                $order = $iteration;
-                $iteration++;
-            } else {
-                array_push($ignoreList, $order);
-            }
-        }
-
-        unset($order);
-
-        return $orders;
-    }
-
-    /**
-     * @param array $columns
      * @param array $columnsOrder
      *
      * @return array
@@ -440,7 +350,7 @@ class ColumnsExtension extends AbstractExtension
                 $result[$name]                         = [];
                 $result[$name][self::ORDER_FIELD_NAME] = $columnsOrder[$name];
 
-                // Default value for render fiels is true
+                // Default value for render fields is true
                 $result[$name][self::RENDER_FIELD_NAME] = true;
                 // If config value for render exist
                 if (isset($column[self::RENDER_FIELD_NAME])) {
@@ -450,25 +360,6 @@ class ColumnsExtension extends AbstractExtension
         }
 
         return $result;
-    }
-
-    /**
-     * Get first number which is not in ignore list
-     *
-     * @param int   $iteration
-     * @param array $ignoreList
-     *
-     * @return int
-     */
-    protected function getFirstFreeOrder($iteration, array $ignoreList = [])
-    {
-        if (in_array($iteration, $ignoreList, true)) {
-            ++$iteration;
-
-            return $this->getFirstFreeOrder($iteration, $ignoreList);
-        }
-
-        return $iteration;
     }
 
     /**
