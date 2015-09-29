@@ -10,6 +10,11 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var messenger = require('oroui/js/messenger');
 
+    var availableModes = {
+        all: 'all',
+        selected: 'selected'
+    };
+
     /**
      * Number filter: formats value as a number
      *
@@ -19,6 +24,8 @@ define(function(require) {
      */
     ChoiceBusinessUnitFilter = TextFilter.extend({
         templateSelector: '#choice-business-unit-template',
+
+        mode: availableModes.all,
 
         events: {
             'keyup input': '_onReadCriteriaInputKey',
@@ -30,7 +37,9 @@ define(function(require) {
             'click .disable-filter': '_onClickDisableFilter',
             'click .choice-value': '_onClickChoiceValue',
             'click .reset-filter': '_onClickResetFilter',
-            'change input[type="checkbox"]': '_onChangeBusinessUnit'
+            'change input[type="checkbox"]': '_onChangeBusinessUnit',
+            'click .button-all': '_onClickButtonAll',
+            'click .button-selected': '_onClickButtonSelected'
         },
 
         emptyValue: {
@@ -118,10 +127,47 @@ define(function(require) {
                 businessUnit = chain;
             }
 
-            response = this._convertToTree(businessUnit);
+            if (this.mode == availableModes.selected) {
+                businessUnit = this._getSelectedItems(businessUnit);
+                var temp = [];
+                _.each(businessUnit, function(value) {
+                    temp .push({
+                        value: value,
+                        children: []
+                    });
+                });
 
-            template = this.getTemplate(response);
+                response = temp;
+            } else {
+                response = this._convertToTree(businessUnit);
+            }
+
+            template = this.getListTemplate(response);
             return template;
+        },
+
+        _getSelectedItems: function(businessUnit) {
+            var temp = [];
+            var values;// = this.getValue();
+
+            values = [];
+
+            var checked = this.$el.find('input:checked');
+            $.each(checked, function(key, value) {
+                values.push($(value).val());
+            });
+
+            //var values = value.value.split(',');
+
+            _.each(values, function(value) {
+                _.each(businessUnit, function(unit) {
+                    if (unit['id'] == value) {
+                        temp.push(unit);
+                    }
+                });
+            });
+
+            return temp;
         },
 
         _prepareItems: function(response, businessUnit) {
@@ -213,7 +259,21 @@ define(function(require) {
             return chain;
         },
 
-        getTemplate: function(items) {
+        isSelected: function(item) {
+            var value = this.getValue();
+            var values = value.value.split(',');
+
+            var response = false;
+            _.each(values, function(value) {
+                if (value == item.value.id) {
+                    response = true;
+                }
+            });
+
+            return response;
+        },
+
+        getListTemplate: function(items) {
             var self = this;
             var template = '<ul>';
             $.each(items, function(key, value) {
@@ -222,13 +282,18 @@ define(function(require) {
                     classSearchResult = 'search-result';
                 }
 
+                var classSelected = '';
+                if (self.isSelected(value)) {
+                    classSelected = 'checked';
+                }
+
                 template += '<li>' +
                 '<label for="business-unit-' + value.value.id + '" class="' + classSearchResult + '">' +
-                    '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox">' +
+                    '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox" ' + classSelected + '>' +
                     value.value.name +
                 '</label>';
                 if (value.children.length > 0) {
-                    template += self.getTemplate(value.children);
+                    template += self.getListTemplate(value.children);
                 }
                 template += '</li>';
             });
@@ -339,6 +404,35 @@ define(function(require) {
             var searchQuery = $(event.target).val();
             var list = this._getListTemplate(this.businessUnit, searchQuery);
             this.$el.find('.list').html(list);
+        },
+
+        _onChangeMode: function() {
+            this.$el.find('.buttons span').removeClass('active');
+            this.$el.find('.button' + this.mode).addClass('active');
+
+            var searchQuery = this.$el.find('[name="search"]').val();
+
+            var list = this._getListTemplate(this.businessUnit, searchQuery);
+            this.$el.find('.list').html(list);
+        },
+
+        _onClickButtonAll: function(event) {
+            if (this.mode != availableModes.all) {
+                this.mode = availableModes.all;
+                this.$el.find('.buttons span').removeClass('active');
+
+                this._onChangeMode();
+                $(event.target).addClass('active');
+            }
+        },
+
+        _onClickButtonSelected: function(event) {
+            if (this.mode != availableModes.selected) {
+                this.$el.find('.buttons span').removeClass('active');
+                this.mode = availableModes.selected;
+                this._onChangeMode();
+                $(event.target).addClass('active');
+            }
         }
     });
 
