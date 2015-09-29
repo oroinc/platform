@@ -30,7 +30,7 @@ class EntityConfigListener
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('email');
-        if (null === $config || !$event->isFieldConfig()) {
+        if (null === $config || $event->isEntityConfig()) {
             return;
         }
 

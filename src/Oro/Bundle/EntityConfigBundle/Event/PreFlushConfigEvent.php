@@ -64,6 +64,14 @@ class PreFlushConfigEvent extends Event
     /**
      * @return bool
      */
+    public function isEntityConfig()
+    {
+        return !$this->isFieldConfig();
+    }
+
+    /**
+     * @return bool
+     */
     public function isFieldConfig()
     {
         if (null === $this->fieldConfig) {

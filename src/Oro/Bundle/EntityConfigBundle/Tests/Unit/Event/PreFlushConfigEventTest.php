@@ -85,4 +85,38 @@ class PreFlushConfigEventTest extends \PHPUnit_Framework_TestCase
             [new FieldConfigId('scope1', 'Test\Entity', 'testField'), true]
         ];
     }
+
+    /**
+     * @dataProvider isEntityConfigDataProvider
+     */
+    public function testIsEntityConfig($configId, $expectedResult)
+    {
+        $config1 = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config2 = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $configs = ['scope1' => $config1, 'scope2' => $config2];
+
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event = new PreFlushConfigEvent($configs, $configManager);
+
+        $config1->expects($this->once())
+            ->method('getId')
+            ->willReturn($configId);
+        $config2->expects($this->never())
+            ->method('getId');
+
+        $this->assertEquals($expectedResult, $event->isEntityConfig());
+        // test that a local cache is used
+        $this->assertEquals($expectedResult, $event->isEntityConfig());
+    }
+
+    public function isEntityConfigDataProvider()
+    {
+        return [
+            [new EntityConfigId('scope1', 'Test\Entity'), true],
+            [new FieldConfigId('scope1', 'Test\Entity', 'testField'), false]
+        ];
+    }
 }
