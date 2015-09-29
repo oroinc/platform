@@ -4,13 +4,16 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Rhumsaa\Uuid\Console\Exception;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DictionaryHelper
 {
+    const DEFAULT_SEARCH_FIELD = 'label';
+
     /** @var \Symfony\Component\PropertyAccess\PropertyAccessor */
     protected $accessor;
 
@@ -27,8 +30,11 @@ class DictionaryHelper
     {
         $idNames = $metadata->getIdentifierFieldNames();
         if (count($idNames) !== 1) {
-            throw new Exception('Primary key for this entity is absent or contains few fields');
+            throw new Exception(
+                sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
+            );
         }
+
         return $idNames[0];
     }
 
@@ -36,34 +42,50 @@ class DictionaryHelper
      * @param ClassMetadata  $doctrineMetadata
      * @param EntityMetadata $entityMetadata
      *
-     * @return string
+     * @return array
      * @throws \LogicException
      */
-    public function getNameLabelField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
+    public function getSearchFields(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
         $fieldNames = $doctrineMetadata->getFieldNames();
 
-        if (isset($entityMetadata->defaultValues['grouping']['dictionaryValueField'])) {
-            $fieldName = $entityMetadata->defaultValues['grouping']['dictionaryValueField'];
-            if (in_array($fieldName, $fieldNames)) {
-                return $fieldName;
+        if (isset($entityMetadata->defaultValues['dictionary']['search_fields'])) {
+            $searchFields = $entityMetadata->defaultValues['dictionary']['search_fields'];
+            foreach ($searchFields as $key => $searchField) {
+                if (!in_array($searchField, $fieldNames)) {
+                    unset($fieldNames[$key]);
+                }
             }
         }
 
-        foreach ($this->getDefaultValueFields() as $fieldName) {
-            if (in_array($fieldName, $fieldNames)) {
-                return $fieldName;
-            }
+        if (!empty($searchFields)) {
+            return $searchFields;
+        } elseif (in_array(self::DEFAULT_SEARCH_FIELD, $fieldNames)) {
+            return [self::DEFAULT_SEARCH_FIELD];
         }
 
-        throw new \LogicException(sprintf('Value field is not configured for class %s', $doctrineMetadata->getName()));
+        throw new \LogicException(
+            sprintf('Search fields are not configured for class %s', $doctrineMetadata->getName())
+        );
     }
 
     /**
-     * @return array
+     * @param ClassMetadata  $doctrineMetadata
+     * @param EntityMetadata $entityMetadata
+     *
+     * @return string|null
      */
-    protected function getDefaultValueFields()
+    public function getRepresentationField(ClassMetadata $doctrineMetadata, EntityMetadata $entityMetadata)
     {
-        return ['label', 'name'];
+        $fieldNames = $doctrineMetadata->getFieldNames();
+
+        if (isset($entityMetadata->defaultValues['dictionary']['representation_field'])) {
+            $representationField = $entityMetadata->defaultValues['dictionary']['representation_field'];
+            if (in_array($representationField, $fieldNames)) {
+                return $representationField;
+            }
+        }
+
+        return null;
     }
 }

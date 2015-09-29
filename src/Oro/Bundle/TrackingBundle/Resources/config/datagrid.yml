@@ -67,9 +67,20 @@ datagrid:
                 url:
                     type:      string
                     data_name: website.url
-                ownerName:
-                    type:      string
-                    data_name: ownerName
+                owner:
+                    type: entity
+                    label: oro.user.owner.label
+                    data_name: website.owner
+                    options:
+                        field_options:
+                            class: OroUserBundle:User
+                            multiple: true
+                            property: fullName
+                            translatable_options: false
+                businessUnitId:
+                    label: oro.business_unit.label
+                    type: choice-business-unit
+                    data_name: website.owner
                 createdAt:
                     type:      datetime
                     data_name: website.createdAt

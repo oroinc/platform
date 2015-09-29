@@ -335,6 +335,7 @@ services:
             - @oro_entity.dictionary_value_list_provider
             - @oro_entity.helper.dictionary
             - @oro_entity_config.config_manager
+            - @property_accessor
 
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
