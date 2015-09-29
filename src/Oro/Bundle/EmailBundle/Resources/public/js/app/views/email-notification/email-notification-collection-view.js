@@ -67,8 +67,7 @@ define(function(require) {
                 'countNewEmail',
                 'folderId',
                 'hasMarkAllButton',
-                'hasMarkVisibleButton',
-                'length']));
+                'hasMarkVisibleButton']));
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             return data;
