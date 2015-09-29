@@ -4,6 +4,7 @@ define(function(require) {
 
     var EmailNotificationCollectionView;
     var $ = require('jquery');
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
@@ -18,6 +19,9 @@ define(function(require) {
         animationDuration: 0,
         listSelector: '.items',
         countNewEmail: 0,
+        folderId: 0,
+        hasMarkAllButton: true,
+        hasMarkVisibleButton: false,
         loadingMask: null,
         /**
          * Id of default action
@@ -41,6 +45,7 @@ define(function(require) {
 
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
+            _.extend(this, _.pick(options, ['folderId', 'hasMarkAllButton', 'hasMarkVisibleButton']));
             this.countNewEmail = parseInt(options.countNewEmail);
             if (options.defaultActionId) {
                 this.defaultActionId = parseInt(options.defaultActionId);
@@ -57,11 +62,14 @@ define(function(require) {
             var visibleUnreadEmails = this.collection.filter(function(item) {
                 return item.get('seen') === false;
             }).length;
+            _.extend(data, _.pick(this, [
+                'defaultActionId',
+                'countNewEmail',
+                'folderId',
+                'hasMarkAllButton',
+                'hasMarkVisibleButton']));
             data.userEmailsUrl = routing.generate('oro_email_user_emails');
-            data.defaultActionId = this.defaultActionId;
-            data.countNewEmail = this.countNewEmail;
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
-            data.isEmpty = this.collection.length === 0;
             return data;
         },
 
@@ -114,7 +122,6 @@ define(function(require) {
             } else {
                 this.countNewEmail++;
             }
-            //this.collection.fetch();
         },
 
         resetModeDropDownMenu: function() {
@@ -179,6 +186,7 @@ define(function(require) {
                 this.loadingMask.hide();
                 this.loadingMask.dispose();
             }
+            this.render();
         },
 
         dispose: function() {

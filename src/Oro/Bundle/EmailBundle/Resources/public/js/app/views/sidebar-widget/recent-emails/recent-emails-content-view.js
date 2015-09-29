@@ -16,12 +16,15 @@ define(function(require) {
             if (this.component) {
                 this.component.dispose();
             }
-
+            var settings = this.model.get('settings');
             var options = {
                 _sourceElement: this.$el,
                 collection: this.model.emailNotificationCollection,
                 countModel: this.model.emailNotificationCountModel,
-                defaultActionId: this.model.get('settings').defaultActionId
+                defaultActionId: settings.defaultActionId,
+                folderId: settings.folderId,
+                hasMarkAllButton: false,
+                hasMarkVisibleButton: true
             };
 
             this.component = new EmailNotificationComponent(options);

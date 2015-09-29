@@ -51,7 +51,10 @@ define(function(require) {
                 el: options._sourceElement,
                 collection: this.collection,
                 countNewEmail: this.countModel.get('unreadEmailsCount'),
-                defaultActionId: options.defaultActionId
+                folderId: options.folderId,
+                defaultActionId: options.defaultActionId,
+                hasMarkAllButton: Boolean(options.hasMarkAllButton),
+                hasMarkVisibleButton: Boolean(options.hasMarkVisibleButton)
             });
             if (options._iconElement && options._iconElement.length) {
                 this.countView = new EmailNotificationCountView({
