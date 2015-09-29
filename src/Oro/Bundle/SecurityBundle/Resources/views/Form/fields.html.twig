@@ -146,7 +146,6 @@
 
 {% block oro_share_select_widget %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"
@@ -181,21 +180,4 @@
             {% endif %}
         </div>
     </div>
-    <h5 class="shared-datagrid-title">{{ 'oro.security.datagrid.shared_datagrid.title'|trans }}</h5>
-    {% set gridName = 'shared-datagrid' %}
-    <div class="entity-create-or-select-container">
-        {{ dataGrid.renderGrid(
-            gridName,
-            {'entityId': form.vars.entityId, 'entityClass': form.vars.entityClass},
-            {'cssClass': gridName}
-        ) }}
-    </div>
-    {% set options = {
-        gridName: gridName,
-        entityId: form.vars.entityId,
-        entityClass: form.vars.entityClass|url_encode,
-
-    } %}
-    <div data-page-component-module="orosecurity/js/app/components/shared-datagrid-component"
-         data-page-component-options="{{ options|json_encode }}"></div>
 {% endblock %}
