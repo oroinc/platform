@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,19 +35,25 @@ class ColumnsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var ColumnsHelper */
+    protected $columnsHelper;
+
     /**
      * @param Registry       $registry
      * @param SecurityFacade $securityFacade
      * @param AclHelper      $aclHelper
+     * @param ColumnsHelper  $columnsHelper
      */
     public function __construct(
         Registry $registry,
         SecurityFacade $securityFacade,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        ColumnsHelper $columnsHelper
     ) {
         $this->registry       = $registry;
         $this->securityFacade = $securityFacade;
         $this->aclHelper      = $aclHelper;
+        $this->columnsHelper  = $columnsHelper;
     }
 
     /**
@@ -96,6 +103,7 @@ class ColumnsExtension extends AbstractExtension
                 if ((int)$currentState['gridView'] === $gridView->getId()) {
                     /** Get columns state from current view */
                     $gridViewColumnsData = $gridView->getColumnsData();
+                    break;
                 }
             }
         }
@@ -103,7 +111,7 @@ class ColumnsExtension extends AbstractExtension
         /** Get columns data from config or current view if no data in URL */
         $columnsData = $this->getColumnsWithOrder($config);
         if (!empty($urlColumnsData)) {
-            if ($this->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
+            if ($this->columnsHelper->compareColumnsData($gridViewColumnsData, $urlColumnsData)) {
                 $columnsData = $gridViewColumnsData;
             } else {
                 $columnsData = $urlColumnsData;
@@ -154,7 +162,7 @@ class ColumnsExtension extends AbstractExtension
             $columnsParam = $this->getParameters()->get(self::MINIFIED_COLUMNS_PARAM, []);
 
             /** @var array $minifiedColumnsState */
-            $minifiedColumnsState = $this->prepareColumnsParam($config, $columnsParam);
+            $minifiedColumnsState = $this->columnsHelper->prepareColumnsParam($config, $columnsParam);
 
             $columns = $data->offsetGetOr(self::COLUMNS_PATH, []);
             foreach ($columns as $key => $column) {
@@ -183,114 +191,6 @@ class ColumnsExtension extends AbstractExtension
         }
 
         return $columnsData;
-    }
-
-    /**
-     * Check if data changed
-     *
-     * @param array $viewData
-     * @param array $urlData
-     *
-     * @return bool
-     */
-    protected function compareColumnsData($viewData, $urlData)
-    {
-        if (!is_array($viewData) || !is_array($urlData) || empty($viewData) || empty($urlData)) {
-            return false;
-        }
-
-        $diff = array_diff_key($viewData, $urlData);
-        if (!empty($diff)) {
-            return false;
-        }
-        $diff = array_diff_key($urlData, $viewData);
-        if (!empty($diff)) {
-            return false;
-        }
-
-        foreach ($viewData as $columnName => $columnData) {
-            if (!isset($urlData[$columnName])) {
-                return false;
-            }
-            $diff = array_diff_assoc($viewData[$columnName], $urlData[$columnName]);
-            if (!empty($diff)) {
-                return false;
-            }
-            $diff = array_diff_assoc($urlData[$columnName], $viewData[$columnName]);
-            if (!empty($diff)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Get Columns State from ColumnsParam string
-     *
-     * @param DatagridConfiguration $config
-     * @param string $columns like '51.11.21.30.40.61.71'
-     *
-     * @return array $columnsData
-     */
-    protected function prepareColumnsParam(DatagridConfiguration $config, $columns)
-    {
-        $columnsData = $config->offsetGet(self::COLUMNS_PATH);
-
-        //For non-minified saved grid views
-        if (is_array($columns)) {
-            foreach ($columns as $key => $value) {
-                if (isset($value[self::ORDER_FIELD_NAME])) {
-                    $columns[$key][self::ORDER_FIELD_NAME] = (int)$columns[$key][self::ORDER_FIELD_NAME];
-                }
-                if (isset($value[self::RENDER_FIELD_NAME])) {
-                    $renderable = filter_var($value[self::RENDER_FIELD_NAME], FILTER_VALIDATE_BOOLEAN);
-                    $columns[$key][self::RENDER_FIELD_NAME] = $renderable;
-                }
-            }
-            return $columns;
-        }
-
-        //For minified column params
-        $columns = explode('.', $columns);
-        $index = 0;
-        foreach ($columnsData as $columnName => $columnData) {
-            $newColumnData = $this->getColumnData($index, $columns);
-            if (!empty($newColumnData)) {
-                $columnsData[$columnName][self::ORDER_FIELD_NAME] = $newColumnData['order'];
-                $columnsData[$columnName][self::RENDER_FIELD_NAME] = $newColumnData['renderable'];
-            }
-            $index++;
-        }
-
-        return  $columnsData;
-    }
-
-    /**
-     * Get new columns data
-     *
-     * @param int $index
-     * @param array $columns
-     * @return array
-     */
-    protected function getColumnData($index, $columns)
-    {
-        $result = array();
-
-        if (!isset($columns[$index])) {
-            return $result;
-        }
-
-        foreach ($columns as $key => $value) {
-            $render = (bool)((int)(substr($value, -1)));
-            $columnNumber = (int)(substr($value, 0, -1));
-            if ($index === $columnNumber) {
-                $result['order'] = $key;
-                $result['renderable'] = $render;
-                return $result;
-            }
-        }
-        return $result;
     }
 
     /**
@@ -410,7 +310,7 @@ class ColumnsExtension extends AbstractExtension
         $ignoreList = [];
 
         foreach ($orders as $name => &$order) {
-            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
+            $iteration = $this->columnsHelper->getFirstFreeOrder($iteration, $ignoreList);
 
             if (0 === $order) {
                 $order = $iteration;
@@ -440,7 +340,7 @@ class ColumnsExtension extends AbstractExtension
                 $result[$name]                         = [];
                 $result[$name][self::ORDER_FIELD_NAME] = $columnsOrder[$name];
 
-                // Default value for render fiels is true
+                // Default value for render fields is true
                 $result[$name][self::RENDER_FIELD_NAME] = true;
                 // If config value for render exist
                 if (isset($column[self::RENDER_FIELD_NAME])) {
@@ -450,25 +350,6 @@ class ColumnsExtension extends AbstractExtension
         }
 
         return $result;
-    }
-
-    /**
-     * Get first number which is not in ignore list
-     *
-     * @param int   $iteration
-     * @param array $ignoreList
-     *
-     * @return int
-     */
-    protected function getFirstFreeOrder($iteration, array $ignoreList = [])
-    {
-        if (in_array($iteration, $ignoreList, true)) {
-            ++$iteration;
-
-            return $this->getFirstFreeOrder($iteration, $ignoreList);
-        }
-
-        return $iteration;
     }
 
     /**
