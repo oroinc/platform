@@ -80,7 +80,7 @@ class ColumnsHelper
         foreach ($columnsData as $columnName => $columnData) {
             $newColumnData = $this->findColumnData($columns, $columnName);
             if (!empty($newColumnData)) {
-                $columnsData[$columnName][ColumnsExtension::ORDER_FIELD_NAME] = $newColumnData['order'];
+                $columnsData[$columnName][ColumnsExtension::ORDER_FIELD_NAME]  = $newColumnData['order'];
                 $columnsData[$columnName][ColumnsExtension::RENDER_FIELD_NAME] = $newColumnData['renderable'];
             }
         }
@@ -104,7 +104,7 @@ class ColumnsHelper
             $render = (bool)((int)(substr($value, -1)));
             $columnNameParam = substr($value, 0, -1);
             if ($columnNameParam === $name) {
-                $result[ColumnsExtension::ORDER_FIELD_NAME] = $key;
+                $result[ColumnsExtension::ORDER_FIELD_NAME]  = $key;
                 $result[ColumnsExtension::RENDER_FIELD_NAME] = $render;
                 return $result;
             }

@@ -186,12 +186,12 @@ class ColumnsExtension extends AbstractExtension
                     $name = $column['name'];
                     $columnData = $minifiedColumnsState[$name];
                     if (array_key_exists(self::ORDER_FIELD_NAME, $columnData)) {
-                        $columns[$key][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
+                        $columns[$key][self::ORDER_FIELD_NAME]      = $columnData[self::ORDER_FIELD_NAME];
                         $columnsData[$name][self::ORDER_FIELD_NAME] = $columnData[self::ORDER_FIELD_NAME];
                     }
 
                     if (array_key_exists(self::RENDER_FIELD_NAME, $columnData)) {
-                        $columns[$key][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
+                        $columns[$key][self::RENDER_FIELD_NAME]      = $columnData[self::RENDER_FIELD_NAME];
                         $columnsData[$name][self::RENDER_FIELD_NAME] = $columnData[self::RENDER_FIELD_NAME];
                     }
                 }
