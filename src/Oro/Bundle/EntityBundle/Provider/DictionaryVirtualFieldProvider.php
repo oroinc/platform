@@ -102,9 +102,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $associationNames = $metadata->getAssociationNames();
             foreach ($associationNames as $associationName) {
                 $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($metadata->isSingleValuedAssociation($associationName)
-                    && isset($this->dictionaries[$targetClassName])
-                ) {
+                if (isset($this->dictionaries[$targetClassName])) {
                     $fields = $this->dictionaries[$targetClassName];
                     $isCombinedLabelName = count($fields) > 1;
                     $fieldNames = array_keys($fields);

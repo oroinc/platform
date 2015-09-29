@@ -489,14 +489,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return string
-     */
-    public function getFullName()
-    {
-        return $this->firstName . ' ' . $this->lastName;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getMiddleName()
