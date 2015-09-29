@@ -40,7 +40,8 @@ define(function(require) {
 
         events: {
             'click': 'onClickIconEnvelope',
-            'click button.mark-as-read': 'onClickMarkAsRead'
+            'click button.mark-as-read': 'onClickMarkAsRead',
+            'click button.mark-visible-as-read': 'onClickMarkVisibleAsRead'
         },
 
         initialize: function(options) {
@@ -90,30 +91,36 @@ define(function(require) {
             }
         },
 
-        onClickMarkAsRead: function() {
+        _markAsRead: function(ids) {
+            $.ajax({
+                url: routing.generate('oro_email_mark_all_as_seen', ids),
+                success: _.bind(function(response) {
+                    this.collection.markAllAsRead();
+                    this.collection.unreadEmailsCount = 0;
+                    this.countNewEmail = 0;
+                    this.render();
+                    if (response.successful) {
+                        mediator.trigger('datagrid:doRefresh:user-email-grid');
+                    }
+                }, this),
+                error: function(model, response) {
+                    messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
+                }
+            });
+        },
+
+        onClickMarkVisibleAsRead: function() {
             var ids = [];
-            var self = this;
             this.collection.each(function(email) {
                 if (email.get('seen') === false) {
                     ids.push(email.get('id'));
                 }
             });
-            $.ajax({
-                url: routing.generate('oro_email_mark_all_as_seen'),
-                data: $.param({'ids': ids}),
-                success: function(response) {
-                    self.collection.markAllAsRead();
-                    self.collection.unreadEmailsCount = 0;
-                    self.countNewEmail = 0;
-                    self.render();
-                    if (response.successful) {
-                        mediator.trigger('datagrid:doRefresh:user-email-grid');
-                    }
-                },
-                error: function(model, response) {
-                    messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
-                }
-            });
+            this._markAsRead({'ids': ids});
+        },
+
+        onClickMarkAsRead: function() {
+            this._markAsRead({});
         },
 
         onSeenStatusChange: function(model, isSeen) {
