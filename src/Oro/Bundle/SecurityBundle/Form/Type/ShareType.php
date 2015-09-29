@@ -55,6 +55,9 @@ class ShareType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
+        $view->vars['entityId'] = $form->get('entityId')->getData();
+        $view->vars['entityClass'] = $form->get('entityClass')->getData();
+
         $routeParameters = isset($view->children['entities']->vars['configs']['route_parameters'])
             ? $view->children['entities']->vars['configs']['route_parameters']
             : [];

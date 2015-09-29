@@ -77,7 +77,6 @@ class ShareSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['entityId'] = $form->getParent()->get('entityId')->getData();
         $view->vars['entityClass'] = $form->getParent()->get('entityClass')->getData();
     }
 }
