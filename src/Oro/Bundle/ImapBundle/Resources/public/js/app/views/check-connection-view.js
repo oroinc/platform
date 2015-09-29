@@ -5,12 +5,17 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var layout = require('oroui/js/layout');
     var messenger = require('oroui/js/messenger');
     var BaseView = require('oroui/js/app/views/base/view');
 
     CheckConnectionView = BaseView.extend({
+        route: 'oro_imap_connection_check',
+        entity: 'user',
+        entityId: 0,
+        organization: '',
         formPrefix: '',
         requestPrefix: 'oro_imap_configuration',
         events: {
@@ -18,7 +23,7 @@ define(function(require) {
             'change .critical-field :input': 'clear'
         },
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['params', 'url', 'formPrefix']));
+            _.extend(this, _.pick(options, ['entity', 'entityId', 'organization', 'formPrefix']));
             this.model.on('change', this.render, this);
         },
 
@@ -37,8 +42,10 @@ define(function(require) {
             var data = this.$el.find('.check-connection').serializeArray();
             var $messageContainer = this.$el.find('.check-connection-messages');
             mediator.execute('showLoading');
-            this.model.set({'imap': {}, 'smtp': []});
-            this.model.sync('create', this.model, {
+            this.clear();
+            $.ajax({
+                type: 'POST',
+                url: this.getUrl(),
                 data: $.param(this.prepareData(data)),
                 success: _.bind(function(response) {
                     if (response.imap) {
@@ -57,12 +64,13 @@ define(function(require) {
                             this.model.set('smtp', response.smtp);
                         }
                     }
-                    mediator.execute('hideLoading');
                 }, this),
                 error: _.bind(function() {
                     this.showMessage('error', 'oro.imap.connection.error', $messageContainer);
+                }, this),
+                complete: function() {
                     mediator.execute('hideLoading');
-                }, this)
+                }
             });
         },
 
@@ -87,6 +95,22 @@ define(function(require) {
             } else {
                 return data;
             }
+        },
+
+        getUrl: function() {
+            var params = {
+                'for_entity': this.entity,
+                'organization': this.organization
+            };
+            if (this.entityId !== null) {
+                params.id = this.entityId;
+            }
+
+            return routing.generate(this.route, params);
+        },
+
+        clear: function() {
+            this.model.set({'imap': {}, 'smtp': []});
         }
     });
 
