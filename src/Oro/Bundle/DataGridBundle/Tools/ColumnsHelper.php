@@ -147,7 +147,6 @@ class ColumnsHelper
         return $orders;
     }
 
-
     /**
      * Get first number which is not in ignore list
      *
