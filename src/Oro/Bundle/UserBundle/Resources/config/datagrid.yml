@@ -238,6 +238,8 @@ datagrid:
                 icon:          trash
                 acl_resource:  oro_user_role_delete
 
+        action_configuration: @oro_user.role.datagrid_helper->getActionConfigurationClosure
+
         sorters:
             columns:
                 label:
