@@ -7,12 +7,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 class UsernamePasswordOrganizationTokenFactory implements UsernamePasswordOrganizationTokenFactoryInterface
 {
     /**
-     * @param string $user
-     * @param string $credentials
-     * @param string $providerKey
-     * @param Organization $organizationContext
-     * @param array $roles
-     * @return UsernamePasswordOrganizationToken
+     * {@inheritdoc}
      */
     public function create($user, $credentials, $providerKey, Organization $organizationContext, array $roles = [])
     {

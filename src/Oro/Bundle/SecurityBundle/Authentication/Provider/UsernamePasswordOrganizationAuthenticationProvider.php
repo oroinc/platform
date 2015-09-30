@@ -9,19 +9,19 @@ use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationPro
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface as TokenFactory;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 
 class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticationProvider
 {
     /**
-     * @var TokenFactory
+     * @var UsernamePasswordOrganizationTokenFactoryInterface
      */
     protected $tokenFactory;
 
     /**
-     * @param TokenFactory $tokenFactory
+     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
      */
-    public function setTokenFactory(TokenFactory $tokenFactory)
+    public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }
