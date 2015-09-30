@@ -26,6 +26,7 @@ define(function(require) {
             this.options = options;
             this.cell = options.cell;
             this.column = options.column;
+            this.placeholder = options.placeholder;
             this.validationRules = options.validationRules || {};
             $(document).on('keydown' + this.eventNamespace(), _.bind(this.onKeyDown, this));
             TextEditorView.__super__.initialize.apply(this, arguments);
@@ -45,6 +46,7 @@ define(function(require) {
             data.data = this.model.toJSON();
             data.column = this.column.toJSON();
             data.value = this.getFormattedValue();
+            data.placeholder = this.placeholder || '';
             return data;
         },
 
@@ -56,7 +58,10 @@ define(function(require) {
             this.$el.addClass(_.result(this, 'className'));
             this.validator = this.$el.validate({
                 submitHandler: _.bind(function(form, e) {
-                    this.onSave(e);
+                    if (e && e.preventDefault) {
+                        e.preventDefault();
+                    }
+                    this.trigger('saveAction');
                 }, this),
                 errorPlacement: function(error, element) {
                     error.appendTo(element.closest('.inline-editor-wrapper'));
@@ -89,15 +94,6 @@ define(function(require) {
             return this.$('input[name=value]').val();
         },
 
-        onSave: function(e, postfix) {
-            if (e && e.preventDefault) {
-                e.preventDefault();
-            }
-            var data = {};
-            data[this.column.get('name')] = this.getValue();
-            this.trigger('save' + (postfix ? postfix : '') + 'Action', data);
-        },
-
         rethrowAction: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -122,7 +118,7 @@ define(function(require) {
                     var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
                     if (this.isChanged()) {
                         if (this.validator.form()) {
-                            this.onSave(null, postfix);
+                            this.trigger('save' + postfix + 'Action');
                         } else {
                             this.focus();
                         }
@@ -134,7 +130,7 @@ define(function(require) {
                 case this.ENTER_KEY_CODE:
                     if (this.isChanged()) {
                         if (this.validator.form()) {
-                            this.onSave(null, false);
+                            this.trigger('saveAction');
                         } else {
                             this.focus();
                         }
@@ -148,6 +144,16 @@ define(function(require) {
                     e.preventDefault();
                     break;
             }
+        },
+
+        getServerUpdateData: function() {
+            var data = {};
+            data[this.column.get('name')] = this.getValue();
+            return data;
+        },
+
+        getModelUpdateData: function() {
+            return this.getServerUpdateData();
         }
     });
 

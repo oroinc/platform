@@ -13,11 +13,17 @@ define(function(require) {
                 zIndex: 10000
             });
             this.updatePosition($overlayContent, options);
-            $overlayContent.data('interval', setInterval(function() {
+            var interval = setInterval(function() {
+                if (!$overlayContent.data('interval')) {
+                    // fix memory leak
+                    clearInterval(interval);
+                }
                 overlayTool.updatePosition($overlayContent, options);
-            }, 400));
+            }, 400);
+            $overlayContent.data('interval', interval);
             return {
                 remove: function() {
+                    clearInterval(interval);
                     overlayTool.removeOverlay($overlayContent);
                 }
             };

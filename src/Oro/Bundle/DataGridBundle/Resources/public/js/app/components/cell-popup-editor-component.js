@@ -47,13 +47,13 @@ define(function(require) {
                     of: options.cell.$el
                 }
             });
-            overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             return viewInstance;
         },
 
         removeView: function() {
-            overlayTool.removeOverlay(this.view.$el);
             this.view.dispose();
+            this.overlay.remove();
         },
 
         dispose: function() {

@@ -163,13 +163,7 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
-            }
-
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
-            }
+            this.prepareColumnsOption(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
@@ -185,6 +179,21 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToBodyEvents();
             this._listenToCommands();
+        },
+
+        prepareColumnsOption: function(opts) {
+            for (var i = 0; i < opts.columns.length; i++) {
+                var column = opts.columns[i];
+                column.metadata = _.findWhere(opts.metadata.columns, {name: column.name});
+            }
+
+            if (Object.keys(this.rowActions).length > 0) {
+                opts.columns.push(this._createActionsColumn());
+            }
+
+            if (opts.multiSelectRowEnabled) {
+                opts.columns.unshift(this._createSelectRowColumn());
+            }
         },
 
         /**

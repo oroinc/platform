@@ -28,7 +28,6 @@ html{
     }
   }
 }
-
 body.backdrop:before {
   position: absolute;
   content: "";
@@ -39,4 +38,7 @@ body.backdrop:before {
   left: 0;
   background: rgba(0,0,0,0.1);
   z-index: 9999;
+}
+body.backdrop .select2-drop{
+  z-index: 10000;
 }

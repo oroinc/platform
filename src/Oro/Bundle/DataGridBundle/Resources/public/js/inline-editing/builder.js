@@ -31,16 +31,18 @@ define(function(require) {
 
                     for (var i = 0; i < columnsMeta.length; i++) {
                         var columnMeta = columnsMeta[i];
-                        if (columnMeta.editor) {
-                            if (columnMeta.editor.component) {
-                                columnMeta.editor.component = loaded[columnMeta.name + 'Component'];
+                        if (columnMeta.inline_editing && columnMeta.inline_editing.editor) {
+                            if (columnMeta.inline_editing.editor.component) {
+                                columnMeta.inline_editing.editor.component = loaded[columnMeta.name + 'Component'];
                             }
-                            if (columnMeta.editor.view) {
-                                columnMeta.editor.view = loadMap[columnMeta.name + 'View'];
+                            if (columnMeta.inline_editing.editor.view) {
+                                columnMeta.inline_editing.editor.view = loadMap[columnMeta.name + 'View'];
                             }
                         }
-                        if (columnMeta.save_api_accessor && columnMeta.save_api_accessor['class']) {
-                            columnMeta.save_api_accessor['class'] = loaded[columnMeta.name + 'AccessorClass'];
+                        if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&
+                            columnMeta.inline_editing.save_api_accessor['class']) {
+                            columnMeta.inline_editing.save_api_accessor['class'] =
+                                loaded[columnMeta.name + 'AccessorClass'];
                         }
                     }
 
@@ -80,16 +82,17 @@ define(function(require) {
             var columnsMeta = options.metadata.columns;
             for (var i = 0; i < columnsMeta.length; i++) {
                 var columnMeta = columnsMeta[i];
-                if (columnMeta.editor) {
-                    if (columnMeta.editor.component) {
-                        loadMap[columnMeta.name + 'Component'] = columnMeta.editor.component;
+                if (columnMeta.inline_editing && columnMeta.inline_editing.editor) {
+                    if (columnMeta.inline_editing.editor.component) {
+                        loadMap[columnMeta.name + 'Component'] = columnMeta.inline_editing.editor.component;
                     }
-                    if (columnMeta.editor.view) {
-                        loadMap[columnMeta.name + 'View'] = columnMeta.editor.view;
+                    if (columnMeta.inline_editing.editor.view) {
+                        loadMap[columnMeta.name + 'View'] = columnMeta.inline_editing.editor.view;
                     }
                 }
-                if (columnMeta.save_api_accessor && columnMeta.save_api_accessor['class']) {
-                    loadMap[columnMeta.name + 'AccessorClass'] = columnMeta.save_api_accessor['class'];
+                if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&
+                    columnMeta.inline_editing.save_api_accessor['class']) {
+                    loadMap[columnMeta.name + 'AccessorClass'] = columnMeta.inline_editing.save_api_accessor['class'];
                 }
             }
 

@@ -71,8 +71,7 @@ define(function(require) {
                 return result;
             };
             function enterEditModeIfNeeded(e) {
-                /*jshint validthis:true */
-                if (_this.isEditable(this)) {
+                if (_this.isEditable(cell)) {
                     _this.enterEditMode(cell);
                 }
                 e.preventDefault();
@@ -86,17 +85,8 @@ define(function(require) {
             delete cell.events.click;
         },
 
-        getColumnMetadata: function(name) {
-            var columnsMeta = this.options.metadata.columns;
-            for (var i = 0; i < columnsMeta.length; i++) {
-                if (columnsMeta[i].name === name) {
-                    return columnsMeta[i];
-                }
-            }
-        },
-
         isEditable: function(cell) {
-            var columnMetadata = this.getColumnMetadata(cell.column.get('name'));
+            var columnMetadata = cell.column.get('metadata');
             if (!columnMetadata) {
                 return false;
             }
@@ -119,7 +109,7 @@ define(function(require) {
         },
 
         getCellEditorOptions: function(cell) {
-            var columnMetadata = this.getColumnMetadata(cell.column.get('name'));
+            var columnMetadata = cell.column.get('metadata');
             var editor = (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.editor) ?
                 $.extend(true, {}, columnMetadata.inline_editing.editor) :
                 {};
@@ -131,8 +121,8 @@ define(function(require) {
                 editor.view = this.options.metadata.inline_editing
                     .default_editors[(columnMetadata.type || this.DEFAULT_COLUMN_TYPE)];
             }
-            if (!editor.options) {
-                editor.options = {};
+            if (!editor.component_options) {
+                editor.component_options = {};
             }
 
             if (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.save_api_accessor) {
@@ -170,12 +160,12 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
-            var editorComponent = new CellEditorComponent(_.extend({}, editor.options, {
+            var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
-                viewOptions: _.extend({
+                viewOptions: $.extend(true, {
                     validationRules: editor.validation_rules
-                }, editor.options),
+                }, editor.view_options || {}),
                 fromPreviousCell: fromPreviousCell
             }));
 
@@ -189,26 +179,29 @@ define(function(require) {
             this.listenTo(editorComponent, 'cancelAndEditPrevAction', this.editPrevCell);
         },
 
-        saveCurrentCell: function(data, exit) {
+        saveCurrentCell: function(exit) {
             if (!this.editModeEnabled) {
                 throw Error('Edit mode disabled');
             }
             var cell = this.currentCell;
+            var serverUpdateData = this.editorComponent.view.getServerUpdateData();
+            var modelUpdateData = this.editorComponent.view.getModelUpdateData();
             cell.$el.addClass('loading');
             var ctx = {
                 cell: cell,
-                oldState: cell.model.toJSON()
+                oldState: _.pick(cell.model.toJSON(), _.keys(modelUpdateData))
             };
-            cell.model.set(data);
+            cell.model.set(modelUpdateData);
             if (this.editor.save_api_accessor.initialOptions.field_name) {
-                if (_.keys(data) > 1) {
+                var keys = _.keys(serverUpdateData);
+                if (keys.length > 1) {
                     throw new Error('Only single field editors are supported with field_name option');
                 }
                 var newData = {};
-                newData[this.editor.save_api_accessor.initialOptions.field_name] = data[cell.column.get('name')];
-                data = newData;
+                newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
+                serverUpdateData = newData;
             }
-            this.editor.save_api_accessor.send(cell.model.toJSON(), data)
+            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData)
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {

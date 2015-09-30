@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         getValue: function() {
-            return parseFloat(this.$('input[name=value]').val());
+            return this.formatter.toRaw(this.$('input[name=value]').val());
         },
 
         getValidationRules: function() {
