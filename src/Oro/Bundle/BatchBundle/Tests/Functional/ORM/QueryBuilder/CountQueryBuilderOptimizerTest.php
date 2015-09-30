@@ -117,10 +117,12 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
             'unused_left_join_with_condition_in_several_joins' => [
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
-                    ->leftJoin('u.owner', 'o', Join::WITH, 'o.id = 123')
-                    ->leftJoin('o.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                    ->leftJoin('u.businessUnits', 'bu', Join::WITH, 'bu.id = 456')
+                    ->leftJoin('bu.users', 'o', Join::WITH, 'o.id = 123')
                     ->select('u.id, o.name'),
-                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u',
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN u.businessUnits bu WITH bu.id = 456 '
+                    . 'LEFT JOIN bu.users o WITH o.id = 123',
             ],
             'used_left_join' => [
                 'queryBuilder' => self::createQueryBuilder($em)
@@ -208,6 +210,7 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'INNER JOIN u.owner bu '
                     . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN u.roles r '
                     . 'LEFT JOIN g.roles gr WITH api.apiKey = :test '
                     . 'LEFT JOIN u.apiKeys api '
                     . 'WHERE gr.id > 10'
@@ -310,7 +313,42 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     . 'LEFT JOIN OroUserBundle:Status s WITH s.user = e.user '
                     . 'WHERE s.status = :statusName '
                     . 'GROUP BY _groupByPart0'
-            ]
+            ],
+            'join_one_to_many_table_and_many_to_one_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:Email', 'e', Join::WITH, 'u MEMBER OF e.user_d41b1c4b')
+                    ->leftJoin('OroCommentBundle:Comment', 'c', Join::WITH, 'c.email_bb212599 = e')
+                    ->leftJoin('OroNoteBundle:Note', 'n', Join::WITH, 'c.note_c0db526d = n'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b '
+                    . 'LEFT JOIN OroCommentBundle:Comment c WITH c.email_bb212599 = e'
+            ],
+            'join_one_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:Email', 'e', Join::WITH, 'u MEMBER OF e.user_d41b1c4b'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b'
+            ],
+            'unidirectional_join_one_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:EmailOrigin', 'eo', Join::WITH, 'eo MEMBER OF u.emailOrigins'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:EmailOrigin eo WITH eo MEMBER OF u.emailOrigins'
+            ],
+            'join_many_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('u.businessUnits', 'b'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN u.businessUnits b'
+            ],
         ];
     }
 
