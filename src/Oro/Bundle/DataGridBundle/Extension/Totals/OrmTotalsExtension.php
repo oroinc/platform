@@ -167,7 +167,12 @@ class OrmTotalsExtension extends AbstractExtension
             if (!empty($groupByParts)) {
                 /** @var Expr\GroupBy $groupByPart */
                 foreach ($groupByParts as $groupByPart) {
-                    $groupParts = array_merge($groupParts, $groupByPart->getParts());
+                    foreach ($groupByPart->getParts() as $part) {
+                        $groupParts = array_merge(
+                            $groupParts,
+                            array_map('trim', explode(',', $part))
+                        );
+                    }
                 }
             }
             $this->groupParts = $groupParts;
