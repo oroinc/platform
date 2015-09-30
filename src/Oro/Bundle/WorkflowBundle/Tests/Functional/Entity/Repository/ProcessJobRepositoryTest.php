@@ -37,30 +37,32 @@ class ProcessJobRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
+
+        $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager()->beginTransaction();
+
         $this->dropJobsRecords();
 
         $this->registry      = $this->getContainer()->get('doctrine');
         $this->entityManager = $this->registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
         $this->repository    = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
 
-        $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
+        $this->loadFixtures(['Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities']);
     }
 
     protected function tearDown()
     {
-        parent::tearDown();
+        // clear DB from separate connection, close to avoid connection limit and memory leak
+        $manager = $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
+        $manager->rollback();
+        $manager->getConnection()->close();
 
         $this->dropJobsRecords();
+
+        parent::tearDown();
     }
 
     protected function dropJobsRecords()
     {
-        // clear DB from separate connection
-        $batchJobManager = $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
-        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobInstance')->execute();
-        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobExecution')->execute();
-        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:StepExecution')->execute();
-
         $this->getContainer()
             ->get('doctrine')
             ->getManager()
@@ -89,7 +91,7 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $this->assertCount($count, $expectedJobs);
 
-        $ids = array();
+        $ids = [];
         /** @var ProcessJob $job */
         foreach ($expectedJobs as $job) {
             $ids[] = $job->getId();
@@ -146,10 +148,10 @@ class ProcessJobRepositoryTest extends WebTestCase
         );
 
         $trigger = $this->entityManager->getRepository('OroWorkflowBundle:ProcessTrigger')
-            ->findOneBy(array('definition' => $definition));
+            ->findOneBy(['definition' => $definition]);
 
         $entity       = $this->getUser();
-        $entityHashes = array();
+        $entityHashes = [];
 
         for ($i = 0; $i < $count; $i++) {
             $processData = new ProcessData();
