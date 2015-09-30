@@ -40,7 +40,7 @@ define([
 
         /** @property */
         simpleTemplate: _.template(
-            '<div class="more-bar-holder"></div>'
+            '<div class="more-bar-holder action-row"></div>'
         ),
 
         /** @property */
