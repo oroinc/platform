@@ -663,16 +663,23 @@ class ConfigManager
      *
      * @return EntityConfigModel
      */
-    public function createConfigEntityModel($className = null, $mode = ConfigModel::MODE_DEFAULT)
+    public function createConfigEntityModel($className = null, $mode = null)
     {
         if (empty($className)) {
-            $entityModel = $this->modelManager->createEntityModel($className, $mode);
+            $entityModel = $this->modelManager->createEntityModel(
+                $className,
+                $mode ?: ConfigModel::MODE_DEFAULT
+            );
         } else {
             $entityModel = $this->modelManager->findEntityModel($className);
             if (null === $entityModel) {
-                $metadata      = $this->getEntityMetadata($className);
-                $newEntityMode = $metadata ? $metadata->mode : $mode;
-                $entityModel   = $this->modelManager->createEntityModel($className, $newEntityMode);
+                $metadata = $this->getEntityMetadata($className);
+                if (!$mode) {
+                    $mode = $metadata && $metadata->mode
+                        ? $metadata->mode
+                        : ConfigModel::MODE_DEFAULT;
+                }
+                $entityModel = $this->modelManager->createEntityModel($className, $mode);
                 foreach ($this->providers as $scope => $provider) {
                     $configKey = $scope . '.' . $className;
                     $config    = new Config(
@@ -681,13 +688,20 @@ class ConfigManager
                     );
                     $this->mergeConfigValues($config, $configKey);
 
-                    // local cache
+                    // put a config to a local cache
                     $this->cache->saveConfig($config, true);
-                    $this->cache->saveConfigurable(true, $className, null, true);
                     // for calculate change set
                     if (!isset($this->originalValues[$configKey])) {
                         $this->originalValues[$configKey] = $config->getValues();
                     }
+                }
+                // put "configurable" flag to a local cache
+                $this->cache->saveConfigurable(true, $className, null, true);
+                // if needed, update the list of entities in a local cache
+                $entities = $this->cache->getEntities(true);
+                if (null !== $entities && !isset($entities[$className])) {
+                    $entities[$className] = $mode === ConfigModel::MODE_HIDDEN;
+                    $this->cache->saveEntities($entities, true);
                 }
 
                 // @todo: Should be removed together with deprecated events
@@ -708,23 +722,24 @@ class ConfigManager
     }
 
     /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param string $mode
+     * @param string      $className
+     * @param string      $fieldName
+     * @param string      $fieldType
+     * @param string|null $mode
      *
      * @return FieldConfigModel
      */
-    public function createConfigFieldModel(
-        $className,
-        $fieldName,
-        $fieldType,
-        $mode = ConfigModel::MODE_DEFAULT
-    ) {
+    public function createConfigFieldModel($className, $fieldName, $fieldType, $mode = null)
+    {
         $fieldModel = $this->modelManager->findFieldModel($className, $fieldName);
         if (null === $fieldModel) {
+            $metadata = $this->getFieldMetadata($className, $fieldName);
+            if (!$mode) {
+                $mode = $metadata && $metadata->mode
+                    ? $metadata->mode
+                    : ConfigModel::MODE_DEFAULT;
+            }
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
-            $metadata   = $this->getFieldMetadata($className, $fieldName);
             foreach ($this->providers as $scope => $provider) {
                 $configKey = $scope . '.' . $className . '.' . $fieldName;
                 $config    = new Config(
@@ -733,13 +748,20 @@ class ConfigManager
                 );
                 $this->mergeConfigValues($config, $configKey);
 
-                // local cache
+                // put a config to a local cache
                 $this->cache->saveConfig($config, true);
-                $this->cache->saveConfigurable(true, $className, $fieldName, true);
                 // for calculate change set
                 if (!isset($this->originalValues[$configKey])) {
                     $this->originalValues[$configKey] = $config->getValues();
                 }
+            }
+            // put "configurable" flag to a local cache
+            $this->cache->saveConfigurable(true, $className, $fieldName, true);
+            // if needed, update the list of fields in a local cache
+            $fields = $this->cache->getFields($className, true);
+            if (null !== $fields && !isset($fields[$fieldName])) {
+                $fields[$fieldName] = ['t' => $fieldType, 'h' => $mode === ConfigModel::MODE_HIDDEN];
+                $this->cache->saveFields($className, $fields, true);
             }
 
             // @todo: Should be removed together with deprecated events
