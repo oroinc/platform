@@ -11,7 +11,6 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -183,7 +182,7 @@ class AttributeGuesser
     public function guessAttributeForm(Attribute $attribute)
     {
         $attributeType = $attribute->getType();
-        if ($attributeType == 'entity') {
+        if ($attributeType === 'entity') {
             list($formType, $formOptions) = $this->getEntityForm($attribute->getOption('class'));
         } elseif (isset($this->formTypeMapping[$attributeType])) {
             $formType = $this->formTypeMapping[$attributeType]['type'];
@@ -331,7 +330,7 @@ class AttributeGuesser
         } elseif ($this->entityConfigProvider->hasConfig($metadata->getName(), $field)) {
             $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
             $fieldType = $entityConfig->getId()->getFieldType();
-            if (!FieldTypeHelper::isRelation($fieldType)) {
+            if (!$metadata->hasAssociation($field)) {
                 return $this->formatResult(
                     $entityConfig->get('label'),
                     $this->doctrineTypeMapping[$fieldType]['type'],
