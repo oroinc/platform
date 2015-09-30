@@ -188,10 +188,12 @@ define(function(require) {
             var modelUpdateData = this.editorComponent.view.getModelUpdateData();
             cell.$el.addClass('loading');
             var ctx = {
+                main: this.main,
                 cell: cell,
                 oldState: _.pick(cell.model.toJSON(), _.keys(modelUpdateData))
             };
             cell.model.set(modelUpdateData);
+            this.main.trigger('content:update');
             if (this.editor.save_api_accessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
@@ -326,6 +328,8 @@ define(function(require) {
                 }, 2000);
             }
             this.cell.model.set(this.oldState);
+            this.main.trigger('content:update');
+
             // @TODO update message
             mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
         }
