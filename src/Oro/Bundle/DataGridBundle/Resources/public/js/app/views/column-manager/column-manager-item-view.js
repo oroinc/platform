@@ -3,7 +3,6 @@ define(function(require) {
 
     var ColumnManagerItemView;
     var $ = require('jquery');
-    var tools = require('oroui/js/tools');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerItemView = BaseView.extend({
