@@ -333,6 +333,14 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN OroEmailBundle:Email e WITH u MEMBER OF e.user_d41b1c4b'
             ],
+            'unidirectional_join_one_to_many_table' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:User', 'u')
+                    ->select(['u.id'])
+                    ->leftJoin('OroEmailBundle:EmailOrigin', 'eo', Join::WITH, 'eo MEMBER OF u.emailOrigins'),
+                'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
+                    . 'LEFT JOIN OroEmailBundle:EmailOrigin eo WITH eo MEMBER OF u.emailOrigins'
+            ],
             'join_many_to_many_table' => [
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
