@@ -11,6 +11,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class BusinessUnitManager
 {
@@ -19,12 +20,16 @@ class BusinessUnitManager
      */
     private $em;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, SecurityFacade $securityFacade)
     {
         $this->em = $em;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -177,8 +182,9 @@ class BusinessUnitManager
      *
      * @return array
      */
-    public function getListBU(Organization $currentOrganization)
+    public function getListBU()
     {
+        $currentOrganization = $this->securityFacade->getOrganization();
         $businessUnitRepository = $this->getBusinessUnitRepo();
         $response = [];
 

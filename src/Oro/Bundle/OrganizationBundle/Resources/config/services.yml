@@ -48,6 +48,7 @@ services:
         class: %oro_organization.business_unit.manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
 
     oro_organization.organization_manager:
         class: %oro_organization.organization.manager.class%

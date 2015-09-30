@@ -55,16 +55,7 @@ define(function(require) {
         initialize: function(options) {
             var self = this;
             if (!self.businessUnit) {
-                $.ajax({
-                    url: routing.generate('oro_business_unit_list'),
-                    success: function(reposne) {
-                        self.businessUnit = reposne;
-                        self._updateCriteriaHint();
-                    },
-                    error: function(jqXHR) {
-                        messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
-                    }
-                });
+                self.businessUnit = this.data;
             }
             ChoiceBusinessUnitFilter.__super__.initialize.apply(this, arguments);
         },

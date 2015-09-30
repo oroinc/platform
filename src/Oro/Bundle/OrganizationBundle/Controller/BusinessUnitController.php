@@ -158,17 +158,6 @@ class BusinessUnitController extends Controller
     }
 
     /**
-     * @Route("/list", name="oro_business_unit_list")
-     */
-    public function listAction()
-    {
-        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
-        $businessUnits = $this->get('oro_organization.business_unit_manager')->getListBU($currentOrganization);
-
-        return new JsonResponse($businessUnits);
-    }
-
-    /**
      * @Route("/widget/users/{id}", name="oro_business_unit_widget_users", requirements={"id"="\d+"})
      * @Template
      * @AclAncestor("oro_user_user_view")

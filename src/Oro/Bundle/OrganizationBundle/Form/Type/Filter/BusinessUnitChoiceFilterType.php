@@ -46,6 +46,7 @@ class BusinessUnitChoiceFilterType extends AbstractType
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
+                'data'=> array()
             )
         )->setRequired(
             array(

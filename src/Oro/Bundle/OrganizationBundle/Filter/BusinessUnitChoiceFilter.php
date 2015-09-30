@@ -48,7 +48,7 @@ class BusinessUnitChoiceFilter extends AbstractFilter
     {
         $metadata = parent::getMetadata();
         $metadata[FilterUtility::TYPE_KEY] = 'choice-business-unit';
-
+        $metadata['data'] = $this->params['options']['data'];
         return $metadata;
     }
 
