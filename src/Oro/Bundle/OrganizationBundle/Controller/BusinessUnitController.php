@@ -160,21 +160,12 @@ class BusinessUnitController extends Controller
     /**
      * @Route("/list", name="oro_business_unit_list")
      */
-    public function listActin()
+    public function listAction()
     {
-        $results = $this->getDoctrine()->getManager()
-            ->getRepository('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')->findAll();
+        $currentOrganization = $this->get('oro_security.security_facade')->getOrganization();
+        $businessUnits = $this->get('oro_organization.business_unit_manager')->getListBU($currentOrganization);
 
-        $response = [];
-        foreach ($results as $result) {
-            $response[] = [
-                'id' => $result->getId(),
-                'name' => $result->getName(),
-                'owner_id' => $result->getOwner() ? $result->getOwner()->getId() : null
-            ];
-        }
-
-        return new JsonResponse($response);
+        return new JsonResponse($businessUnits);
     }
 
     /**

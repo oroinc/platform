@@ -173,6 +173,47 @@ class BusinessUnitManager
     }
 
     /**
+     * @param Organization $currentOrganization
+     *
+     * @return array
+     */
+    public function getListBU(Organization $currentOrganization)
+    {
+        $businessUnitRepository = $this->getBusinessUnitRepo();
+        $response = [];
+
+        $rootBusinessUnits = $businessUnitRepository->getRootBusinessUnits($currentOrganization);
+        foreach ($rootBusinessUnits as $rootBusinessUnit) {
+            if ($currentOrganization->getIsGlobal()) {
+                $name = sprintf(
+                    '%s (%s)',
+                    $rootBusinessUnit->getName(),
+                    $rootBusinessUnit->getOrganization()->getName()
+                );
+            } else {
+                $name = $rootBusinessUnit->getName();
+            }
+
+            $response[] = [
+                'id' => $rootBusinessUnit->getId(),
+                'name' => $name,
+                'owner_id' => $rootBusinessUnit->getOwner() ? $rootBusinessUnit->getOwner()->getId() : null
+            ];
+        }
+
+        $childBusinessUnits = $businessUnitRepository->getChildBusinessUnits($currentOrganization);
+        foreach ($childBusinessUnits as $childBusinessUnit) {
+            $response[] = [
+                'id' => $childBusinessUnit->getId(),
+                'name' => $childBusinessUnit->getName(),
+                'owner_id' => $childBusinessUnit->getOwner() ? $childBusinessUnit->getOwner()->getId() : null
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
      * @param array $children
      *
      * @return array

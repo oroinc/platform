@@ -44,7 +44,7 @@ define(function(require) {
 
         emptyValue: {
             type: 1,
-            value: ''
+            value: 'All'
         },
 
         /**
@@ -289,7 +289,9 @@ define(function(require) {
 
                 template += '<li>' +
                 '<label for="business-unit-' + value.value.id + '" class="' + classSearchResult + '">' +
-                    '<input id="business-unit-' + value.value.id + '" value="' + value.value.id + '" type="checkbox" ' + classSelected + '>' +
+                    '<input id="business-unit-' + value.value.id + '" ' +
+                            'value="' + value.value.id + '" ' +
+                            'type="checkbox" ' + classSelected + '>' +
                     value.value.name +
                 '</label>';
                 if (value.children.length > 0) {
@@ -332,19 +334,25 @@ define(function(require) {
             });
 
             values = values.join(',');
-            this.setValue({value: values});
+            this.setValue({value: values}, true);
         },
 
         /**
-         * Set raw value to filter
-         *
-         * @param value
-         * @return {*}
-         */
-        setValue: function(value) {
-            this.value = tools.deepClone(value);
-            this._updateDOMValue();
-
+        * Set raw value to filter
+        *
+        * @param value
+        * @param skipRefresh
+        * @return {*}
+        */
+        setValue: function(value, skipRefresh) {
+            if (!tools.isEqualsLoosely(this.value, value)) {
+                var oldValue = this.value;
+                this.value = tools.deepClone(value);
+                this._updateDOMValue();
+                if (!skipRefresh) {
+                    this._onValueUpdated(this.value, oldValue);
+                }
+            }
             return this;
         },
 
@@ -381,9 +389,13 @@ define(function(require) {
             var values = value.value.split(',');
             var label = [];
             for (var i in values) {
-                for (var j in self.businessUnit) {
-                    if (values[i] == this.businessUnit[j].id) {
-                        label.push(this.businessUnit[j].name);
+                if (values[i] === 'All') {
+                    label.push(values[i]);
+                } else {
+                    for (var j in self.businessUnit) {
+                        if (values[i] == this.businessUnit[j].id) {
+                            label.push(this.businessUnit[j].name);
+                        }
                     }
                 }
             }
