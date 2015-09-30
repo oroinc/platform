@@ -120,7 +120,7 @@ define(function(require) {
                 value.result = false;
             });
 
-            if (searchQuery) {
+            if (searchQuery && searchQuery !== '') {
                 response = this.searchItems(searchQuery, businessUnit);
                 response = this._calculateChain(response, businessUnit);
                 chain = this._prepareItems(response, businessUnit);
@@ -148,16 +148,8 @@ define(function(require) {
 
         _getSelectedItems: function(businessUnit) {
             var temp = [];
-            var values;// = this.getValue();
-
-            values = [];
-
-            var checked = this.$el.find('input:checked');
-            $.each(checked, function(key, value) {
-                values.push($(value).val());
-            });
-
-            //var values = value.value.split(',');
+            var values;
+            values = this.getValue().value.split(',');
 
             _.each(values, function(value) {
                 _.each(businessUnit, function(unit) {

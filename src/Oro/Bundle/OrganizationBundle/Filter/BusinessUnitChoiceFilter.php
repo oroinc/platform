@@ -63,25 +63,26 @@ class BusinessUnitChoiceFilter extends AbstractFilter
         }
 
         $type =  $data['type'];
-        $parameterName = $ds->generateParameterName($this->getName());
+        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
+            $parameterName = $ds->generateParameterName($this->getName());
 
-        $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
-            ->createQueryBuilder('u')
-            ->select('u.id')
-            ->leftJoin('u.businessUnits', 'bu')
-            ->where('bu.id in (:'.$parameterName.')')
-            ->getQuery()
-          ->getDQL();
+            $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
+                ->createQueryBuilder('u')
+                ->select('u.id')
+                ->leftJoin('u.businessUnits', 'bu')
+                ->where('bu.id in (:'.$parameterName.')')
+                ->getQuery()
+              ->getDQL();
 
-        $this->applyFilterToClause(
-            $ds,
-            $this->get(FilterUtility::DATA_NAME_KEY) . ' in ('.$qb2.')'
-        );
+            $this->applyFilterToClause(
+                $ds,
+                $this->get(FilterUtility::DATA_NAME_KEY) . ' in ('.$qb2.')'
+            );
 
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
-            $ds->setParameter($parameterName, $data['value']);
+            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+                $ds->setParameter($parameterName, $data['value']);
+            }
         }
-
         return true;
     }
 
