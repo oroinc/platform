@@ -3,9 +3,7 @@ define(function(require) {
     'use strict';
 
     /**
-     * Abstraction of api access point
-     *
-     * Useful for parsing configuration that needs to be transformed into server request
+     * Abstraction of api access point. This class is designed to create from server configuration.
      *
      * @class
      * @augment StdClass

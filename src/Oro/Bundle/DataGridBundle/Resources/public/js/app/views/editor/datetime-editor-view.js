@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var DateEditorView;
+    var DatetimeEditorView;
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
@@ -10,7 +10,7 @@ define(function(require) {
     var TextEditorView = require('./text-editor-view');
     var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DateEditorView = TextEditorView.extend({
+    DatetimeEditorView = TextEditorView.extend({
         className: 'datetime-editor',
         inputType: 'hidden',
 
@@ -42,8 +42,47 @@ define(function(require) {
          * @inheritDoc
          */
         render: function() {
-            DateEditorView.__super__.render.call(this);
+            DatetimeEditorView.__super__.render.call(this);
             this.view = new DatetimepickerView(this.getViewOptions());
+            // fix enter behaviour
+            var events = {};
+            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
+            this.$('.hasDatepicker').on(events);
+            // fix esc behaviour
+            events = {};
+            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEscapeKeydown, this);
+            this.$('.hasDatepicker').on(events);
+        },
+
+        onInternalEnterKeydown: function(e) {
+            if (e.keyCode === this.ENTER_KEY_CODE) {
+                // there is no other way to get if datepicker is visible
+                if ($('#ui-datepicker-div').is(':visible')) {
+                    this.$('.hasDatepicker').datepicker('hide');
+                } else {
+                    DatetimeEditorView.__super__.onInternalEnterKeydown.apply(this, arguments);
+                }
+            }
+        },
+
+        onInternalEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                // there is no other way to get if datepicker is visible
+                if ($('#ui-datepicker-div').is(':visible')) {
+                    this.$('.hasDatepicker').datepicker('hide');
+                } else {
+                    DatetimeEditorView.__super__.onInternalEscapeKeydown.apply(this, arguments);
+                }
+            }
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            this.$('.hasDatepicker').off(this.eventNamespace());
+            this.view.dispose();
+            DatetimeEditorView.__super__.dispose.call(this);
         },
 
         getViewOptions: function() {
@@ -111,5 +150,5 @@ define(function(require) {
         }
     });
 
-    return DateEditorView;
+    return DatetimeEditorView;
 });

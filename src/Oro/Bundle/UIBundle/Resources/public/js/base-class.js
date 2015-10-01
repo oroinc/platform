@@ -16,7 +16,12 @@ define(function(require) {
         this.initialize.apply(this, arguments);
     };
 
-    BaseClass.prototype = {};
+    BaseClass.prototype = {
+        dispose: function() {
+            this.stopListening();
+            delete this._events;
+        }
+    };
 
     _.extend(BaseClass.prototype, Backbone.Events);
 

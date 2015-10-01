@@ -33,6 +33,45 @@ define(function(require) {
         render: function() {
             DateEditorView.__super__.render.call(this);
             this.view = new DatepickerView(this.getViewOptions());
+            // fix enter behaviour
+            var events = {};
+            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
+            this.$('.hasDatepicker').on(events);
+            // fix esc behaviour
+            events = {};
+            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEscapeKeydown, this);
+            this.$('.hasDatepicker').on(events);
+        },
+
+        onInternalEnterKeydown: function(e) {
+            if (e.keyCode === this.ENTER_KEY_CODE) {
+                // there is no other way to get if datepicker is visible
+                if ($('#ui-datepicker-div').is(':visible')) {
+                    this.$('.hasDatepicker').datepicker('hide');
+                } else {
+                    DateEditorView.__super__.onInternalEnterKeydown.apply(this, arguments);
+                }
+            }
+        },
+
+        onInternalEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                // there is no other way to get if datepicker is visible
+                if ($('#ui-datepicker-div').is(':visible')) {
+                    this.$('.hasDatepicker').datepicker('hide');
+                } else {
+                    DateEditorView.__super__.onInternalEscapeKeydown.apply(this, arguments);
+                }
+            }
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            this.$('.hasDatepicker').off(this.eventNamespace());
+            this.view.dispose();
+            DateEditorView.__super__.dispose.call(this);
         },
 
         getViewOptions: function() {

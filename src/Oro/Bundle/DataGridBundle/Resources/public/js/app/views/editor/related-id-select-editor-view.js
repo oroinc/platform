@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var OptionSetEditorView;
+    var RelatedIdSelectEditorView;
     var SelectEditorView = require('./select-editor-view');
     require('jquery.select2');
 
-    OptionSetEditorView = SelectEditorView.extend({
+    RelatedIdSelectEditorView = SelectEditorView.extend({
 
         initialize: function(options) {
             if (options.id_field_name) {
@@ -13,7 +13,7 @@ define(function(require) {
             } else {
                 throw new Error('`id_field_name` option is required');
             }
-            OptionSetEditorView.__super__.initialize.apply(this, arguments);
+            RelatedIdSelectEditorView.__super__.initialize.apply(this, arguments);
         },
 
         getAvailableOptions: function(options) {
@@ -65,5 +65,5 @@ define(function(require) {
         }
     });
 
-    return OptionSetEditorView;
+    return RelatedIdSelectEditorView;
 });

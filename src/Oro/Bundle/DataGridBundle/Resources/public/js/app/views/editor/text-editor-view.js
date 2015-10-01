@@ -115,34 +115,55 @@ define(function(require) {
         onKeyDown: function(e) {
             switch (e.keyCode) {
                 case this.TAB_KEY_CODE:
-                    var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
-                    if (this.isChanged()) {
-                        if (this.validator.form()) {
-                            this.trigger('save' + postfix + 'Action');
-                        } else {
-                            this.focus();
-                        }
-                    } else {
-                        this.trigger('cancel' + postfix + 'Action');
-                    }
-                    e.preventDefault();
+                    this.onInternalTabKeydown(e);
                     break;
                 case this.ENTER_KEY_CODE:
-                    if (this.isChanged()) {
-                        if (this.validator.form()) {
-                            this.trigger('saveAction');
-                        } else {
-                            this.focus();
-                        }
-                    } else {
-                        this.trigger('cancelAction');
-                    }
-                    e.preventDefault();
+                    this.onInternalEnterKeydown(e);
                     break;
                 case this.ESCAPE_KEY_CODE:
-                    this.trigger('cancelAction');
-                    e.preventDefault();
+                    this.onInternalEscapeKeydown(e);
                     break;
+            }
+        },
+
+        onInternalEnterKeydown: function(e) {
+            if (e.keyCode === this.ENTER_KEY_CODE) {
+                if (this.isChanged()) {
+                    if (this.validator.form()) {
+                        this.trigger('saveAction');
+                    } else {
+                        this.focus();
+                    }
+                } else {
+                    this.trigger('cancelAction');
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        },
+
+        onInternalTabKeydown: function(e) {
+            if (e.keyCode === this.TAB_KEY_CODE) {
+                var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
+                if (this.isChanged()) {
+                    if (this.validator.form()) {
+                        this.trigger('save' + postfix + 'Action');
+                    } else {
+                        this.focus();
+                    }
+                } else {
+                    this.trigger('cancel' + postfix + 'Action');
+                }
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
+        },
+
+        onInternalEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                this.trigger('cancelAction');
+                e.stopImmediatePropagation();
+                e.preventDefault();
             }
         },
 
