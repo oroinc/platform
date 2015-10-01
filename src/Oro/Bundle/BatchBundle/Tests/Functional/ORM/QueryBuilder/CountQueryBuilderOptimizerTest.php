@@ -361,6 +361,17 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                 'expectedDQL' => 'SELECT u.id FROM OroUserBundle:User u '
                     . 'LEFT JOIN u.businessUnits b'
             ],
+            'join_many_to_many_depends_on_one_to_one' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->select(['e.id'])
+                    ->from('OroNotificationBundle:EmailNotification', 'e')
+                    ->leftJoin('e.recipientList', 'recipientList')
+                    ->leftJoin('recipientList.users', 'recipientUsersList')
+                ,
+                'expectedDQL' => 'SELECT e.id FROM OroNotificationBundle:EmailNotification e '
+                    . 'LEFT JOIN e.recipientList recipientList '
+                    . 'LEFT JOIN recipientList.users recipientUsersList'
+            ],
         ];
     }
 
