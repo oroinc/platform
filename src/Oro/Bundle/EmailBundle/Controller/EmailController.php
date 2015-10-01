@@ -435,11 +435,9 @@ class EmailController extends Controller
      */
     public function toggleSeenAction(EmailUser $emailUser)
     {
-        if ($emailUser) {
-            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-        }
+        $this->getEmailManager()->toggleEmailUserSeen($emailUser);
 
-        return new JsonResponse(['successful' => (bool)$emailUser]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**
