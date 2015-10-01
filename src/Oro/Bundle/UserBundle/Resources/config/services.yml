@@ -35,6 +35,9 @@ parameters:
 
     oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
 
+    oro_user.entity_manager.user.class:             Oro\Bundle\UserBundle\Entity\Manager\ManagerUser
+
+
 services:
     oro_user.manager:
         class: %oro_user.manager.class%
@@ -296,3 +299,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.users-for-context-grid, method: onBuildAfter }
 
+
+    oro_user.entity_manager.user:
+        class: %oro_user.entity_manager.user.class%
+        arguments:
+            - @doctrine
