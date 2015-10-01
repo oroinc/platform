@@ -163,6 +163,18 @@ class CountQueryBuilderOptimizerTest extends WebTestCase
                     . 'INNER JOIN OroOrganizationBundle:BusinessUnit bu WITH owner.id = bu.id '
                     . 'LEFT JOIN u.owner owner'
             ],
+            'with_mediate_inner_join' => [
+                'queryBuilder' => self::createQueryBuilder($em)
+                    ->from('OroUserBundle:Group', 'g')
+                    ->leftJoin('g.owner', 'bu')
+                    ->innerJoin('bu.organization', 'o')
+                    ->leftJoin('o.users', 'u')
+                    ->select(['g.id']),
+                'expectedDQL' => 'SELECT g.id FROM OroUserBundle:Group g '
+                    . 'LEFT JOIN g.owner bu '
+                    . 'INNER JOIN bu.organization o '
+                    . 'LEFT JOIN o.users u'
+            ],
             'inner_with_2_left_group' => [
                 'queryBuilder' => self::createQueryBuilder($em)
                     ->from('OroUserBundle:User', 'u')
