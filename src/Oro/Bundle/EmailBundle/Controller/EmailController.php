@@ -60,7 +60,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->getEmailManager()->setSeenStatus($entity);
+        $this->getEmailManager()->setEmailSeen($entity, true);
 
         return [
             'entity' => $entity,
@@ -121,7 +121,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->getEmailManager()->setSeenStatus($entity, true);
+        $this->getEmailManager()->setEmailSeen($entity, true, true);
 
         return ['entity' => $entity];
     }
@@ -459,18 +459,11 @@ class EmailController extends Controller
      *
      * @return JsonResponse
      */
-    public function markSeenAction(Email $email, $status, $checkThread = true)
+    public function markSeenAction(Email $email, $status, $checkThread)
     {
-        if ($email) {
-            $checkThread = (bool) $checkThread;
-            if ((bool) $status) {
-                $this->getEmailManager()->setSeenStatus($email, $checkThread);
-            } else {
-                $this->getEmailManager()->setUnseenStatus($email, $checkThread);
-            }
-        }
+        $this->getEmailManager()->setEmailSeen($email, (bool) $status, (bool) $checkThread);
 
-        return new JsonResponse(['successful' => (bool) $email]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**

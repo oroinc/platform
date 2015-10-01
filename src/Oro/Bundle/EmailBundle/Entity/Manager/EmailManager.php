@@ -76,37 +76,26 @@ class EmailManager
     }
 
     /**
+     * Set email seen
+     *
      * @param Email $entity
-     * @param bool $checkThread Set statuses for threaded emails
+     * @param bool  $value       - Seen value
+     * @param bool  $checkThread - Set statuses for threaded emails
      */
-    public function setSeenStatus(Email $entity, $checkThread = false)
+    public function setEmailSeen(Email $entity, $value = true, $checkThread = false)
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
             $emailUsers = $this->getCurrentEmailUser($email);
             if ($emailUsers) {
                 foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, true, true);
+                    $this->setEmailUserSeen($emailUser, $value);
+                    $this->em->persist($emailUser);
                 }
             }
         }
-    }
 
-    /**
-     * @param Email $entity
-     * @param bool $checkThread Set statuses for threaded emails
-     */
-    public function setUnseenStatus(Email $entity, $checkThread = false)
-    {
-        $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
-        foreach ($emails as $email) {
-            $emailUsers = $this->getCurrentEmailUser($email);
-            if ($emailUsers) {
-                foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, false, true);
-                }
-            }
-        }
+        $this->em->flush();
     }
 
     /**
