@@ -13,7 +13,7 @@
         <%= !enabled ? " disabled" : "" %>
         <% if (links) { %> dropdown-toggle<% } %>
     "
-    <%= attributesTemplate(attributes) %>
+    <% attributesTemplate(attributes) %>
     title="<%= title %>"
     <% if (links) { %> data-toggle="dropdown"<% } %>>
     <% if (icon) { %>
@@ -29,7 +29,7 @@
     <ul class="dropdown-menu">
     <% _.each(links, function(item) { %>
         <li><a href="<%= link %>" title="<%= item.label %>"
-            <% if (item.attributes) { %> <%= attributesTemplate(item.attributes) %><% } %>
+            <% if (item.attributes) { attributesTemplate(item.attributes); } %>
             data-key="<%= item.key %>">
         <% if (item.icon) { %>
             <i class="icon-<%= item.icon %> hide-text"><%= item.label %></i>
