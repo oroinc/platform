@@ -191,8 +191,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * Adds filter parameters to data
          *
          * @param {Object} data
-         * @param {Object} state
-         * @param {String} prefix
+         * @param {Object=} state
+         * @param {string=} prefix
          * @return {Object}
          */
         processFiltersParams: function(data, state, prefix) {
@@ -210,6 +210,30 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     this.generateParameterStrings(state.filters, prefix)
                 );
             }
+            return data;
+        },
+
+        /**
+         * Adds columns parameters to data
+         *
+         * @param {Object} data
+         * @param {Object=} state
+         * @param {string=} prefix
+         * @return {Object}
+         */
+        processColumnsParams: function(data, state, prefix) {
+            if (!state) {
+                state = this.state;
+            }
+
+            if (!prefix) {
+                prefix = this.inputName + '[_columns]';
+            }
+
+            var columnsData = {};
+            columnsData[prefix] = this._packColumnsStateData(state.columns);
+            _.extend(data, columnsData);
+
             return data;
         },
 
@@ -539,6 +563,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             var state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
+            data = this.processColumnsParams(data, state);
 
             return data;
         },
