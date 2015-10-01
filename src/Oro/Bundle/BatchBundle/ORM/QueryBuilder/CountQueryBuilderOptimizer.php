@@ -136,11 +136,11 @@ class CountQueryBuilderOptimizer
         $requiredToJoin = array_merge($requiredToJoin, $this->qbTools->getUsedTableAliases($parts['having']));
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->qbTools->getUsedJoinAliases($parts['join'], $requiredToJoin, $this->rootAlias)
+            $this->getNonSymmetricJoinAliases($parts['from'], $parts['join'], $groupByAliases)
         );
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->getNonSymmetricJoinAliases($parts['from'], $parts['join'], $groupByAliases)
+            $this->qbTools->getUsedJoinAliases($parts['join'], $requiredToJoin, $this->rootAlias)
         );
 
         $requiredToJoin = array_diff(array_unique($requiredToJoin), [$this->rootAlias]);
