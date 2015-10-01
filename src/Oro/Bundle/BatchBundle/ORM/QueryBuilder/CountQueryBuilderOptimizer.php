@@ -459,19 +459,22 @@ class CountQueryBuilderOptimizer
         $expr = $aliasToJoinExpr[$alias];
 
         $exprParts = explode('.', $expr);
-        while (count($exprParts) === 2) {
+        if (count($exprParts) === 2) {
             list($exprAlias, $exprAssocName) = $exprParts;
 
+            $expr = $aliasToJoinExpr[$exprAlias];
+            if (count(explode('.', $expr)) === 2) {
+                $expr = $this->resolveEntityClassByAlias($exprAlias, $exprAssocName, $aliasToJoinExpr);
+            }
+
             $associationMapping = $this
-                ->getClassMetadata($aliasToJoinExpr[$exprAlias])
+                ->getClassMetadata($expr)
                 ->getAssociationMapping($exprAssocName);
 
-            $sourceClass = $associationMapping['sourceEntity'];
-            $expr        = $this->getClassMetadata($sourceClass)->hasAssociation($associationName)
-                ? $sourceClass
-                : $associationMapping['targetEntity'];
-
-            $exprParts = explode('.', $expr);
+            $expr = $associationMapping['sourceEntity'];
+            if (!$this->getClassMetadata($expr)->hasAssociation($associationName)) {
+                $expr = $associationMapping['targetEntity'];
+            }
         }
 
         return $expr;
