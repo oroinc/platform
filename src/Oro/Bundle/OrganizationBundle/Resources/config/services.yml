@@ -33,6 +33,8 @@ parameters:
 
     oro_organization.orm.validator.oranization_unique.class:   Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
 
+    oro_user.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+
 services:
     #
     # Business Unit API
@@ -189,3 +191,12 @@ services:
             - @oro_entity.doctrine_helper
         tags:
               - { name: validator.constraint_validator, alias: organization_unique }
+
+    oro_organization.autocomplete.business_unit.search_handler:
+        class: %oro_user.autocomplete.business_unit.search_handler.class%
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_organization.business_unit.entity.class%
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }
