@@ -175,4 +175,30 @@ class ColumnsHelper
 
         return $iteration;
     }
+
+    /**
+     * Reorder columns array by order for export
+     *
+     * @param array  $columns
+     * @param string $columnsParams
+     *
+     * @return array
+     */
+    public function reorderColumns($columns, $columnsParams)
+    {
+        if ($columnsParams) {
+            $columns = $this->prepareColumnsParam($columns, $columnsParams);
+            $orders = [];
+            foreach ($columns as $column) {
+                if (isset($column['order'])) {
+                    $orders[] = $column['order'];
+                } else {
+                    $orders[] = 0;
+                }
+            }
+            array_multisort($orders, $columns);
+        }
+
+        return $columns;
+    }
 }

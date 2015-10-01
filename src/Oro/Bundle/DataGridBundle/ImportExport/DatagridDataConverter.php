@@ -10,6 +10,8 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
@@ -32,6 +34,11 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $numberFormatter;
 
     /**
+     * @var ColumnsHelper
+     */
+    protected $columnsHelper;
+
+    /**
      * @var DateTimeFormatter
      */
     protected $dateTimeFormatter;
@@ -47,17 +54,20 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * @param TranslatorInterface $translator
      * @param NumberFormatter     $numberFormatter
      * @param DateTimeFormatter   $dateTimeFormatter
+     * @param ColumnsHelper       $columnsHelper
      */
     public function __construct(
         ServiceLink $gridManagerLink,
         TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatter $dateTimeFormatter,
+        ColumnsHelper $columnsHelper
     ) {
         $this->gridManagerLink   = $gridManagerLink;
         $this->translator        = $translator;
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->columnsHelper     = $columnsHelper;
     }
 
     /**
@@ -75,6 +85,14 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
             );
+        }
+
+        if ($this->context->hasOption('gridParameters')) {
+            $gridParams = $this->context->getOption('gridParameters');
+            if ($gridParams->has(ColumnsExtension::COLUMNS_PARAM)) {
+                $columnsParams = $gridParams->get(ColumnsExtension::COLUMNS_PARAM);
+                $columns = $this->columnsHelper->reorderColumns($columns, $columnsParams);
+            }
         }
 
         $result = array();

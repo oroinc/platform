@@ -21,10 +21,11 @@ class ColumnsExtension extends AbstractExtension
     /**
      * Query param
      */
-    const COLUMNS_PATH = 'columns';
-    const ORDER_FIELD_NAME = 'order';
-    const RENDER_FIELD_NAME = 'renderable';
+    const COLUMNS_PATH           = 'columns';
+    const ORDER_FIELD_NAME       = 'order';
+    const RENDER_FIELD_NAME      = 'renderable';
     const MINIFIED_COLUMNS_PARAM = 'c';
+    const COLUMNS_PARAM          = '_columns';
 
     /** @var Registry */
     protected $registry;
