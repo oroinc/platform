@@ -445,25 +445,32 @@ class EmailController extends Controller
     /**
      * Mark email as seen for user
      *
-     * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @Route(
+     *      "/mark-seen/{id}/{status}/{checkThread}",
+     *      name="oro_email_mark_seen",
+     *      requirements={"id"="\d+", "status"="\d+"},
+     *      defaults={"checkThread"=true}
+     * )
      * @AclAncestor("oro_email_email_user_edit")
      *
      * @param Email $email
      * @param string $status
+     * @param bool $checkThread if false it will be applied for single email instead of thread
      *
      * @return JsonResponse
      */
-    public function markSeenAction(Email $email, $status)
+    public function markSeenAction(Email $email, $status, $checkThread = true)
     {
         if ($email) {
-            if ((bool)$status) {
-                $this->getEmailManager()->setSeenStatus($email, true);
+            $checkThread = (bool) $checkThread;
+            if ((bool) $status) {
+                $this->getEmailManager()->setSeenStatus($email, $checkThread);
             } else {
-                $this->getEmailManager()->setUnseenStatus($email, true);
+                $this->getEmailManager()->setUnseenStatus($email, $checkThread);
             }
         }
 
-        return new JsonResponse(['successful' => (bool)$email]);
+        return new JsonResponse(['successful' => (bool) $email]);
     }
 
     /**
