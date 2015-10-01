@@ -231,6 +231,9 @@ services:
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDecimal']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDatetime']]
             - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\PageState']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\JobExecution']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\StepExecution']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\JobInstance']]
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
