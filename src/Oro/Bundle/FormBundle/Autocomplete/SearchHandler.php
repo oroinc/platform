@@ -178,9 +178,25 @@ class SearchHandler implements SearchHandlerInterface
         $entityIds = $this->searchIds($search, $firstResult, $maxResults);
 
         $resultEntities = [];
-
         if ($entityIds) {
-            $resultEntities = $this->getEntitiesByIds($entityIds);
+            $unsortedEntities = $this->getEntitiesByIds($entityIds);
+
+            /**
+             * We need to sort entities in the same order given by method searchIds.
+             *
+             * @todo Should be not necessary after implementation of BAP-5691.
+             */
+            $entityByIdHash = [];
+
+            foreach ($unsortedEntities as $entity) {
+                $entityByIdHash[$this->getPropertyValue($this->idFieldName, $entity)] = $entity;
+            }
+
+            foreach ($entityIds as $entityId) {
+                if (isset($entityByIdHash[$entityId])) {
+                    $resultEntities[] = $entityByIdHash[$entityId];
+                }
+            }
         }
 
         return $resultEntities;
