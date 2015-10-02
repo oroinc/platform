@@ -146,14 +146,29 @@ class AclRoleHandler
      */
     public function createForm(AbstractRole $role)
     {
+        $this->loadPrivilegeConfigPermissions();
+
+        $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
+
+        return $this->form;
+    }
+
+    /**
+     * @param bool $ignoreShare
+     */
+    protected function loadPrivilegeConfigPermissions($ignoreShare = false)
+    {
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
                 = $this->privilegeRepository->getPermissionNames($config['types']);
         }
 
-        $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
-
-        return $this->form;
+        //TODO: Removing 'SHARE' from config. Remove this code after sharing is implemented.
+        if ($ignoreShare && isset($this->privilegeConfig['entity']['permissions']) &&
+            in_array('SHARE', $this->privilegeConfig['entity']['permissions'], true)
+        ) {
+            array_pop($this->privilegeConfig['entity']['permissions']);
+        }
     }
 
     /**
@@ -214,22 +229,36 @@ class AclRoleHandler
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
-            if ($config['fix_values'] || !$config['show_default']) {
-                foreach ($sortedPrivileges as $sortedPrivilege) {
-                    if (!$config['show_default']
-                        && $sortedPrivilege->getIdentity()->getName() == AclPrivilegeRepository::ROOT_PRIVILEGE_NAME) {
-                        $sortedPrivileges->removeElement($sortedPrivilege);
-                        continue;
-                    }
-                    if ($config['fix_values']) {
-                        foreach ($sortedPrivilege->getPermissions() as $permission) {
-                            $permission->setAccessLevel((bool)$permission->getAccessLevel());
-                        }
+            $this->applyOptions($sortedPrivileges, $config);
+
+            $this->form->get($fieldName)->setData($sortedPrivileges);
+        }
+    }
+
+    /**
+     * @param ArrayCollection|AclPrivilege[] $sortedPrivileges
+     * @param array $config
+     */
+    protected function applyOptions(ArrayCollection $sortedPrivileges, array $config)
+    {
+        $hideDefault = !$config['show_default'];
+        $fixValues = $config['fix_values'];
+
+        if ($fixValues || $hideDefault) {
+            foreach ($sortedPrivileges as $sortedPrivilege) {
+                if ($hideDefault
+                    && $sortedPrivilege->getIdentity()->getName() === AclPrivilegeRepository::ROOT_PRIVILEGE_NAME
+                ) {
+                    $sortedPrivileges->removeElement($sortedPrivilege);
+                    continue;
+                }
+
+                if ($fixValues) {
+                    foreach ($sortedPrivilege->getPermissions() as $permission) {
+                        $permission->setAccessLevel((bool)$permission->getAccessLevel());
                     }
                 }
             }
-
-            $this->form->get($fieldName)->setData($sortedPrivileges);
         }
     }
 
