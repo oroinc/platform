@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block oro_acl_label_widget %}
-    <strong>{{ value|trans }}</strong>
+    <strong class="{{ form.parent.parent.parent.vars.name }}-identity-label">{{ value|trans }}</strong>
     {% set type = type|default('hidden') %}
     {{ block('form_widget_simple') }}
 {% endblock %}
