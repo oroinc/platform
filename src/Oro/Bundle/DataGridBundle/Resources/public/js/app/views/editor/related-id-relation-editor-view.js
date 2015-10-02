@@ -3,8 +3,8 @@ define(function(require) {
 
     var RelatedIdRelationEditorView;
     var SelectEditorView = require('./select-editor-view');
-    var AutocompleteApiAccessor = require('oroui/js/tools/autocomplete-api-accessor');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     require('jquery.select2');
 
     RelatedIdRelationEditorView = SelectEditorView.extend({
@@ -19,12 +19,9 @@ define(function(require) {
                 throw new Error('`id_field_name` option is required');
             }
 
-            this.textFieldName = options.text_field_name;
-            this.autocompleteApiAccessor = new AutocompleteApiAccessor(
-                options.column.get('metadata').inline_editing.autocomplete_api_accessor);
-
-            this.idProperty = options.id_property || this.DEFAULT_ID_PROPERTY;
-            this.textProperty = options.text_property || this.DEFAULT_TEXT_PROPERTY;
+            var apiSpec = options.column.get('metadata').inline_editing.autocomplete_api_accessor;
+            var AutocompleteApiAccessor = apiSpec['class'];
+            this.autocompleteApiAccessor = new AutocompleteApiAccessor(apiSpec);
             this.perPage = options.per_page || this.DEFAULT_PER_PAGE;
             if (options.input_delay) {
                 this.input_delay = options.input_delay;
@@ -40,14 +37,13 @@ define(function(require) {
         getInitialResultItem: function() {
             return {
                 id: this.getModelValue(),
-                text: this.model.get(this.column.get('name'))
+                label: this.model.get(this.column.get('name'))
             };
         },
 
         addInitialOptionToResultIfNeeded: function(results) {
-            var idProperty = this.idProperty;
             return _.uniq([this.getInitialResultItem()].concat(results), function(item) {
-                return '' + item[idProperty];
+                return item.id;
             });
         },
 
@@ -74,7 +70,7 @@ define(function(require) {
                     if (_this.disposed) {
                         return;
                     }
-                    _this.availableChoices = _this.formatChoices(response.results);
+                    _this.availableChoices = response.results;
                     if (options.term === '') {
                         _this.column.emptyQueryChoices = [].concat(_this.availableChoices);
                         _this.column.emptyQueryMoreChoices = response.more;
@@ -107,6 +103,12 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 noFocus: true,
+                formatSelection: function(item) {
+                    return item.label;
+                },
+                formatResult: function(item) {
+                    return item.label;
+                },
                 initSelection: function(element, callback) {
                     callback(_this.getInitialResultItem());
                 },
@@ -127,24 +129,12 @@ define(function(require) {
             };
         },
 
-        formatChoices: function(data) {
-            var choices = [];
-            for (var i = 0; i < data.length; i++) {
-                var item = data[i];
-                choices.push({
-                    id: item[this.idProperty],
-                    text: item[this.textProperty] || ' ' // that symbol is &nbsp;
-                });
-            }
-            return choices;
-        },
-
         getModelValue: function() {
             return this.model.get(this.idFieldName) || '';
         },
 
         getChoiceLabel: function() {
-            return this.$('.select2-choice').data('select2-data').text;
+            return this.$('.select2-choice').data('select2-data').label;
         },
 
         isChanged: function() {
@@ -163,6 +153,18 @@ define(function(require) {
             var data = this.getServerUpdateData();
             data[this.column.get('name')] = this.getChoiceLabel();
             return data;
+        }
+    }, {
+        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
+        processColumnMetadata: function(columnMetadata) {
+            var apiSpec = columnMetadata.inline_editing.autocomplete_api_accessor;
+            if (!_.isObject(apiSpec)) {
+                throw new Error('`autocomplete_api_accessor` is required option');
+            }
+            if (!apiSpec.class) {
+                apiSpec.class = RelatedIdRelationEditorView.DEFAULT_ACCESSOR_CLASS;
+            }
+            return tools.loadModuleAndReplace(apiSpec, 'class');
         }
     });
 

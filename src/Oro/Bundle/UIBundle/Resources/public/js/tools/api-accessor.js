@@ -22,10 +22,14 @@ define(function(require) {
             'Content-Type': 'application/json'
         },
 
-        DEFAULT_HTTP_METHOD: 'POST',
+        DEFAULT_HTTP_METHOD: 'GET',
 
         formName: void 0,
 
+        /**
+         * @constructor
+         * @param options
+         */
         initialize: function(options) {
             if (!options) {
                 options = {};

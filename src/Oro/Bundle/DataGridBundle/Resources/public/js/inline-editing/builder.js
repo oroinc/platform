@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
     var tools = require('oroui/js/tools');
 
     var gridViewsBuilder = {
@@ -21,33 +22,13 @@ define(function(require) {
                 deferred.resolve();
                 return;
             }
-            var loadMap = this.getLoadMap(options);
-            tools.loadModules(loadMap, function(loaded) {
+            var promises = this.preparePlugin(options)
+                .concat(this.prepareColumns(options));
+
+            $.when.apply($, promises).done(function() {
                 options.gridPromise.done(function(grid) {
-                    options.metadata.inline_editing.default_editors = loaded.default_editors;
-                    options.metadata.inline_editing.cell_editor.component = loaded.cell_editor_component;
-                    options.metadata.inline_editing.save_api_accessor.class = loaded.save_api_accessor_class;
-                    var columnsMeta = options.metadata.columns;
-
-                    for (var i = 0; i < columnsMeta.length; i++) {
-                        var columnMeta = columnsMeta[i];
-                        if (columnMeta.inline_editing && columnMeta.inline_editing.editor) {
-                            if (columnMeta.inline_editing.editor.component) {
-                                columnMeta.inline_editing.editor.component = loaded[columnMeta.name + 'Component'];
-                            }
-                            if (columnMeta.inline_editing.editor.view) {
-                                columnMeta.inline_editing.editor.view = loadMap[columnMeta.name + 'View'];
-                            }
-                        }
-                        if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&
-                            columnMeta.inline_editing.save_api_accessor['class']) {
-                            columnMeta.inline_editing.save_api_accessor['class'] =
-                                loaded[columnMeta.name + 'AccessorClass'];
-                        }
-                    }
-
-                    grid.pluginManager.create(loaded.plugin, options);
-                    grid.pluginManager.enable(loaded.plugin);
+                    grid.pluginManager.create(options.metadata.inline_editing.plugin, options);
+                    grid.pluginManager.enable(options.metadata.inline_editing.plugin);
                     deferred.resolve();
                 });
             });
@@ -68,35 +49,55 @@ define(function(require) {
             };
         },
 
-        getLoadMap: function(options) {
-            var loadMap = {};
-            // plugin
+        preparePlugin: function(options) {
+            var promises = [];
             var mainConfig = {};
             $.extend(true, mainConfig, this.getDefaultOptions(), options.metadata.inline_editing);
             options.metadata.inline_editing = mainConfig;
-            loadMap.plugin = mainConfig.plugin;
-            loadMap.default_editors = mainConfig.default_editors;
-            loadMap.cell_editor_component = mainConfig.cell_editor.component;
-            loadMap.save_api_accessor_class = mainConfig.save_api_accessor['class'];
+            promises.push(tools.loadModuleAndReplace(mainConfig, 'plugin'));
+            promises.push(tools.loadModuleAndReplace(mainConfig, 'default_editors'));
+            promises.push(tools.loadModuleAndReplace(mainConfig.cell_editor, 'component'));
+            promises.push(tools.loadModuleAndReplace(mainConfig.save_api_accessor, 'class'));
+            return promises;
+        },
+
+        prepareColumns: function(options) {
+            var promises = [];
+            // plugin
             // column views and components
             var columnsMeta = options.metadata.columns;
-            for (var i = 0; i < columnsMeta.length; i++) {
-                var columnMeta = columnsMeta[i];
+            _.each(columnsMeta, function(columnMeta) {
                 if (columnMeta.inline_editing && columnMeta.inline_editing.editor) {
-                    if (columnMeta.inline_editing.editor.component) {
-                        loadMap[columnMeta.name + 'Component'] = columnMeta.inline_editing.editor.component;
+                    var editor = columnMeta.inline_editing.editor;
+                    if (editor.component) {
+                        promises.push(tools.loadModule(editor.component)
+                            .then(function(realization) {
+                                editor.component = realization;
+                                if (_.isFunction(realization.processColumnMetadata)) {
+                                    return realization.processColumnMetadata(columnMeta);
+                                }
+                                return realization;
+                            }));
                     }
-                    if (columnMeta.inline_editing.editor.view) {
-                        loadMap[columnMeta.name + 'View'] = columnMeta.inline_editing.editor.view;
+                    if (editor.view) {
+                        promises.push(tools.loadModule(editor.view)
+                            .then(function(realization) {
+                                editor.view = realization;
+                                if (_.isFunction(realization.processColumnMetadata)) {
+                                    return realization.processColumnMetadata(columnMeta);
+                                }
+                                return realization;
+                            }));
                     }
                 }
                 if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&
                     columnMeta.inline_editing.save_api_accessor['class']) {
-                    loadMap[columnMeta.name + 'AccessorClass'] = columnMeta.inline_editing.save_api_accessor['class'];
+                    promises.push(tools.loadModuleAndReplace(columnMeta.inline_editing.save_api_accessor,
+                        'class'));
                 }
-            }
+            });
 
-            return loadMap;
+            return promises;
         }
     };
 
