@@ -124,7 +124,7 @@ class SecurityIndexer
                 $userIds[] = $item->getRecordId();
             } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
                 $buIds[] = $item->getRecordId();
-            } else if ($className === 'Oro\Bundle\OrganizationBundle\Entity\Organization') {
+            } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\Organization') {
                 $orgIds[] = $item->getRecordId();
             }
         }

@@ -44,7 +44,7 @@ class ShareFormatter
             $image = 'avatar-organization-small.png';
             $classLabel = $this->translator->trans('oro.organization.entity_label');
             $details = $classLabel;
-        } else if ($object instanceof BusinessUnit) {
+        } elseif ($object instanceof BusinessUnit) {
             $id = $object->getId();
             $label = $object->getName();
             $image = 'avatar-business-unit-small.png';
@@ -52,7 +52,7 @@ class ShareFormatter
             $details = $classLabel
                 . ' ' . $this->translator->trans('oro.security.datagrid.share_grid_row_details_from')
                 . ' ' . $object->getOrganization()->getName();
-        } else if ($object instanceof User) {
+        } elseif ($object instanceof User) {
             $id = $object->getId();
             $label = $object->getUsername();
             $image = 'avatar-small.png';

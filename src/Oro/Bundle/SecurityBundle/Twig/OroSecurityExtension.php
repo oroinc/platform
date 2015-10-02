@@ -181,9 +181,7 @@ class OroSecurityExtension extends \Twig_Extension
         $sidB = $entryB->getSecurityIdentity();
         if ($sidA instanceof UserSecurityIdentity && $sidB instanceof UserSecurityIdentity) {
             return strcmp($sidA->getUsername(), $sidB->getUsername());
-        } elseif (
-            $sidA instanceof BusinessUnitSecurityIdentity && $sidB instanceof BusinessUnitSecurityIdentity
-        ) {
+        } elseif ($sidA instanceof BusinessUnitSecurityIdentity && $sidB instanceof BusinessUnitSecurityIdentity) {
             $idA = (int) $sidA->getId();
             $idB = (int) $sidB->getId();
 
