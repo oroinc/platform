@@ -47,7 +47,7 @@ class BusinessUnitChoiceFilter extends AbstractFilter
     public function getMetadata()
     {
         $metadata = parent::getMetadata();
-        $metadata[FilterUtility::TYPE_KEY] = 'choice-business-unit';
+        $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
         $metadata['data'] = $this->params['options']['data'];
         return $metadata;
     }
