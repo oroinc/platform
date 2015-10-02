@@ -182,7 +182,7 @@ class BusinessUnitManager
      *
      * @return array
      */
-    public function getListBU()
+    public function getList()
     {
         $currentOrganization = $this->securityFacade->getOrganization();
         $businessUnitRepository = $this->getBusinessUnitRepo();
