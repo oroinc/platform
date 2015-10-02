@@ -14,10 +14,10 @@ define(function(require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
 
-            $(this.select2Selector).on('select2-selecting', function (e) {
+            $(this.select2Selector).on('select2-selecting', function(e) {
                 e.stopPropagation();
                 mediator.trigger('datagrid:shared-datagrid:add:data-from-select2', e.object);
                 $(e.currentTarget).select2('close');

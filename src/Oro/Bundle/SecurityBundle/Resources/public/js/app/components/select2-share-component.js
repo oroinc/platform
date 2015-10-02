@@ -10,17 +10,17 @@ define(function(require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             Select2ShareComponent.__super__.initialize.call(this, options);
 
             this.init();
         },
 
-        init: function () {
+        init: function() {
             this.initView();
         },
 
-        initView: function () {
+        initView: function() {
             this.select2ShareView = new Select2ShareView({});
         }
     });
