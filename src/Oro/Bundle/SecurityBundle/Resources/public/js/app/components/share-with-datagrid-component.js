@@ -17,18 +17,18 @@ define(function(require) {
     ShareWithDatagridComponent = BaseComponent.extend({
         shareWithDatagridView: null,
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
             this.init();
         },
 
-        init: function () {
+        init: function() {
             this.initView();
             this.shareWithDatagridView.render();
             this._bindGridEvent();
         },
 
-        initView: function () {
+        initView: function() {
             this.shareWithDatagridView = new ShareWithDatagridView({
                 items: this.options.items || [],
                 el: this.options._sourceElement,
@@ -41,14 +41,14 @@ define(function(require) {
          * Bind event handlers on grid widget
          * @protected
          */
-        _bindGridEvent: function () {
+        _bindGridEvent: function() {
             var self = this;
             var gridWidgetName = this.options.gridWidgetName;
             if (!gridWidgetName) {
                 return;
             }
 
-            widgetManager.getWidgetInstanceByAlias(gridWidgetName, function (widget) {
+            widgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
                 widget.on('grid-row-select', _.bind(self.onRowSelect, self, widget));
                 widget.on('share-with-datagrid-submitted', _.bind(self.onGridAdd, self, widget));
 
@@ -61,7 +61,7 @@ define(function(require) {
          * @param {} gridWidget
          * @param {} data
          */
-        onRowSelect: function (gridWidget, data) {
+        onRowSelect: function(gridWidget, data) {
             var id = data.model.get('id');
             var dialogWidgetName = this.options.dialogWidgetName;
             var targetClass = this.shareWithDatagridView.currentTargetClass();
@@ -87,7 +87,7 @@ define(function(require) {
             if (!dialogWidgetName) {
                 return;
             }
-            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function (dialogWidget) {
+            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {
                 dialogWidget.remove();
             });
         },
@@ -98,7 +98,7 @@ define(function(require) {
          * @param gridWidget
          * @param data
          */
-        onGridAdd: function (gridWidget, data) {
+        onGridAdd: function(gridWidget, data) {
             var dialogWidgetName = this.options.dialogWidgetName;
             var selected = {};
             var grid = gridWidget.pageComponent(this.shareWithDatagridView.currentGridName()).grid;
@@ -112,7 +112,7 @@ define(function(require) {
             if (!dialogWidgetName) {
                 return;
             }
-            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function (dialogWidget) {
+            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {
                 dialogWidget.remove();
             });
         }

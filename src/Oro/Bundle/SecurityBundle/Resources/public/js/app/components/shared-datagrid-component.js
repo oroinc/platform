@@ -23,15 +23,15 @@ define(function(require) {
             'widget:shared-dialog:apply mediator': 'onShareDialogApply'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
         },
 
-        onFrontMassAction: function (action) {
-            _.each(helper.extractModelsFromGridCollection(action.datagrid), function (model) {
+        onFrontMassAction: function(action) {
+            _.each(helper.extractModelsFromGridCollection(action.datagrid), function(model) {
                 action.datagrid.collection.get(model).trigger('backgrid:select', model, false);
                 action.datagrid.removeRow(model, {silent: true});
-                _.each(action.datagrid.body.rows, function (row) {
+                _.each(action.datagrid.body.rows, function(row) {
                     if (row.model.id === model.id) {
                         row.$el.remove();
                     }
@@ -42,10 +42,10 @@ define(function(require) {
             }
         },
 
-        onFrontAction: function (action) {
+        onFrontAction: function(action) {
             action.datagrid.collection.get(action.model).trigger('backgrid:select', action.model, false);
             action.datagrid.removeRow(action.model, {silent: true});
-            _.each(action.datagrid.body.rows, function (row) {
+            _.each(action.datagrid.body.rows, function(row) {
                 if (row.model.id === action.model.id) {
                     row.$el.remove();
                 }
@@ -55,10 +55,10 @@ define(function(require) {
             }
         },
 
-        onSharedWithDatagridAdd: function (data) {
-            widgetManager.getWidgetInstanceByAlias('shared-dialog', function (widget) {
+        onSharedWithDatagridAdd: function(data) {
+            widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                 var grid = widget.pageComponent('shared-datagrid').grid;
-                _.each(data.models, function (model) {
+                _.each(data.models, function(model) {
                     var id = JSON.stringify({
                         entityId: model.id,
                         entityClass: data.entityClass
@@ -79,8 +79,8 @@ define(function(require) {
             });
         },
 
-        onSelect2Add: function (data) {
-            widgetManager.getWidgetInstanceByAlias('shared-dialog', function (widget) {
+        onSelect2Add: function(data) {
+            widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                 var grid = widget.pageComponent('shared-datagrid').grid;
                 if (grid.collection.where({id: data.id}).length == 0) {
                     var model = {
@@ -97,17 +97,17 @@ define(function(require) {
             });
         },
 
-        onShareDialogApply: function () {
+        onShareDialogApply: function() {
             var self = this;
-            widgetManager.getWidgetInstanceByAlias('shared-dialog', function (widget) {
+            widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                 var grid = widget.pageComponent('shared-datagrid').grid;
 
                 var entitiesParam = [];
-                _.each(grid.collection.models, function (model) {
+                _.each(grid.collection.models, function(model) {
                     entitiesParam.push(model.id)
                 });
-                var finallyFunc = function (e) {
-                    widgetManager.getWidgetInstanceByAlias('shared-dialog', function (widget) {
+                var finallyFunc = function(e) {
+                    widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                         if (e.status === 200) {
                             messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
                         } else {
@@ -128,9 +128,9 @@ define(function(require) {
                         }
                     ) + '&entityClass=' + self.options.entityClass,
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                    data: 'oro_share_form%5BentityClass%5D=' + self.options.entityClass
-                    + '&oro_share_form%5BentityId%5D=' + self.options.entityId
-                    + '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
+                    data: 'oro_share_form%5BentityClass%5D=' + self.options.entityClass +
+                        '&oro_share_form%5BentityId%5D=' + self.options.entityId +
+                        '&oro_share_form%5Bentities%5D=' + encodeURIComponent(entitiesParam.join(';')),
                     wait: true,
                     error: finallyFunc,
                     success: finallyFunc

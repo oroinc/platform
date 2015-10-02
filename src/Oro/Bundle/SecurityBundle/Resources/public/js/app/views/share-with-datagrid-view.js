@@ -100,7 +100,7 @@ define(function(require) {
             if (_.isUndefined(value)) {
                 value = this._currentGridName;
             } else {
-                this._currentGridName= value;
+                this._currentGridName = value;
             }
             return value;
         }
