@@ -8,20 +8,21 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendConfigDumper
 {
-    const ACTION_PRE_UPDATE  = 'preUpdate';
+    const ACTION_PRE_UPDATE = 'preUpdate';
     const ACTION_POST_UPDATE = 'postUpdate';
 
     /** @deprecated Use ExtendHelper::getExtendEntityProxyClassName and ExtendHelper::ENTITY_NAMESPACE instead */
@@ -35,8 +36,8 @@ class ExtendConfigDumper
     /** @var EntityManagerBag */
     protected $entityManagerBag;
 
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
@@ -55,7 +56,7 @@ class ExtendConfigDumper
 
     /**
      * @param EntityManagerBag                $entityManagerBag
-     * @param ConfigProvider                  $configProvider
+     * @param ConfigManager                   $configManager
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param FieldTypeHelper                 $fieldTypeHelper
      * @param EntityGenerator                 $entityGenerator
@@ -63,14 +64,14 @@ class ExtendConfigDumper
      */
     public function __construct(
         EntityManagerBag $entityManagerBag,
-        ConfigProvider $configProvider,
+        ConfigManager $configManager,
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
         $this->entityManagerBag = $entityManagerBag;
-        $this->configProvider   = $configProvider;
+        $this->configManager    = $configManager;
         $this->nameGenerator    = $nameGenerator;
         $this->fieldTypeHelper  = $fieldTypeHelper;
         $this->entityGenerator  = $entityGenerator;
@@ -128,17 +129,18 @@ class ExtendConfigDumper
             }
         }
 
-        $configManager = $this->configProvider->getConfigManager();
+        $configProvider = $this->configManager->getProvider('extend');
+
         $extendConfigs = null === $filter
-            ? $this->configProvider->getConfigs(null, true)
-            : $this->configProvider->filter($filter, null, true);
+            ? $configProvider->getConfigs(null, true)
+            : $configProvider->filter($filter, null, true);
         foreach ($extendConfigs as $extendConfig) {
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
-                    $this->checkSchema($extendConfig, $aliases, $filter);
+                    $this->checkSchema($extendConfig, $configProvider, $aliases, $filter);
                 }
 
-                $this->updateStateValues($extendConfig);
+                $this->updateStateValues($extendConfig, $configProvider);
             }
         }
 
@@ -148,15 +150,15 @@ class ExtendConfigDumper
             }
         }
 
-        $configManager->flush();
+        $this->configManager->flush();
 
         $this->clear();
     }
 
     public function dump()
     {
-        $schemas = [];
-        $extendConfigs = $this->configProvider->getConfigs(null, true);
+        $schemas       = [];
+        $extendConfigs = $this->configManager->getProvider('extend')->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema    = $extendConfig->get('schema');
             $className = $extendConfig->getId()->getClassName();
@@ -192,9 +194,8 @@ class ExtendConfigDumper
             return;
         }
 
-        $configManager = $this->configProvider->getConfigManager();
         $hasChanges    = false;
-        $extendConfigs = $this->configProvider->getConfigs(null, true);
+        $extendConfigs = $this->configManager->getProvider('extend')->getConfigs(null, true);
         foreach ($extendConfigs as $extendConfig) {
             $schema = $extendConfig->get('schema', false, []);
 
@@ -220,14 +221,14 @@ class ExtendConfigDumper
                     if ($hasSchemaChanges) {
                         $hasChanges = true;
                         $extendConfig->set('schema', $schema);
-                        $configManager->persist($extendConfig);
+                        $this->configManager->persist($extendConfig);
                     }
                 }
             }
         }
 
         if ($hasChanges) {
-            $configManager->flush();
+            $this->configManager->flush();
         }
     }
 
@@ -274,6 +275,7 @@ class ExtendConfigDumper
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
+
         return $this->sortedExtensions;
     }
 
@@ -287,7 +289,7 @@ class ExtendConfigDumper
      * @param array           $properties
      * @param array           $doctrine
      */
-    protected function checkFields(
+    protected function checkFieldSchema(
         $entityName,
         ConfigInterface $fieldConfig,
         array &$relationProperties,
@@ -295,11 +297,6 @@ class ExtendConfigDumper
         array &$properties,
         array &$doctrine
     ) {
-        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
-            $fieldConfig->set('is_deleted', true);
-        } else {
-            $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
-        }
         if ($fieldConfig->is('is_extend')) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
@@ -345,11 +342,16 @@ class ExtendConfigDumper
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
      * @param ConfigInterface $extendConfig
+     * @param ConfigProvider  $configProvider
      * @param array|null      $aliases
-     * @param callable|null   $filter       function (ConfigInterface $config) : bool
+     * @param callable|null   $filter function (ConfigInterface $config) : bool
      */
-    protected function checkSchema(ConfigInterface $extendConfig, $aliases, $filter = null)
-    {
+    protected function checkSchema(
+        ConfigInterface $extendConfig,
+        ConfigProvider $configProvider,
+        $aliases,
+        $filter = null
+    ) {
         $className  = $extendConfig->getId()->getClassName();
         $doctrine   = [];
         $entityName = $className;
@@ -385,13 +387,11 @@ class ExtendConfigDumper
         $defaultProperties  = isset($schema['default']) && null !== $filter ? $schema['default'] : [];
         $addRemoveMethods   = isset($schema['addremove']) && null !== $filter ? $schema['addremove'] : [];
 
-        $configManager = $this->configProvider->getConfigManager();
-
         $fieldConfigs = null === $filter
-            ? $this->configProvider->getConfigs($className, true)
-            : $this->configProvider->filter($filter, $className, true);
+            ? $configProvider->getConfigs($className, true)
+            : $configProvider->filter($filter, $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
-            $this->checkFields(
+            $this->checkFieldSchema(
                 $entityName,
                 $fieldConfig,
                 $relationProperties,
@@ -399,8 +399,7 @@ class ExtendConfigDumper
                 $properties,
                 $doctrine
             );
-
-            $configManager->persist($fieldConfig);
+            $this->updateFieldState($fieldConfig);
         }
 
         $relations = $extendConfig->get('relation', false, []);
@@ -412,8 +411,8 @@ class ExtendConfigDumper
             }
 
             $fieldName = $fieldId->getFieldName();
-            $isDeleted = $this->configProvider->hasConfig($fieldId->getClassName(), $fieldName)
-                ? $this->configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
+            $isDeleted = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
+                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
                 : false;
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
@@ -459,39 +458,50 @@ class ExtendConfigDumper
 
         $extendConfig->set('schema', $schema);
 
-        $configManager->persist($extendConfig);
+        $this->configManager->persist($extendConfig);
     }
 
     /**
-     * @param ConfigInterface $extendConfig
-     *
-     * @return bool
+     * @param ConfigInterface $fieldConfig
      */
-    protected function updateStateValues(ConfigInterface $extendConfig)
+    protected function updateFieldState(ConfigInterface $fieldConfig)
     {
-        $className    = $extendConfig->getId()->getClassName();
-        $fieldConfigs = $this->configProvider->getConfigs($className, true);
+        if ($fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
+            $fieldConfig->set('is_deleted', true);
+            $this->configManager->persist($fieldConfig);
+        } elseif (!$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+            $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
+            $this->configManager->persist($fieldConfig);
+        }
+    }
 
-        if ($extendConfig->is('state', ExtendScope::STATE_DELETE)) {
+    /**
+     * @param ConfigInterface $entityConfig
+     * @param ConfigProvider  $configProvider
+     */
+    protected function updateStateValues(ConfigInterface $entityConfig, ConfigProvider $configProvider)
+    {
+        if ($entityConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
-            if (!$extendConfig->is('is_deleted')) {
-                $extendConfig->set('is_deleted', true);
-                $this->configProvider->getConfigManager()->persist($extendConfig);
+            if (!$entityConfig->is('is_deleted')) {
+                $entityConfig->set('is_deleted', true);
+                $this->configManager->persist($entityConfig);
             }
 
             // mark all fields as deleted
+            $fieldConfigs = $configProvider->getConfigs($entityConfig->getId()->getClassName(), true);
             foreach ($fieldConfigs as $fieldConfig) {
                 if (!$fieldConfig->is('is_deleted')) {
                     $fieldConfig->set('is_deleted', true);
-                    $this->configProvider->getConfigManager()->persist($fieldConfig);
+                    $this->configManager->persist($fieldConfig);
                 }
             }
-        } elseif (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+        } elseif (!$entityConfig->is('state', ExtendScope::STATE_ACTIVE)) {
             $hasNotActiveFields = false;
+
+            $fieldConfigs = $configProvider->getConfigs($entityConfig->getId()->getClassName(), true);
             foreach ($fieldConfigs as $fieldConfig) {
-                if (!$fieldConfig->is('state', ExtendScope::STATE_DELETE)
-                    && !$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)
-                ) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {
                     $hasNotActiveFields = true;
                     break;
                 }
@@ -499,8 +509,8 @@ class ExtendConfigDumper
 
             // Set entity state to active if all fields are active or deleted
             if (!$hasNotActiveFields) {
-                $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-                $this->configProvider->getConfigManager()->persist($extendConfig);
+                $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
+                $this->configManager->persist($entityConfig);
             }
         }
     }
