@@ -5,7 +5,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    var FieldsCollection = require('../models/fields-collection');
     var __ = require('orotranslation/js/translator');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
     var GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model');
@@ -129,30 +129,60 @@ define(function(require) {
         },
 
         onBeforeSubmit: function(e) {
-            var unsavedComponents = [];
+            var components;
+            var confirms = [];
+            var toConfirm = [{
+                event: 'find-unsaved-components',
+                title: 'oro.segment.confirm.unsaved_changes.title',
+                content: 'oro.segment.confirm.unsaved_changes.message'
+            }, {
+                event: 'find-invalid-data-components',
+                title: 'oro.segment.confirm.invalid_data.title',
+                content: 'oro.segment.confirm.invalid_data.message'
+            }];
 
-            // please note that event name, looks like method call
-            // 'cause listeners will populate unsavedComponents array
-            this.trigger('find-unsaved-components', unsavedComponents);
+            for (var i = 0; i < toConfirm.length; i++) {
+                // please note that event name, looks like method call
+                // 'cause listeners will populate components array
+                this.trigger(toConfirm[i].event, components = []);
+                if (components.length) {
+                    components = {components: '<b>' + components.join('</b>, <b>') + '</b>'};
+                    confirms.push({
+                        title: __(toConfirm[i].title),
+                        content: __(toConfirm[i].content, components)
+                    });
+                }
+            }
 
-            if (!unsavedComponents.length) {
+            if (!confirms.length) {
                 // Normal exit, form submitted
                 this.trigger('before-submit');
                 return;
             }
 
-            var modal = new DeleteConfirmation({
-                title: __('oro.segment.confirm.unsaved_changes.title'),
-                content: __('oro.segment.confirm.unsaved_changes.message', {components: unsavedComponents.join(', ')}),
-                okCloses: true,
-                okText: __('OK')
-            });
-
-            modal.open(_.bind(function() {
+            var submitForm = _.bind(function() {
                 // let sub-components do cleanup before submit
                 this.trigger('before-submit');
                 this.form.trigger('submit');
-            }, this));
+            }, this);
+
+            function confirmSubmit() {
+                var dialogOptions = confirms.shift();
+                var modal = new DeleteConfirmation(_.extend(dialogOptions, {
+                    okCloses: true,
+                    okText: __('OK')
+                }));
+
+                modal.open(function() {
+                    if (confirms.length) {
+                        confirmSubmit();
+                    } else {
+                        submitForm();
+                    }
+                });
+            }
+
+            confirmSubmit();
 
             // prevent form submitting
             e.preventDefault();
@@ -182,9 +212,7 @@ define(function(require) {
         formatChoice: function(value, template) {
             var data;
             if (value) {
-                try {
-                    data = this.entityFieldsUtil.pathToEntityChain(value);
-                } catch (e) {}
+                data = this.entityFieldsUtil.pathToEntityChain(value);
             }
             return data ? template(data) : value;
         },
@@ -342,7 +370,10 @@ define(function(require) {
             });
 
             // prepare collection for Items Manager
-            var collection = new BaseCollection(this.load('grouping_columns'), {model: GroupingModel});
+            var collection = new FieldsCollection(this.load('grouping_columns'), {
+                model: GroupingModel,
+                entityFieldsUtil: this.entityFieldsUtil
+            });
             this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'grouping_columns');
             });
@@ -361,13 +392,20 @@ define(function(require) {
                 collection: collection
             }));
 
-            this.on('find-unsaved-components', function(unsavedComponents) {
+            this.on('find-unsaved-components', function(components) {
                 if ($editor.itemsManagerEditor('hasChanges')) {
-                    unsavedComponents.push(__('oro.segment.grouping_editor'));
+                    components.push(__('oro.segment.grouping_editor'));
+                }
+            });
+
+            this.on('find-invalid-data-components', function(components) {
+                if (collection.isValid()) {
+                    components.push(__('oro.segment.grouping_editor'));
                 }
             });
 
             this.on('before-submit', function() {
+                collection.purify();
                 $editor.itemsManagerEditor('reset');
             });
 
@@ -377,7 +415,12 @@ define(function(require) {
                 collection: collection,
                 itemTemplate: $(options.itemTemplate).html(),
                 itemRender: function(tmpl, data) {
-                    data.name = self.formatChoice(data.name, template);
+                    try {
+                        data.name = self.formatChoice(data.name, template);
+                    } catch (e) {
+                        data.name = __('oro.querydesigner.field_not_found');
+                        data.deleted = true;
+                    }
                     return tmpl(data);
                 },
                 deleteHandler: function(model, data) {
@@ -425,7 +468,10 @@ define(function(require) {
             });
 
             // prepare collection for Items Manager
-            var collection = new BaseCollection(this.load('columns'), {model: ColumnModel});
+            var collection = new FieldsCollection(this.load('columns'), {
+                model: ColumnModel,
+                entityFieldsUtil: this.entityFieldsUtil
+            });
             this.listenTo(collection, 'add remove sort change', function() {
                 this.save(collection.toJSON(), 'columns');
             });
@@ -475,7 +521,14 @@ define(function(require) {
                 }
             });
 
+            this.on('find-invalid-data-components', function(components) {
+                if (collection.isValid()) {
+                    components.push(__('oro.segment.report_column_editor'));
+                }
+            });
+
             this.on('before-submit', function() {
+                collection.purify();
                 $editor.itemsManagerEditor('reset');
             });
 
@@ -488,7 +541,13 @@ define(function(require) {
                     var itemFunc;
                     var func = data.func;
 
-                    data.name = self.formatChoice(data.name, template);
+                    try {
+                        data.name = self.formatChoice(data.name, template);
+                    } catch (e) {
+                        data.name = __('oro.querydesigner.field_not_found');
+                        data.deleted = true;
+                    }
+
                     if (func && func.name) {
                         item = metadata[func.group_type][func.group_name];
                         if (item) {

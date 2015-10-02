@@ -11,6 +11,9 @@ oro:
             unsaved_changes:
                 title: Unsaved changes
                 message: You have unsaved changes in {{ components }} that will be lost. Proceed anyway?
+            invalid_data:
+                title: Invalid data
+                message: You have invalid data in {{ components }} that will be lost. Proceed anyway?
         report_column_editor: the Report Column Editor
         grouping_editor: the Grouping Editor
 
