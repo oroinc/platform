@@ -234,30 +234,28 @@ class ConfigProvider implements ConfigProviderInterface
     public function getClassName($object)
     {
         if (is_string($object)) {
-            $className = ClassUtils::getRealClass($object);
-        } elseif (is_object($object)) {
+            return ClassUtils::getRealClass($object);
+        }
+
+        if (is_object($object)) {
             if ($object instanceof PersistentCollection) {
-                $className = $object->getTypeClass()->getName();
-            } else {
-                $className = ClassUtils::getClass($object);
+                return $object->getTypeClass()->getName();
             }
-        } elseif (is_array($object) && count($object) && is_object(reset($object))) {
-            $className = ClassUtils::getClass(reset($object));
-        } else {
-            $className = $object;
+
+            return ClassUtils::getClass($object);
         }
 
-        if (!is_string($className)) {
-            throw new RuntimeException(
-                sprintf(
-                    'ConfigProvider::getClassName expects Object, ' .
-                    'PersistentCollection, array of entities or string. "%s" given',
-                    gettype($className)
-                )
-            );
+        if (is_array($object) && !empty($object) && is_object(reset($object))) {
+            return ClassUtils::getClass(reset($object));
         }
 
-        return $className;
+        throw new RuntimeException(
+            sprintf(
+                'ConfigProvider::getClassName expects Object, ' .
+                'PersistentCollection, array of entities or string. "%s" given',
+                gettype($object)
+            )
+        );
     }
 
     /**
