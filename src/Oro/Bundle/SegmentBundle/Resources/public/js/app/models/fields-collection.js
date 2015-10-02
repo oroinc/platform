@@ -32,25 +32,35 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        clone: function() {
+            return new this.constructor(this.models, {entityFieldsUtil: this.entityFieldsUtil});
+        },
+
+        /**
          * Check if all models in collection are valid
          *  - check if models contain valid field reference
          *
          * @return {boolean}
          */
         isValid: function() {
-            return this.some(function(model) {
-                return !model.isValid();
+            return this.every(function(model) {
+                return model.isValid();
             });
         },
 
         /**
          * Removes invalid models from collection
+         *
+         * @return {FieldsCollection}
          */
         purify: function() {
             var models = this.filter(function(model) {
                 return !model.isValid();
             });
             this.remove(models);
+            return this;
         }
     });
 

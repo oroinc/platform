@@ -399,7 +399,7 @@ define(function(require) {
             });
 
             this.on('find-invalid-data-components', function(components) {
-                if (collection.isValid()) {
+                if (!collection.isValid()) {
                     components.push(__('oro.segment.grouping_editor'));
                 }
             });
@@ -522,7 +522,7 @@ define(function(require) {
             });
 
             this.on('find-invalid-data-components', function(components) {
-                if (collection.isValid()) {
+                if (!collection.isValid()) {
                     components.push(__('oro.segment.report_column_editor'));
                 }
             });
