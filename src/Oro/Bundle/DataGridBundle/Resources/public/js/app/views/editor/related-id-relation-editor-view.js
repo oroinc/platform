@@ -53,7 +53,7 @@ define(function(require) {
             var currentTerm = null;
 
             var makeRequest = function(options) {
-                if (options.term === '' && _.isArray(_this.column.emptyQueryChoices)) {
+                if (options.term === '' && options.page === 1 && _.isArray(_this.column.emptyQueryChoices)) {
                     options.callback({
                         results: _this.addInitialOptionToResultIfNeeded(_this.column.emptyQueryChoices),
                         more: _this.column.emptyQueryMoreChoices
