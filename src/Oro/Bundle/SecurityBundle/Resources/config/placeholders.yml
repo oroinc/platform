@@ -3,14 +3,24 @@ placeholders:
         items:
             organization_selector:
                 order: 200
+
     organization_name:
         items:
             organization_name:
                 order: 200
 
+    update_content_data_additional_information:
+        items:
+            field_acl_window: ~
+
 items:
     organization_selector:
         template: OroSecurityBundle:Organization:selector.html.twig
         applicable: @oro_user.placeholder.filter->isUserApplicable()
+
     organization_name:
         template: OroSecurityBundle:Organization:current_name.html.twig
+
+    field_acl_window:
+        template: OroSecurityBundle:Form:field-acl-window.html.twig
+        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.role.entity.class%)

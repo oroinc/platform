@@ -1,0 +1,22 @@
+<script type="text/javascript">
+    require(['jquery', 'orotranslation/js/translator', 'oro/dialog-widget', 'routing', 'ready!app'],
+        function($, __, DialogWidget, routing) {
+            $('.entity-identity-label').on('click', function(e) {
+                e.preventDefault();
+
+                var widget = new DialogWidget({
+                    'url': routing.generate('oro_user_role_update', {id: 3}),
+                    'title': '{{ 'oro.security.field-acl-window.label'|trans }}',
+                    'stateEnabled': false,
+                    'incrementalPosition': false,
+                    'dialogOptions': {
+                        'width': 650,
+                        'autoResize': true,
+                        'modal': true,
+                        'minHeight': 100
+                    }
+                });
+                widget.render();
+            });
+        });
+</script>
