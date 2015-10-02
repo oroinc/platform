@@ -16,25 +16,26 @@ class RolesTest extends Selenium2TestCase
     protected $newRole = array('LABEL' => 'NEW_LABEL_', 'ROLE_NAME' => 'NEW_ROLE_');
 
     protected $defaultRoles = array(
-        'header' => array(
-            'ROLE' => 'ROLE',
-            'LABEL' => 'LABEL',
-            '' => 'ACTION'
+        'header'             => array(
+            'ROLE'         => 'ROLE',
+            'LABEL'        => 'LABEL',
+            'ORGANIZATION' => 'ORGANIZATION',
+            ''             => 'ACTION'
         ),
-        'ROLE_MANAGER' => array(
+        'ROLE_MANAGER'       => array(
             'ROLE_MANAGER' => 'ROLE_MANAGER',
-            'Manager' => 'Manager',
-            '...' => 'ACTION'
+            'Manager'      => 'Manager',
+            '...'          => 'ACTION'
         ),
         'ROLE_ADMINISTRATOR' => array(
             'ROLE_ADMINISTRATOR' => 'ROLE_ADMINISTRATOR',
-            'Administrator' => 'Administrator',
-            '...' => 'ACTION'
+            'Administrator'      => 'Administrator',
+            '...'                => 'ACTION'
         ),
-        'ROLE_USER' => array(
+        'ROLE_USER'          => array(
             'ROLE_USER' => 'ROLE_USER',
-            'User' => 'User',
-            '...' => 'ACTION'
+            'User'      => 'User',
+            '...'       => 'ACTION'
         )
     );
 
@@ -86,12 +87,14 @@ class RolesTest extends Selenium2TestCase
         $randomPrefix = WebTestCase::generateRandomString(5);
 
         $login = $this->login();
+        $roleLabel = $this->newRole['LABEL'] . $randomPrefix;
+
         /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle')
             ->assertTitle('All - Roles - User Management - System')
             ->add()
             ->assertTitle('Create Role - Roles - User Management - System')
-            ->setLabel($this->newRole['LABEL'] . $randomPrefix)
+            ->setLabel($roleLabel)
             ->save()
             ->assertMessage('Role saved')
             ->close();
@@ -99,7 +102,7 @@ class RolesTest extends Selenium2TestCase
         //verify new Role
         $roles->refresh();
 
-        static::assertTrue($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
+        static::assertTrue($roles->entityExists(array('name' => $roleLabel)));
 
         return $randomPrefix;
     }
