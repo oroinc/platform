@@ -8,6 +8,7 @@ use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
@@ -47,6 +48,36 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    public function testConfigGet()
+    {
+        $config = new Config(new EntityConfigId('test', 'Entity1'), ['attr' => 'val', 'null_attr' => null]);
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.05,
+            function () use ($config) {
+                $config->get('attr');
+                $config->get('null_attr');
+                $config->get('undefined_attr');
+            }
+        );
+    }
+
+    public function testConfigHas()
+    {
+        $config = new Config(new EntityConfigId('test', 'Entity1'), ['attr' => 'val', 'null_attr' => null]);
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.05,
+            function () use ($config) {
+                $config->has('attr');
+                $config->has('null_attr');
+                $config->has('undefined_attr');
+            }
+        );
+    }
 
     public function testGetConfigsForEntities()
     {
