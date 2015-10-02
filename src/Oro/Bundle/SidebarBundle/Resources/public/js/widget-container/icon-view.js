@@ -4,7 +4,6 @@ define(function(require) {
     var WidgetContainerIconView;
     var Backbone = require('backbone');
     var iconTemplate = require('tpl!./templates/icon-template.html');
-    var constants = require('../constants');
     var BaseView = require('oroui/js/app/views/base/view');
 
     WidgetContainerIconView = BaseView.extend({
