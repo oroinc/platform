@@ -12,36 +12,19 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 {
     /**
-     * Test that preFlush called with event
-     * that has config id something other than FieldConfigId
-     */
-    public function testWrongConfigId()
-    {
-        $this->configProvider->expects($this->never())
-            ->method($this->anything());
-
-        $entityConfigId = new EntityConfigId('extend', 'TestClass');
-        $eventConfig    = new Config($entityConfigId);
-
-        $event = new PreFlushConfigEvent(['extend' => $eventConfig], $this->configManager);
-        $listener = new EntityConfigListener();
-
-        $listener->preFlush($event);
-    }
-
-    /**
      *  Test create new field (entity state is 'NEW', owner - Custom)
      *  Nothing should be persisted
      */
-    public function testScopeExtendNewFieldNewEntity()
+    public function testNewFieldNewEntity()
     {
         $entityConfig = $this->getEntityConfig();
         $fieldConfig = $this->getEventConfigNewField();
 
-        // add to originalValues
-        $this->configCache->expects($this->once())
+        // first call - add to originalValues
+        // second call - call getEntityConfig in preFlush method
+        $this->configCache->expects($this->exactly(2))
             ->method('getEntityConfig')
-            ->willReturn(clone $entityConfig);
+            ->willReturnOnConsecutiveCalls(clone $entityConfig, $entityConfig);
         $this->configManager->getEntityConfig(
             $entityConfig->getId()->getScope(),
             $entityConfig->getId()->getClassName()
@@ -51,10 +34,6 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $this->configManager->persist($fieldConfig);
         $this->configManager->calculateConfigChangeSet($entityConfig);
         $this->configManager->calculateConfigChangeSet($fieldConfig);
-
-        $this->configProvider->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($entityConfig));
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
@@ -71,7 +50,42 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testScopeExtendNewFieldActiveEntity()
+    public function testNewFieldActiveEntity()
+    {
+        $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $fieldConfig = $this->getEventConfigNewField();
+
+        // first call - add to originalValues
+        // second call - call getEntityConfig in preFlush method
+        $this->configCache->expects($this->exactly(2))
+            ->method('getEntityConfig')
+            ->willReturnOnConsecutiveCalls(clone $entityConfig, $entityConfig);
+        $this->configManager->getEntityConfig(
+            $entityConfig->getId()->getScope(),
+            $entityConfig->getId()->getClassName()
+        );
+
+        $this->configManager->persist($entityConfig);
+        $this->configManager->persist($fieldConfig);
+        $this->configManager->calculateConfigChangeSet($entityConfig);
+        $this->configManager->calculateConfigChangeSet($fieldConfig);
+
+        $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
+
+        $listener = new EntityConfigListener();
+        $listener->preFlush($event);
+
+        $this->assertEquals(
+            ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],
+            $this->configManager->getConfigChangeSet($entityConfig)
+        );
+    }
+
+    /**
+     *  Test flush new field (entity state is 'Active')
+     *  The entity state should not be changed
+     */
+    public function testSavingNewFieldActiveEntity()
     {
         $entityConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
         $fieldConfig = $this->getEventConfigNewField();
@@ -87,12 +101,10 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
 
         $this->configManager->persist($entityConfig);
         $this->configManager->persist($fieldConfig);
+        $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
+        $this->configManager->persist($fieldConfig);
         $this->configManager->calculateConfigChangeSet($entityConfig);
         $this->configManager->calculateConfigChangeSet($fieldConfig);
-
-        $this->configProvider->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($entityConfig));
 
         $event = new PreFlushConfigEvent(['extend' => $fieldConfig], $this->configManager);
 
@@ -100,7 +112,7 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $listener->preFlush($event);
 
         $this->assertEquals(
-            ['state' => [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]],
+            [],
             $this->configManager->getConfigChangeSet($entityConfig)
         );
     }

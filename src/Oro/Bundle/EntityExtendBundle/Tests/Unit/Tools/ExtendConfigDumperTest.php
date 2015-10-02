@@ -35,11 +35,14 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($this->configProvider);
 
         $this->generator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator')
             ->disableOriginalConstructor()
@@ -50,7 +53,7 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->dumper = new ExtendConfigDumper(
             $this->entityManagerBag,
-            $this->configProvider,
+            $this->configManager,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),
             $this->generator,

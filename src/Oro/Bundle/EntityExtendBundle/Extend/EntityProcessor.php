@@ -27,7 +27,8 @@ class EntityProcessor
     protected $commands = [
         'oro:entity-extend:update-config' => [],
         'oro:entity-extend:cache:warmup'  => [],
-        'oro:entity-extend:update-schema' => []
+        'oro:entity-extend:update-schema' => [],
+        'oro:entity-config:cache:warmup'  => []
     ];
 
     /** @var array */

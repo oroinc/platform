@@ -24,10 +24,11 @@ class EntityConfigListener
         $configManager = $event->getConfigManager();
         $changeSet     = $configManager->getConfigChangeSet($config);
         // synchronize field state with entity state, when custom field state changed
-        if (isset($changeSet['state']) && $config->is('owner', ExtendScope::OWNER_CUSTOM)) {
-            $className     = $config->getId()->getClassName();
-            $entityConfig  = $configManager->getProvider('extend')->getConfig($className);
-
+        if (isset($changeSet['state'])
+            && $changeSet['state'][1] !== ExtendScope::STATE_ACTIVE
+            && $config->is('owner', ExtendScope::OWNER_CUSTOM)
+        ) {
+            $entityConfig = $configManager->getEntityConfig('extend', $config->getId()->getClassName());
             if ($entityConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_DELETE])) {
                 $entityConfig->set('state', ExtendScope::STATE_UPDATE);
                 $configManager->persist($entityConfig);
