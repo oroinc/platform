@@ -16,7 +16,7 @@ define(function(require) {
         /**
          * @constructor
          * @param options {object}
-         * @param options.entity_name {string} entity name to check permissions on
+         * @param options.permission_check_entity_name {string} entity name to check permissions on
          * @param options.permission {string} Optional. Permission name to check
          */
         initialize: function(options) {
@@ -24,10 +24,10 @@ define(function(require) {
                 options = {};
             }
             options.search_handler_name = 'acl_users';
-            if (!options.entity_name) {
-                throw new Error('`entity_name` option is required');
+            if (!options.permission_check_entity_name) {
+                throw new Error('`permission_check_entity_name` option is required');
             }
-            this.entityName = options.entity_name;
+            this.permissionCheckEntityName = options.permission_check_entity_name;
             options.label_field_name = options.label_field_name || 'fullName';
             this.permission = options.permission || 'ASSIGN';
             AclUsersSearchApiAccessor.__super__.initialize.call(this, options);
@@ -40,7 +40,7 @@ define(function(require) {
             if (!urlParameters.id) {
                 throw new Error('`id` url parameter is required');
             }
-            urlParameters.query = [urlParameters.term, this.entityName, this.permission,
+            urlParameters.query = [urlParameters.term, this.permissionCheckEntityName, this.permission,
                 urlParameters.id, ''].join(';');
             return urlParameters;
         }
