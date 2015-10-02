@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     var ShareWithDatagridComponent;
-    var $ = require('jquery');
     var _ = require('underscore');
     var mediator = require('oroui/js/mediator');
     var widgetManager = require('oroui/js/widget-manager');
@@ -39,6 +38,7 @@ define(function(require) {
 
         /**
          * Bind event handlers on grid widget
+         *
          * @protected
          */
         _bindGridEvent: function() {
@@ -68,13 +68,6 @@ define(function(require) {
 
             gridWidget._showLoading();
             var text = data.model.get('username') ? data.model.get('username') : data.model.get('name');
-            var t = {
-                text: text,
-                id: JSON.stringify({
-                    entityId: id,
-                    entityClass: targetClass
-                })
-            };
             mediator.trigger('datagrid:shared-datagrid:add:data', {
                 entityClass: targetClass,
                 models: [{
