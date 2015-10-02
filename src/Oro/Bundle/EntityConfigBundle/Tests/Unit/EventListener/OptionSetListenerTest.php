@@ -113,7 +113,11 @@ class OptionSetListenerTest extends \PHPUnit_Framework_TestCase
 
         $fieldName       = 'testFieldName';
         $secondFieldName = 'secondTestField';
-        $schema          = array('relation' => array($fieldName, $secondFieldName, $thirdFieldName));
+        $schema          = array('relation' => array(
+            $fieldName       => array(),
+            $secondFieldName => array(),
+            $thirdFieldName  => array()
+        ));
 
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
