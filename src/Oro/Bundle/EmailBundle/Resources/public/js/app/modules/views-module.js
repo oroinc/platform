@@ -19,4 +19,18 @@ require([
             }
         });
     });
+
+    BaseController.loadBeforeAction([
+        'jquery',
+        'oroemail/js/app/components/new-email-message-component'
+    ], function($, NewEmailMessageComponent) {
+        BaseController.addToReuse('mewEmailMessage', {
+            compose: function() {
+                var $notification = $('.email-notification-menu .new-email-notification');
+                this.component = new NewEmailMessageComponent({
+                    notificationElement: $notification.length > 0 ? $notification : null
+                });
+            }
+        });
+    });
 });

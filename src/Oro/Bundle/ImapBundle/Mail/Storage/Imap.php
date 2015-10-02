@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImapBundle\Mail\Storage;
 use Zend\Mail\Storage\Exception as BaseException;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 
 /**
@@ -325,7 +326,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         );
         if (!$selectResponse) {
             $this->currentFolder = '';
-            throw new BaseException\RuntimeException('cannot change folder, maybe it does not exist');
+            throw new UnselectableFolderException('cannot change folder, maybe it does not exist');
         }
 
         $this->uidValidity = $selectResponse['uidvalidity'];
