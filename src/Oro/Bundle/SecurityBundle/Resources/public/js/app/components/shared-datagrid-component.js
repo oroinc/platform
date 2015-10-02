@@ -37,7 +37,7 @@ define(function(require) {
                     }
                 });
             });
-            if (action.datagrid.collection.length == 0) {
+            if (action.datagrid.collection.length === 0) {
                 action.datagrid.collection.reset([]);
             }
         },
@@ -50,7 +50,7 @@ define(function(require) {
                     row.$el.remove();
                 }
             });
-            if (action.datagrid.collection.length == 0) {
+            if (action.datagrid.collection.length === 0) {
                 action.datagrid.collection.reset([]);
             }
         },
@@ -63,17 +63,17 @@ define(function(require) {
                         entityId: model.id,
                         entityClass: data.entityClass
                     });
-                    if (grid.collection.where({id: id}).length == 0) {
-                        var model = {
+                    if (grid.collection.where({id: id}).length === 0) {
+                        var newModel = {
                             id: id,
                             entity: model.get('entity')
                         };
-                        if (grid.collection.length == 0) {
-                            grid.collection.reset([model]);
+                        if (grid.collection.length === 0) {
+                            grid.collection.reset([newModel]);
                         } else {
-                            grid.collection.add(model);
+                            grid.collection.add(newModel);
                         }
-                        grid.collection.get(model).trigger('backgrid:select', model, true);
+                        grid.collection.get(newModel).trigger('backgrid:select', newModel, true);
                     }
                 });
             });
@@ -82,12 +82,12 @@ define(function(require) {
         onSelect2Add: function(data) {
             widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                 var grid = widget.pageComponent('shared-datagrid').grid;
-                if (grid.collection.where({id: data.id}).length == 0) {
+                if (grid.collection.where({id: data.id}).length === 0) {
                     var model = {
                         id: data.id,
                         entity: data.entity
                     };
-                    if (grid.collection.length == 0) {
+                    if (grid.collection.length === 0) {
                         grid.collection.reset([model]);
                     } else {
                         grid.collection.add(model);
@@ -104,7 +104,7 @@ define(function(require) {
 
                 var entitiesParam = [];
                 _.each(grid.collection.models, function(model) {
-                    entitiesParam.push(model.id)
+                    entitiesParam.push(model.id);
                 });
                 var finallyFunc = function(e) {
                     widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {

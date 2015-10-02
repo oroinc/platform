@@ -15,7 +15,7 @@ define(function(require) {
                     if (Object.keys(selectionState.selectedModels).length > 0) {
                         _.each(selectionState.selectedModels, function(selectedModel) {
                             var selectedModelMatched = false;
-                            if (selectedModel.id == model.id) {
+                            if (selectedModel.id === model.id) {
                                 selectedModelMatched = true;
                             }
                             if (!selectedModelMatched) {
