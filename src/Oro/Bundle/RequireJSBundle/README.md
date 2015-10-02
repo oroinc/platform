@@ -123,6 +123,8 @@ Beside general build-configuration, you can set bundle specific options inside `
 
 This directive will prevent module from getting concatenated into build file.
 
+The ```cache_impl``` parameter defaults can be used to specify the service that will write the configuration to the cache. By default, this parameter is ```null``` and the cache is disabled.
+
 ### Building
 To make a build for JS-resources, just execute a command in console:
 

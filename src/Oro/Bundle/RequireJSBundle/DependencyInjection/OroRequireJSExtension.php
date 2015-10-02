@@ -4,6 +4,7 @@ namespace Oro\Bundle\RequireJSBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -25,6 +26,12 @@ class OroRequireJSExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        if (isset($config['cache_impl'])) {
+            $container
+                ->findDefinition('oro_requirejs_config_provider')
+                ->addMethodCall('setCache', array(new Reference($config['cache_impl'])));
+        }
 
         $container->setParameter('oro_require_js', $config);
         $container->setParameter('oro_require_js.web_root', $config['web_root']);

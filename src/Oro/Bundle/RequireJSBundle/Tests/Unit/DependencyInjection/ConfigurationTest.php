@@ -74,6 +74,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'js_engine' => 'node',
+                    'cache_impl' => null,
                     'config' => array(
                         'waitSeconds' => 0,
                     ),
@@ -83,7 +84,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'build' => array(
                         'optimize' => 'uglify2',
                         'paths' => array(),
-                    )
+                    ),
                 )
             ),
             array(
@@ -94,6 +95,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'scriptType' => 'text/javascript'
                     ),
                     'js_engine' => 'node',
+                    'cache_impl' => null,
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
                     'build' => array(
@@ -102,7 +104,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'preserveLicenseComments' => true,
                         'useSourceUrl' => false,
                         'paths' => array(),
-                    )
+                    ),
                 ),
                 array(
                     'config' => array(
@@ -111,6 +113,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'scriptType' => 'text/javascript',
                     ),
                     'js_engine' => 'node',
+                    'cache_impl' => null,
                     'web_root' => '%kernel.root_dir%/../web',
                     'build_path' => 'js/test/app.min.js',
                     'building_timeout' => 3600,
