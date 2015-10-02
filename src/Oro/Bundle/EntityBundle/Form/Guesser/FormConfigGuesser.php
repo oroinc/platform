@@ -68,7 +68,7 @@ class FormConfigGuesser extends AbstractFormGuesser
     protected function getTypeGuess(ConfigInterface $formConfig, $class, $property)
     {
         $formType    = $formConfig->get('form_type');
-        $formOptions = $formConfig->has('form_options') ? $formConfig->get('form_options') : array();
+        $formOptions = $formConfig->get('form_options', false, array());
         $formOptions = $this->addLabelOption($formOptions, $class, $property);
 
         // fallback guess from recursive call must be with low confidence

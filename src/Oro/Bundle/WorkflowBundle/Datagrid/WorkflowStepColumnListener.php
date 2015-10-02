@@ -118,8 +118,9 @@ class WorkflowStepColumnListener
     protected function isShowWorkflowStep($entity)
     {
         if ($this->configProvider->hasConfig($entity)) {
-            $config = $this->configProvider->getConfig($entity);
-            return $config->has('show_step_in_grid') && $config->is('show_step_in_grid');
+            return $this->configProvider
+                ->getConfig($entity)
+                ->is('show_step_in_grid');
         }
 
         return false;

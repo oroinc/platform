@@ -205,8 +205,8 @@ class AttributeGuesser
         $formOptions = array();
         if ($this->formConfigProvider->hasConfig($entityClass)) {
             $formConfig = $this->formConfigProvider->getConfig($entityClass);
-            $formType = $formConfig->has('form_type') ? $formConfig->get('form_type') : null;
-            $formOptions = $formConfig->has('form_options') ? $formConfig->get('form_options') : array();
+            $formType = $formConfig->get('form_type');
+            $formOptions = $formConfig->get('form_options', false, array());
         }
         if (!$formType) {
             $formType = 'entity';
@@ -288,9 +288,6 @@ class AttributeGuesser
 
         $entityConfig = $this->entityConfigProvider->getConfig($class, $field);
         $labelOption = $multiple ? 'plural_label' : 'label';
-        if (!$entityConfig->has($labelOption)) {
-            return null;
-        }
 
         return $entityConfig->get($labelOption);
     }
