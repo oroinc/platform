@@ -41,12 +41,6 @@ define(function(require) {
             };
         },
 
-        addInitialOptionToResultIfNeeded: function(results) {
-            return _.uniq([this.getInitialResultItem()].concat(results), function(item) {
-                return item.id;
-            });
-        },
-
         getSelect2Options: function() {
             var _this = this;
             var currentRequest = null;
@@ -56,7 +50,7 @@ define(function(require) {
                 var column;
                 if (options.term === '' && options.page === 1 && _.isArray(_this.column.emptyQueryChoices)) {
                     options.callback({
-                        results: _this.addInitialOptionToResultIfNeeded(_this.column.emptyQueryChoices),
+                        results: _this.column.emptyQueryChoices,
                         more: _this.column.emptyQueryMoreChoices
                     });
                     return;
@@ -80,9 +74,6 @@ define(function(require) {
                         return;
                     }
                     _this.availableChoices = response.results;
-                    if (options.term === '') {
-                        _this.availableChoices = _this.addInitialOptionToResultIfNeeded(_this.availableChoices);
-                    }
                     if (currentTerm === options.term) {
                         options.callback({
                             results: _this.availableChoices,

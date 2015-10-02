@@ -30,6 +30,7 @@ define(function(require) {
         },
 
         render: function() {
+            var _this = this;
             SelectEditorView.__super__.render.call(this);
             this.$('input[name=value]').select2(this.getSelect2Options());
             // select2 stops propagation of keydown event if key === ENTER
@@ -40,20 +41,25 @@ define(function(require) {
             events = {};
             events['keydown' + this.eventNamespace()] = _.bind(this.onInternalTabKeydown, this);
             this.$('.select2-focusser').on(events);
+
+            // must prevent selection on TAB
+            this.$('input.select2-input').bindFirst('keydown', function(e) {
+                if (e.keyCode === _this.TAB_KEY_CODE) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    _this.$('input[name=value]').select2('close');
+                    _this.onInternalTabKeydown(e);
+                }
+            });
         },
 
         getSelect2Options: function() {
-            var options = [{
-                id: '',
-                text: ' '/* NOTE: this symbol is not space, but &nbsp; Please be patient */
-            }];
-            options.push.apply(options, this.availableChoices);
             return {
                 placeholder: this.placeholder || ' ',
                 allowClear: true,
                 selectOnBlur: false,
                 openOnEnter: false,
-                data: {results: options}
+                data: {results: this.availableChoices}
             };
         },
 
