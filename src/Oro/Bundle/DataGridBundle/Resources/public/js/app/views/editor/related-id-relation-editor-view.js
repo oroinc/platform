@@ -53,6 +53,7 @@ define(function(require) {
             var currentTerm = null;
 
             var makeRequest = function(options) {
+                var column;
                 if (options.term === '' && options.page === 1 && _.isArray(_this.column.emptyQueryChoices)) {
                     options.callback({
                         results: _this.addInitialOptionToResultIfNeeded(_this.column.emptyQueryChoices),
@@ -66,14 +67,20 @@ define(function(require) {
                     per_page: _this.perPage
                 }));
                 currentRequest.term = options.term;
+                if (options.term === '') {
+                    column = _this.column;
+                }
                 currentRequest.done(function(response) {
+                    // save empty query results even if view is disposed
+                    if (options.term === '') {
+                        column.emptyQueryChoices = response.results;
+                        column.emptyQueryMoreChoices = response.more;
+                    }
                     if (_this.disposed) {
                         return;
                     }
                     _this.availableChoices = response.results;
                     if (options.term === '') {
-                        _this.column.emptyQueryChoices = [].concat(_this.availableChoices);
-                        _this.column.emptyQueryMoreChoices = response.more;
                         _this.availableChoices = _this.addInitialOptionToResultIfNeeded(_this.availableChoices);
                     }
                     if (currentTerm === options.term) {
