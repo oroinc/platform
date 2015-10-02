@@ -57,18 +57,16 @@ class EmailManager
     }
 
     /**
-     * Set email seen status
+     * Set EmailUser seen status
      *
-     * @param EmailUser $entity - entity
-     * @param bool      $value  - value for value filed EmailUser entity
-     * @param bool      $flush  - if $flush is true then method executes flush
-     *
-     * @return void
+     * @param EmailUser $entity
+     * @param bool      $isSeen
+     * @param bool      $flush
      */
-    public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
+    public function setEmailUserSeen(EmailUser $entity, $isSeen = true, $flush = false)
     {
-        if ($entity->isSeen() !== $value) {
-            $entity->setSeen($value);
+        if ($entity->isSeen() !== $isSeen) {
+            $entity->setSeen($isSeen);
             if ($flush) {
                 $this->em->flush();
             }
@@ -76,21 +74,20 @@ class EmailManager
     }
 
     /**
-     * Set email seen
+     * Set email seen status for current user for single email or thread
      *
      * @param Email $entity
-     * @param bool  $value       - Seen value
+     * @param bool  $isSeen
      * @param bool  $checkThread - Set statuses for threaded emails
      */
-    public function setEmailSeen(Email $entity, $value = true, $checkThread = false)
+    public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
             $emailUsers = $this->getCurrentEmailUser($email);
             if ($emailUsers) {
                 foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, $value);
-                    $this->em->persist($emailUser);
+                    $this->setEmailUserSeen($emailUser, $isSeen);
                 }
             }
         }
@@ -99,7 +96,7 @@ class EmailManager
     }
 
     /**
-     * Toggle user email seen
+     * Toggle user email thread seen
      *
      * @param EmailUser $entity
      */

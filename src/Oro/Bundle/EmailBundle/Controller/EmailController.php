@@ -33,7 +33,6 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -60,7 +59,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->getEmailManager()->setEmailSeen($entity, true);
+        $this->getEmailManager()->setSeenStatus($entity, true);
 
         return [
             'entity' => $entity,
@@ -121,7 +120,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->getEmailManager()->setEmailSeen($entity, true, true);
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
 
         return ['entity' => $entity];
     }
@@ -441,12 +440,12 @@ class EmailController extends Controller
     }
 
     /**
-     * Mark email as seen for user
+     * Change email seen status for current user for single email or thread
      *
      * @Route(
      *      "/mark-seen/{id}/{status}/{checkThread}",
      *      name="oro_email_mark_seen",
-     *      requirements={"id"="\d+", "status"="\d+"},
+     *      requirements={"id"="\d+", "status"="\d+", "checkThread"="\d+"},
      *      defaults={"checkThread"=true}
      * )
      * @AclAncestor("oro_email_email_user_edit")
@@ -459,7 +458,7 @@ class EmailController extends Controller
      */
     public function markSeenAction(Email $email, $status, $checkThread)
     {
-        $this->getEmailManager()->setEmailSeen($email, (bool) $status, (bool) $checkThread);
+        $this->getEmailManager()->setSeenStatus($email, (bool) $status, (bool) $checkThread);
 
         return new JsonResponse(['successful' => true]);
     }
