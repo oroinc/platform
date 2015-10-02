@@ -47,11 +47,11 @@ class EntitiesToJsonTransformerTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(2);
         $expected = json_encode(
-                [
-                    'entityClass' => ClassUtils::getClass($user0),
-                    'entityId' => 1,
-                ]
-            )
+            [
+                'entityClass' => ClassUtils::getClass($user0),
+                'entityId' => 1,
+            ]
+        )
             . ';' .
             json_encode(
                 [
@@ -79,11 +79,11 @@ class EntitiesToJsonTransformerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $value = json_encode(
-                [
-                    'entityClass' => ClassUtils::getClass($user0),
-                    'entityId' => 1,
-                ]
-            )
+            [
+                'entityClass' => ClassUtils::getClass($user0),
+                'entityId' => 1,
+            ]
+        )
             . ';' .
             json_encode(
                 [
