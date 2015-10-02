@@ -7,6 +7,7 @@ define(function(require) {
     var module = require('module');
     var mediator = require('oroui/js/mediator');
     var sync = require('orosync/js/sync');
+    var Backbone = require('backbone');
     var unreadEmailsCount = _.result(module.config(), 'unreadEmailsCount') || [];
     var channel = module.config().clankEvent;
     var EmailNotificationCollection =
@@ -17,7 +18,8 @@ define(function(require) {
     SidebarRecentEmailsComponent = BaseComponent.extend({
         debouncedNotificationHandler: null,
         listen: {
-            'change:settings model': 'onSettingsChange'
+            'change:settings model': 'onSettingsChange',
+            'widget_dialog:open mediator': 'onWidgetDialogOpen'
         },
 
         /**
@@ -67,6 +69,10 @@ define(function(require) {
             _.delay(function() {
                 model.emailNotificationCollection.setRouteParams(settings);
             }, 0);
+        },
+
+        onWidgetDialogOpen: function() {
+            Backbone.trigger('closeWidget', this.model.cid);
         },
 
         _notificationHandler: function() {

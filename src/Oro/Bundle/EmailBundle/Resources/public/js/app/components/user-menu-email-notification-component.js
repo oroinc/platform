@@ -16,8 +16,10 @@ define(function(require) {
         countModel: null,
         debouncedNotificationHandler: null,
         clankEvent: '',
+        dropdownContainer: null,
         listen: {
-            'sync collection': 'updateCountModel'
+            'sync collection': 'updateCountModel',
+            'widget_dialog:open mediator': 'onWidgetDialogOpen'
         },
 
         initialize: function(options) {
@@ -29,6 +31,7 @@ define(function(require) {
             }
             this.collection = new EmailNotificationCollection(emails);
             this.countModel = new EmailNotificationCountModel({'unreadEmailsCount': options.count});
+            this.dropdownContainer = options._sourceElement.parent();
 
             sync.subscribe(this.clankEvent, this.debouncedNotificationHandler);
 
@@ -42,6 +45,10 @@ define(function(require) {
 
         updateCountModel: function(collection) {
             this.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
+        },
+
+        onWidgetDialogOpen: function() {
+            this.dropdownContainer.removeClass('open');
         },
 
         dispose: function() {
