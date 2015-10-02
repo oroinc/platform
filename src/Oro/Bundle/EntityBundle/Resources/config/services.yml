@@ -86,7 +86,7 @@ services:
         arguments:
             - @security.token_storage
         tags:
-            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: onFlush, priority: 100 }
 
     oro_entity.event_listener.entity_relation_grid_listener:
         class: %oro_entity.event_listener.entity_relation_grid_listener.class%

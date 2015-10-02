@@ -10,23 +10,21 @@
         id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
         forEntity: forEntity,
         organization: data and data.organization is defined and data.organization ? data.organization.id : null,
+        parentElementSelector: 'fieldset'
     } %}
     {% set attr = attr|merge({
-        'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',
+        'data-role': 'check-connection-btn',
+        'data-page-component-module':  'oroimap/js/app/components/check-connection-component',
         'data-page-component-options': options|json_encode|raw,
     }) %}
-    {% set wrapperId = id ~ '_wrapper' %}
-
-    <div class="control-group" id="{{ wrapperId }}">
-        <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
+    <div class="control-group">
+        <div class="controls">
+            {{ form_widget(form, {'attr': attr }) }}
+            <div class="check-connection-messages"></div>
+        </div>
     </div>
     <div class="container-config-group"
          data-page-component-module="oroimap/js/app/components/check-config-settings"
          data-page-component-options="">
     </div>
-    <style type="text/css">
-        {{ '#' ~ wrapperId }} .alert {
-            margin-top: 10px;
-        }
-    </style>
 {% endblock %}
