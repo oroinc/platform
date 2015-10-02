@@ -258,7 +258,7 @@ class User extends AbstractPageEntity
             }
             $element = $this->roles->element(
                 $this->test->using('xpath')->value(
-                    "div[@data-ftid='oro_user_user_form_roles']/div[label[{$condition}]]/input"
+                    "//div[@data-ftid='oro_user_user_form_roles']/div[label[{$condition}]]/input"
                 )
             );
             $this->test->moveto($element);
@@ -267,8 +267,8 @@ class User extends AbstractPageEntity
             foreach ($roles as $role) {
                 $element = $this->roles->element(
                     $this->test->using('xpath')->value(
-                        "div[@data-ftid='oro_user_user_form_roles']".
-                        "/div[label[normalize-space(text()) = '{$role}']]/input"
+                        "//div[@data-ftid='oro_user_user_form_roles']".
+                        "/div[label[contains(normalize-space(text()), '{$role}')]]/input"
                     )
                 );
                 $this->test->moveto($element);
