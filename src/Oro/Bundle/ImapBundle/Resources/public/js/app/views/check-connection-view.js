@@ -29,13 +29,23 @@ define(function(require) {
 
         render: function() {
             var imap = this.model.get('imap');
-            var $container = this.$el.find('.folder-tree');
+            var $container = this.ensureContainer();
             if ('folders' in imap) {
                 $container.replaceWith(imap.folders);
                 layout.initPopover(this.$el.find('.folder-tree'));
             } else {
                 $container.empty();
             }
+        },
+
+        ensureContainer: function() {
+            var $container = this.$el.find('.folder-tree');
+            if ($container.length === 0) {
+                $container = $('<div/>', {'class': 'control-group folder-tree'});
+                this.$el.find('[data-role=check-connection-btn]')
+                    .closest('.control-group').parent().append($container);
+            }
+            return $container;
         },
 
         requestAPI: function() {

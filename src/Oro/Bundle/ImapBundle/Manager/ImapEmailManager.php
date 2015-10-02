@@ -119,6 +119,21 @@ class ImapEmailManager
     }
 
     /**
+     * Retrieve emails by the given uid criteria
+     *
+     * @param string $query
+     *
+     * @return ImapEmailIterator
+     */
+    public function getEmailsUidBased($query = null)
+    {
+        return new ImapEmailIterator(
+            $this->connector->findItemsUidBased($query),
+            $this
+        );
+    }
+
+    /**
      * @param \DateTime $startDate
      *
      * @return ImapEmailIterator
