@@ -38,7 +38,8 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->setMethods(['fetch', 'save'])
+            ->getMockForAbstractClass();
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
