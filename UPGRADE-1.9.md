@@ -8,6 +8,15 @@ UPGRADE FROM 1.8 to 1.9
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::isDateUpdatable` removed. It is not needed.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface::getOwner` added.
 
+####ConfigBundle
+- An implementation of scope managers has been changed to be simpler and performant. This can bring a `backward compatibility break` if you have own scope managers. See [add_new_config_scope.md](./src/Oro/Bundle/ConfigBundle/Resources/doc/add_new_config_scope.md) and the next items for more detailed info.
+- Method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` is made protected.
+- Constructor for `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` changed. New arguments: `ManagerRegistry $doctrine, CacheProvider $cache`.
+- Removed methods `loadSettings`, `getByEntity` from `Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository`.
+- Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
+- Removed `Oro\Bundle\ConfigBundle\Manager\UserConfigManager`. Use `oro_config.user` service instead.
+- Removed `oro_config.user_config_manager` service. Use `oro_config.user` service instead.
+
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
 - `Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface` marked as deprecated. Use `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider` instead.
