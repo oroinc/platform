@@ -11,12 +11,8 @@ use Symfony\Component\DependencyInjection\Loader;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
-/**
- * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
- */
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
     /**
@@ -40,6 +36,38 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                     }
                 }
             }
+        }
+
+        $this->preparePostgreSql($container);
+    }
+
+    /**
+     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
+     *
+     * @param ContainerBuilder $container
+     */
+    public function preparePostgreSql(ContainerBuilder $container)
+    {
+        $dbDriver = $container->getParameter('database_driver');
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+            $doctrineConfig = $container->getExtensionConfig('doctrine');
+            $doctrineConnectionOptions = [];
+            foreach ($doctrineConfig as $config) {
+                if (isset($config['dbal']['connections'])) {
+                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
+                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
+                            \PDO::ATTR_EMULATE_PREPARES => true
+                        ];
+                        // Add support of "oid" and "name" Db types for EnterpriseDB
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
+                            'oid' => 'integer',
+                            'name' => 'string'
+                        ];
+                    }
+                }
+            }
+            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
         }
     }
 
