@@ -54,7 +54,7 @@ class ShareFormatter
                 . ' ' . $object->getOrganization()->getName();
         } elseif ($object instanceof User) {
             $id = $object->getId();
-            $label = $object->getUsername();
+            $label = $object->getFirstName() . ' ' . $object->getLastName();
             $image = 'avatar-small.png';
             $classLabel = $this->translator->trans('oro.user.entity_label');
             $avatar = $object->getAvatar()

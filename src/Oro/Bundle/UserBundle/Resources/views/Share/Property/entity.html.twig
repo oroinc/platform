@@ -4,12 +4,12 @@
     </div>
     <div class="share-info-text">
         <div>
-            {{ record.getValue('username') }}
+            {{ record.getValue('firstName') ~ ' ' ~ record.getValue('lastName') }}
         </div>
         <div class="share-info-details">
             {{ 'oro.user.entity_label'|trans }}
             {{ 'oro.security.datagrid.share_grid_row_details_from'|trans }}
-            {{ record.getValue('fromName') }}
+            {{ record.getValue('businessUnit') }}
         </div>
     </div>
 </div>
