@@ -69,7 +69,7 @@ define(function(require) {
                 'folderId',
                 'hasMarkAllButton',
                 'hasMarkVisibleButton']));
-            data.userEmailsUrl = routing.generate('oro_email_user_emails');
+            data.userEmailsUrl = this._buildEmailFolderUrl();
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             return data;
         },
@@ -89,6 +89,24 @@ define(function(require) {
                     }
                 }
             }
+        },
+
+        _buildEmailFolderUrl: function() {
+            var url = routing.generate('oro_email_user_emails');
+            if (Number(this.folderId)) {
+                url += '?' + $.param({
+                    'grid': {
+                        'user-email-grid': 'i=1'
+                    }
+                }) + encodeURIComponent('&' + $.param({
+                    'f': {
+                        'folders': {
+                            'value': [this.folderId]
+                        }
+                    }
+                }));
+            }
+            return url;
         },
 
         _markAsRead: function(ids) {
