@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var ChoiceBusinessUnitFilter;
+    var ChoiceTreeFilter;
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var TextFilter = require('oro/filter/choice-filter');
@@ -15,6 +15,74 @@ define(function(require) {
         selected: 'selected'
     };
 
+    var searchEngine = {
+        findChild: function(item, items) {
+            var self = this;
+            var responce = [];
+
+            _.each(items, function(value) {
+                if (value['owner_id'] === item.value['id']) {
+                    responce.push({
+                        value: value,
+                        children: []
+                    });
+                }
+            });
+
+            if (responce.length > 0) {
+                $.each(responce, function(key, value) {
+                    responce[key]['children'] = self.findChild(value, items);
+                });
+            }
+
+            return responce;
+        },
+        _calculateChain: function(response, items) {
+            var self = this;
+            _.each(response, function(value, key) {
+                var chain = [];
+                chain = self.findChainToRoot(chain, value, items);
+                response[key].value.chain = chain;
+            });
+
+            return response;
+        },
+        findChainToRoot: function(chain, value, items) {
+            var self = this;
+            var parent;
+            _.each(items, function(item) {
+                if (value.value.owner_id && item['id'] == value.value.owner_id) {
+                    parent = {
+                        value: item,
+                        children: []
+                    };
+                }
+            });
+
+            if (parent) {
+                chain.push(parent.value.id);
+                self.findChainToRoot(chain, parent, items);
+            }
+
+            return chain;
+        },
+        searchItems: function(searchQuery, items) {
+            searchQuery = searchQuery.toLowerCase();
+            var response = [];
+            _.each(items, function (value) {
+                var result = value['name'].toLowerCase().indexOf(searchQuery);
+                if (result >= 0) {
+                    response.push({
+                        value: value,
+                        children: []
+                    });
+                }
+            });
+
+            return response;
+        }
+    };
+
     /**
      * Number filter: formats value as a number
      *
@@ -22,8 +90,8 @@ define(function(require) {
      * @class   oro.filter.ChoiceBusinessUnitFilter
      * @extends oro.filter.TextFilter
      */
-    ChoiceBusinessUnitFilter = TextFilter.extend({
-        templateSelector: '#choice-business-unit-template',
+    ChoiceTreeFilter = TextFilter.extend({
+        templateSelector: '#choice-tree-template',
 
         mode: availableModes.all,
 
@@ -47,21 +115,12 @@ define(function(require) {
             value: 'All'
         },
 
-        /**
-         * Initialize.
-         *
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            var self = this;
-            if (!self.businessUnit) {
-                self.businessUnit = this.data;
-            }
-            ChoiceBusinessUnitFilter.__super__.initialize.apply(this, arguments);
-        },
+        searchEngine: searchEngine,
+
+        checkedItems: {},
 
         _onClickCriteriaSelector: function() {
-            ChoiceBusinessUnitFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
+            ChoiceTreeFilter.__super__._onClickCriteriaSelector.apply(this, arguments);
             this.$el.find('.list').find('input:first').focus();
         },
 
@@ -92,36 +151,50 @@ define(function(require) {
                 value: value.value
             }));
 
-            var list = this._getListTemplate(this.businessUnit, searchQuery);
+            var list = this._getListTemplate(this.data, searchQuery);
             $filter.find('.list').html(list);
 
             this._appendFilter($filter);
             this._updateDOMValue();
+            this._initCheckedItems();
 
             this._criteriaRenderd = true;
         },
 
-        _getListTemplate: function(businessUnit, searchQuery) {
+        _initCheckedItems: function() {
+            var self = this;
+            var value = this.getValue();
+            var temp;
+            if (value.value.length > 0) {
+                temp = value.value.split(',');
+
+                _.each(temp, function(value) {
+                    self.checkedItems[value] = true;
+                });
+            }
+        },
+
+        _getListTemplate: function(items, searchQuery) {
             var self = this;
             var template;
             var response = [];
             var chain;
 
-            _.each(businessUnit, function(value) {
+            _.each(items, function(value) {
                 value.result = false;
             });
 
             if (searchQuery && searchQuery !== '') {
-                response = this.searchItems(searchQuery, businessUnit);
-                response = this._calculateChain(response, businessUnit);
-                chain = this._prepareItems(response, businessUnit);
-                businessUnit = chain;
+                response = this.searchEngine.searchItems(searchQuery, items);
+                response = this.searchEngine._calculateChain(response, items);
+                chain = this._prepareItems(response, items);
+                items = chain;
             }
 
             if (this.mode == availableModes.selected) {
-                businessUnit = this._getSelectedItems(businessUnit);
+                items = this._getSelectedItems(items);
                 var temp = [];
-                _.each(businessUnit, function(value) {
+                _.each(items, function(value) {
                     temp .push({
                         value: value,
                         children: []
@@ -130,22 +203,21 @@ define(function(require) {
 
                 response = temp;
             } else {
-                response = this._convertToTree(businessUnit);
+                response = this._convertToTree(items);
             }
 
             template = this.getListTemplate(response);
             return template;
         },
 
-        _getSelectedItems: function(businessUnit) {
+        _getSelectedItems: function(data) {
             var temp = [];
             var values;
             values = this.getValue().value.split(',');
-
             _.each(values, function(value) {
-                _.each(businessUnit, function(unit) {
-                    if (unit['id'] == value) {
-                        temp.push(unit);
+                _.each(data, function(item) {
+                    if (item['id'] == value) {
+                        temp.push(item);
                     }
                 });
             });
@@ -153,13 +225,13 @@ define(function(require) {
             return temp;
         },
 
-        _prepareItems: function(response, businessUnit) {
+        _prepareItems: function(response, data) {
             var root = {};
             _.each(response, function(value) {
                 root[value.value.id] = value.value;
                 root[value.value.id].result = true;
                 _.each(value.value.chain, function(item) {
-                    _.each(businessUnit, function(bu) {
+                    _.each(data, function(bu) {
                         if (bu['id'] == item) {
                             if (!root[bu['id']]) {
                                 root[bu['id']] = bu;
@@ -177,17 +249,6 @@ define(function(require) {
             return rootArray;
         },
 
-        _calculateChain: function(response, businessUnit) {
-            var self = this;
-            _.each(response, function(value, key) {
-                var chain = [];
-                chain = self.findChainToRoot(chain, value, businessUnit);
-                response[key].value.chain = chain;
-            });
-
-            return response;
-        },
-
         _convertToTree: function(data) {
             var self = this;
             var response = [];
@@ -201,45 +262,10 @@ define(function(require) {
             });
 
             _.each(response, function (value, key) {
-                response[key]['children'] = self.findChild(value, data);
+                response[key]['children'] = self.searchEngine.findChild(value, data);
             });
 
             return response;
-        },
-
-        searchItems: function(searchQuery, businessUnit) {
-            var response = [];
-            _.each(businessUnit, function (value) {
-                var retusl = value['name'].indexOf(searchQuery);
-                if (retusl >= 0) {
-                    response.push({
-                        value: value,
-                        children: []
-                    });
-                }
-            });
-
-            return response;
-        },
-
-        findChainToRoot: function(chain, value, businessUnit) {
-            var self = this;
-            var parent;
-            _.each(businessUnit, function(item) {
-                if (value.value.owner_id && item['id'] == value.value.owner_id) {
-                    parent = {
-                        value: item,
-                        children: []
-                    };
-                }
-            });
-
-            if (parent) {
-                chain.push(parent.value.id);
-                self.findChainToRoot(chain, parent, businessUnit);
-            }
-
-            return chain;
         },
 
         isSelected: function(item) {
@@ -270,9 +296,11 @@ define(function(require) {
                     classSelected = 'checked';
                 }
 
+                var id = self.name + '-' + value.value.id;
+
                 template += '<li>' +
-                '<label for="business-unit-' + value.value.id + '" class="' + classSearchResult + '">' +
-                    '<input id="business-unit-' + value.value.id + '" ' +
+                '<label for="' + id + '" class="' + classSearchResult + '">' +
+                    '<input id="' + id + '" ' +
                             'value="' + value.value.id + '" ' +
                             'type="checkbox" ' + classSelected + '>' +
                     value.value.name +
@@ -287,34 +315,18 @@ define(function(require) {
             return template;
         },
 
-        findChild: function(item, businessUnit) {
-            var self = this;
-            var responce = [];
-            var value = item.value;
-
-            $.each(businessUnit, function(key1, value1) {
-                if (value1['owner_id'] === value['id']) {
-                    responce.push({
-                        value: value1,
-                        children: []
-                    });
-                }
-            });
-
-            if (responce.length > 0) {
-                $.each(responce, function(key1, value1) {
-                    responce[key1]['children'] = self.findChild(value1, businessUnit);
-                });
-            }
-
-            return responce;
-        },
-
         _onChangeBusinessUnit: function(e) {
             var values = [];
-            $.each(this.$el.find('input:checked'), function(key, value) {
-                values.push($(this).val());
-            });
+
+            if ($(e.target).is(':checked')) {
+                this.checkedItems[$(e.target).val()] = true;
+            } else {
+                delete this.checkedItems[$(e.target).val()];
+            }
+
+            for (var i in this.checkedItems) {
+                values.push(i);
+            }
 
             values = values.join(',');
             this.setValue({value: values}, true);
@@ -340,7 +352,7 @@ define(function(require) {
         },
 
         _onClickUpdateCriteria: function() {
-            ChoiceBusinessUnitFilter.__super__._onClickUpdateCriteria.apply(this, arguments);
+            ChoiceTreeFilter.__super__._onClickUpdateCriteria.apply(this, arguments);
             this.trigger('update');
             this._updateCriteriaHint();
         },
@@ -375,21 +387,20 @@ define(function(require) {
                 if (values[i] === 'All') {
                     label.push(values[i]);
                 } else {
-                    for (var j in self.businessUnit) {
-                        if (values[i] == this.businessUnit[j].id) {
-                            label.push(this.businessUnit[j].name);
+                    for (var j in self.data) {
+                        if (values[i] == this.data[j].id) {
+                            label.push(this.data[j].name);
                         }
                     }
                 }
             }
 
             var hintValue = this.wrapHintValue ? ('"' + label.join(',') + '"') : label.join(',');
-
             return (option ? option.label + ' ' : '') + hintValue;
         },
 
         _onClickResetFilter: function() {
-            ChoiceBusinessUnitFilter.__super__._onClickResetFilter.apply(this, arguments);
+            ChoiceTreeFilter.__super__._onClickResetFilter.apply(this, arguments);
             this._updateCriteriaHint();
             this.trigger('update');
             this.$el.find('input:checked').removeAttr('checked');
@@ -397,7 +408,7 @@ define(function(require) {
 
         _onChangeSearchQuery: function(event) {
             var searchQuery = $(event.target).val();
-            var list = this._getListTemplate(this.businessUnit, searchQuery);
+            var list = this._getListTemplate(this.data, searchQuery);
             this.$el.find('.list').html(list);
         },
 
@@ -407,7 +418,7 @@ define(function(require) {
 
             var searchQuery = this.$el.find('[name="search"]').val();
 
-            var list = this._getListTemplate(this.businessUnit, searchQuery);
+            var list = this._getListTemplate(this.data, searchQuery);
             this.$el.find('.list').html(list);
         },
 
@@ -431,5 +442,5 @@ define(function(require) {
         }
     });
 
-    return ChoiceBusinessUnitFilter;
+    return ChoiceTreeFilter;
 });

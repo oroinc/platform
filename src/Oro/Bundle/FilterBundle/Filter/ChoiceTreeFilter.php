@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Filter;
+namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -11,7 +11,7 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\OrganizationBundle\Form\Type\Filter\BusinessUnitChoiceFilterType;
 
-class BusinessUnitChoiceFilter extends AbstractFilter
+class ChoiceTreeFilter extends AbstractFilter
 {
     /**
      * @var ManagerRegistry
@@ -66,17 +66,9 @@ class BusinessUnitChoiceFilter extends AbstractFilter
         if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
-                ->createQueryBuilder('u')
-                ->select('u.id')
-                ->leftJoin('u.businessUnits', 'bu')
-                ->where('bu.id in (:'.$parameterName.')')
-                ->getQuery()
-              ->getDQL();
-
             $this->applyFilterToClause(
                 $ds,
-                $this->get(FilterUtility::DATA_NAME_KEY) . ' in ('.$qb2.')'
+                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (:'. $parameterName .')'
             );
 
             if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
