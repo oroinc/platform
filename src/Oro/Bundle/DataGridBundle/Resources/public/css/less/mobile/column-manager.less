@@ -1,17 +1,28 @@
 .column-manager {
-  a.dropdown-toggle {
+  a.action.btn.dropdown-toggle {
     line-height: 30px;
+    margin-right: 0;
   }
   label {
     line-height: @baseLineHeight;
   }
   .dropdown-menu {
-    right: 40px;
     &:before {
       top: 9px;
     }
     &:after {
       top: 10px;
     }
+  }
+}
+
+.dropup .column-manager .dropdown-menu {
+  &:before {
+    top: auto;
+    bottom: 9px;
+  }
+  &:after {
+    top: auto;
+    bottom: 10px;
   }
 }

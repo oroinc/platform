@@ -84,6 +84,22 @@ define(function(require) {
             if (!this.$(e.target).is('.close')) {
                 e.stopPropagation();
             }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        disable: function () {
+            this.$('.dropdown-toggle').addClass('disabled');
+            return ActionComponentDropdownLauncher.__super__.disable.call(this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enable: function () {
+            this.$('.dropdown-toggle').removeClass('disabled');
+            return ActionComponentDropdownLauncher.__super__.enable.call(this);
         }
     });
 
