@@ -225,6 +225,12 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function configDataProvider()
     {
+        $columns = [
+            'name'  => ['order' => 2, 'renderable' => true],
+            'label' => ['order' => 1, 'renderable' => true],
+            'some'  => ['order' => 3, 'renderable' => true]
+        ];
+
         return [
             'same state'         => [
                 'columnsConfigArray'  => [
@@ -238,29 +244,17 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                     ['label' => 'Test Label', 'type' => 'string', 'name' => 'label'],
                     ['label' => 'Test Some', 'type' => 'string', 'name' => 'some']
                 ],
-                'gridViewColumnsData' => [
-                    'name'  => ['order' => 2,'renderable' => true],
-                    'label' => ['order' => 1,'renderable' => true],
-                    'some'  => ['order' => 3,'renderable' => true],
-                ],
+                'gridViewColumnsData' => $columns,
                 'gridViewId'          => 1,
                 'stateResult'         => [
                     'gridView' => 1,
                     'filters'  => [],
-                    'columns'  => [
-                        'name'  => ['order' => 2,'renderable' => true],
-                        'label' => ['order' => 1,'renderable' => true],
-                        'some'  => ['order' => 3,'renderable' => true],
-                    ]
+                    'columns'  => $columns
                 ],
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
-                    'columns'  => [
-                        'name'  => ['order' => 2,'renderable' => true],
-                        'label' => ['order' => 1,'renderable' => true],
-                        'some'  => ['order' => 3, 'renderable' => true]
-                    ]
+                    'columns'  => $columns
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
             ],
@@ -294,11 +288,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
-                    'columns'  => [
-                        'name'  => ['order' => 2, 'renderable' => true],
-                        'label' => ['order' => 1, 'renderable' => true],
-                        'some'  => ['order' => 3, 'renderable' => true]
-                    ]
+                    'columns'  => $columns
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
             ],
@@ -319,20 +309,12 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
                 'stateResult'         => [
                     'gridView' => '__all__',
                     'filters'  => [],
-                    'columns'  => [
-                        'name'  => ['order' => 2, 'renderable' => true],
-                        'label' => ['order' => 1, 'renderable' => true],
-                        'some'  => ['order' => 3, 'renderable' => true],
-                    ]
+                    'columns'  => $columns
                 ],
                 'initialStateResult'  => [
                     'gridView' => '__all__',
                     'filters'  => [],
-                    'columns'  => [
-                        'name'  => ['order' => 2, 'renderable' => true],
-                        'label' => ['order' => 1, 'renderable' => true],
-                        'some'  => ['order' => 3, 'renderable' => true]
-                    ]
+                    'columns'  => $columns
                 ],
                 'dataInitialState'    => ['gridView' => '__all__', 'filters' => []],
                 'isGridView'          => false
@@ -386,5 +368,4 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
-
 }
