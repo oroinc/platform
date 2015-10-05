@@ -26,7 +26,7 @@ define(function(require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function(options) {
             var settings = this.model.get('settings');
             var count = _.find(unreadEmailsCount, function(item) {
                 return Number(item.id) === Number(settings.folderId);

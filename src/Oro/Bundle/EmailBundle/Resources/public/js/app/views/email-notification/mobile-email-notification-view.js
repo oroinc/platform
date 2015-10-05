@@ -44,10 +44,6 @@ define(function(require) {
             }
             this.$counter.html(count);
             $('#user-menu .dropdown-toggle').toggleClass('has-new-emails', Boolean(this.countNewEmail));
-        },
-
-        showNotification: function() {
-            // nothing to do in mobile version
         }
     });
 
