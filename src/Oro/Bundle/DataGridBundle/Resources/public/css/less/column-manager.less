@@ -1,8 +1,9 @@
 .column-manager {
-  a.dropdown-toggle {
-    display: block;
-    margin: 0 -5px;
-    padding: 0 5px;
+  a.action.btn.dropdown-toggle {
+    margin-right: 0;
+  }
+  &.dropdown {
+    display: inline-block;
   }
   &.disabled.open > .dropdown-menu {
     display: none;
@@ -11,8 +12,8 @@
     cursor: default;
     text-align: left;
     font-weight: normal;
-    top: 0px;
-    right: 36px;
+    top: 0;
+    right: calc(~"100% + 7px");
     left: auto;
     padding: 20px;
     border-color: #ccc;
@@ -34,6 +35,11 @@
       border-left: 6px solid #fff;
       top: 7px;
       right: -6px;
+    }
+    .close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
     }
   }
   .column-manager-title {
@@ -82,5 +88,18 @@
     background-image: none;
     .opacity(65);
     .box-shadow(none);
+  }
+}
+
+.dropup .column-manager .dropdown-menu {
+  top: auto;
+  bottom: 0;
+  &:before {
+    top: auto;
+    bottom: 6px;
+  }
+  &:after {
+    top: auto;
+    bottom: 7px;
   }
 }

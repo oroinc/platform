@@ -3,9 +3,8 @@ _.each(attributes, function(attribute, name) { %>
 <%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %>
 <% });
 } %>
-<div class="<%= wrapperClassName %> dropdown action btn">
-    <a
-        class="action
+<div class="<%= wrapperClassName %> dropdown">
+    <a class="action btn
             <%= className ? " " + className : "" %>
             <%= !enabled ? " disabled" : "" %>
             dropdown-toggle"
@@ -13,11 +12,11 @@ _.each(attributes, function(attribute, name) { %>
         title="<%= title %>"
         data-toggle="dropdown">
         <% if (icon) { %>
-            <i class="icon-<%= icon %> hide-text"><%= label %></i>
+            <i class="icon-<%= icon %>"></i>
         <% } else { %>
             <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
-            <%= label %>
         <% } %>
+        <%= label %>
     </a>
     <div class="dropdown-menu"></div>
 </div>
