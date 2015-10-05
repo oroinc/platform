@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -81,6 +82,16 @@ class ConfigTranslationTest extends WebTestCase
         foreach ($keys as $key) {
             $transKey = $config->get($key);
             if (!$this->getTranslator()->hasTrans($transKey)) {
+                $configId = $config->getId();
+                if ($configId instanceof FieldConfigId) {
+                    $transKey .= sprintf(
+                        ' [Entity: %s; Field: %s]',
+                        $configId->getClassName(),
+                        $configId->getFieldName()
+                    );
+                } else {
+                    $transKey .= sprintf(' [Entity: %s]', $configId->getClassName());
+                }
                 $missingTranslationKeys[] = $transKey;
             }
         }
