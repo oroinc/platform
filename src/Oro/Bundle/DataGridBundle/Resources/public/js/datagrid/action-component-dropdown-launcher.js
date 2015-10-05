@@ -89,7 +89,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        disable: function () {
+        disable: function() {
             this.$('.dropdown-toggle').addClass('disabled');
             return ActionComponentDropdownLauncher.__super__.disable.call(this);
         },
@@ -97,7 +97,7 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        enable: function () {
+        enable: function() {
             this.$('.dropdown-toggle').removeClass('disabled');
             return ActionComponentDropdownLauncher.__super__.enable.call(this);
         }
