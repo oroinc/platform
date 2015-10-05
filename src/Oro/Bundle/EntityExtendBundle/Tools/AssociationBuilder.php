@@ -73,8 +73,18 @@ class AssociationBuilder
                         'without_default' => true,
                     ],
                     'entity' => [
-                        'label'       => $this->getAssociationLabel('label', $relationName, $targetEntityConfig),
-                        'description' => $this->getAssociationLabel('description', $relationName, $targetEntityConfig),
+                        'label'       => $this->getAssociationLabel(
+                            'plural_label',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                        'description' => $this->getAssociationLabel(
+                            'description',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
                     ],
                     'view'   => [
                         'is_displayable' => true
@@ -118,8 +128,18 @@ class AssociationBuilder
                 $relationName,
                 [
                     'entity' => [
-                        'label'       => $this->getAssociationLabel('label', $relationName, $targetEntityConfig),
-                        'description' => $this->getAssociationLabel('description', $relationName, $targetEntityConfig),
+                        'label'       => $this->getAssociationLabel(
+                            'label',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                        'description' => $this->getAssociationLabel(
+                            'description',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
                     ],
                     'view'   => [
                         'is_displayable' => false
@@ -159,19 +179,20 @@ class AssociationBuilder
 
     /**
      * @param string          $labelKey
+     * @param string          $entityClass
      * @param string          $relationName
      * @param ConfigInterface $targetEntityConfig
      *
      * @return string
      */
-    protected function getAssociationLabel($labelKey, $relationName, ConfigInterface $targetEntityConfig)
+    protected function getAssociationLabel($labelKey, $entityClass, $relationName, ConfigInterface $targetEntityConfig)
     {
         $label = $targetEntityConfig->get($labelKey);
         if (!$label) {
             $label = ConfigHelper::getTranslationKey(
                 'entity',
                 $labelKey,
-                $targetEntityConfig->getId()->getClassName(),
+                $entityClass,
                 $relationName
             );
         }
