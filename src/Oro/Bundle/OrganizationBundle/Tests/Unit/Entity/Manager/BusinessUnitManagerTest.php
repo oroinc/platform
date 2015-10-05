@@ -15,8 +15,12 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
 {
     protected $em;
+
     protected $buRepo;
+
     protected $userRepo;
+
+    protected $securityFacade;
 
     /**
      * @var BusinessUnitManager
@@ -54,7 +58,10 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->businessUnitManager = new BusinessUnitManager($this->em);
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->businessUnitManager = new BusinessUnitManager($this->em, $this->securityFacade);
     }
 
     public function testGetTreeOptions()

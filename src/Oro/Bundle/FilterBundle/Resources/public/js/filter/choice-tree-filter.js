@@ -69,7 +69,7 @@ define(function(require) {
         searchItems: function(searchQuery, items) {
             searchQuery = searchQuery.toLowerCase();
             var response = [];
-            _.each(items, function (value) {
+            _.each(items, function(value) {
                 var result = value['name'].toLowerCase().indexOf(searchQuery);
                 if (result >= 0) {
                     response.push({
@@ -252,7 +252,7 @@ define(function(require) {
         _convertToTree: function(data) {
             var self = this;
             var response = [];
-            _.each(data, function (value) {
+            _.each(data, function(value) {
                 if (!value['owner_id']) {
                     response.push({
                         value: value,
@@ -261,7 +261,7 @@ define(function(require) {
                 }
             });
 
-            _.each(response, function (value, key) {
+            _.each(response, function(value, key) {
                 response[key]['children'] = self.searchEngine.findChild(value, data);
             });
 
@@ -352,7 +352,8 @@ define(function(require) {
         },
 
         _onClickUpdateCriteria: function() {
-            ChoiceTreeFilter.__super__._onClickUpdateCriteria.apply(this, arguments);
+            this._hideCriteria();
+            this.applyValue();
             this.trigger('update');
             this._updateCriteriaHint();
         },
@@ -433,6 +434,7 @@ define(function(require) {
         },
 
         _onClickButtonSelected: function(event) {
+            event.stopImmediatePropagation();
             if (this.mode != availableModes.selected) {
                 this.$el.find('.buttons span').removeClass('active');
                 this.mode = availableModes.selected;
