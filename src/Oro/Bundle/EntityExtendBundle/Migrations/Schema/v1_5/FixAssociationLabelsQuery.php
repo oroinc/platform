@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_5;
 
 use Doctrine\DBAL\Connection;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+
 use Psr\Log\LoggerInterface;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 
