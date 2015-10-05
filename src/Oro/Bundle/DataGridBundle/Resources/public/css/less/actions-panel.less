@@ -7,12 +7,15 @@
       margin-right: 0;
     }
   }
-  a.action.btn {
+}
+.grid-toolbar .actions-panel.pull-right {
+  /* hide text label for actions in right panel */
+  .action {
     font: 0/0 a;
     color: transparent;
     text-shadow: none;
     background-color: transparent;
-    i {
+    [class^="icon-"], [class*=" icon-"] {
       font: @baseFontSize/26px 'FontAwesome';
       color: @btnTextColor;
       &.hide-text {
