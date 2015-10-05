@@ -48,13 +48,12 @@ class ColumnsHelper
 
     /**
      * Get Columns State from ColumnsParam string
-     *
-     * @param array        $columnsData
-     * @param string|array $columns
-     *
      * Example $columns:
      * default: name1.contactName1.contactEmail1.contactPhone1.ownerName1.createdAt0.updatedAt1
      * modified: updatedAt1.name1.contactName1.contactEmail1.contactPhone1.ownerName0.createdAt1
+     *
+     * @param array        $columnsData
+     * @param string|array $columns
      *
      * @return array $columnsData
      */
@@ -75,6 +74,66 @@ class ColumnsHelper
         }
 
         return  $columnsData;
+    }
+
+    /**
+     * @param array $columns
+     *
+     * @return array
+     */
+    public function buildColumnsOrder(array $columns = [])
+    {
+        $orders = [];
+
+        $ignoreList = [];
+        foreach ($columns as $name => $column) {
+            if (array_key_exists(ColumnsExtension::ORDER_FIELD_NAME, $column)) {
+                $orders[$name] = (int)$column[ColumnsExtension::ORDER_FIELD_NAME];
+                array_push($ignoreList, $orders[$name]);
+            } else {
+                $orders[$name] = 0;
+            }
+        }
+
+        $iteration  = 0;
+        foreach ($orders as $name => &$order) {
+            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
+            if (0 === $order) {
+                $order = $iteration;
+                $iteration++;
+            } else {
+                array_push($ignoreList, $order);
+            }
+        }
+        unset($order);
+
+        return $orders;
+    }
+
+    /**
+     * Reorder columns array by order for export
+     *
+     * @param array  $columns
+     * @param string $columnsParams
+     *
+     * @return array
+     */
+    public function reorderColumns($columns, $columnsParams)
+    {
+        if ($columnsParams) {
+            $columns = $this->prepareColumnsParam($columns, $columnsParams);
+            $orders = [];
+            foreach ($columns as $column) {
+                if (isset($column['order'])) {
+                    $orders[] = $column['order'];
+                } else {
+                    $orders[] = 0;
+                }
+            }
+            array_multisort($orders, $columns);
+        }
+
+        return $columns;
     }
 
     /**
@@ -125,40 +184,6 @@ class ColumnsHelper
     }
 
     /**
-     * @param array $columns
-     *
-     * @return array
-     */
-    public function buildColumnsOrder(array $columns = [])
-    {
-        $orders = [];
-
-        $ignoreList = [];
-        foreach ($columns as $name => $column) {
-            if (array_key_exists(ColumnsExtension::ORDER_FIELD_NAME, $column)) {
-                $orders[$name] = (int)$column[ColumnsExtension::ORDER_FIELD_NAME];
-                array_push($ignoreList, $orders[$name]);
-            } else {
-                $orders[$name] = 0;
-            }
-        }
-
-        $iteration  = 0;
-        foreach ($orders as $name => &$order) {
-            $iteration = $this->getFirstFreeOrder($iteration, $ignoreList);
-            if (0 === $order) {
-                $order = $iteration;
-                $iteration++;
-            } else {
-                array_push($ignoreList, $order);
-            }
-        }
-        unset($order);
-
-        return $orders;
-    }
-
-    /**
      * Get first number which is not in ignore list
      *
      * @param int   $iteration
@@ -174,31 +199,5 @@ class ColumnsHelper
         }
 
         return $iteration;
-    }
-
-    /**
-     * Reorder columns array by order for export
-     *
-     * @param array  $columns
-     * @param string $columnsParams
-     *
-     * @return array
-     */
-    public function reorderColumns($columns, $columnsParams)
-    {
-        if ($columnsParams) {
-            $columns = $this->prepareColumnsParam($columns, $columnsParams);
-            $orders = [];
-            foreach ($columns as $column) {
-                if (isset($column['order'])) {
-                    $orders[] = $column['order'];
-                } else {
-                    $orders[] = 0;
-                }
-            }
-            array_multisort($orders, $columns);
-        }
-
-        return $columns;
     }
 }

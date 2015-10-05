@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Columns;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 
@@ -204,6 +205,21 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testVisitMetadataNotCurrentUser()
+    {
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
+            ->will($this->returnValue(null));
+
+        $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $data = MetadataObject::createNamed('test-grid', []);
+        $result = $this->extension->visitMetadata($config, $data);
+        $this->assertEquals(null, $result);
+    }
+
     /**
      * @return array
      */
@@ -323,4 +339,52 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @param array $input
+     * @param array $expected
+     * @dataProvider setParametersDataProvider
+     */
+    public function testSetParameters(array $input, array $expected)
+    {
+        $this->extension->setParameters(new ParameterBag($input));
+        $this->assertEquals($expected, $this->extension->getParameters()->all());
+    }
+
+    /**
+     * @return array
+     */
+    public function setParametersDataProvider()
+    {
+        $minifiedParams = 'name1.updatedAt1.contactName1.contactEmail0.contactPhone1.ownerName1.createdAt1';
+
+        return [
+            'empty' => [
+                'input' => [],
+                'expected' => [],
+            ],
+            'regular' => [
+                'input' => [
+                    ColumnsExtension::COLUMNS_PARAM => $minifiedParams
+                ],
+                'expected' => [
+                    ColumnsExtension::COLUMNS_PARAM => $minifiedParams
+                ]
+            ],
+            'minified' => [
+                'input' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        ColumnsExtension::MINIFIED_COLUMNS_PARAM => $minifiedParams
+                    ]
+                ],
+                'expected' => [
+                    ParameterBag::MINIFIED_PARAMETERS => [
+                        ColumnsExtension::MINIFIED_COLUMNS_PARAM => $minifiedParams
+                    ],
+                    ColumnsExtension::MINIFIED_COLUMNS_PARAM => $minifiedParams
+                ]
+            ]
+        ];
+    }
+
 }

@@ -123,43 +123,69 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
     public function compareColumnsDataProvider()
     {
         $array1 = [
-            'name'  => ['order' => 1,'renderable' => false],
-            'email' => ['renderable' => false,'order' => 1]
+            'name'  => ['order' => 1,'renderable' => true],
+            'email' => ['renderable' => true,'order' => 2]
         ];
         $array2 = [
-            'email' => ['order' => 1, 'renderable' => false],
-            'name' => ['order' => 1,'renderable' => false]
+            'email' => ['order' => 2, 'renderable' => true],
+            'name'  => ['order' => 1, 'renderable' => true]
         ];
         $array3 = [
-            'email' => ['order' => 1,'renderable' => true],
-            'name' => ['order' => 1,'renderable' => false]
+            'email' => ['order' => 1, 'renderable' => true],
+            'name'  => ['order' => 2, 'renderable' => false]
         ];
         $array4 = [
-            'email' => ['order' => 1,'renderable' => false],
-            'name' => ['order' => 0,'renderable' => false]
+            'email' => ['order' => 1, 'renderable' => false],
+            'name'  => ['order' => 0, 'renderable' => false]
+        ];
+
+        $array5 = [
+            'email' => ['order' => 1, 'renderable' => false],
+            'name2' => ['order' => 1, 'renderable' => false]
+        ];
+
+        $array6 = [
+            'email' => ['order' => 2, 'renderable' => true],
+            'name'  => ['order' => 1, 'renderable' => true],
+            'name2' => ['order' => 3, 'renderable' => true],
         ];
 
         return [
-            'equal'     => [
+            'equal' => [
                 'viewData' => $array1,
                 'urlData'  => $array2,
-                'result' => true
+                'result'   => true
             ],
             'not equal' => [
-                'viewData'  => $array1,
+                'viewData' => $array1,
                 'urlData'  => $array3,
-                'result' => false
+                'result'   => false
             ],
             'not equal1' => [
-                'viewData'  => $array1,
+                'viewData' => $array1,
                 'urlData'  => $array4,
-                'result' => false
+                'result'   => false
             ],
             'not equal2' => [
-                'viewData'  => $array3,
+                'viewData' => $array3,
                 'urlData'  => $array4,
-                'result' => false
-            ]
+                'result'   => false
+            ],
+            'not equal3' => [
+                'viewData' => $array2,
+                'urlData'  => $array5,
+                'result'   => false
+            ],
+            'not equal keys' => [
+                'viewData' => $array2,
+                'urlData'  => $array6,
+                'result'   => false
+            ],
+            'not valid data2' => [
+                'viewData' => $array1,
+                'urlData'  => [],
+                'result'   => false
+            ],
         ];
     }
 
@@ -217,6 +243,94 @@ class ColumnsHelperTest extends \PHPUnit_Framework_TestCase
             'columns does not have default config' => [
                 'columnsArray' => $columns2,
                 'result'       => $result2
+            ]
+        ];
+    }
+
+    /**
+     * Test reorder column for export grid
+     *
+     * @param array  $columnsArray
+     * @param string $columnsParams
+     * @param array  $result
+     *
+     * @dataProvider reorderColumnsProvider
+     */
+    public function testReorderColumns($columnsArray, $columnsParams, $result)
+    {
+        $isEqual = $this->columnsHelper->reorderColumns($columnsArray, $columnsParams);
+        static::assertEquals(
+            $isEqual,
+            $result
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function reorderColumnsProvider()
+    {
+        $columnsParams1 = 'name1.email1.data1.city1';
+        $columnsParams2 = 'email1.data1.city1.name1';
+        $columnsParams3 = 'city1.name1.email1.data1';
+
+        $columns1 = [
+            'name'  => ['label' => 'Name'],
+            'email' => ['label' => 'Email'],
+            'data'  => ['label' => 'Data'],
+            'city'  => ['label' => 'City'],
+        ];
+
+        $columns2 = [
+            'name'  => ['label' => 'Name',  'renderable' => true],
+            'email' => ['label' => 'Email', 'renderable' => true],
+            'data'  => ['label' => 'Data',  'order' => 2, 'renderable' => true],
+            'city'  => ['label' => 'City',  'renderable' => true]
+        ];
+
+        $columns3 = [
+            'name'  => ['label' => 'Name',  'renderable' => true],
+            'email' => ['label' => 'Email', 'renderable' => true],
+            'data'  => ['label' => 'Data',  'renderable' => true],
+            'city'  => ['label' => 'City',  'renderable' => true]
+        ];
+
+        $result1 = [
+            'name'  => ['label' => 'Name',  'order' => 0, 'renderable' => true],
+            'email' => ['label' => 'Email', 'order' => 1, 'renderable' => true],
+            'data'  => ['label' => 'Data',  'order' => 2, 'renderable' => true],
+            'city'  => ['label' => 'City',  'order' => 3, 'renderable' => true],
+        ];
+
+        $result2 = [
+            'email' => ['label' => 'Email', 'order' => 0, 'renderable' => true],
+            'data'  => ['label' => 'Data',  'order' => 1, 'renderable' => true],
+            'city'  => ['label' => 'City',  'order' => 2, 'renderable' => true],
+            'name'  => ['label' => 'Name',  'order' => 3, 'renderable' => true],
+        ];
+
+        $result3 = [
+            'city'  => ['label' => 'City',  'order' => 0, 'renderable' => true],
+            'name'  => ['label' => 'Name',  'order' => 1, 'renderable' => true],
+            'email' => ['label' => 'Email', 'order' => 2, 'renderable' => true],
+            'data'  => ['label' => 'Data',  'order' => 3, 'renderable' => true],
+        ];
+
+        return [
+            'default order' => [
+                'columnsArray'  => $columns1,
+                'columnsParams' => $columnsParams1,
+                'result'        => $result1
+            ],
+            'columns without order' => [
+                'columnsArray'  => $columns2,
+                'columnsParams' => $columnsParams2,
+                'result'        => $result2
+            ],
+            'some columns have default order' => [
+                'columnsArray'  => $columns3,
+                'columnsParams' => $columnsParams3,
+                'result'        => $result3
             ]
         ];
     }
