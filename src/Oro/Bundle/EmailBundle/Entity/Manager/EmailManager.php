@@ -57,11 +57,11 @@ class EmailManager
     }
 
     /**
-     * Set EmailUser seen status
+     * Set seen status for EmailUser
      *
      * @param EmailUser $entity
      * @param bool      $isSeen
-     * @param bool      $flush
+     * @param bool      $flush - if true then method executes flush
      */
     public function setEmailUserSeen(EmailUser $entity, $isSeen = true, $flush = false)
     {
@@ -78,7 +78,7 @@ class EmailManager
      *
      * @param Email $entity
      * @param bool  $isSeen
-     * @param bool  $checkThread - Set statuses for threaded emails
+     * @param bool  $checkThread - if false it will be applied for single email instead of thread
      */
     public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
@@ -96,7 +96,7 @@ class EmailManager
     }
 
     /**
-     * Toggle user email thread seen
+     * Toggle EmailUser thread seen
      *
      * @param EmailUser $entity
      */
