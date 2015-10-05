@@ -245,7 +245,7 @@ define([
 
             var self = this;
             modal.on('ok', function(e) {
-                var model = new GridViewModel({
+                var model = self._createViewModel({
                     label: this.$('input[name=name]').val(),
                     type: 'private',
                     grid_name: self.gridName,
@@ -545,6 +545,16 @@ define([
                             currentView.get('deletable')
                 }
             ];
+        },
+
+        /**
+         * @protected
+         *
+         * @param   {Object} data
+         * @returns {GridViewModel}
+         */
+        _createViewModel: function(data) {
+            return new GridViewModel(data);
         },
 
         /**
