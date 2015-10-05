@@ -5,9 +5,8 @@ require([
 
     BaseController.loadBeforeAction([
         'jquery',
-        'oroemail/js/app/components/email-notification-component',
-        'oroemail/js/app/models/email-notification/email-notification-count-model'
-    ], function($, EmailNotificationComponent, EmailNotificationCountModel) {
+        'oroemail/js/app/components/user-menu-email-notification-component'
+    ], function($, UserMenuEmailNotificationComponent) {
         BaseController.addToReuse('emailNotification', {
             compose: function() {
                 var $menu = $('.email-notification-menu');
@@ -15,8 +14,7 @@ require([
                     var options = $menu.data('page-component-options');
                     options._sourceElement = $menu.find('.dropdown-menu');
                     options._iconElement = $menu.find('.email-notification-icon');
-                    options.countModel = new EmailNotificationCountModel({'unreadEmailsCount': options.count});
-                    this.component = new EmailNotificationComponent(options);
+                    this.component = new UserMenuEmailNotificationComponent(options);
                 }
             }
         });

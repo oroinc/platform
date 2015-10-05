@@ -13,8 +13,8 @@ define(function(require) {
         },
 
         render: function() {
-            if (this.component) {
-                this.component.dispose();
+            if (this.model.notificationComponentInstance) {
+                this.model.notificationComponentInstance.dispose();
             }
             var settings = this.model.get('settings');
             var options = {
@@ -27,7 +27,7 @@ define(function(require) {
                 hasMarkVisibleButton: true
             };
 
-            this.component = new EmailNotificationComponent(options);
+            this.model.notificationComponentInstance = new EmailNotificationComponent(options);
 
             return this;
         },

@@ -4,17 +4,12 @@ define(function(require) {
     var EmailNotificationComponent;
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var module = require('module');
-    var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
-    var sync = require('orosync/js/sync');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var DesktopEmailNotificationView =
         require('oroemail/js/app/views/email-notification/email-notification-collection-view');
     var MobileEmailNotificationView =
         require('oroemail/js/app/views/email-notification/mobile-email-notification-view');
-    var EmailNotificationCollection =
-        require('oroemail/js/app/models/email-notification/email-notification-collection');
     var EmailNotificationCountView =
         require('oroemail/js/app/views/email-notification/email-notification-count-view');
 
@@ -24,25 +19,11 @@ define(function(require) {
         countModel: null,
 
         initialize: function(options) {
-            if (!options || !(options.countModel instanceof Backbone.Model)) {
+            _.extend(this, _.pick(options, ['countModel']));
+            if (this.countModel instanceof Backbone.Model === false) {
                 throw new TypeError('Invalid "countModel" option of EmailNotificationComponent');
             }
-            _.extend(this, _.pick(options, ['countModel']));
-            this.initCollection(options);
             this.initViews(options);
-            this.initSync();
-        },
-
-        initCollection: function(options) {
-            if (this.collection) {
-                this.usedOutOfScopeCollection = true;
-                return;
-            }
-            var emails = options.emails || [];
-            if (typeof emails === 'string') {
-                emails = JSON.parse(emails);
-            }
-            this.collection = new EmailNotificationCollection(emails);
         },
 
         initViews: function(options) {
@@ -64,44 +45,9 @@ define(function(require) {
             }
         },
 
-        initSync: function() {
-            var channel = module.config().clankEvent;
-            var handlerNotification = _.bind(this.handlerNotification, this);
-            sync.subscribe(channel, handlerNotification);
-            this.once('dispose', function() {
-                sync.unsubscribe(channel, handlerNotification);
-            });
-        },
-
-        handlerNotification: function(response) {
-            var self = this;
-            response = JSON.parse(response);
-            if (response) {
-                var hasNewEmail = response.hasNewEmail;
-                self.loadLastEmail(hasNewEmail);
-            }
-        },
-
-        loadLastEmail: function(hasNewEmail) {
-            this.collection.fetch({
-                success: _.bind(function(collection) {
-                    this.countModel.set('unreadEmailsCount', collection.unreadEmailsCount);
-                    if (hasNewEmail) {
-                        this.view.showNotification();
-                        mediator.trigger('datagrid:doRefresh:user-email-grid');
-                    }
-                }, this)
-            });
-        },
-
         dispose: function() {
-            if (this.disposed) {
-                return true;
-            }
-            if (this.usedOutOfScopeCollection) {
-                // prevent collection disposing
-                delete this.collection;
-            }
+            delete this.collection;
+            delete this.countModel;
             EmailNotificationComponent.__super__.dispose.call(this);
         }
     });

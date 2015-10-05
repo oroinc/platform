@@ -158,13 +158,6 @@ define(function(require) {
             this.updateViewMode();
         },
 
-        showNotification: function() {
-            if (!this.isOpen()) {
-                this.open();
-                this.setModeDropDownMenu('notification');
-            }
-        },
-
         isOpen: function() {
             this.$el.hasClass('open');
         },
@@ -192,6 +185,7 @@ define(function(require) {
             if (this.loadingMask) {
                 this.loadingMask.hide();
                 this.loadingMask.dispose();
+                this.loadingMask = null;
             }
             this.render();
         },
@@ -200,6 +194,7 @@ define(function(require) {
             if (this.loadingMask) {
                 this.loadingMask.hide();
                 this.loadingMask.dispose();
+                this.loadingMask = null;
             }
             EmailNotificationCollectionView.__super__.dispose.call(this);
         }
