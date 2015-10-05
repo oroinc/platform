@@ -165,9 +165,9 @@ class AclRoleHandler
 
         //TODO: Removing 'SHARE' from config. Remove this code after sharing is implemented.
         if ($ignoreShare && isset($this->privilegeConfig['entity']['permissions']) &&
-            in_array('SHARE', $this->privilegeConfig['entity']['permissions'], true)
+            $key = array_search('SHARE', $this->privilegeConfig['entity']['permissions'], true)
         ) {
-            array_pop($this->privilegeConfig['entity']['permissions']);
+            unset($this->privilegeConfig['entity']['permissions'][$key]);
         }
     }
 
