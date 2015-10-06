@@ -5,22 +5,6 @@ define(function(require) {
     /**
      * Abstraction of api access point. This class is designed to create from server configuration.
      *
-     * Options:
-     * Name  | Description
-     * ------|------------
-     * route | Route name
-     * http_method | Http method to access this route. (GET|POST|PUT|PATCH...)
-     * form_name | Wraps request body into form_name, so request will look like ```
-     *             {<form_name>:{<field_name>: <new_value>}}
-     *             ```
-     * headers | Allows to provide additional http headers
-     * default_route_parameters | provides default parameters values for route creation,
-     *                            this defaults will be merged with row model data to get url
-     * query_parameter_names | array of parameter names to put into query string
-     *                         (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>).
-     *                         (The reason is that FOSRestBundle doesn’t provides them for client usage, \
-     *                         so it is required to specify list of available query parameters)
-     *
      * @class
      * @augment StdClass
      * @exports ApiAccessor
@@ -45,6 +29,17 @@ define(function(require) {
         /**
          * @constructor
          * @param options
+         * @param options.route Route name
+         * @param options.http_method  Http method to access this route. (GET|POST|PUT|PATCH...)
+         * @param options.form_name  Wraps request body into form_name, so request will look like
+         *                            `{<form_name>:{<field_name>: <new_value>}}`
+         * @param options.headers  Allows to provide additional http headers
+         * @param options.default_route_parameters  provides default parameters values for route creation,
+         *                            this defaults will be merged with row model data to get url
+         * @param options.query_parameter_names  array of parameter names to put into query string
+         *                         (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>).
+         *                         (The reason is that FOSRestBundle doesn’t provides them for client usage, \
+         *                         so it is required to specify list of available query parameters)
          */
         initialize: function(options) {
             if (!options) {
