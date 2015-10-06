@@ -6,6 +6,18 @@ define(function(require) {
      * Abstraction of api access point. This class is designed to create from server configuration.
      *
      * @class
+     * @param {object} options
+     * @param {string} options.route Route name
+     * @param {string} options.http_method  Http method to access this route. (GET|POST|PUT|PATCH...)
+     * @param {string} options.form_name Wraps request body into form_name, so request will look like
+     *                            `{<form_name>:{<field_name>: <new_value>}}`
+     * @param {object} options.headers  Allows to provide additional http headers
+     * @param {object}options.default_route_parameters  provides default parameters values for route creation,
+     *                            this defaults will be merged with row model data to get url
+     * @param {Array.<string>}options.query_parameter_names  array of parameter names to put into query string
+     *                         (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>).
+     *                         (The reason is that FOSRestBundle doesn’t provides them for client usage, \
+     *                         so it is required to specify list of available query parameters)
      * @augment StdClass
      * @exports ApiAccessor
      */
