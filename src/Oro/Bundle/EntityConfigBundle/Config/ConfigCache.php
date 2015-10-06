@@ -398,6 +398,29 @@ class ConfigCache
     }
 
     /**
+     * Sets flags for entity and all its fields indicates whether they are configurable or not.
+     * Be careful using this method because it completely replaces existing flags
+     *
+     * @param string      $className
+     * @param bool        $classFlag  TRUE if an entity is configurable; otherwise, FALSE
+     * @param string|null $fieldFlags [field_name => flag, ...]
+     *                                flag = TRUE if a field is configurable; otherwise, FALSE
+     *
+     * @return boolean TRUE if the entry was successfully stored in the cache; otherwise, FALSE.
+     */
+    public function saveConfigurableValues($className, $classFlag, $fieldFlags)
+    {
+        $cacheEntry = [
+            self::FLAG_KEY   => $classFlag,
+            self::FIELDS_KEY => $fieldFlags
+        ];
+
+        $this->localModelCache[$className] = $cacheEntry;
+
+        return $this->modelCache->save($className, $cacheEntry);
+    }
+
+    /**
      * Deletes cached "configurable" flags for all configs.
      *
      * @return bool TRUE if the cache entries were successfully deleted; otherwise, FALSE.

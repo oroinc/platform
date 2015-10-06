@@ -39,8 +39,7 @@ class EntityCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
-        $this->configManager->clearCache();
-        $this->configManager->clearConfigurableCache();
+        $this->configManager->flushAllCaches();
         $this->configCacheWarmer->warmUpCache(ConfigCacheWarmer::MODE_CONFIGURABLE_ENTITY_ONLY);
         $this->dumper->dump();
     }

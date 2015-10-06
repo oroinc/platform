@@ -54,8 +54,7 @@ class RefreshExtendCacheMigration implements Migration, DataStorageExtensionAwar
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->configManager->clearCache();
-        $this->configManager->clearConfigurableCache();
+        $this->configManager->flushAllCaches();
 
         if ($schema instanceof ExtendSchema) {
             $queries->addQuery(

@@ -32,8 +32,7 @@ class CacheClearCommand extends ContainerAwareCommand
 
         /** @var ConfigManager $configManager */
         $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
-        $configManager->clearCache();
-        $configManager->clearConfigurableCache();
+        $configManager->flushAllCaches();
 
         if (!$input->getOption('no-warmup')) {
             /** @var ConfigCacheWarmer $configCacheWarmer */

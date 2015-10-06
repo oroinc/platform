@@ -437,6 +437,18 @@ class ConfigManager
     }
 
     /**
+     * Removes all entries from all used caches, completely.
+     */
+    public function flushAllCaches()
+    {
+        //$this->cache->flushAllConfigurable();
+        //$this->cache->flushAllConfigs();
+        // @todo temporary solution. 'flush' methods should be used. should be fixed in BAP-9151
+        $this->cache->deleteAllConfigurable();
+        $this->cache->deleteAllConfigs();
+    }
+
+    /**
      * Makes the given configuration object managed and persistent.
      *
      * @param ConfigInterface $config

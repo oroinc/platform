@@ -67,8 +67,7 @@ class ConfigLoader
                 $this->configManager->clear();
             } else {
                 $this->configManager->flush();
-                $this->configManager->clearCache();
-                $this->configManager->clearConfigurableCache();
+                $this->configManager->flushAllCaches();
             }
         } catch (\Exception $ex) {
             $this->logger = null;
