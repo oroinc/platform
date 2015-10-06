@@ -55,20 +55,22 @@ inline_editing.save_api_accessor.query_parameter_names array of parameter names 
 string (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>). (Actually
 FOSRestBundle doesn’t provides them for client usage, so it is required to specify list of available query parameters)
 
-Sample usage of save_api accessor with full options provided:
-      save_api_accessor:
-            route: orocrm_opportunity_task_update # route uses following mask
- 					# to generate url /api/opportunity/{opportunity_id}/tasks/{id}
-            http_method: POST
-		headers:
-    Api-Secret: ANS2DFN33KASD4F6OEV7M8
-default_route_parameters:
-    opportunity_id: 23
+### Sample usage of save_api accessor with full options provided
+``` yml
+save_api_accessor:
+    route: orocrm_opportunity_task_update # for example this route uses following mask
+        # to generate url /api/opportunity/{opportunity_id}/tasks/{id}
+    http_method: POST
+    headers:
+        Api-Secret: ANS2DFN33KASD4F6OEV7M8
+    default_route_parameters:
+        opportunity_id: 23
     action: patch
-query_parameter_names: [action]
- Result of combining options:
+    query_parameter_names: [action]
+```
+Result of combining options:
 /api/opportunity/23/tasks/{id}?action=patch
-            Please note that {id} will be taken from current row in grid
+    Please note that {id} will be taken from current row in grid
 
 ## Column configuration options:
 ``` yml
