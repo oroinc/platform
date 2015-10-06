@@ -36,7 +36,7 @@ datagrid:
 Option name              | Default value | Description
 -------------------------|---------------|------------
 enable    | false         | Enables inline editing on grid. By default on all cells what have frontend type that support inline editing
-behaviour | enable_all    | Specifies a way how inline editing will be enabled. Possible values: *enable_all* - (default). this will enable inline editing where possible. *enable_selected* - disable by default, enable only on configured cells
+behaviour | enable_all    | Specifies a way how inline editing will be enabled. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
 plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies plugin realization
 default_editors | orodatagrid/js/default-editors | Specifies default editors for front-end types
 cell_editor | {component: 'orodatagrid/js/app/components/cell-popup-editor-component'} | Specifies default cell_editor_component and their options
@@ -94,11 +94,9 @@ datagrid:
 
 Options name | Default value | Description
 -------------|---------------|------------
-enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: *enable_all* - false will disable editing this cell. *enable_selected* - true will enable editing this cell.
+enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
 save_api_accessor | | Allows to override default api accessor for all grid. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
-editor.component | | defines view that used to render cell-editor
+editor.component | | Allows to override component used to display view and specified in `datagrid.{grid-uid}.inline_editing.cell_editor.component`
 editor.component_options | {} | specifies options to pass into cell editor component
-editor.view | | defines view that used to render cell-editor
+editor.view | | defines view that used to render cell-editor. By default this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
 editor.view_options | {} | specifies options to pass into cell editor view
-
-NOTE: if editor option is not provided the default grid editor component will be used and view will be selected using inline_editing.default_editors file
