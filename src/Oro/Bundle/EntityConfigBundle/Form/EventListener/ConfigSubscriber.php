@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
