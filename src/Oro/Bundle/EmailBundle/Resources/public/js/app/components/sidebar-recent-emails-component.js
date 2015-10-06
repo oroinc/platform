@@ -8,8 +8,8 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var sync = require('orosync/js/sync');
     var Backbone = require('backbone');
-    var unreadEmailsCount = _.result(module.config(), 'unreadEmailsCount') || [];
     var channel = module.config().clankEvent;
+    var countCache = require('oroemail/js/util/unread-email-count-cache');
     var EmailNotificationCollection =
         require('oroemail/js/app/models/email-notification/email-notification-collection');
     var EmailNotificationCountModel =
@@ -28,10 +28,7 @@ define(function(require) {
          */
         initialize: function(options) {
             var settings = this.model.get('settings');
-            var count = _.find(unreadEmailsCount, function(item) {
-                return Number(item.id) === Number(settings.folderId);
-            });
-            count = count !== void 0 ? count.num : 0;
+            var count = countCache.get(settings.folderId);
             this.debouncedNotificationHandler = _.debounce(_.bind(this._notificationHandler, this), 3000, true);
             this.model.emailNotificationCountModel = new EmailNotificationCountModel({unreadEmailsCount: count});
             this.listenTo(this.model.emailNotificationCountModel, 'change:unreadEmailsCount', this.updateSidebarCount);
@@ -56,16 +53,14 @@ define(function(require) {
         },
 
         onFetchCollection: function() {
-            this.model.trigger('start-loading');
+            if (!countCache.hasInitState()) {
+                this.model.trigger('start-loading');
+            }
         },
 
         updateModelFromCollection: function(collection) {
             var id = Number(_.result(this.model.get('settings'), 'folderId') || 0);
-            _.each(unreadEmailsCount, function(item) {
-                if (item.id === id) {
-                    item.num = collection.unreadEmailsCount;
-                }
-            });
+            countCache.set(id, collection.unreadEmailsCount);
             this.model.trigger('end-loading');
             this.model.emailNotificationCountModel.set('unreadEmailsCount', collection.unreadEmailsCount);
         },
@@ -81,6 +76,7 @@ define(function(require) {
         },
 
         _notificationHandler: function() {
+            countCache.clear();
             this.model.emailNotificationCollection.fetch();
             mediator.trigger('datagrid:doRefresh:user-email-grid');
         },

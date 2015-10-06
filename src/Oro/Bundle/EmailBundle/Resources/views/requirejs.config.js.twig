@@ -4,8 +4,10 @@ require({
             clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
         },
         'oroemail/js/app/components/sidebar-recent-emails-component': {
-            clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }},
+            clankEvent: {{ oro_get_email_clank_event()|json_encode|raw }}
+        },
+        'oroemail/js/util/unread-email-count-cache': {
             unreadEmailsCount: {{ oro_get_unread_emails_count()|json_encode|raw }}
-        }
+        },
     }
 });

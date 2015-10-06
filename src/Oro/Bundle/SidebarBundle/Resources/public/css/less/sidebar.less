@@ -168,31 +168,33 @@
             position: absolute;
         }
     }
+    .icon-refresh {
+      display: none !important;
+    }
     &.loading {
-      .icon-with-counter {
-        span {
-          font-size: 0;
-          line-height: 6px;
-          padding: 2px;
-        }
-        span:before {
-          content: "\f021";
-          font-size: 7px;
-          font-family: FontAwesome;
-          font-weight: normal;
-          font-style: normal;
-          display: inline-block;
-          vertical-align: middle;
-          margin-top: 1px;
-          -webkit-animatione: spin 1000ms infinite linear;
-          -moz-animation: spin 1000ms infinite linear;
-          -ms-animation: spin 1000ms infinite linear;
-          animation: spin 1000ms infinite linear;
-          -webkit-transform-origin: 50% 45%;
-          -moz-transform-origin: 50% 45%;
-          -ms-transform-origin: 50% 45%;
-          transform-origin: 50% 45%;
-        }
+      > i {
+        position: relative;
+      }
+      span {
+        display: none;
+      }
+      .icon-refresh {
+        display: inline-block !important;
+        position: absolute;
+        top: -3px;
+        left: -5px;
+        font-size: 8px;
+        margin: 0;
+        padding: 1px 2px;
+        background-color: #eee;
+        border-radius: 50%;
+        -webkit-animatione: spin 1000ms infinite linear;
+        -moz-animation: spin 1000ms infinite linear;
+        -ms-animation: spin 1000ms infinite linear;
+        animation: spin 1000ms infinite linear;
+      }
+      .icon-with-counter.highlight .icon-refresh {
+        color: #fabb18;
       }
     }
 }
