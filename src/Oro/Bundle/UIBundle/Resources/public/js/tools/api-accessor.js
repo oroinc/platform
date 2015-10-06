@@ -16,9 +16,9 @@ define(function(require) {
      * @param {object}options.default_route_parameters Provides default parameters values for route creation,
      *                            this defaults will be merged with row model data to get url
      * @param {Array.<string>}options.query_parameter_names - Array of parameter names to put into query string
-     *                         (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>).
-     *                         (The reason is that FOSRestBundle doesn’t provides them for client usage, \
-     *                         so it is required to specify list of available query parameters)
+     *                         (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
+     *                         (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
+     *                         query parameters for client usage, so it is required to specify list of them)
      * @augment StdClass
      * @exports ApiAccessor
      */
