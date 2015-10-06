@@ -135,12 +135,6 @@ define(function(require) {
             return this.$('.select2-choice').data('select2-data').label;
         },
 
-        isChanged: function() {
-            // current value is always string
-            // btw model value could be an number
-            return this.getValue() !== ('' + this.getModelValue());
-        },
-
         getServerUpdateData: function() {
             var data = {};
             data[this.idFieldName] = this.getValue();

@@ -46,12 +46,6 @@ define(function(require) {
             }
         },
 
-        isChanged: function() {
-            // current value is always string
-            // btw model value could be an number
-            return this.getValue() !== ('' + this.getModelValue());
-        },
-
         getServerUpdateData: function() {
             var data = {};
             data[this.idFieldName] = this.getValue();
