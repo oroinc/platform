@@ -12,24 +12,30 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class BusinessUnitManager
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    /** @var EntityManager */
+    protected $em;
 
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        EntityManager $em,
+        SecurityFacade $securityFacade,
+        AclHelper $aclHelper
+    ) {
         $this->em = $em;
         $this->securityFacade = $securityFacade;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -184,22 +190,14 @@ class BusinessUnitManager
      */
     public function getList()
     {
-        $currentOrganization = $this->securityFacade->getOrganization();
         $businessUnitRepository = $this->getBusinessUnitRepo();
         $response = [];
 
-        $rootBusinessUnits = $businessUnitRepository->getRootBusinessUnits($currentOrganization);
+        $qb = $businessUnitRepository->getRootBusinessUnits();
+        $rootBusinessUnits = $this->aclHelper->apply($qb)->getResult();
+        /** @var $childBusinessUnit BusinessUnit */
         foreach ($rootBusinessUnits as $rootBusinessUnit) {
-            if ($currentOrganization->getIsGlobal()) {
-                $name = sprintf(
-                    '%s (%s)',
-                    $rootBusinessUnit->getName(),
-                    $rootBusinessUnit->getOrganization()->getName()
-                );
-            } else {
-                $name = $rootBusinessUnit->getName();
-            }
-
+            $name = $this->getBusinessUnitName($rootBusinessUnit);
             $response[] = [
                 'id' => $rootBusinessUnit->getId(),
                 'name' => $name,
@@ -207,7 +205,9 @@ class BusinessUnitManager
             ];
         }
 
-        $childBusinessUnits = $businessUnitRepository->getChildBusinessUnits($currentOrganization);
+        $qb = $businessUnitRepository->getChildBusinessUnits();
+        $childBusinessUnits = $this->aclHelper->apply($qb)->getResult();
+        /** @var $childBusinessUnit BusinessUnit */
         foreach ($childBusinessUnits as $childBusinessUnit) {
             $response[] = [
                 'id' => $childBusinessUnit->getId(),
@@ -217,6 +217,16 @@ class BusinessUnitManager
         }
 
         return $response;
+    }
+
+    /**
+     * @param BusinessUnit $rootBusinessUnit
+     *
+     * @return string
+     */
+    protected function getBusinessUnitName(BusinessUnit $rootBusinessUnit)
+    {
+        return  $rootBusinessUnit->getName();
     }
 
     /**

@@ -49,6 +49,7 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_security.security_facade
+            - @oro_security.acl_helper
 
     oro_organization.organization_manager:
         class: %oro_organization.organization.manager.class%

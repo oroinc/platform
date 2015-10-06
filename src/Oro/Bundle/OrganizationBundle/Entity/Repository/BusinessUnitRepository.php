@@ -210,36 +210,26 @@ class BusinessUnitRepository extends EntityRepository
     /**
      * @param Organization $organization
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getRootBusinessUnits(Organization $organization)
+    public function getRootBusinessUnits()
     {
         $qb = $this->createQueryBuilder('businessUnit')
         ->where('businessUnit.owner is NULL');
 
-        if (!$organization->getIsGlobal()) {
-            $qb->andWhere('businessUnit.organization = (:organizationId)');
-            $qb->setParameter('organizationId', $organization->getId());
-        }
-
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 
     /**
      * @param Organization $organization
      *
-     * @return array
+     * @return QueryBuilder
      */
-    public function getChildBusinessUnits(Organization $organization)
+    public function getChildBusinessUnits()
     {
         $qb = $this->createQueryBuilder('businessUnit')
             ->where('businessUnit.owner is not NULL');
 
-        if (!$organization->getIsGlobal()) {
-            $qb->andWhere('businessUnit.organization = (:organizationId)');
-            $qb->setParameter('organizationId', $organization->getId());
-        }
-
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 }

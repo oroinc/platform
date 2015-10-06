@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Provider\Filter;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ChoiceTreeUserProvider
 {
@@ -27,7 +28,7 @@ class ChoiceTreeUserProvider
         $response = [];
         $qb = $this->registry->getManager()->getRepository('OroUserBundle:User')->createQueryBuilder('u');
         $users = $this->aclHelper->apply($qb)->getResult();
-
+        /** @var User $user */
         foreach ($users as $user) {
             $response[] = [
                 'id' => $user->getId(),
