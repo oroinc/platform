@@ -37,7 +37,6 @@ config:
         'oro/datagrid/cell/select-row-cell': 'bundles/orodatagrid/js/datagrid/cell/select-row-cell.js'
         'oro/datagrid/cell/string-cell': 'bundles/orodatagrid/js/datagrid/cell/string-cell.js'
         'oro/datagrid/cell/phone-cell': 'bundles/orodatagrid/js/datagrid/cell/phone-cell.js'
-        'oro/datagrid/cell/enum-cell': 'bundles/orodatagrid/js/datagrid/cell/enum-cell.js'
         'orodatagrid/js/datagrid/formatter/cell-formatter': 'bundles/orodatagrid/js/datagrid/formatter/cell-formatter.js'
         'orodatagrid/js/datagrid/formatter/datetime-formatter': 'bundles/orodatagrid/js/datagrid/formatter/datetime-formatter.js'
         'orodatagrid/js/datagrid/formatter/number-formatter': 'bundles/orodatagrid/js/datagrid/formatter/number-formatter.js'
