@@ -30,6 +30,9 @@ class UserDeleteHandler extends DeleteHandler
         if ($loggedUserId && $loggedUserId == $entity->getId()) {
             throw new ForbiddenException('self delete');
         }
+        if ($this->securityFacade->hasUserSharedRecords($entity)) {
+            throw new ForbiddenException('use has shared records');
+        }
         parent::checkPermissions($entity, $em);
     }
 }
