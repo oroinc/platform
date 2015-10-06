@@ -38,13 +38,9 @@ define(function(require) {
             var View = this.view;
             this.view = new View(this.getViewOptions());
             // fix enter behaviour
-            var events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
-            this.$('.hasDatepicker').on(events);
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEnterKeydown, this));
             // fix esc behaviour
-            events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEscapeKeydown, this);
-            this.$('.hasDatepicker').on(events);
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEscapeKeydown, this));
         },
 
         onInternalEnterKeydown: function(e) {
