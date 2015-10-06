@@ -20,31 +20,28 @@ datagrid:
 ``` yml
 datagrid:
     {grid-uid}:
-        # <grid configuration> goes here
         inline_editing:
         enable: true
             behaviour: enable_all
-        plugin: orodatagrid/js/app/plugins/grid/inline-editing-plugin
-        default_editors: orodatagrid/js/default-editors
-        cell_editor:
-            component: my-bundle/js/app/components/cell-editor-component
-            component_options:
+            plugin: orodatagrid/js/app/plugins/grid/inline-editing-plugin
+            default_editors: orodatagrid/js/default-editors
+            cell_editor:
+                component: my-bundle/js/app/components/cell-editor-component
+                component_options:
+                    {key}: {value}
+            save_api_accessor:
+                # api aceesor options
                 {key}: {value}
-        save_api_accessor:
-            route: orocrm_account_update
-            http_method: PUT
 ```
-inline_editing.enable enables inline editing on grid. By default on all cells what have frontend type that support inline editing
-inline_editing.behaviour option specifies a way how inline editing will be enabled. Possible values:
-enable_all - (default). this will enable inline editing where possible
-enable_selected - disable by default, enable only on configured cells
-	inline_editing.plugin - specifies plugin realization, by default
-orodatagrid/js/app/plugins/grid/inline-editing-plugin
-	inline_editing.default_editors - specifies default editors for front-end types, by default
-orodatagrid/js/default-editors
-	inline_editing.cell_editor.component and inline_editing.cell_editor.options - specifies
-default cell_editor_component and their options
-	inline_editing.save_api_accessor option specifies way how update request will be sent
+Option name              | Default value | Description
+-----------------------------------------------------
+inline_editing.enable    | false         | enables inline editing on grid. By default on all cells what have frontend type that support inline editing
+inline_editing.behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: enable_all - (default). this will enable inline editing where possible. enable_selected - disable by default, enable only on configured cells
+inline_editing.plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | specifies plugin realization
+inline_editing.default_editors | orodatagrid/js/default-editors | specifies default editors for front-end types
+inline_editing.cell_editor |  | specifies default cell_editor_component and their options
+inline_editing.save_api_accessor | | Required. describes how update request will be sent
+
 	inline_editing.save_api_accessor.route specifies route
 	inline_editing.save_api_accessor.class specifies class that realizes this accessor, by default
 oroui/js/tools/api-accessor
