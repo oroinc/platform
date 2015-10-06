@@ -32,7 +32,7 @@ Abstraction of api access point. This class is designed to create from server co
 
 <a name="module_ApiAccessor#send"></a>
 ### apiAccessor.send(urlParameters, body, headers) ⇒ <code>$.Promise</code>
-Prepares request body.
+Sends request to server and returns $.Promise with abort() support
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 **Returns**: <code>$.Promise</code> - - Promise with abort() support  

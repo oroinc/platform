@@ -61,7 +61,7 @@ define(function(require) {
         },
 
         /**
-         * Prepares request body.
+         * Sends request to server and returns $.Promise with abort() support
          *
          * @param {object} urlParameters - Url parameters to combine url
          * @param {object} body - Request body
