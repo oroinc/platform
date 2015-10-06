@@ -10,9 +10,9 @@ datagrid:
         # <grid configuration> goes here
         inline_editing:
         enable: true
-            save_api_accessor:
-                http_method: PATCH
-                route: orocrm_account_update
+        save_api_accessor:
+            http_method: PATCH
+            route: orocrm_account_update
 ```
 - Open corresponding page, all columns that have supported frontend type will become editable
 
@@ -36,7 +36,7 @@ datagrid:
 Option name              | Default value | Description
 -------------------------|---------------|------------
 inline_editing.enable    | false         | enables inline editing on grid. By default on all cells what have frontend type that support inline editing
-inline_editing.behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: enable_all - (default). this will enable inline editing where possible. enable_selected - disable by default, enable only on configured cells
+inline_editing.behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: *enable_all* - (default). this will enable inline editing where possible. *enable_selected* - disable by default, enable only on configured cells
 inline_editing.plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | specifies plugin realization
 inline_editing.default_editors | orodatagrid/js/default-editors | specifies default editors for front-end types
 inline_editing.cell_editor |  | specifies default cell_editor_component and their options
