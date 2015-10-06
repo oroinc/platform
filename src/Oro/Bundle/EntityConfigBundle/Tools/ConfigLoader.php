@@ -51,7 +51,8 @@ class ConfigLoader
     ) {
         $this->logger = $logger ?: new NullLogger();
         try {
-            foreach ($this->entityManagerBag->getEntityManagers() as $em) {
+            $entityManagers = $this->entityManagerBag->getEntityManagers();
+            foreach ($entityManagers as $em) {
                 /** @var ClassMetadata[] $doctrineAllMetadata */
                 $doctrineAllMetadata = $em->getMetadataFactory()->getAllMetadata();
                 if (null !== $filter) {
