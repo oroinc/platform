@@ -26,7 +26,7 @@ datagrid:
             plugin: orodatagrid/js/app/plugins/grid/inline-editing-plugin
             default_editors: orodatagrid/js/default-editors
             cell_editor:
-                component: my-bundle/js/app/components/cell-editor-component
+                component: orodatagrid/js/app/components/cell-popup-editor-component
                 component_options:
                     {key}: {value}
             save_api_accessor:
@@ -39,7 +39,7 @@ inline_editing.enable    | false         | enables inline editing on grid. By de
 inline_editing.behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: *enable_all* - (default). this will enable inline editing where possible. *enable_selected* - disable by default, enable only on configured cells
 inline_editing.plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | specifies plugin realization
 inline_editing.default_editors | orodatagrid/js/default-editors | specifies default editors for front-end types
-inline_editing.cell_editor |  | specifies default cell_editor_component and their options
+inline_editing.cell_editor | {component: orodatagrid/js/app/components/cell-popup-editor-component} | specifies default cell_editor_component and their options
 inline_editing.save_api_accessor | | Required. describes how update request will be sent
 
 	inline_editing.save_api_accessor.route specifies route
