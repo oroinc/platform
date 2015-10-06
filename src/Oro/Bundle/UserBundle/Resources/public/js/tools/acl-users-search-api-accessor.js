@@ -15,7 +15,7 @@ define(function(require) {
     AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @exports AclUsersSearchApiAccessor.prototype */{
         /**
          * @constructor
-         * @param options {object}
+         * @param options {Object}
          * @param options.permission_check_entity_name {string} entity name to check permissions on
          * @param options.permission {string} Optional. Permission name to check
          */

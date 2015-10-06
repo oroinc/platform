@@ -223,7 +223,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         /**
          * Loads single module through requireJS and replaces the property
          *
-         * @param {object} container where to replace property
+         * @param {Object} container where to replace property
          * @param {string} property name to replace module ref to concrete realization
          * @return ($.Promise}
          */

@@ -31,14 +31,14 @@ define(function(require) {
      * and will put response to console after it will be finished
      *
      * @class
-     * @param {object} options - Options container.
+     * @param {Object} options - Options container.
      * @param {string} options.route - Required. Route name
      * @param {string} options.http_method - Http method to access this route (e.g. GET/POST/PUT/PATCH...)
      *                          By default `'GET'`.
      * @param {string} options.form_name - Optional. Wraps request body into form_name, so request will look like
      *                          `{<form_name>:<request_body>}`
-     * @param {object} options.headers - Optional. Allows to provide additional http headers
-     * @param {object} options.default_route_parameters - Optional. Provides default parameters values for route
+     * @param {Object} options.headers - Optional. Allows to provide additional http headers
+     * @param {Object} options.default_route_parameters - Optional. Provides default parameters values for route
      *                          creation, this defaults will be merged with row model data to get url
      * @param {Array.<string>} options.query_parameter_names - Optional. Array of parameter names to put into query
      *                          string(e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
@@ -65,7 +65,7 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @param {object} Options passed to constructor
+         * @param {Object} Options passed to constructor
          */
         initialize: function(options) {
             if (!options) {
@@ -88,9 +88,9 @@ define(function(require) {
         /**
          * Sends request to server and returns $.Promise with abort() support
          *
-         * @param {object} urlParameters - Url parameters to combine url
-         * @param {object} body - Request body
-         * @param {object} headers - Headers to send with request
+         * @param {Object} urlParameters - Url parameters to combine url
+         * @param {Object} body - Request body
+         * @param {Object} headers - Headers to send with request
          * @returns {$.Promise} - Promise with abort() support
          */
         send: function(urlParameters, body, headers) {
@@ -108,8 +108,8 @@ define(function(require) {
         /**
          * Prepares headers for request.
          *
-         * @param {object} headers - Headers to merge into default list
-         * @returns {object}
+         * @param {Object} headers - Headers to merge into default list
+         * @returns {Object}
          */
         getHeaders: function(headers) {
             return _.extend({}, this.headers, headers || {});
@@ -119,7 +119,7 @@ define(function(require) {
          * Prepares url parameters before build url
          *
          * @param urlParameters
-         * @returns {object}
+         * @returns {Object}
          */
         prepareUrlParameters: function(urlParameters) {
             return urlParameters;
@@ -128,7 +128,7 @@ define(function(require) {
         /**
          * Prepares url for request.
          *
-         * @param {object} urlParameters - Map of url parameters to use
+         * @param {Object} urlParameters - Map of url parameters to use
          * @returns {string}
          */
         getUrl: function(urlParameters) {
@@ -138,8 +138,8 @@ define(function(require) {
         /**
          * Prepares request body.
          *
-         * @param {object} body - Map of url parameters to use
-         * @returns {object}
+         * @param {Object} body - Map of url parameters to use
+         * @returns {Object}
          */
         formatBody: function(body) {
             var formattedBody;
@@ -155,8 +155,8 @@ define(function(require) {
         /**
          * Formats response before it will be sent out from this api accessor.
          *
-         * @param response {object}
-         * @returns {object}
+         * @param {Object} response
+         * @returns {Object}
          */
         formatResult: function(response) {
             return response;

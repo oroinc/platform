@@ -15,7 +15,7 @@ define(function(require) {
     EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @exports EntitySelectSearchApiAccessor.prototype */{
         /**
          * @constructor
-         * @param options {object}
+         * @param options {Object}
          * @param options.entity_name {string} entity name to search in
          * @param options.field_name {string} field to search by and to show in UI
          */

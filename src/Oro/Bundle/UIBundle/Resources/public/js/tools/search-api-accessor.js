@@ -7,7 +7,7 @@ define(function(require) {
      * This class is designed to create from server configuration.
      *
      * @class
-     * @param {object} options - Options container. Please also overview options for [ApiAccessor](./api-accessor.md)
+     * @param {Object} options - Options container. Please also overview options for [ApiAccessor](./api-accessor.md)
      * @param {string} options.search_handler_name - Name of search handler to use
      * @param {string} options.label_field_name - Name of the property that will be used as label
      * @param {string} options.id_field_name - Optional. Name of the property that will be used as identifier.
@@ -64,8 +64,8 @@ define(function(require) {
          * }
          * ```
          *
-         * @param response {object}
-         * @returns {object}
+         * @param {Object} response
+         * @returns {Object}
          */
         formatResult: function(response) {
             var results = response.results;
