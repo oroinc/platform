@@ -57,7 +57,7 @@ define([
          * @param {Event} e
          */
         onClick: function(e) {
-            var exclude = 'a, .dropdown, .editable, .skip-row-click';
+            var exclude = 'a, .dropdown, .skip-row-click';
             var $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
@@ -109,6 +109,10 @@ define([
                 cell.$el.addClass('skip-row-click');
             }
             this._listenToCellEvents(cell);
+
+            // use columns collection as event bus since there is no alternatives
+            this.columns.trigger('afterMakeCell', this, cell);
+
             return cell;
         },
 

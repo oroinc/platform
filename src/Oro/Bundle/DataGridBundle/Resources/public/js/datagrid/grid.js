@@ -19,6 +19,7 @@ define(function(require) {
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     /**
      * Basic grid class.
@@ -130,6 +131,8 @@ define(function(require) {
                 this.pluginManager.enable(options.plugins);
             }
 
+            this.trigger('beforeParseOptions', options);
+
             // Check required options
             if (!opts.collection) {
                 throw new TypeError('"collection" is required');
@@ -160,15 +163,15 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
-            }
-
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
-            }
+            this.prepareColumnsOption(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
+
+            // use columns collection as event bus since there is no alternatives
+            options.columns = new Backgrid.Columns(options.columns);
+            this.listenTo(options.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
 
             Grid.__super__.initialize.apply(this, arguments);
 
@@ -176,6 +179,21 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToBodyEvents();
             this._listenToCommands();
+        },
+
+        prepareColumnsOption: function(opts) {
+            for (var i = 0; i < opts.columns.length; i++) {
+                var column = opts.columns[i];
+                column.metadata = _.findWhere(opts.metadata.columns, {name: column.name});
+            }
+
+            if (Object.keys(this.rowActions).length > 0) {
+                opts.columns.push(this._createActionsColumn());
+            }
+
+            if (opts.multiSelectRowEnabled) {
+                opts.columns.unshift(this._createSelectRowColumn());
+            }
         },
 
         /**
@@ -243,8 +261,8 @@ define(function(require) {
          * @private
          */
         _createSelectRowColumn: function() {
-            var coulmn;
-            coulmn = new Backgrid.Column({
+            var column;
+            column = new Backgrid.Column({
                 name:       'massAction',
                 label:      __('Selected Rows'),
                 renderable: true,
@@ -253,7 +271,7 @@ define(function(require) {
                 cell:       SelectRowCell,
                 headerCell: SelectAllHeaderCell
             });
-            return coulmn;
+            return column;
         },
 
         /**
@@ -696,6 +714,44 @@ define(function(require) {
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
             }
+        },
+
+        /**
+         * Ensure that cell is visible. Works like cell.el.scrollIntoView, but in more appropriate way
+         *
+         * @param cell
+         */
+        ensureCellIsVisible: function(cell) {
+            var e = $.Event('ensureCellIsVisible');
+            this.trigger('ensureCellIsVisible', e, cell);
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+            scrollHelper.scrollIntoView(cell.el);
+        },
+
+        /**
+         * Finds cell by corresponding model and column
+         *
+         * @param model
+         * @param column
+         * @return {Backgrid.Cell}
+         */
+        findCell: function(model, column) {
+            var rows = this.body.rows;
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.model === model) {
+                    var cells = row.cells;
+                    for (var j = 0; j < cells.length; j++) {
+                        var cell = cells[j];
+                        if (cell.column === column) {
+                            return cell;
+                        }
+                    }
+                }
+            }
+            return null;
         }
     });
 
