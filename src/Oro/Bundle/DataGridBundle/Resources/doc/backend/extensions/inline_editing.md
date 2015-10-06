@@ -35,11 +35,11 @@ datagrid:
 ```
 Option name              | Default value | Description
 -------------------------|---------------|------------
-enable    | false         | enables inline editing on grid. By default on all cells what have frontend type that support inline editing
-behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: *enable_all* - (default). this will enable inline editing where possible. *enable_selected* - disable by default, enable only on configured cells
-plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | specifies plugin realization
-default_editors | orodatagrid/js/default-editors | specifies default editors for front-end types
-cell_editor | {component: 'orodatagrid/js/app/components/cell-popup-editor-component'} | specifies default cell_editor_component and their options
+enable    | false         | Enables inline editing on grid. By default on all cells what have frontend type that support inline editing
+behaviour | enable_all    | Specifies a way how inline editing will be enabled. Possible values: *enable_all* - (default). this will enable inline editing where possible. *enable_selected* - disable by default, enable only on configured cells
+plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies plugin realization
+default_editors | orodatagrid/js/default-editors | Specifies default editors for front-end types
+cell_editor | {component: 'orodatagrid/js/app/components/cell-popup-editor-component'} | Specifies default cell_editor_component and their options
 save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes how update request will be sent. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md)
 
 inline_editing.save_api_accessor.route specifies route
@@ -76,25 +76,25 @@ datagrid:
     {grid-uid}:
         # <grid configuration> goes here
         columns:
-        {column-name}:
-            inline_editing:
-                enable: true
-                save_api_accessor:
-                    # see main save_api_accessor, additonally supports field_name option
-                    # which allows to override field name that sent to server
-                    # {<form_name>:{<field_name>: <new_value>}}
-                editor:
-                    component: my-bundle/js/app/components/cell-editor-component
-                    component_options:
-                        {key}: {value}
-                    view: my-bundle/js/app/views/my-cell-editor-view
-                    view_options:
-                        {key}: {value}
+            {column-name}:
+                inline_editing:
+                    enable: true
+                    save_api_accessor:
+                        # see main save_api_accessor, additonally supports field_name option
+                        # which allows to override field name that sent to server
+                        # {<form_name>:{<field_name>: <new_value>}}
+                    editor:
+                        component: my-bundle/js/app/components/cell-editor-component
+                        component_options:
+                            {key}: {value}
+                        view: my-bundle/js/app/views/my-cell-editor-view
+                        view_options:
+                            {key}: {value}
 ```
 
 Options name | Default value | Description
 -------------|---------------|------------
-enable | | marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: *enable_all* - false will disable editing this cell. *enable_selected* - true will enable editing this cell.
+enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: *enable_all* - false will disable editing this cell. *enable_selected* - true will enable editing this cell.
 save_api_accessor | | Allows to override default api accessor for all grid. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
 editor.component | | defines view that used to render cell-editor
 editor.component_options | {} | specifies options to pass into cell editor component
