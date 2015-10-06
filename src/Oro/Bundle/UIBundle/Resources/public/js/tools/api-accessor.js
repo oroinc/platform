@@ -6,19 +6,19 @@ define(function(require) {
      * Abstraction of api access point. This class is designed to create from server configuration.
      *
      * @class
-     * @param {object} options
-     * @param {string} options.route - Route name
+     * @param {object} options - Options container
+     * @param {string} options.route - Required. Route name
      * @param {string} options.http_method - Http method to access this route (e.g. GET/POST/PUT/PATCH...)
-     *                                     By default `'GET'`.
-     * @param {string} options.form_name - Wraps request body into form_name, so request will look like
-     *                            `{<form_name>:<request_body>}`
-     * @param {object} options.headers - Allows to provide additional http headers
-     * @param {object}options.default_route_parameters Provides default parameters values for route creation,
-     *                            this defaults will be merged with row model data to get url
-     * @param {Array.<string>}options.query_parameter_names - Array of parameter names to put into query string
-     *                         (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
-     *                         (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
-     *                         query parameters for client usage, so it is required to specify list of them)
+     *                          By default `'GET'`.
+     * @param {string} options.form_name - Optional. Wraps request body into form_name, so request will look like
+     *                          `{<form_name>:<request_body>}`
+     * @param {object} options.headers - Optional. Allows to provide additional http headers
+     * @param {object}options.default_route_parameters - Optional. Provides default parameters values for route
+     *                          creation, this defaults will be merged with row model data to get url
+     * @param {Array.<string>}options.query_parameter_names - Optional. Array of parameter names to put into query
+     *                          string(e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
+     *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
+     *                          query parameters for client usage, so it is required to specify list of them)
      * @augment StdClass
      * @exports ApiAccessor
      */
