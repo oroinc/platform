@@ -13,6 +13,7 @@ define(function(require) {
     DateEditorView = TextEditorView.extend({
         className: 'date-editor',
         inputType: 'date',
+        view: DatepickerView,
 
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
@@ -27,12 +28,15 @@ define(function(require) {
             }
         },
 
+        format: datetimeFormatter.backendFormats.date,
+
         /**
          * @inheritDoc
          */
         render: function() {
             DateEditorView.__super__.render.call(this);
-            this.view = new DatepickerView(this.getViewOptions());
+            var View = this.view;
+            this.view = new View(this.getViewOptions());
             // fix enter behaviour
             var events = {};
             events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
@@ -103,12 +107,12 @@ define(function(require) {
             if (value === null) {
                 return '';
             }
-            return value.format(datetimeFormatter.backendFormats.date);
+            return value.format(this.format);
         },
 
         getValue: function() {
             var raw = this.$('input[name=value]').val();
-            return !raw ? null : moment.utc(raw, datetimeFormatter.backendFormats.date);
+            return !raw ? null : moment.utc(raw, this.format);
         },
 
         isChanged: function() {

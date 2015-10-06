@@ -5,14 +5,14 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var moment = require('moment');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var TextEditorView = require('./text-editor-view');
+    var DateEditorView = require('./date-editor-view');
     var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DatetimeEditorView = TextEditorView.extend({
+    DatetimeEditorView = DateEditorView.extend({
         className: 'datetime-editor',
         inputType: 'hidden',
+        view: DatetimepickerView,
 
         DEFAULT_OPTIONS: {
             dateInputAttrs: {
@@ -38,50 +38,29 @@ define(function(require) {
             'keydown .timepicker-input': 'onTimeEditorKeydown'
         },
 
+        format: datetimeFormatter.backendFormats.datetime,
+
         /**
          * @inheritDoc
          */
         render: function() {
+            var _this = this;
             DatetimeEditorView.__super__.render.call(this);
-            this.view = new DatetimepickerView(this.getViewOptions());
-            // fix enter behaviour
-            var events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
-            this.$('.hasDatepicker').on(events);
-            // fix esc behaviour
-            events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEscapeKeydown, this);
-            this.$('.hasDatepicker').on(events);
-        },
-
-        onInternalEnterKeydown: function(e) {
-            if (e.keyCode === this.ENTER_KEY_CODE) {
-                // there is no other way to get if datepicker is visible
-                if ($('#ui-datepicker-div').is(':visible')) {
-                    this.$('.hasDatepicker').datepicker('hide');
-                } else {
-                    DatetimeEditorView.__super__.onInternalEnterKeydown.apply(this, arguments);
+            // fix ESCAPE time-picker behaviour
+            // must stopPropagation on ESCAPE, if time-picker was visible
+            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
+                if (e.keyCode === _this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
+                    e.stopPropagation();
                 }
-            }
-        },
-
-        onInternalEscapeKeydown: function(e) {
-            if (e.keyCode === this.ESCAPE_KEY_CODE) {
-                // there is no other way to get if datepicker is visible
-                if ($('#ui-datepicker-div').is(':visible')) {
-                    this.$('.hasDatepicker').datepicker('hide');
-                } else {
-                    DatetimeEditorView.__super__.onInternalEscapeKeydown.apply(this, arguments);
-                }
-            }
+            });
+            return this;
         },
 
         dispose: function() {
             if (this.disposed) {
                 return;
             }
-            this.$('.hasDatepicker').off(this.eventNamespace());
-            this.view.dispose();
+            this.$('.timepicker-input').off(this.eventNamespace());
             DatetimeEditorView.__super__.dispose.call(this);
         },
 
@@ -111,28 +90,6 @@ define(function(require) {
             // ignore seconds to avoid excessive server requests
             parsed.seconds(0);
             return parsed;
-        },
-
-        getFormattedValue: function() {
-            var value = this.getModelValue();
-            if (value === null) {
-                return '';
-            }
-            return value.format(datetimeFormatter.backendFormats.datetime);
-        },
-
-        getValue: function() {
-            var raw = this.$('input[name=value]').val();
-            return !raw ? null : moment.utc(raw, datetimeFormatter.backendFormats.datetime);
-        },
-
-        isChanged: function() {
-            var value = this.getValue();
-            var modelValue = this.getModelValue();
-            if (value !== null && modelValue !== null) {
-                return value.diff(modelValue);
-            }
-            return value !== modelValue;
         },
 
         onDateEditorKeydown: function(e) {
