@@ -8,7 +8,7 @@ define(function(require) {
      * @class
      * @param {object} options
      * @param {string} options.route Route name
-     * @param {string} options.http_method  Http method to access this route. (GET|POST|PUT|PATCH...)
+     * @param {string} options.http_method  Http method to access this route. (e.g. GET/POST/PUT/PATCH...)
      * @param {string} options.form_name Wraps request body into form_name, so request will look like
      *                            `{<form_name>:{<field_name>: <new_value>}}`
      * @param {object} options.headers  Allows to provide additional http headers
@@ -41,7 +41,7 @@ define(function(require) {
         /**
          * @param {object} options
          * @param {string} options.route Route name
-         * @param {string} options.http_method  Http method to access this route. (GET|POST|PUT|PATCH...)
+         * @param {string} options.http_method  Http method to access this route. (e.g. GET/POST/PUT/PATCH...)
          * @param {string} options.form_name Wraps request body into form_name, so request will look like
          *                            `{<form_name>:{<field_name>: <new_value>}}`
          * @param {object} options.headers  Allows to provide additional http headers
