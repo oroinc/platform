@@ -7,7 +7,7 @@ define(function(require) {
      * This class is designed to create from server configuration.
      *
      * @class
-     * @augment ApiAccessor
+     * @augment [ApiAccessor](../api-accessor.md)
      * @exports SearchApiAccessor
      */
     var SearchApiAccessor;
