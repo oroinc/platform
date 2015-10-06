@@ -8,8 +8,14 @@ define(function(require) {
         autoRender: true,
         template: require('tpl!oroemail/templates/email-notification/email-notification-icon-view.html'),
         initialize: function() {
+            console.log('init-count-view')
             EmailNotificationCountView.__super__.initialize.apply(this, arguments);
-            this.listenTo(this.model, 'change:unreadEmailsCount', this.render);
+            this.listenTo(this.model, 'change', this.render);
+        },
+
+        render: function() {
+            console.log('render');
+            return EmailNotificationCountView.__super__.render.apply(this, arguments);
         }
     });
 

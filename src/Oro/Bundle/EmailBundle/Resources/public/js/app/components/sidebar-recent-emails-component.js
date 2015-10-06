@@ -40,7 +40,7 @@ define(function(require) {
             this.model.emailNotificationCollection = new EmailNotificationCollection([], {
                 routeParameters: _.pick(settings, ['limit', 'folderId'])
             });
-
+            this.listenTo(this.model.emailNotificationCollection, 'request', this.onFetchCollection);
             this.listenTo(this.model.emailNotificationCollection, 'sync', this.updateModelFromCollection);
             this.model.emailNotificationCollection.fetch();
 
@@ -55,6 +55,10 @@ define(function(require) {
             });
         },
 
+        onFetchCollection: function() {
+            this.model.trigger('start-loading');
+        },
+
         updateModelFromCollection: function(collection) {
             var id = Number(_.result(this.model.get('settings'), 'folderId') || 0);
             _.each(unreadEmailsCount, function(item) {
@@ -62,6 +66,7 @@ define(function(require) {
                     item.num = collection.unreadEmailsCount;
                 }
             });
+            this.model.trigger('end-loading');
             this.model.emailNotificationCountModel.set('unreadEmailsCount', collection.unreadEmailsCount);
         },
 

@@ -15,7 +15,9 @@ define(function(require) {
         },
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'start-loading model': 'onLoadingStart',
+            'end-loading model': 'onLoadingEnd'
         },
 
         render: function() {
@@ -25,6 +27,14 @@ define(function(require) {
             this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
 
             return this;
+        },
+
+        onLoadingStart: function() {
+            this.$el.addClass('loading');
+        },
+
+        onLoadingEnd: function() {
+            this.$el.removeClass('loading');
         },
 
         onClick: function(e) {
