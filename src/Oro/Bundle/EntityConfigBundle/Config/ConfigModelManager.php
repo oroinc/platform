@@ -13,6 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
+ * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ConfigModelManager
@@ -131,7 +133,9 @@ class ConfigModelManager
 
         // load a model if it was not found in the local cache
         if ($result === false) {
-            $this->entities[$className] = $result = $this->loadEntityModel($className);
+            $result = $this->loadEntityModel($className);
+
+            $this->entities[$className] = $result;
         }
 
         return $result;

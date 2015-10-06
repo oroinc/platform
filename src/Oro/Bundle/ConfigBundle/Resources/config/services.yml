@@ -67,7 +67,7 @@ services:
     oro_config.manager:
         class: %oro_config.manager.class%
         arguments:
-            - ~ # scope; it sets by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
+            - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - @oro_config.config_definition_bag
             - @event_dispatcher
             - @oro_config.manager_value_bag

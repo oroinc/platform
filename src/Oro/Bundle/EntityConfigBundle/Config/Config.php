@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).
+ * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
  */
 class Config implements ConfigInterface
 {
