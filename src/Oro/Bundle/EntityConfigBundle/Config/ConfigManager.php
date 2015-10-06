@@ -138,6 +138,16 @@ class ConfigManager
     }
 
     /**
+     * Checks whether a database contains all tables required to work with entity configuration data.
+     *
+     * @return bool
+     */
+    public function isDatabaseReadyToWork()
+    {
+        return $this->modelManager->checkDatabase();
+    }
+
+    /**
      * @param string $className
      *
      * @return EntityMetadata|null

@@ -80,6 +80,10 @@ class ConfigCacheWarmer
      */
     public function warmUpCache($mode = self::MODE_ALL)
     {
+        if (!$this->configManager->isDatabaseReadyToWork()) {
+            return;
+        }
+
         $classMap = $this->loadConfigurableEntities();
         if ($mode === self::MODE_ALL || $mode === self::MODE_CONFIGURABLE_ONLY) {
             $this->loadConfigurableFields($classMap);
