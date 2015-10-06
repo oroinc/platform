@@ -2,9 +2,9 @@
 ## ApiAccessor
 Abstraction of api access point. This class is designed to create from server configuration.
 
-### Sample usage of api_accessor with full options provided.
+#### Sample usage of api_accessor with full options provided.
 Example configuration is provided on server:
-     ``` yml
+``` yml
 save_api_accessor:
     route: orocrm_opportunity_task_update # for example this route uses following mask
                         # to generate url /api/opportunity/{opportunity_id}/tasks/{id}
