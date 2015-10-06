@@ -33,7 +33,6 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
 /**
@@ -60,7 +59,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $noBodyFound = true;
         }
-        $this->getEmailManager()->setSeenStatus($entity);
+        $this->getEmailManager()->setSeenStatus($entity, true);
 
         return [
             'entity' => $entity,
@@ -121,7 +120,7 @@ class EmailController extends Controller
      */
     public function viewThreadAction(Email $entity)
     {
-        $this->getEmailManager()->setSeenStatus($entity, true);
+        $this->getEmailManager()->setSeenStatus($entity, true, true);
 
         return ['entity' => $entity];
     }
@@ -435,35 +434,33 @@ class EmailController extends Controller
      */
     public function toggleSeenAction(EmailUser $emailUser)
     {
-        if ($emailUser) {
-            $this->getEmailManager()->toggleEmailUserSeen($emailUser);
-        }
+        $this->getEmailManager()->toggleEmailUserSeen($emailUser);
 
-        return new JsonResponse(['successful' => (bool)$emailUser]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**
-     * Mark email as seen for user
+     * Change email seen status for current user for single email or thread
      *
-     * @Route("/mark-seen/{id}/{status}", name="oro_email_mark_seen", requirements={"id"="\d+", "status"="\d+"})
+     * @Route(
+     *      "/mark-seen/{id}/{status}/{checkThread}",
+     *      name="oro_email_mark_seen",
+     *      requirements={"id"="\d+", "status"="\d+", "checkThread"="\d+"},
+     *      defaults={"checkThread"=true}
+     * )
      * @AclAncestor("oro_email_email_user_edit")
      *
      * @param Email $email
      * @param string $status
+     * @param bool $checkThread if false it will be applied for single email instead of thread
      *
      * @return JsonResponse
      */
-    public function markSeenAction(Email $email, $status)
+    public function markSeenAction(Email $email, $status, $checkThread)
     {
-        if ($email) {
-            if ((bool)$status) {
-                $this->getEmailManager()->setSeenStatus($email, true);
-            } else {
-                $this->getEmailManager()->setUnseenStatus($email, true);
-            }
-        }
+        $this->getEmailManager()->setSeenStatus($email, (bool) $status, (bool) $checkThread);
 
-        return new JsonResponse(['successful' => (bool)$email]);
+        return new JsonResponse(['successful' => true]);
     }
 
     /**
