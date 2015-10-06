@@ -42,20 +42,7 @@ default_editors | orodatagrid/js/default-editors | Specifies default editors for
 cell_editor | {component: 'orodatagrid/js/app/components/cell-popup-editor-component'} | Specifies default cell_editor_component and their options
 save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes how update request will be sent. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md)
 
-inline_editing.save_api_accessor.route specifies route
-inline_editing.save_api_accessor.class specifies class that realizes this accessor, by default
-oroui/js/tools/api-accessor
-	inline_editing.save_api_accessor.http_method specifies http_method to access this route
-	inline_editing.save_api_accessor.form_name wraps request body into form_name, so request will look like
-					{<form_name>:{<field_name>: <new_value>}}
-inline_editing.save_api_accessor.headers allows to provide additional http headers
-inline_editing.save_api_accessor.default_route_parameters provides default parameters values for
-route creation, this defaults will be merged with row model data to get url
-inline_editing.save_api_accessor.query_parameter_names array of parameter names to put into query
-string (e.g. ?<parameter-name>=<value>&<parameter-name>=<value>). (Actually
-FOSRestBundle doesn’t provides them for client usage, so it is required to specify list of available query parameters)
-
-### Sample usage of save_api accessor with full options provided
+### Sample usage of save_api_accessor with full options provided
 ``` yml
 save_api_accessor:
     route: orocrm_opportunity_task_update # for example this route uses following mask
