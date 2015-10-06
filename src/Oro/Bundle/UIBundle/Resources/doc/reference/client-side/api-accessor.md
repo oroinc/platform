@@ -19,8 +19,10 @@ Abstraction of api access point. This class is designed to create from server co
   * [.initialize(Options)](#module_ApiAccessor#initialize)
   * [.send(urlParameters, body, headers)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
   * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>object</code>
+  * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>object</code>
   * [.getUrl(urlParameters)](#module_ApiAccessor#getUrl) ⇒ <code>string</code>
   * [.formatBody(body)](#module_ApiAccessor#formatBody) ⇒ <code>object</code>
+  * [.formatResult(response)](#module_ApiAccessor#formatResult) ⇒ <code>object</code>
 
 <a name="module_ApiAccessor#initialize"></a>
 ### apiAccessor.initialize(Options)
@@ -53,6 +55,16 @@ Prepares headers for request.
 | --- | --- | --- |
 | headers | <code>object</code> | Headers to merge into default list |
 
+<a name="module_ApiAccessor#prepareUrlParameters"></a>
+### apiAccessor.prepareUrlParameters(urlParameters) ⇒ <code>object</code>
+Prepares url parameters before build url
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+
+| Param |
+| --- |
+| urlParameters | 
+
 <a name="module_ApiAccessor#getUrl"></a>
 ### apiAccessor.getUrl(urlParameters) ⇒ <code>string</code>
 Prepares url for request.
@@ -72,4 +84,14 @@ Prepares request body.
 | Param | Type | Description |
 | --- | --- | --- |
 | body | <code>object</code> | Map of url parameters to use |
+
+<a name="module_ApiAccessor#formatResult"></a>
+### apiAccessor.formatResult(response) ⇒ <code>object</code>
+Formats response before it will be sent out from this api accessor.
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+
+| Param | Type |
+| --- | --- |
+| response | <code>object</code> | 
 

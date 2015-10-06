@@ -7,7 +7,12 @@ define(function(require) {
      * This class is designed to create from server configuration.
      *
      * @class
-     * @augment [ApiAccessor](../api-accessor.md)
+     * @param {object} options - Options container
+     * @param {string} options.search_handler_name - Name of search handler to use
+     * @param {string} options.label_field_name - Name of the property that will be used as label
+     * @param {string} options.id_field_name - Optional. Name of the property that will be used as identifier.
+     *                                       By default = `'id'`
+     * @augment [ApiAccessor](./api-accessor.md)
      * @exports SearchApiAccessor
      */
     var SearchApiAccessor;
@@ -18,14 +23,6 @@ define(function(require) {
     SearchApiAccessor = ApiAccessor.extend(/** @exports SearchApiAccessor.prototype */{
         DEFAULT_HTTP_METHOD: 'GET',
 
-        /**
-         * @constructor
-         * @param options {object}
-         * @param options.search_handler_name {string} NAme of search handler to use
-         * @param options.label_field_name {string} Name of the property that will be used as label
-         * @param options.id_field_name {string} Optional. Name of the property that will be used as identifier.
-         *                                       By default = 'id'
-         */
         initialize: function(options) {
             if (!options) {
                 options = {};
@@ -49,33 +46,12 @@ define(function(require) {
         },
 
         /**
-         * Prepares url parameters before build url
-         *
-         * @param urlParameters
-         * @returns {object}
+         * @inheritDoc
          */
         prepareUrlParameters: function(urlParameters) {
+            urlParameters.name = this.searchHandlerName;
             urlParameters.query = urlParameters.term;
             return urlParameters;
-        },
-
-        /**
-         * @inheritDoc
-         */
-        getUrl: function(urlParameters) {
-            urlParameters.name = this.searchHandlerName;
-            return this.route.getUrl(this.prepareUrlParameters(urlParameters));
-        },
-
-        /**
-         * @inheritDoc
-         */
-        send: function(urlParameters, body, headers) {
-            var promise = SearchApiAccessor.__super__.send.apply(this, arguments);
-            var resultPromise = promise.then(_.bind(this.formatResult, this));
-            // allow to abort request
-            resultPromise.abort = _.bind(promise.abort, promise);
-            return resultPromise;
         },
 
         /**

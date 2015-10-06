@@ -69,12 +69,15 @@ define(function(require) {
          * @returns {$.Promise} - Promise with abort() support
          */
         send: function(urlParameters, body, headers) {
-            return $.ajax({
+            var promise = $.ajax({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
                 data: JSON.stringify(this.formatBody(body))
             });
+            var resultPromise = promise.then(_.bind(this.formatResult, this));
+            resultPromise.abort = _.bind(promise.abort, promise);
+            return resultPromise;
         },
 
         /**
@@ -88,13 +91,23 @@ define(function(require) {
         },
 
         /**
+         * Prepares url parameters before build url
+         *
+         * @param urlParameters
+         * @returns {object}
+         */
+        prepareUrlParameters: function(urlParameters) {
+            return urlParameters;
+        },
+
+        /**
          * Prepares url for request.
          *
          * @param {object} urlParameters - Map of url parameters to use
          * @returns {string}
          */
         getUrl: function(urlParameters) {
-            return this.route.getUrl(urlParameters);
+            return this.route.getUrl(this.prepareUrlParameters(urlParameters));
         },
 
         /**
@@ -112,6 +125,16 @@ define(function(require) {
                 formattedBody = body;
             }
             return formattedBody;
+        },
+
+        /**
+         * Formats response before it will be sent out from this api accessor.
+         *
+         * @param response {object}
+         * @returns {object}
+         */
+        formatResult: function(response) {
+            return response;
         }
     });
 
