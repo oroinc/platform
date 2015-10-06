@@ -58,7 +58,8 @@ class ConfigController extends Controller
         $actions       = [];
         $modules       = [];
 
-        foreach ($this->getConfigManager()->getProviders() as $provider) {
+        $providers = $this->getConfigManager()->getProviders();
+        foreach ($providers as $provider) {
             foreach ($provider->getPropertyConfig()->getLayoutActions() as $config) {
                 $actions[] = $config;
             }
@@ -459,7 +460,8 @@ class ConfigController extends Controller
         $actions          = [];
         $requireJsModules = [];
 
-        foreach ($this->getConfigManager()->getProviders() as $provider) {
+        $providers = $this->getConfigManager()->getProviders();
+        foreach ($providers as $provider) {
             $layoutActions = $provider->getPropertyConfig()->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
             foreach ($layoutActions as $action) {
                 if ($this->isLayoutActionApplicable($action, $entity, $provider)) {
