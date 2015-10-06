@@ -169,7 +169,9 @@ define(function(require) {
                 temp = value.value.split(',');
 
                 _.each(temp, function(value) {
-                    self.checkedItems[value] = true;
+                    if (value != 'All') {
+                        self.checkedItems[value] = true;
+                    }
                 });
             }
         },
@@ -317,7 +319,6 @@ define(function(require) {
 
         _onChangeBusinessUnit: function(e) {
             var values = [];
-
             if ($(e.target).is(':checked')) {
                 this.checkedItems[$(e.target).val()] = true;
             } else {
@@ -352,10 +353,9 @@ define(function(require) {
         },
 
         _onClickUpdateCriteria: function() {
+            this.trigger('updateCriteriaClick', this);
             this._hideCriteria();
             this.applyValue();
-            this.trigger('update');
-            this._updateCriteriaHint();
         },
 
         /**
@@ -402,9 +402,11 @@ define(function(require) {
 
         _onClickResetFilter: function() {
             ChoiceTreeFilter.__super__._onClickResetFilter.apply(this, arguments);
-            this._updateCriteriaHint();
-            this.trigger('update');
+            this._hideCriteria();
+            this.checkedItems = {};
+            this.$el.find('input[name="search"]').val('');
             this.$el.find('input:checked').removeAttr('checked');
+            this.$el.find('label').removeClass('search-result');
         },
 
         _onChangeSearchQuery: function(event) {
