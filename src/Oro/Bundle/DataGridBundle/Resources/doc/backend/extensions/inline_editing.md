@@ -34,7 +34,7 @@ datagrid:
                 {key}: {value}
 ```
 Option name              | Default value | Description
------------------------------------------------------
+-------------------------|---------------|------------
 inline_editing.enable    | false         | enables inline editing on grid. By default on all cells what have frontend type that support inline editing
 inline_editing.behaviour | enable_all    | option specifies a way how inline editing will be enabled. Possible values: enable_all - (default). this will enable inline editing where possible. enable_selected - disable by default, enable only on configured cells
 inline_editing.plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | specifies plugin realization
