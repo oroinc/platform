@@ -57,10 +57,12 @@ define(function(require) {
         /**
          * Formats response before it will be sent out from this api accessor.
          * Converts it to form
+         * ``` javascipt
          * {
          *     results: [{id: '<id>', label: '<label>'}, ...],
          *     more: '<more>'
          * }
+         * ```
          *
          * @param response {object}
          * @returns {object}

@@ -24,10 +24,12 @@ This class is designed to create from server configuration.
 ### searchApiAccessor.formatResult(response) ⇒ <code>object</code>
 Formats response before it will be sent out from this api accessor.
 Converts it to form
+``` javascipt
 {
     results: [{id: '<id>', label: '<label>'}, ...],
     more: '<more>'
 }
+```
 
 **Kind**: instance method of <code>[SearchApiAccessor](#module_SearchApiAccessor)</code>  
 
