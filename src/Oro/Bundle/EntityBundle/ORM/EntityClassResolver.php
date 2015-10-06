@@ -54,7 +54,8 @@ class EntityClassResolver
      */
     public function isKnownEntityClassNamespace($namespace)
     {
-        foreach ($this->doctrine->getManagers() as $name => $manager) {
+        $managers = $this->doctrine->getManagers();
+        foreach ($managers as $name => $manager) {
             if ($manager instanceof EntityManager) {
                 $namespaces = $manager->getConfiguration()->getEntityNamespaces();
                 if (in_array($namespace, $namespaces, true)) {
