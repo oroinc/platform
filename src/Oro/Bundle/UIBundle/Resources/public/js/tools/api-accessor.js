@@ -60,14 +60,49 @@ define(function(require) {
             }));
         },
 
+        /**
+         * Prepares request body.
+         *
+         * @param {object} urlParameters - Url parameters to combine url
+         * @param {object} body - Request body
+         * @param {object} headers - Headers to send with request
+         * @returns {$.Promise} - Promise with abort() support
+         */
+        send: function(urlParameters, body, headers) {
+            return $.ajax({
+                headers: this.getHeaders(headers),
+                type: this.httpMethod,
+                url: this.getUrl(urlParameters),
+                data: JSON.stringify(this.formatBody(body))
+            });
+        },
+
+        /**
+         * Prepares headers for request.
+         *
+         * @param {object} headers - Headers to merge into default list
+         * @returns {object}
+         */
         getHeaders: function(headers) {
             return _.extend({}, this.headers, headers || {});
         },
 
+        /**
+         * Prepares url for request.
+         *
+         * @param {object} urlParameters - Map of url parameters to use
+         * @returns {string}
+         */
         getUrl: function(urlParameters) {
             return this.route.getUrl(urlParameters);
         },
 
+        /**
+         * Prepares request body.
+         *
+         * @param {object} body - Map of url parameters to use
+         * @returns {object}
+         */
         formatBody: function(body) {
             var formattedBody;
             if (this.formName) {
@@ -77,15 +112,6 @@ define(function(require) {
                 formattedBody = body;
             }
             return formattedBody;
-        },
-
-        send: function(urlParameters, body, headers) {
-            return $.ajax({
-                headers: this.getHeaders(headers),
-                type: this.httpMethod,
-                url: this.getUrl(urlParameters),
-                data: JSON.stringify(this.formatBody(body))
-            });
         }
     });
 
