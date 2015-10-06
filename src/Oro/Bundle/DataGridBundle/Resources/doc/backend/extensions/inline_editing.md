@@ -71,7 +71,7 @@ query_parameter_names: [action]
             Please note that {id} will be taken from current row in grid
 
 ## Column configuration options:
-`` yml
+``` yml
 datagrid:
     {grid-uid}:
         # <grid configuration> goes here
@@ -91,6 +91,7 @@ datagrid:
                     view_options:
                         {key}: {value}
 ```
+
 Options name | Default value | Description
 -------------|---------------|------------
 enable | | marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: *enable_all* - false will disable editing this cell. *enable_selected* - true will enable editing this cell.
