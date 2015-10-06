@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 
 /**
  * Contains tests for a performance crucial parts of entity configs
@@ -381,6 +382,20 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         $repo->expects($this->any())
             ->method('findAll')
             ->willReturn($this->getEntityConfigModels());
+        $repo->expects($this->any())
+            ->method('findOneBy')
+            ->willReturnCallback(
+                function ($criteria) {
+                    $className = $criteria['className'];
+                    foreach ($this->getEntityConfigModels() as $model) {
+                        if ($className === $model->getClassName()) {
+                            return $model;
+                        }
+                    }
+
+                    return null;
+                }
+            );
 
         $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -425,7 +440,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         return new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            new ConfigModelManager($emLink),
+            new ConfigModelManager($emLink, new LockObject()),
             new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );

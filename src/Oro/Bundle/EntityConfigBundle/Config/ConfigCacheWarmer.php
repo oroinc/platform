@@ -34,6 +34,9 @@ class ConfigCacheWarmer
     /** @var ConfigCache */
     protected $cache;
 
+    /** @var LockObject */
+    protected $configModelLockObject;
+
     /** @var EntityManagerBag */
     protected $entityManagerBag;
 
@@ -49,6 +52,7 @@ class ConfigCacheWarmer
     /**
      * @param ConfigManager                    $configManager
      * @param ConfigCache                      $cache
+     * @param LockObject                       $configModelLockObject
      * @param EntityManagerBag                 $entityManagerBag
      * @param VirtualFieldProviderInterface    $virtualFieldProvider
      * @param VirtualRelationProviderInterface $virtualRelationProvider
@@ -56,12 +60,14 @@ class ConfigCacheWarmer
     public function __construct(
         ConfigManager $configManager,
         ConfigCache $cache,
+        LockObject $configModelLockObject,
         EntityManagerBag $entityManagerBag,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider
     ) {
         $this->configManager           = $configManager;
         $this->cache                   = $cache;
+        $this->configModelLockObject   = $configModelLockObject;
         $this->entityManagerBag        = $entityManagerBag;
         $this->virtualFieldProvider    = $virtualFieldProvider;
         $this->virtualRelationProvider = $virtualRelationProvider;
@@ -78,8 +84,16 @@ class ConfigCacheWarmer
         if ($mode === self::MODE_ALL || $mode === self::MODE_CONFIGURABLE_ONLY) {
             $this->loadConfigurableFields($classMap);
             if ($mode === self::MODE_ALL) {
-                $this->loadNonConfigurable();
-                $this->loadVirtualFields();
+                // disallow to load new models
+                $this->configModelLockObject->lock();
+                try {
+                    $this->loadNonConfigurable();
+                    $this->loadVirtualFields();
+                    $this->configModelLockObject->unlock();
+                } catch (\Exception $e) {
+                    $this->configModelLockObject->unlock();
+                    throw $e;
+                }
             }
         }
     }
@@ -175,7 +189,7 @@ class ConfigCacheWarmer
                 }
 
                 $className = $metadata->getName();
-                if (!isset($cached[$className]) && null === $this->cache->getConfigurable($className)) {
+                if (!isset($cached[$className])) {
                     $this->cache->saveConfigurable(false, $className);
                     foreach ($metadata->getFieldNames() as $fieldName) {
                         $this->cache->saveConfigurable(false, $className, $fieldName);
