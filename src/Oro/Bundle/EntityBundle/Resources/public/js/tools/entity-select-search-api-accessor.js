@@ -38,6 +38,7 @@ define(function(require) {
          */
         prepareUrlParameters: function(urlParameters) {
             urlParameters.query = [urlParameters.term, this.entityName, this.fieldName].join(',');
+            urlParameters.name = this.searchHandlerName;
             return urlParameters;
         }
     });

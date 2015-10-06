@@ -42,6 +42,7 @@ define(function(require) {
             }
             urlParameters.query = [urlParameters.term, this.permissionCheckEntityName, this.permission,
                 urlParameters.id, ''].join(';');
+            urlParameters.name = this.searchHandlerName;
             return urlParameters;
         }
     });

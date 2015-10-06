@@ -25,8 +25,7 @@ define([
         /** @property */
         events: {
             'change :checkbox': 'onChange',
-            'click :checkbox': 'stopPropagation',
-            'click': 'stopPropagation'
+            'click': 'updateCheckbox'
         },
 
         /**
@@ -65,7 +64,7 @@ define([
          *
          * @param e
          */
-        enterEditMode: function(e) {
+        updateCheckbox: function(e) {
             if (this.$checkbox[0] !== e.target) {
                 this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
             }
@@ -94,10 +93,6 @@ define([
                 this.$checkbox.prop('checked', 'checked');
             }
             return this;
-        },
-
-        stopPropagation: function(e) {
-            e.stopPropagation();
         }
     });
 

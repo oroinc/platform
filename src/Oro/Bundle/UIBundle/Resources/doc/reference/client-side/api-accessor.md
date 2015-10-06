@@ -27,7 +27,7 @@ apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
 Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
 and will put response to console after it will be finished
 
-**Augment**: StdClass  
+**Augment**: BaseClass  
 
 | Param | Type | Description |
 | --- | --- | --- |

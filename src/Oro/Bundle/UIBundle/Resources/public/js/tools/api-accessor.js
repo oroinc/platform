@@ -38,13 +38,13 @@ define(function(require) {
      * @param {string} options.form_name - Optional. Wraps request body into form_name, so request will look like
      *                          `{<form_name>:<request_body>}`
      * @param {object} options.headers - Optional. Allows to provide additional http headers
-     * @param {object}options.default_route_parameters - Optional. Provides default parameters values for route
+     * @param {object} options.default_route_parameters - Optional. Provides default parameters values for route
      *                          creation, this defaults will be merged with row model data to get url
-     * @param {Array.<string>}options.query_parameter_names - Optional. Array of parameter names to put into query
+     * @param {Array.<string>} options.query_parameter_names - Optional. Array of parameter names to put into query
      *                          string(e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
      *                          query parameters for client usage, so it is required to specify list of them)
-     * @augment StdClass
+     * @augment BaseClass
      * @exports ApiAccessor
      */
     var ApiAccessor;
