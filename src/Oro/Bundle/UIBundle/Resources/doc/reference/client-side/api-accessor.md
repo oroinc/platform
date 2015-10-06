@@ -16,8 +16,8 @@ Abstraction of api access point. This class is designed to create from server co
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options |  |  |
-| options.route |  | Route name |
+| options | <code>object</code> |  |
+| options.route | <code>string</code> | Route name |
 | options.http_method | <code>string</code> | Http method to access this route. (GET|POST|PUT|PATCH...) |
 | options.form_name | <code>string</code> | Wraps request body into form_name, so request will look like                            `{<form_name>:{<field_name>: <new_value>}}` |
 | options.headers | <code>object</code> | Allows to provide additional http headers |
