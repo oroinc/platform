@@ -55,9 +55,12 @@ save_api_accessor:
     action: patch
     query_parameter_names: [action]
 ```
+
 Result of combining options:
-/api/opportunity/23/tasks/{id}?action=patch
-    Please note that {id} will be taken from current row in grid
+
+`/api/opportunity/23/tasks/{id}?action=patch`
+
+Please note that `{id}` will be taken from current row in grid
 
 ## Column configuration options:
 ``` yml
