@@ -205,6 +205,41 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         },
 
         /**
+         * Loads single module through requireJS and returns promise
+         *
+         * @param {string} module name
+         * @return ($.Promise}
+         */
+        loadModule: function(module) {
+            var deferred = $.Deferred();
+            require([module], function(moduleRealization) {
+                deferred.resolve(moduleRealization);
+            }, function(e) {
+                deferred.reject(e);
+            });
+            return deferred.promise();
+        },
+
+        /**
+         * Loads single module through requireJS and replaces the property
+         *
+         * @param {Object} container where to replace property
+         * @param {string} property name to replace module ref to concrete realization
+         * @return ($.Promise}
+         */
+        loadModuleAndReplace: function(container, moduleProperty) {
+            if (_.isFunction(container[moduleProperty])) {
+                var deferred = $.Deferred();
+                deferred.resolve(container[moduleProperty]);
+                return deferred.promise();
+            }
+            return this.loadModule(container[moduleProperty]).then(function(realization) {
+                container[moduleProperty] = realization;
+                return realization;
+            });
+        },
+
+        /**
          * Check if current page is an error page (404, 503, 504, etc.)
          * @returns {boolean}
          */

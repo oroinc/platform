@@ -68,7 +68,6 @@ config:
         'orodatagrid/js/pageable-collection': 'bundles/orodatagrid/js/pageable-collection.js'
 
         'orodatagrid/js/app/components/datagrid-component': 'bundles/orodatagrid/js/app/components/datagrid-component.js'
-
 build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
