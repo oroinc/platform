@@ -6,7 +6,7 @@ Abstraction of api access point. This class is designed to create from server co
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> | Options container |
+| options | <code>object</code> | Options container. |
 | options.route | <code>string</code> | Required. Route name |
 | options.http_method | <code>string</code> | Http method to access this route (e.g. GET/POST/PUT/PATCH...)                          By default `'GET'`. |
 | options.form_name | <code>string</code> | Optional. Wraps request body into form_name, so request will look like                          `{<form_name>:<request_body>}` |

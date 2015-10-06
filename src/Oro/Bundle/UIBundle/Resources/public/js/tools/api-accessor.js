@@ -6,7 +6,7 @@ define(function(require) {
      * Abstraction of api access point. This class is designed to create from server configuration.
      *
      * @class
-     * @param {object} options - Options container
+     * @param {object} options - Options container.
      * @param {string} options.route - Required. Route name
      * @param {string} options.http_method - Http method to access this route (e.g. GET/POST/PUT/PATCH...)
      *                          By default `'GET'`.
