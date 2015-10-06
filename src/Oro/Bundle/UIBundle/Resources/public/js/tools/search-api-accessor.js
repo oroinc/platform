@@ -1,4 +1,4 @@
-/** @lends AutocompleteApiAccessor */
+/** @lends SearchApiAccessor */
 define(function(require) {
     'use strict';
 

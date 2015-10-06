@@ -43,7 +43,7 @@ define(function(require) {
             this.$('.select2-focusser').on(events);
 
             // must prevent selection on TAB
-            this.$('input.select2-input').bindFirst('keydown', function(e) {
+            this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
                 if (e.keyCode === _this.TAB_KEY_CODE) {
                     e.stopImmediatePropagation();
                     e.preventDefault();
@@ -68,6 +68,7 @@ define(function(require) {
                 return;
             }
             this.$('.select2-focusser').off(this.eventNamespace());
+            this.$('input.select2-input').off(this.eventNamespace());
             this.$('input[name=value]').select2('destroy');
             // due to bug in select2
             $('body > .select2-drop-mask').remove();

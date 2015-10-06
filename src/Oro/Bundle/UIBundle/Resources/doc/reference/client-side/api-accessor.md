@@ -2,6 +2,31 @@
 ## ApiAccessor
 Abstraction of api access point. This class is designed to create from server configuration.
 
+### Sample usage of api_accessor with full options provided.
+Example configuration is provided on server:
+     ``` yml
+save_api_accessor:
+    route: orocrm_opportunity_task_update # for example this route uses following mask
+                        # to generate url /api/opportunity/{opportunity_id}/tasks/{id}
+    http_method: POST
+    headers:
+        Api-Secret: ANS2DFN33KASD4F6OEV7M8
+    default_route_parameters:
+        opportunity_id: 23
+    action: patch
+    query_parameter_names: [action]
+```
+
+Then following code on client:
+``` javascript
+var apiAP = new ApiAccessror(serverConfiguration);
+apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
+    console.log(result)
+})
+```
+Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
+and will put response to console after it will be finished
+
 **Augment**: StdClass  
 
 | Param | Type | Description |
