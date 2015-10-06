@@ -3,16 +3,9 @@
 Abstraction of api access point. This class is designed to create from server configuration.
 
 **Augment**: StdClass  
-
-* [ApiAccessor](#module_ApiAccessor)
-  * [.initialize](#module_ApiAccessor#initialize)
-    * [new initialize(options)](#new_module_ApiAccessor#initialize_new)
-
 <a name="module_ApiAccessor#initialize"></a>
-### apiAccessor.initialize
-**Kind**: instance class of <code>[ApiAccessor](#module_ApiAccessor)</code>  
-<a name="new_module_ApiAccessor#initialize_new"></a>
-#### new initialize(options)
+### apiAccessor.initialize(options)
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |

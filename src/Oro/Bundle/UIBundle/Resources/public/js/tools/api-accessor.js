@@ -27,7 +27,6 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @constructor
          * @param {object} options
          * @param {string} options.route Route name
          * @param {string} options.http_method  Http method to access this route. (GET|POST|PUT|PATCH...)
