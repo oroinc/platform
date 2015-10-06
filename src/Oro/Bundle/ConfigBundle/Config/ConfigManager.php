@@ -282,7 +282,7 @@ class ConfigManager
     protected function getValue($name, $default = false, $full = false)
     {
         $value = null;
-        foreach ($this->getScopeManagersToGetValue($default) as $scope => $manager) {
+        foreach ($this->getScopeManagersToGetValue($default) as $manager) {
             $value = $manager->getSettingValue($name, $full);
             if (null !== $value) {
                 break;
