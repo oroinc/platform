@@ -281,8 +281,9 @@ class ConfigManager
      */
     protected function getValue($name, $default = false, $full = false)
     {
-        $value = null;
-        foreach ($this->getScopeManagersToGetValue($default) as $manager) {
+        $value    = null;
+        $managers = $this->getScopeManagersToGetValue($default);
+        foreach ($managers as $manager) {
             $value = $manager->getSettingValue($name, $full);
             if (null !== $value) {
                 break;

@@ -105,7 +105,9 @@ class ConfigCacheWarmer
     {
         if (null === $this->emptyData) {
             $this->emptyData = [];
-            foreach ($this->configManager->getProviders() as $scope => $provider) {
+
+            $providers = $this->configManager->getProviders();
+            foreach ($providers as $scope => $provider) {
                 $this->emptyData[$scope] = [];
             }
         }
@@ -181,7 +183,9 @@ class ConfigCacheWarmer
     protected function loadNonConfigurable()
     {
         $cached = $this->cache->getEntities();
-        foreach ($this->entityManagerBag->getEntityManagers() as $em) {
+
+        $entityManagers = $this->entityManagerBag->getEntityManagers();
+        foreach ($entityManagers as $em) {
             /** @var ClassMetadata $metadata */
             foreach ($em->getMetadataFactory()->getAllMetadata() as $metadata) {
                 if ($metadata->isMappedSuperclass) {
@@ -204,7 +208,8 @@ class ConfigCacheWarmer
 
     protected function loadVirtualFields()
     {
-        foreach ($this->cache->getEntities() as $className => $isHidden) {
+        $entities = $this->cache->getEntities();
+        foreach ($entities as $className => $isHidden) {
             $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {

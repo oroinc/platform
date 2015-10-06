@@ -556,7 +556,8 @@ class ConfigModelManager
                     : null;
             }
         } elseif (!$this->entitiesAreLoaded) {
-            foreach ($this->loadEntityModels() as $model) {
+            $entityModels = $this->loadEntityModels();
+            foreach ($entityModels as $model) {
                 $this->entities[$model->getClassName()] = $model;
             }
             $this->entitiesAreLoaded = true;
