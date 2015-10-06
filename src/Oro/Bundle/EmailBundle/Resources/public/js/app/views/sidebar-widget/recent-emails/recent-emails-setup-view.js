@@ -34,19 +34,23 @@ define(function(require) {
                 var folders;
                 if (mailbox.active) {
                     text = mailbox.properties.user;
-                    folders = mailbox.folders.map(function(folder) {
-                        return {
-                            id: Number(folder.id),
-                            text: folder.fullName
-                        };
-                    });
-                    if (text) {
-                        mailboxes.push({
-                            text: text,
-                            children: folders
+                    folders = mailbox.folders.filter(function(folder) {
+                            return Boolean(folder.syncEnabled);
+                        }).map(function(folder) {
+                            return {
+                                id: Number(folder.id),
+                                text: folder.fullName
+                            };
                         });
-                    } else {
-                        mailboxes = mailboxes.concat(folders);
+                    if (folders.length > 0) {
+                        if (text) {
+                            mailboxes.push({
+                                text: text,
+                                children: folders
+                            });
+                        } else {
+                            mailboxes = mailboxes.concat(folders);
+                        }
                     }
                 }
             });

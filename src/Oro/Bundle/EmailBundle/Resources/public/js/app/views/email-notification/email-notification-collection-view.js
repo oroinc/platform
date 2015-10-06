@@ -8,6 +8,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
+    var emailsGridRouteBuilder = require('oroemail/js/util/emails-grid-route-builder');
     var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var messenger = require('oroui/js/messenger');
@@ -69,7 +70,7 @@ define(function(require) {
                 'folderId',
                 'hasMarkAllButton',
                 'hasMarkVisibleButton']));
-            data.userEmailsUrl = routing.generate('oro_email_user_emails');
+            data.userEmailsUrl = emailsGridRouteBuilder.generate(this.folderId);
             data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
             return data;
         },
