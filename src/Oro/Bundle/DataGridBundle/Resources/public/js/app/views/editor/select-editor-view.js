@@ -33,14 +33,12 @@ define(function(require) {
             var _this = this;
             SelectEditorView.__super__.render.call(this);
             this.$('input[name=value]').select2(this.getSelect2Options());
-            // select2 stops propagation of keydown event if key === ENTER
+            // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
-            var events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalEnterKeydown, this);
-            this.$('.select2-focusser').on(events);
-            events = {};
-            events['keydown' + this.eventNamespace()] = _.bind(this.onInternalTabKeydown, this);
-            this.$('.select2-focusser').on(events);
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
+                _.bind(this.onInternalEnterKeydown, this));
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
+                _.bind(this.onInternalTabKeydown, this));
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
