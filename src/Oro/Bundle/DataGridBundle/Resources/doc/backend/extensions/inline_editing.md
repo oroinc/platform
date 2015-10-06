@@ -21,7 +21,7 @@ datagrid:
 datagrid:
     {grid-uid}:
         inline_editing:
-        enable: true
+            enable: true
             behaviour: enable_all
             plugin: orodatagrid/js/app/plugins/grid/inline-editing-plugin
             default_editors: orodatagrid/js/default-editors
