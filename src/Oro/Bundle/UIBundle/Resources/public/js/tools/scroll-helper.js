@@ -10,10 +10,10 @@ define(function(require) {
          * Returns visible rect of DOM element
          *
          * @param el
-         * @param {{top: number, left: Number, bottom: Number, right: Number}} increments for each initial rect side
+         * @param {{top: number, left: number, bottom: number, right: number}} increments for each initial rect side
          * @param {boolean} forceInvisible if true - function will return initial rect when element is out of screen
          * @param {Function} onAfterGetClientRect - callback called after each getBoundingClientRect
-         * @returns {{top: number, left: Number, bottom: Number, right: Number}}
+         * @returns {{top: number, left: number, bottom: number, right: number}}
          */
         getVisibleRect: function(el, increments, forceInvisible, onAfterGetClientRect) {
             increments = increments || {};
