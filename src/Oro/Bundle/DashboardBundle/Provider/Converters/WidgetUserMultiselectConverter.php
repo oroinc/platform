@@ -47,7 +47,7 @@ class WidgetUserMultiselectConverter extends ConfigValueConverterAbstract
             $names[] = $user->getFirstName() . ' ' . $user->getLastName();
         }
 
-        return implode('; ', $names);
+        return empty($names) ? null : implode('; ', $names);
     }
 
     /**

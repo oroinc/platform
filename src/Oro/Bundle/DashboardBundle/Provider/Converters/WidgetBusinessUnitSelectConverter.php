@@ -12,12 +12,10 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
 {
     /**
      * @param mixed $value
-     * @return string
+     * @return mixed
      */
     public function getViewValue($value)
     {
-        $value = is_array($value) ? $value : [$value];
-
-        return implode('; ', $value);
+        return empty($value) ? null : implode('; ', $value);
     }
 }
