@@ -6,7 +6,7 @@ define(function(require) {
      * Text cell content editor
      *
      * @class
-     * @param {Object} options - Options container.
+     * @param {Object} options - Options container
      * @param {Object} options.model - current row model
      * @param {Backgrid.Cell} options.cell - current datagrid cell
      * @param {Backgrid.Column} options.column - current datagrid column

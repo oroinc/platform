@@ -31,7 +31,7 @@ define(function(require) {
      * and will put response to console after it will be finished
      *
      * @class
-     * @param {Object} options - Options container.
+     * @param {Object} options - Options container
      * @param {string} options.route - Required. Route name
      * @param {string} options.http_method - Http method to access this route (e.g. GET/POST/PUT/PATCH...)
      *                          By default `'GET'`.

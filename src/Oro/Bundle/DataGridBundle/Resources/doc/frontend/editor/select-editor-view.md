@@ -6,7 +6,7 @@ Text cell content editor
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container. |
+| options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | current row model |
 | options.cell | <code>Backgrid.Cell</code> | current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | current datagrid column |

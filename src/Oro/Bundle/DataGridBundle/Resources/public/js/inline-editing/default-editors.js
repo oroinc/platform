@@ -15,30 +15,56 @@ define(function(require) {
          * @type {function(new:TextEditorView)}
          */
         string: require('orodatagrid/js/app/views/editor/text-editor-view'),
+
         /**
          * Please look at [datetime-editor-view](../frontend/editor/datetime-editor-view.md) for details
          *
          * @type {Function}
          */
         datetime: require('orodatagrid/js/app/views/editor/datetime-editor-view'),
+
         /**
          * Please look at [date-editor-view](../frontend/editor/date-editor-view.md) for details
          *
          * @type {Function}
          */
         date: require('orodatagrid/js/app/views/editor/date-editor-view'),
+
         /**
          * Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
          *
          * @type {Function}
          */
         currency: require('orodatagrid/js/app/views/editor/number-editor-view'),
+
         /**
          * Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
          *
          * @type {Function}
          */
         number: require('orodatagrid/js/app/views/editor/number-editor-view'),
+
+        /**
+         * Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         *
+         * @type {Function}
+         */
+        integer: require('orodatagrid/js/app/views/editor/number-editor-view'),
+
+        /**
+         * Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         *
+         * @type {Function}
+         */
+        decimal: require('orodatagrid/js/app/views/editor/number-editor-view'),
+
+        /**
+         * Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         *
+         * @type {Function}
+         */
+        percent: require('orodatagrid/js/app/views/editor/number-editor-view'),
+
         /**
          * Please look at [select-editor-view](../frontend/editor/select-editor-view.md) for details
          *

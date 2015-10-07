@@ -3,15 +3,55 @@ define(function(require) {
     'use strict';
 
     /**
-     * Text cell content editor
+     * Date cell content editor
+     *
+     * ### Column configuration samples:
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     columns:
+     *       # Sample 1. Mapped by number frontend type
+     *       {column-name-1}:
+     *         frontend_type: date
+     *       # Sample 2. Full configuration
+     *       {column-name-2}:
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/date-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *               datePickerOptions:
+     *                 altFormat: 'yy-mm-dd'
+     *                 changeMonth: true
+     *                 changeYear: true
+     *                 yearRange: '-80:+1'
+     *                 showButtonPanel: true
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:-----------
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+     * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for date HTML input element
+     * inline_editing.editor.view_options.datePickerOptions| Optional. See (details here)[http://goo.gl/pddxZU]
+     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     *
+     * ### Constructor parameters
      *
      * @class
-     * @param {Object} options - Options container.
-     * @param {Object} options.model - current row model
-     * @param {Backgrid.Cell} options.cell - current datagrid cell
-     * @param {Backgrid.Column} options.column - current datagrid column
-     * @param {string} options.placeholder - placeholder for empty element
-     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     * @param {Object} options - Options container
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for empty element
+     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
      *
      * @augments (TextEditorView)[./text-editor-view.md]
      * @exports DateEditorView

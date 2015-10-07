@@ -1,6 +1,6 @@
 <a name="module_TextEditorView"></a>
 ## TextEditorView ⇐ <code>BaseView</code>
-Text cell content editor. this view is used by default (when no frontend type specified).
+Text cell content editor. This view is used by default (when no frontend type specified).
 
 ### Column configuration samples:
 ``` yml
@@ -27,6 +27,10 @@ datagrid:
             view: orodatagrid/js/app/views/editor/text-editor-view
             view_options:
               placeholder: '<placeholder>'
+          validationRules:
+            # jQuery.validate configuration
+            required: true
+            minlen: 5
 ```
 
 ### Options in yml:
@@ -34,6 +38,7 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+inline_editing.editor.validationRules               | Optional. Client side validation rules
 
 ### Constructor parameters
 
@@ -41,12 +46,12 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container. |
-| options.model | <code>Object</code> | current row model |
-| options.cell | <code>Backgrid.Cell</code> | current datagrid cell |
-| options.column | <code>Backgrid.Column</code> | current datagrid column |
-| options.placeholder | <code>string</code> | placeholder for empty element |
-| options.validationRules | <code>Object</code> | validation rules in form applicable to jQuery.validate |
+| options | <code>Object</code> | Options container |
+| options.model | <code>Object</code> | Current row model |
+| options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
+| options.column | <code>Backgrid.Column</code> | Current datagrid column |
+| options.placeholder | <code>string</code> | Placeholder for empty element |
+| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
 
 
 * [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>

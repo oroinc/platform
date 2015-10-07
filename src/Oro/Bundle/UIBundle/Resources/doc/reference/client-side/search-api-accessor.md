@@ -7,7 +7,7 @@ This class is designed to create from server configuration.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>Object</code> | Options container. Please also overview options for [ApiAccessor](./api-accessor.md) |
+| options | <code>Object</code> | Options container Please also overview options for [ApiAccessor](./api-accessor.md) |
 | options.search_handler_name | <code>string</code> | Name of search handler to use |
 | options.label_field_name | <code>string</code> | Name of the property that will be used as label |
 | options.id_field_name | <code>string</code> | Optional. Name of the property that will be used as identifier.                                       By default = `'id'` |

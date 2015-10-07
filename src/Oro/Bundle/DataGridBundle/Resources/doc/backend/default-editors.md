@@ -9,6 +9,9 @@ Maps frontend types into editor views
   * [.date](#module_defaultEditors.date) : <code>function</code>
   * [.currency](#module_defaultEditors.currency) : <code>function</code>
   * [.number](#module_defaultEditors.number) : <code>function</code>
+  * [.integer](#module_defaultEditors.integer) : <code>function</code>
+  * [.decimal](#module_defaultEditors.decimal) : <code>function</code>
+  * [.percent](#module_defaultEditors.percent) : <code>function</code>
   * [.select](#module_defaultEditors.select) : <code>function</code>
 
 <a name="module_defaultEditors.string"></a>
@@ -33,6 +36,21 @@ Please look at [number-editor-view](../frontend/editor/number-editor-view.md) fo
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.number"></a>
 ### defaultEditors.number : <code>function</code>
+Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+
+**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+<a name="module_defaultEditors.integer"></a>
+### defaultEditors.integer : <code>function</code>
+Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+
+**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+<a name="module_defaultEditors.decimal"></a>
+### defaultEditors.decimal : <code>function</code>
+Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
+
+**Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
+<a name="module_defaultEditors.percent"></a>
+### defaultEditors.percent : <code>function</code>
 Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  

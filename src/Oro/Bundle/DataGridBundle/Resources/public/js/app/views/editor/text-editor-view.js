@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     /**
-     * Text cell content editor. this view is used by default (when no frontend type specified).
+     * Text cell content editor. This view is used by default (when no frontend type specified).
      *
      * ### Column configuration samples:
      * ``` yml
@@ -30,6 +30,10 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/text-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     *             minlen: 5
      * ```
      *
      * ### Options in yml:
@@ -37,16 +41,17 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+     * inline_editing.editor.validationRules               | Optional. Client side validation rules
      *
      * ### Constructor parameters
      *
      * @class
-     * @param {Object} options - Options container.
-     * @param {Object} options.model - current row model
-     * @param {Backgrid.Cell} options.cell - current datagrid cell
-     * @param {Backgrid.Column} options.column - current datagrid column
-     * @param {string} options.placeholder - placeholder for empty element
-     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     * @param {Object} options - Options container
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for empty element
+     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
      *
      * @augments BaseView
      * @exports TextEditorView
