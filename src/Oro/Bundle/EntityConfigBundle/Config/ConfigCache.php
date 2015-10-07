@@ -306,13 +306,17 @@ class ConfigCache
     /**
      * Deletes cache entries for all configs.
      *
+     * @param bool $localCacheOnly
+     *
      * @return bool TRUE if the cache entries were successfully deleted; otherwise, FALSE.
      */
-    public function deleteAllConfigs()
+    public function deleteAllConfigs($localCacheOnly = false)
     {
         $this->localCache = [];
 
-        return $this->cache->deleteAll();
+        return $localCacheOnly
+            ? true
+            : $this->cache->deleteAll();
     }
 
     /**
@@ -423,13 +427,17 @@ class ConfigCache
     /**
      * Deletes cached "configurable" flags for all configs.
      *
+     * @param bool $localCacheOnly
+     *
      * @return bool TRUE if the cache entries were successfully deleted; otherwise, FALSE.
      */
-    public function deleteAllConfigurable()
+    public function deleteAllConfigurable($localCacheOnly = false)
     {
         $this->localModelCache = [];
 
-        return $this->modelCache->deleteAll();
+        return $localCacheOnly
+            ? true
+            : $this->modelCache->deleteAll();
     }
 
     /**

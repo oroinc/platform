@@ -824,11 +824,41 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteAllConfigs()
     {
+        $config = new Config(
+            new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
+            ['key1' => 'val1']
+        );
+
+        $this->configCache->saveConfig($config, true);
+
         $this->cache->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);
 
         $this->assertTrue($this->configCache->deleteAllConfigs());
+        // check that a local cache is cleaned up as well
+        $this->assertNull(
+            $this->configCache->getEntityConfig(self::SCOPE, self::ENTITY_CLASS, true)
+        );
+    }
+
+    public function testDeleteAllConfigsLocalCacheOnly()
+    {
+        $config = new Config(
+            new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
+            ['key1' => 'val1']
+        );
+
+        $this->configCache->saveConfig($config, true);
+
+        $this->cache->expects($this->never())
+            ->method('deleteAll');
+
+        $this->assertTrue($this->configCache->deleteAllConfigs(true));
+        // check that a local cache is cleaned up
+        $this->assertNull(
+            $this->configCache->getEntityConfig(self::SCOPE, self::ENTITY_CLASS, true)
+        );
     }
 
     public function testFlushAllConfigs()
@@ -949,11 +979,31 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteAllConfigurable()
     {
+        $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
+
         $this->modelCache->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);
 
         $this->assertTrue($this->configCache->deleteAllConfigurable());
+        // test that a local cache is cleaned up as well
+        $this->assertNull(
+            $this->configCache->getConfigurable(self::ENTITY_CLASS)
+        );
+    }
+
+    public function testDeleteAllConfigurableLocalCacheOnly()
+    {
+        $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
+
+        $this->modelCache->expects($this->never())
+            ->method('deleteAll');
+
+        $this->assertTrue($this->configCache->deleteAllConfigurable(true));
+        // test that a local cache is cleaned up
+        $this->assertNull(
+            $this->configCache->getConfigurable(self::ENTITY_CLASS)
+        );
     }
 
     public function testFlushAllConfigurable()
