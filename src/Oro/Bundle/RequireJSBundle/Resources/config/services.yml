@@ -13,7 +13,7 @@ services:
     oro_requirejs.cache:
           parent: oro.cache.abstract
           calls:
-              - [setNamespace, ['oro_requirejs.cache']]
+              - [setNamespace, [ 'oro_requirejs' ] ]
 
     oro_requirejs_config_provider:
         class: %oro_requirejs.provider.config.class%

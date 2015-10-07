@@ -46,7 +46,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_entity_ownership.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_entity_ownership' ] ]
 
     oro_security.owner.ownership_config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigListener

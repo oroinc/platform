@@ -116,7 +116,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl" ] ]
+            - [ setNamespace, [ 'oro_acl' ] ]
 
     oro_security.acl.ace_provider:
         public: false
@@ -243,7 +243,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_entities.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_entities' ] ]
 
     oro_security.action_metadata_provider:
         public: false
@@ -256,7 +256,7 @@ services:
         public: false
         parent: oro.file_cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_actions.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_actions' ] ]
 
     oro_security.acl.annotation_provider:
         class: %oro_security.acl.annotation_provider.class%
@@ -267,7 +267,7 @@ services:
         public: false
         parent: oro.file_cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_annotations.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_annotations' ] ]
 
     oro_security.acl.annotation_loader:
         public: false
@@ -422,7 +422,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_owner_tree.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_owner_tree' ] ]
 
     oro_security.ownership_tree.cache.warmer:
         public: false
