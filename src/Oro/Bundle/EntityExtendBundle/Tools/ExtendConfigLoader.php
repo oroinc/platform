@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
 class ExtendConfigLoader extends ConfigLoader
@@ -10,7 +11,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasEntityConfigs(ClassMetadataInfo $metadata)
+    protected function hasEntityConfigs(ClassMetadata $metadata)
     {
         return parent::hasEntityConfigs($metadata) && !ExtendHelper::isCustomEntity($metadata->getName());
     }
@@ -18,7 +19,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasFieldConfigs(ClassMetadataInfo $metadata, $fieldName)
+    protected function hasFieldConfigs(ClassMetadata $metadata, $fieldName)
     {
         if ($this->isExtendField($metadata->getName(), $fieldName)) {
             return false;
@@ -30,7 +31,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasAssociationConfigs(ClassMetadataInfo $metadata, $associationName)
+    protected function hasAssociationConfigs(ClassMetadata $metadata, $associationName)
     {
         if ($this->isExtendField($metadata->getName(), $associationName)) {
             return false;

@@ -92,10 +92,12 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getSearchHandler')
             ->will($this->returnValue($handler));
 
-        $configManager = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $config        = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
-        $configManager
+        $configProvider
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($config));
@@ -109,7 +111,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             new EntitySelectOrCreateInlineFormExtension(
                 $entityManager,
                 $searchRegistry,
-                $configManager
+                $configProvider
             )
         ];
     }

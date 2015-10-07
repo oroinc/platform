@@ -18,7 +18,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "acme_test.cache" ] ]
+            - [ setNamespace, [ 'acme_test' ] ]
 ```
 
 Also each of these abstract services can be re-declared in the application configuration file, for example:

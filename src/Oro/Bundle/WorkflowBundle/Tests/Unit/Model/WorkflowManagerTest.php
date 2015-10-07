@@ -892,7 +892,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('set')->with('active_workflow', $workflowName);
 
-        $workflowConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
             ->will($this->returnValue(true));
         $workflowConfigProvider->expects($this->once())->method('getConfig')->with($entityClass)
@@ -913,7 +915,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $entityConfig->expects($this->once())->method('set')->with('active_workflow', null);
 
-        $workflowConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
             ->will($this->returnValue(true));
         $workflowConfigProvider->expects($this->once())->method('getConfig')->with($entityClass)
@@ -935,7 +939,9 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = '\DateTime';
 
-        $workflowConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $workflowConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $workflowConfigProvider->expects($this->once())->method('hasConfig')->with($entityClass)
             ->will($this->returnValue(false));
         $workflowConfigProvider->expects($this->never())->method('getConfig');
