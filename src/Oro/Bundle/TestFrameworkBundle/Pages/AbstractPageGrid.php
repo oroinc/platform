@@ -290,7 +290,8 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function delete($entityData, $actionName = 'Delete', $confirmation = true)
     {
-        return $this->action($entityData, $actionName, $confirmation);
+        $this->action($entityData, $actionName, $confirmation);
+        return $this;
     }
 
     /**
@@ -303,10 +304,10 @@ abstract class AbstractPageGrid extends AbstractPage
     public function action($entityData, $actionName = 'Update', $confirmation = false)
     {
         $entity = $this->getEntity($entityData);
-
-        if (!empty($entity->elements($this->test->using('xpath')->value(
+        $flag = $entity->elements($this->test->using('xpath')->value(
             "td[contains(@class,'action-cell')]//a[contains(., '...')]"
-        )))) {
+        ));
+        if (!empty($flag)) {
             $element = $entity->element($this->test->using('xpath')->value(
                 "td[contains(@class,'action-cell')]//a[contains(., '...')]"
             ));
