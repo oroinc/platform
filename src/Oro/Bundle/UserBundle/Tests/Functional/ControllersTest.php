@@ -6,6 +6,7 @@ use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Doctrine\ORM\EntityManager;
 
 /**
  * @outputBuffering enabled
@@ -14,9 +15,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     public function testIndex()
@@ -167,7 +174,7 @@ class ControllersTest extends WebTestCase
                 'page' => 1,
                 'per_page' => 10,
                 'name' => 'acl_users',
-                'query' => 'John Doe;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
+                'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
             )
         );
 
@@ -175,4 +182,27 @@ class ControllersTest extends WebTestCase
         $arr = $this->getJsonResponseContent($result, 200);
         $this->assertCount(1, $arr['results']);
     }
+
+    public function testAutoCompleteWithInactiveUser()
+    {
+        $user = $this->em->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
+        $user->setEnabled(false);
+        $this->em->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_form_autocomplete_search'),
+            array(
+                'page' => 1,
+                'per_page' => 10,
+                'name' => 'acl_users',
+                'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
+            )
+        );
+
+        $result = $this->client->getResponse();
+        $arr = $this->getJsonResponseContent($result, 200);
+        $this->assertCount(0, $arr['results']);
+    }
+
 }
