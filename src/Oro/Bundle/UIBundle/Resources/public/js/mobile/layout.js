@@ -46,16 +46,29 @@ define(function(require) {
      * Binds to dialog state change events and locks/unlocks page scroll
      */
     function initDialogStateTracker() {
-        var  dialogs = {};
+        var dialogs = {};
+        var modals = {};
 
         function scrollUpdate() {
             var $mainEl = $('#container').find('>:first-child');
-            if (_.some(dialogs)) {
+            if (_.some(dialogs) || _.some(modals)) {
                 mediator.execute('layout:disablePageScroll', $mainEl);
-                $('#page').css('display', 'none');
             } else {
                 mediator.execute('layout:enablePageScroll');
-                $('#page').css('display', '');
+            }
+
+            // any dialog is opened -- hide page under dialog window (increases performance)
+            if (_.some(dialogs)) {
+                $('#page').addClass('hidden-page');
+            } else {
+                $('#page').removeClass('hidden-page');
+            }
+
+            // any modal is opened  -- prevent page scrolling under the modal window
+            if (_.some(modals)) {
+                $('html').addClass('lock-page-scroll');
+            } else {
+                $('html').removeClass('lock-page-scroll');
             }
         }
 
@@ -75,11 +88,11 @@ define(function(require) {
             },
             // modals
             'modal:open': function(modal) {
-                dialogs[modal.cid] = true;
+                modals[modal.cid] = true;
                 scrollUpdate();
             },
             'modal:close': function(modal) {
-                delete dialogs[modal.cid];
+                delete modals[modal.cid];
                 scrollUpdate();
             }
         });

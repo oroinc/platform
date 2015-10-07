@@ -66,4 +66,10 @@ class CalendarTest extends Selenium2TestCase
             ->assertTitle('My Calendar - John Doe')
             ->checkEventNotPresent($eventName);
     }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
+    }
 }
