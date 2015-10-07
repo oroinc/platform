@@ -35,7 +35,8 @@ define(function(require) {
      *             # jQuery.validate configuration
      *             required: true
      *         autocomplete_api_accessor:
-     *           # class: oroentity/js/tools/entity-select-search-api-accessor # entity_select is default search api
+     *           # class: oroentity/js/tools/entity-select-search-api-accessor
+     *           # entity_select is default search api
      *           # following options are specific only for entity-select-search-api-accessor
      *           # please place here an options corresponding to specified class
      *           entity_name: {corresponding-entity}
