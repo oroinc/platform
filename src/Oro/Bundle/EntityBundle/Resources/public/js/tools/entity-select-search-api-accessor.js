@@ -10,7 +10,7 @@ define(function(require) {
      * @param options.entity_name {string} entity name to search in
      * @param options.field_name {string} field to search by and to show in UI
      *
-     * @augment SearchApiAccessor
+     * @augment [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
      * @exports EntitySelectSearchApiAccessor
      */
     var EntitySelectSearchApiAccessor;
@@ -31,9 +31,6 @@ define(function(require) {
             EntitySelectSearchApiAccessor.__super__.initialize.call(this, options);
         },
 
-        /**
-         * @inheritDoc
-         */
         prepareUrlParameters: function(urlParameters) {
             urlParameters.query = [urlParameters.term, this.entityName, this.fieldName].join(',');
             urlParameters.name = this.searchHandlerName;
