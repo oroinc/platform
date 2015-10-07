@@ -1,5 +1,5 @@
 # Inline editing
-## How to enable inline editing on grid:
+## How to enable inline editing on grid
 To enable inline editing on grid you must do following actions:
 
 - Go into datagrid yml
@@ -16,7 +16,7 @@ datagrid:
 ```
 - Open corresponding page, all columns that have supported frontend type will become editable
 
-## Datagrid configuration details:
+## Datagrid configuration details
 ``` yml
 datagrid:
     {grid-uid}:
@@ -62,7 +62,7 @@ Result of combining options:
 
 Please note that `{id}` will be taken from current row in grid
 
-## Column configuration options:
+## Column configuration options
 ``` yml
 datagrid:
     {grid-uid}:
@@ -118,8 +118,8 @@ Editor                                                                      | De
 [date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells
 [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
 [select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
-[related-id-select-editor-view](../../frontend/editor/select-editor-view.md)   | Editing cells which already contains label(and not value) using predefined choices
-[related-id-relation-editor-view](../../frontend/editor/select-editor-view.md) | Editing cells which already contains label(and not value) using search api
+[related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contains label(and not value) using predefined choices
+[related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contains label(and not value) using search api
 
 ## Supported search API's
 

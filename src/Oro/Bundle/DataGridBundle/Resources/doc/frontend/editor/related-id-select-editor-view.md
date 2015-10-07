@@ -42,7 +42,9 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 inline_editing.editor.view_options.choices          | Key-value set of available choices
-inline_editing.editor.view_options.value_field_name | Related value field name. Please note the value registration in query and properties in the provided sample yml configuration
+inline_editing.editor.view_options.value_field_name | Related value field name. Please note the value
+                                                    | registration in query and properties in the provided
+                                                    | sample yml configuration
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 inline_editing.editor.validationRules               | Optional. Client side validation rules
 
