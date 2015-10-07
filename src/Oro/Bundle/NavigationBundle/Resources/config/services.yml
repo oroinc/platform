@@ -45,6 +45,7 @@ parameters:
     oro_navigation.form.handler.pagestate.class:               Oro\Bundle\NavigationBundle\Form\Handler\PageStateHandler
 
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
+    oro_navigation.chain_breadcrumbs_manager.class:            Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager
 
     oro_navigation.twig.content_tags.class:                    Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension
     oro_navigation.content.topic_sender.class:                 Oro\Bundle\NavigationBundle\Content\TopicSender
@@ -98,6 +99,8 @@ services:
             - @knp_menu.helper
             - @oro_menu.builder_chain
             - @oro_navigation.breadcrumb_manager
+        calls:
+          - [ setBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
         tags:
             - { name: twig.extension }
 
@@ -221,13 +224,17 @@ services:
         calls:
             - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\Audit']]
             - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\AuditData']]
+            - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\PageState']]
             - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\Item']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexText']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexInteger']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDecimal']]
             - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDatetime']]
-            - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\PageState']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\JobExecution']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\StepExecution']]
+            - [ markSkipped, ['Akeneo\Bundle\BatchBundle\Entity\JobInstance']]
+            - [ markSkipped, ['JMS\JobQueueBundle\Entity\Job']]
         tags:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
@@ -264,6 +271,8 @@ services:
           - @oro_config.user
           - @oro_navigation.breadcrumb_manager
           - @oro_navigation.title_provider
+        calls:
+          - [ setBreadcrumbManager, [ @oro_navigation.chain_breadcrumb_manager ]]
 
     oro_navigation.title_provider:
         class: %oro_navigation.title_provider.class%
@@ -344,6 +353,11 @@ services:
             - @oro_menu.builder_chain
             - @knp_menu.matcher
             - @router
+
+    oro_navigation.chain_breadcrumb_manager:
+        class: %oro_navigation.chain_breadcrumbs_manager.class%
+        calls:
+          - [ setDefaultManager, [ @oro_navigation.breadcrumb_manager ]]
 
     oro_navigation.twig.content_tags:
         class: %oro_navigation.twig.content_tags.class%

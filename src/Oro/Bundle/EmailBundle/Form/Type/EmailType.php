@@ -129,7 +129,10 @@ class EmailType extends AbstractType
                     'label'    => 'oro.email.contexts.label',
                     'tooltip'  => 'oro.email.contexts.tooltip',
                     'required' => false,
-                    'read_only' => true,
+                    'read_only' => !$this->securityContext->isGranted(
+                        'EDIT',
+                        'entity:Oro\Bundle\EmailBundle\Entity\EmailUser'
+                    ),
                 ]
             );
 
@@ -173,16 +176,6 @@ class EmailType extends AbstractType
             ],
             ['choice_list', 'choices']
         );
-
-        if ($this->securityContext->isGranted('EDIT', 'entity:Oro\Bundle\EmailBundle\Entity\EmailUser')) {
-            FormUtils::replaceField(
-                $form,
-                'contexts',
-                [
-                    'read_only' => false,
-                ]
-            );
-        }
     }
 
     /**
