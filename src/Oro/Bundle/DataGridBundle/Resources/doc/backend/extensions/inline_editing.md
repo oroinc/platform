@@ -121,6 +121,6 @@ Editor                                                                      | De
 [related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contains label(and not value) using predefined choices
 [related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contains label(and not value) using search api
 
-## Supported search API's
+## Supported search API's for `related-id-relation-editor-view`
 
-API name |
+Please find list of supported search API's [here](../../frontend/search-apis.mp)

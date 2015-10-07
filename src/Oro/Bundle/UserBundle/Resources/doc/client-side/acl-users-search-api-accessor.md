@@ -8,7 +8,7 @@ Provides access to acl_users search API.
 | --- | --- | --- |
 | options | <code>Object</code> |  |
 | options.permission_check_entity_name | <code>string</code> | Entity name to check permissions on |
-| options.permission | <code>string</code> | Optional. Permission name to check. Default values is `'ASSIGN'` |
+| options.permission | <code>string</code> | Optional. Permission name to check. Default value is `'ASSIGN'` |
 
 <a name="module_AclUsersSearchApiAccessor#initialize"></a>
 ### aclUsersSearchApiAccessor.initialize

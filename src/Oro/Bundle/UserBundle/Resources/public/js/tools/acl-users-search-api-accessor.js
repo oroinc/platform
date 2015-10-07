@@ -10,7 +10,7 @@ define(function(require) {
      *
      * @param options {Object}
      * @param options.permission_check_entity_name {string} - Entity name to check permissions on
-     * @param options.permission {string} - Optional. Permission name to check. Default values is `'ASSIGN'`
+     * @param options.permission {string} - Optional. Permission name to check. Default value is `'ASSIGN'`
      *
      * @exports AclUsersSearchApiAccessor
      */
