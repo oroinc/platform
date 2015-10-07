@@ -223,33 +223,31 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     }
 
     /**
+     * @param string $message
+     *
+     * @return callable
+     */
+    protected function getNotBlankValidator($message)
+    {
+        return function ($value) use ($message) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception($message);
+            }
+
+            return $value;
+        };
+    }
+
+    /**
      * Update the administrator user
      *
      * @param CommandExecutor $commandExecutor
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $emailValidator     = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The email must be specified');
-            }
-
-            return $value;
-        };
-        $firstNameValidator = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The first name must be specified');
-            }
-
-            return $value;
-        };
-        $lastNameValidator  = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The last name must be specified');
-            }
-
-            return $value;
-        };
+        $emailValidator     = $this->getNotBlankValidator('The email must be specified');
+        $firstNameValidator = $this->getNotBlankValidator('The first name must be specified');
+        $lastNameValidator  = $this->getNotBlankValidator('The last name must be specified');
         $passwordValidator  = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
