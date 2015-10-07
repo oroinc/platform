@@ -6,7 +6,7 @@ define(function(require) {
      * Provides access to acl_users search API.
      *
      * @class
-     * @augment [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
+     * @augments [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
      *
      * @param options {Object}
      * @param options.permission_check_entity_name {string} - Entity name to check permissions on

@@ -1,8 +1,8 @@
 <a name="module_EntitySelectSearchApiAccessor"></a>
-## EntitySelectSearchApiAccessor
+## EntitySelectSearchApiAccessor ⇐ <code>[SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)</code>
 Provides access to entity_select search API.
 
-**Augment**: [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)  
+**Extends:** <code>[SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
