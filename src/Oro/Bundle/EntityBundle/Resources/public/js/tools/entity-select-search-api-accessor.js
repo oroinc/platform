@@ -6,11 +6,12 @@ define(function(require) {
      * Provides access to entity_select search API.
      *
      * @class
+     * @augment [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
+     *
      * @param options {Object}
      * @param options.entity_name {string} entity name to search in
      * @param options.field_name {string} field to search by and to show in UI
      *
-     * @augment [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
      * @exports EntitySelectSearchApiAccessor
      */
     var EntitySelectSearchApiAccessor;

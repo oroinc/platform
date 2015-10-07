@@ -6,7 +6,12 @@ define(function(require) {
      * Provides access to acl_users search API.
      *
      * @class
-     * @augment SearchApiAccessor
+     * @augment [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
+     *
+     * @param options {Object}
+     * @param options.permission_check_entity_name {string} - Entity name to check permissions on
+     * @param options.permission {string} - Optional. Permission name to check. Default values is `'ASSIGN'`
+     *
      * @exports AclUsersSearchApiAccessor
      */
     var AclUsersSearchApiAccessor;
@@ -15,9 +20,6 @@ define(function(require) {
     AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @exports AclUsersSearchApiAccessor.prototype */{
         /**
          * @constructor
-         * @param options {Object}
-         * @param options.permission_check_entity_name {string} entity name to check permissions on
-         * @param options.permission {string} Optional. Permission name to check
          */
         initialize: function(options) {
             if (!options) {
@@ -33,9 +35,6 @@ define(function(require) {
             AclUsersSearchApiAccessor.__super__.initialize.call(this, options);
         },
 
-        /**
-         * @inheritDoc
-         */
         prepareUrlParameters: function(urlParameters) {
             if (!urlParameters.id) {
                 throw new Error('`id` url parameter is required');
