@@ -216,13 +216,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ];
             if ($dropDatabase === 'full') {
                 $schemaDropOptions['--full-database'] = true;
-            }
-
-            $managers = $this->getContainer()->get('doctrine')->getManagers();
-            foreach ($managers as $name => $manager) {
-                if ($manager instanceof EntityManager) {
-                    $schemaDropOptions['--em'] = $name;
-                    $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+                $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+            } else {
+                $managers = $this->getContainer()->get('doctrine')->getManagers();
+                foreach ($managers as $name => $manager) {
+                    if ($manager instanceof EntityManager) {
+                        $schemaDropOptions['--em'] = $name;
+                        $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+                    }
                 }
             }
         }
