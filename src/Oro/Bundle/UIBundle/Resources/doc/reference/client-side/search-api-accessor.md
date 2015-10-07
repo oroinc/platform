@@ -7,7 +7,7 @@ This class is designed to create from server configuration.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> | Options container. Please also overview options for [ApiAccessor](./api-accessor.md) |
+| options | <code>Object</code> | Options container. Please also overview options for [ApiAccessor](./api-accessor.md) |
 | options.search_handler_name | <code>string</code> | Name of search handler to use |
 | options.label_field_name | <code>string</code> | Name of the property that will be used as label |
 | options.id_field_name | <code>string</code> | Optional. Name of the property that will be used as identifier.                                       By default = `'id'` |
@@ -15,13 +15,13 @@ This class is designed to create from server configuration.
 
 * [SearchApiAccessor](#module_SearchApiAccessor)
   * [.prepareUrlParameters()](#module_SearchApiAccessor#prepareUrlParameters)
-  * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ <code>object</code>
+  * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ <code>Object</code>
 
 <a name="module_SearchApiAccessor#prepareUrlParameters"></a>
 ### searchApiAccessor.prepareUrlParameters()
 **Kind**: instance method of <code>[SearchApiAccessor](#module_SearchApiAccessor)</code>  
 <a name="module_SearchApiAccessor#formatResult"></a>
-### searchApiAccessor.formatResult(response) ⇒ <code>object</code>
+### searchApiAccessor.formatResult(response) ⇒ <code>Object</code>
 Formats response before it will be sent out from this api accessor.
 Converts it to form
 ``` javascipt
@@ -35,5 +35,5 @@ Converts it to form
 
 | Param | Type |
 | --- | --- |
-| response | <code>object</code> | 
+| response | <code>Object</code> | 
 

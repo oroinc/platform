@@ -1,12 +1,27 @@
+/** @lends TextEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Text cell content editor
+     *
+     * @class
+     * @param {Object} options - Options container.
+     * @param {Object} options.model - current row model
+     * @param {Backgrid.Cell} options.cell - current datagrid cell
+     * @param {Backgrid.Column} options.column - current datagrid column
+     * @param {string} options.placeholder - placeholder for empty element
+     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     *
+     * @augments BaseView
+     * @exports TextEditorView
+     */
     var TextEditorView;
     var _ = require('underscore');
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    TextEditorView = BaseView.extend({
+    TextEditorView = BaseView.extend(/** @exports TextEditorView.prototype */{
         autoRender: true,
         tagName: 'form',
         template: require('tpl!../../../../templates/text-editor.html'),
@@ -22,6 +37,9 @@ define(function(require) {
         ENTER_KEY_CODE: 13,
         ESCAPE_KEY_CODE: 27,
 
+        /**
+         * @inheritDoc
+         */
         initialize: function(options) {
             this.options = options;
             this.cell = options.cell;
@@ -32,6 +50,9 @@ define(function(require) {
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
+        /**
+         * @inheritDoc
+         */
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -40,6 +61,9 @@ define(function(require) {
             TextEditorView.__super__.dispose.call(this);
         },
 
+        /**
+         * @inheritDoc
+         */
         getTemplateData: function() {
             var data = {};
             data.inputType = this.inputType;
@@ -73,37 +97,76 @@ define(function(require) {
             this.onChange();
         },
 
-        focus: function() {
+        /**
+         * Places focus on editor
+         *
+         * @param {boolean} side - Usefull for multi inputs editors. Specifies which input should be focused first
+         *                         or last
+         */
+        focus: function(side) {
             this.$('input[name=value]').setCursorToEnd().focus();
         },
 
+        /**
+         * Prepares validation rules for usage
+         *
+         * @returns {Object}
+         */
         getValidationRules: function() {
             return this.validationRules;
         },
 
+        /**
+         * Formats and returns model value before it will be rendered
+         *
+         * @returns {string}
+         */
         getFormattedValue: function() {
             return this.getModelValue();
         },
 
+        /**
+         * Returns raw model value
+         *
+         * @returns {string}
+         */
         getModelValue: function() {
             var raw = this.model.get(this.column.get('name'));
             return raw ? raw : '';
         },
 
+        /**
+         * Returns current user edited value
+         *
+         * @returns {string}
+         */
         getValue: function() {
             return this.$('input[name=value]').val();
         },
 
+        /**
+         * Generic handler for buttons which allows to notify overlaying component about some user action
+         *
+         * @returns {string}
+         */
         rethrowAction: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             this.trigger($(e.currentTarget).attr('data-action') + 'Action');
         },
 
+        /**
+         * Returns true if user has changed value
+         *
+         * @returns {boolean}
+         */
         isChanged: function() {
             return this.getValue() !== this.getModelValue();
         },
 
+        /**
+         * Change handler. In this realization - tracks submit button disabled attribute
+         */
         onChange: function() {
             if (!this.isChanged()) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
@@ -112,6 +175,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Keydown handler for entire document
+         *
+         * @param {$.Event} e
+         */
         onKeyDown: function(e) {
             switch (e.keyCode) {
                 case this.TAB_KEY_CODE:
@@ -126,6 +194,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Generic keydown handler which handles ENTER
+         *
+         * @param {$.Event} e
+         */
         onInternalEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (this.isChanged()) {
@@ -142,6 +215,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Generic keydown handler which handles TAB
+         *
+         * @param {$.Event} e
+         */
         onInternalTabKeydown: function(e) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
@@ -159,6 +237,11 @@ define(function(require) {
             }
         },
 
+        /**
+         * Generic keydown handler which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
         onInternalEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 this.trigger('cancelAction');
@@ -167,12 +250,22 @@ define(function(require) {
             }
         },
 
+        /**
+         * Returns data which should be sent to server
+         *
+         * @returns {Object}
+         */
         getServerUpdateData: function() {
             var data = {};
             data[this.column.get('name')] = this.getValue();
             return data;
         },
 
+        /**
+         * Returns data to update model
+         *
+         * @returns {Object}
+         */
         getModelUpdateData: function() {
             return this.getServerUpdateData();
         }
