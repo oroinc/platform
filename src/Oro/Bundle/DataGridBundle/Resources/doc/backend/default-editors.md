@@ -13,31 +13,31 @@ Maps frontend types into editor views
 
 <a name="module_defaultEditors.string"></a>
 ### defaultEditors.string : <code>function</code>
-See [text-editor-view](../frontend/editor/text-editor-view.md) for details
+Please look at [text-editor-view](../frontend/editor/text-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.datetime"></a>
 ### defaultEditors.datetime : <code>function</code>
-See [datetime-editor-view](../frontend/editor/datetime-editor-view.md) for details
+Please look at [datetime-editor-view](../frontend/editor/datetime-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.date"></a>
 ### defaultEditors.date : <code>function</code>
-See [date-editor-view](../frontend/editor/date-editor-view.md) for details
+Please look at [date-editor-view](../frontend/editor/date-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.currency"></a>
 ### defaultEditors.currency : <code>function</code>
-See [number-editor-view](../frontend/editor/number-editor-view.md) for details
+Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.number"></a>
 ### defaultEditors.number : <code>function</code>
-See [number-editor-view](../frontend/editor/number-editor-view.md) for details
+Please look at [number-editor-view](../frontend/editor/number-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.select"></a>
 ### defaultEditors.select : <code>function</code>
-See [select-editor-view](../frontend/editor/select-editor-view.md) for details
+Please look at [select-editor-view](../frontend/editor/select-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  

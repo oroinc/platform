@@ -1,6 +1,24 @@
 <a name="module_TextEditorView"></a>
 ## TextEditorView ⇐ <code>BaseView</code>
-Text cell content editor
+Text cell content editor. this view is used by default (when no frontend type specified).
+
+Sample column configuration:
+``` yml
+datagrid:
+  {grid-uid}:
+    # <grid configuration> goes here
+    columns:
+      {column-name}:
+        inline_editing:
+          editor:
+            view: orodatagrid/js/app/views/editor/text-editor-view // if required
+            view_options:
+              placeholder: '<placeholder>'
+```
+Options:
+Name                                           | Description
+-----------------------------------------------|------------
+inline_editing.editor.view_options.placeholder | Placeholder for empty element
 
 **Extends:** <code>BaseView</code>  
 
