@@ -123,4 +123,4 @@ Editor                                                                      | De
 
 ## Supported search API's for `related-id-relation-editor-view`
 
-Please find list of supported search API's [here](../../frontend/search-apis.mp)
+Please find list of supported search API's [here](../../frontend/search-apis.md)
