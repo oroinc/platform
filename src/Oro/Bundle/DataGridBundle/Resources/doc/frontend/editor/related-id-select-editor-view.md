@@ -1,9 +1,9 @@
 <a name="module_RelatedIdSelectEditorView"></a>
 ## RelatedIdSelectEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
 Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-Editor will use provided map and `value_field_name`. Server will be updated with value only.
+Editor will use provided `choices` map and `value_field_name`. Server will be updated with value only.
 
-### Column configuration samples:
+### Column configuration sample:
 
 Please note the value_field_name registration in query and properties in the provided sample yml configuration
 

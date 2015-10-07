@@ -4,7 +4,7 @@ define(function(require) {
 
     /**
      * Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-     * Editor will use provided map and `value_field_name`. Server will be updated with value only.
+     * Editor will use provided `choices` map and `value_field_name`. Server will be updated with value only.
      *
      * ### Column configuration sample:
      *

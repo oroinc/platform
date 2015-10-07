@@ -3,15 +3,70 @@ define(function(require) {
     'use strict';
 
     /**
-     * Text cell content editor
+
+     /**
+     * Select-like cell content editor. This view is applicable when cell value contains label (not the value).
+     * Editor will use 'autocomplete_api_accessor' and `value_field_name`. Server will be updated with value only.
+     *
+     * ### Column configuration sample:
+     *
+     * Please note the value_field_name registration in query and properties in the provided sample yml configuration
+     *
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     source:
+     *       query:
+     *         select:
+     *           # please note that both fields(value and label) are required for valid work
+     *           - {entity}.id as {column-name-value}
+     *           - {entity}.name as {column-name-label}
+     *           # query continues here
+     *     columns:
+     *       {column-name-label}:
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/related-id-select-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *               value_field_name: {column-name-value}
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     *         autocomplete_api_accessor:
+     *           # class: oroentity/js/tools/entity-select-search-api-accessor # entity_select is default search api
+     *           entity_name: {corresponding-entity}
+     *           field_name: {corresponding-entity-field-name}
+     *     properties:
+     *       # this line is required to add {column-name-value} to data sent to client
+     *       {column-name-value}: ~
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:---------------------------------------
+     * inline_editing.editor.view_options.value_field_name | Related value field name.
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available options
+     * inline_editing.editor.autocomplete_api_accessor.class | One from the [list of search API's](../search-apis.md)
+     *
+     * ### Constructor parameters
      *
      * @class
      * @param {Object} options - Options container
-     * @param {Object} options.model - current row model
-     * @param {Backgrid.Cell} options.cell - current datagrid cell
-     * @param {Backgrid.Column} options.column - current datagrid column
-     * @param {string} options.placeholder - placeholder for empty element
-     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for empty element
+     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {Object} options.value_field_name - Related value field name
+     * @param {Object} options.autocomplete_api_accessor - Autocomplete API specification.
+     *                                      Please see [list of search API's](../search-apis.md)
      *
      * @augments [SelectEditorView](./select-editor-view.md)
      * @exports RelatedIdRelationEditorView
