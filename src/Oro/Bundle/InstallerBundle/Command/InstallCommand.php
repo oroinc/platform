@@ -108,7 +108,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         if ($forceInstall) {
             if ($input->getOption('drop-database')) {
                 $dropDatabase = 'full';
-            } elseif (!$isInstalled) {
+            } elseif ($isInstalled) {
                 $dropDatabase = 'app';
             }
         }
