@@ -44,7 +44,7 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testIsObjectSharedWithContext()
+    public function testIsObjectSharedWithUser()
     {
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
             ->disableOriginalConstructor()
@@ -81,10 +81,10 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getSecurityIdentity')
             ->willReturn($aceSid);
 
-        $this->assertTrue($this->shareProvider->isObjectSharedWithContext($object, $token));
+        $this->assertTrue($this->shareProvider->isObjectSharedWithUser($object, $token));
     }
 
-    public function testIsObjectSharedWithUser()
+    public function testIsObjectSharedWithUserSid()
     {
         $user = new User(1, 2, 'test_user');
         $object = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\DomainObjectInterface')
@@ -108,7 +108,7 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getSecurityIdentity')
             ->willReturn($aceSid);
 
-        $this->assertTrue($this->shareProvider->isObjectSharedWithUser($object, $user));
+        $this->assertTrue($this->shareProvider->isObjectSharedWithUserSid($object, $user));
     }
 
     public function testHasUserSharedRecords()
@@ -130,6 +130,6 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getManager')
             ->willReturn($manager);
 
-        $this->assertTrue($this->shareProvider->hasUserSharedRecords($user));
+        $this->assertTrue($this->shareProvider->hasUserSidSharedRecords($user));
     }
 }

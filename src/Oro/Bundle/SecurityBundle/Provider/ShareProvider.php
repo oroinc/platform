@@ -45,7 +45,7 @@ class ShareProvider
     }
 
     /**
-     * Determines if object is shared with current user context. If record was shared for user through
+     * Determines if object is shared with current user. If record was shared for user through
      * organization or business unit only, this method will return true.
      *
      * @param object $object
@@ -53,45 +53,51 @@ class ShareProvider
      *
      * @return bool
      */
-    public function isObjectSharedWithContext($object, TokenInterface $token)
+    public function isObjectSharedWithUser($object, TokenInterface $token)
     {
-        $acl = $this->getAcl($object);
-        if ($acl) {
-            $sids = $this->sidRetrievalStrategy->getSecurityIdentities($token);
-            foreach ($acl->getObjectAces() as $ace) {
-                /** @var Entry $ace */
-                foreach ($sids as $sid) {
-                    /** @var SecurityIdentityInterface $sid */
-                    if ($sid->equals($ace->getSecurityIdentity())) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return $this->isObjectSharedWithSids($object, $this->sidRetrievalStrategy->getSecurityIdentities($token));
     }
 
     /**
      * Determines if object is shared exactly for given user. If record was shared for user through
      * organization or business unit only, this method will return false.
      *
-     * @param $object
+     * @param object $object
      * @param UserInterface|null $user
      *
      * @return bool
      */
-    public function isObjectSharedWithUser($object, UserInterface $user = null)
+    public function isObjectSharedWithUserSid($object, UserInterface $user = null)
     {
         if ($user) {
-            $acl = $this->getAcl($object);
-            if ($acl) {
-                $userSid = UserSecurityIdentity::fromAccount($user);
-                foreach ($acl->getObjectAces() as $ace) {
-                    /** @var Entry $ace */
-                    if ($userSid->equals($ace->getSecurityIdentity())) {
-                        return true;
-                    }
+            return $this->isObjectSharedWithSids($object, [UserSecurityIdentity::fromAccount($user)]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines if object is shared for specified security identities.
+     *
+     * @param object $object
+     * @param SecurityIdentityInterface[] $sids
+     *
+     * @return bool
+     */
+    public function isObjectSharedWithSids($object, array $sids)
+    {
+        $objectIdentity = ObjectIdentity::fromDomainObject($object);
+        try {
+            $acl = $this->aclProvider->findAcl($objectIdentity);
+        } catch (AclNotFoundException $e) {
+            return false;
+        }
+
+        foreach ($acl->getObjectAces() as $ace) {
+            /** @var Entry $ace */
+            foreach ($sids as $sid) {
+                if ($sid->equals($ace->getSecurityIdentity())) {
+                    return true;
                 }
             }
         }
@@ -107,7 +113,7 @@ class ShareProvider
      *
      * @return bool
      */
-    public function hasUserSharedRecords(UserInterface $user = null)
+    public function hasUserSidSharedRecords(UserInterface $user = null)
     {
         if ($user) {
             /** @var UserSecurityIdentity $userSid */
@@ -121,22 +127,5 @@ class ShareProvider
         }
 
         return false;
-    }
-
-    /**
-     * @param $object
-     *
-     * @return bool|mixed|AclInterface
-     */
-    protected function getAcl($object)
-    {
-        $objectIdentity = ObjectIdentity::fromDomainObject($object);
-        try {
-            $acl = $this->aclProvider->findAcl($objectIdentity);
-        } catch (AclNotFoundException $e) {
-            return false;
-        }
-
-        return $acl;
     }
 }

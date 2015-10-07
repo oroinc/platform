@@ -304,9 +304,9 @@ class SecurityFacade
      *
      * @return bool
      */
-    public function isObjectSharedWithContext($object)
+    public function isObjectSharedWithUser($object)
     {
-        return $this->shareProvider->isObjectSharedWithContext($object, $this->getToken());
+        return $this->shareProvider->isObjectSharedWithUser($object, $this->getToken());
     }
 
     /**
@@ -318,13 +318,13 @@ class SecurityFacade
      *
      * @return bool
      */
-    public function isObjectSharedWithUser($object, UserInterface $user = null)
+    public function isObjectSharedWithUserSid($object, UserInterface $user = null)
     {
         if (!$user) {
             $user = $this->getLoggedUser();
         }
 
-        return $this->shareProvider->isObjectSharedWithUser($object, $user);
+        return $this->shareProvider->isObjectSharedWithUserSid($object, $user);
     }
 
     /**
@@ -335,12 +335,12 @@ class SecurityFacade
      *
      * @return bool
      */
-    public function hasUserSharedRecords(UserInterface $user = null)
+    public function hasUserSidSharedRecords(UserInterface $user = null)
     {
         if (!$user) {
             $user = $this->getLoggedUser();
         }
 
-        return $this->shareProvider->hasUserSharedRecords($user);
+        return $this->shareProvider->hasUserSidSharedRecords($user);
     }
 }
