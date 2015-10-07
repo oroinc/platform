@@ -85,9 +85,6 @@ define(function(require) {
 
         format: datetimeFormatter.backendFormats.date,
 
-        /**
-         * @inheritDoc
-         */
         render: function() {
             DateEditorView.__super__.render.call(this);
             var View = this.view;

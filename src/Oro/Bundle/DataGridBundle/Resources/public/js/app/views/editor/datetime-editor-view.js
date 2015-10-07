@@ -100,9 +100,6 @@ define(function(require) {
 
         format: datetimeFormatter.backendFormats.datetime,
 
-        /**
-         * @inheritDoc
-         */
         render: function() {
             var _this = this;
             DatetimeEditorView.__super__.render.call(this);

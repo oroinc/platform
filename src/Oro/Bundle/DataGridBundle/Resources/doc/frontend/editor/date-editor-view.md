@@ -53,6 +53,3 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.placeholder | <code>string</code> | Placeholder for empty element |
 | options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
 
-<a name="module_DateEditorView#render"></a>
-### dateEditorView.render()
-**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  
