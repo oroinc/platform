@@ -17,7 +17,7 @@ define(function(require) {
      *       {column-name-1}:
      *         frontend_type: string
      *       # Sample 2. Mapped by frontend type and placeholder specified
-     *       {column-name-1}:
+     *       {column-name-2}:
      *         frontend_type: string
      *         inline_editing:
      *           editor:
@@ -34,7 +34,7 @@ define(function(require) {
      *
      * Options in yml:
      *
-     * Option name (path from certain column configuration)| Description
+     * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
      *
