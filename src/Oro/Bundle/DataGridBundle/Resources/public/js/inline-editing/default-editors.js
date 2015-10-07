@@ -10,9 +10,7 @@ define(function(require) {
      */
     var defaultEditors = {
         /**
-         * See [text-editor-view](../frontend/editor/text-editor-view.md) for details
-         *
-         * @type {Function}
+         * @type {[text-editor-view](../frontend/editor/text-editor-view.md)}
          */
         string: require('orodatagrid/js/app/views/editor/text-editor-view'),
         /**
