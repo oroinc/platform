@@ -66,6 +66,11 @@ define(function(require) {
             });
         },
 
+        /**
+         * Prepares and returns Select2 options
+         *
+         * @returns {Object}
+         */
         getSelect2Options: function() {
             return {
                 placeholder: this.placeholder || ' ',

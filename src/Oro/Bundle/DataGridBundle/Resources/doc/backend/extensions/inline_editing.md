@@ -92,3 +92,34 @@ editor.component | | Allows to override component used to display view and speci
 editor.component_options | {} | specifies options to pass into cell editor component
 editor.view | | defines view that used to render cell-editor. By default this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
 editor.view_options | {} | specifies options to pass into cell editor view
+
+## Default frontend type to editor mapping
+
+Frontend type | Editor view
+--------------|------------------------------------------------------------------
+string        | [text-editor-view](../frontend/editor/text-editor-view.md)
+datetime      | [datetime-editor-view](../frontend/editor/datetime-editor-view.md)
+date          | [date-editor-view](../frontend/editor/date-editor-view.md)
+currency      | [number-editor-view](../frontend/editor/number-editor-view.md)
+number        | [number-editor-view](../frontend/editor/number-editor-view.md)
+integer       | [number-editor-view](../frontend/editor/number-editor-view.md)
+decimal       | [number-editor-view](../frontend/editor/number-editor-view.md)
+percent       | [number-editor-view](../frontend/editor/number-editor-view.md)
+select        | [select-editor-view](../frontend/editor/select-editor-view.md)
+
+Taken from [default-editors.md](../default-editors.md)
+
+## Supported editors
+
+Editor                                                                      | Description
+----------------------------------------------------------------------------|------------------------------------------------------
+[text-editor-view](../frontend/editor/text-editor-view.md)                  | Editing text cells
+[number-editor-view](../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/percent/currency cells
+[date-editor-view](../frontend/editor/date-editor-view.md)                  | Editing date cells
+[datetime-editor-view](../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
+[select-editor-view](../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
+[related-id-select-editor-view](../frontend/editor/select-editor-view.md)   | Editing cells which already contains label(and not value) using predefined choices
+[related-id-relation-editor-view](../frontend/editor/select-editor-view.md) | Editing cells which already contains label(and not value) using search api
+
+## Supported search API
+

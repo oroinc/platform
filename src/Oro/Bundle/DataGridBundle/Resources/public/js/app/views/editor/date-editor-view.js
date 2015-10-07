@@ -13,7 +13,7 @@ define(function(require) {
      *       enable: true
      *     # <grid configuration> goes here
      *     columns:
-     *       # Sample 1. Mapped by number frontend type
+     *       # Sample 1. Mapped by frontend type
      *       {column-name-1}:
      *         frontend_type: date
      *       # Sample 2. Full configuration
@@ -128,6 +128,11 @@ define(function(require) {
             DateEditorView.__super__.dispose.call(this);
         },
 
+        /**
+         * Prepares and returns editor sub-view options
+         *
+         * @returns {Object}
+         */
         getViewOptions: function() {
             return $.extend(true, {}, this.DEFAULT_OPTIONS,
                 _.pick(this.options, ['dateInputAttrs', 'datePickerOptions']), {
