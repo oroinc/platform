@@ -13,7 +13,7 @@ define(function(require) {
      * @param {string} options.placeholder - placeholder for empty element
      * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
      *
-     * @augment (DateEditorView)[./date-editor-view.md]
+     * @augments (DateEditorView)[./date-editor-view.md]
      * @exports DatetimeEditorView
      */
     var DatetimeEditorView;

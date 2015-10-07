@@ -5,7 +5,7 @@ define(function(require) {
     /**
      * Text cell content editor. this view is used by default (when no frontend type specified).
      *
-     * Column configuration samples:
+     * ### Column configuration samples:
      * ``` yml
      * datagrid:
      *   {grid-uid}:
@@ -32,11 +32,13 @@ define(function(require) {
      *               placeholder: '<placeholder>'
      * ```
      *
-     * Options in yml:
+     * ### Options in yml:
      *
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+     *
+     * ### Constructor parameters
      *
      * @class
      * @param {Object} options - Options container.
@@ -46,7 +48,7 @@ define(function(require) {
      * @param {string} options.placeholder - placeholder for empty element
      * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
      *
-     * @augment BaseView
+     * @augments BaseView
      * @exports TextEditorView
      */
     var TextEditorView;

@@ -13,7 +13,7 @@ define(function(require) {
      * @param {string} options.placeholder - placeholder for empty element
      * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
      *
-     * @augment (TextEditorView)[./text-editor-view.md]
+     * @augments (TextEditorView)[./text-editor-view.md]
      * @exports SelectEditorView
      */
     var SelectEditorView;

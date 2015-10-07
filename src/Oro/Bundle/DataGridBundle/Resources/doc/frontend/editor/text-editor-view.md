@@ -1,8 +1,8 @@
 <a name="module_TextEditorView"></a>
-## TextEditorView
+## TextEditorView ⇐ <code>BaseView</code>
 Text cell content editor. this view is used by default (when no frontend type specified).
 
-Column configuration samples:
+### Column configuration samples:
 ``` yml
 datagrid:
   {grid-uid}:
@@ -29,13 +29,15 @@ datagrid:
               placeholder: '<placeholder>'
 ```
 
-Options in yml:
+### Options in yml:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 
-**Augment**: BaseView  
+### Constructor parameters
+
+**Extends:** <code>BaseView</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -47,7 +49,7 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 | options.validationRules | <code>Object</code> | validation rules in form applicable to jQuery.validate |
 
 
-* [TextEditorView](#module_TextEditorView)
+* [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
   * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>

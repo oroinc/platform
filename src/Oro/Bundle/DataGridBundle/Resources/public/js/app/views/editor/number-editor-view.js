@@ -7,7 +7,7 @@ define(function(require) {
      *
      * @class
      * @param {Object} options - Options container.
-     * @augment (TextEditorView)[./text-editor-view.md]
+     * @augments (TextEditorView)[./text-editor-view.md]
      * @exports NumberEditorView
      */
     var NumberEditorView;

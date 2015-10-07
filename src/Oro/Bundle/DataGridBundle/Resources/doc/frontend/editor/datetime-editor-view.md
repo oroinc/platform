@@ -1,8 +1,8 @@
 <a name="module_DatetimeEditorView"></a>
-## DatetimeEditorView
+## DatetimeEditorView ⇐ <code>(DateEditorView)[./date-editor-view.md]</code>
 Text cell content editor
 
-**Augment**: (DateEditorView)[./date-editor-view.md]  
+**Extends:** <code>(DateEditorView)[./date-editor-view.md]</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |

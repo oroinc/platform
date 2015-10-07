@@ -1,8 +1,8 @@
 <a name="module_NumberEditorView"></a>
-## NumberEditorView
+## NumberEditorView ⇐ <code>(TextEditorView)[./text-editor-view.md]</code>
 Number cell content editor
 
-**Augment**: (TextEditorView)[./text-editor-view.md]  
+**Extends:** <code>(TextEditorView)[./text-editor-view.md]</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
