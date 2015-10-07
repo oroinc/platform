@@ -7,7 +7,6 @@ define(function(require) {
     var routing = require('routing');
     var mediator = require('oroui/js/mediator');
     var widgetManager = require('oroui/js/widget-manager');
-    var messenger = require('oroui/js/messenger');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var helper = require('orosecurity/js/app/helper/component-helper');
 
@@ -15,6 +14,10 @@ define(function(require) {
      * @exports SharedDatagridComponent
      */
     SharedDatagridComponent = BaseComponent.extend({
+        options: {
+            messages: {}
+        },
+
         listen: {
             'datagrid:mass:frontend:execute:shared-datagrid mediator': 'onFrontMassAction',
             'datagrid:frontend:execute:shared-datagrid mediator': 'onFrontAction',
@@ -24,7 +27,13 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            this.options = options;
+            this.options = _.defaults(options || {}, this.options);
+
+            _.defaults(this.options.messages, {
+                sharedSuccess: __('oro.security.action.shared_success'),
+                sharedError: __('oro.security.action.shared_error'),
+                forbiddenError: __('oro.security.action.forbidden_error')
+            });
         },
 
         onFrontMassAction: function(action) {
@@ -109,9 +118,11 @@ define(function(require) {
                 var finallyFunc = function(e) {
                     widgetManager.getWidgetInstanceByAlias('shared-dialog', function(widget) {
                         if (e.status === 200) {
-                            messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
+                            mediator.execute('showFlashMessage', 'success', self._getMessage('sharedSuccess'));
+                        } else if (e.status === 403) {
+                            mediator.execute('showErrorMessage', self._getMessage('forbiddenError'), e);
                         } else {
-                            messenger.notificationFlashMessage('error', __('oro.security.action.share_failed'));
+                            mediator.execute('showErrorMessage', self._getMessage('sharedError'), e);
                         }
 
                         widget.remove();
@@ -136,6 +147,10 @@ define(function(require) {
                     success: finallyFunc
                 });
             });
+        },
+
+        _getMessage: function(labelKey) {
+            return this.options.messages[labelKey];
         }
     });
 
