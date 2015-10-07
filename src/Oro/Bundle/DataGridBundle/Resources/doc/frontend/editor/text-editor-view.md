@@ -15,11 +15,7 @@ Text cell content editor
 
 
 * [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
-  * [.initialize()](#module_TextEditorView#initialize)
-  * [.dispose()](#module_TextEditorView#dispose)
-  * [.getTemplateData()](#module_TextEditorView#getTemplateData)
-  * [.render()](#module_TextEditorView#render)
-  * [.focus(side)](#module_TextEditorView#focus)
+  * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
   * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
   * [.getModelValue()](#module_TextEditorView#getModelValue) ⇒ <code>string</code>
@@ -34,27 +30,15 @@ Text cell content editor
   * [.getServerUpdateData()](#module_TextEditorView#getServerUpdateData) ⇒ <code>Object</code>
   * [.getModelUpdateData()](#module_TextEditorView#getModelUpdateData) ⇒ <code>Object</code>
 
-<a name="module_TextEditorView#initialize"></a>
-### textEditorView.initialize()
-**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#dispose"></a>
-### textEditorView.dispose()
-**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#getTemplateData"></a>
-### textEditorView.getTemplateData()
-**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#render"></a>
-### textEditorView.render()
-**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#focus"></a>
-### textEditorView.focus(side)
+### textEditorView.focus(atEnd)
 Places focus on editor
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| side | <code>boolean</code> | Usefull for multi inputs editors. Specifies which input should be focused first                         or last |
+| atEnd | <code>boolean</code> | Usefull for multi inputs editors. Specifies which input should be focused first                         or last |
 
 <a name="module_TextEditorView#getValidationRules"></a>
 ### textEditorView.getValidationRules() ⇒ <code>Object</code>
@@ -78,7 +62,21 @@ Returns current user edited value
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#rethrowAction"></a>
 ### textEditorView.rethrowAction() ⇒ <code>string</code>
-Generic handler for buttons which allows to notify overlaying component about some user action
+Generic handler for buttons which allows to notify overlaying component about some user action.
+Any button with 'data-action' attribute will rethrow action to inline editing plugin.
+
+Available actions:
+- save
+- cancel
+- saveAndEditNext
+- saveAndEditPrev
+- cancelAndEditNext
+- cancelAndEditPrev
+
+Sample usage:
+``` html
+ <button data-action="cancelAndEditNext">Skip and Go Next</button>
+```
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#isChanged"></a>

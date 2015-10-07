@@ -37,9 +37,6 @@ define(function(require) {
         ENTER_KEY_CODE: 13,
         ESCAPE_KEY_CODE: 27,
 
-        /**
-         * @inheritDoc
-         */
         initialize: function(options) {
             this.options = options;
             this.cell = options.cell;
@@ -50,9 +47,6 @@ define(function(require) {
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
-        /**
-         * @inheritDoc
-         */
         dispose: function() {
             if (this.disposed) {
                 return;
@@ -61,9 +55,6 @@ define(function(require) {
             TextEditorView.__super__.dispose.call(this);
         },
 
-        /**
-         * @inheritDoc
-         */
         getTemplateData: function() {
             var data = {};
             data.inputType = this.inputType;
@@ -74,9 +65,6 @@ define(function(require) {
             return data;
         },
 
-        /**
-         * @inheritDoc
-         */
         render: function() {
             TextEditorView.__super__.render.call(this);
             this.$el.addClass(_.result(this, 'className'));
@@ -100,10 +88,10 @@ define(function(require) {
         /**
          * Places focus on editor
          *
-         * @param {boolean} side - Usefull for multi inputs editors. Specifies which input should be focused first
+         * @param {boolean} atEnd - Usefull for multi inputs editors. Specifies which input should be focused first
          *                         or last
          */
-        focus: function(side) {
+        focus: function(atEnd) {
             this.$('input[name=value]').setCursorToEnd().focus();
         },
 
@@ -145,7 +133,21 @@ define(function(require) {
         },
 
         /**
-         * Generic handler for buttons which allows to notify overlaying component about some user action
+         * Generic handler for buttons which allows to notify overlaying component about some user action.
+         * Any button with 'data-action' attribute will rethrow action to inline editing plugin.
+         *
+         * Available actions:
+         * - save
+         * - cancel
+         * - saveAndEditNext
+         * - saveAndEditPrev
+         * - cancelAndEditNext
+         * - cancelAndEditPrev
+         *
+         * Sample usage:
+         * ``` html
+         *  <button data-action="cancelAndEditNext">Skip and Go Next</button>
+         * ```
          *
          * @returns {string}
          */
