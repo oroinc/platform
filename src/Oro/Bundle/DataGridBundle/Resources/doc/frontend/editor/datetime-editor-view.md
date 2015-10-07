@@ -1,5 +1,5 @@
 <a name="module_DatetimeEditorView"></a>
-## DatetimeEditorView ⇐ <code>(DateEditorView)[./date-editor-view.md]</code>
+## DatetimeEditorView ⇐ <code>[DateEditorView](./date-editor-view.md)</code>
 Datetime cell content editor
 
 ### Column configuration samples:
