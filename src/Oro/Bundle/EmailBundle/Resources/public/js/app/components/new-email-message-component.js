@@ -4,7 +4,7 @@ define(function(require) {
     var NewEmailMessageComponent;
     var _ = require('underscore');
     var messenger = require('oroui/js/messenger');
-    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
     var module = require('module');
     var sync = require('orosync/js/sync');
     var BaseComponent = require('oroui/js/app/components/base/component');
@@ -12,6 +12,8 @@ define(function(require) {
     NewEmailMessageComponent = BaseComponent.extend({
         notificationElement: null,
         debouncedHandler: null,
+        messageTpl: '<%=_.__("oro.email.notification.new_email")%>' +
+            '<span class="separator">|</span><a href="<%=url %>"><%=_.__("Read") %></a>',
         initialize: function(options) {
             var channel = module.config().clankEvent;
             this.notificationElement = options.notificationElement;
@@ -27,8 +29,10 @@ define(function(require) {
         },
 
         onNewEmailReceived: function() {
+            var message;
             if (this.notificationElement === null) {
-                messenger.notificationMessage('success', __('oro.email.notification.new_email'));
+                message = _.template(this.messageTpl)({url: routing.generate('oro_email_user_emails')});
+                messenger.notificationMessage('info', message);
             } else {
                 if (this.notificationElement.parent().hasClass('open') === false) {
                     this.notificationElement.show().delay(5000).fadeOut(1000);
