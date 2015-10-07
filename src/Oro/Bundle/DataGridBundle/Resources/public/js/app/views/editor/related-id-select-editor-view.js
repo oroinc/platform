@@ -6,7 +6,10 @@ define(function(require) {
      * Select-like cell content editor. This view is applicable when cell value contains label (not the value).
      * Editor will use provided map and `value_field_name`. Server will be updated with value only.
      *
-     * ### Column configuration samples:
+     * ### Column configuration sample:
+     *
+     * Please note the value_field_name registration in query and properties in the provided sample yml configuration
+     *
      * ``` yml
      * datagrid:
      *   {grid-uid}:
@@ -24,7 +27,7 @@ define(function(require) {
      *       {column-name-label}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/select-editor-view
+     *             view: orodatagrid/js/app/views/editor/related-id-select-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
      *               value_field_name: {column-name-value}
@@ -45,11 +48,10 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:---------------------------------------
      * inline_editing.editor.view_options.choices          | Key-value set of available choices
-     * inline_editing.editor.view_options.value_field_name | Related value field name. Please note the value
-     *                                                     | registration in query and properties in the provided
-     *                                                     | sample yml configuration
+     * inline_editing.editor.view_options.value_field_name | Related value field name.
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
      * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     *
      *
      * ### Constructor parameters
      *
