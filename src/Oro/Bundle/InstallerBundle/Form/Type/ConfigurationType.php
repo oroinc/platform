@@ -9,6 +9,8 @@ use Oro\Bundle\InstallerBundle\Validator\Constraints as Assert;
 
 class ConfigurationType extends AbstractType
 {
+    const NAME = 'oro_installer_configuration';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -47,6 +49,6 @@ class ConfigurationType extends AbstractType
 
     public function getName()
     {
-        return 'oro_installer_configuration';
+        return self::NAME;
     }
 }
