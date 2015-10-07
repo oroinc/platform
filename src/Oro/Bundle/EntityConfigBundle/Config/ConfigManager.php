@@ -434,6 +434,8 @@ class ConfigManager
     public function clearModelCache()
     {
         $this->modelManager->clearCache();
+        $this->cache->deleteAllConfigurable(true);
+        $this->cache->deleteAllConfigs(true);
     }
 
     /**

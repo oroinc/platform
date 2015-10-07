@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,6 +16,9 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     /** @var InputOptionProvider */
@@ -212,7 +217,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             if ($dropDatabase === 'full') {
                 $schemaDropOptions['--full-database'] = true;
             }
-            $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+
+            $managers = $this->getContainer()->get('doctrine')->getManagers();
+            foreach ($managers as $name => $manager) {
+                if ($manager instanceof EntityManager) {
+                    $schemaDropOptions['--em'] = $name;
+                    $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+                }
+            }
         }
 
         $commandExecutor
