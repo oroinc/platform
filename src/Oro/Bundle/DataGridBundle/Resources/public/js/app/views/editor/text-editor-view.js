@@ -5,7 +5,7 @@ define(function(require) {
     /**
      * Text cell content editor. this view is used by default (when no frontend type specified).
      *
-     * Sample column configuration:
+     * Sample column configuration with full options provided:
      * ``` yml
      * datagrid:
      *   {grid-uid}:
@@ -14,14 +14,16 @@ define(function(require) {
      *       {column-name}:
      *         inline_editing:
      *           editor:
-     *             view: orodatagrid/js/app/views/editor/text-editor-view // if required
+     *             view: orodatagrid/js/app/views/editor/text-editor-view # Optional
      *             view_options:
      *               placeholder: '<placeholder>'
      * ```
-     * Options:
+     *
+     * Available options:
+     *
      * Name                                           | Description
      * -----------------------------------------------|------------
-     * inline_editing.editor.view_options.placeholder | Placeholder for empty element
+     * inline_editing.editor.view_options.placeholder | Optional. Placeholder for empty element
      *
      * @class
      * @param {Object} options - Options container.
