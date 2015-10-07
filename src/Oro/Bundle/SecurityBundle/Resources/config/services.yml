@@ -100,10 +100,9 @@ services:
             - @oro_security.acl.object_identity_factory
             - @oro_entity.orm.entity_class_resolver
             - @logger
+            - @oro_security.provider.share_provider
         tags:
             - { name: monolog.logger, channel: security }
-        calls:
-            - [ setShareProvider, [ "@oro_security.provider.share_provider" ] ]
 
     security.context.link:
         tags:

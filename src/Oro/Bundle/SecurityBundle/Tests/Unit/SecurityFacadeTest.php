@@ -50,19 +50,18 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->shareProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Provider\ShareProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->facade = new SecurityFacade(
             $this->securityContext,
             $this->annotationProvider,
             $this->objectIdentityFactory,
             $this->classResolver,
-            $this->logger
+            $this->logger,
+            $this->shareProvider
         );
-
-        $this->shareProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Provider\ShareProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->facade->setShareProvider($this->shareProvider);
     }
 
     public function testIsClassMethodGrantedDenyingByMethodAcl()

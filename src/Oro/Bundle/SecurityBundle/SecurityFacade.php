@@ -47,27 +47,22 @@ class SecurityFacade
      * @param ObjectIdentityFactory    $objectIdentityFactory
      * @param EntityClassResolver      $classResolver
      * @param LoggerInterface          $logger
+     * @param ShareProvider            $shareProvider
      */
     public function __construct(
         SecurityContextInterface $securityContext,
         AclAnnotationProvider $annotationProvider,
         ObjectIdentityFactory $objectIdentityFactory,
         EntityClassResolver $classResolver,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ShareProvider $shareProvider
     ) {
         $this->securityContext       = $securityContext;
         $this->annotationProvider    = $annotationProvider;
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->entityClassResolver   = $classResolver;
         $this->logger                = $logger;
-    }
-
-    /**
-     * @param ShareProvider $shareProvider
-     */
-    public function setShareProvider(ShareProvider $shareProvider)
-    {
-        $this->shareProvider = $shareProvider;
+        $this->shareProvider         = $shareProvider;
     }
 
     /**
@@ -311,7 +306,7 @@ class SecurityFacade
      */
     public function isObjectSharedWithContext($object)
     {
-        return $this->shareProvider->isObjectSharedWithContext($this->getToken(), $object);
+        return $this->shareProvider->isObjectSharedWithContext($object, $this->getToken());
     }
 
     /**

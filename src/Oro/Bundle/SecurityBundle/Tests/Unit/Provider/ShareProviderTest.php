@@ -81,7 +81,7 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getSecurityIdentity')
             ->willReturn($aceSid);
 
-        $this->assertTrue($this->shareProvider->isObjectSharedWithContext($token, $object));
+        $this->assertTrue($this->shareProvider->isObjectSharedWithContext($object, $token));
     }
 
     public function testIsObjectSharedWithUser()
@@ -114,39 +114,18 @@ class ShareProviderTest extends \PHPUnit_Framework_TestCase
     public function testHasUserSharedRecords()
     {
         $user = new User(1, 2, 'test_user');
-        $sid = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\AclSecurityIdentity')
+        $repo = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\Repository\AclSecurityIdentityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $sid->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
-        $sidRepo = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $sidRepo->expects($this->once())
-            ->method('findOneBy')
-            ->willReturn($sid);
-        $entry = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Entity\AclEntry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entry->expects($this->once())
-            ->method('getId')
-            ->willReturn(2);
-        $entryRepo = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entryRepo->expects($this->once())
-            ->method('findOneBy')
-            ->willReturn($entry);
+        $repo->expects($this->once())
+            ->method('hasAclEntry')
+            ->willReturn(true);
         $manager = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $manager->expects($this->at(0))
+        $manager->expects($this->once())
             ->method('getRepository')
-            ->willReturn($sidRepo);
-        $manager->expects($this->at(1))
-            ->method('getRepository')
-            ->willReturn($entryRepo);
+            ->willReturn($repo);
         $this->registry->expects($this->once())
             ->method('getManager')
             ->willReturn($manager);
