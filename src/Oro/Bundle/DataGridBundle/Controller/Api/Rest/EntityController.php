@@ -59,7 +59,7 @@ class EntityController extends RestController
      * @param int $id
      *
      * @return Response
-     * @Rest\Patch("entity/{className}/{entityId}/{fieldName}/{fieldValue}", requirements={"id"="\d+"})
+     * @Rest\Patch("entity/{className}/{entityId}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Update entity property",
      *      resource=true,
@@ -68,10 +68,15 @@ class EntityController extends RestController
      *      }
      * )
      */
-    public function patchAction($className, $entityId, $fieldName, $fieldValue)
+    public function patchAction($className, $entityId)
     {
+        $className = strtr($className, '-', '\\');
         $entity = $this->getManager()->getEntity($className, $entityId);
-
-        $this->getManager()->updateField($entity, $fieldName, $fieldValue);
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $content = $request->getContent();
+        $content  = json_decode($content, true);
+        foreach ($content  as $fieldName => $fieldValue) {
+            $this->getManager()->updateField($entity, $fieldName, $fieldValue);
+        }
     }
 }
