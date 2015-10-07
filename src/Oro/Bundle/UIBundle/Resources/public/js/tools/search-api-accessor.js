@@ -10,9 +10,9 @@ define(function(require) {
      * @param {Object} options - Options container Please also overview options for [ApiAccessor](./api-accessor.md)
      * @param {string} options.search_handler_name - Name of search handler to use
      * @param {string} options.label_field_name - Name of the property that will be used as label
-     * @param {string} options.id_field_name - Optional. Name of the property that will be used as identifier.
+     * @param {string} options.value_field_name - Optional. Name of the property that will be used as identifier.
      *                                       By default = `'id'`
-     * @augment [ApiAccessor](./api-accessor.md)
+     * @augments [ApiAccessor](./api-accessor.md)
      * @exports SearchApiAccessor
      */
     var SearchApiAccessor;
@@ -40,7 +40,7 @@ define(function(require) {
                 ['page', 'per_page', 'name', 'query']);
             options.query_parameter_names = _.uniq(options.query_parameter_names);
             this.searchHandlerName = options.search_handler_name;
-            this.idFieldName = options.id_field_name || 'id';
+            this.valueFieldName = options.value_field_name || 'id';
             this.labelFieldName = options.label_field_name;
             SearchApiAccessor.__super__.initialize.call(this, options);
         },
@@ -59,7 +59,7 @@ define(function(require) {
          * Converts it to form
          * ``` javascipt
          * {
-         *     results: [{id: '<id>', label: '<label>'}, ...],
+         *     results: [{id: '<value>', label: '<label>'}, ...],
          *     more: '<more>'
          * }
          * ```
@@ -71,7 +71,7 @@ define(function(require) {
             var results = response.results;
             for (var i = 0; i < results.length; i++) {
                 var result = results[i];
-                result.id = result[this.idFieldName];
+                result.id = result[this.valueFieldName];
                 result.label = result[this.labelFieldName];
             }
             return response;

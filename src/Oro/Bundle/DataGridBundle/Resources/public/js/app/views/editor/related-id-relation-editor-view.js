@@ -28,10 +28,10 @@ define(function(require) {
         DEFAULT_PER_PAGE: 20,
         input_delay: 250,
         initialize: function(options) {
-            if (options.id_field_name) {
-                this.idFieldName = options.id_field_name;
+            if (options.value_field_name) {
+                this.valueFieldName = options.value_field_name;
             } else {
-                throw new Error('`id_field_name` option is required');
+                throw new Error('`value_field_name` option is required');
             }
 
             var apiSpec = options.column.get('metadata').inline_editing.autocomplete_api_accessor;
@@ -143,7 +143,7 @@ define(function(require) {
         },
 
         getModelValue: function() {
-            return this.model.get(this.idFieldName) || '';
+            return this.model.get(this.valueFieldName) || '';
         },
 
         getChoiceLabel: function() {
@@ -152,7 +152,7 @@ define(function(require) {
 
         getServerUpdateData: function() {
             var data = {};
-            data[this.idFieldName] = this.getValue();
+            data[this.valueFieldName] = this.getValue();
             return data;
         },
 

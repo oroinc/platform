@@ -10,9 +10,9 @@ datagrid:
       enable: true
     # <grid configuration> goes here
     columns:
-      # Sample 1. Mapped by number frontend type
+      # Sample 1. Mapped by frontend type
       {column-name-1}:
-        frontend_type: date
+        frontend_type: datetime
       # Sample 2. Full configuration
       {column-name-2}:
         inline_editing:

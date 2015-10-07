@@ -3,15 +3,57 @@ define(function(require) {
     'use strict';
 
     /**
-     * Text cell content editor
+     * Select cell content editor. Cell value should be value field.
+     * Grid will render the corresponding label from the options.choices map.
+     * Editor will use same map
+     *
+     * ### Column configuration samples:
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     columns:
+     *       # Sample 1. Mapped by frontend type
+     *       {column-name-1}:
+     *         frontend_type: select
+     *         choices: # required
+     *           key-1: First
+     *           key-2: Second
+     *       # Sample 2. Full configuration
+     *       {column-name-2}:
+     *         choices: # required
+     *           key-1: First
+     *           key-2: Second
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/select-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:---------------------------------------
+     * choices                                             | Key-value set of available choices
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     *
+     * ### Constructor parameters
      *
      * @class
      * @param {Object} options - Options container
-     * @param {Object} options.model - current row model
-     * @param {Backgrid.Cell} options.cell - current datagrid cell
-     * @param {Backgrid.Column} options.column - current datagrid column
-     * @param {string} options.placeholder - placeholder for empty element
-     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for empty element
+     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {Object} options.choices - Key-value set of available choices
      *
      * @augments [TextEditorView](./text-editor-view.md)
      * @exports SelectEditorView

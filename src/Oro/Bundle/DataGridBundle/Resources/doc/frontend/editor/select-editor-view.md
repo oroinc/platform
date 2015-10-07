@@ -1,15 +1,62 @@
 <a name="module_SelectEditorView"></a>
 ## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-Text cell content editor
+Select cell content editor. Cell value should be value field.
+Grid will render the corresponding label from the options.choices map.
+Editor will use same map
+
+### Column configuration samples:
+``` yml
+datagrid:
+  {grid-uid}:
+    inline_editing:
+      enable: true
+    # <grid configuration> goes here
+    columns:
+      # Sample 1. Mapped by frontend type
+      {column-name-1}:
+        frontend_type: select
+        choices: # required
+          key-1: First
+          key-2: Second
+      # Sample 2. Full configuration
+      {column-name-2}:
+        choices: # required
+          key-1: First
+          key-2: Second
+        inline_editing:
+          editor:
+            view: orodatagrid/js/app/views/editor/select-editor-view
+            view_options:
+              placeholder: '<placeholder>'
+          validationRules:
+            # jQuery.validate configuration
+            required: true
+```
+
+### Options in yml:
+
+Column option name                                  | Description
+:---------------------------------------------------|:---------------------------------------
+choices                                             | Key-value set of available choices
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
+inline_editing.editor.validationRules               | Optional. Client side validation rules
+
+### Constructor parameters
 
 **Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
-| options.model | <code>Object</code> | current row model |
-| options.cell | <code>Backgrid.Cell</code> | current datagrid cell |
-| options.column | <code>Backgrid.Column</code> | current datagrid column |
-| options.placeholder | <code>string</code> | placeholder for empty element |
-| options.validationRules | <code>Object</code> | validation rules in form applicable to jQuery.validate |
+| options.model | <code>Object</code> | Current row model |
+| options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
+| options.column | <code>Backgrid.Column</code> | Current datagrid column |
+| options.placeholder | <code>string</code> | Placeholder for empty element |
+| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.choices | <code>Object</code> | Key-value set of available choices |
 
+<a name="module_SelectEditorView#getSelect2Options"></a>
+### selectEditorView.getSelect2Options() ⇒ <code>Object</code>
+Prepares and returns Select2 options
+
+**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  

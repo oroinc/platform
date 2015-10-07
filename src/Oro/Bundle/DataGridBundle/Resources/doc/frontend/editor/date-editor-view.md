@@ -10,7 +10,7 @@ datagrid:
       enable: true
     # <grid configuration> goes here
     columns:
-      # Sample 1. Mapped by number frontend type
+      # Sample 1. Mapped by frontend type
       {column-name-1}:
         frontend_type: date
       # Sample 2. Full configuration
@@ -55,3 +55,8 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
 
+<a name="module_DateEditorView#getViewOptions"></a>
+### dateEditorView.getViewOptions() ⇒ <code>Object</code>
+Prepares and returns editor sub-view options
+
+**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  

@@ -1,19 +1,19 @@
 <a name="module_SearchApiAccessor"></a>
-## SearchApiAccessor
+## SearchApiAccessor ⇐ <code>[ApiAccessor](./api-accessor.md)</code>
 Provides access to search API for autocompletes.
 This class is designed to create from server configuration.
 
-**Augment**: [ApiAccessor](./api-accessor.md)  
+**Extends:** <code>[ApiAccessor](./api-accessor.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> | Options container Please also overview options for [ApiAccessor](./api-accessor.md) |
 | options.search_handler_name | <code>string</code> | Name of search handler to use |
 | options.label_field_name | <code>string</code> | Name of the property that will be used as label |
-| options.id_field_name | <code>string</code> | Optional. Name of the property that will be used as identifier.                                       By default = `'id'` |
+| options.value_field_name | <code>string</code> | Optional. Name of the property that will be used as identifier.                                       By default = `'id'` |
 
 
-* [SearchApiAccessor](#module_SearchApiAccessor)
+* [SearchApiAccessor](#module_SearchApiAccessor) ⇐ <code>[ApiAccessor](./api-accessor.md)</code>
   * [.prepareUrlParameters()](#module_SearchApiAccessor#prepareUrlParameters)
   * [.formatResult(response)](#module_SearchApiAccessor#formatResult) ⇒ <code>Object</code>
 
@@ -26,7 +26,7 @@ Formats response before it will be sent out from this api accessor.
 Converts it to form
 ``` javascipt
 {
-    results: [{id: '<id>', label: '<label>'}, ...],
+    results: [{id: '<value>', label: '<label>'}, ...],
     more: '<more>'
 }
 ```
