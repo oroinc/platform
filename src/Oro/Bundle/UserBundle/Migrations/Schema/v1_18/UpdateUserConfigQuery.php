@@ -43,7 +43,7 @@ class UpdateUserConfigQuery extends ParametrizedMigrationQuery
             $data['grouping'] = ['groups' => 'dictionary'];
             $data['dictionary'] = [
                 'virtual_fields'=> 'id',
-                'search_fields' => ['firstName'. 'lastName'],
+                'search_fields' => ['firstName', 'lastName'],
                 'representation_field' => 'fullName'
             ];
 
