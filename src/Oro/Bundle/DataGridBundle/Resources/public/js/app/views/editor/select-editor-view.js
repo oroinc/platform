@@ -36,9 +36,9 @@ define(function(require) {
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onInternalEnterKeydown, this));
+                _.bind(this.onGenericEnterKeydown, this));
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onInternalTabKeydown, this));
+                _.bind(this.onGenericTabKeydown, this));
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
@@ -46,7 +46,7 @@ define(function(require) {
                     e.stopImmediatePropagation();
                     e.preventDefault();
                     _this.$('input[name=value]').select2('close');
-                    _this.onInternalTabKeydown(e);
+                    _this.onGenericTabKeydown(e);
                 }
             });
         },

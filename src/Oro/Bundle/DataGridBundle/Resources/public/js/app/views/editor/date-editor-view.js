@@ -38,29 +38,29 @@ define(function(require) {
             var View = this.view;
             this.view = new View(this.getViewOptions());
             // fix enter behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEnterKeydown, this));
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEscapeKeydown, this));
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
         },
 
-        onInternalEnterKeydown: function(e) {
+        onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
                     this.$('.hasDatepicker').datepicker('hide');
                 } else {
-                    DateEditorView.__super__.onInternalEnterKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
                 }
             }
         },
 
-        onInternalEscapeKeydown: function(e) {
+        onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
                     this.$('.hasDatepicker').datepicker('hide');
                 } else {
-                    DateEditorView.__super__.onInternalEscapeKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEscapeKeydown.apply(this, arguments);
                 }
             }
         },

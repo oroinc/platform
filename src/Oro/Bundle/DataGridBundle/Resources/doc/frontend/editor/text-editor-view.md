@@ -24,9 +24,9 @@ Text cell content editor
   * [.isChanged()](#module_TextEditorView#isChanged) ⇒ <code>boolean</code>
   * [.onChange()](#module_TextEditorView#onChange)
   * [.onKeyDown(e)](#module_TextEditorView#onKeyDown)
-  * [.onInternalEnterKeydown(e)](#module_TextEditorView#onInternalEnterKeydown)
-  * [.onInternalTabKeydown(e)](#module_TextEditorView#onInternalTabKeydown)
-  * [.onInternalEscapeKeydown(e)](#module_TextEditorView#onInternalEscapeKeydown)
+  * [.onGenericEnterKeydown(e)](#module_TextEditorView#onGenericEnterKeydown)
+  * [.onGenericTabKeydown(e)](#module_TextEditorView#onGenericTabKeydown)
+  * [.onGenericEscapeKeydown(e)](#module_TextEditorView#onGenericEscapeKeydown)
   * [.getServerUpdateData()](#module_TextEditorView#getServerUpdateData) ⇒ <code>Object</code>
   * [.getModelUpdateData()](#module_TextEditorView#getModelUpdateData) ⇒ <code>Object</code>
 
@@ -99,8 +99,8 @@ Keydown handler for entire document
 | --- | --- |
 | e | <code>$.Event</code> | 
 
-<a name="module_TextEditorView#onInternalEnterKeydown"></a>
-### textEditorView.onInternalEnterKeydown(e)
+<a name="module_TextEditorView#onGenericEnterKeydown"></a>
+### textEditorView.onGenericEnterKeydown(e)
 Generic keydown handler which handles ENTER
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
@@ -109,8 +109,8 @@ Generic keydown handler which handles ENTER
 | --- | --- |
 | e | <code>$.Event</code> | 
 
-<a name="module_TextEditorView#onInternalTabKeydown"></a>
-### textEditorView.onInternalTabKeydown(e)
+<a name="module_TextEditorView#onGenericTabKeydown"></a>
+### textEditorView.onGenericTabKeydown(e)
 Generic keydown handler which handles TAB
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
@@ -119,8 +119,8 @@ Generic keydown handler which handles TAB
 | --- | --- |
 | e | <code>$.Event</code> | 
 
-<a name="module_TextEditorView#onInternalEscapeKeydown"></a>
-### textEditorView.onInternalEscapeKeydown(e)
+<a name="module_TextEditorView#onGenericEscapeKeydown"></a>
+### textEditorView.onGenericEscapeKeydown(e)
 Generic keydown handler which handles ESCAPE
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  

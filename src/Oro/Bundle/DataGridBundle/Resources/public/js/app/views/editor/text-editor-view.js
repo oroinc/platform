@@ -185,13 +185,13 @@ define(function(require) {
         onKeyDown: function(e) {
             switch (e.keyCode) {
                 case this.TAB_KEY_CODE:
-                    this.onInternalTabKeydown(e);
+                    this.onGenericTabKeydown(e);
                     break;
                 case this.ENTER_KEY_CODE:
-                    this.onInternalEnterKeydown(e);
+                    this.onGenericEnterKeydown(e);
                     break;
                 case this.ESCAPE_KEY_CODE:
-                    this.onInternalEscapeKeydown(e);
+                    this.onGenericEscapeKeydown(e);
                     break;
             }
         },
@@ -201,7 +201,7 @@ define(function(require) {
          *
          * @param {$.Event} e
          */
-        onInternalEnterKeydown: function(e) {
+        onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (this.isChanged()) {
                     if (this.validator.form()) {
@@ -222,7 +222,7 @@ define(function(require) {
          *
          * @param {$.Event} e
          */
-        onInternalTabKeydown: function(e) {
+        onGenericTabKeydown: function(e) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
                 if (this.isChanged()) {
@@ -244,7 +244,7 @@ define(function(require) {
          *
          * @param {$.Event} e
          */
-        onInternalEscapeKeydown: function(e) {
+        onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 this.trigger('cancelAction');
                 e.stopImmediatePropagation();
