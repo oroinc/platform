@@ -164,7 +164,7 @@
     width: 28px;
     cursor: pointer;
     .icon-with-counter {
-        span {
+        .item-counter {
             position: absolute;
         }
     }
@@ -175,13 +175,13 @@
       > i {
         position: relative;
       }
-      span {
+      .item-counter {
         display: none;
       }
       .icon-refresh {
         display: inline-block !important;
         position: absolute;
-        top: -3px;
+        top: -4px;
         left: -5px;
         font-size: 8px;
         margin: 0;
@@ -241,7 +241,7 @@
     filter: grayscale(100%);
   }
   .icon-with-counter {
-    span {
+    .item-counter {
       background-color: #eee;
       top: -3px;
       left: 3px;
@@ -253,7 +253,7 @@
       -o-filter: none;
       -ms-filter: none;
       filter: none;
-      &:before, span {
+      &:before, .item-counter {
         color: #fabb18;
       }
     }

@@ -6,15 +6,10 @@ define(function(require) {
 
     EmailNotificationCountView = BaseView.extend({
         autoRender: true,
-        template: require('tpl!oroemail/templates/email-notification/email-notification-icon-view.html'),
-        initialize: function() {
-            EmailNotificationCountView.__super__.initialize.apply(this, arguments);
-            this.listenTo(this.model, 'change', this.render);
+        listen: {
+            'change:unreadEmailsCount model': 'render'
         },
-
-        render: function() {
-            return EmailNotificationCountView.__super__.render.apply(this, arguments);
-        }
+        template: require('tpl!oroemail/templates/email-notification/email-notification-icon-view.html')
     });
 
     return EmailNotificationCountView;

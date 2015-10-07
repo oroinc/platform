@@ -9,8 +9,7 @@ define(function(require) {
      */
     EmailNotificationCountModel = BaseModel.extend({
         defaults: {
-            unreadEmailsCount: 0,
-            loading: false
+            unreadEmailsCount: 0
         }
     });
 

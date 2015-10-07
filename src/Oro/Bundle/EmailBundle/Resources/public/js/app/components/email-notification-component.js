@@ -17,10 +17,6 @@ define(function(require) {
         view: null,
         collection: null,
         countModel: null,
-        listen: {
-            'request collection': 'onCollectionRequest',
-            'sync collection': 'onCollectionSync'
-        },
 
         initialize: function(options) {
             _.extend(this, _.pick(options, ['countModel']));
@@ -47,15 +43,6 @@ define(function(require) {
                     model: this.countModel
                 });
             }
-        },
-
-        onCollectionRequest: function() {
-            console.log('start loading');
-            this.countModel.set('loading', true);
-        },
-
-        onCollectionSync: function() {
-            //this.countModel.set('loading', false);
         },
 
         dispose: function() {
