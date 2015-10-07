@@ -330,7 +330,7 @@ services:
     oro_email.cache:
           parent: oro.cache.abstract
           calls:
-              - [setNamespace, ['oro_email.cache']]
+              - [setNamespace, [ 'oro_email' ] ]
 
     # Available variables services
     oro_email.listener.config_listener:

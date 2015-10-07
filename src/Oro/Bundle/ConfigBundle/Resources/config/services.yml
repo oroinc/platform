@@ -34,7 +34,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [setNamespace, ['oro_config.cache']]
+            - [setNamespace, [ 'oro_config' ] ]
 
     oro_config.scope_manager.abstract:
         abstract: true
