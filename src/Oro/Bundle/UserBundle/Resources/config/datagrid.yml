@@ -696,13 +696,13 @@ datagrid:
                     - u.username
                     - u.enabled
                     - bu.name as businessUnit
-                    - org.name as organization
+                    - organizationOwner.name as organization
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
                 join:
                     inner:
                         - { join: u.owner, alias: bu }
-                        - { join: bu.organization, alias: org }
+                        - { join: bu.organization, alias: organizationOwner }
 
                 where:
                     and:
@@ -748,7 +748,7 @@ datagrid:
                 businessUnit:
                     data_name: bu.name
                 organization:
-                    data_name: org.name
+                    data_name: organizationOwner.name
             default:
                 enabled: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 

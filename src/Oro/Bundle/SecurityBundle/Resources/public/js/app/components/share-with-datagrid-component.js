@@ -49,39 +49,8 @@ define(function(require) {
             }
 
             widgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
-                widget.on('grid-row-select', _.bind(self.onRowSelect, self, widget));
                 widget.on('share-with-datagrid-submitted', _.bind(self.onGridAdd, self, widget));
 
-            });
-        },
-
-        /**
-         * Handles row selection on a grid
-         *
-         * @param {} gridWidget
-         * @param {} data
-         */
-        onRowSelect: function(gridWidget, data) {
-            var id = data.model.get('id');
-            var dialogWidgetName = this.options.dialogWidgetName;
-            var targetClass = this.shareWithDatagridView.currentTargetClass();
-
-            gridWidget._showLoading();
-            var text = data.model.get('username') ? data.model.get('username') : data.model.get('name');
-            mediator.trigger('datagrid:shared-datagrid:add:data', {
-                entityClass: targetClass,
-                models: [{
-                    id: id,
-                    name: text,
-                    entityClass: targetClass
-                }]
-            });
-            gridWidget._hideLoading();
-            if (!dialogWidgetName) {
-                return;
-            }
-            widgetManager.getWidgetInstanceByAlias(dialogWidgetName, function(dialogWidget) {
-                dialogWidget.remove();
             });
         },
 
