@@ -4,9 +4,10 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Doctrine\ORM\EntityManager;
 
 /**
  * @dbIsolation
@@ -14,14 +15,14 @@ use Doctrine\ORM\EntityManager;
 class ControllersTest extends WebTestCase
 {
     /**
-     * @var EntityManager
+     * @var Registry
      */
-    protected $em;
+    protected $registry;
 
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
-        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->registry = $this->getContainer()->get('doctrine');
     }
 
     public function testIndex()
@@ -163,29 +164,16 @@ class ControllersTest extends WebTestCase
         $this->assertEquals('1999-01-01', $form['oro_user_user_form[birthday]']->getValue());
     }
 
-    public function testAutoCompleteTwoPart()
+    /**
+     * @dataProvider autoCompleteHandlerProvider
+     * @param boolean $active
+     * @param string $handlerName
+     */
+    public function testAutoCompleteHandler($active, $handlerName, $query)
     {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_form_autocomplete_search'),
-            array(
-                'page' => 1,
-                'per_page' => 10,
-                'name' => 'acl_users',
-                'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
-            )
-        );
-
-        $result = $this->client->getResponse();
-        $arr = $this->getJsonResponseContent($result, 200);
-        $this->assertCount(1, $arr['results']);
-    }
-
-    public function testAutoCompleteWithInactiveUser()
-    {
-        $user = $this->em->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
-        $user->setEnabled(false);
-        $this->em->flush();
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
+        $user->setEnabled($active);
+        $this->registry->getManager()->flush();
 
         $this->client->request(
             'GET',
@@ -193,14 +181,46 @@ class ControllersTest extends WebTestCase
             array(
                 'page' => 1,
                 'per_page' => 10,
-                'name' => 'acl_users',
-                'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
+                'name' => $handlerName,
+                'query' => $query,
             )
         );
 
         $result = $this->client->getResponse();
         $arr = $this->getJsonResponseContent($result, 200);
-        $this->assertCount(0, $arr['results']);
+        $this->assertCount((int)$active, $arr['results']);
     }
 
+    /**
+     * @return array
+     */
+    public function autoCompleteHandlerProvider()
+    {
+        return array(
+                'Acl user autocomplete handler active' =>
+                array(
+                    'active' => true,
+                    'handler' => 'acl_users',
+                    'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                ),
+                'Acl user autocomplete handler inactive' =>
+                array(
+                    'active' => false,
+                    'handler' => 'acl_users',
+                    'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                ),
+                'Organization user autocomplete handler active' =>
+                array(
+                    'active' => true,
+                    'handler' => 'organization_users',
+                    'query' => 'Michael Buckley'
+                ),
+                'Organization user autocomplete handler inactive' =>
+                array(
+                    'active' => false,
+                    'handler' => 'organization_users',
+                    'query' => 'Michael Buckley'
+                ),
+        );
+    }
 }

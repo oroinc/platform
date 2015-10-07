@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -9,9 +11,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    /**
+     * @var Registry
+     */
+    protected $registry;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->registry = $this->getContainer()->get('doctrine');
     }
 
     public function testIndex()
@@ -42,5 +50,53 @@ class ControllersTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("Template saved", $crawler->html());
+    }
+
+    /**
+     * @dataProvider autoCompleteHandlerProvider
+     * @param boolean $active
+     * @param string $handlerName
+     */
+    public function testAutoCompleteHandler($active, $handlerName, $query)
+    {
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
+        $user->setEnabled($active);
+        $this->registry->getManager()->flush();
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_email_mailbox_users_search', ['organizationId' => $user->getOrganization()->getId()]),
+            array(
+                'page' => 1,
+                'per_page' => 10,
+                'name' => $handlerName,
+                'query' => $query,
+            )
+        );
+
+        $result = $this->client->getResponse();
+        $arr = $this->getJsonResponseContent($result, 200);
+        $this->assertCount((int)$active, $arr['results']);
+    }
+
+    /**
+     * @return array
+     */
+    public function autoCompleteHandlerProvider()
+    {
+        return array(
+                'Mailbox user autocomplete handler active' =>
+                array(
+                    'active' => true,
+                    'handler' => 'users',
+                    'query' => 'Michael Buckley'
+                ),
+                'Mailbox user autocomplete handler inactive' =>
+                array(
+                    'active' => false,
+                    'handler' => 'users',
+                    'query' => 'Michael Buckley'
+                )
+        );
     }
 }
