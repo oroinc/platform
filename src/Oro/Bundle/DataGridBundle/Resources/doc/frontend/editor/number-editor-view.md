@@ -1,5 +1,5 @@
 <a name="module_NumberEditorView"></a>
-## NumberEditorView ⇐ <code>(TextEditorView)[./text-editor-view.md]</code>
+## NumberEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
 Number cell content editor.
 
 ### Column configuration samples:
@@ -35,7 +35,7 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 
 ### Constructor parameters
 
-**Extends:** <code>(TextEditorView)[./text-editor-view.md]</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |

@@ -40,7 +40,7 @@ define(function(require) {
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
      * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for date HTML input element
-     * inline_editing.editor.view_options.datePickerOptions| Optional. See (details here)[http://goo.gl/pddxZU]
+     * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
      * inline_editing.editor.validationRules               | Optional. Client side validation rules
      *
      * ### Constructor parameters
@@ -52,8 +52,10 @@ define(function(require) {
      * @param {Backgrid.Column} options.column - Current datagrid column
      * @param {string} options.placeholder - Placeholder for empty element
      * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
+     * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
      *
-     * @augments (TextEditorView)[./text-editor-view.md]
+     * @augments [TextEditorView](./text-editor-view.md)
      * @exports DateEditorView
      */
     var DateEditorView;

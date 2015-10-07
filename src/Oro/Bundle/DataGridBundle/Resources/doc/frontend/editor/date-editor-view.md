@@ -1,5 +1,5 @@
 <a name="module_DateEditorView"></a>
-## DateEditorView ⇐ <code>(TextEditorView)[./text-editor-view.md]</code>
+## DateEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
 Date cell content editor
 
 ### Column configuration samples:
@@ -37,12 +37,12 @@ Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for date HTML input element
-inline_editing.editor.view_options.datePickerOptions| Optional. See (details here)[http://goo.gl/pddxZU]
+inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
 inline_editing.editor.validationRules               | Optional. Client side validation rules
 
 ### Constructor parameters
 
-**Extends:** <code>(TextEditorView)[./text-editor-view.md]</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -52,4 +52,6 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for empty element |
 | options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
+| options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
 

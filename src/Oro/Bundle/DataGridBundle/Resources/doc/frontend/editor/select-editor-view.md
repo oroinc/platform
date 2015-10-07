@@ -1,8 +1,8 @@
 <a name="module_SelectEditorView"></a>
-## SelectEditorView ⇐ <code>(TextEditorView)[./text-editor-view.md]</code>
+## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
 Text cell content editor
 
-**Extends:** <code>(TextEditorView)[./text-editor-view.md]</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
