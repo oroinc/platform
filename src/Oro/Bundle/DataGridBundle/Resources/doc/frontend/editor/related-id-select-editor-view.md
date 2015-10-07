@@ -5,7 +5,7 @@ Editor will use provided `choices` map and `value_field_name`. Server will be up
 
 ### Column configuration sample:
 
-Please note the value_field_name registration in query and properties in the provided sample yml configuration
+Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
 
 ``` yml
 datagrid:

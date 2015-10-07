@@ -8,7 +8,7 @@ define(function(require) {
      *
      * ### Column configuration sample:
      *
-     * Please note the value_field_name registration in query and properties in the provided sample yml configuration
+     * Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
      *
      * ``` yml
      * datagrid:

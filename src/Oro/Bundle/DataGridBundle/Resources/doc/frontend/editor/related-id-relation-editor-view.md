@@ -1,12 +1,11 @@
 <a name="module_RelatedIdRelationEditorView"></a>
 ## RelatedIdRelationEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
-/**
 Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-Editor will use 'autocomplete_api_accessor' and `value_field_name`. Server will be updated with value only.
+Editor will use `autocomplete_api_accessor` and `value_field_name`. Server will be updated with value only.
 
 ### Column configuration sample:
 
-Please note the value_field_name registration in query and properties in the provided sample yml configuration
+Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
 
 ``` yml
 datagrid:
@@ -34,6 +33,8 @@ datagrid:
             required: true
         autocomplete_api_accessor:
           # class: oroentity/js/tools/entity-select-search-api-accessor # entity_select is default search api
+          # following options are specific only for entity-select-search-api-accessor
+          # please place here an options corresponding to specified class
           entity_name: {corresponding-entity}
           field_name: {corresponding-entity-field-name}
     properties:
@@ -48,7 +49,7 @@ Column option name                                  | Description
 inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 inline_editing.editor.validationRules               | Optional. Client side validation rules
-inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available options
+inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
 inline_editing.editor.autocomplete_api_accessor.class | One from the [list of search API's](../search-apis.md)
 
 ### Constructor parameters
