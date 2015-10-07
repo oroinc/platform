@@ -8,7 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
  * This entity class intended to allow usage of basic acl_security_identities table in DQL. The main goal
  * of this approach is possibility to use this entity in AclWalker to determine shared records.
  *
- * @ORM\Entity(readOnly=true)
+ * @ORM\Entity(
+ *      readOnly=true,
+ *      repositoryClass="Oro\Bundle\SecurityBundle\Entity\Repository\AclSecurityIdentityRepository"
+ * )
  * @ORM\Table(
  *      name="acl_security_identities",
  *      indexes={

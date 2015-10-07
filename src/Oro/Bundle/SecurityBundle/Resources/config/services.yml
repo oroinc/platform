@@ -48,6 +48,7 @@ parameters:
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.provider.share_grid_provider.class:           Oro\Bundle\SecurityBundle\Provider\ShareGridProvider
+    oro_security.provider.share_provider.class:                Oro\Bundle\SecurityBundle\Provider\ShareProvider
 
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
@@ -99,6 +100,7 @@ services:
             - @oro_security.acl.object_identity_factory
             - @oro_entity.orm.entity_class_resolver
             - @logger
+            - @oro_security.provider.share_provider
         tags:
             - { name: monolog.logger, channel: security }
 
@@ -394,6 +396,13 @@ services:
             - @oro_entity_config.config_manager
             - @oro_security.search.acl_helper
             - @translator
+
+    oro_security.provider.share_provider:
+        class: %oro_security.provider.share_provider.class%
+        arguments:
+            - @doctrine
+            - @security.acl.provider
+            - @security.acl.security_identity_retrieval_strategy
 
     oro_security.twig.security_organization_extension:
         class: %oro_security.twig.security_organization_extension%
