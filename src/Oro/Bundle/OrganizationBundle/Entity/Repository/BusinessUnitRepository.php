@@ -214,22 +214,6 @@ class BusinessUnitRepository extends EntityRepository
      */
     public function getRootBusinessUnits()
     {
-        $qb = $this->createQueryBuilder('businessUnit')
-        ->where('businessUnit.owner is NULL');
-
-        return $qb;
-    }
-
-    /**
-     * @param Organization $organization
-     *
-     * @return QueryBuilder
-     */
-    public function getChildBusinessUnits()
-    {
-        $qb = $this->createQueryBuilder('businessUnit')
-            ->where('businessUnit.owner is not NULL');
-
-        return $qb;
+        return $this->createQueryBuilder('businessUnit');
     }
 }

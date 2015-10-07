@@ -78,7 +78,7 @@ datagrid:
                     type: choice-business-unit
                     data_name: website.owne
                     options:
-                        data: @oro_organization.business_unit_manager->getList
+                        data: @oro_organization.provider.filter.busines_unit_choice_tree->getList
                 createdAt:
                     type:      datetime
                     data_name: website.createdAt
