@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -15,11 +16,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\BatchBundle\Step\StepExecutor;
-use Oro\Bundle\ImportExportBundle\Context\Context as ExportContext;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
 class GridController extends Controller
 {
@@ -39,12 +35,12 @@ class GridController extends Controller
      */
     public function widgetAction($gridName)
     {
-        return array(
+        return [
             'gridName'     => $gridName,
-            'params'       => $this->getRequest()->get('params', array()),
+            'params'       => $this->getRequest()->get('params', []),
             'renderParams' => $this->getRenderParams(),
             'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
-        );
+        ];
     }
 
     /**
@@ -106,46 +102,29 @@ class GridController extends Controller
         ignore_user_abort(false);
         set_time_limit(0);
 
-        $request = $this->getRequest();
-        $format  = $request->query->get('format');
-
+        $request           = $this->getRequest();
+        $format            = $request->query->get('format');
+        $csvWriterId       = 'oro_importexport.writer.echo.csv';
+        $writerId          = sprintf('oro_importexport.writer.echo.%s', $format);
+        $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
-        $parameters = $parametersFactory->createParameters($gridName);
-        $context = new ExportContext(
-            array(
-                'gridName' => $gridName,
-                'gridParameters' => $parameters,
-            )
-        );
+        $parameters        = $parametersFactory->createParameters($gridName);
 
-        // prepare export executor
-        $executor = new StepExecutor();
-        $executor->setBatchSize(self::EXPORT_BATCH_SIZE);
-        $executor
-            ->setReader($this->get('oro_datagrid.importexport.export_connector'))
-            ->setProcessor($this->get('oro_datagrid.importexport.processor.export'))
-            ->setWriter($this->get(sprintf('oro_importexport.writer.echo.%s', $format)));
-        foreach ([$executor->getReader(), $executor->getProcessor(), $executor->getWriter()] as $element) {
-            if ($element instanceof ContextAwareInterface) {
-                $element->setImportExportContext($context);
-            }
-        }
-
-        /** @var MimeTypeGuesser $mimeTypeGuesser */
-        $mimeTypeGuesser = $this->get('oro_importexport.file.mime_type_guesser');
-        $contentType     = $mimeTypeGuesser->guessByFileExtension($format);
-        if (!$contentType) {
-            $contentType = 'application/octet-stream';
-        }
-
-        // prepare response
-        $response = new StreamedResponse($this->exportCallback($context, $executor));
-        $response->headers->set('Content-Type', $contentType);
-        $response->headers->set('Content-Transfer-Encoding', 'binary');
-        $outputFileName = sprintf('datagrid_%s_%s.%s', str_replace('-', '_', $gridName), date('Y_m_d_H_i_s'), $format);
-        $response->headers->set(
-            'Content-Disposition',
-            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $outputFileName)
+        $response = $this->get('oro_datagrid.handler.export')->handle(
+            $this->get('oro_datagrid.importexport.export_connector'),
+            $this->get('oro_datagrid.importexport.processor.export'),
+            $writer,
+            [
+                'gridName'                            => $gridName,
+                'gridParameters'                      => $parameters,
+                FormatterProvider::FORMATTER_PROVIDER => [
+                    'datetime' => 'excel_datetime',
+                    'date'     => 'excel_datetime',
+                    'time'     => 'excel_datetime'
+                ]
+            ],
+            self::EXPORT_BATCH_SIZE,
+            $format
         );
 
         return $response->send();
@@ -181,25 +160,11 @@ class GridController extends Controller
     }
 
     /**
-     * @param ContextInterface $context
-     * @param StepExecutor     $executor
-     *
-     * @return \Closure
-     */
-    protected function exportCallback(ContextInterface $context, StepExecutor $executor)
-    {
-        return function () use ($executor) {
-            flush();
-            $executor->execute();
-        };
-    }
-
-    /**
      * @return array
      */
     protected function getRenderParams()
     {
-        $renderParams = $this->getRequest()->get('renderParams', []);
+        $renderParams      = $this->getRequest()->get('renderParams', []);
         $renderParamsTypes = $this->getRequest()->get('renderParamsTypes', []);
 
         foreach ($renderParamsTypes as $param => $type) {

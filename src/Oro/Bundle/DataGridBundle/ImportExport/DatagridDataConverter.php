@@ -10,12 +10,22 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
+    protected static $formatFrontendTypes = [
+        PropertyInterface::TYPE_DATE,
+        PropertyInterface::TYPE_DATETIME,
+        PropertyInterface::TYPE_TIME,
+        PropertyInterface::TYPE_DECIMAL,
+        PropertyInterface::TYPE_INTEGER,
+        PropertyInterface::TYPE_PERCENT,
+        PropertyInterface::TYPE_CURRENCY
+    ];
+
     /**
      * @var ServiceLink
      */
@@ -27,14 +37,9 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $translator;
 
     /**
-     * @var NumberFormatter
+     * @var FormatterProvider
      */
-    protected $numberFormatter;
-
-    /**
-     * @var DateTimeFormatter
-     */
-    protected $dateTimeFormatter;
+    protected $formatterProvider;
 
     /**
      * @var ContextInterface
@@ -42,22 +47,24 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $context;
 
     /**
+     * @var TypeFormatterInterface[]
+     */
+    protected $formatters = [];
+
+    /**
      *
      * @param ServiceLink         $gridManagerLink
      * @param TranslatorInterface $translator
-     * @param NumberFormatter     $numberFormatter
-     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param FormatterProvider   $formatterProvider
      */
     public function __construct(
         ServiceLink $gridManagerLink,
         TranslatorInterface $translator,
-        NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter
+        FormatterProvider $formatterProvider
     ) {
         $this->gridManagerLink   = $gridManagerLink;
         $this->translator        = $translator;
-        $this->numberFormatter   = $numberFormatter;
-        $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->formatterProvider = $formatterProvider;
     }
 
     /**
@@ -77,15 +84,16 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             );
         }
 
-        $result = array();
+        $result = [];
         foreach ($columns as $columnName => $column) {
             if (isset($column['renderable']) && false === $column['renderable']) {
                 continue;
             }
 
-            $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
-            $val = $this->applyFrontendFormatting($val, $column);
-            $result[$this->translator->trans($column['label'])] = $val;
+            $val            = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
+            $val            = $this->applyFrontendFormatting($val, $column);
+            $label          = $this->translator->trans($column['label']);
+            $result[$label] = $val;
         }
 
         return $result;
@@ -100,8 +108,8 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @param mixed       $val
-     * @param array       $options
+     * @param mixed $val
+     * @param array $options
      *
      * @return string|null
      *
@@ -112,29 +120,9 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
-                case PropertyInterface::TYPE_DATE:
-                    $val = $this->dateTimeFormatter->formatDate($val);
-                    break;
-                case PropertyInterface::TYPE_DATETIME:
-                    $val = $this->dateTimeFormatter->format($val);
-                    break;
-                case PropertyInterface::TYPE_TIME:
-                    $val = $this->dateTimeFormatter->formatTime($val);
-                    break;
-                case PropertyInterface::TYPE_DECIMAL:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_INTEGER:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_BOOLEAN:
-                    $val = $this->translator->trans((bool)$val ? 'Yes' : 'No', [], 'jsmessages');
-                    break;
-                case PropertyInterface::TYPE_PERCENT:
-                    $val = $this->numberFormatter->formatPercent($val);
-                    break;
-                case PropertyInterface::TYPE_CURRENCY:
-                    $val = $this->numberFormatter->formatCurrency($val);
+                case in_array($frontendType, self::$formatFrontendTypes):
+                    $formatter = $this->getFormatterForType($frontendType);
+                    $val       = $formatter->formatType($val, FormatterProvider::FORMAT_TYPE_PREFIX . $frontendType);
                     break;
                 case PropertyInterface::TYPE_SELECT:
                     if (isset($options['choices'][$val])) {
@@ -183,5 +171,31 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * @param $type
+     * @return TypeFormatterInterface
+     */
+    protected function getFormatterForType($type)
+    {
+        $contextFormatters   = $this->context->getOption(FormatterProvider::FORMATTER_PROVIDER);
+        $formatterTypePrefix = FormatterProvider::FORMAT_TYPE_PREFIX;
+        if (isset($contextFormatters[$type])) {
+            if (isset($this->formatters[$type])) {
+                return $this->formatters[$type];
+            }
+            $formatter               = $this->formatterProvider->getFormatter($contextFormatters[$type]);
+            $this->formatters[$type] = $formatter;
+
+            return $formatter;
+        }
+        if (isset($this->formatters[$type])) {
+            return $this->formatters[$type];
+        }
+        $formatter               = $this->formatterProvider->getFormatterFor($formatterTypePrefix . $type);
+        $this->formatters[$type] = $formatter;
+
+        return $formatter;
     }
 }

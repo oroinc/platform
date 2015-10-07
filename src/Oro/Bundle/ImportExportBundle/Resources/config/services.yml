@@ -19,3 +19,11 @@ services:
             - @oro_importexport.job_executor
         tags:
             - { name: oro_workflow.action, alias: execute_job }
+
+    oro_importexport.converter.formatter_provider:
+        class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
+        arguments:
+            - @service_container
+            - []
+            - []
+        public: false

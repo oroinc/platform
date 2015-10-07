@@ -15,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class ImportExportController extends Controller
@@ -130,6 +131,13 @@ class ImportExportController extends Controller
             'csv',
             null,
             array_merge(
+                [
+                    FormatterProvider::FORMATTER_PROVIDER => [
+                        'datetime' => 'excel_datetime',
+                        'date' => 'excel_datetime',
+                        'time' => 'excel_datetime'
+                    ]
+                ],
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
