@@ -40,14 +40,14 @@ Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for date HTML input element
-inline_editing.editor.view_options.datePickerOptions| Optional. See (details here)[http://goo.gl/pddxZU]
+inline_editing.editor.view_options.datePickerOptions| Optional. See [details here](http://goo.gl/pddxZU)
 inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for time HTML input element
-inline_editing.editor.view_options.timePickerOptions| Optional. See (details here)[https://goo.gl/MP6Unb]
+inline_editing.editor.view_options.timePickerOptions| Optional. See [details here](https://goo.gl/MP6Unb)
 inline_editing.editor.validationRules               | Optional. Client side validation rules
 
 ### Constructor parameters
 
-**Extends:** <code>(DateEditorView)[./date-editor-view.md]</code>  
+**Extends:** <code>(DateEditorView)[./date-editor-view.md]</code>
 
 | Param | Type | Description |
 | --- | --- | --- |
