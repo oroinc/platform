@@ -1,8 +1,8 @@
 <a name="module_RelatedIdRelationEditorView"></a>
-## RelatedIdRelationEditorView ⇐ <code>(SelectEditorView)[./select-editor-view.md]</code>
+## RelatedIdRelationEditorView
 Text cell content editor
 
-**Extends:** <code>(SelectEditorView)[./select-editor-view.md]</code>  
+**Augment**: (SelectEditorView)[./select-editor-view.md]  
 
 | Param | Type | Description |
 | --- | --- | --- |

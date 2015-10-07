@@ -1,5 +1,5 @@
 <a name="module_TextEditorView"></a>
-## TextEditorView ⇐ <code>BaseView</code>
+## TextEditorView
 Text cell content editor. this view is used by default (when no frontend type specified).
 
 Column configuration samples:
@@ -35,7 +35,7 @@ Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
 
-**Extends:** <code>BaseView</code>  
+**Augment**: BaseView  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 | options.validationRules | <code>Object</code> | validation rules in form applicable to jQuery.validate |
 
 
-* [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
+* [TextEditorView](#module_TextEditorView)
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
   * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
