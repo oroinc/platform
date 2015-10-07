@@ -1,13 +1,28 @@
+/** @lends SelectEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Text cell content editor
+     *
+     * @class
+     * @param {Object} options - Options container.
+     * @param {Object} options.model - current row model
+     * @param {Backgrid.Cell} options.cell - current datagrid cell
+     * @param {Backgrid.Column} options.column - current datagrid column
+     * @param {string} options.placeholder - placeholder for empty element
+     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     *
+     * @augments (TextEditorView)[./text-editor-view.md]
+     * @exports SelectEditorView
+     */
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.select2');
 
-    SelectEditorView = TextEditorView.extend({
+    SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
         className: 'select-editor',
 
         initialize: function(options) {

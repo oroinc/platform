@@ -1,13 +1,28 @@
+/** @lends RelatedIdRelationEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Text cell content editor
+     *
+     * @class
+     * @param {Object} options - Options container.
+     * @param {Object} options.model - current row model
+     * @param {Backgrid.Cell} options.cell - current datagrid cell
+     * @param {Backgrid.Column} options.column - current datagrid column
+     * @param {string} options.placeholder - placeholder for empty element
+     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     *
+     * @augments (SelectEditorView)[./select-editor-view.md]
+     * @exports RelatedIdRelationEditorView
+     */
     var RelatedIdRelationEditorView;
     var SelectEditorView = require('./select-editor-view');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     require('jquery.select2');
 
-    RelatedIdRelationEditorView = SelectEditorView.extend({
+    RelatedIdRelationEditorView = SelectEditorView.extend(/** @exports RelatedIdRelationEditorView.prototype */{
         DEFAULT_ID_PROPERTY: 'id',
         DEFAULT_TEXT_PROPERTY: 'text',
         DEFAULT_PER_PAGE: 20,

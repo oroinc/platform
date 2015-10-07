@@ -1,6 +1,21 @@
+/** @lends DatetimeEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Text cell content editor
+     *
+     * @class
+     * @param {Object} options - Options container.
+     * @param {Object} options.model - current row model
+     * @param {Backgrid.Cell} options.cell - current datagrid cell
+     * @param {Backgrid.Column} options.column - current datagrid column
+     * @param {string} options.placeholder - placeholder for empty element
+     * @param {Object} options.validationRules - validation rules in form applicable to jQuery.validate
+     *
+     * @augments (DateEditorView)[./date-editor-view.md]
+     * @exports DatetimeEditorView
+     */
     var DatetimeEditorView;
     var $ = require('jquery');
     var _ = require('underscore');
@@ -9,7 +24,7 @@ define(function(require) {
     var DateEditorView = require('./date-editor-view');
     var DatetimepickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
 
-    DatetimeEditorView = DateEditorView.extend({
+    DatetimeEditorView = DateEditorView.extend(/** @exports DatetimeEditorView.prototype */{
         className: 'datetime-editor',
         inputType: 'hidden',
         view: DatetimepickerView,
