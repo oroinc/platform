@@ -35,7 +35,6 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsNormalizationProvider()
     {
-
         $dateTime    = new \DateTime();
         $providerKey = FormatterProvider::FORMATTER_PROVIDER;
 

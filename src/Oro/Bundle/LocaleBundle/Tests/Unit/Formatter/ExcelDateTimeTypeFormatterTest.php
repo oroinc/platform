@@ -38,6 +38,9 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale));
     }
 
+    /**
+     * @return array
+     */
     public function testGetPatternProvider()
     {
         return [

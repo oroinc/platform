@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -107,6 +106,8 @@ class GridController extends Controller
         $format            = $request->query->get('format');
         $csvWriterId       = 'oro_importexport.writer.echo.csv';
         $writerId          = sprintf('oro_importexport.writer.echo.%s', $format);
+
+        /** @var ItemWriterInterface $writer */
         $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters        = $parametersFactory->createParameters($gridName);

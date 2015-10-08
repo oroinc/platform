@@ -32,8 +32,11 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
     }
 
     /**
+     * Modify locale specific pattern to excel supported.
+     *
      * @param string $pattern
      * @param int    $timeType
+     *
      * @return string
      */
     protected function modifyPattern($pattern, $timeType)
@@ -48,6 +51,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
 
     /**
      * @param string $pattern
+     *
      * @return array
      */
     protected function detectOrder($pattern)
@@ -68,6 +72,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
 
     /**
      * @param string $pattern
+     *
      * @return string
      */
     protected function detectDelimiter($pattern)

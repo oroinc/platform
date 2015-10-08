@@ -10,16 +10,16 @@ class FormatterProvider
     const FORMATTER_PROVIDER = 'formatter_provider';
     const FORMAT_TYPE_PREFIX = 'format_type_';
 
-    /** @var array */
+    /** @var array [{formatter_alias} => {formatter_service_id}] */
     protected $formatterIds       = [];
 
-    /** @var array */
+    /** @var array [{data_type} => {formatter_service_id}] */
     protected $defaultsFormatters = [];
 
-    /** @var array */
+    /** @var TypeFormatterInterface[] */
     protected $formatters         = [];
 
-    /** @var array */
+    /** @var TypeFormatterInterface[] */
     protected $formattersByType   = [];
 
     /** @var ContainerInterface */
@@ -39,11 +39,11 @@ class FormatterProvider
 
     /**
      * @param string $type
-     * @return null|TypeFormatterInterface
+     *
+     * @return TypeFormatterInterface
      */
     public function getFormatterFor($type)
     {
-        $formatter = null;
         if (isset($this->formattersByType[$type])) {
             return $this->formattersByType[$type];
         }
@@ -51,47 +51,44 @@ class FormatterProvider
         if (isset($this->defaultsFormatters[$type])) {
             $formatter                     = $this->getFormatterService($this->defaultsFormatters[$type]);
             $this->formattersByType[$type] = $formatter;
-        }
 
-        if (null === $formatter) {
-            $message = sprintf('No available formatters for "%s" type.', $type);
-            throw new InvalidArgumentException($message);
+            return $formatter;
         }
-
-        return $formatter;
+        throw new InvalidArgumentException(
+            sprintf('No available formatters for "%s" type.', $type)
+        );
     }
 
     /**
      * @param string $alias
-     * @return null|TypeFormatterInterface
+     *
+     * @return TypeFormatterInterface
      */
-    public function getFormatter($alias)
+    public function getFormatterByAlias($alias)
     {
-        $formatter = null;
         if (isset($this->formatters[$alias])) {
             return $this->formatters[$alias];
         }
         if (isset($this->formatterIds[$alias])) {
             $formatter                = $this->getFormatterService($this->formatterIds[$alias]);
             $this->formatters[$alias] = $formatter;
-        }
 
-        if (null === $formatter) {
-            $message = sprintf('The formatter alias "%s" is not registered with the provider.', $alias);
-            throw new InvalidArgumentException($message);
+            return $formatter;
         }
-
-        return $formatter;
+        throw new InvalidArgumentException(
+            sprintf('The formatter is not found by "%s" alias.', $alias)
+        );
     }
 
     /**
      * @param string $formatterId
+     *
      * @return TypeFormatterInterface
      */
     protected function getFormatterService($formatterId)
     {
         if (!$this->container->has($formatterId)) {
-            $message = sprintf('The formatter "%s" is not registered with the container.', $formatterId);
+            $message = sprintf('The formatter "%s" is not registered with the service container.', $formatterId);
             throw new InvalidArgumentException($message);
         }
 

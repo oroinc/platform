@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestTypeFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 
@@ -32,23 +31,23 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFormatter()
     {
-        $testTypeFormatter = new TestTypeFormatter();
+        $testTypeFormatter = new \stdClass();
         $this->setContainerMock('exist_formatter', $testTypeFormatter);
 
-        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatter('exist_alias'));
+        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterByAlias('exist_alias'));
 
         //test already created formatter will be stored in provider
-        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatter('exist_alias'));
+        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterByAlias('exist_alias'));
         $this->setExpectedException(
             'Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException',
-            'The formatter alias "non_exist_alias" is not registered with the provider.'
+            'The formatter is not found by "non_exist_alias" alias.'
         );
-        $this->formatter->getFormatter('non_exist_alias');
+        $this->formatter->getFormatterByAlias('non_exist_alias');
     }
 
     public function testGetFormatterFor()
     {
-        $testTypeFormatter = new TestTypeFormatter();
+        $testTypeFormatter = new \stdClass();
         $this->setContainerMock('test_formatter', $testTypeFormatter);
         $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_type'));
 
@@ -62,7 +61,7 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
         $this->formatter->getFormatterFor('non_exist_type');
     }
 
-    protected function setContainerMock($id, TestTypeFormatter $testTypeFormatter)
+    protected function setContainerMock($id, \stdClass $testTypeFormatter)
     {
         $this->container
             ->expects($this->at(0))

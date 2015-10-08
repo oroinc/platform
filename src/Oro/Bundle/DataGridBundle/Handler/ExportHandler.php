@@ -10,10 +10,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 
 class ExportHandler
@@ -38,6 +38,7 @@ class ExportHandler
      * @param array               $contextParameters
      * @param int                 $batchSize
      * @param string              $format
+     *
      * @return StreamedResponse
      */
     public function handle(

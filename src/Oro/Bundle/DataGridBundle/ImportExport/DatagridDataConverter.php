@@ -16,7 +16,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
-    /** @var array */
+    /** @var string[] */
     protected static $formatFrontendTypes = [
         PropertyInterface::TYPE_DATE,
         PropertyInterface::TYPE_DATETIME,
@@ -53,7 +53,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $formatters = [];
 
     /**
-     *
      * @param ServiceLink         $gridManagerLink
      * @param TranslatorInterface $translator
      * @param FormatterProvider   $formatterProvider
@@ -113,15 +112,13 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * @param array $options
      *
      * @return string|null
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
-                case in_array($frontendType, self::$formatFrontendTypes):
+                case in_array($frontendType, self::$formatFrontendTypes, true):
                     $formatter = $this->getFormatterForType($frontendType);
                     $val       = $formatter->formatType($val, FormatterProvider::FORMAT_TYPE_PREFIX . $frontendType);
                     break;
@@ -176,6 +173,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
 
     /**
      * @param string $type
+     *
      * @return TypeFormatterInterface
      */
     protected function getFormatterForType($type)
@@ -186,7 +184,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             if (isset($this->formatters[$type])) {
                 return $this->formatters[$type];
             }
-            $formatter               = $this->formatterProvider->getFormatter($contextFormatters[$type]);
+            $formatter               = $this->formatterProvider->getFormatterByAlias($contextFormatters[$type]);
             $this->formatters[$type] = $formatter;
 
             return $formatter;

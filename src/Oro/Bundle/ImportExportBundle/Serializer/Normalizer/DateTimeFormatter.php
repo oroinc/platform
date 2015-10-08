@@ -6,7 +6,6 @@ use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 
 class DateTimeFormatter implements NormalizerInterface
 {
-
     /**
      * @var FormatterProvider
      */
@@ -38,7 +37,7 @@ class DateTimeFormatter implements NormalizerInterface
         $type                = $context['type'];
         $formatterTypePrefix = FormatterProvider::FORMAT_TYPE_PREFIX;
         $alias               = $context[FormatterProvider::FORMATTER_PROVIDER][$type];
-        $formatter           = $this->formatterProvider->getFormatter($alias);
+        $formatter           = $this->formatterProvider->getFormatterByAlias($alias);
 
         return $formatter->formatType($object, $formatterTypePrefix . $type);
     }
