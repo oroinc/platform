@@ -1,0 +1,21 @@
+{
+    "name": "oro/dependency-injection",
+    "type": "library",
+    "description": "Oro DependencyInjection Component",
+    "keywords": ["ORO", "BAP", "DIC", "DependencyInjection", "injection"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "symfony/dependency-injection": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\DependencyInjection": "" }
+    },
+    "target-dir": "Oro/Component/DependencyInjection",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

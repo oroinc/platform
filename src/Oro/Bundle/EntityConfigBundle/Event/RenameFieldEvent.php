@@ -2,37 +2,24 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class RenameFieldEvent extends Event
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $fieldName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $newFieldName;
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @param string        $className Entity class name
-     * @param string        $fieldName
-     * @param string        $newFieldName
-     * @param ConfigManager $configManager
+     * @param string        $className     The FQCN of an entity
+     * @param string        $fieldName     The old name of a field
+     * @param string        $newFieldName  The new name of a field
+     * @param ConfigManager $configManager The entity config manager
      */
     public function __construct($className, $fieldName, $newFieldName, ConfigManager $configManager)
     {
@@ -64,13 +51,5 @@ class RenameFieldEvent extends Event
     public function getNewFieldName()
     {
         return $this->newFieldName;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
-    {
-        return $this->configManager;
     }
 }

@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
@@ -19,22 +23,27 @@ class AuditManager
     /** @var TokenStorageInterface */
     protected $securityTokenStorage;
 
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /**
      * @param TokenStorageInterface $securityTokenStorage
+     * @param ManagerRegistry       $doctrine
      */
-    public function __construct(TokenStorageInterface $securityTokenStorage)
+    public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
     {
         $this->securityTokenStorage = $securityTokenStorage;
+        $this->doctrine               = $doctrine;
     }
 
     /**
-     * Creates a log entry contains all changed configs
+     * Creates an audit entity contains all changed configs
      *
      * @param ConfigManager $configManager
      *
      * @return ConfigLog|null
      */
-    public function buildLogEntry(ConfigManager $configManager)
+    public function buildEntity(ConfigManager $configManager)
     {
         $user = $this->getUser();
         if (null === $user) {
@@ -56,6 +65,15 @@ class AuditManager
         $log->setUser($user);
 
         return $log;
+    }
+
+    /**
+     * @param ConfigLog $entity
+     */
+    public function save(ConfigLog $entity)
+    {
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
     }
 
     /**
@@ -102,6 +120,19 @@ class AuditManager
             return null;
         }
 
-        return $user;
+        $className = ClassUtils::getClass($user);
+
+        $id = $this->getEntityManager()->getClassMetadata($className)->getIdentifierValues($user);
+        $id = reset($id);
+
+        return $this->getEntityManager()->getReference($className, $id);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrine->getManager();
     }
 }

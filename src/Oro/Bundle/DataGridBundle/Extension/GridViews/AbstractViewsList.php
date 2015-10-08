@@ -76,8 +76,9 @@ abstract class AbstractViewsList
     {
         $choices = [];
 
-        /** @var View $view */
-        foreach ($this->getList() as $view) {
+        /** @var View[] $views */
+        $views = $this->getList();
+        foreach ($views as $view) {
             $choices[] = ['value' => $view->getName(), 'label' => $this->translator->trans($view->getLabel())];
         }
 

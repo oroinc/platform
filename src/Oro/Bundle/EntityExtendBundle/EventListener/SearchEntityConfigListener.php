@@ -8,8 +8,8 @@ use Doctrine\DBAL\Types\Type;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
 
@@ -30,28 +30,27 @@ class SearchEntityConfigListener
     }
 
     /**
-     * @param PersistConfigEvent $event
+     * @param PreFlushConfigEvent $event
      */
-    public function persistConfig(PersistConfigEvent $event)
+    public function preFlush(PreFlushConfigEvent $event)
     {
-        $config   = $event->getConfig();
-        $configId = $config->getId();
-
-        if ($configId->getScope() !== 'search') {
+        $config = $event->getConfig('search');
+        if (null === $config) {
             return;
         }
 
         $configManager = $event->getConfigManager();
-        $change = $configManager->getConfigChangeSet($config);
-        if (!isset($change['searchable'])) {
+        $changeSet     = $configManager->getConfigChangeSet($config);
+        if (!isset($changeSet['searchable'])) {
             return;
         }
 
-        $extendConfig = $configManager->getProvider('extend')->getConfig($configId->getClassName());
+        $className    = $config->getId()->getClassName();
+        $extendConfig = $configManager->getProvider('extend')->getConfig($className);
         if ($extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
-            $this->addReindexJob($configId->getClassName());
+            $this->addReindexJob($className);
         } else {
-            $this->addPostponeJob($configId->getClassName());
+            $this->addPostponeJob($className);
         }
     }
 

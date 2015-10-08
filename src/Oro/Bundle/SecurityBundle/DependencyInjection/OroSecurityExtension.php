@@ -9,11 +9,11 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
-use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
-
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+
+use Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationCumulativeResourceLoader;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
@@ -42,7 +42,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
      */
     public function prepend(ContainerBuilder $container)
     {
-        if ($container instanceof OroContainerBuilder) {
+        if ($container instanceof ExtendedContainerBuilder) {
             $this->setupWsseNonceCache($container);
         }
     }
@@ -72,9 +72,9 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
     /**
      * Sets default implementation of the cache for WSSE nonces if a custom implementation is not specified
      *
-     * @param OroContainerBuilder $container
+     * @param ExtendedContainerBuilder $container
      */
-    protected function setupWsseNonceCache(OroContainerBuilder $container)
+    protected function setupWsseNonceCache(ExtendedContainerBuilder $container)
     {
         $securityConfig = $container->getExtensionConfig('security');
         if (isset($securityConfig[0]['firewalls']['wsse_secured'])
