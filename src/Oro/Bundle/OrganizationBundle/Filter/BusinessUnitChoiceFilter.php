@@ -2,56 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
-use Symfony\Component\Form\FormFactoryInterface;
-
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\OrganizationBundle\Form\Type\Filter\BusinessUnitChoiceFilterType;
 
-class BusinessUnitChoiceFilter extends AbstractFilter
+class BusinessUnitChoiceFilter extends ChoiceTreeFilter
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * Constructor
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     */
-    public function __construct(
-        FormFactoryInterface $factory,
-        FilterUtility $util,
-        ManagerRegistry $registry
-    ) {
-        parent::__construct($factory, $util);
-        $this->registry = $registry;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getFormType()
-    {
-        return BusinessUnitChoiceFilterType::NAME;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetadata()
-    {
-        $metadata = parent::getMetadata();
-        $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
-        $metadata['data'] = $this->params['options']['data'];
-        return $metadata;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -86,6 +42,11 @@ class BusinessUnitChoiceFilter extends AbstractFilter
         return true;
     }
 
+    /**
+     * @param $data
+     *
+     * @return mixed
+     */
     public function parseData($data)
     {
         $data['value'] = explode(',', $data['value']);

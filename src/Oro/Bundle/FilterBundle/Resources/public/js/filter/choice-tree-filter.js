@@ -3,12 +3,9 @@ define(function(require) {
 
     var ChoiceTreeFilter;
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var TextFilter = require('oro/filter/choice-filter');
     var $ = require('jquery');
-    var routing = require('routing');
     var tools = require('oroui/js/tools');
-    var messenger = require('oroui/js/messenger');
 
     var availableModes = {
         all: 'all',
@@ -21,7 +18,7 @@ define(function(require) {
             var responce = [];
 
             _.each(items, function(value) {
-                if (value['owner_id'] === item.value['id']) {
+                if (value.owner_id === item.value.id) {
                     responce.push({
                         value: value,
                         children: []
@@ -31,7 +28,7 @@ define(function(require) {
 
             if (responce.length > 0) {
                 $.each(responce, function(key, value) {
-                    responce[key]['children'] = self.findChild(value, items);
+                    responce[key].children = self.findChild(value, items);
                 });
             }
 
@@ -51,7 +48,7 @@ define(function(require) {
             var self = this;
             var parent;
             _.each(items, function(item) {
-                if (value.value.owner_id && item['id'] == value.value.owner_id) {
+                if (value.value.owner_id && item.id === value.value.owner_id) {
                     parent = {
                         value: item,
                         children: []
@@ -70,7 +67,7 @@ define(function(require) {
             searchQuery = searchQuery.toLowerCase();
             var response = [];
             _.each(items, function(value) {
-                var result = value['name'].toLowerCase().indexOf(searchQuery);
+                var result = value.name.toLowerCase().indexOf(searchQuery);
                 if (result >= 0) {
                     response.push({
                         value: value,
@@ -131,7 +128,6 @@ define(function(require) {
             var value = _.extend({}, this.emptyValue, this.value);
             var searchQuery = this.SearchQuery ? this.SearchQuery : undefined;
             var selectedChoiceLabel = '';
-            var self = this;
 
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
@@ -169,7 +165,7 @@ define(function(require) {
                 temp = value.value.split(',');
 
                 _.each(temp, function(value) {
-                    if (value != 'All') {
+                    if (value !== 'All') {
                         self.checkedItems[value] = true;
                     }
                 });
@@ -177,7 +173,6 @@ define(function(require) {
         },
 
         _getListTemplate: function(items, searchQuery) {
-            var self = this;
             var template;
             var response = [];
             var chain;
@@ -193,7 +188,7 @@ define(function(require) {
                 items = chain;
             }
 
-            if (this.mode == availableModes.selected) {
+            if (this.mode === availableModes.selected) {
                 items = this._getSelectedItems(items);
                 var temp = [];
                 _.each(items, function(value) {
@@ -218,7 +213,7 @@ define(function(require) {
             values = this.getValue().value.split(',');
             _.each(values, function(value) {
                 _.each(data, function(item) {
-                    if (item['id'] == value) {
+                    if (item.id === value) {
                         temp.push(item);
                     }
                 });
@@ -234,9 +229,9 @@ define(function(require) {
                 root[value.value.id].result = true;
                 _.each(value.value.chain, function(item) {
                     _.each(data, function(bu) {
-                        if (bu['id'] == item) {
-                            if (!root[bu['id']]) {
-                                root[bu['id']] = bu;
+                        if (bu.id === item) {
+                            if (!root[bu.id]) {
+                                root[bu.id] = bu;
                             }
                         }
                     });
@@ -245,7 +240,9 @@ define(function(require) {
 
             var rootArray = [];
             for (var i in root) {
-                rootArray.push(root[i]);
+                if (root.hasOwnProperty(i)) {
+                    rootArray.push(root[i]);
+                }
             }
 
             return rootArray;
@@ -255,7 +252,7 @@ define(function(require) {
             var self = this;
             var response = [];
             _.each(data, function(value) {
-                if (!value['owner_id']) {
+                if (!value.owner_id) {
                     response.push({
                         value: value,
                         children: []
@@ -264,7 +261,7 @@ define(function(require) {
             });
 
             _.each(response, function(value, key) {
-                response[key]['children'] = self.searchEngine.findChild(value, data);
+                response[key].children = self.searchEngine.findChild(value, data);
             });
 
             return response;
@@ -276,7 +273,7 @@ define(function(require) {
 
             var response = false;
             _.each(values, function(value) {
-                if (value == item.value.id) {
+                if (value === item.value.id) {
                     response = true;
                 }
             });
@@ -326,7 +323,9 @@ define(function(require) {
             }
 
             for (var i in this.checkedItems) {
-                values.push(i);
+                if (this.checkedItems.hasOwnProperty(i)) {
+                    values.push(i);
+                }
             }
 
             values = values.join(',');
@@ -389,7 +388,7 @@ define(function(require) {
                     label.push(values[i]);
                 } else {
                     for (var j in self.data) {
-                        if (values[i] == this.data[j].id) {
+                        if (values[i] === this.data[j].id) {
                             label.push(this.data[j].name);
                         }
                     }
@@ -426,7 +425,7 @@ define(function(require) {
         },
 
         _onClickButtonAll: function(event) {
-            if (this.mode != availableModes.all) {
+            if (this.mode !== availableModes.all) {
                 this.mode = availableModes.all;
                 this.$el.find('.buttons span').removeClass('active');
 
@@ -437,7 +436,7 @@ define(function(require) {
 
         _onClickButtonSelected: function(event) {
             event.stopImmediatePropagation();
-            if (this.mode != availableModes.selected) {
+            if (this.mode !== availableModes.selected) {
                 this.$el.find('.buttons span').removeClass('active');
                 this.mode = availableModes.selected;
                 this._onChangeMode();

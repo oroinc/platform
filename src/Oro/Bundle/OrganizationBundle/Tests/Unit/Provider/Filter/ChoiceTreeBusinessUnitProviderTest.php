@@ -1,15 +1,10 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Provider\Filter;
-
-use Doctrine\Bundle\DoctrineBundle\Registry;
-
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\UserBundle\Entity\User;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider\Filter;
 
 use Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider;
 
-class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
+class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ChoiceTreeBusinessUnitProvider */
     protected $choiceTreeBusinessUnitProvider;
@@ -40,15 +35,13 @@ class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
             $this->securityFacade,
             $this->aclHelper
         );
-
-        $this->registry->getRepository('OroOrganizationBundle:BusinessUnit');
     }
 
     public function testGetList()
     {
         $businessUnitRepository = $this->getMockBuilder('BusinessUnitRepository')
             ->disableOriginalConstructor()
-            ->setMethods(['getRootBusinessUnits', 'getChildBusinessUnits'])
+            ->setMethods(['getQueryBuilder'])
             ->getMock();
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -56,14 +49,33 @@ class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->aclHelper->expects($this->any())->method('apply')->with($qb1)->willReturn($qb1);
-
-        $businessUnitRepository->expects($this->any())->method('getRootBusinessUnits')->willReturn($qb1);
-
-
-        $this->aclHelper->expects($this->any())->method('apply')->with($qb)->willReturn($qb);
+        $this->aclHelper->expects($this->any())->method('apply')->willReturn($qb);
+        $businessUnitRepository->expects($this->any())->method('getQueryBuilder')->willReturn($qb);
         $qb->expects($this->any())->method('getResult')->willReturn($this->getTestBusinessUnits());
 
+        $this->registry->expects($this->once())->method('getRepository')->with('OroOrganizationBundle:BusinessUnit')
+            ->willReturn($businessUnitRepository);
+
+        $result = $this->choiceTreeBusinessUnitProvider->getList();
+
+        $this->assertEquals($this->getExpectedData(), $result);
+    }
+
+    public function testGetEmptyList()
+    {
+        $businessUnitRepository = $this->getMockBuilder('BusinessUnitRepository')
+            ->disableOriginalConstructor()
+            ->setMethods(['getQueryBuilder'])
+            ->getMock();
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->setMethods(['getResult'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->aclHelper->expects($this->any())->method('apply')->willReturn($qb);
+        $businessUnitRepository->expects($this->any())->method('getQueryBuilder')->willReturn($qb);
+        $qb->expects($this->any())->method('getResult')->willReturn([]);
 
         $this->registry->expects($this->once())->method('getRepository')->with('OroOrganizationBundle:BusinessUnit')
             ->willReturn($businessUnitRepository);
@@ -75,21 +87,24 @@ class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
 
     protected function getTestBusinessUnits()
     {
-        $rootBusinessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $rootBusinessUnit->expects($this->any())->method('getId')->willReturn('1');
-        $rootBusinessUnit->expects($this->any())->method('getOwner')->willReturn(null);
-        $rootBusinessUnit->expects($this->any())->method('getName')->willReturn('Main Business Unit');
-
         $data = [
             [
-                'name' => '2',
-                'id' => '2',
-                'owner_id' => $rootBusinessUnit
+                'name' => 'Main Business Unit',
+                'id' => 1,
+                'owner_id' => null
+            ],
+            [
+                'name' => 'Business Uit 1',
+                'id' => 2,
+                'owner_id' => $this->getTestDataRootBusinessUnit()
             ]
         ];
 
+        return $this->convertTestDataToBusinessUnitEntity($data);
+    }
+
+    protected function convertTestDataToBusinessUnitEntity($data)
+    {
         $response = [];
         foreach($data as $item) {
             $businessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
@@ -99,14 +114,13 @@ class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
             $businessUnit->expects($this->any())->method('getOwner')->willReturn($item['owner_id']);
             $businessUnit->expects($this->any())->method('getName')->willReturn($item['name']);
 
-
             $response[] = $businessUnit;
         }
 
         return $response;
     }
 
-    protected function getRootBusinessUnits()
+    protected function getTestDataRootBusinessUnit()
     {
         $rootBusinessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
             ->disableOriginalConstructor()
@@ -115,8 +129,22 @@ class ChoiceTreeUserProviderText extends \PHPUnit_Framework_TestCase
         $rootBusinessUnit->expects($this->any())->method('getOwner')->willReturn(null);
         $rootBusinessUnit->expects($this->any())->method('getName')->willReturn('Main Business Unit');
 
-        $response = [$rootBusinessUnit];
+        return $rootBusinessUnit;
+    }
 
-        return $response;
+    protected function getExpectedData()
+    {
+        return [
+            [
+                'name' => 'Main Business Unit',
+                'id' => 1,
+                'owner_id' => null
+            ],
+            [
+                'name' => 'Business Uit 1',
+                'id' => 2,
+                'owner_id' => 1
+            ]
+        ];
     }
 }

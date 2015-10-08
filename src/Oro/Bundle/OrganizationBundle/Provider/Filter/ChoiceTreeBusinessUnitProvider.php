@@ -41,20 +41,20 @@ class ChoiceTreeBusinessUnitProvider
         $businessUnitRepository = $this->getBusinessUnitRepo();
         $response = [];
 
-        $qb = $businessUnitRepository->getRootBusinessUnits();
-        $rootBusinessUnits = $this->aclHelper->apply($qb)->getResult();
-        /** @var BusinessUnit $rootBusinessUnit */
-        foreach ($rootBusinessUnits as $rootBusinessUnit) {
-            if ($rootBusinessUnit->getOwner()) {
-                $name = $this->getBusinessUnitName($rootBusinessUnit);
+        $qb = $businessUnitRepository->getQueryBuilder();
+        $businessUnits = $this->aclHelper->apply($qb)->getResult();
+        /** @var BusinessUnit $businessUnit */
+        foreach ($businessUnits as $businessUnit) {
+            if ($businessUnit->getOwner()) {
+                $name =$businessUnit->getName();
             } else {
-                $name = $rootBusinessUnit->getName();
+                $name = $this->getBusinessUnitName($businessUnit);
             }
 
             $response[] = [
-                'id' => $rootBusinessUnit->getId(),
+                'id' => $businessUnit->getId(),
                 'name' => $name,
-                'owner_id' => $rootBusinessUnit->getOwner() ? $rootBusinessUnit->getOwner()->getId() : null
+                'owner_id' => $businessUnit->getOwner() ? $businessUnit->getOwner()->getId() : null
             ];
         }
 
@@ -70,12 +70,12 @@ class ChoiceTreeBusinessUnitProvider
     }
 
     /**
-     * @param BusinessUnit $rootBusinessUnit
+     * @param BusinessUnit $businessUnit
      *
      * @return string
      */
-    protected function getBusinessUnitName(BusinessUnit $rootBusinessUnit)
+    protected function getBusinessUnitName(BusinessUnit $businessUnit)
     {
-        return  $rootBusinessUnit->getName();
+        return  $businessUnit->getName();
     }
 }

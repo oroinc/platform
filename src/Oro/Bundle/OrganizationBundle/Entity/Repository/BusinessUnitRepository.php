@@ -208,11 +208,9 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
-     * @param Organization $organization
-     *
      * @return QueryBuilder
      */
-    public function getRootBusinessUnits()
+    public function getQueryBuilder()
     {
         return $this->createQueryBuilder('businessUnit');
     }

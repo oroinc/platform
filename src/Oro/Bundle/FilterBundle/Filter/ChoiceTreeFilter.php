@@ -7,9 +7,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
-use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\OrganizationBundle\Form\Type\Filter\BusinessUnitChoiceFilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType;
 
 class ChoiceTreeFilter extends AbstractFilter
 {
@@ -38,7 +36,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getFormType()
     {
-        return BusinessUnitChoiceFilterType::NAME;
+        return ChoiceTreeFilterType::NAME;
     }
 
     /**

@@ -1,16 +1,17 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Form\Type\Filter;
+namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
-class BusinessUnitChoiceFilterType extends AbstractType
+class ChoiceTreeFilterType extends AbstractType
 {
     const TYPE_CONTAINS     = 1;
     const TYPE_NOT_CONTAINS = 2;
-    const NAME              = 'oro_type_business_unit_filter';
+    const NAME              = 'oro_type_choice_tree_filter';
 
     /**
      * {@inheritDoc}
