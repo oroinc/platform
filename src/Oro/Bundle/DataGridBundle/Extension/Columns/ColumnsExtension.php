@@ -240,14 +240,17 @@ class ColumnsExtension extends AbstractExtension
         $columnsOrdered = $this->getColumnsWithOrder($config);
         $columns  = $data->offsetGetOr(self::COLUMNS_PATH, []);
         foreach ($columns as $key => $column) {
-            if (isset($column['name']) && isset($columnsOrdered[$column['name']])) {
-                if (isset($columnsOrdered[$column['name']]['order'])) {
-                    $order = $columnsOrdered[$column['name']]['order'];
-                    $data->offsetSetByPath(sprintf('[columns][%s][order]', $key), $order);
-                }
-                if (isset($columnsOrdered[$column['name']]['renderable'])) {
-                    $renderable = $columnsOrdered[$column['name']]['renderable'];
-                    $data->offsetSetByPath(sprintf('[columns][%s][renderable]', $key), $renderable);
+            if (isset($column['name'])) {
+                $columnName = $column['name'];
+                if (isset($columnsOrdered[$columnName])) {
+                    if (isset($columnsOrdered[$columnName]['order'])) {
+                        $order = $columnsOrdered[$columnName]['order'];
+                        $data->offsetSetByPath(sprintf('[columns][%s][order]', $key), $order);
+                    }
+                    if (isset($columnsOrdered[$columnName]['renderable'])) {
+                        $renderable = $columnsOrdered[$columnName]['renderable'];
+                        $data->offsetSetByPath(sprintf('[columns][%s][renderable]', $key), $renderable);
+                    }
                 }
             }
         }

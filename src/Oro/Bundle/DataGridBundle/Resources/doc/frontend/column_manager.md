@@ -13,6 +13,7 @@ Column Manager operates with columns' attributes:
 - `manageable` if `false` the column does not appear in Column Manage (generally is used for system columns such as `actions` or `selectRow`)
 
 There's the option that allows to turn off Column Manager over `datagrid.yml` configuration:
+
 ```yaml
 datagrid:
     my-grid:

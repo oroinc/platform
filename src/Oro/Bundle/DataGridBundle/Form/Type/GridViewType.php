@@ -11,6 +11,11 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 class GridViewType extends AbstractType
 {
     /**
+     * Example of usage:
+     *     Sorters options choices:
+     *     '-1': 'ASC',
+     *     '1': 'DESC'
+     *
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)

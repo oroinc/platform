@@ -25,7 +25,15 @@ class View
     /** @var bool */
     protected $deletable = false;
 
-    /** @var array */
+    /**
+     * @var array
+     *
+     * Format array:
+     * [columnName => ['order' => int, 'renderable' => bool]]
+     *    columnName: column name
+     *    order: column number in grid
+     *    renderable: visible in grid or not
+     */
     protected $columnsData;
 
     /**

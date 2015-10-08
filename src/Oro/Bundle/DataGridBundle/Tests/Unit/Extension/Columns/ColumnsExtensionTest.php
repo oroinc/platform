@@ -125,7 +125,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade
             ->expects(static::any())
             ->method('getLoggedUser')
-            ->will(static::returnValue($user));
+            ->willReturn($user);
 
         $config = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
