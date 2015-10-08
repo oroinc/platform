@@ -1,26 +1,26 @@
 parameters:
-    oro_entity.listener.navigation_listener.class:                 Oro\Bundle\EntityBundle\EventListener\NavigationListener
-    oro_entity.owner.entity_config_subscriber.class:               Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
-    oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
-    oro_entity.event_listener.custom_entity_grid_listener.class:   Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
-    oro_entity.event_listener.entity_relation_grid_listener.class: Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
-    oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
-    oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
-    oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
-    oro_entity.dictionary_value_list_provider.class:               Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
-    oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
-    oro_entity.virtual_relation_provider.config.class:             Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
-    oro_entity.virtual_relation_provider.chain.class:              Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
-    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
-    oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
-    oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
-    oro_entity.virtual_field_provider.enum.class:                  Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
-    oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
-    oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
-    oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-    oro_entity.twig.extension.entity.class:                        Oro\Bundle\EntityBundle\Twig\EntityExtension
-    oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
-    oro_entity.extension.unique_entity_extension.class:            Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
+    oro_entity.listener.navigation_listener.class:                                     Oro\Bundle\EntityBundle\EventListener\NavigationListener
+    oro_entity.datagrid_helper.class:                                                  Oro\Bundle\EntityBundle\Grid\GridHelper
+    oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
+    oro_entity.event_listener.entity_relation_grid_listener.class:                     Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
+    oro_entity.event_listener.entity_modify_created_updated_properties_listener.class: Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener
+    oro_entity.entity_hierarchy_provider.class:                                        Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
+    oro_entity.exclusion_provider.config.class:                                        Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+    oro_entity.exclusion_provider.chain.class:                                         Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+    oro_entity.dictionary_value_list_provider.class:                                   Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider
+    oro_entity.exclusion_provider.dictionary.class:                                    Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
+    oro_entity.virtual_relation_provider.config.class:                                 Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
+    oro_entity.virtual_relation_provider.chain.class:                                  Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
+    oro_entity.virtual_field_provider.class:                                           Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
+    oro_entity.virtual_field_provider.chain.class:                                     Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
+    oro_entity.virtual_field_provider.dictionary.class:                                Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
+    oro_entity.virtual_field_provider.enum.class:                                      Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
+    oro_entity.entity_provider.class:                                                  Oro\Bundle\EntityBundle\Provider\EntityProvider
+    oro_entity.entity_field_provider.class:                                            Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
+    oro_entity.entity_field_list_provider.class:                                       Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
+    oro_entity.twig.extension.entity.class:                                            Oro\Bundle\EntityBundle\Twig\EntityExtension
+    oro_entity.routing_helper.class:                                                   Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
+    oro_entity.extension.unique_entity_extension.class:                                Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
 
     # override default Doctrine event manager class
     doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
@@ -60,13 +60,14 @@ services:
             - @validator
             - @translator
             - @oro_entity_config.provider.entity
+            - @oro_entity.doctrine_helper
         tags:
             - { name: form.type_extension, alias: form }
 
-    oro_entity.owner.entity_config_subscriber:
-        class: %oro_entity.owner.entity_config_subscriber.class%
+    oro_entity.owner.entity_config_listener:
+        class: Oro\Bundle\EntityBundle\EventListener\EntityConfigListener
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro.entity_config.field.create, method: createField }
 
     oro_entity.datagrid_helper:
         class: %oro_entity.datagrid_helper.class%
@@ -79,6 +80,13 @@ services:
             - @router
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
+
+    oro_entity.event_listener.entity_modify_created_updated_properties_listener:
+        class:  %oro_entity.event_listener.entity_modify_created_updated_properties_listener.class%
+        arguments:
+            - @security.token_storage
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: 100 }
 
     oro_entity.event_listener.entity_relation_grid_listener:
         class: %oro_entity.event_listener.entity_relation_grid_listener.class%

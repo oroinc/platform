@@ -9,7 +9,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "validation.cache" ] ]
+            - [ setNamespace, [ 'validation' ] ]
 
     oro_cache.validation_cache.doctrine:
         public: false

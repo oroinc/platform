@@ -6,11 +6,13 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAMESPACE = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\Dumper';
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManagerBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -29,11 +31,18 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->entityManagerBag = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag')
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->configProvider = new ConfigProviderMock($this->configManager, 'extend');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($this->configProvider);
 
         $this->generator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EntityGenerator')
             ->disableOriginalConstructor()
@@ -43,7 +52,8 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
         $this->dumper = new ExtendConfigDumper(
-            $this->configProvider,
+            $this->entityManagerBag,
+            $this->configManager,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),
             $this->generator,

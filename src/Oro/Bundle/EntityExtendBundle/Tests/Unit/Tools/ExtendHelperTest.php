@@ -192,6 +192,9 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumValueIdProvider()
     {
         return [
+            ['0', '0'],
+            ['10', '10'],
+            ['1.0', '10'],
             ['test', 'test'],
             ['Test', 'test'],
             ['tēstà', 'testa'],

@@ -219,7 +219,7 @@ class Email extends ExtendEmail
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     *      cascade={"remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emailUsers;

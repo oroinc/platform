@@ -14,7 +14,7 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
@@ -256,16 +256,19 @@ abstract class OroKernel extends Kernel
         // cache the container
         $dumper = new PhpDumper($container);
 
-        if ($container->getParameter('installed') && class_exists('ProxyManager\Configuration')) {
-            $dumper->setProxyDumper(new ProxyDumper());
+        if ($container->getParameter('installed')
+            && class_exists('ProxyManager\Configuration')
+            && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper')
+        ) {
+            $dumper->setProxyDumper(new ProxyDumper(md5($cache->getPath())));
         }
 
-        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
-        $cache->write($content, $container->getResources());
-
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass, 'file' => $cache->getPath()));
         if (!$this->debug) {
-            $cache->write(php_strip_whitespace($cache), $container->getResources());
+            $content = static::stripComments($content);
         }
+
+        $cache->write($content, $container->getResources());
     }
 
     /**
@@ -302,9 +305,11 @@ abstract class OroKernel extends Kernel
      */
     protected function getContainerBuilder()
     {
-        $container = new OroContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = new ExtendedContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
-        if (class_exists('ProxyManager\Configuration')) {
+        if (class_exists('ProxyManager\Configuration')
+            && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
+        ) {
             $container->setProxyInstantiator(new RuntimeInstantiator());
         }
 
