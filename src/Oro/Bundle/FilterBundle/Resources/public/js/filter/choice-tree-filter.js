@@ -213,7 +213,7 @@ define(function(require) {
             values = this.getValue().value.split(',');
             _.each(values, function(value) {
                 _.each(data, function(item) {
-                    if (item.id === value) {
+                    if (item.id === parseInt(value)) {
                         temp.push(item);
                     }
                 });
@@ -273,7 +273,7 @@ define(function(require) {
 
             var response = false;
             _.each(values, function(value) {
-                if (value === item.value.id) {
+                if (parseInt(value) === item.value.id) {
                     response = true;
                 }
             });
@@ -361,11 +361,9 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
-            var values  = this._getInputValue(this.criteriaValueSelectors.value);
-
             return {
-                value: values,
-                type: 1 //this._getInputValue(this.criteriaValueSelectors.type)
+                value: this._getInputValue(this.criteriaValueSelectors.value),
+                type: 1
             };
         },
 
@@ -388,7 +386,7 @@ define(function(require) {
                     label.push(values[i]);
                 } else {
                     for (var j in self.data) {
-                        if (values[i] === this.data[j].id) {
+                        if (parseInt(values[i]) === this.data[j].id) {
                             label.push(this.data[j].name);
                         }
                     }
