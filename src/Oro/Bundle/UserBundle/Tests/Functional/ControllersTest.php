@@ -23,6 +23,7 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
     public function testIndex()
@@ -171,7 +172,7 @@ class ControllersTest extends WebTestCase
      */
     public function testAutoCompleteHandler($active, $handlerName, $query)
     {
-        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user']);
         $user->setEnabled($active);
         $this->registry->getManager()->flush();
 
@@ -201,25 +202,25 @@ class ControllersTest extends WebTestCase
                 array(
                     'active' => true,
                     'handler' => 'acl_users',
-                    'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                    'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
                 ),
                 'Acl user autocomplete handler inactive' =>
                 array(
                     'active' => false,
                     'handler' => 'acl_users',
-                    'query' => 'Michael Buckley;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                    'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
                 ),
                 'Organization user autocomplete handler active' =>
                 array(
                     'active' => true,
                     'handler' => 'organization_users',
-                    'query' => 'Michael Buckley'
+                    'query' => 'Elley Towards'
                 ),
                 'Organization user autocomplete handler inactive' =>
                 array(
                     'active' => false,
                     'handler' => 'organization_users',
-                    'query' => 'Michael Buckley'
+                    'query' => 'Elley Towards'
                 ),
         );
     }

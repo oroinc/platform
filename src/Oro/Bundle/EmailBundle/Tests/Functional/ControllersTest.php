@@ -20,6 +20,7 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
+        $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
     public function testIndex()
@@ -59,7 +60,7 @@ class ControllersTest extends WebTestCase
      */
     public function testAutoCompleteHandler($active, $handlerName, $query)
     {
-        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'marketing']);
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user2']);
         $user->setEnabled($active);
         $this->registry->getManager()->flush();
 
@@ -89,13 +90,13 @@ class ControllersTest extends WebTestCase
                 array(
                     'active' => true,
                     'handler' => 'users',
-                    'query' => 'Michael Buckley'
+                    'query' => 'Elley Towards'
                 ),
                 'Mailbox user autocomplete handler inactive' =>
                 array(
                     'active' => false,
                     'handler' => 'users',
-                    'query' => 'Michael Buckley'
+                    'query' => 'Elley Towards'
                 )
         );
     }
