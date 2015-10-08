@@ -1,11 +1,11 @@
 <a name="module_RelatedIdSelectEditorView"></a>
 ## RelatedIdSelectEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
-Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-Editor will use provided `choices` map and `value_field_name`. Server will be updated with value only.
+Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
+The editor will use provided `choices` map and `value_field_name`. The server will be updated with the value only.
 
 ### Column configuration sample:
 
-Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
+Please pay attention at the registration of the `value_field_name` in the query and properties sections of the yml configuration below.
 
 ``` yml
 datagrid:
@@ -46,8 +46,8 @@ Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 inline_editing.editor.view_options.choices          | Key-value set of available choices
 inline_editing.editor.view_options.value_field_name | Related value field name.
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 
 ### Constructor parameters
@@ -60,8 +60,8 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for empty element |
-| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 | options.choices | <code>Object</code> | Key-value set of available choices |
 | options.value_field_name | <code>Object</code> | Related value field name |
 
