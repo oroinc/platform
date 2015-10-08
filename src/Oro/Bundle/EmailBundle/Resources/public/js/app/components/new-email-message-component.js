@@ -32,7 +32,7 @@ define(function(require) {
             var message;
             if (this.notificationElement === null) {
                 message = _.template(this.messageTpl)({url: routing.generate('oro_email_user_emails')});
-                messenger.notificationMessage('info', message);
+                messenger.notificationFlashMessage('info', message);
             } else {
                 if (this.notificationElement.parent().hasClass('open') === false) {
                     this.notificationElement.show().delay(5000).fadeOut(1000);

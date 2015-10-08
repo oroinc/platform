@@ -2395,6 +2395,10 @@ div.uploader.focus,
       color: @warningClose;
       opacity: 1;
     }
+    .separator {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
   }
   .alert-success {
     background-color: @successBackground;
@@ -2403,6 +2407,9 @@ div.uploader.focus,
     color: @successText;
     .close {
       color: @successClose;
+    }
+    .separator {
+      color: lighten(@successText, 25%);
     }
   }
   .alert-danger,
@@ -2413,6 +2420,9 @@ div.uploader.focus,
     color: @errorText;
     .close {
       color: @errorClose;
+    }
+    .separator {
+      color: lighten(@errorText, 25%);
     }
   }
   .alert-warning {
@@ -2427,6 +2437,9 @@ div.uploader.focus,
     padding-left: 20px;
     .close {
       color: @infoClose;
+    }
+    .separator {
+      color: lighten(@infoText, 25%);
     }
   }
   .alert-empty {
