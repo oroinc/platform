@@ -35,14 +35,14 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for date HTML input element
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** the <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -59,4 +59,4 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 ### dateEditorView.getViewOptions() ⇒ <code>Object</code>
 Prepares and returns editor sub-view options
 
-**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  
+**Kind**: an instance method of the <code>[DateEditorView](#module_DateEditorView)</code>  
