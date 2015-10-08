@@ -5,7 +5,7 @@ The editor will use `autocomplete_api_accessor` and `value_field_name`. The serv
 
 ### Column configuration sample:
 
-Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
+Please pay attention to the registration of the `value_field_name` in the query and properties sections of the sample yml configuration below.
 
 ``` yml
 datagrid:
