@@ -57,7 +57,7 @@ services:
     oro_ui.view.content_provider.listener:
         class: %oro_ui.view.content_provider.listener.class%
         arguments:
-            - @oro_ui.content_provider.manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 

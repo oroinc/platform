@@ -306,7 +306,7 @@ services:
         tags:
             - { name: kernel.event_listener, priority: -255, event: kernel.request, method: onKernelRequest }
         arguments:
-            - @oro_navigation.title_service
+            - @service_container
 
     oro_navigation.translation.extractor:
         class: %oro_navigation.translation.extractor.class%

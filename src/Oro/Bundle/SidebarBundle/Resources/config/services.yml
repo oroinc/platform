@@ -23,7 +23,6 @@ services:
     oro_sidebar.request.handler:
         class: %oro_sidebar.request.handler.class%
         arguments:
-            - @oro_sidebar.widget_definition.registry
-            - @assets.packages
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

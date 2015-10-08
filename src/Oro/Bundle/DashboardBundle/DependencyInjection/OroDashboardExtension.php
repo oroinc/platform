@@ -41,6 +41,8 @@ class OroDashboardExtension extends Extension
         $loader->load('services.yml');
 
         $container->getDefinition('oro_dashboard.config_provider')->replaceArgument(0, $config);
+
+        $this->addClassesToCompile(['Oro\Bundle\DataauditBundle\EventListener\KernelListener']);
     }
 
     /**

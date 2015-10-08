@@ -97,5 +97,7 @@ class OroLayoutExtension extends Extension
         }
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
+
+        $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
     }
 }
