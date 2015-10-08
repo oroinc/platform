@@ -7,7 +7,7 @@ services:
     oro_help.help_link.cache:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_help.help_link.cache" ] ]
+            - [ setNamespace, [ 'oro_help_link' ] ]
 
     oro_help.model.help_link_provider:
         class: %oro_help.model.help_link_provider.class%

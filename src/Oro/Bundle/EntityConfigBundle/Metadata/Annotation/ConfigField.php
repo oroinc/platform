@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Metadata\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
 
 /**
@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
  */
 class ConfigField
 {
-    public $mode = ConfigModelManager::MODE_DEFAULT;
+    public $mode = ConfigModel::MODE_DEFAULT;
     public $defaultValues = array();
 
     public function __construct(array $data)
@@ -37,12 +37,12 @@ class ConfigField
         }
 
         $availableMode = array(
-            ConfigModelManager::MODE_DEFAULT,
-            ConfigModelManager::MODE_HIDDEN,
-            ConfigModelManager::MODE_READONLY
+            ConfigModel::MODE_DEFAULT,
+            ConfigModel::MODE_HIDDEN,
+            ConfigModel::MODE_READONLY
         );
 
-        if (!in_array($this->mode, $availableMode)) {
+        if (!in_array($this->mode, $availableMode, true)) {
             throw new AnnotationException(
                 sprintf('Annotation "ConfigField" give invalid parameter "mode" : "%s"', $this->mode)
             );

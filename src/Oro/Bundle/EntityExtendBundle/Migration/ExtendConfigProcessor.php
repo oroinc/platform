@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -158,7 +158,7 @@ class ExtendConfigProcessor
             } else {
                 $this->createEntityModel(
                     $className,
-                    isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    isset($configs['mode']) ? $configs['mode'] : ConfigModel::MODE_DEFAULT,
                     $configs['configs']
                 );
             }
@@ -204,7 +204,7 @@ class ExtendConfigProcessor
                 $className,
                 $fieldName,
                 $configs['type'],
-                isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                isset($configs['mode']) ? $configs['mode'] : ConfigModel::MODE_DEFAULT,
                 isset($configs['configs']) ? $configs['configs'] : [],
                 $isExtendEntity
             );
@@ -266,7 +266,7 @@ class ExtendConfigProcessor
 
     /**
      * @param string $className
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
      */
     protected function changeEntityMode($className, $mode)
     {
@@ -356,7 +356,7 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param string $fieldName
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
      *
      * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
