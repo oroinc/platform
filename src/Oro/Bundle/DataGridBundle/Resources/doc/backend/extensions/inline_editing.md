@@ -1,9 +1,9 @@
 # Inline editing
-## How to enable inline editing on grid
-To enable inline editing on grid you must do following actions:
+## How to enable inline editing on a grid
+To enable inline editing on a grid, do the following actions:
 
-- Go into datagrid yml
-- Add into datagrid configuration following lines
+- Go to the datagrid yml
+- Add the following lines into the datagrid configuration
 ``` yml
 datagrid:
     {grid-uid}:
@@ -14,7 +14,7 @@ datagrid:
             http_method: PATCH
             route: orocrm_account_update
 ```
-- Open corresponding page, all columns that have supported frontend type will become editable
+- Open corresponding page, all the columns for which the frontend type supports editing will become editable
 
 ## Datagrid configuration details
 ``` yml
@@ -35,14 +35,14 @@ datagrid:
 ```
 Option name              | Default value | Description
 :------------------------|:--------------|:-----------
-enable    | false        | Enables inline editing on grid. By default on all cells what have frontend type that support inline editing
-behaviour | enable_all   | Specifies a way how inline editing will be enabled. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
-plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies plugin realization
+enable    | false        | Enables inline editing on the grid. By default is enabled for all cells that have frontend type that supports inline editing
+behaviour | enable_all   | Specifies the way to enable the inline editing. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
+plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies the plugin realization
 default_editors | orodatagrid/js/default-editors | Specifies default editors for front-end types
 cell_editor | {component: 'orodatagrid/js/app/components/cell-popup-editor-component'} | Specifies default cell_editor_component and their options
-save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes how update request will be sent. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md)
+save_api_accessor | {class: 'oroui/js/tools/api-accessor'} | Required. Describes the way to send update request. Please see [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md)
 
-### Sample usage of save_api_accessor with full options provided
+### Sample usage of the save_api_accessor with full options provided
 ``` yml
 save_api_accessor:
     route: orocrm_opportunity_task_update # for example this route uses following mask
@@ -56,11 +56,11 @@ save_api_accessor:
     query_parameter_names: [action]
 ```
 
-Result of combining options:
+Result of the combined options:
 
 `/api/opportunity/23/tasks/{id}?action=patch`
 
-Please note that `{id}` will be taken from current row in grid
+Please note that `{id}` will be taken from the current row in the grid
 
 ## Column configuration options
 ``` yml
@@ -86,14 +86,14 @@ datagrid:
 
 Options name | Default value | Description
 :------------|:--------------|:-----------
-enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
-save_api_accessor | | Allows to override default api accessor for all grid. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
+enable | | Marks or unmarks this column as editable. The behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
+save_api_accessor | | Allows to override default api accessor for the whole grid. Please see [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
 editor.component | | Allows to override component used to display view and specified in `datagrid.{grid-uid}.inline_editing.cell_editor.component`
-editor.component_options | {} | Specifies options to pass into cell editor component
-editor.view | | Defines view that used to render cell-editor. By default this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
-editor.view_options | {} | Specifies options to pass into cell editor view
+editor.component_options | {} | Specifies options to pass into the cell editor component
+editor.view | | Defines view that used to render cell-editor. By default, this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
+editor.view_options | {} | Specifies options to pass into the cell editor view
 
-## Default frontend type to editor mapping
+## Mapping of the default frontend type and editor
 
 Frontend type | Editor view
 :-------------|:-----------------------------------------------------------------
@@ -118,9 +118,9 @@ Editor                                                                      | De
 [date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells
 [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
 [select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
-[related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contains label(and not value) using predefined choices
-[related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contains label(and not value) using search api
+[related-id-select-editor-view](../../frontend/editor/related-id-select-editor-view.md)   | Editing cells which already contain label (and no value) using predefined choices
+[related-id-relation-editor-view](../../frontend/editor/related-id-relation-editor-view.md) | Editing cells which already contain label (and no value) using search api
 
 ## Supported search API's for `related-id-relation-editor-view`
 
-Please find list of supported search API's [here](../../frontend/search-apis.md)
+Please find the list of supported search APIs [here](../../frontend/search-apis.md)
