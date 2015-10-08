@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener\Datagrid;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class ShareGridListener
 {
-    /** @var Request */
-    protected $request;
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
-     * @param Request $request
+     * @param RequestStack $requestStack
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -24,16 +24,19 @@ class ShareGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $entityId = $this->request->get('entityId');
-        $entityClass = $this->request->get('entityClass');
-        $shareGridParams = $this->request->get('shared-datagrid');
-        if ($shareGridParams) {
-            $entityId = $shareGridParams['entityId'];
-            $entityClass = $shareGridParams['entityClass'];
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request) {
+            $entityId = $request->get('entityId');
+            $entityClass = $request->get('entityClass');
+            $shareGridParams = $request->get('shared-datagrid');
+            if ($shareGridParams) {
+                $entityId = $shareGridParams['entityId'];
+                $entityClass = $shareGridParams['entityClass'];
+            }
+            $event->getDatagrid()->getParameters()->add([
+                'entityId' => $entityId,
+                'entityClass' => $entityClass,
+            ]);
         }
-        $event->getDatagrid()->getParameters()->add([
-            'entityId' => $entityId,
-            'entityClass' => $entityClass,
-        ]);
     }
 }

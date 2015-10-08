@@ -700,9 +700,8 @@ services:
 
     oro_security.event_listener.share_grid_listener:
         class: %oro_security.event_listener.share_grid_listener.class%
-        scope: request
         arguments:
-            - @request
+            - @request_stack
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.shared-datagrid, method: onBuildBefore }
 
