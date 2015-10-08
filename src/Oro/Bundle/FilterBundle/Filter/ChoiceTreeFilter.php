@@ -76,6 +76,11 @@ class ChoiceTreeFilter extends AbstractFilter
         return true;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return mixed
+     */
     public function parseData($data)
     {
         $data['value'] = explode(',', $data['value']);

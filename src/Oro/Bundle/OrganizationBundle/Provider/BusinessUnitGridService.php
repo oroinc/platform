@@ -30,9 +30,13 @@ class BusinessUnitGridService
         return $this->getChoices('name', 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
     }
 
+    /**
+     * @return array
+     */
     public function getOwnerIdChoices()
     {
         $ids= $this->getChoices('id', 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
+
         return $ids;
     }
 

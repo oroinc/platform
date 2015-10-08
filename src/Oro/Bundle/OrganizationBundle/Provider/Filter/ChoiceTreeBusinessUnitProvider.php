@@ -21,6 +21,11 @@ class ChoiceTreeBusinessUnitProvider
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /**
+     * @param Registry $registry
+     * @param SecurityFacade $securityFacade
+     * @param AclHelper $aclHelper
+     */
     public function __construct(
         Registry $registry,
         SecurityFacade $securityFacade,

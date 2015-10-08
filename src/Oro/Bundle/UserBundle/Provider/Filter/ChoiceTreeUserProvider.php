@@ -9,20 +9,25 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class ChoiceTreeUserProvider
 {
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
 
     /** @var AclHelper */
     protected $aclHelper;
 
+    /**
+     * @param Registry $registry
+     * @param AclHelper $aclHelper
+     */
     public function __construct(Registry $registry, AclHelper $aclHelper)
     {
         $this->registry = $registry;
         $this->aclHelper = $aclHelper;
     }
 
+    /**
+     * @return array
+     */
     public function getList()
     {
         $response = [];
