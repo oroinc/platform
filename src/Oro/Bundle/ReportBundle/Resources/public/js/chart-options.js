@@ -74,7 +74,7 @@ define(function(require) {
             var entity = $(this.options.fieldsLoaderSelector).fieldsLoader('getEntityName');
             var data = $(this.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
             this.util = new Util(entity, data);
-            this.items = collection.clone().purify().toJSON();
+            this.items = collection.clone().removeInvalidModels().toJSON();
         },
 
         /**

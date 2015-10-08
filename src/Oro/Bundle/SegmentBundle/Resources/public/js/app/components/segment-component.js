@@ -405,7 +405,7 @@ define(function(require) {
             });
 
             this.on('before-submit', function() {
-                collection.purify();
+                collection.removeInvalidModels();
                 $editor.itemsManagerEditor('reset');
             });
 
@@ -528,7 +528,7 @@ define(function(require) {
             });
 
             this.on('before-submit', function() {
-                collection.purify();
+                collection.removeInvalidModels();
                 $editor.itemsManagerEditor('reset');
             });
 

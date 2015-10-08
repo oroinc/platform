@@ -2,9 +2,9 @@ define(function(require) {
     'use strict';
 
     var GroupingModel;
-    var FieldRelatedModel = require('./field-related-model');
+    var EntityFieldModel = require('./entity-field-model');
 
-    GroupingModel = FieldRelatedModel.extend({
+    GroupingModel = EntityFieldModel.extend({
         fieldAttribute: 'name',
 
         defaults: {

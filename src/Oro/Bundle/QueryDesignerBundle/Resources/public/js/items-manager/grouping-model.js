@@ -2,9 +2,9 @@ define(function(require) {
     'use strict';
 
     var ColumnModel;
-    var FieldRelatedModel = require('./field-related-model');
+    var EntityFieldModel = require('./entity-field-model');
 
-    ColumnModel = FieldRelatedModel.extend({
+    ColumnModel = EntityFieldModel.extend({
         fieldAttribute: 'name',
 
         defaults: {

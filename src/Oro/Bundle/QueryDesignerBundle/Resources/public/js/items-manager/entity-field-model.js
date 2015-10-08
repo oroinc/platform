@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var FieldRelatedModel;
+    var EntityFieldModel;
     var _ = require('underscore');
     var BaseModel = require('oroui/js/app/models/base/model');
     var EntityFieldsUtil = require('oroentity/js/entity-fields-util');
 
-    FieldRelatedModel = BaseModel.extend({
+    EntityFieldModel = BaseModel.extend({
         fieldAttribute: 'name',
 
         /**
@@ -22,7 +22,7 @@ define(function(require) {
                 throw new TypeError('Option "entityFieldsUtil" have to be instance of EntityFieldsUtil');
             }
             _.extend(this, _.pick(options, ['entityFieldsUtil']));
-            FieldRelatedModel.__super__.initialize.call(this, attributes, options);
+            EntityFieldModel.__super__.initialize.call(this, attributes, options);
         },
 
         /**
@@ -39,5 +39,5 @@ define(function(require) {
         }
     });
 
-    return FieldRelatedModel;
+    return EntityFieldModel;
 });

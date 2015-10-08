@@ -55,7 +55,7 @@ define(function(require) {
          *
          * @return {FieldsCollection}
          */
-        purify: function() {
+        removeInvalidModels: function() {
             var models = this.filter(function(model) {
                 return !model.isValid();
             });
