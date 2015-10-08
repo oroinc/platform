@@ -129,60 +129,44 @@ define(function(require) {
         },
 
         onBeforeSubmit: function(e) {
-            var components;
-            var confirms = [];
-            var toConfirm = [{
-                event: 'find-unsaved-components',
-                title: 'oro.segment.confirm.unsaved_changes.title',
-                content: 'oro.segment.confirm.unsaved_changes.message'
-            }, {
-                event: 'find-invalid-data-components',
-                title: 'oro.segment.confirm.invalid_data.title',
-                content: 'oro.segment.confirm.invalid_data.message'
-            }];
+            var issues = [];
 
-            for (var i = 0; i < toConfirm.length; i++) {
-                // please note that event name, looks like method call
-                // 'cause listeners will populate components array
-                this.trigger(toConfirm[i].event, components = []);
-                if (components.length) {
-                    components = {components: '<b>' + components.join('</b>, <b>') + '</b>'};
-                    confirms.push({
-                        title: __(toConfirm[i].title),
-                        content: __(toConfirm[i].content, components)
-                    });
-                }
-            }
+            // please note that event name, looks like method call
+            // 'cause listeners will populate issues array by components
+            this.trigger('validate-data', issues);
 
-            if (!confirms.length) {
+            if (!issues.length) {
                 // Normal exit, form submitted
                 this.trigger('before-submit');
                 return;
             }
 
-            var submitForm = _.bind(function() {
+            issues = _.map(_.groupBy(issues, 'type'), function(items, type) {
+                var components = _.map(items, function(item) {
+                    return item.component;
+                });
+                components = {components: '<b>' + components.join('</b>, <b>') + '</b>'};
+                return __('oro.segment.confirm.data_issue.' + type.toLowerCase(), components);
+            });
+
+            if (issues.length > 1) {
+                issues = '<ul><li>' + issues.join('</li><li>') + '</li></ul>';
+            } else {
+                issues = issues[0];
+            }
+
+            var modal = new DeleteConfirmation({
+                title: __('oro.segment.confirm.dialog.title'),
+                content: __('oro.segment.confirm.dialog.message', {data_issue: issues}),
+                okCloses: true,
+                okText: __('OK')
+            });
+
+            modal.open(_.bind(function() {
                 // let sub-components do cleanup before submit
                 this.trigger('before-submit');
                 this.form.trigger('submit');
-            }, this);
-
-            function confirmSubmit() {
-                var dialogOptions = confirms.shift();
-                var modal = new DeleteConfirmation(_.extend(dialogOptions, {
-                    okCloses: true,
-                    okText: __('OK')
-                }));
-
-                modal.open(function() {
-                    if (confirms.length) {
-                        confirmSubmit();
-                    } else {
-                        submitForm();
-                    }
-                });
-            }
-
-            confirmSubmit();
+            }, this));
 
             // prevent form submitting
             e.preventDefault();
@@ -392,15 +376,18 @@ define(function(require) {
                 collection: collection
             }));
 
-            this.on('find-unsaved-components', function(components) {
+            this.on('validate-data', function(issues) {
                 if ($editor.itemsManagerEditor('hasChanges')) {
-                    components.push(__('oro.segment.grouping_editor'));
+                    issues.push({
+                        component: __('oro.segment.grouping_editor'),
+                        type: SegmentComponent.UNSAVED_CHANGES_ISSUE
+                    });
                 }
-            });
-
-            this.on('find-invalid-data-components', function(components) {
                 if (!collection.isValid()) {
-                    components.push(__('oro.segment.grouping_editor'));
+                    issues.push({
+                        component: __('oro.segment.grouping_editor'),
+                        type: SegmentComponent.INVALID_DATA_ISSUE
+                    });
                 }
             });
 
@@ -515,15 +502,18 @@ define(function(require) {
                 sortingLabels[this.value] = $(this).text();
             });
 
-            this.on('find-unsaved-components', function(unsavedComponents) {
+            this.on('validate-data', function(issues) {
                 if ($editor.itemsManagerEditor('hasChanges')) {
-                    unsavedComponents.push(__('oro.segment.report_column_editor'));
+                    issues.push({
+                        component: __('oro.segment.report_column_editor'),
+                        type: SegmentComponent.UNSAVED_CHANGES_ISSUE
+                    });
                 }
-            });
-
-            this.on('find-invalid-data-components', function(components) {
                 if (!collection.isValid()) {
-                    components.push(__('oro.segment.report_column_editor'));
+                    issues.push({
+                        component: __('oro.segment.report_column_editor'),
+                        type: SegmentComponent.INVALID_DATA_ISSUE
+                    });
                 }
             });
 
@@ -633,6 +623,9 @@ define(function(require) {
                 $builder.conditionBuilder('destroy');
             }, this);
         }
+    }, {
+        INVALID_DATA_ISSUE: 'INVALID_DATA',
+        UNSAVED_CHANGES_ISSUE: 'UNSAVED_CHANGES'
     });
 
     return SegmentComponent;
