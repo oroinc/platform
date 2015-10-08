@@ -1,11 +1,51 @@
 doctrine:
     dbal:
+        default_connection: default
         connections:
+            default:
+                driver:   %database_driver%
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
             session:
-                driver:       "%database_driver%"
-                host:         "%database_host%"
-                port:         "%database_port%"
-                dbname:       "%database_name%"
-                user:         "%database_user%"
-                password:     "%database_password%"
-                charset:      UTF8
+                driver:   %database_driver%
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
+            config:
+                driver:   %database_driver%
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
+    orm:
+        default_entity_manager:      default
+        auto_generate_proxy_classes: %kernel.debug%
+        resolve_target_entities:
+            Symfony\Component\Security\Core\User\UserInterface: Oro\Bundle\UserBundle\Entity\User
+        entity_managers:
+            default:
+                connection:   default
+                auto_mapping: true
+                class_metadata_factory_name: Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory
+                mappings:
+                    OroDistributionBundle:
+                        mapping:   false
+                        is_bundle: true
+                metadata_cache_driver:
+                    type: service
+                    id:   doctrine.metadata.cache
+            config:
+                connection: config
+                mappings: ~
+                metadata_cache_driver:
+                    type: service
+                    id:   doctrine.metadata.cache.config

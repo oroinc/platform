@@ -476,7 +476,8 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return false;
         }
 
-        foreach ($this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId) as $buId) {
+        $businessUnits = $this->getTreeProvider()->getTree()->getUserBusinessUnitIds($userId, $organizationId);
+        foreach ($businessUnits as $buId) {
             if ($businessUnitId === $buId) {
                 return true;
             }

@@ -1,6 +1,5 @@
 parameters:
     oro_entity.listener.navigation_listener.class:                                     Oro\Bundle\EntityBundle\EventListener\NavigationListener
-    oro_entity.owner.entity_config_subscriber.class:                                   Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
     oro_entity.datagrid_helper.class:                                                  Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class:                     Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
@@ -61,13 +60,14 @@ services:
             - @validator
             - @translator
             - @oro_entity_config.provider.entity
+            - @oro_entity.doctrine_helper
         tags:
             - { name: form.type_extension, alias: form }
 
-    oro_entity.owner.entity_config_subscriber:
-        class: %oro_entity.owner.entity_config_subscriber.class%
+    oro_entity.owner.entity_config_listener:
+        class: Oro\Bundle\EntityBundle\EventListener\EntityConfigListener
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro.entity_config.field.create, method: createField }
 
     oro_entity.datagrid_helper:
         class: %oro_entity.datagrid_helper.class%

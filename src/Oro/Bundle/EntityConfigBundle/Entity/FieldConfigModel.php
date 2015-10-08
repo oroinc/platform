@@ -5,17 +5,12 @@ namespace Oro\Bundle\EntityConfigBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-
 /**
  * @ORM\Table(name="oro_entity_config_field")
  * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
  */
-class FieldConfigModel extends AbstractConfigModel
+class FieldConfigModel extends ConfigModel
 {
-    const ENTITY_NAME = 'OroEntityConfigBundle:FieldConfigModel';
-
     /**
      * @var integer
      * @ORM\Column(type="integer")
@@ -26,10 +21,8 @@ class FieldConfigModel extends AbstractConfigModel
 
     /**
      * @var EntityConfigModel
-     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields", cascade={"persist"})
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="EntityConfigModel", inversedBy="fields")
+     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $entity;
 
@@ -61,7 +54,7 @@ class FieldConfigModel extends AbstractConfigModel
     {
         $this->fieldName     = $fieldName;
         $this->type          = $type;
-        $this->mode          = ConfigModelManager::MODE_DEFAULT;
+        $this->mode          = self::MODE_DEFAULT;
         $this->indexedValues = new ArrayCollection();
         $this->options       = new ArrayCollection();
     }

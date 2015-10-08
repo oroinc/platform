@@ -14,7 +14,7 @@ use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 
 use Oro\Component\Config\CumulativeResourceManager;
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
@@ -305,7 +305,7 @@ abstract class OroKernel extends Kernel
      */
     protected function getContainerBuilder()
     {
-        $container = new OroContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $container = new ExtendedContainerBuilder(new ParameterBag($this->getKernelParameters()));
 
         if (class_exists('ProxyManager\Configuration')
             && class_exists('Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator')
