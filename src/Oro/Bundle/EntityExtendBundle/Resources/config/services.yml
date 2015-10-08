@@ -342,8 +342,9 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @router
-            - @oro_entity_extend.extend.field_type_helper
-            - @doctrine.orm.entity_manager
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
 
