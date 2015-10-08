@@ -1,6 +1,6 @@
-# Search API's
+# Search APIs
 
-This section contains list of connected search api's
+This section contains the list of connected search APIs
 
 Name          | Full file name
 :-------------|:------------------------------------------------------------------------
