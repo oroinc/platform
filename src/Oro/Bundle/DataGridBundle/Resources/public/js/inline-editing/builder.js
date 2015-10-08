@@ -18,7 +18,7 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            if (tools.isMobile() || !options.metadata.inline_editing || !options.metadata.inline_editing.enabled) {
+            if (tools.isMobile() || !options.metadata.inline_editing || !options.metadata.inline_editing.enable) {
                 deferred.resolve();
                 return;
             }
