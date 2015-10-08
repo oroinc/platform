@@ -3,30 +3,25 @@
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CountQueryBuilderOptimizer
 {
-    /** @var string */
-    protected $idFieldName;
-
-    /** @var string */
-    protected $rootAlias;
-
-    /** @var QueryBuilder */
-    protected $originalQb;
-
     /** @var QueryBuilderTools */
     protected $qbTools;
 
-    /** @var ClassMetadataFactory */
-    private $metadataFactory;
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    /** @var QueryOptimizationContext */
+    protected $context;
 
     /**
      * @param QueryBuilderTools|null $qbTools
@@ -40,19 +35,47 @@ class CountQueryBuilderOptimizer
     }
 
     /**
+     * Sets an event dispatcher
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * Get optimized query builder for count calculation.
      *
-     * @param QueryBuilder $originalQb
+     * @param QueryBuilder $queryBuilder
      *
      * @return QueryBuilder
      */
-    public function getCountQueryBuilder(QueryBuilder $originalQb)
+    public function getCountQueryBuilder(QueryBuilder $queryBuilder)
     {
-        $this->setOriginalQueryBuilder($originalQb);
-        $parts = $this->originalQb->getDQLParts();
+        $this->context = new QueryOptimizationContext($queryBuilder, $this->qbTools);
+        try {
+            $this->buildCountQueryBuilder();
+        } catch (\Exception $e) {
+            // make sure that a link to the context is removed even if an exception occurred
+            $this->context = null;
+            // rethrow an exception
+            throw $e;
+        }
 
-        $qb = clone $this->originalQb;
-        $qb->setFirstResult(null)
+        $qb = $this->context->getOptimizedQueryBuilder();
+
+        // remove a link to the context
+        $this->context = null;
+
+        return $qb;
+    }
+
+    protected function buildCountQueryBuilder()
+    {
+        $optimizedQueryBuilder = $this->context->getOptimizedQueryBuilder();
+        $optimizedQueryBuilder
+            ->setFirstResult(null)
             ->setMaxResults(null)
             ->resetDQLPart('orderBy')
             ->resetDQLPart('groupBy')
@@ -61,9 +84,11 @@ class CountQueryBuilderOptimizer
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
+        $originalQueryParts = $this->context->getOriginalQueryBuilder()->getDQLParts();
+
         $fieldsToSelect = [];
-        if ($parts['groupBy']) {
-            $groupBy            = (array)$parts['groupBy'];
+        if ($originalQueryParts['groupBy']) {
+            $groupBy            = (array)$originalQueryParts['groupBy'];
             $groupByFields      = $this->getSelectFieldFromGroupBy($groupBy);
             $usedGroupByAliases = [];
             foreach ($groupByFields as $key => $groupByField) {
@@ -71,140 +96,112 @@ class CountQueryBuilderOptimizer
                 $usedGroupByAliases[] = $alias;
                 $fieldsToSelect[]     = $groupByField . ' as ' . $alias;
             }
-            $qb->groupBy(implode(', ', $usedGroupByAliases));
-        } elseif (!$parts['where'] && $parts['having']) {
+            $optimizedQueryBuilder->groupBy(implode(', ', $usedGroupByAliases));
+        } elseif (!$originalQueryParts['where'] && $originalQueryParts['having']) {
             // If there is no where and group by, but having is present - convert having to where.
-            $parts['where']  = $parts['having'];
-            $parts['having'] = null;
-            $qb->resetDQLPart('having');
+            $originalQueryParts['where']  = $originalQueryParts['having'];
+            $originalQueryParts['having'] = null;
+            $optimizedQueryBuilder->resetDQLPart('having');
         }
 
-        if ($parts['having']) {
-            $qb->having(
-                $this->qbTools->replaceAliasesWithFields($parts['having'])
+        if ($originalQueryParts['having']) {
+            $optimizedQueryBuilder->having(
+                $this->qbTools->replaceAliasesWithFields($originalQueryParts['having'])
             );
         }
 
-        if ($parts['join']) {
-            $this->addJoins($qb, $parts);
+        if ($originalQueryParts['join']) {
+            $this->addJoins($optimizedQueryBuilder, $originalQueryParts);
         }
-        if (!$parts['groupBy']) {
-            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
+        if (!$originalQueryParts['groupBy']) {
+            /** @var Expr\From $from */
+            foreach ($originalQueryParts['from'] as $from) {
+                $fieldNames = $this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames();
+                foreach ($fieldNames as $fieldName) {
+                    $fieldsToSelect[] = $from->getAlias() . '.' . $fieldName;
+                }
+            }
         }
 
-        if ($parts['where']) {
-            $qb->where($this->qbTools->replaceAliasesWithFields($parts['where']));
+        if ($originalQueryParts['where']) {
+            $optimizedQueryBuilder->where(
+                $this->qbTools->replaceAliasesWithFields($originalQueryParts['where'])
+            );
         }
 
-        $qb->select(array_unique($fieldsToSelect));
-        $this->qbTools->fixUnusedParameters($qb);
-
-        return $qb;
-    }
-
-    /**
-     * Set original query builder.
-     *
-     * @param QueryBuilder $originalQb
-     */
-    protected function setOriginalQueryBuilder(QueryBuilder $originalQb)
-    {
-        $this->originalQb = $originalQb;
-
-        $this->metadataFactory = $this->originalQb->getEntityManager()->getMetadataFactory();
-        // make sure that metadata factory is initialized
-        $this->metadataFactory->getAllMetadata();
-
-        $this->qbTools->prepareFieldAliases($originalQb->getDQLPart('select'));
-        $this->qbTools->prepareJoinTablePaths($originalQb->getDQLPart('join'));
-        $this->rootAlias = current($this->originalQb->getRootAliases());
-        $this->initIdFieldName();
+        $optimizedQueryBuilder->select(array_unique($fieldsToSelect));
+        $this->qbTools->fixUnusedParameters($optimizedQueryBuilder);
     }
 
     /**
      * Add required JOINs to resulting Query Builder.
      *
-     * @param QueryBuilder $qb
-     * @param array        $parts
+     * @param QueryBuilder $optimizedQueryBuilder
+     * @param array        $originalQueryParts
      */
-    protected function addJoins(QueryBuilder $qb, array $parts)
+    protected function addJoins(QueryBuilder $optimizedQueryBuilder, array $originalQueryParts)
     {
         // Collect list of tables which should be added to new query
-        $requiredToJoin = $this->qbTools->getUsedTableAliases($parts['where']);
-        $groupByAliases = $this->qbTools->getUsedTableAliases($parts['groupBy']);
+        $requiredToJoin = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
+        $groupByAliases = $this->qbTools->getUsedTableAliases($originalQueryParts['groupBy']);
         $requiredToJoin = array_merge($requiredToJoin, $groupByAliases);
-        $requiredToJoin = array_merge($requiredToJoin, $this->qbTools->getUsedTableAliases($parts['having']));
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->getNonSymmetricJoinAliases($parts['from'], $parts['join'], $groupByAliases)
+            $this->qbTools->getUsedTableAliases($originalQueryParts['having'])
         );
         $requiredToJoin = array_merge(
             $requiredToJoin,
-            $this->qbTools->getUsedJoinAliases($parts['join'], $requiredToJoin, $this->rootAlias)
+            $this->getNonSymmetricJoinAliases(
+                $originalQueryParts['from'],
+                $originalQueryParts['join'],
+                $groupByAliases
+            )
         );
 
-        $requiredToJoin = array_diff(array_unique($requiredToJoin), [$this->rootAlias]);
+        $rootAliases = [];
+        /** @var Expr\From $from */
+        foreach ($originalQueryParts['from'] as $from) {
+            $rootAliases[] = $from->getAlias();
+            $requiredToJoin = array_merge(
+                $requiredToJoin,
+                $this->qbTools->getUsedJoinAliases($originalQueryParts['join'], $requiredToJoin, $from->getAlias())
+            );
+        }
 
-        /** @var Expr\Join $join */
-        foreach ($parts['join'][$this->rootAlias] as $join) {
-            $alias = $join->getAlias();
-            // To count results number join all tables with inner join and required to tables
-            if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin, true)) {
-                $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
-                $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
+        $requiredToJoin = array_diff(array_unique($requiredToJoin), $rootAliases);
 
-                if ($join->getJoinType() === Expr\Join::INNER_JOIN) {
-                    $qb->innerJoin(
-                        $join->getJoin(),
-                        $alias,
-                        $join->getConditionType(),
-                        $condition,
-                        $join->getIndexBy()
-                    );
-                } else {
-                    $qb->leftJoin(
-                        $join->getJoin(),
-                        $alias,
-                        $join->getConditionType(),
-                        $condition,
-                        $join->getIndexBy()
-                    );
+        foreach ($rootAliases as $rootAlias) {
+            if (!isset($originalQueryParts['join'][$rootAlias])) {
+                continue;
+            }
+            /** @var Expr\Join $join */
+            foreach ($originalQueryParts['join'][$rootAlias] as $join) {
+                $alias = $join->getAlias();
+                // To count results number join all tables with inner join and required to tables
+                if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin, true)) {
+                    $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
+                    $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
+
+                    if ($join->getJoinType() === Expr\Join::INNER_JOIN) {
+                        $optimizedQueryBuilder->innerJoin(
+                            $join->getJoin(),
+                            $alias,
+                            $join->getConditionType(),
+                            $condition,
+                            $join->getIndexBy()
+                        );
+                    } else {
+                        $optimizedQueryBuilder->leftJoin(
+                            $join->getJoin(),
+                            $alias,
+                            $join->getConditionType(),
+                            $condition,
+                            $join->getIndexBy()
+                        );
+                    }
                 }
             }
         }
-    }
-
-    /**
-     * Initialize the column id of the targeted class.
-     *
-     * @return string
-     */
-    protected function initIdFieldName()
-    {
-        /** @var Expr\From $from */
-        $from  = current($this->originalQb->getDQLPart('from'));
-        $class = $from->getFrom();
-
-        $idNames = $this->getClassMetadata($class)
-            ->getIdentifierFieldNames();
-
-        $this->idFieldName = current($idNames);
-    }
-
-    /**
-     * Get fields fully qualified name
-     *
-     * @param string $fieldName
-     *
-     * @return string
-     */
-    protected function getFieldFQN($fieldName)
-    {
-        if (strpos($fieldName, '.') === false) {
-            $fieldName = $this->rootAlias . '.' . $fieldName;
-        }
-
-        return $fieldName;
     }
 
     /**
@@ -258,12 +255,12 @@ class CountQueryBuilderOptimizer
      */
     protected function getNonSymmetricJoinAliases($fromStatements, $joins, $groupByAliases)
     {
-        $aliases         = [];
-        $aliasToJoinExpr = $this->getAliasToJoinExprMap($fromStatements, $joins);
+        $aliases = [];
 
-        $dependencies = $this->qbTools->getAllDependencies($this->rootAlias, $joins[$this->rootAlias]);
+        $aliasToJoinExpr = $this->getAliasToJoinExprMap($fromStatements, $joins);
+        $dependencies    = $this->getNonSymmetricJoinDependencies($fromStatements, $joins);
         foreach ($dependencies as $alias => $joinInfo) {
-            $join = $this->getJoinByAlias($joins[$this->rootAlias], $alias);
+            $join = $this->getJoinByAlias($joins, $alias);
 
             // skip joins that is not left joins or was not used in GROUP BY statement
             // if it was a GROUP BY statement at all
@@ -318,6 +315,28 @@ class CountQueryBuilderOptimizer
     }
 
     /**
+     * @param Expr\From[] $fromStatements
+     * @param array       $joins
+     *
+     * @return array
+     */
+    protected function getNonSymmetricJoinDependencies($fromStatements, $joins)
+    {
+        $dependencies = [];
+        foreach ($fromStatements as $from) {
+            $rootAlias = $from->getAlias();
+            if (isset($joins[$rootAlias])) {
+                $dependencies = array_merge(
+                    $dependencies,
+                    $this->qbTools->getAllDependencies($rootAlias, $joins[$rootAlias])
+                );
+            }
+        }
+
+        return $dependencies;
+    }
+
+    /**
      * @param string $entityClass
      * @param string $associationName
      * @param string $targetEntityClass
@@ -352,7 +371,7 @@ class CountQueryBuilderOptimizer
      */
     protected function getAssociationType($entityClass, $associationName, $targetEntityClass = null)
     {
-        $metadata = $this->getClassMetadata($entityClass);
+        $metadata = $this->context->getClassMetadata($entityClass);
         if (!$targetEntityClass) {
             $associationMapping = $metadata->getAssociationMapping($associationName);
 
@@ -381,9 +400,11 @@ class CountQueryBuilderOptimizer
         foreach ($fromStatements as $from) {
             $result[$from->getAlias()] = $this->resolveEntityClass($from->getFrom());
         }
-        /* @var Expr\Join $join */
-        foreach ($joins[$this->rootAlias] as $join) {
-            $result[$join->getAlias()] = $this->resolveEntityClass($join->getJoin());
+        /* @var Expr\Join[] $childJoins */
+        foreach ($joins as $rootAlias => $childJoins) {
+            foreach ($childJoins as $join) {
+                $result[$join->getAlias()] = $this->resolveEntityClass($join->getJoin());
+            }
         }
 
         return $result;
@@ -392,8 +413,8 @@ class CountQueryBuilderOptimizer
     /**
      * Finds a join statement that corresponds to current alias
      *
-     * @param Expr\Join[] $joins
-     * @param string      $alias
+     * @param array  $joins
+     * @param string $alias
      *
      * @return Expr\Join
      *
@@ -401,9 +422,12 @@ class CountQueryBuilderOptimizer
      */
     protected function getJoinByAlias($joins, $alias)
     {
-        foreach ($joins as $join) {
-            if ($join->getAlias() === $alias) {
-                return $join;
+        /* @var Expr\Join[] $childJoins */
+        foreach ($joins as $rootAlias => $childJoins) {
+            foreach ($childJoins as $join) {
+                if ($join->getAlias() === $alias) {
+                    return $join;
+                }
             }
         }
 
@@ -436,7 +460,7 @@ class CountQueryBuilderOptimizer
     {
         $parts = explode(':', $join);
         if (count($parts) === 2) {
-            $join = $this->originalQb
+            $join = $this->context->getOriginalQueryBuilder()
                     ->getEntityManager()
                     ->getConfiguration()
                     ->getEntityNamespace($parts[0]) . '\\' . $parts[1];
@@ -467,26 +491,15 @@ class CountQueryBuilderOptimizer
                 $expr = $this->resolveEntityClassByAlias($exprAlias, $exprAssocName, $aliasToJoinExpr);
             }
 
-            $associationMapping = $this
-                ->getClassMetadata($expr)
+            $associationMapping = $this->context->getClassMetadata($expr)
                 ->getAssociationMapping($exprAssocName);
 
             $expr = $associationMapping['sourceEntity'];
-            if (!$this->getClassMetadata($expr)->hasAssociation($associationName)) {
+            if (!$this->context->getClassMetadata($expr)->hasAssociation($associationName)) {
                 $expr = $associationMapping['targetEntity'];
             }
         }
 
         return $expr;
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return ClassMetadata
-     */
-    protected function getClassMetadata($className)
-    {
-        return $this->metadataFactory->getMetadataFor($className);
     }
 }
