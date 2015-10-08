@@ -10,14 +10,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 class PropertyConfigContainer
 {
-    /**
-     * Type Of Config
-     */
     const TYPE_ENTITY = 'entity';
     const TYPE_FIELD = 'field';
 
     /** @var array */
     protected $config;
+
+    /** @var array */
+    protected $cache = [];
 
     /**
      * @param array $config
@@ -73,6 +73,16 @@ class PropertyConfigContainer
             return [];
         }
 
+        if ($fieldType) {
+            if (isset($this->cache['defaults'][$type][$fieldType])) {
+                return $this->cache['defaults'][$type][$fieldType];
+            }
+        } else {
+            if (isset($this->cache['defaults'][$type])) {
+                return $this->cache['defaults'][$type];
+            }
+        }
+
         $result = [];
         if ($fieldType) {
             foreach ($this->config[$type]['items'] as $code => $item) {
@@ -85,12 +95,14 @@ class PropertyConfigContainer
                     $result[$code] = $item['options']['default_value'];
                 }
             }
+            $this->cache['defaults'][$type][$fieldType] = $result;
         } else {
             foreach ($this->config[$type]['items'] as $code => $item) {
                 if (isset($item['options']['default_value'])) {
                     $result[$code] = $item['options']['default_value'];
                 }
             }
+            $this->cache['defaults'][$type] = $result;
         }
 
         return $result;
@@ -109,12 +121,17 @@ class PropertyConfigContainer
             return [];
         }
 
+        if (isset($this->cache['notAuditable'][$type])) {
+            return $this->cache['notAuditable'][$type];
+        }
+
         $result = [];
         foreach ($this->config[$type]['items'] as $code => $item) {
             if (isset($item['options']['auditable']) && $item['options']['auditable'] === false) {
                 $result[$code] = true;
             }
         }
+        $this->cache['notAuditable'][$type] = $result;
 
         return $result;
     }
@@ -134,12 +151,17 @@ class PropertyConfigContainer
             return [];
         }
 
+        if (isset($this->cache['translatable'][$type])) {
+            return $this->cache['translatable'][$type];
+        }
+
         $result = [];
         foreach ($this->config[$type]['items'] as $code => $item) {
             if (isset($item['options']['translatable']) && $item['options']['translatable'] === true) {
                 $result[] = $code;
             }
         }
+        $this->cache['translatable'][$type] = $result;
 
         return $result;
     }
@@ -157,12 +179,17 @@ class PropertyConfigContainer
             return [];
         }
 
+        if (isset($this->cache['indexed'][$type])) {
+            return $this->cache['indexed'][$type];
+        }
+
         $result = [];
         foreach ($this->config[$type]['items'] as $code => $item) {
             if (isset($item['options']['indexed']) && $item['options']['indexed'] === true) {
                 $result[$code] = true;
             }
         }
+        $this->cache['indexed'][$type] = $result;
 
         return $result;
     }
@@ -181,6 +208,16 @@ class PropertyConfigContainer
             return false;
         }
 
+        if ($fieldType) {
+            if (isset($this->cache['hasForm'][$type][$fieldType])) {
+                return $this->cache['hasForm'][$type][$fieldType];
+            }
+        } else {
+            if (isset($this->cache['hasForm'][$type])) {
+                return $this->cache['hasForm'][$type];
+            }
+        }
+
         $result = false;
         if ($fieldType) {
             foreach ($this->config[$type]['items'] as $code => $item) {
@@ -194,6 +231,7 @@ class PropertyConfigContainer
                     break;
                 }
             }
+            $this->cache['hasForm'][$type][$fieldType] = $result;
         } else {
             foreach ($this->config[$type]['items'] as $code => $item) {
                 if (isset($item['form']['type'])) {
@@ -201,6 +239,7 @@ class PropertyConfigContainer
                     break;
                 }
             }
+            $this->cache['hasForm'][$type] = $result;
         }
 
         return $result;
@@ -220,6 +259,16 @@ class PropertyConfigContainer
             return [];
         }
 
+        if ($fieldType) {
+            if (isset($this->cache['formItems'][$type][$fieldType])) {
+                return $this->cache['formItems'][$type][$fieldType];
+            }
+        } else {
+            if (isset($this->cache['formItems'][$type])) {
+                return $this->cache['formItems'][$type];
+            }
+        }
+
         $result = [];
         if ($fieldType) {
             foreach ($this->config[$type]['items'] as $code => $item) {
@@ -232,12 +281,14 @@ class PropertyConfigContainer
                     $result[$code] = $item;
                 }
             }
+            $this->cache['formItems'][$type][$fieldType] = $result;
         } else {
             foreach ($this->config[$type]['items'] as $code => $item) {
                 if (isset($item['form']['type'])) {
                     $result[$code] = $item;
                 }
             }
+            $this->cache['formItems'][$type] = $result;
         }
 
         return $result;
@@ -326,12 +377,17 @@ class PropertyConfigContainer
             return [];
         }
 
+        if (isset($this->cache['required'][$type])) {
+            return $this->cache['required'][$type];
+        }
+
         $result = [];
         foreach ($this->config[$type]['items'] as $code => $item) {
             if (isset($item['options']['required_property'])) {
                 $result[$code] = $item['options']['required_property'];
             }
         }
+        $this->cache['required'][$type] = $result;
 
         return $result;
     }

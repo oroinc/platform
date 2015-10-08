@@ -8,38 +8,39 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class UniqueEntityExtension extends AbstractTypeExtension
 {
-    /**
-     * @var ValidatorInterface
-     */
+    /** @var ValidatorInterface */
     protected $validator;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var ConfigProviderInterface
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /**
-     * @param ValidatorInterface      $validator
-     * @param TranslatorInterface     $translator
-     * @param ConfigProviderInterface $entityConfigProvider
+     * @param ValidatorInterface  $validator
+     * @param TranslatorInterface $translator
+     * @param ConfigProvider      $entityConfigProvider
+     * @param DoctrineHelper      $doctrineHelper
      */
     public function __construct(
         ValidatorInterface $validator,
         TranslatorInterface $translator,
-        ConfigProviderInterface $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->validator            = $validator;
         $this->translator           = $translator;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->doctrineHelper       = $doctrineHelper;
     }
 
     /**
@@ -60,18 +61,17 @@ class UniqueEntityExtension extends AbstractTypeExtension
         }
 
         $className = $options['data_class'];
-
+        if (!$this->doctrineHelper->isManageableEntity($className)) {
+            return;
+        }
         if (!$this->entityConfigProvider->hasConfig($className)) {
             return;
         }
 
-        $config = $this->entityConfigProvider->getConfig($className);
-
-        if (!$config->has('unique_key')) {
+        $uniqueKeys = $this->entityConfigProvider->getConfig($className)->get('unique_key');
+        if (empty($uniqueKeys)) {
             return;
         }
-
-        $uniqueKeys = $config->get('unique_key', false, ['keys' => []]);
 
         /* @var \Symfony\Component\Validator\Mapping\ClassMetadata $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($className);

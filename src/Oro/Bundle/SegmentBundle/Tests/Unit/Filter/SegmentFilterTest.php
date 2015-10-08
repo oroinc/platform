@@ -42,6 +42,9 @@ class SegmentFilterTest extends OrmTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
     protected $formFactory;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
     /** @var DynamicSegmentQueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $dynamicSegmentQueryBuilder;
 
@@ -95,6 +98,13 @@ class SegmentFilterTest extends OrmTestCase
             )
             ->getFormFactory();
 
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValue($this->em));
+
         $this->em->expects($this->any())
             ->method('getClassMetadata')
             ->will($this->returnValue($this->getClassMetadata()));
@@ -140,6 +150,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter = new SegmentFilter(
             $this->formFactory,
             new FilterUtility(),
+            $this->doctrine,
             new ServiceLink($container, $dynamicQBServiceID),
             new ServiceLink($container, $staticQBServiceID),
             $this->entityNameProvider,

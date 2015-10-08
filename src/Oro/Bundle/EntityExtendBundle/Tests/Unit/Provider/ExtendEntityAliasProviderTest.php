@@ -6,8 +6,8 @@ use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -181,7 +181,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityConfigModel = new EntityConfigModel();
         $entityConfigModel->setClassName($entityClass);
-        $entityConfigModel->setMode(ConfigModelManager::MODE_HIDDEN);
+        $entityConfigModel->setMode(ConfigModel::MODE_HIDDEN);
 
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -243,7 +243,7 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
     {
         $entityConfigModel = new EntityConfigModel();
         $entityConfigModel->setClassName($entityClass);
-        $entityConfigModel->setMode(ConfigModelManager::MODE_DEFAULT);
+        $entityConfigModel->setMode(ConfigModel::MODE_DEFAULT);
 
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

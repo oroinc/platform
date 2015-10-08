@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -16,6 +18,11 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $doctrine;
+
     /**
      * @var ConfigManager
      */
@@ -32,15 +39,18 @@ class ConfigType extends AbstractType
     protected $dbTranslationMetadataCache;
 
     /**
-     * @param ConfigManager $configManager
-     * @param Translator    $translator
+     * @param ManagerRegistry                 $doctrine
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         Translator $translator,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
+        $this->doctrine                   = $doctrine;
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
@@ -115,6 +125,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventSubscriber(
             new ConfigSubscriber(
+                $this->doctrine,
                 $this->configManager,
                 $this->translator,
                 $this->dbTranslationMetadataCache
@@ -131,7 +142,7 @@ class ConfigType extends AbstractType
 
         $resolver->setAllowedTypes(
             array(
-                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'
+                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'
             )
         );
     }

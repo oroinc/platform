@@ -284,7 +284,8 @@ class EntityAliasResolver implements WarmableInterface
      */
     protected function ensureAllAliasesLoaded()
     {
-        foreach ($this->getAllEntityClasses() as $entityClass) {
+        $entityClasses = $this->getAllEntityClasses();
+        foreach ($entityClasses as $entityClass) {
             if (!isset($this->aliases[$entityClass])) {
                 $this->findEntityAlias($entityClass);
             }

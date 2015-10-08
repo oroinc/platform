@@ -21,10 +21,7 @@ class SchemaStep extends AbstractStep
             case 'clear-extend':
                 return $this->handleAjaxAction('oro:entity-extend:cache:clear', array('--no-warmup' => true));
             case 'schema-drop':
-                return $this->handleAjaxAction(
-                    'doctrine:schema:drop',
-                    array('--force' => true, '--full-database' => $context->getStorage()->get('fullDatabase', false))
-                );
+                return $this->handleDropDatabase($context);
             case 'schema-update':
                 return $this->handleAjaxAction('oro:migration:load', array('--force' => true));
             case 'fixtures':
@@ -38,6 +35,34 @@ class SchemaStep extends AbstractStep
                 return $this->handleAjaxAction('oro:process:configuration:load');
         }
 
-        return $this->render('OroInstallerBundle:Process/Step:schema.html.twig');
+        return $this->render(
+            'OroInstallerBundle:Process/Step:schema.html.twig',
+            array(
+                'dropDatabase' => in_array($context->getStorage()->get('dropDatabase', 'none'), ['app', 'full'], true)
+            )
+        );
+    }
+
+    /**
+     * @param ProcessContextInterface $context
+     *
+     * @return mixed
+     */
+    protected function handleDropDatabase(ProcessContextInterface $context)
+    {
+        $dropDatabase = $context->getStorage()->get('dropDatabase', 'none');
+        if ($dropDatabase === 'app') {
+            return $this->handleAjaxAction(
+                'doctrine:schema:drop',
+                array('--force' => true)
+            );
+        } elseif ($dropDatabase === 'full') {
+            return $this->handleAjaxAction(
+                'doctrine:schema:drop',
+                array('--force' => true, '--full-database' => true)
+            );
+        } else {
+            return true;
+        }
     }
 }
