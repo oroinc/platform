@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -345,7 +345,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'multiple' => false
                         ],
                     ],
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
+                    'mode'    => ConfigModel::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
                             'configs' => [
@@ -458,7 +458,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'test_attr' => 'test'
                         ],
                     ],
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
+                    'mode'    => ConfigModel::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
                             'configs' => [

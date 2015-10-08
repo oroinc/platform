@@ -14,10 +14,6 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
         $container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
         $dispatcher = $this->getMock('Symfony\Component\DependencyInjection\Definition');
 
-        $repository = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Entity\Repository\EventRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $container->expects($this->once())
             ->method('hasDefinition')
             ->with('oro_notification.manager')
@@ -31,23 +27,26 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
             ->method('hasParameter')
             ->with('installed')
             ->will($this->returnValue(true));
+        $container->expects($this->once())
+            ->method('getParameter')
+            ->with('installed')
+            ->will($this->returnValue(true));
 
         $container->expects($this->once())
             ->method('findDefinition')
             ->with('event_dispatcher')
             ->will($this->returnValue($dispatcher));
 
+        $connection = $this->configureConnectionMock();
+
         $container->expects($this->once())
             ->method('get')
-            ->with('doctrine.orm.entity_manager')
-            ->will($this->returnValue($this->configureEntityManagerMock($repository)));
+            ->with('doctrine.dbal.default_connection')
+            ->will($this->returnValue($connection));
 
-        $container->expects($this->any())
-            ->method('getParameter')
-            ->will($this->returnValue(self::CLASS_NAME));
-
-        $repository->expects($this->once())
-            ->method('getEventNames')
+        $connection->expects($this->once())
+            ->method('fetchAll')
+            ->with('SELECT name FROM ' . EventsCompilerPass::EVENT_TABLE_NAME)
             ->will($this->returnValue(array(array('name' => self::EVENT_NAME))));
 
         $dispatcher->expects($this->once())
@@ -80,53 +79,32 @@ class EventsCompilerPassTest extends \PHPUnit_Framework_TestCase
     /**
      * Creates and configure EM mock object
      *
-     * @param $repository
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function configureEntityManagerMock($repository)
+    private function configureConnectionMock()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\MySqlSchemaManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
 
-        $schemaManager->expects($this->once())
-            ->method('listTableNames')
-            ->will($this->returnValue(array('event_table_exist')));
         $connection->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManager));
-        $connection->expects($this->any())
+            ->method('connect');
+        $connection->expects($this->once())
             ->method('isConnected')
             ->will($this->returnValue(true));
 
-        $metadata->expects($this->once())
-            ->method('getTableName')
-            ->will($this->returnValue('event_table_exist'));
+        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\MySqlSchemaManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $schemaManager->expects($this->once())
+            ->method('tablesExist')
+            ->with([EventsCompilerPass::EVENT_TABLE_NAME])
+            ->will($this->returnValue(true));
 
-        $em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with(self::CLASS_NAME)
-            ->will($this->returnValue($metadata));
+        $connection->expects($this->once())
+            ->method('getSchemaManager')
+            ->will($this->returnValue($schemaManager));
 
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with('Oro\Bundle\NotificationBundle\Entity\Event')
-            ->will($this->returnValue($repository));
-
-        $em->expects($this->exactly(2))
-            ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        return $em;
+        return $connection;
     }
 }
