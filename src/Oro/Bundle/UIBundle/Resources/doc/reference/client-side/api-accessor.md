@@ -1,6 +1,6 @@
 <a name="module_ApiAccessor"></a>
 ## ApiAccessor
-Abstraction of api access point. This class is designed to create from server configuration.
+Abstraction of api access point. This class is by design to be initiated from the server configuration.
 
 #### Sample usage of api_accessor with a full set of options provided.
 Example of configuration provided on the server:
