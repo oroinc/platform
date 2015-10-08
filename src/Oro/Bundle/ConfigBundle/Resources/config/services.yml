@@ -17,7 +17,6 @@ parameters:
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
     oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
-    oro_config.user_config_manager.class:                                        Oro\Bundle\ConfigBundle\Manager\UserConfigManager
 
 services:
     oro_config.config_bag:
@@ -31,27 +30,47 @@ services:
         arguments:
             - []
 
+    oro_config.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [setNamespace, [ 'oro_config' ] ]
+
+    oro_config.scope_manager.abstract:
+        abstract: true
+        arguments:
+            - @doctrine
+            - @oro_config.cache
+
     oro_config.scope.user:
         class: %oro_config.user.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+        public: false
+        parent: oro_config.scope_manager.abstract
         calls:
-            - [setContainer, ["@service_container"]]
+            - [setSecurityContext, [ @security.token_storage ]]
         tags:
             - { name: oro_config.scope, scope: user, priority: 255 }
 
     oro_config.scope.global:
         class: %oro_config.global.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+        public: false
+        parent: oro_config.scope_manager.abstract
         tags:
             - { name: oro_config.scope, scope: global, priority: -255 }
 
+    oro_config.manager_value_bag:
+        class: Oro\Bundle\ConfigBundle\Config\ConfigValueBag
+        public: false
+
+    # a template definition for scoped config managers
+    # actually this service is replaced with an alias to the most priority scoped config manager
     oro_config.manager:
         class: %oro_config.manager.class%
         arguments:
+            - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - @oro_config.config_definition_bag
             - @event_dispatcher
+            - @oro_config.manager_value_bag
 
     oro_config.twig.config_extension:
         class: %oro_config.twig_extension.class%
@@ -106,9 +125,3 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - @oro_config.provider.system_configuration.form_provider
-        lazy: true
-
-    oro_config.user_config_manager:
-        class: %oro_config.user_config_manager.class%
-        arguments:
-            - @oro_config.scope.user

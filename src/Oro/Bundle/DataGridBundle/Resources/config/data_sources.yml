@@ -6,7 +6,7 @@ services:
     oro_datagrid.datasource.orm:
         class: %oro_datagrid.datasource.orm.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @oro_datagrid.event.dispatcher
             - @oro_datagrid.datasource.orm.parameter_binder
             - @oro_entity.query_hint_resolver

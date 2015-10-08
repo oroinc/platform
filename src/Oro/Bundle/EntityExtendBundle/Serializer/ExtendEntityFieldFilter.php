@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Serializer;
 use Oro\Component\EntitySerializer\EntityFieldFilterInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ExtendEntityFieldFilter implements EntityFieldFilterInterface
@@ -37,7 +36,7 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
             return true;
         }
 
-        if ($fieldModel->getMode() === ConfigModelManager::MODE_HIDDEN) {
+        if ($fieldModel->isHidden()) {
             // exclude hidden fields
             return false;
         }

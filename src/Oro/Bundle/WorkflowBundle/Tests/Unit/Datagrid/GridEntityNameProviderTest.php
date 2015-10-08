@@ -31,7 +31,8 @@ class GridEntityNameProviderTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();

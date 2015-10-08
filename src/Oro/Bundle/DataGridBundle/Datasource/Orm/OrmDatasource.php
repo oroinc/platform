@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
@@ -32,8 +32,8 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var array|null */
     protected $queryHints;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var DatagridInterface */
     protected $datagrid;
@@ -48,18 +48,18 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     protected $queryHintResolver;
 
     /**
-     * @param EntityManager            $em
+     * @param ManagerRegistry          $doctrine
      * @param EventDispatcherInterface $eventDispatcher
      * @param ParameterBinderInterface $parameterBinder
      * @param QueryHintResolver        $queryHintResolver
      */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         EventDispatcherInterface $eventDispatcher,
         ParameterBinderInterface $parameterBinder,
         QueryHintResolver $queryHintResolver
     ) {
-        $this->em                = $em;
+        $this->doctrine          = $doctrine;
         $this->eventDispatcher   = $eventDispatcher;
         $this->parameterBinder   = $parameterBinder;
         $this->queryHintResolver = $queryHintResolver;
@@ -75,12 +75,12 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         if (isset($config['query'])) {
             $queryConfig = array_intersect_key($config, array_flip(['query']));
             $converter = new YamlConverter();
-            $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
+            $this->qb  = $converter->parse($queryConfig, $this->doctrine);
 
         } elseif (isset($config['entity']) && isset($config['repository_method'])) {
             $entity = $config['entity'];
             $method = $config['repository_method'];
-            $repository = $this->em->getRepository($entity);
+            $repository = $this->doctrine->getRepository($entity);
             if (method_exists($repository, $method)) {
                 $qb = $repository->$method();
                 if ($qb instanceof QueryBuilder) {
