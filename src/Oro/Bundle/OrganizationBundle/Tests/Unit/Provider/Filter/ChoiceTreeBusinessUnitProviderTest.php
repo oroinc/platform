@@ -106,7 +106,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
     protected function convertTestDataToBusinessUnitEntity($data)
     {
         $response = [];
-        foreach($data as $item) {
+        foreach ($data as $item) {
             $businessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
                 ->disableOriginalConstructor()
                 ->getMock();

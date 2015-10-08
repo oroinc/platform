@@ -87,10 +87,8 @@ class ChoiceTreeUserProviderTest extends \PHPUnit_Framework_TestCase
     public function getUsers()
     {
         $data = $this->getExpectedData();
-
         $response = [];
-
-        foreach($data as $item) {
+        foreach ($data as $item) {
             $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
 
             $user->expects($this->any())->method('getId')->willReturn($item['id']);
