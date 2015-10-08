@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Formatter;
 interface TypeFormatterInterface
 {
     /**
-     * formats value by provided type.
+     * Formats value by provided type.
      *
      * @param mixed  $value
      * @param string $type

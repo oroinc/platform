@@ -33,6 +33,8 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
 
     /**
      * Modify locale specific pattern to excel supported.
+     * See icu formats:
+     * @link http://userguide.icu-project.org/formatparse/datetime
      *
      * @param string $pattern
      * @param int    $timeType
@@ -59,7 +61,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
         $result = [];
         $orders = ['mdy', 'dmy', 'ymd', 'myd', 'dym', 'ydm'];
         foreach (str_split($pattern) as $char) {
-            if (!in_array($char, ['d', 'M', 'y']) || in_array($char, $result)) {
+            if (!in_array($char, ['d', 'M', 'y'], true) || in_array($char, $result, true)) {
                 continue;
             }
             $result[] = $char;
@@ -67,7 +69,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
         $result = array_map('strtolower', $result);
         $order  = implode('', $result);
 
-        return in_array($order, $orders) ? $result : ['d', 'm', 'y'];
+        return in_array($order, $orders, true) ? $result : ['d', 'm', 'y'];
     }
 
     /**
