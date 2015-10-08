@@ -31,7 +31,7 @@ class Configuration implements ConfigurationInterface
 
         $builder->root($this->root)
             ->children()
-                ->booleanNode('enabled')->end()
+                ->booleanNode('enable')->end()
                 ->scalarNode('behaviour')->end() //  Possible values: enable_all, enable_selected
                 ->scalarNode('plugin')->end()
                 ->scalarNode('default_editors')->end()

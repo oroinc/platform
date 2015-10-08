@@ -89,9 +89,9 @@ Options name | Default value | Description
 enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
 save_api_accessor | | Allows to override default api accessor for all grid. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
 editor.component | | Allows to override component used to display view and specified in `datagrid.{grid-uid}.inline_editing.cell_editor.component`
-editor.component_options | {} | specifies options to pass into cell editor component
-editor.view | | defines view that used to render cell-editor. By default this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
-editor.view_options | {} | specifies options to pass into cell editor view
+editor.component_options | {} | Specifies options to pass into cell editor component
+editor.view | | Defines view that used to render cell-editor. By default this view is selected using `datagrid.{grid-uid}.inline_editing.default_editors` file.
+editor.view_options | {} | Specifies options to pass into cell editor view
 
 ## Default frontend type to editor mapping
 
