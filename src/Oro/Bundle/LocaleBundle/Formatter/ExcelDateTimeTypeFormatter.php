@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Formatter;
+namespace Oro\Bundle\LocaleBundle\Formatter;
 
-class ExcelDateTimeFormatter extends LocaleDateTimeFormatter
+class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
 {
+    const FORMATTER_ALIAS = 'excel_datetime';
+
     /**
      * {@inheritdoc}
      */

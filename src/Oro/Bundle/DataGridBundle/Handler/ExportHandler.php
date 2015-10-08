@@ -36,8 +36,8 @@ class ExportHandler
      * @param ExportProcessor     $processor
      * @param ItemWriterInterface $writer
      * @param array               $contextParameters
-     * @param                     $batchSize
-     * @param                     $format
+     * @param int                 $batchSize
+     * @param string              $format
      * @return StreamedResponse
      */
     public function handle(

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -16,6 +15,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Bundle\LocaleBundle\Formatter\ExcelDateTimeTypeFormatter;
 
 class GridController extends Controller
 {
@@ -110,6 +111,7 @@ class GridController extends Controller
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters        = $parametersFactory->createParameters($gridName);
 
+        $formatterAlias = ExcelDateTimeTypeFormatter::FORMATTER_ALIAS;
         $response = $this->get('oro_datagrid.handler.export')->handle(
             $this->get('oro_datagrid.importexport.export_connector'),
             $this->get('oro_datagrid.importexport.processor.export'),
@@ -118,9 +120,9 @@ class GridController extends Controller
                 'gridName'                            => $gridName,
                 'gridParameters'                      => $parameters,
                 FormatterProvider::FORMATTER_PROVIDER => [
-                    'datetime' => 'excel_datetime',
-                    'date'     => 'excel_datetime',
-                    'time'     => 'excel_datetime'
+                    'datetime' => $formatterAlias,
+                    'date'     => $formatterAlias,
+                    'time'     => $formatterAlias
                 ]
             ],
             self::EXPORT_BATCH_SIZE,

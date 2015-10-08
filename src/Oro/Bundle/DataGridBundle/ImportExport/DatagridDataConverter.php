@@ -16,6 +16,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
+    /** @var array */
     protected static $formatFrontendTypes = [
         PropertyInterface::TYPE_DATE,
         PropertyInterface::TYPE_DATETIME,
@@ -174,7 +175,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @param $type
+     * @param string $type
      * @return TypeFormatterInterface
      */
     protected function getFormatterForType($type)

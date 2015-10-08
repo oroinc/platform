@@ -1,12 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Formatter;
+namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Converter\TypeFormatterInterface;
-use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 
-class LocaleNumberFormatter extends NumberFormatter implements TypeFormatterInterface
+class NumberTypeFormatter extends NumberFormatter implements TypeFormatterInterface
 {
     const FORMAT_TYPE_CURRENCY = 'format_type_currency';
     const FORMAT_TYPE_PERCENT  = 'format_type_percent';

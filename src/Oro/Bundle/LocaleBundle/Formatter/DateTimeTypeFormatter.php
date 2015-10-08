@@ -1,12 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Formatter;
+namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Oro\Bundle\ImportExportBundle\Converter\TypeFormatterInterface;
+use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
-class LocaleDateTimeFormatter extends DateTimeFormatter implements TypeFormatterInterface
+class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterInterface
 {
     const FORMAT_TYPE_DATETIME = 'format_type_datetime';
     const FORMAT_TYPE_DATE     = 'format_type_date';
