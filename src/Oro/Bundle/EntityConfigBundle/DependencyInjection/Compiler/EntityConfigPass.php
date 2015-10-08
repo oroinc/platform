@@ -12,12 +12,14 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class EntityConfigPass implements CompilerPassInterface
 {
+    const CONFIG_MANAGER_SERVICE = 'oro_entity_config.config_manager';
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $providerBagDefinition = $container->getDefinition('oro_entity_config.provider_bag');
+        $configManagerDefinition = $container->getDefinition(self::CONFIG_MANAGER_SERVICE);
 
         $configLoader = new CumulativeConfigLoader(
             'oro_entity_config',
@@ -42,7 +44,7 @@ class EntityConfigPass implements CompilerPassInterface
             $provider = new Definition('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider');
             $provider->setArguments(
                 [
-                    new Reference('oro_entity_config.config_manager'),
+                    new Reference(self::CONFIG_MANAGER_SERVICE),
                     $scope,
                     $config
                 ]
@@ -50,7 +52,7 @@ class EntityConfigPass implements CompilerPassInterface
 
             $container->setDefinition('oro_entity_config.provider.' . $scope, $provider);
 
-            $providerBagDefinition->addMethodCall('addProvider', array($provider));
+            $configManagerDefinition->addMethodCall('addProvider', array($provider));
         }
     }
 }

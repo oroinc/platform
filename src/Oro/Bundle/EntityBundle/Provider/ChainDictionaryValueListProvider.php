@@ -56,7 +56,8 @@ class ChainDictionaryValueListProvider
             return null;
         }
 
-        foreach ($this->getProviders() as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getSerializationConfig($className);
             }
@@ -78,7 +79,8 @@ class ChainDictionaryValueListProvider
             return null;
         }
 
-        foreach ($this->getProviders() as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider->supports($className)) {
                 return $provider->getValueListQueryBuilder($className);
             }
@@ -95,7 +97,9 @@ class ChainDictionaryValueListProvider
     public function getSupportedEntityClasses()
     {
         $supportedClasses = [];
-        foreach ($this->getProviders() as $provider) {
+
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             $supportedClasses = array_merge($supportedClasses, $provider->getSupportedEntityClasses());
         }
 

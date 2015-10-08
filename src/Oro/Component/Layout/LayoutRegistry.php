@@ -37,7 +37,9 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
 
         $type = null;
-        foreach ($this->getExtensions() as $extension) {
+
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasType($name)) {
                 $type = $extension->getType($name);
                 break;
@@ -67,7 +69,9 @@ class LayoutRegistry implements LayoutRegistryInterface
     public function getContextConfigurators()
     {
         $configurators = [];
-        foreach ($this->getExtensions() as $extension) {
+
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasContextConfigurators()) {
                 $configurators = array_merge($configurators, $extension->getContextConfigurators());
             }
@@ -90,7 +94,9 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
 
         $dataProvider = null;
-        foreach ($this->getExtensions() as $extension) {
+
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasDataProvider($name)) {
                 $dataProvider = $extension->getDataProvider($name);
                 break;
@@ -162,7 +168,8 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasLayoutUpdates($item)) {
                 $layoutUpdates = $extension->getLayoutUpdates($item);
                 foreach ($layoutUpdates as $layoutUpdate) {
@@ -177,7 +184,8 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasContextConfigurators()) {
                 $configurators = $extension->getContextConfigurators();
                 foreach ($configurators as $configurator) {
@@ -224,14 +232,16 @@ class LayoutRegistry implements LayoutRegistryInterface
      */
     protected function loadTypeExtensions($name)
     {
-        $extensions = [];
-        foreach ($this->getExtensions() as $extension) {
+        $typeExtensions = [];
+
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->hasTypeExtensions($name)) {
-                $extensions = array_merge($extensions, $extension->getTypeExtensions($name));
+                $typeExtensions = array_merge($typeExtensions, $extension->getTypeExtensions($name));
             }
         }
-        $this->typeExtensions[$name] = $extensions;
+        $this->typeExtensions[$name] = $typeExtensions;
 
-        return $extensions;
+        return $typeExtensions;
     }
 }

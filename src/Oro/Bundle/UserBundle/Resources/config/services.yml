@@ -73,7 +73,7 @@ services:
     oro_user.cache:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_user.cache" ] ]
+            - [ setNamespace, [ 'oro_user' ] ]
 
     oro_user.user_menu:
         class:                        %oro_user.user_menu.builder.class%

@@ -47,7 +47,7 @@ class DictionaryExclusionProvider implements ExclusionProviderInterface
         if ($metadata->isSingleValuedAssociation($associationName)) {
             $targetClassName = $metadata->getAssociationTargetClass($associationName);
             $groups = $this->groupingConfigProvider->getConfig($targetClassName)->get('groups');
-            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
+            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
                 return true;
             }
         }
