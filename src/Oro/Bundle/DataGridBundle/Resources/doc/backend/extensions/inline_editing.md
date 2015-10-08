@@ -35,7 +35,7 @@ datagrid:
 ```
 Option name              | Default value | Description
 :------------------------|:--------------|:-----------
-enabled    | false        | Enables inline editing on grid. By default on all cells what have frontend type that support inline editing
+enable    | false        | Enables inline editing on grid. By default on all cells what have frontend type that support inline editing
 behaviour | enable_all   | Specifies a way how inline editing will be enabled. Possible values: `enable_all` - (default). this will enable inline editing where possible. `enable_selected` - disable by default, enable only on configured cells
 plugin    | orodatagrid/js/app/plugins/grid/inline-editing-plugin | Specifies plugin realization
 default_editors | orodatagrid/js/default-editors | Specifies default editors for front-end types
@@ -86,7 +86,7 @@ datagrid:
 
 Options name | Default value | Description
 :------------|:--------------|:-----------
-enabled | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
+enable | | Marks or unmarks this column as editable, behaviour depends on main inline_editing.behaviour: `enable_all` - false will disable editing this cell. `enable_selected` - true will enable editing this cell.
 save_api_accessor | | Allows to override default api accessor for all grid. Please overview [documentation for `oroui/js/tools/api-accessor`](../../../../../UIBundle/Resources/doc/reference/client-side/api-accessor.md) for details
 editor.component | | Allows to override component used to display view and specified in `datagrid.{grid-uid}.inline_editing.cell_editor.component`
 editor.component_options | {} | specifies options to pass into cell editor component
