@@ -455,6 +455,40 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'LEFT JOIN e.recipientList recipientList '
                     . 'LEFT JOIN recipientList.users recipientUsersList'
             ],
+            'several_from'                                                              => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:Group', 'g')
+                        ->from('Test:BusinessUnit', 'bu')
+                        ->leftJoin('bu.organization', 'o')
+                        ->select(['g.id']);
+                },
+                'expectedDQL'  => 'SELECT g.id, bu.id FROM Test:Group g, Test:BusinessUnit bu'
+            ],
+            'several_from_with_unused_crossed_dependency'                                      => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:Group', 'g')
+                        ->from('Test:BusinessUnit', 'bu')
+                        ->leftJoin('bu.organization', 'o')
+                        ->leftJoin('g.owner', 'gbu', Join::WITH, 'gbu MEMBER OF o.businessUnits')
+                        ->select(['g.id']);
+                },
+                'expectedDQL'  => 'SELECT g.id, bu.id FROM Test:Group g, Test:BusinessUnit bu'
+            ],
+            'several_from_with_used_crossed_dependency'                                      => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:Group', 'g')
+                        ->from('Test:BusinessUnit', 'bu')
+                        ->leftJoin('bu.organization', 'o')
+                        ->innerJoin('g.owner', 'gbu', Join::WITH, 'gbu MEMBER OF o.businessUnits')
+                        ->select(['g.id']);
+                },
+                'expectedDQL'  => 'SELECT g.id, bu.id FROM '
+                    . 'Test:Group g INNER JOIN g.owner gbu WITH g.owner MEMBER OF o.businessUnits, '
+                    . 'Test:BusinessUnit bu LEFT JOIN bu.organization o'
+            ],
         ];
     }
 
