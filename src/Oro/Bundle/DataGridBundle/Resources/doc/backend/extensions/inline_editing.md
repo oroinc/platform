@@ -14,7 +14,7 @@ datagrid:
             http_method: PATCH
             route: orocrm_account_update
 ```
-- Open corresponding page, all the columns for which the frontend type supports editing will become editable
+- Open the corresponding page, all the columns for which the frontend type supports inline editing will become editable
 
 ## Datagrid configuration details
 ``` yml
