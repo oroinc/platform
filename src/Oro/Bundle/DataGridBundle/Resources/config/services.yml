@@ -165,3 +165,9 @@ services:
             - @request
             - @doctrine
         scope: request
+
+    oro_datagrid.handler.export:
+        class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
+        arguments:
+            - @oro_importexport.file.mime_type_guesser
+
