@@ -10,10 +10,19 @@ class FormatterProvider
     const FORMATTER_PROVIDER = 'formatter_provider';
     const FORMAT_TYPE_PREFIX = 'format_type_';
 
+    /** @var array */
     protected $formatterIds       = [];
+
+    /** @var array */
     protected $defaultsFormatters = [];
+
+    /** @var array */
     protected $formatters         = [];
+
+    /** @var array */
     protected $formattersByType   = [];
+
+    /** @var ContainerInterface */
     protected $container;
 
     /**
@@ -45,7 +54,7 @@ class FormatterProvider
         }
 
         if (null === $formatter) {
-            $message = sprintf('No available formatters for %s type.', $type);
+            $message = sprintf('No available formatters for "%s" type.', $type);
             throw new InvalidArgumentException($message);
         }
 

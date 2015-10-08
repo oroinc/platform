@@ -27,7 +27,7 @@ class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterIn
                 return $this->formatTime($value);
                 break;
             default:
-                throw new InvalidArgumentException(sprintf('Couldn\'t format %s type', $type));
+                throw new InvalidArgumentException(sprintf('Couldn\'t format "%s" type', $type));
         }
     }
 }

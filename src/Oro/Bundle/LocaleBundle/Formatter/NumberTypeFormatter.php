@@ -31,7 +31,7 @@ class NumberTypeFormatter extends NumberFormatter implements TypeFormatterInterf
                 return $this->formatDecimal($value);
                 break;
             default:
-                throw new InvalidArgumentException(sprintf('Couldn\'t format %s type', $type));
+                throw new InvalidArgumentException(sprintf('Couldn\'t format "%s" type', $type));
         }
     }
 }
