@@ -351,3 +351,42 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     vertical-align: middle;
   }
 }
+.filter-item.filter-business-unit {
+  margin-right: 0;
+  margin-bottom: 0;
+  .buttons {
+    margin-bottom: 5px;
+    span {
+      cursor: pointer;
+      color: #006acc;
+    }
+    span.active {
+      color: rgb(68, 68, 68);
+      cursor: default;
+    }
+  }
+  .list {
+    height: 200px;
+    max-height: 200px;
+    overflow: auto;
+    margin-bottom: 10px;
+    ul:first-child{
+      margin-left: 0;
+    }
+    ul {
+      list-style-type: none;
+      margin-right: 25px;
+      input {
+        margin-right: 5px;
+        margin-top: 0;
+      }
+      label.search-result {
+        color: #000000;
+        font-weight: bold;
+      }
+    }
+  }
+  input[name="value"] {
+    display: none;
+  }
+}
