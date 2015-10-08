@@ -36,35 +36,36 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     public function testSupportsNormalizationProvider()
     {
 
-        $dateTime = new \DateTime();
+        $dateTime    = new \DateTime();
         $providerKey = FormatterProvider::FORMATTER_PROVIDER;
+
         return [
-            'supports datetime' => [
+            'supports datetime'              => [
                 $dateTime,
                 [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
                 true
             ],
-            'supports date' => [
+            'supports date'                  => [
                 $dateTime,
                 [$providerKey => ['date' => 'test'], 'type' => 'date'],
                 true
             ],
-            'supports time' => [
+            'supports time'                  => [
                 $dateTime,
                 [$providerKey => ['time' => 'test'], 'type' => 'time'],
                 true
             ],
-            'not supports object' => [
+            'not supports object'            => [
                 new \StdClass,
                 [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
                 false
             ],
-            'not supports string' => [
+            'not supports string'            => [
                 $dateTime->format('d/m/Y H:i:s'),
                 [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
                 false
             ],
-            'not supports bad type' => [
+            'not supports bad type'          => [
                 $dateTime,
                 [$providerKey => ['datetime' => 'test'], 'type' => 'test'],
                 false
