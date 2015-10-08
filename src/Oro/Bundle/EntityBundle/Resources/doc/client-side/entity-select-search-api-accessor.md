@@ -7,6 +7,6 @@ Provides access to entity_select search API.
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>Object</code> |  |
-| options.entity_name | <code>string</code> | Entity name to search in |
-| options.field_name | <code>string</code> | Field to search by and to show in UI |
+| options.entity_name | <code>string</code> | The tntity name to search in |
+| options.field_name | <code>string</code> | The field to search by and to show in UI |
 
