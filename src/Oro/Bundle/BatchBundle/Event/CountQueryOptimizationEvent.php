@@ -16,19 +16,19 @@ class CountQueryOptimizationEvent extends Event
     protected $context;
 
     /** @var string[] */
-    protected $requiredAliases;
+    protected $aliases;
 
     /** @var string[] */
     protected $toRemoveAliases = [];
 
     /**
-     * @param QueryOptimizationContext $context
-     * @param string[]                 $requiredAliases
+     * @param QueryOptimizationContext $context A query optimization context
+     * @param string[]                 $aliases A list of join aliases to be added to optimized query
      */
-    public function __construct(QueryOptimizationContext $context, array $requiredAliases)
+    public function __construct(QueryOptimizationContext $context, array $aliases)
     {
-        $this->context         = $context;
-        $this->requiredAliases = $requiredAliases;
+        $this->context = $context;
+        $this->aliases = $aliases;
     }
 
     /**
@@ -58,7 +58,7 @@ class CountQueryOptimizationEvent extends Event
      */
     public function getOptimizedQueryJoinAliases()
     {
-        return $this->requiredAliases;
+        return $this->aliases;
     }
 
     /**
@@ -72,11 +72,11 @@ class CountQueryOptimizationEvent extends Event
     }
 
     /**
-     * Requests to remove a join alias from optimized query
+     * Requests to remove a join from optimized query
      *
-     * @param string $alias
+     * @param string $alias The alias of a join to be removed
      */
-    public function removeOptimizedQueryJoinAlias($alias)
+    public function removeJoinFromOptimizedQuery($alias)
     {
         if (!in_array($alias, $this->toRemoveAliases, true)) {
             $this->toRemoveAliases[] = $alias;

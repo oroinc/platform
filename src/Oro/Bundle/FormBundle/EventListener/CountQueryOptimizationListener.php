@@ -21,7 +21,7 @@ class CountQueryOptimizationListener
         $joinAliases = $event->getOptimizedQueryJoinAliases();
         foreach ($joinAliases as $alias) {
             if ($this->isPrimaryItemLeftJoin($alias, $context)) {
-                $event->removeOptimizedQueryJoinAlias($alias);
+                $event->removeJoinFromOptimizedQuery($alias);
             }
         }
     }
