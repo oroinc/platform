@@ -716,7 +716,7 @@ class TrackingProcessor implements LoggerAwareInterface
     }
 
     /**
-     * Get batch size for batch size for tracking events
+     * Get batch size for tracking events
      *
      * @return int
      */
