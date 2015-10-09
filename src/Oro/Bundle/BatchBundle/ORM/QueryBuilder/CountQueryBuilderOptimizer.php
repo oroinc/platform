@@ -222,7 +222,7 @@ class CountQueryBuilderOptimizer
     {
         if (null !== $this->eventDispatcher) {
             $event = new CountQueryOptimizationEvent($this->context, $joinAliases);
-            $this->eventDispatcher->dispatch('oro.entity.count_query.optimize', $event);
+            $this->eventDispatcher->dispatch(CountQueryOptimizationEvent::EVENT_NAME, $event);
             $toRemoveAliases = $event->getRemovedOptimizedQueryJoinAliases();
             if (!empty($toRemoveAliases)) {
                 $toRemoveAliases = array_diff($toRemoveAliases, $requiredJoinAliases);
