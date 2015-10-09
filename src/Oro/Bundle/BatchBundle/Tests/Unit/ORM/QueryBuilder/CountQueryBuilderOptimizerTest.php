@@ -8,8 +8,8 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
-use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 class CountQueryBuilderOptimizerTest extends OrmTestCase
