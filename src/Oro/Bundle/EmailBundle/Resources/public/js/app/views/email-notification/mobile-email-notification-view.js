@@ -6,6 +6,8 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
 
     MobileEmailNotificationView = BaseView.extend({
+        autoRender: true,
+
         /**
          * @type {number}
          */
@@ -42,10 +44,6 @@ define(function(require) {
             }
             this.$counter.html(count);
             $('#user-menu .dropdown-toggle').toggleClass('has-new-emails', Boolean(this.countNewEmail));
-        },
-
-        showNotification: function() {
-            // nothing to do in mobile version
         }
     });
 
