@@ -350,4 +350,16 @@ JS;
         $this->waitForAjax();
         return $this;
     }
+
+    public function closeWidgetWindow()
+    {
+        $widgetCloseButton =
+            "//div[starts-with(@class,'ui-dialog-titlebar ui-widget-header')]//button|span[contains(., 'close')]";
+        while ($this->isElementPresent($widgetCloseButton)) {
+            $this->test->byXPath($widgetCloseButton)->click();
+            $this->waitForAjax();
+        }
+
+        return $this;
+    }
 }

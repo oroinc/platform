@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 /**
@@ -57,8 +58,9 @@ class AuditController extends Controller
     public function auditFieldAction($entity, $id)
     {
         /** @var FieldConfigModel $fieldName */
-        $fieldName = $this->getDoctrine()
-            ->getRepository(FieldConfigModel::ENTITY_NAME)
+        $fieldName = $this->getConfigManager()
+            ->getEntityManager()
+            ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
             ->findOneBy(['id' => $id]);
 
         return [
@@ -67,5 +69,13 @@ class AuditController extends Controller
             'fieldName'   => $fieldName->getFieldName(),
             'entityId'    => $id,
         ];
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    protected function getConfigManager()
+    {
+        return $this->get('oro_entity_config.config_manager');
     }
 }
