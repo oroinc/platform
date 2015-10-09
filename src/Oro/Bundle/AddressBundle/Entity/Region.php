@@ -24,6 +24,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      defaultValues={
  *          "grouping"={
  *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "search_fields"={"name"}
  *          }
  *      }
  * )
