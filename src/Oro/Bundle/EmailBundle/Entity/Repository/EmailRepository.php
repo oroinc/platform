@@ -87,7 +87,7 @@ class EmailRepository extends EntityRepository
      *
      * @return mixed
      */
-    public function getCountNewEmails(User $user, Organization $organization, $folderId)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
         $qb = $this->createQueryBuilder('e')
             ->select('COUNT(DISTINCT e)')
@@ -98,7 +98,7 @@ class EmailRepository extends EntityRepository
             ->setParameter('owner', $user)
             ->setParameter('seen', false);
 
-        if ($folderId > 0) {
+        if ($folderId !== null && $folderId > 0) {
             $qb->leftJoin('eu.folder', 'f')
                 ->andWhere('f.id = :folderId')
                 ->setParameter('folderId', $folderId);

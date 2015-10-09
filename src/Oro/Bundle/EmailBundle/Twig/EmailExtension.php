@@ -198,7 +198,7 @@ class EmailExtension extends \Twig_Extension
         $result = $this->em->getRepository("OroEmailBundle:Email")
             ->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
         $total = $this->em->getRepository("OroEmailBundle:Email")
-            ->getCountNewEmails($currentUser, $currentOrganization, 0);
+            ->getCountNewEmails($currentUser, $currentOrganization);
         $result[] = array('num' => $total, 'id' => 0);
         return $result;
     }

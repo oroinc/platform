@@ -117,7 +117,7 @@ class EmailNotificationManager
      *
      * @return integer
      */
-    public function getCountNewEmails(User $user, Organization $organization, $folderId)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
         return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
     }

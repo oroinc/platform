@@ -4,9 +4,7 @@
     float: left;
     height: 100%;
     position: relative;
-    z-index: @zindexFixedNavbar;
     overflow: visible;
-
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -302,6 +300,7 @@
     }
 }
 .sidebar-widget-popup {
+    z-index: @zindexPopover;
     .sidebar-widget-header-icon {
         display: none;
     }
