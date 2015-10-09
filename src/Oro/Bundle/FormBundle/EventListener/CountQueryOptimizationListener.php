@@ -49,19 +49,17 @@ class CountQueryOptimizationListener
             self::PRIMARY_CONDITION_PATTERN,
             $condition,
             $matches,
-            PREG_SET_ORDER | PREG_OFFSET_CAPTURE
+            PREG_SET_ORDER
         );
         if (!$matchResult
-            || count($matches) !== 1
-            || $matches[0][0][1] !== 0
-            || $matches[0][0][0] !== $condition
-            || $matches[0]['alias'][0] !== $alias
-            || $matches[0]['field'][0] !== 'primary'
+            || $matches[0][0] !== $condition
+            || $matches[0]['alias'] !== $alias
+            || $matches[0]['field'] !== 'primary'
         ) {
             return false;
         }
 
-        return $this->isTrueValue($matches[0]['value'][0], $context);
+        return $this->isTrueValue($matches[0]['value'], $context);
     }
 
     /**
