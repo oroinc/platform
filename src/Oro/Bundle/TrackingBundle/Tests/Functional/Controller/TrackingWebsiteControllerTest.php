@@ -5,7 +5,6 @@ namespace Oro\Bundle\TrackingBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class TrackingWebsiteControllerTest extends WebTestCase

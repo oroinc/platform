@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class WorkflowStepTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,5 +71,12 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $newStep->getLabel());
         $this->assertEquals(1, $newStep->getStepOrder());
         $this->assertTrue($newStep->isFinal());
+    }
+
+    public function testToString()
+    {
+        $label = 'Step Label';
+        $this->step->setLabel($label);
+        $this->assertEquals($label, (string)$this->step);
     }
 }

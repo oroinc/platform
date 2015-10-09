@@ -49,6 +49,9 @@ define([
                 filtersList.$el.hide();
             }
 
+            this.grid.filterManager = filtersList;
+            this.grid.trigger('filterManager:connected');
+
             this.deferred.resolve(filtersList);
         },
 
@@ -102,6 +105,7 @@ define([
 
             options.gridPromise.done(function(grid) {
                 self.collection = grid.collection;
+                self.grid = grid;
                 methods.build.call(self);
             }).fail(function() {
                 deferred.reject();

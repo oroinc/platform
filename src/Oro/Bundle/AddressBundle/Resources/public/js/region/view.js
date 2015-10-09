@@ -96,6 +96,7 @@ define([
          * @param e {Object}
          */
         selectionChanged: function(e) {
+            this.$el.trigger('value:changing');
             if ($(e.currentTarget).val()) {
                 var countryId = $(e.currentTarget).val();
                 this.collection.setCountryId(countryId);
@@ -111,9 +112,9 @@ define([
                 this.displaySelect2(true);
                 this.uniform.show();
 
-                this.target.val('').trigger('change');
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
+                this.target.val(this.target.data('selected-data') || '').trigger('change');
 
                 this.$simpleEl.hide();
                 this.$simpleEl.val('');
@@ -124,6 +125,7 @@ define([
                 this.uniform.hide();
                 this.$simpleEl.show();
             }
+            this.$el.trigger('value:changed');
         }
     });
 });

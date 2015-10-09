@@ -14,11 +14,12 @@ datagrid:
                     - ce.id
                     - ce.updated
                     - ce.mode
+                    - ce.data
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
                 where:
                     and:
-                        - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
+                        - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
         columns:
             updated:
                 label: oro.ui.updated_at
@@ -80,6 +81,7 @@ datagrid:
                     - cf.type
                     - cf.mode
                     - ce.id as entity_id
+                    - cf.data
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
                 join:
@@ -88,7 +90,7 @@ datagrid:
                 where:
                     and:
                         - ce.id = :entity_id
-                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
 
         columns:
             fieldName:
@@ -139,7 +141,7 @@ datagrid:
                         CONCAT(' - ', u.email)
                       ) as author
                 from:
-                    - { table: OroEntityConfigBundle:ConfigLog, alias: log }
+                    - { table: Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog, alias: log }
                 join:
                     left:
                         user:

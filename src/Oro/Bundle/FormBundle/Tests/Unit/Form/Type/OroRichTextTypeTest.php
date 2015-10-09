@@ -81,7 +81,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $this->assetsHelper->expects($this->exactly(2))
+        $this->assetsHelper->expects($this->once())
             ->method('getUrl')
             ->will(
                 $this->returnCallback(

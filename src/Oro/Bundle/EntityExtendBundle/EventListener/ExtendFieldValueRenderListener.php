@@ -10,16 +10,13 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -28,7 +25,7 @@ class ExtendFieldValueRenderListener
     const ENTITY_VIEW_ROUTE = 'oro_entity_view';
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $extendProvider;
 
@@ -89,14 +86,6 @@ class ExtendFieldValueRenderListener
         /** Prepare Relation field type */
         if ($value && $value instanceof Collection) {
             $viewData = $this->getValueForCollection($value, $event->getFieldConfigId());
-            $event->setFieldViewValue($viewData);
-
-            return;
-        }
-
-        /** Prepare OptionSet field type */
-        if ($type == 'optionSet') {
-            $viewData = $this->getValueForOptionSet($event->getEntity(), $event->getFieldConfigId());
             $event->setFieldViewValue($viewData);
 
             return;
@@ -176,37 +165,6 @@ class ExtendFieldValueRenderListener
             'route'        => false,
             'route_params' => false
         ];
-    }
-
-    /**
-     * @param object $entity
-     * @param FieldConfigId $fieldConfig
-     *
-     * @return OptionSetRelation[]
-     */
-    protected function getValueForOptionSet($entity, FieldConfigId $fieldConfig)
-    {
-        /** @var $optionSetRepository OptionSetRelationRepository */
-        $optionSetRepository = $this->configManager
-            ->getEntityManager()
-            ->getRepository(OptionSetRelation::ENTITY_NAME);
-
-        $model = $this->configManager->getConfigFieldModel(
-            $fieldConfig->getClassName(),
-            $fieldConfig->getFieldName()
-        );
-
-        $value = $optionSetRepository->findByFieldId($model->getId(), $entity->getId());
-        array_walk(
-            $value,
-            function (OptionSetRelation &$item) {
-                $item = array('title' => $item->getOption()->getLabel());
-            }
-        );
-
-        $value['values'] = $value;
-
-        return $value;
     }
 
     /**

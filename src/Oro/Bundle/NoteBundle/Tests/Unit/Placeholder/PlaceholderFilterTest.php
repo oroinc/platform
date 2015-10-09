@@ -50,6 +50,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
                 throw new \RuntimeException('Something wrong');
             });
 
+        $this->doctrineHelper->expects($this->any())
+            ->method('isManageableEntity')
+            ->willReturnCallback(function ($entity) {
+                return !$entity instanceof \stdClass;
+            });
+
         $this->filter = new PlaceholderFilter(
             $this->noteConfigProvider,
             $this->entityConfigProvider,
@@ -60,6 +66,12 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->noteConfigProvider, $this->entityConfigProvider, $this->doctrineHelper, $this->filter);
+    }
+
+    public function testIsNoteAssociationEnabledWithNonManagedEntity()
+    {
+        $testEntity = new \stdClass();
+        $this->assertFalse($this->filter->isNoteAssociationEnabled($testEntity));
     }
 
     public function testIsNoteAssociationEnabledWithNull()

@@ -118,6 +118,25 @@ class ImapConnector
     }
 
     /**
+     * @param string|null $searchString
+     *
+     * @return ImapMessageIterator
+     */
+    public function findItemsUidBased($searchString = null)
+    {
+        $this->ensureConnected();
+
+        if (empty($searchString)) {
+            $result = new ImapMessageIterator($this->imap);
+        } else {
+            $uid    = $this->imap->uidSearch([$searchString]);
+            $result = new ImapMessageIterator($this->imap, $uid, true);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param null $query
      *
      * @return mixed

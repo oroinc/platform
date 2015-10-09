@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
-use Oro\Bundle\NavigationBundle\Entity\Builder\AbstractBuilder;
-
 class ItemFactory
 {
     /**
@@ -11,7 +9,7 @@ class ItemFactory
      *
      * @var array
      */
-    protected $builders = array();
+    protected $builders = [];
 
     /**
      * Add builder

@@ -5,7 +5,6 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\Controller\Api;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestApiTest extends WebTestCase
@@ -50,7 +49,7 @@ class RestApiTest extends WebTestCase
                     'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
-            ) . '?createdAt<'.$date->format('c')
+            ) . '?createdAt<' . urlencode($date->format('c'))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -71,7 +70,7 @@ class RestApiTest extends WebTestCase
                     'relationClass' => 'Oro_Bundle_CalendarBundle_Entity_CalendarEvent',
                     'relationId'    => $this->getReference('default_activity')->getId()
                 ]
-            ) . '?updatedAt>'.$date->format('c')
+            ) . '?updatedAt>' . urlencode($date->format('c'))
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

@@ -21,7 +21,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var config = options.configs;
+            var config = options.configs || {};
             this.perPage = _.result(config, 'per_page') || this.perPage;
             this.url = _.result(options, 'url') || '';
             this.excluded = _.result(options, 'excluded') || this.excluded;
@@ -229,7 +229,7 @@ define(function(require) {
 
     function formatFabric(config, jsTemplate) {
         // pre-compile template if it exists
-        if (jsTemplate) {
+        if (jsTemplate && !_.isFunction(jsTemplate)) {
             jsTemplate = _.template(jsTemplate);
         }
 

@@ -1,10 +1,17 @@
 html& {
   overflow-x: hidden;
   overflow-y: auto;
+  &.lock-page-scroll {
+    overflow: hidden;
+  }
 }
 & {
   min-width: inherit;
   font-size: @baseFontSize;
+}
+
+#page.hidden-page {
+  display: none;
 }
 
 .btn-group > .dropdown-menu li a {
@@ -24,7 +31,7 @@ html& {
   margin: 0 0 7px;
 }
 
-.form-horizontal .control-group label.control-label {
+.form-horizontal .control-group .control-label {
   float: none;
   text-align: left;
 }

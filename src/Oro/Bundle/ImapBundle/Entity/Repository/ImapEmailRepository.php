@@ -3,11 +3,13 @@
 namespace Oro\Bundle\ImapBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 
 class ImapEmailRepository extends EntityRepository
 {
@@ -20,12 +22,37 @@ class ImapEmailRepository extends EntityRepository
     public function getEmailsByUidsQueryBuilder(EmailFolder $folder, array $uids)
     {
         return $this->createQueryBuilder('imap_email')
-            ->innerJoin('imap_email.email', 'email')
-            ->innerJoin('email.emailUsers', 'email_users')
-            ->innerJoin('email_users.folder', 'folder')
+            ->innerJoin('imap_email.imapFolder', 'imapFolder')
+            ->innerJoin('imapFolder.folder', 'folder')
             ->where('folder = :folder AND imap_email.uid IN (:uids)')
             ->setParameter('folder', $folder)
             ->setParameter('uids', $uids);
+    }
+
+    /**
+     * Get last email sequence uid by folder
+     *
+     * @param ImapEmailFolder $imapFolder
+     *
+     * @return int
+     */
+    public function findLastUidByFolder(ImapEmailFolder $imapFolder)
+    {
+        try {
+            $lastUid = $this->createQueryBuilder('ie')
+                ->select('ie.uid')
+                ->innerJoin('ie.imapFolder', 'if')
+                ->where('if = :imapFolder')
+                ->setParameter('imapFolder', $imapFolder)
+                ->orderBy('ie.uid', 'DESC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getSingleScalarResult();
+
+            return $lastUid;
+        } catch (NoResultException $e) {
+            return 0;
+        }
     }
 
     /**
@@ -77,23 +104,6 @@ class ImapEmailRepository extends EntityRepository
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
             ->select('imap_email, email, email_users, imap_folder, folder')
-            ->getQuery()
-            ->getResult();
-
-        return $rows;
-    }
-
-    /**
-     * @param EmailOrigin $origin
-     * @param string[]    $messageIds
-     *
-     * @return ImapEmail[] Existing emails
-     */
-    public function getOutdatedEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
-    {
-        $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, email_users, imap_folder, folder')
-            ->andWhere('folder.outdatedAt IS NOT NULL')
             ->getQuery()
             ->getResult();
 

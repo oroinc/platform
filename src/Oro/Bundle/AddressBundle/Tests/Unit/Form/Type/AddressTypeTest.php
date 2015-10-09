@@ -2,6 +2,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AddressBundle\Form\Type\AddressType;
+use Symfony\Component\Form\FormView;
 
 class AddressTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -102,12 +103,24 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
 
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
+    }
+
+    public function testBuildView()
+    {
+        $view = new FormView();
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $this->type->buildView($view, $form, ['region_route' => 'test']);
+
+        $this->assertArrayHasKey('region_route', $view->vars);
+        $this->assertEquals('test', $view->vars['region_route']);
     }
 
     public function testGetName()

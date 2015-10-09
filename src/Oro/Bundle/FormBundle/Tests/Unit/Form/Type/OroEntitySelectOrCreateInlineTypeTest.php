@@ -92,10 +92,12 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getSearchHandler')
             ->will($this->returnValue($handler));
 
-        $configManager = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $config        = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
-        $configManager
+        $configProvider
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($config));
@@ -109,7 +111,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             new EntitySelectOrCreateInlineFormExtension(
                 $entityManager,
                 $searchRegistry,
-                $configManager
+                $configProvider
             )
         ];
     }
@@ -192,6 +194,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
         return [
             'create disabled'                   => [
                 [
+                    'grid_widget_route' => 'some_route',
                     'grid_name'      => 'test',
                     'converter'      => $converter,
                     'entity_class'   => 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity',
@@ -208,6 +211,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
                 false,
                 false,
                 [
+                    'grid_widget_route' => 'some_route',
                     'grid_name'               => 'test',
                     'existing_entity_grid_id' => 'id',
                     'create_enabled'          => false

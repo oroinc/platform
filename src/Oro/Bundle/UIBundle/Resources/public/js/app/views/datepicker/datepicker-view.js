@@ -114,6 +114,9 @@ define(function(require) {
                 onSelect: _.bind(this.onSelect, this)
             });
             this.$frontDateField.datepicker(widgetOptions);
+            if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
+                this.$frontDateField.datepicker('disable');
+            }
         },
 
         /**

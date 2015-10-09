@@ -70,10 +70,8 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
             );
 
             if (!empty($activities)) {
-                $activities = $this->adjustRoutes($route, $routes, $activities);
-                if (!empty($activities)) {
-                    $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
-                }
+                $this->adjustRoutes($route, $routes, $activities);
+                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
             }
             $this->completeRouteRequirements($route);
         } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
@@ -85,12 +83,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
      * @param string[]                $activities
-     *
-     * @return string[] The list of activities handled by the default controller
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $activities)
     {
-        $result    = [];
         $routeName = $routes->getName($route);
 
         foreach ($activities as $activity) {
@@ -120,11 +115,8 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                     $routeName,
                     true
                 );
-                $result[] = $activity;
             }
         }
-
-        return $result;
     }
 
     /**

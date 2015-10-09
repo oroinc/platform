@@ -8,6 +8,11 @@ oro.user.form.choose_gender: Choose a gender...
 oro.user.gender.male: Male
 oro.user.gender.female: Female
 
+Username: Username
+Password: Password
+"Remember me on this computer": Remember me on this computer
+"Forgot your password?": Forgot your password?
+"Log in": Log in
 Login: Login
 Logout: Logout
 Login page: Login page
@@ -167,3 +172,5 @@ oro:
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
             password_reseted.message: Your password was successfully reset. You may login now.
+        user_bar_settings:
+            title: User bar

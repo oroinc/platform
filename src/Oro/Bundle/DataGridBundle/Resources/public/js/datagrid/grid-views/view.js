@@ -244,7 +244,7 @@ define([
 
             var self = this;
             modal.on('ok', function(e) {
-                var model = new GridViewModel({
+                var model = self._createViewModel({
                     label: this.$('input[name=name]').val(),
                     type: 'private',
                     grid_name: self.gridName,
@@ -274,6 +274,7 @@ define([
             });
 
             modal.open();
+            $('#gridViewName').focus();
         },
 
         /**
@@ -543,6 +544,16 @@ define([
         },
 
         /**
+         * @protected
+         *
+         * @param   {Object} data
+         * @returns {GridViewModel}
+         */
+        _createViewModel: function(data) {
+            return new GridViewModel(data);
+        },
+
+        /**
          * @private
          *
          * @returns {undefined|GridViewModel}
@@ -588,9 +599,8 @@ define([
          * @returns {undefined|Object}
          */
         _getView: function(name) {
-            var viewId = name === this.DEFAULT_GRID_VIEW_ID ? name : parseInt(name, 10);
             var currentViews =  _.filter(this.choices, function(item) {
-                return item.value === viewId;
+                return item.value === name;
             }, this);
 
             return _.first(currentViews);

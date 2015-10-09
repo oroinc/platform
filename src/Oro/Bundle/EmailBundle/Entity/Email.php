@@ -41,9 +41,6 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "acl"="oro_email_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
- *          },
- *          "comment"={
- *              "applicable"=true
  *          }
  *      }
  * )
@@ -222,7 +219,7 @@ class Email extends ExtendEmail
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     *      cascade={"remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emailUsers;
@@ -645,6 +642,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
+        $emailBody->setEmail($this);
         $this->emailBody = $emailBody;
 
         return $this;

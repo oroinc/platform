@@ -7,9 +7,12 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\UnitOfWork;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Config\LockObject;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock;
 
 /**
@@ -28,6 +31,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $repo;
+
+    /** @var LockObject */
+    protected $lockObject;
+
     /** @var ConfigModelManager */
     protected $configModelManager;
 
@@ -37,14 +46,24 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $this->repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $serviceLink->expects($this->any())
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
+            ->will($this->returnValue($this->repo));
+
+        $emLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emLink->expects($this->any())
             ->method('getService')
             ->will($this->returnValue($this->em));
 
-        $this->configModelManager = new ConfigModelManager($serviceLink);
+        $this->lockObject = new LockObject();
+
+        $this->configModelManager = new ConfigModelManager($emLink, $this->lockObject);
     }
 
     public function testGetEntityManager()
@@ -57,9 +76,6 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->once())
-            ->method('isConnected')
-            ->will($this->returnValue(false));
         $connection->expects($this->once())
             ->method('connect')
             ->will($this->throwException(new \PDOException()));
@@ -79,9 +95,6 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->exactly(2))
-            ->method('isConnected')
-            ->will($this->returnValue(true));
         $connection->expects($this->once())
             ->method('getConfiguration')
             ->will($this->returnValue(new Configuration()));
@@ -176,7 +189,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function ignoredEntitiesProvider()
     {
         return [
-            ['Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'],
+            ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'],
             ['Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue'],
@@ -187,11 +200,11 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]
         );
-        $repo->expects($this->never())
+        $this->repo->expects($this->never())
             ->method('findOneBy');
 
         $this->assertSame(
@@ -215,7 +228,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
             [
                 UnitOfWork::STATE_DETACHED,
@@ -223,7 +236,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_MANAGED,
             ]
         );
-        $repo->expects($this->once())
+        $this->repo->expects($this->once())
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->will($this->returnValue($entityModel));
@@ -244,7 +257,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
             [
                 UnitOfWork::STATE_DETACHED,
@@ -252,11 +265,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_DETACHED,
                 UnitOfWork::STATE_MANAGED,
                 UnitOfWork::STATE_MANAGED,
-            ],
-            2
+            ]
         );
-        $repo->expects($this->never())
-            ->method('findOneBy');
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => self::TEST_ENTITY])
+            ->will($this->returnValue($entityModel));
 
         $this->assertSame(
             $entityModel,
@@ -270,12 +284,191 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFindEntityModelWhenNoAnyModelIsLoadedYet()
+    {
+        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
+
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => self::TEST_ENTITY])
+            ->will($this->returnValue($entityModel));
+
+        $this->prepareCheckDetached([UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]);
+
+        $this->assertSame(
+            $entityModel,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+
+        // test localCache
+        $this->assertSame(
+            $entityModel,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+    }
+
+    public function testFindEntityModelLoadSeveralModelCheckThatAllOfThemLoadedSeparately()
+    {
+        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
+        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
+
+        $this->repo->expects($this->exactly(2))
+            ->method('findOneBy')
+            ->willReturnMap(
+                [
+                    [['className' => self::TEST_ENTITY], null, $entityModel1],
+                    [['className' => self::TEST_ENTITY2], null, $entityModel2]
+                ]
+            );
+
+        $this->prepareCheckDetached(
+            [
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED
+            ]
+        );
+
+        $this->assertSame(
+            $entityModel1,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+        $this->assertSame(
+            $entityModel2,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
+        );
+
+        // test localCache
+        $this->assertSame(
+            $entityModel1,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+        $this->assertSame(
+            $entityModel2,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
+        );
+    }
+
+    public function testThatEntityListAreLoadedAfterNonConfigurableEntityIsLoaded()
+    {
+        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
+        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
+
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => 'Test\NonConfigurableEntity'])
+            ->will($this->returnValue(null));
+        $this->repo->expects($this->once())
+            ->method('findAll')
+            ->will($this->returnValue([$entityModel1, $entityModel2]));
+
+        $this->prepareCheckDetached(
+            [
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED
+            ]
+        );
+
+        $this->assertNull(
+            $this->configModelManager->findEntityModel('Test\NonConfigurableEntity')
+        );
+        $this->assertEquals(
+            [$entityModel1, $entityModel2],
+            $this->configModelManager->getModels()
+        );
+
+        // test localCache
+        $this->assertNull(
+            $this->configModelManager->findEntityModel('Test\NonConfigurableEntity')
+        );
+        $this->assertSame(
+            $entityModel1,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+        $this->assertSame(
+            $entityModel2,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
+        );
+    }
+
+    public function testThatEntityListAreLoadedAfterConfigurableEntityIsLoaded()
+    {
+        $entityModel0 = $this->createEntityModel('Test\ConfigurableEntity');
+        ReflectionUtil::setId($entityModel0, 123);
+        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
+        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
+
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => 'Test\ConfigurableEntity'])
+            ->will($this->returnValue($entityModel0));
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->repo->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($qb);
+        $qb->expects($this->once())
+            ->method('where')
+            ->with('e.id NOT IN (:exclusions)')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('exclusions', [$entityModel0->getId()])
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $query->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue([$entityModel1, $entityModel2]));
+
+        $this->prepareCheckDetached(
+            [
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED,
+                UnitOfWork::STATE_MANAGED
+            ]
+        );
+
+        $this->assertSame(
+            $entityModel0,
+            $this->configModelManager->findEntityModel('Test\ConfigurableEntity')
+        );
+        $this->assertEquals(
+            [$entityModel0, $entityModel1, $entityModel2],
+            $this->configModelManager->getModels()
+        );
+
+        // test localCache
+        $this->assertSame(
+            $entityModel0,
+            $this->configModelManager->findEntityModel('Test\ConfigurableEntity')
+        );
+        $this->assertSame(
+            $entityModel1,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY)
+        );
+        $this->assertSame(
+            $entityModel2,
+            $this->configModelManager->findEntityModel(self::TEST_ENTITY2)
+        );
+    }
+
     public function testFindFieldModel()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -283,7 +476,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_MANAGED,
             ]
         );
-        $repo->expects($this->never())
+        $this->repo->expects($this->never())
             ->method('findOneBy');
 
         $this->assertSame(
@@ -308,7 +501,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
             [
                 UnitOfWork::STATE_DETACHED,
@@ -317,7 +510,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_MANAGED,
             ]
         );
-        $repo->expects($this->once())
+        $this->repo->expects($this->once())
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->will($this->returnValue($entityModel));
@@ -344,7 +537,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel, $this->createEntityModel('Test\Entity\AnotherEntity')],
             [
                 UnitOfWork::STATE_DETACHED,
@@ -353,11 +546,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_MANAGED,
                 UnitOfWork::STATE_MANAGED,
                 UnitOfWork::STATE_MANAGED,
-            ],
-            2
+            ]
         );
-        $repo->expects($this->never())
-            ->method('findOneBy');
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => self::TEST_ENTITY])
+            ->will($this->returnValue($entityModel));
 
         $this->assertSame(
             $fieldModel,
@@ -381,7 +575,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
 
-        $repo = $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -390,7 +584,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
                 UnitOfWork::STATE_MANAGED,
             ]
         );
-        $repo->expects($this->once())
+        $this->repo->expects($this->once())
             ->method('findOneBy')
             ->with(['className' => self::TEST_ENTITY])
             ->will($this->returnValue($entityModel));
@@ -428,14 +622,14 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityModelForNonExistingEntity()
     {
-        $this->createRepositoryMock();
+        $this->prepareEntityConfigRepository();
         $this->configModelManager->getEntityModel(self::TEST_ENTITY);
     }
 
     public function testGetEntityModel()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
         );
@@ -472,7 +666,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFieldModelForNonExistingEntity()
     {
-        $this->createRepositoryMock();
+        $this->prepareEntityConfigRepository();
         $this->configModelManager->getFieldModel(self::TEST_ENTITY, self::TEST_FIELD);
     }
 
@@ -483,7 +677,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldModelForNonExistingField()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
         );
@@ -495,7 +689,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED, UnitOfWork::STATE_MANAGED]
         );
@@ -510,25 +704,15 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
         $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
-        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock([$entityModel1, $entityModel2]);
+        $entityModel2->setMode(ConfigModel::MODE_HIDDEN);
 
-        $this->assertEquals(
-            [$entityModel1],
-            $this->configModelManager->getModels()
-        );
-    }
-
-    public function testGetEntityModelsWithHidden()
-    {
-        $entityModel1 = $this->createEntityModel(self::TEST_ENTITY);
-        $entityModel2 = $this->createEntityModel(self::TEST_ENTITY2);
-        $entityModel2->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock([$entityModel1, $entityModel2]);
+        $this->repo->expects($this->once())
+            ->method('findAll')
+            ->will($this->returnValue([$entityModel1, $entityModel2]));
 
         $this->assertEquals(
             [$entityModel1, $entityModel2],
-            $this->configModelManager->getModels(null, true)
+            $this->configModelManager->getModels()
         );
     }
 
@@ -537,32 +721,17 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
         $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
-        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock(
-            [$entityModel],
-            [UnitOfWork::STATE_MANAGED]
-        );
+        $fieldModel2->setMode(ConfigModel::MODE_HIDDEN);
 
-        $this->assertEquals(
-            [$fieldModel1],
-            $this->configModelManager->getModels(self::TEST_ENTITY)
-        );
-    }
-
-    public function testGetFieldModelsWithHidden()
-    {
-        $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel1 = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $fieldModel2 = $this->createFieldModel($entityModel, self::TEST_FIELD2);
-        $fieldModel2->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock(
-            [$entityModel],
-            [UnitOfWork::STATE_MANAGED]
-        );
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['className' => self::TEST_ENTITY])
+            ->will($this->returnValue($entityModel));
+        $this->prepareCheckDetached([UnitOfWork::STATE_MANAGED]);
 
         $this->assertEquals(
             [$fieldModel1, $fieldModel2],
-            $this->configModelManager->getModels(self::TEST_ENTITY, true)
+            $this->configModelManager->getModels(self::TEST_ENTITY)
         );
     }
 
@@ -595,7 +764,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntityModelEmptyClassName($className)
     {
         $expectedResult = new EntityConfigModel($className);
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
 
         $result = $this->configModelManager->createEntityModel($className);
         $this->assertEquals($expectedResult, $result);
@@ -611,9 +780,9 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntityModel()
     {
         $expectedResult = new EntityConfigModel(self::TEST_ENTITY);
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
 
-        $this->createRepositoryMock([], [UnitOfWork::STATE_MANAGED]);
+        $this->prepareEntityConfigRepository([], [UnitOfWork::STATE_MANAGED]);
 
         $result = $this->configModelManager->createEntityModel(self::TEST_ENTITY);
         $this->assertEquals($expectedResult, $result);
@@ -640,10 +809,10 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
         $expectedResult = new FieldConfigModel($fieldName, 'int');
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
         $expectedResult->setEntity($entityModel);
 
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [UnitOfWork::STATE_MANAGED]
         );
@@ -652,7 +821,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             self::TEST_ENTITY,
             $fieldName,
             'int',
-            ConfigModelManager::MODE_DEFAULT
+            ConfigModel::MODE_DEFAULT
         );
         $this->assertEquals($expectedResult, $result);
 
@@ -669,10 +838,10 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
 
         $expectedResult = new FieldConfigModel(self::TEST_FIELD, 'int');
-        $expectedResult->setMode(ConfigModelManager::MODE_DEFAULT);
+        $expectedResult->setMode(ConfigModel::MODE_DEFAULT);
         $expectedResult->setEntity($entityModel);
 
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -685,7 +854,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
             self::TEST_ENTITY,
             self::TEST_FIELD,
             'int',
-            ConfigModelManager::MODE_DEFAULT
+            ConfigModel::MODE_DEFAULT
         );
         $this->assertEquals($expectedResult, $result);
 
@@ -741,8 +910,8 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testChangeFieldNameWithTheSameName()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->createFieldModel($entityModel, self::TEST_FIELD);
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -773,7 +942,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -850,7 +1019,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -881,7 +1050,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -919,7 +1088,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->configModelManager->changeFieldMode(
             $className,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -933,7 +1102,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             $fieldName,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -955,8 +1124,8 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $fieldModel->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock(
+        $fieldModel->setMode(ConfigModel::MODE_HIDDEN);
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -973,7 +1142,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertFalse($result);
 
@@ -987,7 +1156,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
         $fieldModel  = $this->createFieldModel($entityModel, self::TEST_FIELD);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -1005,12 +1174,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configModelManager->changeFieldMode(
             self::TEST_ENTITY,
             self::TEST_FIELD,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertTrue($result);
 
         $this->assertEquals(
-            ConfigModelManager::MODE_HIDDEN,
+            ConfigModel::MODE_HIDDEN,
             $this->configModelManager->getFieldModel(self::TEST_ENTITY, self::TEST_FIELD)->getMode()
         );
     }
@@ -1024,7 +1193,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configModelManager->changeEntityMode(
             $className,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
     }
 
@@ -1044,8 +1213,8 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testChangeEntityModeWithTheSameMode()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $entityModel->setMode(ConfigModelManager::MODE_HIDDEN);
-        $this->createRepositoryMock(
+        $entityModel->setMode(ConfigModel::MODE_HIDDEN);
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -1060,7 +1229,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->configModelManager->changeEntityMode(
             self::TEST_ENTITY,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertFalse($result);
 
@@ -1073,7 +1242,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     public function testChangeEntityMode()
     {
         $entityModel = $this->createEntityModel(self::TEST_ENTITY);
-        $this->createRepositoryMock(
+        $this->prepareEntityConfigRepository(
             [$entityModel],
             [
                 UnitOfWork::STATE_MANAGED,
@@ -1089,12 +1258,12 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->configModelManager->changeEntityMode(
             self::TEST_ENTITY,
-            ConfigModelManager::MODE_HIDDEN
+            ConfigModel::MODE_HIDDEN
         );
         $this->assertTrue($result);
 
         $this->assertEquals(
-            ConfigModelManager::MODE_HIDDEN,
+            ConfigModel::MODE_HIDDEN,
             $this->configModelManager->getEntityModel(self::TEST_ENTITY)->getMode()
         );
     }
@@ -1110,23 +1279,17 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param EntityConfigModel[] $entityModels
      * @param array               $entityStates
-     * @param int                 $findAllCount
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createRepositoryMock($entityModels = [], $entityStates = [], $findAllCount = 1)
+    protected function prepareEntityConfigRepository($entityModels = [], $entityStates = [])
     {
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo->expects($this->exactly($findAllCount))
+        $this->repo->expects($this->once())
             ->method('findAll')
             ->will($this->returnValue($entityModels));
-        $this->em->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValue($repo));
+
         $this->prepareCheckDetached($entityStates);
 
-        return $repo;
+        $this->configModelManager->getModels();
     }
 
     /**
