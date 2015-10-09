@@ -71,7 +71,11 @@ class EntityController extends RestController
      */
     public function patchAction($className, $entityId)
     {
+//        $this->createFormBuilder()
+        $em = $this->getDoctrine()->getManager();
+
         $className = strtr($className, '-', '\\');
+        $tableName = $em->getClassMetadata($className);
         $entity = $this->getManager()->getEntity($className, $entityId);
         $request = $this->get('request_stack')->getCurrentRequest();
         $content = $request->getContent();

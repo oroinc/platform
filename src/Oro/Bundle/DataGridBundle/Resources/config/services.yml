@@ -171,3 +171,4 @@ services:
         class: %oro_datagrid.entity.manager.api.class%
         arguments:
             - @doctrine
+            - @form.factory
