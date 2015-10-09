@@ -128,25 +128,23 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueByPrimaryKey($keys)
     {
-        if (!empty($keys)) {
-            $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
-
-            $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-            $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
-            $representationField = $this->dictionaryHelper
-                ->getRepresentationField($this->getMetadata(), $entityMetadata);
-
-            $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
-            $qb->andWhere('e.' . $keyField . ' in (:keys)');
-            $qb->setParameter('keys', $keys);
-
-            $query = $qb->getQuery();
-            $results = $query->getResult();
-
-            return $this->prepareData($results, $keyField, $searchFields, $representationField);
+        if (empty($keys)) {
+            return [];
         }
+        $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
+        $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
+        $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
+        $representationField = $this->dictionaryHelper
+            ->getRepresentationField($this->getMetadata(), $entityMetadata);
 
-        return [];
+        $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
+        $qb->andWhere('e.' . $keyField . ' in (:keys)');
+        $qb->setParameter('keys', $keys);
+
+        $query = $qb->getQuery();
+        $results = $query->getResult();
+
+        return $this->prepareData($results, $keyField, $searchFields, $representationField);
     }
 
     /**
