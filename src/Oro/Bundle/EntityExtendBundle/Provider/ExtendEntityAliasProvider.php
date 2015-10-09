@@ -9,7 +9,6 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendEntityAliasProvider implements EntityAliasProviderInterface
@@ -56,7 +55,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
             }
 
             // exclude hidden entities
-            if ($model->getMode() === ConfigModelManager::MODE_HIDDEN) {
+            if ($model->isHidden()) {
                 return false;
             }
 

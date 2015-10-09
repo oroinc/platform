@@ -61,7 +61,8 @@ define(function(require) {
                 content: $('#available-dashboard-widgets').html(),
                 className: 'modal oro-modal-normal dashboard-widgets-wrapper',
                 title: __('oro.dashboard.add_dashboard_widgets.title'),
-                loadWidget: _.bind(this.loadWidget, this)
+                loadWidget: _.bind(this.loadWidget, this),
+                cancelText: __('Close')
             });
             dialog.open();
         }
