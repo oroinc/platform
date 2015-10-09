@@ -3,10 +3,10 @@ define(function(require) {
     'use strict';
 
     /**
-     * Abstraction of api access point. This class is designed to create from server configuration.
+     * Abstraction of api access point. This class is by design to be initiated from server configuration.
      *
-     * #### Sample usage of api_accessor with full options provided.
-     * Example configuration is provided on server:
+     * #### Sample usage of api_accessor with a full set of options provided.
+     * Example of configuration provided on the server:
      * ``` yml
      * save_api_accessor:
      *     route: orocrm_opportunity_task_update # for example this route uses following mask
@@ -20,7 +20,7 @@ define(function(require) {
      *     query_parameter_names: [action]
      * ```
      *
-     * Then following code on client:
+     * Then following code on the client:
      * ``` javascript
      * var apiAP = new ApiAccessror(serverConfiguration);
      * apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
@@ -28,20 +28,20 @@ define(function(require) {
      * })
      * ```
      * Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
-     * and will put response to console after it will be finished
+     * and will put response to console after completion
      *
      * @class
-     * @param {Object} options - Options container.
+     * @param {Object} options - Options container
      * @param {string} options.route - Required. Route name
      * @param {string} options.http_method - Http method to access this route (e.g. GET/POST/PUT/PATCH...)
      *                          By default `'GET'`.
-     * @param {string} options.form_name - Optional. Wraps request body into form_name, so request will look like
+     * @param {string} options.form_name - Optional. Wraps the request body into a form_name, so request will look like
      *                          `{<form_name>:<request_body>}`
      * @param {Object} options.headers - Optional. Allows to provide additional http headers
-     * @param {Object} options.default_route_parameters - Optional. Provides default parameters values for route
-     *                          creation, this defaults will be merged with row model data to get url
+     * @param {Object} options.default_route_parameters - Optional. Provides default parameters for route,
+     *                                                    this defaults will be merged the `urlParameters` to get url
      * @param {Array.<string>} options.query_parameter_names - Optional. Array of parameter names to put into query
-     *                          string(e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
+     *                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
      *                          query parameters for client usage, so it is required to specify list of them)
      * @augment BaseClass
@@ -65,7 +65,7 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @param {Object} Options passed to constructor
+         * @param {Object} Options passed to the constructor
          */
         initialize: function(options) {
             if (!options) {
@@ -86,12 +86,12 @@ define(function(require) {
         },
 
         /**
-         * Sends request to server and returns $.Promise with abort() support
+         * Sends request to the server and returns $.Promise instance with abort() support
          *
-         * @param {Object} urlParameters - Url parameters to combine url
+         * @param {Object} urlParameters - Url parameters to compose the url
          * @param {Object} body - Request body
-         * @param {Object} headers - Headers to send with request
-         * @returns {$.Promise} - Promise with abort() support
+         * @param {Object} headers - Headers to send with the request
+         * @returns {$.Promise} - $.Promise instance with abort() support
          */
         send: function(urlParameters, body, headers) {
             var promise = $.ajax({
@@ -106,9 +106,9 @@ define(function(require) {
         },
 
         /**
-         * Prepares headers for request.
+         * Prepares headers for the request.
          *
-         * @param {Object} headers - Headers to merge into default list
+         * @param {Object} headers - Headers to merge into the default list
          * @returns {Object}
          */
         getHeaders: function(headers) {
@@ -116,7 +116,7 @@ define(function(require) {
         },
 
         /**
-         * Prepares url parameters before build url
+         * Prepares url parameters before the url build
          *
          * @param urlParameters
          * @returns {Object}
@@ -126,7 +126,7 @@ define(function(require) {
         },
 
         /**
-         * Prepares url for request.
+         * Prepares url for the request.
          *
          * @param {Object} urlParameters - Map of url parameters to use
          * @returns {string}
@@ -136,9 +136,9 @@ define(function(require) {
         },
 
         /**
-         * Prepares request body.
+         * Prepares the request body.
          *
-         * @param {Object} body - Map of url parameters to use
+         * @param {Object} body - Map of the url parameters to use
          * @returns {Object}
          */
         formatBody: function(body) {
@@ -153,7 +153,7 @@ define(function(require) {
         },
 
         /**
-         * Formats response before it will be sent out from this api accessor.
+         * Formats response before it is sent out from this api accessor.
          *
          * @param {Object} response
          * @returns {Object}
