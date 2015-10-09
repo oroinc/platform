@@ -234,6 +234,23 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                         ->leftJoin('u.roles', 'r')
                         ->leftJoin('g.roles', 'gr')
                         ->select(['u.id', 'u.username', 'api.apiKey as aKey'])
+                        ->groupBy('gr.id');
+                },
+                'expectedDQL'  => 'SELECT gr.id as _groupByPart0 FROM Test:User u '
+                    . 'INNER JOIN u.owner bu '
+                    . 'LEFT JOIN u.groups g '
+                    . 'LEFT JOIN g.roles gr '
+                    . 'GROUP BY _groupByPart0'
+            ],
+            'inner_with_2_left_group_and_having'                                        => [
+                'queryBuilder' => function ($em) {
+                    return self::createQueryBuilder($em)
+                        ->from('Test:User', 'u')
+                        ->innerJoin('u.owner', 'bu')
+                        ->leftJoin('u.groups', 'g')
+                        ->leftJoin('u.roles', 'r')
+                        ->leftJoin('g.roles', 'gr')
+                        ->select(['u.id', 'u.username', 'api.apiKey as aKey'])
                         ->groupBy('gr.id')
                         ->having('u.username LIKE :test');
                 },
@@ -244,7 +261,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                     . 'GROUP BY _groupByPart0 '
                     . 'HAVING u.username LIKE :test'
             ],
-            'inner_with_2_left_having'                                                  => [
+            'inner_with_3_left_having'                                                  => [
                 'queryBuilder' => function ($em) {
                     return self::createQueryBuilder($em)
                         ->from('Test:User', 'u')
@@ -465,7 +482,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                 },
                 'expectedDQL'  => 'SELECT g.id, bu.id FROM Test:Group g, Test:BusinessUnit bu'
             ],
-            'several_from_with_unused_crossed_dependency'                                      => [
+            'several_from_with_unused_crossed_dependency'                               => [
                 'queryBuilder' => function ($em) {
                     return self::createQueryBuilder($em)
                         ->from('Test:Group', 'g')
@@ -476,7 +493,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                 },
                 'expectedDQL'  => 'SELECT g.id, bu.id FROM Test:Group g, Test:BusinessUnit bu'
             ],
-            'several_from_with_used_crossed_dependency'                                      => [
+            'several_from_with_used_crossed_dependency'                                 => [
                 'queryBuilder' => function ($em) {
                     return self::createQueryBuilder($em)
                         ->from('Test:Group', 'g')
