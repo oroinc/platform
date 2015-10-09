@@ -2373,11 +2373,6 @@ div.uploader.focus,
 .alert-error > ul{
   margin-bottom: 0;
 }
-.alert-info .separator {
-  margin-left: 10px;
-  margin-right: 10px;
-  color: #b6d0dc;
-}
 #flash-messages,
 .flash-messages {
   position: relative;
@@ -2405,11 +2400,8 @@ div.uploader.focus,
     background-image: url('../../img/sucsses-ico.png');
     border:1px solid rgba(77,161,36,.3);
     color: @successText;
-    .close {
+    .close, .separator {
       color: @successClose;
-    }
-    .separator {
-      color: lighten(@successText, 25%);
     }
   }
   .alert-danger,
@@ -2418,16 +2410,16 @@ div.uploader.focus,
     background-color: @errorBackground;
     border:1px solid rgba(203,17,17,.3);
     color: @errorText;
-    .close {
+    .close, .separator {
       color: @errorClose;
-    }
-    .separator {
-      color: lighten(@errorText, 25%);
     }
   }
   .alert-warning {
     background-image: none;
     padding-left: 20px;
+    .separator {
+      color: @warningClose;
+    }
   }
   .alert-info {
     background-color: @infoBackground;
@@ -2435,11 +2427,8 @@ div.uploader.focus,
     color: @infoText;
     background-image: none;
     padding-left: 20px;
-    .close {
+    .close, .separator {
       color: @infoClose;
-    }
-    .separator {
-      color: lighten(@infoText, 25%);
     }
   }
   .alert-empty {
