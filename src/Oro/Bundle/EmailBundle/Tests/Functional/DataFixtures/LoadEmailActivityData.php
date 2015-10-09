@@ -118,7 +118,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
             $cc,
             $bcc
         );
-        $emailUser->setFolder($folder);
+        $emailUser->addFolder($folder);
         $emailUser->getEmail()->setMessageId($messageId);
 
         return $emailUser->getEmail();
