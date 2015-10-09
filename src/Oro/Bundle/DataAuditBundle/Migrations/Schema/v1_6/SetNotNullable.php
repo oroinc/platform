@@ -23,11 +23,15 @@ class SetNotNullable implements Migration, OrderedMigrationInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $auditTable = $schema->getTable('oro_audit');
-        $auditTable->getColumn('type')->setType(Type::getType(Type::STRING))->setOptions(['length' => 255]);
+        $auditTable->getColumn('type')
+            ->setType(Type::getType(Type::STRING))
+            ->setOptions(['length' => 255, 'notnull' => true]);
         $auditTable->addIndex(['type'], 'idx_oro_audit_type');
 
         $auditFieldTable = $schema->getTable('oro_audit_field');
-        $auditFieldTable->getColumn('type')->setType(Type::getType(Type::STRING))->setOptions(['length' => 255]);
+        $auditFieldTable->getColumn('type')
+            ->setType(Type::getType(Type::STRING))
+            ->setOptions(['length' => 255, 'notnull' => true]);
         $auditFieldTable->addIndex(['type'], 'idx_oro_audit_field_type');
     }
 }
