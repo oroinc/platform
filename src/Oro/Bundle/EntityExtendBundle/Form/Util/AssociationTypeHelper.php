@@ -39,10 +39,13 @@ class AssociationTypeHelper extends ConfigTypeHelper
             $groups = $groupingConfigProvider->getConfig($className)->get('groups');
             if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
                 $dictionaryConfigProvider = $this->configManager->getProvider('dictionary');
-                $activitySupport = $dictionaryConfigProvider
-                    ->getConfig($className)
-                    ->get(GroupingScope::GROUP_DICTIONARY_ACTIVITY_SUPPORT);
-                if (!$activitySupport || $activitySupport !== 'true') {
+                $activitySupport = '';
+                if ($dictionaryConfigProvider->hasConfig($className)) {
+                    $activitySupport = $dictionaryConfigProvider
+                        ->getConfig($className)
+                        ->get(GroupingScope::GROUP_DICTIONARY_ACTIVITY_SUPPORT);
+                }
+                if ($activitySupport !== 'true') {
 
                     return true;
                 }
