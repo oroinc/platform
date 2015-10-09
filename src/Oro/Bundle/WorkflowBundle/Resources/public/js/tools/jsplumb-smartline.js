@@ -169,33 +169,35 @@ define(function(require) {
             return userSuppliedSegments || segments;
         };
 
+        function getBorderRadius(el, directionY, directionX) {
+            var borderRadius = 0;
+            var maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
+            var propName = ['border', directionY, directionX, 'radius'].join('-');
+            var styles = window.getComputedStyle(el);
+            if (styles[propName] && styles[propName] !== 'none') {
+                borderRadius = Math.min(parseFloat(styles[propName]) || 0, maxPossibleBorderRadius);
+            }
+            return borderRadius;
+        }
+
         function getAdjustment(el, point, direction) {
             var realX = point.x - el.offsetLeft;
             if (realX < 1 || realX > el.offsetWidth - 1) {
                 return 0;
             }
             var dx;
-            var radiusPropName;
             var borderRadius;
-            var maxPossibleBorderRadius = Math.min(el.offsetWidth / 2, el.offsetHeight / 2);
-            var style = window.getComputedStyle(el);
             if (realX < el.offsetWidth / 2) {
-                radiusPropName = 'border-' + direction + '-left-radius';
-                if (style[radiusPropName] && style[radiusPropName] !== 'none') {
-                    borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
-                    dx = borderRadius - realX;
-                    if (dx > 0) {
-                        return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
-                    }
+                borderRadius = getBorderRadius(el, direction, 'left');
+                dx = borderRadius - realX;
+                if (dx > 0) {
+                    return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
                 }
             } else {
-                radiusPropName = 'border-' + direction + '-right-radius';
-                if (style[radiusPropName] && style[radiusPropName] !== 'none') {
-                    borderRadius = Math.min(parseFloat(style[radiusPropName]) || 0, maxPossibleBorderRadius);
-                    dx = realX - (el.offsetWidth - borderRadius);
-                    if (dx > 0) {
-                        return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
-                    }
+                borderRadius = getBorderRadius(el, direction, 'right');
+                dx = realX - (el.offsetWidth - borderRadius);
+                if (dx > 0) {
+                    return Math.sqrt(borderRadius * borderRadius - dx * dx) - 1;
                 }
             }
 
@@ -213,16 +215,11 @@ define(function(require) {
 
         function adjustSourcePosition(paintInfo, params) {
             var elem = params.sourceEndpoint.element;
-            if ($(elem).hasClass('start-step')) {
-                adjustStartSourcePosition(elem, paintInfo, params);
-            } else {
-                adjustRegularSourcePosition(elem, paintInfo, params);
-            }
-        }
-
-        function adjustRegularSourcePosition(elem, paintInfo, params) {
             var source = getSourceElement(elem, params.sourcePos);
-            if (source) {
+            var sourceStyle = window.getComputedStyle(source);
+            if (sourceStyle.visibility === 'hidden' || sourceStyle.display === 'none') {
+                dockSourcePositionToEdge(elem, paintInfo, params);
+            } else if (source) {
                 paintInfo.points[0] +=
                     (elem.offsetLeft + source.offsetLeft + source.offsetWidth / 2) - params.sourcePos[0];
                 paintInfo.points[1] +=
@@ -230,15 +227,42 @@ define(function(require) {
             }
         }
 
-        function adjustStartSourcePosition(elem, paintInfo, params) {
-            var radius = elem.offsetWidth / 2;
-            var centerX = elem.offsetLeft + radius;
-            var centerY = elem.offsetTop + radius;
+        function dockSourcePositionToEdge(elem, paintInfo, params) {
+            var centerX; // center of curve of rounded corner
+            var centerY; // center of curve of rounded corner
+            var ratio;
+            var directionX = elem.offsetLeft + elem.offsetWidth / 2 - params.sourcePos[0] >= 0 ? 'left' : 'right';
+            var directionY = elem.offsetTop + elem.offsetHeight / 2 - params.sourcePos[1] >= 0 ? 'top' : 'bottom';
+            var radius = getBorderRadius(elem, directionY, directionX);
+            if (directionX === 'left') {
+                centerX = elem.offsetLeft + radius;
+            } else {
+                centerX = elem.offsetLeft + elem.offsetWidth - radius;
+            }
+            if (directionY === 'top') {
+                centerY = elem.offsetTop + radius;
+            } else {
+                centerY = elem.offsetTop + elem.offsetHeight - radius;
+            }
             var dx = params.sourcePos[0] - centerX;
             var dy = params.sourcePos[1] - centerY;
-            var ratio = (radius - 1.5) / Math.sqrt(dx * dx + dy * dy);
-            paintInfo.points[0] += centerX + dx * ratio - params.sourcePos[0];
-            paintInfo.points[1] += centerY + dy * ratio - params.sourcePos[1];
+            if (directionX === 'left' && dx >= 0 || directionX === 'right' && dx <= 0) { // dock to horizontal side
+                if (directionY === 'top') {
+                    paintInfo.points[1] += elem.offsetTop - params.sourcePos[1];
+                } else {
+                    paintInfo.points[1] += elem.offsetTop + elem.offsetHeight - params.sourcePos[1];
+                }
+            } else if (directionY === 'top' && dy >= 0 || directionY === 'bottom' && dy <= 0) { // dock to vertical side
+                if (directionX === 'left') {
+                    paintInfo.points[0] += elem.offsetLeft - params.sourcePos[0];
+                } else {
+                    paintInfo.points[0] += elem.offsetLeft + elem.offsetWidth - params.sourcePos[0];
+                }
+            } else { // dock to rounded corner
+                ratio = (radius - 1.5) / Math.sqrt(dx * dx + dy * dy);
+                paintInfo.points[0] += centerX + dx * ratio - params.sourcePos[0];
+                paintInfo.points[1] += centerY + dy * ratio - params.sourcePos[1];
+            }
         }
 
         this._compute = function(paintInfo, params) {
