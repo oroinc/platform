@@ -9,8 +9,8 @@ define(function(require) {
      * @augments [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
      *
      * @param options {Object}
-     * @param options.permission_check_entity_name {string} - Entity name to check permissions on
-     * @param options.permission {string} - Optional. Permission name to check. Default value is `'ASSIGN'`
+     * @param options.permission_check_entity_name {string} - The entity name to check permissions on
+     * @param options.permission {string} - Optional. The permission name to check. Default value is `'ASSIGN'`
      *
      * @exports AclUsersSearchApiAccessor
      */

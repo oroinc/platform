@@ -42,7 +42,7 @@ inline_editing.editor.validationRules               | Optional. The client side 
 
 ### Constructor parameters
 
-**Extends:** the <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -50,8 +50,8 @@ inline_editing.editor.validationRules               | Optional. The client side 
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for empty element |
-| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
 
@@ -59,4 +59,4 @@ inline_editing.editor.validationRules               | Optional. The client side 
 ### dateEditorView.getViewOptions() ⇒ <code>Object</code>
 Prepares and returns editor sub-view options
 
-**Kind**: an instance method of the <code>[DateEditorView](#module_DateEditorView)</code>  
+**Kind**: instance method of <code>[DateEditorView](#module_DateEditorView)</code>  

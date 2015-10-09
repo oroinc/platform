@@ -1,6 +1,6 @@
 <a name="module_ApiAccessor"></a>
 ## ApiAccessor
-Abstraction of api access point. This class is by design to be initiated from the server configuration.
+Abstraction of api access point. This class is by design to be initiated from server configuration.
 
 #### Sample usage of api_accessor with a full set of options provided.
 Example of configuration provided on the server:
@@ -24,7 +24,7 @@ apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
     console.log(result)
 })
 ```
-will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
+Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
 and will put response to console after completion
 
 **Augment**: BaseClass  
@@ -36,8 +36,8 @@ and will put response to console after completion
 | options.http_method | <code>string</code> | Http method to access this route (e.g. GET/POST/PUT/PATCH...)                          By default `'GET'`. |
 | options.form_name | <code>string</code> | Optional. Wraps the request body into a form_name, so request will look like                          `{<form_name>:<request_body>}` |
 | options.headers | <code>Object</code> | Optional. Allows to provide additional http headers |
-| options.default_route_parameters | <code>Object</code> | Optional. Provides values of default parameter for route                          creation, this defaults will be merged with the row model data to get url |
-| options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provide acceptable                          query parameters for client usage, so it is required to specify a list of them) |
+| options.default_route_parameters | <code>Object</code> | Optional. Provides default parameters for route,                                                    this defaults will be merged the `urlParameters` to get url |
+| options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable                          query parameters for client usage, so it is required to specify list of them) |
 
 
 * [ApiAccessor](#module_ApiAccessor)
@@ -51,7 +51,7 @@ and will put response to console after completion
 
 <a name="module_ApiAccessor#initialize"></a>
 ### apiAccessor.initialize(Options)
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -59,10 +59,10 @@ and will put response to console after completion
 
 <a name="module_ApiAccessor#send"></a>
 ### apiAccessor.send(urlParameters, body, headers) ⇒ <code>$.Promise</code>
-Sends request to the server and returns $.Promise with abort() support
+Sends request to the server and returns $.Promise instance with abort() support
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
-**Returns**: <code>$.Promise</code> - - Promise with abort() support  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Returns**: <code>$.Promise</code> - - $.Promise instance with abort() support  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -74,7 +74,7 @@ Sends request to the server and returns $.Promise with abort() support
 ### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>
 Prepares headers for the request.
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ Prepares headers for the request.
 ### apiAccessor.prepareUrlParameters(urlParameters) ⇒ <code>Object</code>
 Prepares url parameters before the url build
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param |
 | --- |
@@ -94,17 +94,17 @@ Prepares url parameters before the url build
 ### apiAccessor.getUrl(urlParameters) ⇒ <code>string</code>
 Prepares url for the request.
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| urlParameters | <code>Object</code> | Map of the url parameters to use |
+| urlParameters | <code>Object</code> | Map of url parameters to use |
 
 <a name="module_ApiAccessor#formatBody"></a>
 ### apiAccessor.formatBody(body) ⇒ <code>Object</code>
 Prepares the request body.
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -112,9 +112,9 @@ Prepares the request body.
 
 <a name="module_ApiAccessor#formatResult"></a>
 ### apiAccessor.formatResult(response) ⇒ <code>Object</code>
-Formats response before it is sent from this API accessor.
+Formats response before it is sent out from this api accessor.
 
-**Kind**: an instance method of the <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type |
 | --- | --- |

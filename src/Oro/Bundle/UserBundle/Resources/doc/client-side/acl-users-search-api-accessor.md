@@ -12,4 +12,4 @@ Provides access to acl_users search API.
 
 <a name="module_AclUsersSearchApiAccessor#initialize"></a>
 ### aclUsersSearchApiAccessor.initialize
-**Kind**: an instance class of the <code>[AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)</code>  
+**Kind**: instance class of <code>[AclUsersSearchApiAccessor](#module_AclUsersSearchApiAccessor)</code>  

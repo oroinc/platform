@@ -38,7 +38,7 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
@@ -74,32 +74,32 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 ### textEditorView.focus(atEnd)
 Places focus on the editor
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| atEnd | <code>boolean</code> | Usefull for multi input editors. Specifies which input should be processed first                         or last |
+| atEnd | <code>boolean</code> | Usefull for multi input editors. Specifies which input should be focused: first                         or last |
 
 <a name="module_TextEditorView#getValidationRules"></a>
 ### textEditorView.getValidationRules() ⇒ <code>Object</code>
 Prepares validation rules for usage
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getFormattedValue"></a>
 ### textEditorView.getFormattedValue() ⇒ <code>string</code>
 Formats and returns the model value before it is rendered
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelValue"></a>
 ### textEditorView.getModelValue() ⇒ <code>string</code>
-Returns a raw model value
+Returns the raw model value
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getValue"></a>
 ### textEditorView.getValue() ⇒ <code>string</code>
-Returns the current user edited value
+Returns the current value after user edit
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#rethrowAction"></a>
 ### textEditorView.rethrowAction() ⇒ <code>string</code>
 Generic handler for buttons which allows to notify overlaying component about some user action.
@@ -118,22 +118,22 @@ Sample usage:
  <button data-action="cancelAndEditNext">Skip and Go Next</button>
 ```
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#isChanged"></a>
 ### textEditorView.isChanged() ⇒ <code>boolean</code>
 Returns true if the user has changed the value
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#onChange"></a>
 ### textEditorView.onChange()
 Change handler. In this realization, it tracks a submit button disabled attribute
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#onKeyDown"></a>
 ### textEditorView.onKeyDown(e)
 Keydown handler for the entire document
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type |
 | --- | --- |
@@ -143,7 +143,7 @@ Keydown handler for the entire document
 ### textEditorView.onGenericEnterKeydown(e)
 Generic keydown handler, which handles ENTER
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type |
 | --- | --- |
@@ -153,7 +153,7 @@ Generic keydown handler, which handles ENTER
 ### textEditorView.onGenericTabKeydown(e)
 Generic keydown handler, which handles TAB
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type |
 | --- | --- |
@@ -163,7 +163,7 @@ Generic keydown handler, which handles TAB
 ### textEditorView.onGenericEscapeKeydown(e)
 Generic keydown handler, which handles ESCAPE
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type |
 | --- | --- |
@@ -173,9 +173,9 @@ Generic keydown handler, which handles ESCAPE
 ### textEditorView.getServerUpdateData() ⇒ <code>Object</code>
 Returns data which should be sent to the server
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelUpdateData"></a>
 ### textEditorView.getModelUpdateData() ⇒ <code>Object</code>
-Returns data to the update model
+Returns data for the model update
 
-**Kind**: an instance method of the <code>[TextEditorView](#module_TextEditorView)</code>  
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  

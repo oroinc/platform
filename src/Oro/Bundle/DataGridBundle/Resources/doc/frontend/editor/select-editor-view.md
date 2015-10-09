@@ -1,7 +1,7 @@
 <a name="module_SelectEditorView"></a>
 ## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
 Select cell content editor. The cell value should be a value field.
-The grid will render a corresponding label from the options.choices map.
+The grid will render a corresponding label from the `options.choices` map.
 The editor will use the same mapping
 
 ### Column configuration samples:
@@ -59,4 +59,4 @@ inline_editing.editor.validationRules               | Optional. The client side 
 ### selectEditorView.getSelect2Options() ⇒ <code>Object</code>
 Prepares and returns Select2 options
 
-**Kind**: an instance method of the <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  

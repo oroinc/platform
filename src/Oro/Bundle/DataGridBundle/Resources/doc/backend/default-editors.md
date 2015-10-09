@@ -16,7 +16,7 @@ Maps frontend types to editor views
 
 <a name="module_defaultEditors.string"></a>
 ### defaultEditors.string : <code>function</code>
-Please see the [text-editor-view](../frontend/editor/text-editor-view.md) for details
+Please see [text-editor-view](../frontend/editor/text-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.datetime"></a>

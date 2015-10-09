@@ -1,11 +1,13 @@
 <a name="module_RelatedIdRelationEditorView"></a>
 ## RelatedIdRelationEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
-Select-like cell content editor. This view is applicable when a cell value contains label (not the value).
-The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value only.
+Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
+The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value
+only.
 
 ### Column configuration sample:
 
-Please pay attention to the registration of the `value_field_name` in the query and properties sections of the sample yml configuration below.
+Please pay attention to the registration of the `value_field_name` in `query` and `properties` sections of the
+sample yml configuration below
 
 ``` yml
 datagrid:
@@ -66,5 +68,5 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
 | options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 | options.value_field_name | <code>Object</code> | Related value field name |
-| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see the [list of search API's](../search-apis.md) |
+| options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
 
