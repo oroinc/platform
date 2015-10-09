@@ -172,8 +172,9 @@ class CountQueryBuilderOptimizer
             );
         }
 
-        $joinAliases         = array_diff(array_unique($joinAliases), $rootAliases);
-        $requiredJoinAliases = array_diff($requiredJoinAliases, $rootAliases);
+        $allAliases          = $this->context->getAliases();
+        $joinAliases         = array_intersect(array_diff(array_unique($joinAliases), $rootAliases), $allAliases);
+        $requiredJoinAliases = array_intersect(array_diff($requiredJoinAliases, $rootAliases), $allAliases);
 
         $joinAliases = $this->dispatchQueryOptimizationEvent($joinAliases, $requiredJoinAliases);
 

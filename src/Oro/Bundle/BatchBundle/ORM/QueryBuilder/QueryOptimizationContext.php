@@ -77,6 +77,16 @@ class QueryOptimizationContext
     }
 
     /**
+     * Gets aliases of all entities exist in original query, except aliases from sub queries
+     *
+     * @return string[]
+     */
+    public function getAliases()
+    {
+        return array_keys($this->getAliasToJoinMap());
+    }
+
+    /**
      * Gets an entity class name that corresponds to the given alias
      *
      * @param string $alias
