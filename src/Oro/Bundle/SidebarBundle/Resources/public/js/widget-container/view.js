@@ -24,7 +24,9 @@ define(function(require) {
         },
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'start-loading model': 'onLoadingStart',
+            'end-loading model': 'onLoadingEnd'
         },
 
         render: function() {
@@ -121,6 +123,14 @@ define(function(require) {
             e.stopPropagation();
             e.preventDefault();
             Backbone.trigger('closeWidget', this.model.cid);
+        },
+
+        onLoadingStart: function() {
+            this.$('.sidebar-widget-header-icon').addClass('loading');
+        },
+
+        onLoadingEnd: function() {
+            this.$('.sidebar-widget-header-icon').removeClass('loading');
         }
     });
 

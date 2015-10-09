@@ -162,9 +162,68 @@
     width: 28px;
     cursor: pointer;
     .icon-with-counter {
-        span {
+        .item-counter {
             position: absolute;
         }
+    }
+}
+.sidebar-icon, .sidebar-widget-header-icon {
+  .icon-refresh {
+    display: none !important;
+  }
+  &.loading {
+    > i {
+      position: relative;
+    }
+    .item-counter {
+      display: none;
+    }
+    .icon-refresh {
+      display: inline-block !important;
+      position: absolute;
+      top: -4px;
+      left: -5px;
+      font-size: 8px;
+      margin: 0;
+      padding: 1px 2px;
+      background-color: #eee;
+      border-radius: 50%;
+      -webkit-animatione: spin 1000ms infinite linear;
+      -moz-animation: spin 1000ms infinite linear;
+      -ms-animation: spin 1000ms infinite linear;
+      animation: spin 1000ms infinite linear;
+    }
+    .icon-with-counter.highlight .icon-refresh {
+      color: #fabb18;
+    }
+  }
+}
+@-ms-keyframes spin {
+  from {
+    -ms-transform: rotate(0deg);
+  } to {
+      -ms-transform: rotate(360deg);
+    }
+}
+@-moz-keyframes spin {
+  from {
+    -moz-transform: rotate(0deg);
+  } to {
+      -moz-transform: rotate(360deg);
+    }
+}
+@-webkit-keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+  } to {
+      -webkit-transform: rotate(360deg);
+    }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  } to {
+      transform: rotate(360deg);
     }
 }
 
@@ -182,7 +241,7 @@
     filter: grayscale(100%);
   }
   .icon-with-counter {
-    span {
+    .item-counter {
       background-color: #eee;
       top: -3px;
       left: 3px;
@@ -194,7 +253,7 @@
       -o-filter: none;
       -ms-filter: none;
       filter: none;
-      &:before, span {
+      &:before, .item-counter {
         color: #fabb18;
       }
     }

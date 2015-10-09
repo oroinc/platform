@@ -58,7 +58,7 @@ define(function(require) {
             } else {
                 response.emails.forEach(function(element, index) {
                     if (element.seen && index < count || !element.seen && index >= count) {
-                        throw new Error('Wrong server response', response);
+                        window.console.error('Wrong server response', response);
                     }
                 });
             }

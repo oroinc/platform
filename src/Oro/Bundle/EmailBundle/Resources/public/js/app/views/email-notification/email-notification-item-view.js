@@ -49,7 +49,11 @@ define(function(require) {
             e.stopPropagation();
             var model = this.model;
             var status = model.get('seen');
-            var url = routing.generate('oro_email_mark_seen', {id: model.get('id'), status: status ? 0 : 1});
+            var url = routing.generate('oro_email_mark_seen', {
+                id: model.get('id'),
+                status: status ? 0 : 1,
+                checkThread: 0
+            });
             model.set('seen', !status);
             Backbone.ajax({
                 type: 'GET',

@@ -1,9 +1,22 @@
 .sidebar-widget-recent-emails {
-  .sidebar-widget .sidebar-widget-header {
-    .icon-with-counter {
-      span {
-        top: -2px;
+  .sidebar-widget .sidebar-widget-header-icon {
+    &.loading {
+      .icon-with-counter {
+        .item-counter {
+          display: inline-block;
+          opacity: 0;
+        }
       }
+    }
+    .item-counter {
+      top: -2px;
+    }
+    .icon-refresh {
+      left: 13px;
+      top: 3px;
+      font-size: 7px;
+      padding: 2px 3px;
+      background: #c4c4c4;
     }
   }
   .sidebar-widget-content {
@@ -35,7 +48,7 @@
   }
   .icon-envelope.highlight, i.icon-envelope.highlight:before{
     color: #fabb18;
-    span {
+    .item-counter, .icon-refresh {
       background: #eeeeee;
       font-size: 8px;
     }
