@@ -19,13 +19,19 @@ use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
 class EmailActivityManager
 {
-    /** @var ActivityManager */
+    /**
+     * @var ActivityManager
+     */
     protected $activityManager;
 
-    /** @var EmailActivityListProvider */
+    /**
+     * @var EmailActivityListProvider
+     */
     protected $activityListProvider;
 
-    /** @var EmailThreadProvider */
+    /**
+     * @var EmailThreadProvider
+     */
     protected $emailThreadProvider;
 
     /**
@@ -35,10 +41,14 @@ class EmailActivityManager
      */
     protected $queueUpdate;
 
-    /** @var TokenStorage */
+    /**
+     * @var TokenStorage
+     */
     protected $tokenStorage;
 
-    /** @var ServiceLink */
+    /**
+     * @var ServiceLink
+     */
     protected $entityOwnerAccessorLink;
 
     /**
@@ -298,8 +308,7 @@ class EmailActivityManager
         foreach ($contexts as $context) {
             $isPresentInContexts = false;
             foreach ($anotherContexts as $anotherContext) {
-                if (
-                    is_object($anotherContext) && is_object($context)
+                if (is_object($anotherContext) && is_object($context)
                     && get_class($context) === get_class($anotherContext)
                     && $context->getId() === $anotherContext->getId()
                 ) {
