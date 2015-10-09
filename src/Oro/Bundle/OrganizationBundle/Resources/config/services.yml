@@ -31,6 +31,7 @@ parameters:
     oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
 
     oro_organization.orm.validator.oranization_unique.class:   Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
+    oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
 
@@ -49,6 +50,8 @@ services:
         class: %oro_organization.business_unit.manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
 
     oro_organization.organization_manager:
         class: %oro_organization.organization.manager.class%
@@ -191,6 +194,13 @@ services:
             - @oro_entity.doctrine_helper
         tags:
               - { name: validator.constraint_validator, alias: organization_unique }
+
+    oro_organization.provider.filter.busines_unit_choice_tree:
+        class: %oro_organization.provider.filter.busines_unit_choice_tree.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
 
     oro_organization.autocomplete.business_unit.search_handler:
         class: %oro_organization.autocomplete.business_unit.search_handler.class%

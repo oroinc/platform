@@ -21,6 +21,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Oro\Loggable
  * @Config(
  *      defaultValues={
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "search_fields"={"name"},
+ *              "virtual_fields"={"id"},
+ *          },
  *          "entity"={
  *              "icon"="icon-building",
  *              "share_with_datagrid"="share-with-business-units-datagrid"

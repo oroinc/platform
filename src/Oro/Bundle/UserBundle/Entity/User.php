@@ -43,6 +43,14 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *              "context-grid"="users-for-context-grid",
  *              "share_with_datagrid"="share-with-users-datagrid"
  *          },
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"id"},
+ *              "search_fields"={"firstName", "lastName"},
+ *              "representation_field"="fullName"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
@@ -1150,5 +1158,15 @@ class User extends ExtendUser implements
     public function getCurrentOrganization()
     {
         return $this->currentOrganization;
+    }
+
+    /**
+     * Get user full name
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
     }
 }
