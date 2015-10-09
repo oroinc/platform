@@ -362,11 +362,6 @@ class OwnerTree implements OwnerTreeInterface
     public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
     {
         if ($deepLevelEntityId !== null) {
-            /*foreach ($this->subordinateBusinessUnitIds as $key => $val) {
-                if (in_array($deepLevelEntityId, $val, true)) {
-                    $this->subordinateBusinessUnitIds[$key][] = $localLevelEntityId;
-                }
-            }*/
             if (!isset($this->subordinateBusinessUnitIds[$deepLevelEntityId])) {
                 $this->subordinateBusinessUnitIds[$deepLevelEntityId] = [];
             }
@@ -390,14 +385,13 @@ class OwnerTree implements OwnerTreeInterface
                  * We have to add some element to the end of array and remove it after processing,
                  * otherwise the last element of the original array will not be processed.
                  */
-                $deepLevelEntityIds[] = 'EOF';
+                $deepLevelEntityIds[] = 'EndOfArray';
                 foreach ($deepLevelEntityIds as $position => $deepLevelEntityId) {
-                    if ($deepLevelEntityId === 'EOF') {
-                        continue;
+                    if ($deepLevelEntityId === 'EndOfArray') {
+                        $deepLevelEntityIds = array_slice($deepLevelEntityIds, 0, -1);
+                        break;
                     }
-                    if (isset($subordinateBusinessUnitIds[$deepLevelEntityId])
-                        && !empty($subordinateBusinessUnitIds[$deepLevelEntityId])
-                    ) {
+                    if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
                         $diff = array_diff(
                             $subordinateBusinessUnitIds[$deepLevelEntityId],
                             $deepLevelEntityIds
@@ -412,8 +406,6 @@ class OwnerTree implements OwnerTreeInterface
                         }
                     }
                 }
-
-                $deepLevelEntityIds = array_slice($deepLevelEntityIds, 0, -1);
             }
         }
 
