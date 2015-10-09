@@ -18,7 +18,7 @@ use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
@@ -27,7 +27,7 @@ class ExtendFieldValueRenderListener
     const ENTITY_VIEW_ROUTE = 'oro_entity_view';
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $extendProvider;
 

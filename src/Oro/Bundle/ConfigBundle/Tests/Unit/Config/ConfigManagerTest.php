@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
@@ -39,7 +40,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             )
         ),
         'oro_test' => array(
-            'anysetting' => array(
+            'anysetting'  => array(
                 'value' => 'anyvalue',
                 'type'  => 'scalar',
             ),
@@ -52,27 +53,35 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->bag = new ConfigDefinitionImmutableBag($this->settings);
+        $this->bag        = new ConfigDefinitionImmutableBag($this->settings);
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager = new ConfigManager($this->bag, $this->dispatcher);
+
+        $this->manager = new ConfigManager(
+            'user',
+            $this->bag,
+            $this->dispatcher,
+            new ConfigValueBag()
+        );
 
         $this->globalScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\GlobalScopeManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->userScopeManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\GlobalScopeManager')
+        $this->userScopeManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\GlobalScopeManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->userScopeManager->expects($this->any())
+            ->method('getScopeId')
+            ->willReturn(123);
 
-        $this->manager->addManager('global', $this->globalScopeManager);
         $this->manager->addManager('user', $this->userScopeManager);
-        $this->manager->setScopeName('user');
+        $this->manager->addManager('global', $this->globalScopeManager);
     }
 
     public function testSet()
     {
-        $name = 'testName';
+        $name  = 'testName';
         $value = 'testValue';
         $this->userScopeManager->expects($this->once())
             ->method('set')
@@ -93,39 +102,111 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
+        $changes = [
+            'oro_user.greeting' => [
+                'value'                  => 'updated value',
+                'use_parent_scope_value' => false
+            ]
+        ];
+
         $this->userScopeManager->expects($this->once())
-            ->method('flush');
+            ->method('getSettingValue')
+            ->with('oro_user.greeting', false)
+            ->willReturn('old value');
+
+        $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
+        $afterEvent  = new ConfigUpdateEvent(
+            [
+                'oro_user.greeting' => ['old' => 'old value', 'new' => 'updated value']
+            ]
+        );
+
+        $this->userScopeManager->expects($this->once())
+            ->method('getChanges')
+            ->willReturn($changes);
+
+        $this->userScopeManager->expects($this->once())
+            ->method('save')
+            ->with($changes)
+            ->willReturn(
+                [
+                    ['oro_user.greeting' => 'updated value'],
+                    []
+                ]
+            );
+
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch');
+        $this->dispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
+        $this->dispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
 
         $this->manager->flush();
     }
 
     public function testSave()
     {
-        $data = [];
+        $data           = [
+            'oro_user___greeting' => [
+                'value'                  => 'updated value',
+                'use_parent_scope_value' => false
+            ],
+            'oro_user___unknown'  => [
+                'value'                  => 'some value',
+                'use_parent_scope_value' => false
+            ],
+            'oro_user___level'    => [
+                'use_parent_scope_value' => true
+            ]
+        ];
+        $normalizedData = [
+            'oro_user.greeting' => [
+                'value'                  => 'updated value',
+                'use_parent_scope_value' => false
+            ],
+            'oro_user.level'    => [
+                'use_parent_scope_value' => true
+            ]
+        ];
+
+        $this->userScopeManager->expects($this->exactly(2))
+            ->method('getSettingValue')
+            ->willReturnMap(
+                [
+                    ['oro_user.greeting', false, 'old value'],
+                    ['oro_user.level', false, 2000]
+                ]
+            );
+
+        $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $normalizedData);
+        $afterEvent  = new ConfigUpdateEvent(
+            [
+                'oro_user.greeting' => ['old' => 'old value', 'new' => 'updated value'],
+                'oro_user.level'    => ['old' => 2000, 'new' => 20]
+            ]
+        );
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
-            ->with($data)
-            ->willReturn([[], []]);
+            ->with($normalizedData)
+            ->willReturn(
+                [
+                    ['oro_user.greeting' => 'updated value'],
+                    ['oro_user.level']
+                ]
+            );
+
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch');
         $this->dispatcher->expects($this->at(0))
             ->method('dispatch')
-            ->with(
-                ConfigSettingsUpdateEvent::BEFORE_SAVE,
-                $this->isInstanceOf('Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent')
-            );
+            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
         $this->dispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(
-                ConfigUpdateEvent::EVENT_NAME,
-                $this->isInstanceOf('Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent')
-            );
-        $this->userScopeManager->expects($this->once())
-            ->method('reload');
-        $this->userScopeManager->expects($this->once())
-            ->method('save')
-            ->with($data);
+            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
 
         $this->manager->save($data);
     }
@@ -140,17 +221,6 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->calculateChangeSet($data);
     }
 
-    public function testLoadStoredSettings()
-    {
-        $entity = 'test';
-        $entityId = 1;
-        $this->userScopeManager->expects($this->once())
-            ->method('loadStoredSettings')
-            ->with($entity, $entityId);
-
-        $this->manager->loadStoredSettings($entity, $entityId);
-    }
-
     public function testReload()
     {
         $this->userScopeManager->expects($this->once())
@@ -160,33 +230,32 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool  $full
-     * @param array $expectedResult
-     *
      * @dataProvider getFromParentParamProvider
      */
     public function testGetFromParentScope($parameterName, $full, $expectedResult)
     {
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
+            ->with($parameterName, $full)
             ->willReturn(null);
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
+            ->with($parameterName, $full)
             ->willReturnCallback(function ($name, $full) {
                 if ($name === 'oro_test.someArrayValue') {
                     $value = ['foo' => 'bar'];
                     if ($full) {
                         $value = [
-                            'scope' => 'global',
-                            'value' => ['foo' => 'bar'],
+                            'scope'                  => 'global',
+                            'value'                  => ['foo' => 'bar'],
                             'use_parent_scope_value' => false
                         ];
                     }
                 } else {
                     $value = 1;
                     if ($full) {
-                        $value = ['scope' => 'global', 'value' => 1];
+                        $value = ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true];
                     }
                 }
 
@@ -203,27 +272,27 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'parameterName' => 'oro_test.someValue',
-                'full' => false,
+                'parameterName'  => 'oro_test.someValue',
+                'full'           => false,
                 'expectedResult' => 1,
             ],
             [
-                'parameterName' => 'oro_test.someValue',
-                'full' => true,
+                'parameterName'  => 'oro_test.someValue',
+                'full'           => true,
                 'expectedResult' => ['scope' => 'global', 'value' => 1, 'use_parent_scope_value' => true],
             ],
             [
-                'parameterName' => 'oro_test.someArrayValue',
-                'full' => true,
+                'parameterName'  => 'oro_test.someArrayValue',
+                'full'           => true,
                 'expectedResult' => [
-                    'scope' => 'global',
-                    'value' => ['foo' => 'bar'],
-                    'use_parent_scope_value' => true
+                    'scope'                  => 'global',
+                    'value'                  => ['foo' => 'bar'],
+                    'use_parent_scope_value' => false
                 ]
             ],
             [
-                'parameterName' => 'oro_test.someArrayValue',
-                'full' => false,
+                'parameterName'  => 'oro_test.someArrayValue',
+                'full'           => false,
                 'expectedResult' => ['foo' => 'bar']
             ]
         ];
@@ -235,17 +304,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->willReturn(['value' => 2]);
+            ->with($parameterName, false)
+            ->willReturn(2);
 
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
-        $this->globalScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
 
-        $this->assertEquals(
-            ['value' => 2],
-            $this->manager->get($parameterName)
-        );
+        $this->assertEquals(2, $this->manager->get($parameterName));
     }
 
     public function testGetDefaultSettings()
@@ -254,15 +319,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
+            ->with($parameterName, false)
             ->willReturn(null);
-        $this->userScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
 
         $this->globalScopeManager->expects($this->once())
             ->method('getSettingValue')
+            ->with($parameterName, false)
             ->willReturn(null);
-        $this->globalScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
 
         $this->assertEquals(
             'anyvalue',
@@ -276,29 +339,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->willReturn(['value' => '']);
+            ->with($parameterName, false)
+            ->willReturn('');
 
         $this->globalScopeManager->expects($this->never())
             ->method('getSettingValue');
-        $this->globalScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
 
-        $this->assertEquals(['value' => null], $this->manager->get($parameterName));
-    }
-
-    public function testGetEmptyValueSettingsFalse()
-    {
-        $parameterName = 'oro_test.emptystring';
-
-        $this->userScopeManager->expects($this->once())
-            ->method('getSettingValue')
-            ->willReturn(['value' => false]);
-
-        $this->globalScopeManager->expects($this->never())
-            ->method('getSettingValue');
-        $this->globalScopeManager->expects($this->never())
-            ->method('getScopedEntityName');
-
-        $this->assertEquals(['value' => null], $this->manager->get($parameterName, null));
+        $this->assertEquals('', $this->manager->get($parameterName));
     }
 }

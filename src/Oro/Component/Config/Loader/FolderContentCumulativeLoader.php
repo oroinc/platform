@@ -340,7 +340,9 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
     protected function getDirectoryContentsArray($dir)
     {
         $result = [];
-        foreach ($this->getDirectoryContents($dir) as $file) {
+
+        $files = $this->getDirectoryContents($dir);
+        foreach ($files as $file) {
             $result[] = $file->getPathname();
         }
 

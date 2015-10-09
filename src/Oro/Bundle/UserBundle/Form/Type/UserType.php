@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -31,20 +31,20 @@ class UserType extends AbstractType
     /** @var bool */
     protected $isMyProfilePage;
 
-    /** UserConfigManager */
+    /** ConfigManager */
     protected $userConfigManager;
 
     /**
      * @param SecurityContextInterface $security Security context
      * @param SecurityFacade           $securityFacade
      * @param Request                  $request Request
-     * @param UserConfigManager        $userConfigManager
+     * @param ConfigManager            $userConfigManager
      */
     public function __construct(
         SecurityContextInterface $security,
         SecurityFacade           $securityFacade,
         Request                  $request,
-        UserConfigManager        $userConfigManager
+        ConfigManager            $userConfigManager
     ) {
         $this->security          = $security;
         $this->securityFacade    = $securityFacade;
@@ -256,7 +256,7 @@ class UserType extends AbstractType
                         'label'    => 'oro.user.form.signature.label',
                         'required' => false,
                         'mapped'   => false,
-                        'data'     => $this->userConfigManager->getUserConfigSignature(),
+                        'data'     => $this->userConfigManager->get('oro_email.signature'),
                     ]
                 );
             }

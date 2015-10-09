@@ -128,8 +128,8 @@ class LocaleListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', -15)),
+            // must be registered before Symfony's original LocaleListener
+            KernelEvents::REQUEST  => array(array('onKernelRequest', 17)),
             ConsoleEvents::COMMAND => array(array('onConsoleCommand')),
         );
     }
