@@ -14,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -41,9 +41,13 @@ class OroDataAuditBundleInstaller implements Installation
         $auditTable->addColumn('object_name', 'string', ['length' => 255]);
         $auditTable->addColumn('version', 'integer', []);
         $auditTable->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $auditTable->addColumn('type', 'string', ['length' => 255]);
+
         $auditTable->setPrimaryKey(['id']);
 
         $auditTable->addIndex(['user_id'], 'IDX_5FBA427CA76ED395', []);
+        $auditTable->addIndex(['type'], 'idx_oro_audit_type');
+
         $auditTable->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
@@ -110,6 +114,9 @@ class OroDataAuditBundleInstaller implements Installation
             'comment' => '(DC2Type:json_array)',
         ]);
         $auditFieldTable->setPrimaryKey(['id']);
+        $auditFieldTable->addColumn('type', 'string', ['length' => 255]);
+
+        $auditFieldTable->addIndex(['type'], 'idx_oro_audit_field_type');
         $auditFieldTable->addIndex(['audit_id'], 'IDX_9A31A824BD29F359', []);
 
         $auditFieldTable->addForeignKeyConstraint(
