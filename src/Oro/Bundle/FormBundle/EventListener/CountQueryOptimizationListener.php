@@ -10,7 +10,7 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
 
 class CountQueryOptimizationListener
 {
-    const PRIMARY_CONDITION_PATTERN = '/(?P<alias>\w+).(?P<field>\w+)\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
+    const PRIMARY_CONDITION_PATTERN = '/%s.primary\s*=\s*(?P<value>true|1|:\w+|\?\d+)/';
 
     /**
      * @param CountQueryOptimizationEvent $event
@@ -45,21 +45,16 @@ class CountQueryOptimizationListener
         }
 
         $condition   = trim($join->getCondition());
-        $matchResult = preg_match_all(
-            self::PRIMARY_CONDITION_PATTERN,
+        $matchResult = preg_match(
+            sprintf(self::PRIMARY_CONDITION_PATTERN, $alias),
             $condition,
-            $matches,
-            PREG_SET_ORDER
+            $matches
         );
-        if (!$matchResult
-            || $matches[0][0] !== $condition
-            || $matches[0]['alias'] !== $alias
-            || $matches[0]['field'] !== 'primary'
-        ) {
+        if (!$matchResult || $matches[0] !== $condition) {
             return false;
         }
 
-        return $this->isTrueValue($matches[0]['value'], $context);
+        return $this->isTrueValue($matches['value'], $context);
     }
 
     /**
