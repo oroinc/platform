@@ -706,7 +706,7 @@ class TrackingProcessor implements LoggerAwareInterface
     }
 
     /**
-     * Allow possibility t override max retries count from third party bundles
+     * Get max retries to identify tracking visit
      *
      * @return int
      */
@@ -716,7 +716,7 @@ class TrackingProcessor implements LoggerAwareInterface
     }
 
     /**
-     * Allow possibility t override butch size from third party bundles
+     * Get batch size for batch size for tracking events
      *
      * @return int
      */
