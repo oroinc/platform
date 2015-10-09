@@ -132,10 +132,10 @@ class DictionaryApiEntityManager extends ApiEntityManager
             return [];
         }
         $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
+
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
         $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
-        $representationField = $this->dictionaryHelper
-            ->getRepresentationField($this->getMetadata(), $entityMetadata);
+        $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
         $qb->andWhere('e.' . $keyField . ' in (:keys)');
