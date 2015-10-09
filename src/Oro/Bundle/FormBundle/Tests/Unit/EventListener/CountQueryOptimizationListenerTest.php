@@ -8,11 +8,13 @@ use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CountQueryOptimizationListenerTest extends OrmTestCase
 {
@@ -45,7 +47,7 @@ class CountQueryOptimizationListenerTest extends OrmTestCase
     {
         $listener        = new CountQueryOptimizationListener();
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('oro.entity.count_query.optimize', [$listener, 'onOptimize']);
+        $eventDispatcher->addListener(CountQueryOptimizationEvent::EVENT_NAME, [$listener, 'onOptimize']);
 
         $optimizer = new CountQueryBuilderOptimizer();
         $optimizer->setEventDispatcher($eventDispatcher);
