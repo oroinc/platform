@@ -1,7 +1,7 @@
 oro_entity:
     entity_alias_exclusions:
-        - Oro\Bundle\EntityConfigBundle\Entity\ConfigLog
-        - Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff
+        - Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog
+        - Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff
         - Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue
         - Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel
         - Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel

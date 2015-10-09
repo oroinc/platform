@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension;
@@ -148,7 +148,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $configManagerAt = 3;
         $this->configManager->expects($this->at($configManagerAt++))
             ->method('createConfigEntityModel')
-            ->with($enumValueClassName1, ConfigModelManager::MODE_HIDDEN);
+            ->with($enumValueClassName1, ConfigModel::MODE_HIDDEN);
 
         $relationBuilderAt = 0;
         $this->relationBuilder->expects($this->at($relationBuilderAt++))
@@ -301,7 +301,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $configManagerAt = 3;
         $this->configManager->expects($this->at($configManagerAt++))
             ->method('createConfigEntityModel')
-            ->with($enumValueClassName1, ConfigModelManager::MODE_HIDDEN);
+            ->with($enumValueClassName1, ConfigModel::MODE_HIDDEN);
 
         $relationBuilderAt = 0;
         $this->relationBuilder->expects($this->at($relationBuilderAt++))

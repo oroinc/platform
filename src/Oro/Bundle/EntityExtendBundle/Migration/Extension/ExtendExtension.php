@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -161,7 +161,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $options = array_replace_recursive(
             [
-                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_HIDDEN,
+                ExtendOptionsManager::MODE_OPTION         => ConfigModel::MODE_HIDDEN,
                 ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
                 'entity'                                  => [
                     'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),

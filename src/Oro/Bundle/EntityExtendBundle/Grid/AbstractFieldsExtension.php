@@ -167,20 +167,6 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     abstract protected function getFields(DatagridConfiguration $config);
 
     /**
-     * Gets the full class name for the given entity name
-     *
-     * @param string $entityName
-     *
-     * @return string
-     */
-    protected function prepareEntityName($entityName)
-    {
-        return $this->configManager->getEntityManager()
-            ->getClassMetadata($entityName)
-            ->getName();
-    }
-
-    /**
      * @param FieldConfigId $field
      * @param array         $columnOptions
      */

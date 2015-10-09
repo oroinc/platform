@@ -65,7 +65,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary1'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -104,7 +104,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary2'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -159,7 +159,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary3'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -199,7 +199,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary4'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));

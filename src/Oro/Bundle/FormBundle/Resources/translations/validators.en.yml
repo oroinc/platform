@@ -1,3 +1,9 @@
 "This value is not a valid time.": "This value is not a valid time."
 "This value should be entity class or alias.": "This value should be entity class or alias."
 "The entity was not found.": "The entity was not found."
+oro:
+    form:
+        number:
+            min: "]-Inf,Inf[The value have to be more than {{ limit }}."
+            max:  "]-Inf,Inf[The value have to be less than {{ limit }}."
+            exect: "]-Inf,Inf[The value have to be equal {{ limit }}."

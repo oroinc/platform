@@ -213,6 +213,23 @@ define([
     });
 
     /**
+     * Since IE removes content form child elements when parent node is emptied
+     * we need re-render item subviews manually
+     * (see https://jsfiddle.net/3hrfhppe/)
+     */
+
+    if (/(MSIE\s|Trident\/|Edge\/)/.test(window.navigator.userAgent)) {
+        Chaplin.CollectionView.prototype.insertView = _.wrap(
+            Chaplin.CollectionView.prototype.insertView, function(func, item, view) {
+                if (view.el.childNodes.length === 0) {
+                    view.render();
+                }
+                return func.apply(this, _.rest(arguments));
+            }
+        );
+    }
+
+    /**
      * In case it's an error page blocks application's navigation and turns on full redirect
      * @override
      */

@@ -10,7 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -20,8 +19,8 @@ class FileConfigType extends AbstractType
 {
     const NAME = 'oro_attachment_file_config';
 
-    /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var Config */
     protected $config;
@@ -31,7 +30,7 @@ class FileConfigType extends AbstractType
      */
     public function __construct(ConfigManager $configManager)
     {
-        $this->extendConfigProvider = $configManager->getProvider('extend');
+        $this->configManager = $configManager;
     }
 
     /**
@@ -45,13 +44,15 @@ class FileConfigType extends AbstractType
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $options['config_id'];
 
-                $entityConfig = $this->extendConfigProvider->getConfig($fieldConfigId->getClassName());
+                $entityConfig = $this->configManager
+                    ->getProvider('extend')
+                    ->getConfig($fieldConfigId->getClassName());
                 if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)
                     && !$this->hasRelation($entityConfig, $this->getRelationKey($fieldConfigId))
                 ) {
                     $entityConfig->set('state', ExtendScope::STATE_UPDATE);
-                    $this->extendConfigProvider->persist($entityConfig);
-                    $this->extendConfigProvider->flush();
+                    $this->configManager->persist($entityConfig);
+                    $this->configManager->flush();
                 }
             }
         );

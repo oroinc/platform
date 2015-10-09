@@ -1,3 +1,10 @@
 "Choose a condition": "Choose a condition"
 "Choose a column first": "Choose a column first"
 "Drop condition here": "Drop condition here"
+
+oro:
+    querydesigner:
+        field_not_found: "The field no longer exists"
+        field_condition:
+            filter_not_supported: "This filter is not supported."
+            lifetimevalue_filter_not_supported: "The filtering by the LifetimeValue is not supported yet."
