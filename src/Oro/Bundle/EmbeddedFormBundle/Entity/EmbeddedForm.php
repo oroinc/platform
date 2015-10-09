@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EmbeddedFormBundle\Model\ExtendEmbeddedForm;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
@@ -41,7 +42,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
      *
      * @ORM\Id
      * @ORM\Column(type="string", name="id")
-     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $id;
 
@@ -112,6 +112,13 @@ class EmbeddedForm extends ExtendEmbeddedForm
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->id = UUIDGenerator::v4();
+    }
 
     /**
      * @return int
