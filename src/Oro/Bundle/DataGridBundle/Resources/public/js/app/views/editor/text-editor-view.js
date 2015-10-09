@@ -1,12 +1,67 @@
+/** @lends TextEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Text cell content editor. This view is used by default (if no frontend type has been specified).
+     *
+     * ### Column configuration samples:
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     columns:
+     *       # Sample 1. Mapped by frontend type
+     *       {column-name-1}:
+     *         frontend_type: string
+     *       # Sample 2. Mapped by frontend type and placeholder specified
+     *       {column-name-2}:
+     *         frontend_type: string
+     *         inline_editing:
+     *           editor:
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *       # Sample 3. Full configuration
+     *       {column-name-3}:
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/text-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     *             minlen: 5
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:-----------
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     *
+     * ### Constructor parameters
+     *
+     * @class
+     * @param {Object} options - Options container
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
+     *
+     * @augments BaseView
+     * @exports TextEditorView
+     */
     var TextEditorView;
     var _ = require('underscore');
     var $ = require('jquery');
     var BaseView = require('oroui/js/app/views/base/view');
 
-    TextEditorView = BaseView.extend({
+    TextEditorView = BaseView.extend(/** @exports TextEditorView.prototype */{
         autoRender: true,
         tagName: 'form',
         template: require('tpl!../../../../templates/text-editor.html'),
@@ -50,9 +105,6 @@ define(function(require) {
             return data;
         },
 
-        /**
-         * @inheritDoc
-         */
         render: function() {
             TextEditorView.__super__.render.call(this);
             this.$el.addClass(_.result(this, 'className'));
@@ -73,37 +125,90 @@ define(function(require) {
             this.onChange();
         },
 
-        focus: function() {
+        /**
+         * Places focus on the editor
+         *
+         * @param {boolean} atEnd - Usefull for multi input editors. Specifies which input should be focused: first
+         *                         or last
+         */
+        focus: function(atEnd) {
             this.$('input[name=value]').setCursorToEnd().focus();
         },
 
+        /**
+         * Prepares validation rules for usage
+         *
+         * @returns {Object}
+         */
         getValidationRules: function() {
             return this.validationRules;
         },
 
+        /**
+         * Formats and returns the model value before it is rendered
+         *
+         * @returns {string}
+         */
         getFormattedValue: function() {
             return this.getModelValue();
         },
 
+        /**
+         * Returns the raw model value
+         *
+         * @returns {string}
+         */
         getModelValue: function() {
             var raw = this.model.get(this.column.get('name'));
             return raw ? raw : '';
         },
 
+        /**
+         * Returns the current value after user edit
+         *
+         * @returns {string}
+         */
         getValue: function() {
             return this.$('input[name=value]').val();
         },
 
+        /**
+         * Generic handler for buttons which allows to notify overlaying component about some user action.
+         * Any button with 'data-action' attribute will rethrow the action to the inline editing plugin.
+         *
+         * Available actions:
+         * - save
+         * - cancel
+         * - saveAndEditNext
+         * - saveAndEditPrev
+         * - cancelAndEditNext
+         * - cancelAndEditPrev
+         *
+         * Sample usage:
+         * ``` html
+         *  <button data-action="cancelAndEditNext">Skip and Go Next</button>
+         * ```
+         *
+         * @returns {string}
+         */
         rethrowAction: function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             this.trigger($(e.currentTarget).attr('data-action') + 'Action');
         },
 
+        /**
+         * Returns true if the user has changed the value
+         *
+         * @returns {boolean}
+         */
         isChanged: function() {
             return this.getValue() !== this.getModelValue();
         },
 
+        /**
+         * Change handler. In this realization, it tracks a submit button disabled attribute
+         */
         onChange: function() {
             if (!this.isChanged()) {
                 this.$('[type=submit]').attr('disabled', 'disabled');
@@ -112,21 +217,31 @@ define(function(require) {
             }
         },
 
+        /**
+         * Keydown handler for the entire document
+         *
+         * @param {$.Event} e
+         */
         onKeyDown: function(e) {
             switch (e.keyCode) {
                 case this.TAB_KEY_CODE:
-                    this.onInternalTabKeydown(e);
+                    this.onGenericTabKeydown(e);
                     break;
                 case this.ENTER_KEY_CODE:
-                    this.onInternalEnterKeydown(e);
+                    this.onGenericEnterKeydown(e);
                     break;
                 case this.ESCAPE_KEY_CODE:
-                    this.onInternalEscapeKeydown(e);
+                    this.onGenericEscapeKeydown(e);
                     break;
             }
         },
 
-        onInternalEnterKeydown: function(e) {
+        /**
+         * Generic keydown handler, which handles ENTER
+         *
+         * @param {$.Event} e
+         */
+        onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (this.isChanged()) {
                     if (this.validator.form()) {
@@ -142,7 +257,12 @@ define(function(require) {
             }
         },
 
-        onInternalTabKeydown: function(e) {
+        /**
+         * Generic keydown handler, which handles TAB
+         *
+         * @param {$.Event} e
+         */
+        onGenericTabKeydown: function(e) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
                 if (this.isChanged()) {
@@ -159,7 +279,12 @@ define(function(require) {
             }
         },
 
-        onInternalEscapeKeydown: function(e) {
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 this.trigger('cancelAction');
                 e.stopImmediatePropagation();
@@ -167,12 +292,22 @@ define(function(require) {
             }
         },
 
+        /**
+         * Returns data which should be sent to the server
+         *
+         * @returns {Object}
+         */
         getServerUpdateData: function() {
             var data = {};
             data[this.column.get('name')] = this.getValue();
             return data;
         },
 
+        /**
+         * Returns data for the model update
+         *
+         * @returns {Object}
+         */
         getModelUpdateData: function() {
             return this.getServerUpdateData();
         }
