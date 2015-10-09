@@ -1,8 +1,8 @@
 <a name="module_SelectEditorView"></a>
 ## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-Select cell content editor. Cell value should be value field.
-Grid will render the corresponding label from the options.choices map.
-Editor will use same map
+Select cell content editor. The cell value should be a value field.
+The grid will render a corresponding label from the `options.choices` map.
+The editor will use the same mapping
 
 ### Column configuration samples:
 ``` yml
@@ -38,8 +38,8 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 choices                                             | Key-value set of available choices
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
@@ -51,8 +51,8 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for empty element |
-| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 | options.choices | <code>Object</code> | Key-value set of available choices |
 
 <a name="module_SelectEditorView#getSelect2Options"></a>

@@ -1,6 +1,28 @@
 <a name="module_RouteModel"></a>
 ## RouteModel
-Abstraction of routeBasic usage:```javascriptvar route = new RouteModel({    // route specification    routeName: 'oro_api_comment_get_items',    routeQueryParameterNames: ['page', 'limit'],    // required parameters for route path    relationId: 123,    relationClass: 'Some_Class'    // default query parameter    limit: 10});// returns api/rest/latest/relation/Some_Class/123/comment?limit=10route.getUrl();// returns api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2route.getUrl({page: 2})```
+Abstraction of route
+
+Basic usage:
+```javascript
+var route = new RouteModel({
+    // route specification
+    routeName: 'oro_api_comment_get_items',
+    routeQueryParameterNames: ['page', 'limit'],
+
+    // required parameters for route path
+    relationId: 123,
+    relationClass: 'Some_Class'
+
+    // default query parameter
+    limit: 10
+});
+
+// returns api/rest/latest/relation/Some_Class/123/comment?limit=10
+route.getUrl();
+
+// returns api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2
+route.getUrl({page: 2})
+```
 
 **Augment**: BaseModel  
 
@@ -26,7 +48,11 @@ List of acceptable query parameter names for this route
 **Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
 <a name="module_RouteModel#getAcceptableParameters"></a>
 ### routeModel.getAcceptableParameters() ⇒ <code>Array.&lt;string&gt;</code>
-Return list of parameter names accepted by this route.Includes both query and route parameters,E.g. for route `api/rest/latest/<relationClass>/<relationId/comments?page=<page>&limit=<limit>`this function will return `['relationClass', 'relationId', 'page', 'limit']`
+Return list of parameter names accepted by this route.
+Includes both query and route parameters,
+
+E.g. for route `api/rest/latest/<relationClass>/<relationId/comments?page=<page>&limit=<limit>`
+this function will return `['relationClass', 'relationId', 'page', 'limit']`
 
 **Kind**: instance method of <code>[RouteModel](#module_RouteModel)</code>  
 <a name="module_RouteModel#getUrl"></a>

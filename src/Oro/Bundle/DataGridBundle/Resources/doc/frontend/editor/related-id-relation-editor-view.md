@@ -1,11 +1,13 @@
 <a name="module_RelatedIdRelationEditorView"></a>
 ## RelatedIdRelationEditorView ⇐ <code>[SelectEditorView](./select-editor-view.md)</code>
-Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-Editor will use `autocomplete_api_accessor` and `value_field_name`. Server will be updated with value only.
+Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
+The editor will use `autocomplete_api_accessor` and `value_field_name`. The server will be updated with the value
+only.
 
 ### Column configuration sample:
 
-Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
+Please pay attention to the registration of the `value_field_name` in `query` and `properties` sections of the
+sample yml configuration below
 
 ``` yml
 datagrid:
@@ -48,10 +50,10 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 inline_editing.editor.view_options.value_field_name | Related value field name.
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
-inline_editing.editor.autocomplete_api_accessor.class | One from the [list of search API's](../search-apis.md)
+inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
 
 ### Constructor parameters
 
@@ -63,8 +65,8 @@ inline_editing.editor.autocomplete_api_accessor.class | One from the [list of se
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for empty element |
-| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 | options.value_field_name | <code>Object</code> | Related value field name |
 | options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
 

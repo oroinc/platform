@@ -3,7 +3,7 @@ define(function(require) {
     'use strict';
 
     /**
-     * Text cell content editor. This view is used by default (when no frontend type specified).
+     * Text cell content editor. This view is used by default (if no frontend type has been specified).
      *
      * ### Column configuration samples:
      * ``` yml
@@ -40,8 +40,8 @@ define(function(require) {
      *
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
-     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
      *
@@ -50,8 +50,8 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Backgrid.Cell} options.cell - Current datagrid cell
      * @param {Backgrid.Column} options.column - Current datagrid column
-     * @param {string} options.placeholder - Placeholder for empty element
-     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
      *
      * @augments BaseView
      * @exports TextEditorView
@@ -126,9 +126,9 @@ define(function(require) {
         },
 
         /**
-         * Places focus on editor
+         * Places focus on the editor
          *
-         * @param {boolean} atEnd - Usefull for multi inputs editors. Specifies which input should be focused first
+         * @param {boolean} atEnd - Usefull for multi input editors. Specifies which input should be focused: first
          *                         or last
          */
         focus: function(atEnd) {
@@ -145,7 +145,7 @@ define(function(require) {
         },
 
         /**
-         * Formats and returns model value before it will be rendered
+         * Formats and returns the model value before it is rendered
          *
          * @returns {string}
          */
@@ -154,7 +154,7 @@ define(function(require) {
         },
 
         /**
-         * Returns raw model value
+         * Returns the raw model value
          *
          * @returns {string}
          */
@@ -164,7 +164,7 @@ define(function(require) {
         },
 
         /**
-         * Returns current user edited value
+         * Returns the current value after user edit
          *
          * @returns {string}
          */
@@ -174,7 +174,7 @@ define(function(require) {
 
         /**
          * Generic handler for buttons which allows to notify overlaying component about some user action.
-         * Any button with 'data-action' attribute will rethrow action to inline editing plugin.
+         * Any button with 'data-action' attribute will rethrow the action to the inline editing plugin.
          *
          * Available actions:
          * - save
@@ -198,7 +198,7 @@ define(function(require) {
         },
 
         /**
-         * Returns true if user has changed value
+         * Returns true if the user has changed the value
          *
          * @returns {boolean}
          */
@@ -207,7 +207,7 @@ define(function(require) {
         },
 
         /**
-         * Change handler. In this realization - tracks submit button disabled attribute
+         * Change handler. In this realization, it tracks a submit button disabled attribute
          */
         onChange: function() {
             if (!this.isChanged()) {
@@ -218,7 +218,7 @@ define(function(require) {
         },
 
         /**
-         * Keydown handler for entire document
+         * Keydown handler for the entire document
          *
          * @param {$.Event} e
          */
@@ -237,7 +237,7 @@ define(function(require) {
         },
 
         /**
-         * Generic keydown handler which handles ENTER
+         * Generic keydown handler, which handles ENTER
          *
          * @param {$.Event} e
          */
@@ -258,7 +258,7 @@ define(function(require) {
         },
 
         /**
-         * Generic keydown handler which handles TAB
+         * Generic keydown handler, which handles TAB
          *
          * @param {$.Event} e
          */
@@ -280,7 +280,7 @@ define(function(require) {
         },
 
         /**
-         * Generic keydown handler which handles ESCAPE
+         * Generic keydown handler, which handles ESCAPE
          *
          * @param {$.Event} e
          */
@@ -293,7 +293,7 @@ define(function(require) {
         },
 
         /**
-         * Returns data which should be sent to server
+         * Returns data which should be sent to the server
          *
          * @returns {Object}
          */
@@ -304,7 +304,7 @@ define(function(require) {
         },
 
         /**
-         * Returns data to update model
+         * Returns data for the model update
          *
          * @returns {Object}
          */

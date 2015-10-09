@@ -3,12 +3,13 @@ define(function(require) {
     'use strict';
 
     /**
-     * Select-like cell content editor. This view is applicable when cell value contains label (not the value).
-     * Editor will use provided `choices` map and `value_field_name`. Server will be updated with value only.
+     * Select-like cell content editor. This view is applicable when the cell value contains label (not the value).
+     * The editor will use provided `choices` map and `value_field_name`. The server will be updated with value only.
      *
      * ### Column configuration sample:
      *
-     * Please note the `value_field_name` registration in query and properties in the provided sample yml configuration
+     * Please pay attention to the registration of the `value_field_name` in `query` and `properties` sections of the
+     * sample yml configuration below
      *
      * ``` yml
      * datagrid:
@@ -49,8 +50,8 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * inline_editing.editor.view_options.choices          | Key-value set of available choices
      * inline_editing.editor.view_options.value_field_name | Related value field name.
-     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      *
      * ### Constructor parameters
@@ -60,8 +61,8 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Backgrid.Cell} options.cell - Current datagrid cell
      * @param {Backgrid.Column} options.column - Current datagrid column
-     * @param {string} options.placeholder - Placeholder for empty element
-     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
      * @param {Object} options.choices - Key-value set of available choices
      * @param {Object} options.value_field_name - Related value field name
      *

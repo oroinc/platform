@@ -1,6 +1,6 @@
 <a name="module_TextEditorView"></a>
 ## TextEditorView ⇐ <code>BaseView</code>
-Text cell content editor. This view is used by default (when no frontend type specified).
+Text cell content editor. This view is used by default (if no frontend type has been specified).
 
 ### Column configuration samples:
 ``` yml
@@ -37,8 +37,8 @@ datagrid:
 
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
-inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-inline_editing.editor.validationRules               | Optional. Client side validation rules
+inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
@@ -50,8 +50,8 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 | options.model | <code>Object</code> | Current row model |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
-| options.placeholder | <code>string</code> | Placeholder for empty element |
-| options.validationRules | <code>Object</code> | Validation rules in form applicable to jQuery.validate |
+| options.placeholder | <code>string</code> | Placeholder for an empty element |
+| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
 
 
 * [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
@@ -72,13 +72,13 @@ inline_editing.editor.validationRules               | Optional. Client side vali
 
 <a name="module_TextEditorView#focus"></a>
 ### textEditorView.focus(atEnd)
-Places focus on editor
+Places focus on the editor
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| atEnd | <code>boolean</code> | Usefull for multi inputs editors. Specifies which input should be focused first                         or last |
+| atEnd | <code>boolean</code> | Usefull for multi input editors. Specifies which input should be focused: first                         or last |
 
 <a name="module_TextEditorView#getValidationRules"></a>
 ### textEditorView.getValidationRules() ⇒ <code>Object</code>
@@ -87,23 +87,23 @@ Prepares validation rules for usage
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getFormattedValue"></a>
 ### textEditorView.getFormattedValue() ⇒ <code>string</code>
-Formats and returns model value before it will be rendered
+Formats and returns the model value before it is rendered
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelValue"></a>
 ### textEditorView.getModelValue() ⇒ <code>string</code>
-Returns raw model value
+Returns the raw model value
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getValue"></a>
 ### textEditorView.getValue() ⇒ <code>string</code>
-Returns current user edited value
+Returns the current value after user edit
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#rethrowAction"></a>
 ### textEditorView.rethrowAction() ⇒ <code>string</code>
 Generic handler for buttons which allows to notify overlaying component about some user action.
-Any button with 'data-action' attribute will rethrow action to inline editing plugin.
+Any button with 'data-action' attribute will rethrow the action to the inline editing plugin.
 
 Available actions:
 - save
@@ -121,17 +121,17 @@ Sample usage:
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#isChanged"></a>
 ### textEditorView.isChanged() ⇒ <code>boolean</code>
-Returns true if user has changed value
+Returns true if the user has changed the value
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#onChange"></a>
 ### textEditorView.onChange()
-Change handler. In this realization - tracks submit button disabled attribute
+Change handler. In this realization, it tracks a submit button disabled attribute
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#onKeyDown"></a>
 ### textEditorView.onKeyDown(e)
-Keydown handler for entire document
+Keydown handler for the entire document
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
@@ -141,7 +141,7 @@ Keydown handler for entire document
 
 <a name="module_TextEditorView#onGenericEnterKeydown"></a>
 ### textEditorView.onGenericEnterKeydown(e)
-Generic keydown handler which handles ENTER
+Generic keydown handler, which handles ENTER
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
@@ -151,7 +151,7 @@ Generic keydown handler which handles ENTER
 
 <a name="module_TextEditorView#onGenericTabKeydown"></a>
 ### textEditorView.onGenericTabKeydown(e)
-Generic keydown handler which handles TAB
+Generic keydown handler, which handles TAB
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
@@ -161,7 +161,7 @@ Generic keydown handler which handles TAB
 
 <a name="module_TextEditorView#onGenericEscapeKeydown"></a>
 ### textEditorView.onGenericEscapeKeydown(e)
-Generic keydown handler which handles ESCAPE
+Generic keydown handler, which handles ESCAPE
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 
@@ -171,11 +171,11 @@ Generic keydown handler which handles ESCAPE
 
 <a name="module_TextEditorView#getServerUpdateData"></a>
 ### textEditorView.getServerUpdateData() ⇒ <code>Object</code>
-Returns data which should be sent to server
+Returns data which should be sent to the server
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#getModelUpdateData"></a>
 ### textEditorView.getModelUpdateData() ⇒ <code>Object</code>
-Returns data to update model
+Returns data for the model update
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  

@@ -3,14 +3,14 @@ define(function(require) {
     'use strict';
 
     /**
-     * Provides access to search API for autocompletes.
-     * This class is designed to create from server configuration.
+     * Provides access to the search API for autocompletes.
+     * This class is by design to be initiated from server configuration.
      *
      * @class
-     * @param {Object} options - Options container Please also overview options for [ApiAccessor](./api-accessor.md)
-     * @param {string} options.search_handler_name - Name of search handler to use
-     * @param {string} options.label_field_name - Name of the property that will be used as label
-     * @param {string} options.value_field_name - Optional. Name of the property that will be used as identifier.
+     * @param {Object} options - Options container Also check the options for [ApiAccessor](./api-accessor.md)
+     * @param {string} options.search_handler_name - Name of the search handler to use
+     * @param {string} options.label_field_name - Name of the property that will be used as a label
+     * @param {string} options.value_field_name - Optional. Name of the property that will be used as an identifier.
      *                                       By default = `'id'`
      * @augments [ApiAccessor](./api-accessor.md)
      * @exports SearchApiAccessor
@@ -55,7 +55,7 @@ define(function(require) {
         },
 
         /**
-         * Formats response before it will be sent out from this api accessor.
+         * Formats response before it is sent out from this api accessor.
          * Converts it to form
          * ``` javascipt
          * {

@@ -3,9 +3,9 @@ define(function(require) {
     'use strict';
 
     /**
-     * Select cell content editor. Cell value should be value field.
-     * Grid will render the corresponding label from the options.choices map.
-     * Editor will use same map
+     * Select cell content editor. The cell value should be a value field.
+     * The grid will render a corresponding label from the `options.choices` map.
+     * The editor will use the same mapping
      *
      * ### Column configuration samples:
      * ``` yml
@@ -41,8 +41,8 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:---------------------------------------
      * choices                                             | Key-value set of available choices
-     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for empty element
-     * inline_editing.editor.validationRules               | Optional. Client side validation rules
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
      *
@@ -51,8 +51,8 @@ define(function(require) {
      * @param {Object} options.model - Current row model
      * @param {Backgrid.Cell} options.cell - Current datagrid cell
      * @param {Backgrid.Column} options.column - Current datagrid column
-     * @param {string} options.placeholder - Placeholder for empty element
-     * @param {Object} options.validationRules - Validation rules in form applicable to jQuery.validate
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
      * @param {Object} options.choices - Key-value set of available choices
      *
      * @augments [TextEditorView](./text-editor-view.md)
