@@ -4,9 +4,9 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\BatchBundle\Event\CountQueryOptimizationEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -39,7 +39,7 @@ class CountQueryBuilderOptimizer
      *
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function setDispatcher(EventDispatcherInterface $eventDispatcher)
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -55,25 +55,25 @@ class CountQueryBuilderOptimizer
     {
         $this->context = new QueryOptimizationContext($queryBuilder, $this->qbTools);
         try {
-            $this->buildCountQueryBuilder();
+            $qb = $this->buildCountQueryBuilder();
+            // remove a link to the context
+            $this->context = null;
+
+            return $qb;
         } catch (\Exception $e) {
             // make sure that a link to the context is removed even if an exception occurred
             $this->context = null;
             // rethrow an exception
             throw $e;
         }
-
-        $qb = $this->context->getOptimizedQueryBuilder();
-
-        // remove a link to the context
-        $this->context = null;
-
-        return $qb;
     }
 
+    /**
+     * @return QueryBuilder
+     */
     protected function buildCountQueryBuilder()
     {
-        $optimizedQueryBuilder = $this->context->getOptimizedQueryBuilder();
+        $optimizedQueryBuilder = clone $this->context->getOriginalQueryBuilder();
         $optimizedQueryBuilder
             ->setFirstResult(null)
             ->setMaxResults(null)
@@ -131,6 +131,8 @@ class CountQueryBuilderOptimizer
 
         $optimizedQueryBuilder->select(array_unique($fieldsToSelect));
         $this->qbTools->fixUnusedParameters($optimizedQueryBuilder);
+
+        return $optimizedQueryBuilder;
     }
 
     /**
@@ -142,15 +144,18 @@ class CountQueryBuilderOptimizer
     protected function addJoins(QueryBuilder $optimizedQueryBuilder, array $originalQueryParts)
     {
         // Collect list of tables which should be added to new query
-        $requiredToJoin = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
+        $joinAliases    = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
         $groupByAliases = $this->qbTools->getUsedTableAliases($originalQueryParts['groupBy']);
-        $requiredToJoin = array_merge($requiredToJoin, $groupByAliases);
-        $requiredToJoin = array_merge(
-            $requiredToJoin,
-            $this->qbTools->getUsedTableAliases($originalQueryParts['having'])
-        );
-        $requiredToJoin = array_merge(
-            $requiredToJoin,
+        $havingAliases  = $this->qbTools->getUsedTableAliases($originalQueryParts['having']);
+        $joinAliases    = array_merge($joinAliases, $groupByAliases);
+        $joinAliases    = array_merge($joinAliases, $havingAliases);
+        $joinAliases    = array_unique($joinAliases);
+
+        // this joins cannot be removed outside of this class
+        $requiredJoinAliases = $joinAliases;
+
+        $joinAliases = array_merge(
+            $joinAliases,
             $this->getNonSymmetricJoinAliases(
                 $originalQueryParts['from'],
                 $originalQueryParts['join'],
@@ -162,13 +167,16 @@ class CountQueryBuilderOptimizer
         /** @var Expr\From $from */
         foreach ($originalQueryParts['from'] as $from) {
             $rootAliases[] = $from->getAlias();
-            $requiredToJoin = array_merge(
-                $requiredToJoin,
-                $this->qbTools->getUsedJoinAliases($originalQueryParts['join'], $requiredToJoin, $from->getAlias())
+            $joinAliases   = array_merge(
+                $joinAliases,
+                $this->qbTools->getUsedJoinAliases($originalQueryParts['join'], $joinAliases, $from->getAlias())
             );
         }
 
-        $requiredToJoin = array_diff(array_unique($requiredToJoin), $rootAliases);
+        $joinAliases         = array_diff(array_unique($joinAliases), $rootAliases);
+        $requiredJoinAliases = array_diff($requiredJoinAliases, $rootAliases);
+
+        $joinAliases = $this->dispatchQueryOptimizationEvent($joinAliases, $requiredJoinAliases);
 
         foreach ($rootAliases as $rootAlias) {
             if (!isset($originalQueryParts['join'][$rootAlias])) {
@@ -178,7 +186,7 @@ class CountQueryBuilderOptimizer
             foreach ($originalQueryParts['join'][$rootAlias] as $join) {
                 $alias = $join->getAlias();
                 // To count results number join all tables with inner join and required to tables
-                if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin, true)) {
+                if ($join->getJoinType() === Expr\Join::INNER_JOIN || in_array($alias, $joinAliases, true)) {
                     $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
                     $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
 
@@ -205,7 +213,28 @@ class CountQueryBuilderOptimizer
     }
 
     /**
-     * @param GroupBy[] $groupBy
+     * @param string[] $joinAliases
+     * @param string[] $requiredJoinAliases
+     *
+     * @return string[]
+     */
+    protected function dispatchQueryOptimizationEvent($joinAliases, $requiredJoinAliases)
+    {
+        if (null !== $this->eventDispatcher) {
+            $event = new CountQueryOptimizationEvent($this->context, $joinAliases);
+            $this->eventDispatcher->dispatch('oro.entity.count_query.optimize', $event);
+            $toRemoveAliases = $event->getRemovedOptimizedQueryJoinAliases();
+            if (!empty($toRemoveAliases)) {
+                $toRemoveAliases = array_diff($toRemoveAliases, $requiredJoinAliases);
+                $joinAliases     = array_diff($joinAliases, $toRemoveAliases);
+            }
+        }
+
+        return $joinAliases;
+    }
+
+    /**
+     * @param Expr\GroupBy[] $groupBy
      *
      * @return array
      */
@@ -257,53 +286,44 @@ class CountQueryBuilderOptimizer
     {
         $aliases = [];
 
-        $aliasToJoinExpr = $this->getAliasToJoinExprMap($fromStatements, $joins);
-        $dependencies    = $this->getNonSymmetricJoinDependencies($fromStatements, $joins);
+        $dependencies = $this->getNonSymmetricJoinDependencies($fromStatements, $joins);
         foreach ($dependencies as $alias => $joinInfo) {
-            $join = $this->getJoinByAlias($joins, $alias);
+            $join = $this->context->getJoinByAlias($alias);
 
-            // skip joins that is not left joins or was not used in GROUP BY statement
+            // skip joins that is not left joins or was not used in GROUP BY statement,
             // if it was a GROUP BY statement at all
-            if ($join->getJoinType() !== 'LEFT'
+            if ($join->getJoinType() !== Expr\Join::LEFT_JOIN
                 || (!empty($groupByAliases) && !in_array($alias, $groupByAliases, true))
             ) {
                 continue;
             }
 
-            // if there is just association expression like `a.owner`
+            // if there is just association expression like `alias.fieldName`
             $parts = explode('.', $join->getJoin());
             if (count($parts) === 2) {
-                list($associationAlias, $associationName) = $parts;
-                $className       = $this->resolveEntityClassByAlias(
-                    $associationAlias,
-                    $associationName,
-                    $aliasToJoinExpr
-                );
-                $associationType = $this->getAssociationType($className, $associationName);
+                $associationType = $this->context->getAssociationType($parts[0], $parts[1]);
                 if ($associationType & ClassMetadata::TO_MANY) {
                     $aliases[] = $alias;
                 }
-            } else { // otherwise there is a class name
-                $joinEntityClass = $this->resolveEntityClass($join->getJoin());
+            } else { // otherwise there is an entity name
+                $joinEntityClass = $this->context->getEntityClassByAlias($join->getAlias());
 
                 $aliasToAssociation = []; // [alias => associationName, ...]
-                foreach ($this->qbTools->getFields($join->getCondition()) as $field) {
-                    list($associationAlias, $associationName) = explode('.', $field);
-                    $aliasToAssociation[$associationAlias] = $associationName;
+                $fields             = $this->qbTools->getFields($join->getCondition());
+                foreach ($fields as $field) {
+                    $fieldParts                         = explode('.', $field);
+                    $aliasToAssociation[$fieldParts[0]] = $fieldParts[1];
                 }
 
                 // for each alias the current join is depended (this alias is called as $dependeeAlias):
                 // - resolve it's entity class
                 // - check the relations
                 foreach ($joinInfo[1] as $dependeeAlias) {
+                    $dependeeClass   = $this->context->getEntityClassByAlias($dependeeAlias);
                     $associationName = array_key_exists($dependeeAlias, $aliasToAssociation)
                         ? $aliasToAssociation[$dependeeAlias]
                         : $aliasToAssociation[$alias];
-                    $dependeeClass   = $this->resolveEntityClassByAlias(
-                        $dependeeAlias,
-                        $associationName,
-                        $aliasToJoinExpr
-                    );
+
                     if ($this->isToManyAssociation($dependeeClass, $associationName, $joinEntityClass)) {
                         $aliases[] = $alias;
                     }
@@ -361,145 +381,22 @@ class CountQueryBuilderOptimizer
     }
 
     /**
-     * Gets the type of the given association
+     * Gets the type of an association between the given entities
      *
-     * @param string      $entityClass
-     * @param string      $associationName
-     * @param string|null $targetEntityClass
+     * @param string $entityClass
+     * @param string $associationName
+     * @param string $targetEntityClass
      *
      * @return int
      */
-    protected function getAssociationType($entityClass, $associationName, $targetEntityClass = null)
+    protected function getAssociationType($entityClass, $associationName, $targetEntityClass)
     {
-        $metadata = $this->context->getClassMetadata($entityClass);
-        if (!$targetEntityClass) {
-            $associationMapping = $metadata->getAssociationMapping($associationName);
-
-            return $associationMapping['type'];
-        }
-
-        $associations = $metadata->getAssociationsByTargetClass($targetEntityClass);
+        $associations = $this->context->getClassMetadata($entityClass)
+            ->getAssociationsByTargetClass($targetEntityClass);
         if (!array_key_exists($associationName, $associations)) {
             return 0;
         }
 
         return $associations[$associationName]['type'];
-    }
-
-    /**
-     * Collects the correspondence of select alias to it's join expression
-     *
-     * @param Expr\From[] $fromStatements
-     * @param array       $joins
-     *
-     * @return array [alias => joinExpr, ...]
-     */
-    protected function getAliasToJoinExprMap($fromStatements, $joins)
-    {
-        $result = [];
-        foreach ($fromStatements as $from) {
-            $result[$from->getAlias()] = $this->resolveEntityClass($from->getFrom());
-        }
-        /* @var Expr\Join[] $childJoins */
-        foreach ($joins as $rootAlias => $childJoins) {
-            foreach ($childJoins as $join) {
-                $result[$join->getAlias()] = $this->resolveEntityClass($join->getJoin());
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Finds a join statement that corresponds to current alias
-     *
-     * @param array  $joins
-     * @param string $alias
-     *
-     * @return Expr\Join
-     *
-     * @throws \InvalidArgumentException if a requested join cannot be found
-     */
-    protected function getJoinByAlias($joins, $alias)
-    {
-        /* @var Expr\Join[] $childJoins */
-        foreach ($joins as $rootAlias => $childJoins) {
-            foreach ($childJoins as $join) {
-                if ($join->getAlias() === $alias) {
-                    return $join;
-                }
-            }
-        }
-
-        throw new \InvalidArgumentException(
-            sprintf(
-                'The join alias "%s" was not found. Existing aliases: %s.',
-                $alias,
-                implode(
-                    ', ',
-                    array_map(
-                        function ($join) {
-                            /** @var Expr\Join $join */
-                            return $join->getAlias();
-                        },
-                        $joins
-                    )
-                )
-            )
-        );
-    }
-
-    /**
-     * Gets the full class name if the given join represents an entity name in form "bundle:class"
-     *
-     * @param string $join
-     *
-     * @return string
-     */
-    protected function resolveEntityClass($join)
-    {
-        $parts = explode(':', $join);
-        if (count($parts) === 2) {
-            $join = $this->context->getOriginalQueryBuilder()
-                    ->getEntityManager()
-                    ->getConfiguration()
-                    ->getEntityNamespace($parts[0]) . '\\' . $parts[1];
-        }
-
-        return $join;
-    }
-
-    /**
-     * Resolve the FQCN by it's alias and association name
-     *
-     * @param string   $alias
-     * @param string   $associationName
-     * @param string[] $aliasToJoinExpr [alias => joinExpr, ...]
-     *
-     * @return string
-     */
-    protected function resolveEntityClassByAlias($alias, $associationName, $aliasToJoinExpr)
-    {
-        $expr = $aliasToJoinExpr[$alias];
-
-        $exprParts = explode('.', $expr);
-        if (count($exprParts) === 2) {
-            list($exprAlias, $exprAssocName) = $exprParts;
-
-            $expr = $aliasToJoinExpr[$exprAlias];
-            if (count(explode('.', $expr)) === 2) {
-                $expr = $this->resolveEntityClassByAlias($exprAlias, $exprAssocName, $aliasToJoinExpr);
-            }
-
-            $associationMapping = $this->context->getClassMetadata($expr)
-                ->getAssociationMapping($exprAssocName);
-
-            $expr = $associationMapping['sourceEntity'];
-            if (!$this->context->getClassMetadata($expr)->hasAssociation($associationName)) {
-                $expr = $associationMapping['targetEntity'];
-            }
-        }
-
-        return $expr;
     }
 }
