@@ -144,11 +144,10 @@ class CountQueryBuilderOptimizer
     protected function addJoins(QueryBuilder $optimizedQueryBuilder, array $originalQueryParts)
     {
         // Collect list of tables which should be added to new query
-        $joinAliases    = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
+        $whereAliases   = $this->qbTools->getUsedTableAliases($originalQueryParts['where']);
         $groupByAliases = $this->qbTools->getUsedTableAliases($originalQueryParts['groupBy']);
         $havingAliases  = $this->qbTools->getUsedTableAliases($originalQueryParts['having']);
-        $joinAliases    = array_merge($joinAliases, $groupByAliases);
-        $joinAliases    = array_merge($joinAliases, $havingAliases);
+        $joinAliases    = array_merge($whereAliases, $groupByAliases, $havingAliases);
         $joinAliases    = array_unique($joinAliases);
 
         // this joins cannot be removed outside of this class
@@ -213,8 +212,9 @@ class CountQueryBuilderOptimizer
     }
 
     /**
-     * @param string[] $joinAliases
-     * @param string[] $requiredJoinAliases
+     * @param string[] $joinAliases         A list of joins to be added to an optimized query
+     * @param string[] $requiredJoinAliases A list of joins that cannot be removed
+     *                                      even if it is requested by a listener
      *
      * @return string[]
      */
