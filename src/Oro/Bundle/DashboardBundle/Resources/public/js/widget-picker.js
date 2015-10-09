@@ -62,6 +62,7 @@ define(function(require) {
                 className: 'modal dashboard-widgets-wrapper',
                 title: __('oro.dashboard.add_dashboard_widgets.title'),
                 loadWidget: _.bind(this.loadWidget, this),
+                cancelText: __('Close'),
             });
             dialog.open();
         }
