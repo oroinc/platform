@@ -34,6 +34,12 @@ class TrackingProcessor implements LoggerAwareInterface
     const TRACKING_VISIT_ENTITY       = 'OroTrackingBundle:TrackingVisit';
     const TRACKING_VISIT_EVENT_ENTITY = 'OroTrackingBundle:TrackingVisitEvent';
 
+    /** Batch size for tracking events */
+    const BATCH_SIZE = 100;
+
+    /** Max retries to identify tracking visit */
+    const MAX_RETRIES = 5;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -63,12 +69,6 @@ class TrackingProcessor implements LoggerAwareInterface
 
     /** Default max execution time (in minutes) */
     protected $maxExecTime = 5;
-
-    /** @var int Maximum retries of parsing  */
-    private $maxRetries = 5;
-
-    /** @var int Batch size for tracking events */
-    private $batchSize  = 100;
 
     /**
      * @param ManagerRegistry                     $doctrine
@@ -712,7 +712,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function getMaxRetriesCount()
     {
-        return $this->maxRetries;
+        return self::MAX_RETRIES;
     }
 
     /**
@@ -722,7 +722,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function getBatchSize()
     {
-        return $this->batchSize;
+        return self::BATCH_SIZE;
     }
 
     /**
