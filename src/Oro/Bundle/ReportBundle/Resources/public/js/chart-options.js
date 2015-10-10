@@ -68,13 +68,13 @@ define(function(require) {
         },
 
         /**
-         * @param {Array} collection
+         * @param {FieldsCollection} collection
          */
         updateCollection: function(collection) {
             var entity = $(this.options.fieldsLoaderSelector).fieldsLoader('getEntityName');
             var data = $(this.options.fieldsLoaderSelector).fieldsLoader('getFieldsData');
             this.util = new Util(entity, data);
-            this.items = collection.toJSON();
+            this.items = collection.clone().removeInvalidModels().toJSON();
         },
 
         /**
@@ -85,11 +85,16 @@ define(function(require) {
             var $element = $('#' + id);
             var childSelector = this.childSelectorTemplate({id: $element.data('ftid')});
             $element.find(childSelector).each(function() {
-                var value = $(this).val();
+                var $input = $(this);
+                var value = $input.val();
                 if (value) {
                     var name = _.first(value.split('('));
                     if (!_.findWhere(self.items, {name: name})) {
-                        $(this).select2('val', '');
+                        if ($input.data('select2')) {
+                            $input.select2('val', '');
+                        } else {
+                            $input.val('');
+                        }
                     }
                 }
             });
