@@ -63,6 +63,9 @@ class EmailCacheManager implements LoggerAwareInterface
             $emailUser = $email->getEmailUsers()->first();
             $folder = $emailUser->getFolders()->first();
             $origin = $emailUser->getOrigin();
+            if (!$origin) {
+                throw new LoadEmailBodyFailedException($email);
+            }
             $loader = $this->selector->select($origin);
 
             try {

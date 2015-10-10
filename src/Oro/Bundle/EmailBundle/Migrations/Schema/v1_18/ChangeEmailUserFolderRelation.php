@@ -5,10 +5,19 @@ namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_18;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class ChangeEmailUserFolderRelation implements Migration
+class ChangeEmailUserFolderRelation implements Migration, OrderedMigrationInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder()
+    {
+        return 1;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -16,6 +25,7 @@ class ChangeEmailUserFolderRelation implements Migration
     {
         self::createOroEmailUserFoldersTable($schema);
         self::addOroEmailUserFoldersForeignKeys($schema);
+        self::updateOroEmailUserTable($schema);
     }
 
     /**
@@ -32,6 +42,11 @@ class ChangeEmailUserFolderRelation implements Migration
         $table->setPrimaryKey(['email_user_id', 'folder_id']);
         $table->addIndex(['email_user_id'], 'IDX_201746D71AAEBB5A', []);
         $table->addIndex(['folder_id'], 'IDX_201746D7162CB942', []);
+        // temporary columns
+        $table->addColumn('origin_id', 'integer', []);
+        $table->addColumn('email_id', 'integer', []);
+        $table->addIndex(['origin_id'], 'IDX_origin', []);
+        $table->addIndex(['email_id'], 'IDX_email', []);
     }
 
     /**
@@ -55,5 +70,19 @@ class ChangeEmailUserFolderRelation implements Migration
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
+    }
+
+    /**
+     * Add origin to EmailUser
+     *
+     * @param Schema $schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function updateOroEmailUserTable(Schema $schema)
+    {
+        $table = $schema->getTable('oro_email_user');
+        $table->removeForeignKey('fk_91f5cff6162cb942');
+        $table->dropIndex('idx_91f5cff6162cb942');
+        $table->addColumn('origin_id', 'integer', ['notnull' => false]);
     }
 }

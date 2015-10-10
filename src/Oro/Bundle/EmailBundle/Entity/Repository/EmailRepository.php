@@ -70,7 +70,7 @@ class EmailRepository extends EntityRepository
             ->setMaxResults($limit);
 
         if ($folderId > 0) {
-            $qb->leftJoin('eu.folder', 'f')
+            $qb->leftJoin('eu.folders', 'f')
                ->andWhere('f.id = :folderId')
                ->setParameter('folderId', $folderId);
         }
@@ -99,7 +99,7 @@ class EmailRepository extends EntityRepository
             ->setParameter('seen', false);
 
         if ($folderId !== null && $folderId > 0) {
-            $qb->leftJoin('eu.folder', 'f')
+            $qb->leftJoin('eu.folders', 'f')
                 ->andWhere('f.id = :folderId')
                 ->setParameter('folderId', $folderId);
         }
@@ -124,7 +124,7 @@ class EmailRepository extends EntityRepository
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
             ->setParameter('seen', false)
-            ->leftJoin('eu.folder', 'f')
+            ->leftJoin('eu.folders', 'f')
             ->groupBy('f.id');
 
         return $qb->getQuery()->getResult();
