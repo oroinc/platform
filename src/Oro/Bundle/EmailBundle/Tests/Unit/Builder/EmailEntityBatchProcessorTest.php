@@ -132,6 +132,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email1->setFromEmailAddress($addr);
         $emailUser1 = new EmailUser();
         $emailUser1->addFolder($folder);
+        $emailUser1->setOrigin($origin);
         $email1->addEmailUser($emailUser1);
         $this->addEmailRecipient($email1, $addr);
         $this->addEmailRecipient($email1, $newAddr);
@@ -143,6 +144,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email2->setFromEmailAddress($newAddr);
         $emailUser2 = new EmailUser();
         $emailUser2->addFolder($newFolder);
+        $emailUser2->setOrigin($origin);
         $email2->addEmailUser($emailUser2);
         $this->addEmailRecipient($email2, $addr);
         $this->addEmailRecipient($email2, $newAddr);
@@ -237,10 +239,10 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $email1->getEmailUsers());
         $this->assertCount(1, $email2->getEmailUsers());
-        $this->assertTrue($origin === $emailUser1->getFolder()->getOrigin());
-        $this->assertTrue($origin === $emailUser2->getFolder()->getOrigin());
-        $this->assertSame($newFolder, $emailUser2->getFolder());
-        $this->assertSame($dbFolder, $emailUser1->getFolder());
+        $this->assertTrue($origin === $emailUser1->getOrigin());
+        $this->assertTrue($origin === $emailUser2->getOrigin());
+        $this->assertSame($newFolder, $emailUser2->getFolders()->first());
+        $this->assertSame($dbFolder, $emailUser1->getFolders()->first());
         $this->assertTrue($dbAddr === $email1->getFromEmailAddress());
         $this->assertNull($email1->getFromEmailAddress()->getOwner());
         $this->assertTrue($newAddr === $email2->getFromEmailAddress());
