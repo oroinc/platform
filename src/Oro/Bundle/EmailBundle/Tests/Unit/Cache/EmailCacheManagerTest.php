@@ -69,6 +69,7 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
@@ -118,6 +119,7 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
@@ -167,6 +169,7 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
+        $emailUser->setOrigin($origin);
         $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
