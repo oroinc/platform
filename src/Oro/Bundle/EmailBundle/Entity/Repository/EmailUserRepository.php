@@ -129,17 +129,22 @@ class EmailUserRepository extends EntityRepository
      * @param Organization $organization
      * @return mixed
      */
-    public function findUnseenUserEmail(User $user, Organization $organization)
+    public function findUnseenUserEmail(User $user, Organization $organization, $ids = [])
     {
         $qb = $this->createQueryBuilder('eu');
-
-        return $qb
-            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+        $qb->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
             ->setParameter('owner', $user)
             ->setParameter('organization', $organization)
             ->setParameter('seen', false);
+
+        if (!empty($ids)) {
+            $qb->andWhere($qb->expr()->in('eu.email', ':ids'))
+                ->setParameter('ids', $ids);
+        }
+
+        return $qb;
     }
 
     /**

@@ -4,17 +4,14 @@
             <a href="#" class="sidebar-widget-header-toggle">
                 <i class="icon-caret-down"></i>
             </a>
-            <% if (iconClass) { %>
-                <i class="<%= iconClass %>" title="<%= title %>"></i>
-            <% } else { %>
-                <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
-            <% } %>
-            <span class="widget-title"><%= title %></span>
+            <span class="widget-title" title="<%= title %>"><div class="sidebar-widget-header-icon"><%= icon %></div> <%= title %></span>
         </span>
         <span class="sidebar-widget-header-wrap">
+            <% if (showRefreshButton) { %>
             <a href="#" class="sidebar-widget-refresh">
                 <i class="icon-refresh"></i>
             </a>
+            <% } %>
             <a href="#" class="sidebar-widget-settings">
                 <i class="icon-cog"></i>
             </a>

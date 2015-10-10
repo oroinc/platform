@@ -27,14 +27,10 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected $em;
 
-    /**
-     * @var CacheProvider
-     */
+    /** @var CacheProvider */
     private $cache;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var OwnershipMetadataProvider */
     private $ownershipMetadataProvider;
 
     /**
@@ -50,7 +46,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
-     * @return OwnerTree
+     * {@inheritdoc}
      */
     protected function getTreeData()
     {
@@ -66,7 +62,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     }
 
     /**
-     * @return OwnerTree
+     * {@inheritdoc}
      */
     public function getTree()
     {
@@ -82,7 +78,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
     public function __construct(EntityManager $em, CacheProvider $cache)
     {
         $this->cache = $cache;
-        $this->em = $em;
+        $this->em    = $em;
     }
 
     /**
@@ -90,23 +86,34 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
      */
     protected function fillTree(OwnerTreeInterface $tree)
     {
-        $userClass = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
+        $userClass         = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
         $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();
 
         /** @var User[] $users */
         $users = $this->getManagerForClass($userClass)->getRepository($userClass)->findAll();
 
         /** @var BusinessUnit[] $businessUnits */
-        $businessUnits = $this->getManagerForClass($businessUnitClass)->getRepository($businessUnitClass)->findAll();
+        $businessUnitsRepo = $this->getManagerForClass($businessUnitClass)->getRepository($businessUnitClass);
+        $businessUnits     = $businessUnitsRepo
+            ->createQueryBuilder('bu')
+            ->select([
+                'bu.id',
+                'IDENTITY(bu.organization) organization',
+                'IDENTITY(bu.owner) owner' //aka parent business unit
+            ])
+            ->getQuery()
+            ->getArrayResult();
 
         foreach ($businessUnits as $businessUnit) {
-            if ($businessUnit->getOrganization()) {
-                $tree->addLocalEntity($businessUnit->getId(), $businessUnit->getOrganization()->getId());
-                if ($businessUnit->getOwner()) {
-                    $tree->addDeepEntity($businessUnit->getId(), $businessUnit->getOwner()->getId());
+            if (!empty($businessUnit['organization'])) {
+                $tree->addLocalEntity($businessUnit['id'], $businessUnit['organization']);
+                if ($businessUnit['owner']) {
+                    $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
                 }
             }
         }
+
+        $tree->buildTree();
 
         foreach ($users as $user) {
             $owner = $user->getOwner();
@@ -114,7 +121,9 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
             foreach ($user->getOrganizations() as $organization) {
                 $organizationId = $organization->getId();
                 $tree->addGlobalEntity($user->getId(), $organizationId);
-                foreach ($user->getBusinessUnits() as $businessUnit) {
+
+                $userBusinessUnits = $user->getBusinessUnits();
+                foreach ($userBusinessUnits as $businessUnit) {
                     $buOrganizationId = $businessUnit->getOrganization()->getId();
                     if ($organizationId == $buOrganizationId) {
                         $tree->addLocalEntityToBasic($user->getId(), $businessUnit->getId(), $organizationId);

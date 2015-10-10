@@ -56,8 +56,13 @@ define(function(require) {
                     var opts = instance.opts;
                     var id = element.val();
                     var match = null;
-                    var chain = self.util.pathToEntityChain(id, true);
-                    instance.pagePath = chain[chain.length - 1].basePath;
+                    var chain;
+                    try {
+                        chain = self.util.pathToEntityChain(id, true);
+                        instance.pagePath = chain[chain.length - 1].basePath;
+                    } catch (e) {
+                        instance.pagePath = '';
+                    }
                     opts.query({
                         matcher: function(term, text, el) {
                             var isMatch = id === opts.id(el);
@@ -72,7 +77,7 @@ define(function(require) {
                     });
                 },
                 id: function(result) {
-                    return result.id !== undefined ? result.id : result.pagePath;
+                    return result.id !== void 0 ? result.id : result.pagePath;
                 },
                 data: function() {
                     var pagePath = (instance && instance.pagePath) || '';
@@ -121,7 +126,11 @@ define(function(require) {
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
                 options.formatSelection = $.proxy(function(item) {
-                    return this.formatChoice(item.id, template);
+                    var result;
+                    if (item !== null) {
+                        result = this.formatChoice(item.id, template);
+                    }
+                    return result;
                 }, this);
             }
         },
@@ -193,8 +202,9 @@ define(function(require) {
                 return results;
             }
 
-            chain = this.util.pathToEntityChain(path, true);
-            if (!chain.length) {
+            try {
+                chain = this.util.pathToEntityChain(path, true);
+            } catch (e) {
                 return results;
             }
 
