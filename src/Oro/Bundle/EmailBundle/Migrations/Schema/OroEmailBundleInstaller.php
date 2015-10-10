@@ -22,6 +22,8 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_15\OroEmailBundle as OroEmailBun
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\OroEmailBundle as OroEmailBundle116_1;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\CreateAutoResponse as OroEmailBundle116_2;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
 
 /**
  * Class OroEmailBundleInstaller
@@ -103,5 +105,8 @@ class OroEmailBundleInstaller implements Installation
 
         ChangeEmailUserFolderRelation::createOroEmailUserFoldersTable($schema);
         ChangeEmailUserFolderRelation::addOroEmailUserFoldersForeignKeys($schema);
+        ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
+        AddEmailUserColumn::updateOroEmailUserTable($schema);
+        DropEmailUserColumn::updateOroEmailUserTable($schema);
     }
 }
