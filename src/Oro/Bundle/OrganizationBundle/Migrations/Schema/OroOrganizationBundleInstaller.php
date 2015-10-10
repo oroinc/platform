@@ -17,7 +17,7 @@ class OroOrganizationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_4';
     }
 
     /**
