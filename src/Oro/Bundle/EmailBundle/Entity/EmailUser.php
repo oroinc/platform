@@ -353,7 +353,7 @@ class EmailUser
     }
 
     /**
-     * Get email folder origin
+     * Get email user origin
      *
      * @return EmailOrigin
      */
@@ -363,7 +363,7 @@ class EmailUser
     }
 
     /**
-     * Set email folder origin
+     * Set email user origin
      *
      * @param EmailOrigin $origin
      *
