@@ -117,6 +117,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $emailUser->getEmail()->setHead(true);
             $emailUser->setOrganization($owner->getOrganization());
             $emailUser->setOwner($owner);
+            $emailUser->setOrigin($origin);
 
             $emailBody = $this->emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],
