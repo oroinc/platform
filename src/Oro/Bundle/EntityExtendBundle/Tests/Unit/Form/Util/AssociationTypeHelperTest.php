@@ -54,40 +54,28 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider isDictionaryProvider
      */
-    public function testIsDictionary($groups, $activitySupport, $expected)
+    public function testIsDictionary($groups, $expected)
     {
         $className = 'Test\Entity';
 
         $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $config->expects($this->at(0))
+        $config->expects($this->once())
             ->method('get')
             ->with('groups')
             ->will($this->returnValue($groups));
 
         $configProvider = $this->getConfigProviderMock();
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('grouping')
             ->will($this->returnValue($configProvider));
-
-        if ($groups && in_array('dictionary', $groups)) {
-            $this->configManager->expects($this->at(1))
-                ->method('getProvider')
-                ->with('dictionary')
-                ->will($this->returnValue($configProvider));
-            $config->expects($this->at(1))
-                ->method('get')
-                ->with('activity_support')
-                ->will($this->returnValue($activitySupport));
-        }
-
-        $configProvider->expects($this->any())
+        $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
             ->will($this->returnValue(true));
-        $configProvider->expects($this->any())
+        $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className)
             ->will($this->returnValue($config));
@@ -101,12 +89,56 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
     public function isDictionaryProvider()
     {
         return [
-            [null, 'false', false],
-            [[], 'false', false],
-            [['some_group'], 'false', false],
-            [['dictionary'], 'false', true],
-            [['some_group', 'dictionary'], 'false', true],
-            [['some_group', 'dictionary'], 'true', false],
+            [null, false],
+            [[], false],
+            [['some_group'], false],
+            [['dictionary'], true],
+            [['some_group', 'dictionary'], true],
+        ];
+    }
+
+    /**
+     * @dataProvider isActivitySupport
+     */
+    public function testIsActivitySupport($dictionaryOptions, $expected)
+    {
+        $className = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('activity_support')
+            ->will($this->returnValue($dictionaryOptions));
+
+        $configProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('dictionary')
+            ->will($this->returnValue($configProvider));
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className)
+            ->will($this->returnValue($config));
+
+        $this->assertEquals(
+            $expected,
+            $this->typeHelper->isSupportActivityEnabled($className)
+        );
+    }
+
+    public function isActivitySupport()
+    {
+        return [
+            [null, false],
+            [['some_group'], false],
+            ['true', true],
+            ['false', false],
         ];
     }
 
