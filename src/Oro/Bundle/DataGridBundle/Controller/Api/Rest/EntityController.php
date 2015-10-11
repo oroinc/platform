@@ -20,7 +20,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_entity_")
- *
  */
 class EntityController extends RestController
 {
@@ -76,7 +75,7 @@ class EntityController extends RestController
         $request = $this->get('request_stack')->getCurrentRequest();
         $content = $request->getContent();
         $content  = json_decode($content, true);
-        foreach ($content  as $fieldName => $fieldValue) {
+        foreach ($content as $fieldName => $fieldValue) {
             $this->getManager()->updateField($entity, $fieldName, $fieldValue);
         }
 
