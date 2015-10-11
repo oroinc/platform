@@ -1,11 +1,12 @@
-define(['backbone'], function(Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @class   oroquerydesigner.itemsManager.ColumnModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var GroupingModel;
+    var EntityFieldModel = require('./entity-field-model');
+
+    GroupingModel = EntityFieldModel.extend({
+        fieldAttribute: 'name',
+
         defaults: {
             name: null,
             label: null,
@@ -13,4 +14,6 @@ define(['backbone'], function(Backbone) {
             sorting: null
         }
     });
+
+    return GroupingModel;
 });

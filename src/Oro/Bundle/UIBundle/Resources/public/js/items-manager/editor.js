@@ -91,7 +91,6 @@ define([
 
         _onSaveItem: function(e) {
             var attrs;
-            var model;
             e.preventDefault();
             if (!this._validate()) {
                 return;
@@ -101,8 +100,7 @@ define([
             if (this.model) {
                 this.model.set(attrs);
             } else {
-                model = new (this.options.collection.model)(attrs);
-                this.options.collection.add(model);
+                this.options.collection.set(attrs, {add: true, remove: false});
             }
 
             this.reset();

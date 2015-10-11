@@ -36,6 +36,9 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
             $resolvedParams = $this->resolveParams($params, $types);
             $logger->notice('Parameters:');
             foreach ($resolvedParams as $key => $val) {
+                if (is_array($val)) {
+                    $val = implode(',', $val);
+                }
                 $logger->notice(sprintf('[%s] = %s', $key, $val));
             }
         }

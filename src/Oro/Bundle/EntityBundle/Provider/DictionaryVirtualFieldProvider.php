@@ -102,9 +102,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $associationNames = $metadata->getAssociationNames();
             foreach ($associationNames as $associationName) {
                 $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($metadata->isSingleValuedAssociation($associationName)
-                    && isset($this->dictionaries[$targetClassName])
-                ) {
+                if (isset($this->dictionaries[$targetClassName])) {
                     $fields = $this->dictionaries[$targetClassName];
                     $isCombinedLabelName = count($fields) > 1;
                     $fieldNames = array_keys($fields);
@@ -150,24 +148,24 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $configs            = $this->groupingConfigProvider->getConfigs();
             foreach ($configs as $config) {
                 $groups = $config->get('groups');
-                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
+                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
                     $className  = $config->getId()->getClassName();
                     $metadata   = $this->getManagerForClass($className)->getClassMetadata($className);
-                    $fieldNames = null;
-                    if ($this->dictionaryConfigProvider->hasConfig($className)) {
-                        $fieldNames = $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields');
-                    }
-                    if (null === $fieldNames) {
-                        $fieldNames = array_filter(
-                            $metadata->getFieldNames(),
-                            function ($fieldName) use (&$metadata) {
-                                return !$metadata->isIdentifier($fieldName);
+                    $fields     = [];
+                    $fieldNames = $this->dictionaryConfigProvider->hasConfig($className)
+                        ? $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields', false, [])
+                        : [];
+                    if (!empty($fieldNames)) {
+                        foreach ($fieldNames as $fieldName) {
+                            $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
+                        }
+                    } else {
+                        $fieldNames = $metadata->getFieldNames();
+                        foreach ($fieldNames as $fieldName) {
+                            if (!$metadata->isIdentifier($fieldName)) {
+                                $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
                             }
-                        );
-                    }
-                    $fields = [];
-                    foreach ($fieldNames as $fieldName) {
-                        $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
+                        }
                     }
                     $this->dictionaries[$className] = $fields;
                 }

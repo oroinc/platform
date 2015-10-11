@@ -86,7 +86,8 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
      */
     protected function runActivityLists(LoggerInterface $logger, $dryRun = false)
     {
-        $this->configManager->clearModelCache();
+        // @todo: this workaround should be removed in BAP-9156
+        $this->configManager->clear();
 
         $targetEntities   = $this->provider->getTargetEntityClasses();
         $toSchema         = clone $this->schema;

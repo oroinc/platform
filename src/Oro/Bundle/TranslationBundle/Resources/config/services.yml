@@ -90,7 +90,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
+            - [ setNamespace, [ 'oro_db_trans_metadata' ] ]
 
     oro_translation.database_translation.persister:
         class: %oro_translation.database_translation.persister.class%
@@ -111,7 +111,7 @@ services:
     oro_translation.cache:
           parent: oro.cache.abstract
           calls:
-              - [setNamespace, ['oro_translation.cache']]
+              - [setNamespace, [ 'oro_trans' ] ]
 
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%

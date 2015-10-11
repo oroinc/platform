@@ -6,19 +6,18 @@ define(function(require) {
      * Provides access to entity_select search API.
      *
      * @class
-     * @augment SearchApiAccessor
+     * @augments [SearchApiAccessor](../../../../UIBundle/Resources/doc/reference/client-side/search-api-accessor.md)
+     *
+     * @param options {Object}
+     * @param options.entity_name {string} The entity name to search in
+     * @param options.field_name {string} The field to search by and to show in UI
+     *
      * @exports EntitySelectSearchApiAccessor
      */
     var EntitySelectSearchApiAccessor;
     var SearchApiAccessor = require('oroui/js/tools/search-api-accessor');
 
     EntitySelectSearchApiAccessor = SearchApiAccessor.extend(/** @exports EntitySelectSearchApiAccessor.prototype */{
-        /**
-         * @constructor
-         * @param options {Object}
-         * @param options.entity_name {string} entity name to search in
-         * @param options.field_name {string} field to search by and to show in UI
-         */
         initialize: function(options) {
             if (!options) {
                 options = {};
@@ -33,9 +32,6 @@ define(function(require) {
             EntitySelectSearchApiAccessor.__super__.initialize.call(this, options);
         },
 
-        /**
-         * @inheritDoc
-         */
         prepareUrlParameters: function(urlParameters) {
             urlParameters.query = [urlParameters.term, this.entityName, this.fieldName].join(',');
             urlParameters.name = this.searchHandlerName;

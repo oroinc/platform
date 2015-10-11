@@ -3,6 +3,9 @@ define(function(require) {
 
     var EmailNotificationView;
     var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
     var BaseView = require('oroui/js/app/views/base/view');
@@ -12,21 +15,19 @@ define(function(require) {
 
         templateSelector: '#email-notification-item-template',
 
-        className: function() {
-            return this.model.get('seen') ? '' : 'new';
-        },
-
         events: {
-            'click .info': 'onClickOpenEmail'
+            'click .title': 'onClickOpenEmail',
+            'click [data-role=toggle-read-status]': 'onClickReadStatus'
         },
 
         listen: {
-            'change model': 'render'
+            'change model': 'render',
+            'addedToParent': 'delegateEvents'
         },
 
         render: function() {
             EmailNotificationView.__super__.render.apply(this, arguments);
-            this.$el.find('.replay a').attr('data-url', this.model.get('route'));
+            this.$el.toggleClass('highlight', !this.model.get('seen'));
             this.initLayout();
         },
 
@@ -42,6 +43,32 @@ define(function(require) {
             var url = routing.generate('oro_email_thread_view', {id: this.model.get('id')});
             this.model.set({'seen': true});
             mediator.execute('redirectTo', {url: url});
+        },
+
+        onClickReadStatus: function(e) {
+            e.stopPropagation();
+            var model = this.model;
+            var status = model.get('seen');
+            var url = routing.generate('oro_email_mark_seen', {
+                id: model.get('id'),
+                status: status ? 0 : 1,
+                checkThread: 0
+            });
+            model.set('seen', !status);
+            Backbone.ajax({
+                type: 'GET',
+                url: url,
+                success: function(response) {
+                    if (_.result(response, 'successful') !== true) {
+                        model.set('seen', status);
+                        mediator.execute('showErrorMessage', __('Sorry, unexpected error was occurred'), 'error');
+                    }
+                },
+                error: function(xhr, err, message) {
+                    model.set('seen', status);
+                    mediator.execute('showErrorMessage', message, err);
+                }
+            });
         }
     });
 

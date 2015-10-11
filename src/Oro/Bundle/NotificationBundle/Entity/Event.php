@@ -5,7 +5,8 @@ namespace Oro\Bundle\NotificationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Event
+ * IMPORTANT: by performance reasons a table name (rather that a class name) of this entity is used in
+ * @see Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass
  *
  * @ORM\HasLifecycleCallbacks
  * @ORM\Table(name="oro_notification_event")

@@ -1,9 +1,9 @@
 <a name="module_ApiAccessor"></a>
 ## ApiAccessor
-Abstraction of api access point. This class is designed to create from server configuration.
+Abstraction of api access point. This class is by design to be initiated from server configuration.
 
-#### Sample usage of api_accessor with full options provided.
-Example configuration is provided on server:
+#### Sample usage of api_accessor with a full set of options provided.
+Example of configuration provided on the server:
 ``` yml
 save_api_accessor:
     route: orocrm_opportunity_task_update # for example this route uses following mask
@@ -17,7 +17,7 @@ save_api_accessor:
     query_parameter_names: [action]
 ```
 
-Then following code on client:
+Then following code on the client:
 ``` javascript
 var apiAP = new ApiAccessror(serverConfiguration);
 apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
@@ -25,29 +25,29 @@ apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
 })
 ```
 Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
-and will put response to console after it will be finished
+and will put response to console after completion
 
 **Augment**: BaseClass  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| options | <code>object</code> | Options container. |
+| options | <code>Object</code> | Options container |
 | options.route | <code>string</code> | Required. Route name |
 | options.http_method | <code>string</code> | Http method to access this route (e.g. GET/POST/PUT/PATCH...)                          By default `'GET'`. |
-| options.form_name | <code>string</code> | Optional. Wraps request body into form_name, so request will look like                          `{<form_name>:<request_body>}` |
-| options.headers | <code>object</code> | Optional. Allows to provide additional http headers |
-| options.default_route_parameters | <code>object</code> | Optional. Provides default parameters values for route                          creation, this defaults will be merged with row model data to get url |
-| options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string(e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable                          query parameters for client usage, so it is required to specify list of them) |
+| options.form_name | <code>string</code> | Optional. Wraps the request body into a form_name, so request will look like                          `{<form_name>:<request_body>}` |
+| options.headers | <code>Object</code> | Optional. Allows to provide additional http headers |
+| options.default_route_parameters | <code>Object</code> | Optional. Provides default parameters for route,                                                    this defaults will be merged the `urlParameters` to get url |
+| options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable                          query parameters for client usage, so it is required to specify list of them) |
 
 
 * [ApiAccessor](#module_ApiAccessor)
   * [.initialize(Options)](#module_ApiAccessor#initialize)
   * [.send(urlParameters, body, headers)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
-  * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>object</code>
-  * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>object</code>
+  * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>Object</code>
+  * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>Object</code>
   * [.getUrl(urlParameters)](#module_ApiAccessor#getUrl) ⇒ <code>string</code>
-  * [.formatBody(body)](#module_ApiAccessor#formatBody) ⇒ <code>object</code>
-  * [.formatResult(response)](#module_ApiAccessor#formatResult) ⇒ <code>object</code>
+  * [.formatBody(body)](#module_ApiAccessor#formatBody) ⇒ <code>Object</code>
+  * [.formatResult(response)](#module_ApiAccessor#formatResult) ⇒ <code>Object</code>
 
 <a name="module_ApiAccessor#initialize"></a>
 ### apiAccessor.initialize(Options)
@@ -55,34 +55,34 @@ and will put response to console after it will be finished
 
 | Param | Type | Description |
 | --- | --- | --- |
-| Options | <code>object</code> | passed to constructor |
+| Options | <code>Object</code> | passed to the constructor |
 
 <a name="module_ApiAccessor#send"></a>
 ### apiAccessor.send(urlParameters, body, headers) ⇒ <code>$.Promise</code>
-Sends request to server and returns $.Promise with abort() support
+Sends request to the server and returns $.Promise instance with abort() support
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
-**Returns**: <code>$.Promise</code> - - Promise with abort() support  
+**Returns**: <code>$.Promise</code> - - $.Promise instance with abort() support  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| urlParameters | <code>object</code> | Url parameters to combine url |
-| body | <code>object</code> | Request body |
-| headers | <code>object</code> | Headers to send with request |
+| urlParameters | <code>Object</code> | Url parameters to compose the url |
+| body | <code>Object</code> | Request body |
+| headers | <code>Object</code> | Headers to send with the request |
 
 <a name="module_ApiAccessor#getHeaders"></a>
-### apiAccessor.getHeaders(headers) ⇒ <code>object</code>
-Prepares headers for request.
+### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>
+Prepares headers for the request.
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| headers | <code>object</code> | Headers to merge into default list |
+| headers | <code>Object</code> | Headers to merge into the default list |
 
 <a name="module_ApiAccessor#prepareUrlParameters"></a>
-### apiAccessor.prepareUrlParameters(urlParameters) ⇒ <code>object</code>
-Prepares url parameters before build url
+### apiAccessor.prepareUrlParameters(urlParameters) ⇒ <code>Object</code>
+Prepares url parameters before the url build
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
@@ -92,31 +92,31 @@ Prepares url parameters before build url
 
 <a name="module_ApiAccessor#getUrl"></a>
 ### apiAccessor.getUrl(urlParameters) ⇒ <code>string</code>
-Prepares url for request.
+Prepares url for the request.
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| urlParameters | <code>object</code> | Map of url parameters to use |
+| urlParameters | <code>Object</code> | Map of url parameters to use |
 
 <a name="module_ApiAccessor#formatBody"></a>
-### apiAccessor.formatBody(body) ⇒ <code>object</code>
-Prepares request body.
+### apiAccessor.formatBody(body) ⇒ <code>Object</code>
+Prepares the request body.
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| body | <code>object</code> | Map of url parameters to use |
+| body | <code>Object</code> | Map of the url parameters to use |
 
 <a name="module_ApiAccessor#formatResult"></a>
-### apiAccessor.formatResult(response) ⇒ <code>object</code>
-Formats response before it will be sent out from this api accessor.
+### apiAccessor.formatResult(response) ⇒ <code>Object</code>
+Formats response before it is sent out from this api accessor.
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
 
 | Param | Type |
 | --- | --- |
-| response | <code>object</code> | 
+| response | <code>Object</code> | 
 

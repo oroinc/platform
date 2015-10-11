@@ -92,13 +92,13 @@ define(function(require) {
             }
             switch (this.options.metadata.inline_editing.behaviour) {
                 case 'enable_all':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enabled === false) {
+                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
                         return false;
                     }
                     return (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
                         this.options.metadata.inline_editing.default_editors;
                 case 'enable_selected':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enabled === true) {
+                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
                         return true;
                     }
                     break;
