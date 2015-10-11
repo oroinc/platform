@@ -49,4 +49,14 @@ interface OwnerTreeInterface
      * @param int|string|null $globalLevelEntityId
      */
     public function addLocalEntity($localLevelEntityId, $globalLevelEntityId = null);
+
+    /**
+     * Calculate subordinated entity ids.
+     *
+     * The main aim is to remove such calculations inside each "addDeepEntity" as it has performance impact in case of
+     * huge amount of entities.
+     *
+     * Should be called only once after all "addDeepEntity".
+     */
+    public function buildTree();
 }
