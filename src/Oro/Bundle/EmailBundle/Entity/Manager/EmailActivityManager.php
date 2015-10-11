@@ -300,6 +300,8 @@ class EmailActivityManager
      * @param array $contexts
      * @param array $anotherContexts
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getContextsDiff(array $contexts, array $anotherContexts)
     {

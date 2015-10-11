@@ -211,13 +211,13 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContextsDiff()
     {
-        $user = new User();
+        $user = new TestUser();
         $user->setId(1);
 
-        $anotherUser = new User();
+        $anotherUser = new TestUser();
         $anotherUser->setId(2);
 
-        $thirdUser = new User();
+        $thirdUser = new TestUser();
         $thirdUser->setId(3);
 
         $contexts = [$user, $anotherUser, $thirdUser];
