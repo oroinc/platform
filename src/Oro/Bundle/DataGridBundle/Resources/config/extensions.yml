@@ -43,6 +43,7 @@ services:
         class: %oro_datagrid.extension.inline_editing.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
         tags:
             - { name: oro_datagrid.extension }
 

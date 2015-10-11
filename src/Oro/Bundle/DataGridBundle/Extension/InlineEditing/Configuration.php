@@ -7,17 +7,34 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const BASE_CONFIG_KEY             = 'inline_editing';
-    const BEHAVIOUR_DEFAULT_VALUE     = 'enable_selected';
-    const BEHAVIOUR_ENABLE_ALL_VALUE  = 'enable_all';
-    const ENABLED_CONFIG_PATH         = '[inline_editing][enable]';
+    const BASE_CONFIG_KEY                   = 'inline_editing';
+    const CONFIG_KEY_ENABLE                 = 'enable';
+    const BEHAVIOUR_DEFAULT_VALUE           = 'enable_selected';
+    const BEHAVIOUR_ENABLE_ALL_VALUE        = 'enable_all';
+    const ENABLED_CONFIG_PATH               = '[inline_editing][enable]';
+    const INLINE_EDIT_BLACK_LIST_ID         = 'id';
+    const INLINE_EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
+    const INLINE_EDIT_BLACK_LIST_UPDATED_AT = 'updatedAt';
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $types;
 
+    /**
+     * @var array
+     */
     protected $behaviourConfigValues;
 
+    /**
+     * @var string
+     */
     protected $root;
+
+    /**
+     * @var array
+     */
+    protected $inlineEditBlackList;
 
     /**
      * @param string $root
@@ -26,6 +43,11 @@ class Configuration implements ConfigurationInterface
     {
         $this->root  = $root;
         $this->behaviourConfigValues = [self::BEHAVIOUR_DEFAULT_VALUE, self::BEHAVIOUR_ENABLE_ALL_VALUE];
+        $this->inlineEditBlackList = [
+            self::INLINE_EDIT_BLACK_LIST_ID,
+            self::INLINE_EDIT_BLACK_LIST_CREATED_AT,
+            self::INLINE_EDIT_BLACK_LIST_UPDATED_AT,
+        ];
     }
 
     /**
@@ -37,7 +59,11 @@ class Configuration implements ConfigurationInterface
 
         $builder->root($this->root)
             ->validate()
-                ->ifTrue(function($v){ return $v['enable'] == true && empty($v['entity_name']);})
+                ->ifTrue(
+                    function ($value) {
+                        return $value[self::CONFIG_KEY_ENABLE] == true && empty($value['entity_name']);
+                    }
+                )
                 ->thenInvalid('"entity_name" parameter must be not empty.')
             ->end()
             ->children()
@@ -62,5 +88,13 @@ class Configuration implements ConfigurationInterface
             ->end();
 
         return $builder;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBlackList()
+    {
+        return $this->inlineEditBlackList;
     }
 }

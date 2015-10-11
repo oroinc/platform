@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -17,9 +18,15 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected $entityManager;
 
-    public function __construct(OroEntityManager $entityManager)
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    public function __construct(OroEntityManager $entityManager, SecurityFacade $securityFacade)
     {
         $this->entityManager = $entityManager;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -39,11 +46,16 @@ class InlineEditingExtension extends AbstractExtension
     {
         $configItems    = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
         $configuration   = new Configuration(Configuration::BASE_CONFIG_KEY);
+        $isGranted = $this->securityFacade->isGranted('EDIT', 'entity:' . $configItems['entity_name']);
 
         $normalizedConfigItems = $this->validateConfiguration(
             $configuration,
             [Configuration::BASE_CONFIG_KEY => $configItems]
         );
+
+        if (!$isGranted) {
+            $normalizedConfigItems[Configuration::CONFIG_KEY_ENABLE] = false;
+        }
 
         // replace config values by normalized, extra keys passed directly
         $config->offsetSet(
@@ -52,17 +64,27 @@ class InlineEditingExtension extends AbstractExtension
         );
 
         //add inline editing where it is possible
-        $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
-        $configParams = $config->offsetGet(Configuration::BASE_CONFIG_KEY);
-        $metadata = $this->entityManager->getClassMetadata($configParams['entity_name']);
+        if ($isGranted) {
+            $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
+            $metadata = $this->entityManager->getClassMetadata($configItems['entity_name']);
+            $blackList = $configuration->getBlackList();
 
-        foreach ($columns as $columnName => &$column) {
-            if ($metadata->hasField($columnName)) {
-                $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
+            foreach ($columns as $columnName => &$column) {
+                if ($metadata->hasField($columnName)
+                    && !in_array($columnName, $blackList)
+                    && !$metadata->hasAssociation($columnName)
+                ) {
+                    $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
+                } else {
+                    $mapping = $metadata->getAssociationMapping($columnName);
+                    if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
+                        //try to create select list
+                    }
+                }
             }
-        }
 
-        $config->offsetSet(FormatterConfiguration::COLUMNS_KEY, $columns);
+            $config->offsetSet(FormatterConfiguration::COLUMNS_KEY, $columns);
+        }
     }
 
     /**
