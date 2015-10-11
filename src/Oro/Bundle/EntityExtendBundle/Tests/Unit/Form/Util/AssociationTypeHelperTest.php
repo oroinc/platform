@@ -136,7 +136,7 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null, false],
-            [['some_group'], false],
+            [['some'], false],
             ['true', true],
             ['false', false],
         ];
