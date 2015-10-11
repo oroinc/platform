@@ -37,7 +37,9 @@ class Configuration implements ConfigurationInterface
 
         $builder->root($this->root)
             ->validate()
-                ->ifTrue(function($v){ return $v['enable'] == true && empty($v['entity_name']);})
+                ->ifTrue(function ($v) {
+                    return $v['enable'] == true && empty($v['entity_name']);
+                })
                 ->thenInvalid('"entity_name" parameter must be not empty.')
             ->end()
             ->children()

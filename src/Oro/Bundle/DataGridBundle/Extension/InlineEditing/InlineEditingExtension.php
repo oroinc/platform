@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -17,6 +15,9 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected $entityManager;
 
+    /**
+     * @param OroEntityManager $entityManager
+     */
     public function __construct(OroEntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
