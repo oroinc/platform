@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -10,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
 class InlineEditingExtension extends AbstractExtension
 {
@@ -19,15 +17,9 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected $entityManager;
 
-    /**
-     * @var DictionaryHelper
-     */
-    protected $dictionaryHelper;
-
-    public function __construct(OroEntityManager $entityManager, DictionaryHelper $dictionaryHelper)
+    public function __construct(OroEntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->dictionaryHelper = $dictionaryHelper;
     }
 
     /**
@@ -67,8 +59,6 @@ class InlineEditingExtension extends AbstractExtension
         foreach ($columns as $columnName => &$column) {
             if ($metadata->hasField($columnName)) {
                 $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
-            } elseif ($metadata->hasAssociation($columnName)) {
-                //create select list if possible
             }
         }
 
@@ -84,17 +74,5 @@ class InlineEditingExtension extends AbstractExtension
             Configuration::BASE_CONFIG_KEY,
             $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, [])
         );
-    }
-
-    protected function prepareChoices($results, $keyField, $labelField)
-    {
-        $resultsData = [];
-        $methodGetPK = 'get' . ucfirst($keyField);
-        $methodGetLabel = 'get' . ucfirst($labelField);
-        foreach ($results as $result) {
-            $resultsData[$result->$methodGetPK()] = $result->$methodGetLabel();
-        }
-
-        return $resultsData;
     }
 }

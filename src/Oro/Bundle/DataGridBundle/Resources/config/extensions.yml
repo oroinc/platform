@@ -43,7 +43,6 @@ services:
         class: %oro_datagrid.extension.inline_editing.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @oro_entity.helper.dictionary
         tags:
             - { name: oro_datagrid.extension }
 
