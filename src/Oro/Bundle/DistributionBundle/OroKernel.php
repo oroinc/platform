@@ -21,6 +21,8 @@ use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 /**
  * This class should work on PHP 5.3
  * Keep old array syntax
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class OroKernel extends Kernel
 {
