@@ -27,6 +27,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "dictionary"={
  *              "search_fields"={"name"},
  *              "virtual_fields"={"id"},
+ *              "activity_support"="true"
  *          },
  *          "entity"={
  *              "icon"="icon-building"
