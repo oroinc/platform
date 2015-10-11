@@ -83,7 +83,7 @@ class DatabaseType extends AbstractType
                 'choice',
                 array(
                     'label'         => 'form.configuration.database.drop',
-                    'data'          => 'app',
+                    'data'          => 'none',
                     'choices'       => array(
                         'none' => 'form.configuration.database.drop_none',
                         'app'  => 'form.configuration.database.drop_app',
