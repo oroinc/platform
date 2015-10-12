@@ -181,9 +181,14 @@ class EmailExtension extends \Twig_Extension
      */
     public function getEmailClankEvent()
     {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return '';
+        }
+
         $currentOrganization = $this->securityFacade->getOrganization();
-        $currentUser = $this->securityFacade->getLoggedUser();
-        return  WebSocketSendProcessor::getUserTopic($currentUser, $currentOrganization);
+        $currentUser         = $this->securityFacade->getLoggedUser();
+
+        return WebSocketSendProcessor::getUserTopic($currentUser, $currentOrganization);
     }
 
     /**
@@ -193,6 +198,10 @@ class EmailExtension extends \Twig_Extension
      */
     public function getUnreadEmailsCount()
     {
+        if (!$this->securityFacade->hasLoggedUser()) {
+            return [];
+        }
+
         $currentOrganization = $this->securityFacade->getOrganization();
         $currentUser = $this->securityFacade->getLoggedUser();
         $result = $this->em->getRepository("OroEmailBundle:Email")
@@ -200,6 +209,7 @@ class EmailExtension extends \Twig_Extension
         $total = $this->em->getRepository("OroEmailBundle:Email")
             ->getCountNewEmails($currentUser, $currentOrganization);
         $result[] = array('num' => $total, 'id' => 0);
+
         return $result;
     }
 
