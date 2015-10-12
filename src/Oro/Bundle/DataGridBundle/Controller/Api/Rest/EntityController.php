@@ -20,7 +20,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_entity_")
- *
  */
 class EntityController extends RestController
 {
