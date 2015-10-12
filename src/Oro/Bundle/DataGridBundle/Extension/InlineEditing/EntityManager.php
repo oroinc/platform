@@ -30,14 +30,12 @@ class EntityManager
      * @param Registry $registry
      * @param FormBuilder $formBuilder
      */
-    public function __construct(
-        Registry $registry,
-        FormBuilder $formBuilder
-    ) {
+    public function __construct(Registry $registry, FormBuilder $formBuilder)
+    {
         $this->registry = $registry;
-        $this->formBuilder = $formBuilder;
-
         $this->em = $this->registry->getManager();
+        $this->formBuilder = $formBuilder;
+        parent::__construct(null, $this->em);
     }
 
     /**
@@ -54,7 +52,7 @@ class EntityManager
      * @param $fieldName
      * @return bool
      */
-    public function hasAccessEditFiled($fieldName)
+    protected function hasAccessEditFiled($fieldName)
     {
         $blackList = FieldsBlackList::getValues();
         if ((in_array($fieldName, $blackList))) {

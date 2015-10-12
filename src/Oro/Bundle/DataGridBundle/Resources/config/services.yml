@@ -29,7 +29,7 @@ parameters:
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
 
-    oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditings\EntityManager
+    oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager
     oro_datagrid.extension.inline_editing.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder
 services:
     oro_datagrid.datagrid.manager:
