@@ -30,6 +30,7 @@ parameters:
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.entity.manager.api.class:                        Oro\Bundle\DataGridBundle\Manager\Api\EntityManagerApi
 
+    oro_datagrid.manager.api.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Manager\Api\EntityManager\FormBuilder
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -171,4 +172,10 @@ services:
         class: %oro_datagrid.entity.manager.api.class%
         arguments:
             - @doctrine
+            - @oro_datagrid.manager.api.entity_manager.form_builder
+
+    oro_datagrid.manager.api.entity_manager.form_builder:
+        class: %oro_datagrid.manager.api.entity_manager.form_builder.class%
+        arguments:
             - @form.factory
+            - @doctrine
