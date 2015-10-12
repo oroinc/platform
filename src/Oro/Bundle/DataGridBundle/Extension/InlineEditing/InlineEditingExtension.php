@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class InlineEditingExtension extends AbstractExtension
 {
@@ -72,7 +75,7 @@ class InlineEditingExtension extends AbstractExtension
                     && !$metadata->hasAssociation($columnName)
                 ) {
                     $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
-                } else {
+                } elseif ($metadata->hasAssociation($columnName)) {
                     $mapping = $metadata->getAssociationMapping($columnName);
                     if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
                         //try to create select list
