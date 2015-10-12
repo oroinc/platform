@@ -23,6 +23,10 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected $securityFacade;
 
+    /**
+     * @param OroEntityManager $entityManager
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(OroEntityManager $entityManager, SecurityFacade $securityFacade)
     {
         $this->entityManager = $entityManager;
