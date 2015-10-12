@@ -38,16 +38,6 @@ class EntityManager
     }
 
     /**
-     * @param $className
-     * @param $entityId
-     * @return object
-     */
-    public function getEntity($className, $entityId)
-    {
-        return $this->registry->getManager()->find($className, $entityId);
-    }
-
-    /**
      * @param $fieldName
      * @return bool
      */

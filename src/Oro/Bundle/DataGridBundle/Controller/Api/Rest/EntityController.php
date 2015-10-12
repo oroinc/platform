@@ -50,8 +50,6 @@ class EntityController extends FOSRestController
     public function patchAction($className, $id)
     {
         $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
-//        $className = strtr($className, '', '\\');
-//        $entity = $this->getManager()->getEntity($className, $id);
 
         if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
