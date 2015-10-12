@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
@@ -10,53 +9,27 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigUpdateEvent */
     protected $event;
 
-    /** @var ConfigManager */
-    protected $cm;
-
     /** @var array */
-    protected $testUpdatedConfigValues
-        = [
-            'oro_user___level' => [
-                'value' => 50,
-            ]
-        ];
-
-    /** @var array */
-    protected $testDeletedConfigValues
-        = [
-            ['oro_user', 'greeting'],
-            ['oro_user', 'testNotChangedValue']
-        ];
+    protected $changeSet = [
+        'oro_user.greeting' => [
+            'old' => 'old value',
+            'new' => 'default value'
+        ],
+        'oro_user.level' => [
+            'old' => 'pre value',
+            'new' => 50
+        ]
+    ];
 
 
     protected function setUp()
     {
-        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->cm->expects($this->exactly(5))->method('get')
-            ->will($this->onConsecutiveCalls('old value', 'default value', 'old value', 'old value', 'pre value'));
-
-        $this->event = new ConfigUpdateEvent($this->cm, $this->testUpdatedConfigValues, $this->testDeletedConfigValues);
+        $this->event = new ConfigUpdateEvent($this->changeSet);
     }
 
     public function testChangeSet()
     {
-        $result = $this->event->getChangeSet();
-
-        $this->assertEquals(
-            [
-                'oro_user.greeting' => [
-                    'old' => "old value",
-                    'new' => "default value"
-                ],
-                'oro_user.level' => [
-                    'old' => "pre value",
-                    'new' => 50
-                ]
-            ],
-            $result
-        );
+        $this->assertEquals($this->changeSet, $this->event->getChangeSet());
     }
 
     /**
@@ -112,8 +85,8 @@ class ConfigUpdateEventTest extends \PHPUnit_Framework_TestCase
             'changed value'     => [
                 'oro_user.greeting',
                 [
-                    'old' => "old value",
-                    'new' => "default value"
+                    'old' => 'old value',
+                    'new' => 'default value'
                 ]
             ],
             'not changed value' => [

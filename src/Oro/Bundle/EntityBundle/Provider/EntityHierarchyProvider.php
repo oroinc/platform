@@ -77,24 +77,10 @@ class EntityHierarchyProvider
                 }
 
                 $className = $entityConfig->getId()->getClassName();
-                $parents   = [];
-                $this->loadParents($parents, $className);
-                if (empty($parents)) {
-                    continue;
+                $parents   = $this->loadParents($className);
+                if (!empty($parents)) {
+                    $this->hierarchy[$className] = $parents;
                 }
-
-                // remove proxies if they are in list of parents
-                $parents = array_filter(
-                    $parents,
-                    function ($parentClassName) {
-                        return strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0;
-                    }
-                );
-                if (empty($parents)) {
-                    continue;
-                }
-
-                $this->hierarchy[$className] = $parents;
             }
         }
     }
@@ -102,20 +88,32 @@ class EntityHierarchyProvider
     /**
      * Finds parent doctrine entities for given entity class name
      *
-     * @param array  $result
      * @param string $className
+     *
+     * @return string[]
      */
-    protected function loadParents(array &$result, $className)
+    protected function loadParents($className)
     {
+        $result = [];
+
         $reflection  = new \ReflectionClass($className);
         $parentClass = $reflection->getParentClass();
-        if ($parentClass) {
+        while ($parentClass) {
             $parentClassName = $parentClass->getName();
-            $em              = $this->doctrine->getManagerForClass($className);
-            if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
-                $result[] = $parentClassName;
+            // a parent class should be:
+            // - not extended entity proxy
+            // - registered in Doctrine, for example Entity or MappedSuperclass
+            if (strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0) {
+                $em = $this->doctrine->getManagerForClass($className);
+                if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
+                    $result[] = $parentClassName;
+                }
             }
-            $this->loadParents($result, $parentClassName);
+
+            $reflection  = new \ReflectionClass($parentClassName);
+            $parentClass = $reflection->getParentClass();
         }
+
+        return $result;
     }
 }

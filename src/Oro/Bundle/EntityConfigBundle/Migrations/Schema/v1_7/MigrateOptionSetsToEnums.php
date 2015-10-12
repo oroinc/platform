@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_7;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -83,7 +82,14 @@ class MigrateOptionSetsToEnums implements
             );
             $existingEnumTables[] = $enumTable->getName();
 
-            $optionSet['table_name']      = $entityTableName;
+            $optionSet['table_name'] = $entityTableName;
+            if ($data['extend']['set_expanded']) {
+                $pkColumns = $schema->getTable($entityTableName)
+                    ->getPrimaryKey()
+                    ->getColumns();
+
+                $optionSet['pk_column_name'] = reset($pkColumns);
+            }
             $optionSet['enum_class_name'] = ExtendHelper::buildEnumValueClassName($enumCode);
             $optionSet['enum_table_name'] = $enumTable->getName();
         }
@@ -192,6 +198,8 @@ class MigrateOptionSetsToEnums implements
                     if ($optionSet['data']['extend']['set_expanded']) {
                         $this->assignMultiEnumValue(
                             $queries,
+                            $optionSet['table_name'],
+                            $optionSet['pk_column_name'],
                             $optionSet['class_name'],
                             $optionSet['field_name'],
                             $optionSet['enum_class_name'],
@@ -261,6 +269,8 @@ class MigrateOptionSetsToEnums implements
 
     /**
      * @param QueryBag $queries
+     * @param string   $entityTableName
+     * @param string   $entityPkColumnName
      * @param string   $entityClassName
      * @param string   $entityFieldName
      * @param string   $enumClassName
@@ -269,6 +279,8 @@ class MigrateOptionSetsToEnums implements
      */
     protected function assignMultiEnumValue(
         QueryBag $queries,
+        $entityTableName,
+        $entityPkColumnName,
         $entityClassName,
         $entityFieldName,
         $enumClassName,
@@ -278,11 +290,14 @@ class MigrateOptionSetsToEnums implements
         $nameGenerator = $this->extendExtension->getNameGenerator();
 
         $query  = sprintf(
-            'INSERT INTO %s (%s, %s) '
-            . 'VALUES (:entityId, :enumValueId)',
+            'INSERT INTO %s (%s, %s) SELECT %s, :enumValueId '
+            . 'FROM %s WHERE %s = :entityId',
             $nameGenerator->generateManyToManyJoinTableName($entityClassName, $entityFieldName, $enumClassName),
             $nameGenerator->generateManyToManyRelationColumnName($entityClassName),
-            $nameGenerator->generateManyToManyRelationColumnName($enumClassName)
+            $nameGenerator->generateManyToManyRelationColumnName($enumClassName),
+            $entityPkColumnName,
+            $entityTableName,
+            $entityPkColumnName
         );
         $params = [
             'entityId'    => $entityId,

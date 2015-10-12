@@ -3,9 +3,9 @@ define(['underscore', 'orotranslation/js/translator'
     'use strict';
 
     var defaultParam = {
-        exactMessage: '',
-        maxMessage: '',
-        minMessage: ''
+        exactMessage: 'oro.form.number.exect',
+        maxMessage: 'oro.form.number.max',
+        minMessage: 'oro.form.number.min'
     };
 
     /**

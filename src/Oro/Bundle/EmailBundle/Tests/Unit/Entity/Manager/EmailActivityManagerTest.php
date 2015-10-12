@@ -209,6 +209,29 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->manager->getQueue());
     }
 
+    public function testGetContextsDiff()
+    {
+        $user = new TestUser();
+        $user->setId(1);
+
+        $anotherUser = new TestUser();
+        $anotherUser->setId(2);
+
+        $thirdUser = new TestUser();
+        $thirdUser->setId(3);
+
+        $contexts = [$user, $anotherUser, $thirdUser];
+        $otherContexts = [$user, $thirdUser];
+
+        $result = $this->manager->getContextsDiff($contexts, $otherContexts);
+        $this->assertEquals($result, [$anotherUser]);
+
+        $contexts = ["one", "two", "three"];
+        $otherContexts = ["two", "three"];
+        $result = $this->manager->getContextsDiff($contexts, $otherContexts);
+        $this->assertEquals($result, ["one"]);
+    }
+
     /**
      * @param integer $id
      * @param integer $thread
