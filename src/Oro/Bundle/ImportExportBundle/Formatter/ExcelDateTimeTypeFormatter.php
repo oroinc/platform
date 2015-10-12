@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Formatter;
 
 class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
 {
