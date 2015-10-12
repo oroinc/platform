@@ -26,3 +26,4 @@ items:
         template: OroEmailBundle:Js:default_templates.js.twig
     email_requirejs_config:
         template: OroEmailBundle::requirejs.config.js.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
