@@ -24,6 +24,8 @@ services:
         class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
         arguments:
             - @service_container
+            - []
+            - []
         public: false
 
     oro_importexport.formatter.excel_datetime:

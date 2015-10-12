@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Unit\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 

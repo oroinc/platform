@@ -21,7 +21,7 @@ use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
-    /** @var string[] */
+    /** @var array [{data_type} => {frontend_type}] */
     protected static $formatFrontendTypesMap = [
         DateTimeTypeFormatter::TYPE_DATE     => PropertyInterface::TYPE_DATE,
         DateTimeTypeFormatter::TYPE_DATETIME => PropertyInterface::TYPE_DATETIME,
@@ -65,8 +65,8 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     /**
      * @param ServiceLink         $gridManagerLink
      * @param TranslatorInterface $translator
-     * @param FormatterProvider   $formatterProvider
      * @param ColumnsHelper       $columnsHelper
+     * @param FormatterProvider   $formatterProvider
      */
     public function __construct(
         ServiceLink $gridManagerLink,
