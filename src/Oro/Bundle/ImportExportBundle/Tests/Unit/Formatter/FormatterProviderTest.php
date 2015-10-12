@@ -21,7 +21,7 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
     protected $formatters = ['exist_alias' => 'exist_formatter'];
 
     /** @var array */
-    protected $typeFormatters = ['test_type' => 'test_formatter'];
+    protected $typeFormatters = ['test_format_type' => ['test_type' => 'test_formatter']];
 
     protected function setUp()
     {
@@ -49,16 +49,16 @@ class FormatterProviderTest extends \PHPUnit_Framework_TestCase
     {
         $testTypeFormatter = new \stdClass();
         $this->setContainerMock('test_formatter', $testTypeFormatter);
-        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_type'));
+        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_format_type', 'test_type'));
 
         // test already created formatter will be stored in provider
-        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_type'));
+        $this->assertEquals($testTypeFormatter, $this->formatter->getFormatterFor('test_format_type', 'test_type'));
 
         $this->setExpectedException(
             'Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException',
-            'No available formatters for "non_exist_type" type.'
+            'No available formatters for "non_exist_type" format_type and "test_type" data_type.'
         );
-        $this->formatter->getFormatterFor('non_exist_type');
+        $this->formatter->getFormatterFor('non_exist_type', 'test_type');
     }
 
     protected function setContainerMock($id, \stdClass $testTypeFormatter)

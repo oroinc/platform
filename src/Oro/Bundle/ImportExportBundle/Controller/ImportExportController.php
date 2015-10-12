@@ -17,7 +17,6 @@ use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\LocaleBundle\Formatter\ExcelDateTimeTypeFormatter;
 
 class ImportExportController extends Controller
 {
@@ -70,6 +69,7 @@ class ImportExportController extends Controller
      * @Template
      *
      * @param string $processorAlias
+     *
      * @return array
      */
     public function importValidateAction($processorAlias)
@@ -80,8 +80,11 @@ class ImportExportController extends Controller
         $existingAliases   = $processorRegistry
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
-        $jobName           = $this->getRequest()->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
-        $result            = $this->getImportHandler()->handleImportValidation(
+        $jobName                = $this->getRequest()->get(
+            'importValidateJob',
+            JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV
+        );
+        $result                 = $this->getImportHandler()->handleImportValidation(
             $jobName,
             $processorAlias,
             'csv',
@@ -98,6 +101,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return JsonResponse
      */
     public function importProcessAction($processorAlias)
@@ -119,12 +123,12 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function instantExportAction($processorAlias)
     {
-        $jobName        = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
-        $formatterAlias = ExcelDateTimeTypeFormatter::FORMATTER_ALIAS;
+        $jobName = $this->getRequest()->get('exportJob', JobExecutor::JOB_EXPORT_TO_CSV);
 
         return $this->getExportHandler()->handleExport(
             $jobName,
@@ -133,13 +137,7 @@ class ImportExportController extends Controller
             'csv',
             null,
             array_merge(
-                [
-                    FormatterProvider::FORMATTER_PROVIDER => [
-                        'datetime' => $formatterAlias,
-                        'date'     => $formatterAlias,
-                        'time'     => $formatterAlias
-                    ]
-                ],
+                [FormatterProvider::FORMAT_TYPE => 'excel'],
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
@@ -151,6 +149,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function templateExportAction($processorAlias)
@@ -173,6 +172,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $fileName
+     *
      * @return Response
      */
     public function downloadExportResultAction($fileName)
@@ -185,6 +185,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport")
      *
      * @param string $jobCode
+     *
      * @return Response
      */
     public function errorLogAction($jobCode)

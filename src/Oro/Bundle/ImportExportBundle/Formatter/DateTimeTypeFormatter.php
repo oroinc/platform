@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Formatter;
 
-use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterInterface
 {
-    const FORMAT_TYPE_DATETIME = 'format_type_datetime';
-    const FORMAT_TYPE_DATE     = 'format_type_date';
-    const FORMAT_TYPE_TIME     = 'format_type_time';
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_DATE     = 'date';
+    const TYPE_TIME     = 'time';
 
     /**
      * {@inheritdoc}
@@ -17,13 +17,13 @@ class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterIn
     public function formatType($value, $type)
     {
         switch ($type) {
-            case self::FORMAT_TYPE_DATETIME:
+            case self::TYPE_DATETIME:
                 return $this->format($value);
                 break;
-            case self::FORMAT_TYPE_DATE:
+            case self::TYPE_DATE:
                 return $this->formatDate($value);
                 break;
-            case self::FORMAT_TYPE_TIME:
+            case self::TYPE_TIME:
                 return $this->formatTime($value);
                 break;
             default:

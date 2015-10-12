@@ -4,29 +4,29 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
+
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
+use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
     /** @var string[] */
-    protected static $formatFrontendTypes = [
-        PropertyInterface::TYPE_DATE,
-        PropertyInterface::TYPE_DATETIME,
-        PropertyInterface::TYPE_TIME,
-        PropertyInterface::TYPE_DECIMAL,
-        PropertyInterface::TYPE_INTEGER,
-        PropertyInterface::TYPE_PERCENT,
-        PropertyInterface::TYPE_CURRENCY
+    protected static $formatFrontendTypesMap = [
+        DateTimeTypeFormatter::TYPE_DATE     => PropertyInterface::TYPE_DATE,
+        DateTimeTypeFormatter::TYPE_DATETIME => PropertyInterface::TYPE_DATETIME,
+        DateTimeTypeFormatter::TYPE_TIME     => PropertyInterface::TYPE_TIME,
+        NumberTypeFormatter::TYPE_DECIMAL    => PropertyInterface::TYPE_DECIMAL,
+        NumberTypeFormatter::TYPE_INTEGER    => PropertyInterface::TYPE_INTEGER,
+        NumberTypeFormatter::TYPE_PERCENT    => PropertyInterface::TYPE_PERCENT,
+        NumberTypeFormatter::TYPE_CURRENCY   => PropertyInterface::TYPE_CURRENCY
     ];
 
     /**
@@ -136,9 +136,10 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         if (null !== $val) {
             $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
-                case in_array($frontendType, self::$formatFrontendTypes, true):
-                    $formatter = $this->getFormatterForType($frontendType);
-                    $val       = $formatter->formatType($val, FormatterProvider::FORMAT_TYPE_PREFIX . $frontendType);
+                case in_array($frontendType, self::$formatFrontendTypesMap, true):
+                    $type      = array_search($frontendType, self::$formatFrontendTypesMap);
+                    $formatter = $this->getFormatterForType($type);
+                    $val       = $formatter->formatType($val, $type);
                     break;
                 case PropertyInterface::TYPE_SELECT:
                     if (isset($options['choices'][$val])) {
@@ -196,22 +197,12 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     protected function getFormatterForType($type)
     {
-        $contextFormatters   = $this->context->getOption(FormatterProvider::FORMATTER_PROVIDER);
-        $formatterTypePrefix = FormatterProvider::FORMAT_TYPE_PREFIX;
-        if (isset($contextFormatters[$type])) {
-            if (isset($this->formatters[$type])) {
-                return $this->formatters[$type];
-            }
-            $formatter               = $this->formatterProvider->getFormatterByAlias($contextFormatters[$type]);
-            $this->formatters[$type] = $formatter;
-
-            return $formatter;
+        $formatType = $this->context->getOption(FormatterProvider::FORMAT_TYPE);
+        if (isset($this->formatters[$formatType][$type])) {
+            return $this->formatters[$formatType][$type];
         }
-        if (isset($this->formatters[$type])) {
-            return $this->formatters[$type];
-        }
-        $formatter               = $this->formatterProvider->getFormatterFor($formatterTypePrefix . $type);
-        $this->formatters[$type] = $formatter;
+        $formatter                            = $this->formatterProvider->getFormatterFor($formatType, $type);
+        $this->formatters[$formatType][$type] = $formatter;
 
         return $formatter;
     }

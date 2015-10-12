@@ -35,6 +35,6 @@ services:
     oro_importexport.serializer.datetime_formatter:
         class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeFormatter
         arguments:
-            - @oro_importexport.converter.formatter_provider
+            - @oro_importexport.formatter.formatter_provider
         tags:
             - { name: oro_importexport.normalizer }
