@@ -8,19 +8,21 @@ use Doctrine\ORM\UnitOfWork;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
+use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 
 /**
  * Contains tests for a performance crucial parts of entity configs
  * By default all tests are disabled and they are enabled only during
- * modification of entity configs.
+ * modification of ConfigManager and related classes.
  * To enable tests use ENABLE_TESTS constant.
  */
 class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
@@ -39,9 +41,6 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
     /** @var Stopwatch */
     protected static $stopwatch;
 
-    /** @var ConfigProviderBag */
-    protected $configProviderBag;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
@@ -50,6 +49,36 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
+
+    public function testConfigGet()
+    {
+        $config = new Config(new EntityConfigId('test', 'Entity1'), ['attr' => 'val', 'null_attr' => null]);
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.05,
+            function () use ($config) {
+                $config->get('attr');
+                $config->get('null_attr');
+                $config->get('undefined_attr');
+            }
+        );
+    }
+
+    public function testConfigHas()
+    {
+        $config = new Config(new EntityConfigId('test', 'Entity1'), ['attr' => 'val', 'null_attr' => null]);
+
+        self::assertBenchmark(
+            __METHOD__,
+            0.05,
+            function () use ($config) {
+                $config->has('attr');
+                $config->has('null_attr');
+                $config->has('undefined_attr');
+            }
+        );
+    }
 
     public function testGetConfigsForEntities()
     {
@@ -329,14 +358,9 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConfigManager()
     {
-        $this->configProviderBag = new ConfigProviderBag();
-        $configProviderBagLink   = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $configProviderBagLink->expects($this->any())
-            ->method('getService')
-            ->willReturn($this->configProviderBag);
 
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -353,11 +377,25 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->em->expects($this->any())
             ->method('getRepository')
-            ->with(EntityConfigModel::ENTITY_NAME)
+            ->with('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
             ->willReturn($repo);
         $repo->expects($this->any())
             ->method('findAll')
             ->willReturn($this->getEntityConfigModels());
+        $repo->expects($this->any())
+            ->method('findOneBy')
+            ->willReturnCallback(
+                function ($criteria) {
+                    $className = $criteria['className'];
+                    foreach ($this->getEntityConfigModels() as $model) {
+                        if ($className === $model->getClassName()) {
+                            return $model;
+                        }
+                    }
+
+                    return null;
+                }
+            );
 
         $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()
@@ -386,10 +424,10 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityState')
             ->willReturn(UnitOfWork::STATE_MANAGED);
 
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -400,11 +438,10 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         return new ConfigManager(
-            $this->metadataFactory,
             $this->eventDispatcher,
-            $configProviderBagLink,
-            new ConfigModelManager($emLink),
-            new AuditManager($securityTokenStorage),
+            $this->metadataFactory,
+            new ConfigModelManager($emLink, new LockObject()),
+            new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );
     }
@@ -418,7 +455,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         for ($i = 1; $i <= self::NUMBER_OF_ENTITIES; $i++) {
             $model = new EntityConfigModel('Entity' . $i);
             if ($i % 20 === 0) {
-                $model->setMode(ConfigModelManager::MODE_HIDDEN);
+                $model->setMode(ConfigModel::MODE_HIDDEN);
             }
 
             foreach ($this->getFieldConfigModels() as $field) {
@@ -440,7 +477,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         for ($i = 1; $i <= self::NUMBER_OF_FIELDS; $i++) {
             $model = new FieldConfigModel('field' . $i, 'string');
             if ($i % 5 === 0) {
-                $model->setMode(ConfigModelManager::MODE_HIDDEN);
+                $model->setMode(ConfigModel::MODE_HIDDEN);
             }
 
             $models[] = $model;

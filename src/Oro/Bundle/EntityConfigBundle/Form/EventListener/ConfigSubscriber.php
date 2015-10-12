@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -16,6 +18,11 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $doctrine;
+
     /**
      * @var ConfigManager
      */
@@ -27,29 +34,26 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $translator;
 
     /**
-     * @var OroEntityManager
-     */
-    protected $em;
-
-    /**
      * @var DynamicTranslationMetadataCache
      */
     protected $dbTranslationMetadataCache;
 
     /**
+     * @param ManagerRegistry                 $doctrine
      * @param ConfigManager                   $configManager
      * @param Translator                      $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         Translator $translator,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
+        $this->doctrine                   = $doctrine;
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
-        $this->em                         = $configManager->getEntityManager();
     }
 
     /**
@@ -84,7 +88,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if (in_array($code, $translatable)) {
+                    if (in_array($code, $translatable, true)) {
                         if ($this->translator->hasTrans($value)) {
                             $data[$scope][$code] = $this->translator->trans($value);
                         } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
@@ -121,7 +125,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
                 foreach ($data[$scope] as $code => $value) {
-                    if (in_array($code, $translatable)) {
+                    if (in_array($code, $translatable, true)) {
                         // check if a label text was changed
                         $labelKey = $config->get($code);
                         if (!$configModel->getId()) {
@@ -142,12 +146,16 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($form->isValid()) {
             // update changed labels if any
             if (!empty($labelsToBeUpdated)) {
+                /** @var EntityManager $translationEm */
+                $translationEm = $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
+                /** @var TranslationRepository $translationRepo */
+                $translationRepo = $translationEm->getRepository(Translation::ENTITY_NAME);
+
+                $values = [];
                 $locale = $this->translator->getLocale();
                 foreach ($labelsToBeUpdated as $labelKey => $labelText) {
                     // save into translation table
-                    /** @var TranslationRepository $translationRepo */
-                    $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
-                    $translationRepo->saveValue(
+                    $values[] = $translationRepo->saveValue(
                         $labelKey,
                         $labelText,
                         $locale,
@@ -157,6 +165,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                 }
                 // mark translation cache dirty
                 $this->dbTranslationMetadataCache->updateTimestamp($locale);
+
+                $translationEm->flush($values);
             }
 
             $this->configManager->flush();

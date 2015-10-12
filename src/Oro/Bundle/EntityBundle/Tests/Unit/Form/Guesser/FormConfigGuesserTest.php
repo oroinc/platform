@@ -36,15 +36,13 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $this->entityConfigProvider
-            = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
 
-        $this->formConfigProvider
-            = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
-                ->disableOriginalConstructor()
-                ->getMockForAbstractClass();
+        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->guesser = new FormConfigGuesser(
             $this->managerRegistry,
@@ -193,7 +191,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->method('hasAssociation')
             ->with($property)
             ->will($this->returnValue(true));
-        $sourceClassMetadata->expects($this->once())
+        $sourceClassMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with($property)
             ->will($this->returnValue(true));

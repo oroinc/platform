@@ -713,6 +713,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 ->method('getFieldNames')
                 ->will($this->returnValue($fieldNames));
             $entityMetadata->expects($this->any())
+                ->method('hasField')
+                ->willReturnCallback(
+                    function ($name) use ($fieldNames) {
+                        return in_array($name, $fieldNames, true);
+                    }
+                );
+            $entityMetadata->expects($this->any())
                 ->method('isIdentifier')
                 ->will($this->returnValueMap($fieldIdentifiers));
 
@@ -740,6 +747,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $entityMetadata->expects($this->any())
                 ->method('getAssociationNames')
                 ->will($this->returnValue($relNames));
+            $entityMetadata->expects($this->any())
+                ->method('hasAssociation')
+                ->willReturnCallback(
+                    function ($name) use ($relNames) {
+                        return in_array($name, $relNames, true);
+                    }
+                );
             if (isset($entityData['unidirectional_relations'])) {
                 foreach ($entityData['unidirectional_relations'] as $relName => $relData) {
                     $fieldTypes[] = [$relName, $relData['type']];

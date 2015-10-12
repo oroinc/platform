@@ -21,6 +21,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Oro\Loggable
  * @Config(
  *      defaultValues={
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "search_fields"={"name"},
+ *              "virtual_fields"={"id"},
+ *              "activity_support"="true"
+ *          },
  *          "entity"={
  *              "icon"="icon-building"
  *          },

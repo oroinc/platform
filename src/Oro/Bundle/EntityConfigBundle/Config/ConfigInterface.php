@@ -15,20 +15,20 @@ interface ConfigInterface extends \Serializable
     public function getId();
 
     /**
-     * Gets a value of a configuration parameter.
+     * Gets a value of a configuration attribute.
      *
-     * @param string     $code    The code (name) a configuration parameter
+     * @param string     $code    The code (name) a configuration attribute
      * @param bool       $strict  Set to true if this method must raise an exception
-     *                            when the requested parameter does not exist
+     *                            when the requested attribute does not exist
      * @param mixed|null $default Will return default value if code does not exist and $strict == false
      *
-     * @return mixed|null The parameter value of null if the requested parameter does not exist and $strict = false
-     * @throws RuntimeException When $strict = true and the requested parameter does not exist
+     * @return mixed|null The attribute value of null if the requested attribute does not exist and $strict = false
+     * @throws RuntimeException When $strict = true and the requested attribute does not exist
      */
     public function get($code, $strict = false, $default = null);
 
     /**
-     * Sets a value of the given configuration parameter.
+     * Sets a value of the given configuration attribute.
      *
      * @param string $code
      * @param mixed  $value
@@ -37,7 +37,7 @@ interface ConfigInterface extends \Serializable
     public function set($code, $value);
 
     /**
-     * Removes the given configuration parameter.
+     * Removes the given configuration attribute.
      *
      * @param string $code
      * @return $this
@@ -45,7 +45,7 @@ interface ConfigInterface extends \Serializable
     public function remove($code);
 
     /**
-     * Checks whether a configuration parameter with the given code exists on not.
+     * Checks whether a configuration attribute with the given code exists on not.
      *
      * @param string $code
      * @return bool
@@ -53,7 +53,7 @@ interface ConfigInterface extends \Serializable
     public function has($code);
 
     /**
-     * Checks id a value of a configuration parameter equals to $value.
+     * Checks id a value of a configuration attribute equals to $value.
      *
      * @param string $code
      * @param mixed  $value
@@ -66,23 +66,30 @@ interface ConfigInterface extends \Serializable
      *
      * @param string $code
      * @param array  $values
-     * @param bool   $strict If this parameter is set to TRUE then this method also check the types of a config value
+     * @param bool   $strict If this attribute is set to TRUE then this method also check the types of a config value
      *                       and items in $values array.
      * @return bool
      */
     public function in($code, array $values, $strict = false);
 
     /**
-     * Returns parameters is filtered using the given callback function.
-     * Returns all parameters if $filter argument is not specified.
+     * Returns configuration attributes is filtered using the given callback function.
+     * Returns all configuration attributes if $filter argument is not specified.
      *
-     * @param callable|null $filter The callback function to be used to filter parameters
+     * @param callable|null $filter The callback function to be used to filter attributes
      * @return array
      */
     public function all(\Closure $filter = null);
 
     /**
-     * Replace all parameters with parameters specified in $values argument.
+     * Returns all configuration attributes.
+     *
+     * @return array
+     */
+    public function getValues();
+
+    /**
+     * Replace all configuration attributes with attributes specified in $values argument.
      *
      * @param array $values
      * @return $this

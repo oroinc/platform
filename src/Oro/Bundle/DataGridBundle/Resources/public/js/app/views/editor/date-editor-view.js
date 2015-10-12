@@ -1,6 +1,63 @@
+/** @lends DateEditorView */
 define(function(require) {
     'use strict';
 
+    /**
+     * Date cell content editor
+     *
+     * ### Column configuration samples:
+     * ``` yml
+     * datagrid:
+     *   {grid-uid}:
+     *     inline_editing:
+     *       enable: true
+     *     # <grid configuration> goes here
+     *     columns:
+     *       # Sample 1. Mapped by frontend type
+     *       {column-name-1}:
+     *         frontend_type: date
+     *       # Sample 2. Full configuration
+     *       {column-name-2}:
+     *         inline_editing:
+     *           editor:
+     *             view: orodatagrid/js/app/views/editor/date-editor-view
+     *             view_options:
+     *               placeholder: '<placeholder>'
+     *               datePickerOptions:
+     *                 altFormat: 'yy-mm-dd'
+     *                 changeMonth: true
+     *                 changeYear: true
+     *                 yearRange: '-80:+1'
+     *                 showButtonPanel: true
+     *           validationRules:
+     *             # jQuery.validate configuration
+     *             required: true
+     * ```
+     *
+     * ### Options in yml:
+     *
+     * Column option name                                  | Description
+     * :---------------------------------------------------|:-----------
+     * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
+     * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
+     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     *
+     * ### Constructor parameters
+     *
+     * @class
+     * @param {Object} options - Options container
+     * @param {Object} options.model - Current row model
+     * @param {Backgrid.Cell} options.cell - Current datagrid cell
+     * @param {Backgrid.Column} options.column - Current datagrid column
+     * @param {string} options.placeholder - Placeholder for an empty element
+     * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
+     * @param {Object} options.dateInputAttrs - Attributes for date HTML input element
+     * @param {Object} options.datePickerOptions - See [documentation here](http://goo.gl/pddxZU)
+     *
+     * @augments [TextEditorView](./text-editor-view.md)
+     * @exports DateEditorView
+     */
     var DateEditorView;
     var $ = require('jquery');
     var _ = require('underscore');
@@ -10,7 +67,7 @@ define(function(require) {
     var TextEditorView = require('./text-editor-view');
     var DatepickerView = require('oroui/js/app/views/datepicker/datepicker-view');
 
-    DateEditorView = TextEditorView.extend({
+    DateEditorView = TextEditorView.extend(/** @exports DateEditorView.prototype */{
         className: 'date-editor',
         inputType: 'date',
         view: DatepickerView,
@@ -30,37 +87,34 @@ define(function(require) {
 
         format: datetimeFormatter.backendFormats.date,
 
-        /**
-         * @inheritDoc
-         */
         render: function() {
             DateEditorView.__super__.render.call(this);
             var View = this.view;
             this.view = new View(this.getViewOptions());
             // fix enter behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEnterKeydown, this));
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onInternalEscapeKeydown, this));
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
         },
 
-        onInternalEnterKeydown: function(e) {
+        onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
                     this.$('.hasDatepicker').datepicker('hide');
                 } else {
-                    DateEditorView.__super__.onInternalEnterKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
                 }
             }
         },
 
-        onInternalEscapeKeydown: function(e) {
+        onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
                     this.$('.hasDatepicker').datepicker('hide');
                 } else {
-                    DateEditorView.__super__.onInternalEscapeKeydown.apply(this, arguments);
+                    DateEditorView.__super__.onGenericEscapeKeydown.apply(this, arguments);
                 }
             }
         },
@@ -74,6 +128,11 @@ define(function(require) {
             DateEditorView.__super__.dispose.call(this);
         },
 
+        /**
+         * Prepares and returns editor sub-view options
+         *
+         * @returns {Object}
+         */
         getViewOptions: function() {
             return $.extend(true, {}, this.DEFAULT_OPTIONS,
                 _.pick(this.options, ['dateInputAttrs', 'datePickerOptions']), {

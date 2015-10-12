@@ -4,8 +4,6 @@ namespace Oro\Bundle\ConfigBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-
 class ConfigUpdateEvent extends Event
 {
     const EVENT_NAME = 'oro_config.update_after';
@@ -14,55 +12,17 @@ class ConfigUpdateEvent extends Event
     protected $changeSet = [];
 
     /**
-     * @param ConfigManager $cm
-     * @param array         $updateChangeSet
-     * @param array         $deleteChangeSet
+     * @param array $changeSet
      */
-    public function __construct(ConfigManager $cm, array $updateChangeSet, array $deleteChangeSet)
+    public function __construct(array $changeSet)
     {
-        foreach ($deleteChangeSet as $key) {
-            $key = implode(ConfigManager::SECTION_MODEL_SEPARATOR, $key);
-
-            $this->changeSet[$key] = [
-                'old' => $cm->get($key),
-                'new' => $cm->get($key, true)
-            ];
-        }
-
-        foreach ($updateChangeSet as $key => $value) {
-            $key   = str_replace(ConfigManager::SECTION_VIEW_SEPARATOR, ConfigManager::SECTION_MODEL_SEPARATOR, $key);
-            $value = is_array($value) ? $value['value'] : $value;
-
-            $this->changeSet[$key] = [
-                'old' => $cm->get($key),
-                'new' => $value
-            ];
-        }
-
-        // prevent case when old value is the same as new
-        $this->changeSet = array_filter(
-            $this->changeSet,
-            function ($changeSet) {
-                return $changeSet['old'] != $changeSet['new'];
-            }
-        );
+        $this->changeSet = $changeSet;
     }
 
     /**
      * Returns config change set
      *
-     * [
-     *     ...
-     *
-     *     KEY => [
-     *        'new' => VALUE,
-     *        'old' => VALUE
-     *     ],
-     *
-     *    ....
-     * ]
-     *
-     * @return array
+     * @return array [name => ['new' => value, 'old' => value], ...]
      */
     public function getChangeSet()
     {
@@ -70,49 +30,49 @@ class ConfigUpdateEvent extends Event
     }
 
     /**
-     * Checks whenever configuration value changed for give key
+     * Checks whenever configuration value is changed
      *
-     * @param string $key
+     * @param string $name
      *
      * @return bool
      */
-    public function isChanged($key)
+    public function isChanged($name)
     {
-        return !empty($this->changeSet[$key]);
+        return !empty($this->changeSet[$name]);
     }
 
     /**
      * Retrieve new value from change set
      *
-     * @param string $key
+     * @param string $name
      *
      * @return mixed
      * @throws \LogicException
      *
      */
-    public function getNewValue($key)
+    public function getNewValue($name)
     {
-        if (!$this->isChanged($key)) {
+        if (!$this->isChanged($name)) {
             throw new \LogicException('Could not retrieve value for given key');
         }
 
-        return $this->changeSet[$key]['new'];
+        return $this->changeSet[$name]['new'];
     }
 
     /**
      * Retrieve old value from change set
      *
-     * @param string $key
+     * @param string $name
      *
      * @return mixed
      * @throws \LogicException
      */
-    public function getOldValue($key)
+    public function getOldValue($name)
     {
-        if (!$this->isChanged($key)) {
+        if (!$this->isChanged($name)) {
             throw new \LogicException('Could not retrieve value for given key');
         }
 
-        return $this->changeSet[$key]['old'];
+        return $this->changeSet[$name]['old'];
     }
 }

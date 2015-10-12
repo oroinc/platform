@@ -8,3 +8,10 @@ oro.sidebar:
     remove:
       confirm:
         message: "The widget will be removed"
+    setup:
+      dialog:
+        title: "Widget setup"
+
+  sticky_note_widget:
+      settings: Sticky Note settings
+      content: Note content
