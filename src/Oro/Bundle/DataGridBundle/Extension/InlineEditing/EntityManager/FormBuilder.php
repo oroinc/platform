@@ -11,6 +11,11 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FormBuilder
 {
+    protected $fieldTypeMap = [
+        'string' => 'text',
+        'datetime' => 'oro_datatime'
+    ];
+
     /** @var FormFactory */
     protected $formFactory;
 
@@ -70,16 +75,9 @@ class FormBuilder
         $fieldInfo = $accessor->getValue($metaData->fieldMappings, '['.$fieldName.']');
         $fieldType = $fieldInfo['type'];
 
-        switch ($fieldType) {
-            case 'string':
-                $type = 'text';
-                break;
-            case 'datetime':
-                $type = 'oro_datetime';
-                break;
-            default:
-                $type = $fieldType;
-                break;
+        $type = $fieldType;
+        if (array_key_exists($fieldType, $this->fieldTypeMap)) {
+            $type = $this->fieldTypeMap[$fieldType];
         }
 
         return $type;
