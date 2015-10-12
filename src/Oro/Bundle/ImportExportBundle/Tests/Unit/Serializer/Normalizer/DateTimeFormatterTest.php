@@ -36,42 +36,42 @@ class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
     public function testSupportsNormalizationProvider()
     {
         $dateTime    = new \DateTime();
-        $providerKey = FormatterProvider::FORMATTER_PROVIDER;
+        $formatTypeKey = FormatterProvider::FORMAT_TYPE;
 
         return [
             'supports datetime'              => [
                 $dateTime,
-                [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
+                [$formatTypeKey => 'test', 'type' => 'datetime'],
                 true
             ],
             'supports date'                  => [
                 $dateTime,
-                [$providerKey => ['date' => 'test'], 'type' => 'date'],
+                [$formatTypeKey => 'test', 'type' => 'date'],
                 true
             ],
             'supports time'                  => [
                 $dateTime,
-                [$providerKey => ['time' => 'test'], 'type' => 'time'],
+                [$formatTypeKey => 'test', 'type' => 'time'],
                 true
             ],
             'not supports object'            => [
                 new \StdClass,
-                [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
+                [$formatTypeKey => 'test', 'type' => 'datetime'],
                 false
             ],
             'not supports string'            => [
                 $dateTime->format('d/m/Y H:i:s'),
-                [$providerKey => ['datetime' => 'test'], 'type' => 'datetime'],
+                [$formatTypeKey => 'test', 'type' => 'datetime'],
                 false
             ],
             'not supports bad type'          => [
                 $dateTime,
-                [$providerKey => ['datetime' => 'test'], 'type' => 'test'],
+                [$formatTypeKey => 'test', 'type' => 'test'],
                 false
             ],
             'not supports not provided type' => [
                 $dateTime,
-                [$providerKey => ['test' => 'test'], 'type' => 'datetime'],
+                ['type' => 'datetime'],
                 false
             ],
         ];

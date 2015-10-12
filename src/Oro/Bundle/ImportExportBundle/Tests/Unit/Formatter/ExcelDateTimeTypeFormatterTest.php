@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Symfony\Component\Translation\Translator;
 
-use Oro\Bundle\LocaleBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 
 class ExcelDateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 {

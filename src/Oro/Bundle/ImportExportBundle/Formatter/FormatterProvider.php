@@ -49,7 +49,9 @@ class FormatterProvider
         }
 
         if (isset($this->formatTypes[$formatType][$dataType])) {
-            $formatter                                      = $this->getFormatterService($this->formatTypes[$formatType][$dataType]);
+            $formatter                                      = $this->getFormatterService(
+                $this->formatTypes[$formatType][$dataType]
+            );
             $this->formattersByType[$formatType][$dataType] = $formatter;
 
             return $formatter;

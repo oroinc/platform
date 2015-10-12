@@ -1,16 +1,17 @@
 <?php
 
-namespace LocaleBundle\Tests\Unit\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
-use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\LocaleBundle\Formatter\NumberTypeFormatter;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 
-class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
+class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var NumberTypeFormatter
+     * @var DateTimeTypeFormatter
      */
     protected $formatter;
 
@@ -20,8 +21,11 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->formatter = new NumberTypeFormatter($localeSettings);
+        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
+        $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->formatter = new DateTimeTypeFormatter($localeSettings, $translator);
     }
 
     /**
@@ -43,13 +47,12 @@ class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatTypeProvider()
     {
-        $value = 1;
+        $value = (new \DateTime())->format('d/m/Y H:i:s');
 
         return [
-            'type currency'           => [$value, NumberTypeFormatter::FORMAT_TYPE_CURRENCY],
-            'type decimal'            => [$value, NumberTypeFormatter::FORMAT_TYPE_DECIMAL],
-            'type integer'            => [$value, NumberTypeFormatter::FORMAT_TYPE_INTEGER],
-            'type percent'            => [$value, NumberTypeFormatter::FORMAT_TYPE_PERCENT],
+            'type datetime'           => [$value, DateTimeTypeFormatter::TYPE_DATETIME],
+            'type date'               => [$value, DateTimeTypeFormatter::TYPE_DATETIME],
+            'type time'               => [$value, DateTimeTypeFormatter::TYPE_DATETIME],
             'type not supported type' => [
                 $value,
                 'test',
