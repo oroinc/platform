@@ -35,7 +35,6 @@ class EntityManager
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
-        parent::__construct(null, $this->em);
     }
 
     /**
