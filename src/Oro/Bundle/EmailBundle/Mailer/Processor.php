@@ -201,9 +201,9 @@ class Processor
             $origin->getOwner(),
             $origin->getOrganization()
         );
+        $emailUser->setOrigin($origin);
 
         if ($origin instanceof UserEmailOrigin) {
-            $emailUser->setOrigin($origin);
             if ($origin->getMailbox() !== null) {
                 $emailUser->setOwner(null);
                 $emailUser->setMailboxOwner($origin->getMailbox());
