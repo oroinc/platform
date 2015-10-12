@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class NumberTypeFormatter extends NumberFormatter implements TypeFormatterInterface
 {
-    const FORMAT_TYPE_CURRENCY = 'format_type_currency';
-    const FORMAT_TYPE_PERCENT  = 'format_type_percent';
-    const FORMAT_TYPE_INTEGER  = 'format_type_integer';
-    const FORMAT_TYPE_DECIMAL  = 'format_type_decimal';
+    const TYPE_CURRENCY = 'currency';
+    const TYPE_PERCENT  = 'percent';
+    const TYPE_INTEGER  = 'integer';
+    const TYPE_DECIMAL  = 'decimal';
 
     /**
      * {@inheritdoc}
@@ -18,16 +18,16 @@ class NumberTypeFormatter extends NumberFormatter implements TypeFormatterInterf
     public function formatType($value, $type)
     {
         switch ($type) {
-            case self::FORMAT_TYPE_CURRENCY:
+            case self::TYPE_CURRENCY:
                 return $this->formatCurrency($value);
                 break;
-            case self::FORMAT_TYPE_PERCENT:
+            case self::TYPE_PERCENT:
                 return $this->formatPercent($value);
                 break;
-            case self::FORMAT_TYPE_DECIMAL:
+            case self::TYPE_DECIMAL:
                 return $this->formatDecimal($value);
                 break;
-            case self::FORMAT_TYPE_INTEGER:
+            case self::TYPE_INTEGER:
                 return $this->formatDecimal($value);
                 break;
             default:

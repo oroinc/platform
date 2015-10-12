@@ -1,17 +1,16 @@
 <?php
 
-namespace LocaleBundle\Tests\Unit\Formatter;
+namespace Oro\Bundle\ImportExportBundle\Unit\Formatter;
 
-use Symfony\Component\Translation\Translator;
-
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeTypeFormatter;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
-class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+
+class NumberTypeFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DateTimeTypeFormatter
+     * @var NumberTypeFormatter
      */
     protected $formatter;
 
@@ -21,11 +20,8 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var Translator|\PHPUnit_Framework_MockObject_MockObject $translator */
-        $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formatter = new DateTimeTypeFormatter($localeSettings, $translator);
+
+        $this->formatter = new NumberTypeFormatter($localeSettings);
     }
 
     /**
@@ -47,12 +43,13 @@ class DateTimeTypeFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatTypeProvider()
     {
-        $value = (new \DateTime())->format('d/m/Y H:i:s');
+        $value = 1;
 
         return [
-            'type datetime'           => [$value, DateTimeTypeFormatter::FORMAT_TYPE_DATETIME],
-            'type date'               => [$value, DateTimeTypeFormatter::FORMAT_TYPE_DATETIME],
-            'type time'               => [$value, DateTimeTypeFormatter::FORMAT_TYPE_DATETIME],
+            'type currency'           => [$value, NumberTypeFormatter::TYPE_CURRENCY],
+            'type decimal'            => [$value, NumberTypeFormatter::TYPE_DECIMAL],
+            'type integer'            => [$value, NumberTypeFormatter::TYPE_INTEGER],
+            'type percent'            => [$value, NumberTypeFormatter::TYPE_PERCENT],
             'type not supported type' => [
                 $value,
                 'test',

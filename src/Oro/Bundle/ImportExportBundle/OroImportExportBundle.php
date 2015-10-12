@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
-use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ConverterFormattersPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
 
 class OroImportExportBundle extends Bundle
 {
@@ -22,6 +22,6 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new AddNormalizerCompilerPass());
         $container->addCompilerPass(new ProcessorRegistryCompilerPass());
         $container->addCompilerPass(new TemplateEntityRepositoryCompilerPass());
-        $container->addCompilerPass(new ConverterFormattersPass());
+        $container->addCompilerPass(new FormatterProviderPass());
     }
 }

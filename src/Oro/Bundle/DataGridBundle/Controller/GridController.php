@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\LocaleBundle\Formatter\ExcelDateTimeTypeFormatter;
 
 class GridController extends Controller
 {
@@ -51,6 +50,7 @@ class GridController extends Controller
      * )
      *
      * @param string $gridName
+     *
      * @return Response
      * @throws \Exception
      */
@@ -102,29 +102,24 @@ class GridController extends Controller
         ignore_user_abort(false);
         set_time_limit(0);
 
-        $request           = $this->getRequest();
-        $format            = $request->query->get('format');
-        $csvWriterId       = 'oro_importexport.writer.echo.csv';
-        $writerId          = sprintf('oro_importexport.writer.echo.%s', $format);
+        $request     = $this->getRequest();
+        $format      = $request->query->get('format');
+        $csvWriterId = 'oro_importexport.writer.echo.csv';
+        $writerId    = sprintf('oro_importexport.writer.echo.%s', $format);
 
         /** @var ItemWriterInterface $writer */
         $writer            = $this->has($writerId) ? $this->get($writerId) : $this->get($csvWriterId);
         $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
         $parameters        = $parametersFactory->createParameters($gridName);
 
-        $formatterAlias = ExcelDateTimeTypeFormatter::FORMATTER_ALIAS;
         $response = $this->get('oro_datagrid.handler.export')->handle(
             $this->get('oro_datagrid.importexport.export_connector'),
             $this->get('oro_datagrid.importexport.processor.export'),
             $writer,
             [
-                'gridName'                            => $gridName,
-                'gridParameters'                      => $parameters,
-                FormatterProvider::FORMATTER_PROVIDER => [
-                    'datetime' => $formatterAlias,
-                    'date'     => $formatterAlias,
-                    'time'     => $formatterAlias
-                ]
+                'gridName'                     => $gridName,
+                'gridParameters'               => $parameters,
+                FormatterProvider::FORMAT_TYPE => $request->query->get('format_type', 'excel')
             ],
             self::EXPORT_BATCH_SIZE,
             $format

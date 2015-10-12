@@ -7,20 +7,19 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
 class FormatterProvider
 {
-    const FORMATTER_PROVIDER = 'formatter_provider';
-    const FORMAT_TYPE_PREFIX = 'format_type_';
+    const FORMAT_TYPE = 'format_type';
 
     /** @var array [{formatter_alias} => {formatter_service_id}] */
-    protected $formatterIds       = [];
+    protected $formatterIds = [];
 
-    /** @var array [{data_type} => {formatter_service_id}] */
-    protected $defaultsFormatters = [];
-
-    /** @var TypeFormatterInterface[] */
-    protected $formatters         = [];
+    /** @var array [{format_type} => [{data_type} => {formatter_service_id}]] */
+    protected $formatTypes = [];
 
     /** @var TypeFormatterInterface[] */
-    protected $formattersByType   = [];
+    protected $formatters = [];
+
+    /** @var TypeFormatterInterface[] */
+    protected $formattersByType = [];
 
     /** @var ContainerInterface */
     protected $container;
@@ -28,34 +27,38 @@ class FormatterProvider
     /**
      * @param ContainerInterface $container
      * @param array              $formatterIds
-     * @param array              $defaultsFormatters
+     * @param array              $formatTypes
      */
-    public function __construct(ContainerInterface $container, array $formatterIds = [], $defaultsFormatters = [])
+    public function __construct(ContainerInterface $container, array $formatterIds = [], $formatTypes = [])
     {
-        $this->container          = $container;
-        $this->formatterIds       = $formatterIds;
-        $this->defaultsFormatters = $defaultsFormatters;
+        $this->container    = $container;
+        $this->formatterIds = $formatterIds;
+        $this->formatTypes  = $formatTypes;
     }
 
     /**
-     * @param string $type
+     * @param string $formatType
+     * @param string $dataType
      *
      * @return TypeFormatterInterface
      */
-    public function getFormatterFor($type)
+    public function getFormatterFor($formatType, $dataType)
     {
-        if (isset($this->formattersByType[$type])) {
-            return $this->formattersByType[$type];
+        if (isset($this->formattersByType[$formatType][$dataType])) {
+            return $this->formattersByType[$formatType][$dataType];
         }
 
-        if (isset($this->defaultsFormatters[$type])) {
-            $formatter                     = $this->getFormatterService($this->defaultsFormatters[$type]);
-            $this->formattersByType[$type] = $formatter;
+        if (isset($this->formatTypes[$formatType][$dataType])) {
+            $formatter                                      = $this->getFormatterService(
+                $this->formatTypes[$formatType][$dataType]
+            );
+            $this->formattersByType[$formatType][$dataType] = $formatter;
 
             return $formatter;
         }
+
         throw new InvalidArgumentException(
-            sprintf('No available formatters for "%s" type.', $type)
+            sprintf('No available formatters for "%s" format_type and "%s" data_type.', $formatType, $dataType)
         );
     }
 

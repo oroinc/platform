@@ -25,8 +25,8 @@ class DateTimeFormatter implements NormalizerInterface
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return $data instanceof \DateTime &&
-            isset($context[FormatterProvider::FORMATTER_PROVIDER][$context['type']]) &&
-            in_array($context['type'], ['datetime', 'date', 'time']);
+        isset($context[FormatterProvider::FORMAT_TYPE]) &&
+        in_array($context['type'], ['datetime', 'date', 'time']);
     }
 
     /**
@@ -34,11 +34,10 @@ class DateTimeFormatter implements NormalizerInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $type                = $context['type'];
-        $formatterTypePrefix = FormatterProvider::FORMAT_TYPE_PREFIX;
-        $alias               = $context[FormatterProvider::FORMATTER_PROVIDER][$type];
-        $formatter           = $this->formatterProvider->getFormatterByAlias($alias);
+        $type       = $context['type'];
+        $formatType = $context[FormatterProvider::FORMAT_TYPE];
+        $formatter  = $this->formatterProvider->getFormatterFor($formatType, $type);
 
-        return $formatter->formatType($object, $formatterTypePrefix . $type);
+        return $formatter->formatType($object, $type);
     }
 }
