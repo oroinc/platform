@@ -15,6 +15,9 @@ use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
+use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
@@ -98,7 +101,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             $gridParams = $this->context->getOption('gridParameters');
             if ($gridParams->has(ColumnsExtension::COLUMNS_PARAM)) {
                 $columnsParams = $gridParams->get(ColumnsExtension::COLUMNS_PARAM);
-                $columns = $this->columnsHelper->reorderColumns($columns, $columnsParams);
+                $columns       = $this->columnsHelper->reorderColumns($columns, $columnsParams);
             }
         }
 
@@ -108,10 +111,9 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                 continue;
             }
 
-            $val            = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
-            $val            = $this->applyFrontendFormatting($val, $column);
-            $label          = $this->translator->trans($column['label']);
-            $result[$label] = $val;
+            $val  = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
+            $val  = $this->applyFrontendFormatting($val, $column);
+            $result[$this->translator->trans($column['label'])] = $val;
         }
 
         return $result;

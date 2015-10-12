@@ -17,7 +17,7 @@ services:
             - @oro_datagrid.datagrid.manager.link
             - @translator
             - @oro_datagrid.columns.helper
-            - @oro_importexport.converter.formatter_provider
+            - @oro_importexport.formatter.formatter_provider
 
     oro_datagrid.importexport.export_reader:
         class: %oro_datagrid.importexport.export_reader.class%

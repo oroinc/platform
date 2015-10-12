@@ -172,6 +172,5 @@ services:
         arguments:
             - @oro_importexport.file.mime_type_guesser
 
-
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%
