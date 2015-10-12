@@ -6,15 +6,21 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class FormBuilder {
+class FormBuilder
+{
     /** @var FormFactory */
     protected $formFactory;
 
     /** @var Registry */
     protected $registry;
 
+    /**
+     * @param FormFactory $formFactory
+     * @param Registry $registry
+     */
     public function __construct(
         FormFactory $formFactory,
         Registry $registry
@@ -23,6 +29,10 @@ class FormBuilder {
         $this->registry = $registry;
     }
 
+    /**
+     * @param $entity
+     * @return Form
+     */
     public function getForm($entity)
     {
         $form = $this->formFactory->createBuilder('form', $entity, array('csrf_protection' => false))
@@ -31,14 +41,26 @@ class FormBuilder {
         return $form;
     }
 
-    public function add(Form $form, $entity, $fieldName)
+    /**
+     * @param FormInterface $form
+     * @param $entity
+     * @param $fieldName
+     *
+     * @return FormInterface
+     */
+    public function add(FormInterface $form, $entity, $fieldName)
     {
         $fieldType = $this->getAssociationType($entity, $fieldName);
-        $form = $form->add($fieldName, $fieldType)
+        $form = $form->add($fieldName, $fieldType);
 
         return $form;
     }
 
+    /**
+     * @param $entity
+     * @param $fieldName
+     * @return string
+     */
     protected function getAssociationType($entity, $fieldName)
     {
         $className = get_class($entity);

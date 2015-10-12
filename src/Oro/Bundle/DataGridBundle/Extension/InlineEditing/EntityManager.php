@@ -3,18 +3,33 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
 
 class EntityManager
 {
+    /**
+     * @var Registry
+     */
     protected $registry;
 
+    /**
+     * @var FormBuilder
+     */
     protected $formBuilder;
 
+    /**
+     * @var ObjectManager
+     */
     protected $em;
 
+    /**
+     * @param Registry $registry
+     * @param FormBuilder $formBuilder
+     */
     public function __construct(
         Registry $registry,
         FormBuilder $formBuilder
@@ -25,11 +40,20 @@ class EntityManager
         $this->em = $this->registry->getManager();
     }
 
+    /**
+     * @param $className
+     * @param $entityId
+     * @return object
+     */
     public function getEntity($className, $entityId)
     {
         return $this->registry->getManager()->find($className, $entityId);
     }
 
+    /**
+     * @param $fieldName
+     * @return bool
+     */
     public function hasAccessEditFiled($fieldName)
     {
         $blackList = FieldsBlackList::getValues();
@@ -40,6 +64,10 @@ class EntityManager
         return true;
     }
 
+    /**
+     * @param $entity
+     * @param $content
+     */
     public function updateFields($entity, $content)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
@@ -71,6 +99,12 @@ class EntityManager
         }
     }
 
+    /**
+     * @param $entity
+     * @param $fieldName
+     * @param $fieldValue
+     * @return \DateTime
+     */
     protected function prepareFieldValue($entity, $fieldName, $fieldValue)
     {
         $className = get_class($entity);
@@ -80,7 +114,7 @@ class EntityManager
         $fieldInfo = $accessor->getValue($metaData->fieldMappings, '['.$fieldName.']');
         $fieldType = $fieldInfo['type'];
 
-        if ($fieldType == 'datetime') {
+        if ($fieldType === 'datetime') {
             $fieldValue = new \DateTime($fieldValue);
         }
 
