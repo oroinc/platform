@@ -1,0 +1,28 @@
+<fieldset class="recent-emails-setup">
+    <div class="control-group">
+        <div class="control-label wrap">
+            <label class="required"><%= _.__("oro.email.recent_emails_widget.mailbox_folder") %><em>*</em></label>
+        </div>
+        <div class="controls">
+            <input name="folderId" type="hidden" value="<%= settings.folderId %>" />
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="control-label wrap">
+            <label class="required"><%= _.__("oro.email.recent_emails_widget.amount_of_emails") %><em>*</em></label>
+        </div>
+        <div class="controls"><input type="text" name="limit" value="<%= settings.limit %>"/></div>
+    </div>
+    <div class="control-group">
+        <div class="control-label wrap">
+            <label class="required"><%= _.__("oro.email.recent_emails_widget.default_action") %><em>*</em></label>
+        </div>
+        <div class="controls">
+            <select name="defaultActionId"  class="select2">
+                <option<% if (settings.defaultActionId == 1) { %> selected="selected"<% } %> value="1"><%= _.__("oro.email.recent_emails_widget.reply_all") %></option>
+                <option<% if (settings.defaultActionId == 2) { %> selected="selected"<% } %> value="2"><%= _.__("oro.email.recent_emails_widget.reply") %></option>
+                <option<% if (settings.defaultActionId == 3) { %> selected="selected"<% } %> value="3"><%= _.__("oro.email.recent_emails_widget.forward") %></option>
+            </select>
+        </div>
+    </div>
+</fieldset>

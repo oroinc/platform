@@ -10,6 +10,8 @@ use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
+use Oro\Bundle\DataGridBundle\Tools\ColumnsHelper;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
@@ -43,6 +45,11 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $formatterProvider;
 
     /**
+     * @var ColumnsHelper
+     */
+    protected $columnsHelper;
+
+    /**
      * @var ContextInterface
      */
     protected $context;
@@ -56,14 +63,17 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * @param ServiceLink         $gridManagerLink
      * @param TranslatorInterface $translator
      * @param FormatterProvider   $formatterProvider
+     * @param ColumnsHelper       $columnsHelper
      */
     public function __construct(
         ServiceLink $gridManagerLink,
         TranslatorInterface $translator,
+        ColumnsHelper $columnsHelper,
         FormatterProvider $formatterProvider
     ) {
         $this->gridManagerLink   = $gridManagerLink;
         $this->translator        = $translator;
+        $this->columnsHelper     = $columnsHelper;
         $this->formatterProvider = $formatterProvider;
     }
 
@@ -82,6 +92,14 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export processor must contain "gridName" or "columns" options.'
             );
+        }
+
+        if ($this->context->hasOption('gridParameters')) {
+            $gridParams = $this->context->getOption('gridParameters');
+            if ($gridParams->has(ColumnsExtension::COLUMNS_PARAM)) {
+                $columnsParams = $gridParams->get(ColumnsExtension::COLUMNS_PARAM);
+                $columns = $this->columnsHelper->reorderColumns($columns, $columnsParams);
+            }
         }
 
         $result = [];

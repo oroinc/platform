@@ -54,28 +54,40 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider isDictionaryProvider
      */
-    public function testIsDictionary($groups, $expected)
+    public function testIsDictionary($groups, $activitySupport, $expected)
     {
         $className = 'Test\Entity';
 
         $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $config->expects($this->once())
+        $config->expects($this->at(0))
             ->method('get')
             ->with('groups')
             ->will($this->returnValue($groups));
 
         $configProvider = $this->getConfigProviderMock();
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->at(0))
             ->method('getProvider')
             ->with('grouping')
             ->will($this->returnValue($configProvider));
-        $configProvider->expects($this->once())
+
+        if ($groups && in_array('dictionary', $groups)) {
+            $this->configManager->expects($this->at(1))
+                ->method('getProvider')
+                ->with('dictionary')
+                ->will($this->returnValue($configProvider));
+            $config->expects($this->at(1))
+                ->method('get')
+                ->with('activity_support')
+                ->will($this->returnValue($activitySupport));
+        }
+
+        $configProvider->expects($this->any())
             ->method('hasConfig')
             ->with($className)
             ->will($this->returnValue(true));
-        $configProvider->expects($this->once())
+        $configProvider->expects($this->any())
             ->method('getConfig')
             ->with($className)
             ->will($this->returnValue($config));
@@ -89,11 +101,12 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
     public function isDictionaryProvider()
     {
         return [
-            [null, false],
-            [[], false],
-            [['some_group'], false],
-            [['dictionary'], true],
-            [['some_group', 'dictionary'], true],
+            [null, 'false', false],
+            [[], 'false', false],
+            [['some_group'], 'false', false],
+            [['dictionary'], 'false', true],
+            [['some_group', 'dictionary'], 'false', true],
+            [['some_group', 'dictionary'], 'true', false],
         ];
     }
 

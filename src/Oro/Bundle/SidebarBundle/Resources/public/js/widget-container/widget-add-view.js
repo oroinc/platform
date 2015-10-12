@@ -68,14 +68,11 @@ define(function(require) {
                     placement = 'right';
                 }
 
-                var widget = new WidgetContainerModel({
+                var widget = new WidgetContainerModel(_.extend({}, widgetData, {
                     widgetName: widgetName,
                     position: widgets.length,
                     placement: placement
-                });
-                widget.update(widgetData);
-                widget.set('settings', $.extend(true, {}, widgetData.settings));
-
+                }));
                 widgets.push(widget);
 
                 widget.save();

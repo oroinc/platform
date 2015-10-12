@@ -18,29 +18,19 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var OwnerTreeProvider
-     */
+    /** @var OwnerTreeProvider */
     protected $treeProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $em;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
     protected $cache;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     protected $container;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade */
     protected $securityFacade;
 
     protected function setUp()
@@ -132,8 +122,28 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
             ->method('findAll')
             ->will($this->returnValue($users));
 
-        $buRepo->expects($this->any())
-            ->method('findAll')
+        $qb = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
+            ->setMethods(['setParameter', 'getArrayResult'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $buRepo
+            ->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
+            ->method('select')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $query
+            ->expects($this->once())
+            ->method('getArrayResult')
             ->will($this->returnValue($bUnits));
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
@@ -226,8 +236,28 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $user3->setOrganizations(new ArrayCollection([$organization]));
 
         return [
-            [$user1, $user2, $user3],
-            [$mainBu, $bu2, $childBu],
+            [
+                $user1,
+                $user2,
+                $user3
+            ],
+            [
+                [
+                    'id' => 1,
+                    'organization' => 1,
+                    'owner' => null
+                ],
+                [
+                    'id' => 2,
+                    'organization' => 1,
+                    'owner' => null
+                ],
+                [
+                    'id' => 3,
+                    'organization' => 1,
+                    'owner' => 1
+                ]
+            ]
         ];
     }
 

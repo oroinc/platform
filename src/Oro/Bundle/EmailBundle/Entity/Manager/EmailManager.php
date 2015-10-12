@@ -130,12 +130,12 @@ class EmailManager
      *
      * @return boolean
      */
-    public function markAllEmailsAsSeen(User $user, Organization $organization)
+    public function markAllEmailsAsSeen(User $user, Organization $organization, $ids = [])
     {
         $emailUserQueryBuilder = $this
             ->em
             ->getRepository('OroEmailBundle:EmailUser')
-            ->findUnseenUserEmail($user, $organization);
+            ->findUnseenUserEmail($user, $organization, $ids);
         $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
 
         foreach ($unseenUserEmails as $userEmail) {
