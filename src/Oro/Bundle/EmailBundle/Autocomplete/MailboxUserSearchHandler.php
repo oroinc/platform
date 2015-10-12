@@ -28,7 +28,9 @@ class MailboxUserSearchHandler extends OrganizationUsersHandler
         $queryBuilder = $this->entityRepository->createQueryBuilder('u');
         $queryBuilder->leftJoin('u.organizations', 'org')
             ->andWhere('org.id = :org')
-            ->setParameter('org', $this->organizationId);
+            ->andWhere('u.enabled = :enabled')
+            ->setParameter('org', $this->organizationId)
+            ->setParameter('enabled', true);
 
         return $queryBuilder;
     }

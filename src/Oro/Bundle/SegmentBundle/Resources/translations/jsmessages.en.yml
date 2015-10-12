@@ -8,9 +8,12 @@ oro:
             error: An unidentified error has occurred. Please contact your Administrator.
             okText: Yes
         confirm:
-            unsaved_changes:
-                title: Unsaved changes
-                message: You have unsaved changes in {{ components }} that will be lost. Proceed anyway?
+            data_issue:
+                unsaved_changes: unsaved changes in {{ components }}
+                invalid_data: invalid data in {{ components }}
+            dialog:
+                title: Data will be lost
+                message: You have {{ data_issue }} that will be lost. Proceed anyway?
         report_column_editor: the Report Column Editor
         grouping_editor: the Grouping Editor
 

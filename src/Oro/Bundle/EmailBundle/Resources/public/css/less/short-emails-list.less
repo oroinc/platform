@@ -1,0 +1,118 @@
+.short-emails-list {
+  .header {
+    padding: 0 17px;
+  }
+
+  .mark-as-read, .mark-visible-as-read {
+    cursor: pointer;
+    height: 19px;
+    padding: 0 10px 0 8px;
+    margin-top: 8PX;
+    font-size: 12px;
+    line-height: 15px;
+    i {
+      float: left;
+      margin-top: 1px;
+      margin-right: 5px;
+      font-size: 13px;
+    }
+  }
+  .mark-visible-as-read {
+    font-weight: normal;
+    font-size: 11px;
+    padding: 0 8px 0 4px;
+  }
+
+  .items {
+    .icon-envelope {
+      &.highlight {
+        color: #fabb18;
+      }
+      color: #b4b4b4;
+    }
+    list-style-type: none;
+    margin: 0;
+
+    li {
+      border-bottom: 1px solid #f5eff3;
+      padding: 10px 17px 10px;
+      position: relative;
+      background: #fff;
+      .icon-envelope {
+        cursor: pointer;
+        position: absolute;
+        right: 14px;
+        top: 9px;
+      }
+      &.highlight {
+        background: #fff9e9;
+        .title {
+          color: #a38c62;
+        }
+        .description {
+          color: #615642;
+        }
+        .footer {
+          color: #c5b382;
+          a {
+            &:hover {
+              color: #a59364;
+            }
+            color: #c5b382;
+          }
+        }
+      }
+      .info .title {
+        cursor: pointer;
+      }
+      .body {
+        padding-right: 20px;
+      }
+      .title {
+        color: #4d4c4c;
+        line-height: 14px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .description {
+        color: #777777;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .footer {
+        font-size: 10px;
+        color: #b4b4b4;
+        a {
+          &:hover {
+            color: #777777;
+          }
+          color: #b4b4b4;
+          padding: 0;
+        }
+        .reply-action, .reply-all-action, .forward-action {
+          display: none;
+          margin-left: 1em;
+        }
+      }
+    }
+  }
+  .notification, .more-unread {
+    display: none;
+  }
+  .empty {
+    text-align: center;
+    padding: 4px 0;
+    color: #666;
+  }
+}
+.default-reply-action .items li .footer .reply-action,
+.default-reply-all-action .items li .footer .reply-all-action,
+.default-forward-action .items li .footer .forward-action{
+  display: inline;
+}
+.widget-setup .recent-emails-setup {
+  padding: 15px 15px 15px 20px;
+  margin: -15px -15px -15px -20px;
+}
