@@ -4,13 +4,13 @@ namespaces:
 
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     constraints:
-        - doctrine:UniqueEntity: [fieldName, entity]
+        - oro_entity_extend:UniqueExtendEntityField: ~
     properties:
         fieldName:
             - NotBlank: ~
             - Regex:
-                pattern: "/^[a-z]+[a-z0-9]*$/i"
-                message: "This value should contain only alphabetic symbols and numbers."
+                pattern: "/^[a-z]+[a-z0-9_]*$/i"
+                message: "This value should contain only alphabetic symbols, underscore and numbers."
             - Regex:
                 pattern: "/^id$/i"
                 match:   false
