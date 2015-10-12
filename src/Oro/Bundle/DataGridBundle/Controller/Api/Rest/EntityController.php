@@ -73,13 +73,20 @@ class EntityController extends RestController
     {
         $className = strtr($className, '-', '\\');
         $entity = $this->getManager()->getEntity($className, $entityId);
-        $request = $this->get('request_stack')->getCurrentRequest();
-        $content = $request->getContent();
-        $content  = json_decode($content, true);
-        foreach ($content  as $fieldName => $fieldValue) {
-            $this->getManager()->updateField($entity, $fieldName, $fieldValue);
+
+        if ($this->get('security.authorization_checker')->isGranted('EDIT', $entity)) {
+            $request = $this->get('request_stack')->getCurrentRequest();
+            $content = $request->getContent();
+            $content = json_decode($content, true);
+            foreach ($content as $fieldName => $fieldValue) {
+                $this->getManager()->updateField($entity, $fieldName, $fieldValue);
+            }
+
+            $response = ['status' => true];
+        } else {
+            $response = ['status' => false];
         }
 
-        return new JsonResponse(['status' => true]);
+        return new JsonResponse($response);
     }
 }
