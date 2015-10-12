@@ -4,6 +4,12 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerInterface;
 
+/**
+ * Test handler. Remove it in future.
+ *
+ * Class ContactApiHandler
+ * @package Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra
+ */
 class ContactApiHandler implements EntityApiHandlerInterface
 {
     const HANDLER_KEY = 'oro.entity.api.extra.contact';
