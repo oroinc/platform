@@ -30,6 +30,10 @@ parameters:
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.entity.manager.api.class:                        Oro\Bundle\DataGridBundle\Manager\Api\EntityManagerApi
 
+    oro_datagrid.extension.inline.base_handler.class:             Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler
+    oro_datagrid.extension.inline.handler_processor.class:        Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor
+    oro_datagrid.extension.inline.handler_contact.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra\ContactApiHandler
+
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -171,3 +175,18 @@ services:
         class: %oro_datagrid.entity.manager.api.class%
         arguments:
             - @doctrine
+
+    oro_datagrid.extension.inline.handler:
+        class: %oro_datagrid.extension.inline.base_handler.class%
+        scope: request
+        arguments:
+            - @doctrine
+            - @oro_datagrid.extension.inline.handler_processor
+
+    oro_datagrid.extension.inline.handler_processor:
+        class: %oro_datagrid.extension.inline.handler_processor.class%
+
+    oro_datagrid.extension.inline.handler_contact:
+        class: %oro_datagrid.extension.inline.handler_contact.class%
+        tags:
+            - { name: oro_datagrid.extension.api.handler }
