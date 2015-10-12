@@ -1,14 +1,13 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Manager\Api;
+namespace Oro\Bundle\DataGridBundle\Extension\InlineEditings;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
-use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Oro\Bundle\DataGridBundle\Manager\Api\EntityManager\FormBuilder;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
 
-class EntityManagerApi
+class EntityManager
 {
     protected $registry;
 
@@ -45,29 +44,34 @@ class EntityManagerApi
         return true;
     }
 
-    public function updateField($entity, $fieldName, $fieldValue)
+    public function updateFields($entity, $content)
     {
-        if ($this->hasAccessEditFiled($fieldName)) {
-            $accessor = PropertyAccess::createPropertyAccessor();
-            $oldVakue = $fieldValue;
-            $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $fromData = [
+            'owner' => $entity->getOwner()->getId()
+        ];
 
-            $accessor->setValue($entity, $fieldName, $fieldValue);
+        $form = $this->formBuilder->getForm($entity);
 
-            $form = $this->formBuilder->getForm($entity, $fieldName);
+        foreach ($content as $fieldName => $fieldValue) {
+            if ($this->hasAccessEditFiled($fieldName)) {
+                $oldVakue = $fieldValue;
+                $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
+                $accessor->setValue($entity, $fieldName, $fieldValue);
 
-            $form->submit([
-                $fieldName => $oldVakue,
-                'owner' => $entity->getOwner()->getId()
-            ]);
+                $fromData[$fieldName] = $oldVakue;
+                $form = $this->formBuilder->add($form, $entity, $fieldName);
+            }
+        }
+
+        if (count($fromData) > 1) {
+            $form->submit($fromData);
 
             if ($form->isValid()) {
                 $em = $this->registry->getManager();
                 $em->persist($entity);
                 $em->flush();
             }
-        } else {
-            throw new Exception("Field can`t be changed");
         }
     }
 

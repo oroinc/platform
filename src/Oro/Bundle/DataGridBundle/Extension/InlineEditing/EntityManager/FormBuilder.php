@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Manager\Api\EntityManager;
+namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -22,18 +23,24 @@ class FormBuilder {
         $this->registry = $registry;
     }
 
-    public function getForm($entity, $fieldName)
+    public function getForm($entity)
     {
-        $fieldType = $this->getAssociationType($entity, $fieldName);
-
         $form = $this->formFactory->createBuilder('form', $entity, array('csrf_protection' => false))
-            ->add($fieldName, $fieldType)
             ->getForm();
 
         return $form;
     }
 
-    protected function getAssociationType($entity, $fieldName) {
+    public function add(Form $form, $entity, $fieldName)
+    {
+        $fieldType = $this->getAssociationType($entity, $fieldName);
+        $form = $form->add($fieldName, $fieldType)
+
+        return $form;
+    }
+
+    protected function getAssociationType($entity, $fieldName)
+    {
         $className = get_class($entity);
         $em = $this->registry->getManager();
         $metaData = $em->getClassMetadata($className);

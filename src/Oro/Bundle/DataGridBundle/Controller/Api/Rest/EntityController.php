@@ -44,7 +44,7 @@ class EntityController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_datagrid.entity.manager.api');
+        return $this->get('oro_datagrid.extension.inline_editing.entity.manager');
     }
 
     /**
@@ -59,7 +59,7 @@ class EntityController extends RestController
      * @param int $id
      *
      * @return Response
-     * @Rest\Patch("entity/{className}/{entityId}", requirements={"id"="\d+"})
+     * @Rest\Patch("entity/{className}/{id}")
      * @ApiDoc(
      *      description="Update entity property",
      *      resource=true,
@@ -68,22 +68,17 @@ class EntityController extends RestController
      *      }
      * )
      */
-    public function patchAction($className, $entityId)
+    public function patchAction($className, $id)
     {
-//        $this->createFormBuilder()
-        $em = $this->getDoctrine()->getManager();
-
         $className = strtr($className, '-', '\\');
-        $tableName = $em->getClassMetadata($className);
-        $entity = $this->getManager()->getEntity($className, $entityId);
+        $entity = $this->getManager()->getEntity($className, $id);
 
         if ($this->get('security.authorization_checker')->isGranted('EDIT', $entity)) {
             $request = $this->get('request_stack')->getCurrentRequest();
             $content = $request->getContent();
             $content = json_decode($content, true);
-            foreach ($content as $fieldName => $fieldValue) {
-                $this->getManager()->updateField($entity, $fieldName, $fieldValue);
-            }
+            $this->getManager()->updateFields($entity, $content);
+
 
             $response = ['status' => true];
         } else {

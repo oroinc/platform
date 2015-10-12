@@ -28,9 +28,9 @@ parameters:
     oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
-    oro_datagrid.entity.manager.api.class:                        Oro\Bundle\DataGridBundle\Manager\Api\EntityManagerApi
 
-    oro_datagrid.manager.api.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Manager\Api\EntityManager\FormBuilder
+    oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditings\EntityManager
+    oro_datagrid.extension.inline_editing.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -168,14 +168,14 @@ services:
             - @doctrine
         scope: request
 
-    oro_datagrid.entity.manager.api:
-        class: %oro_datagrid.entity.manager.api.class%
+    oro_datagrid.extension.inline_editing.entity.manager:
+        class: %oro_datagrid.extension.inline_editing.entity.manager.class%
         arguments:
             - @doctrine
-            - @oro_datagrid.manager.api.entity_manager.form_builder
+            - @oro_datagrid.extension.inline_editing.entity_manager.form_builder
 
-    oro_datagrid.manager.api.entity_manager.form_builder:
-        class: %oro_datagrid.manager.api.entity_manager.form_builder.class%
+    oro_datagrid.extension.inline_editing.entity_manager.form_builder:
+        class: %oro_datagrid.extension.inline_editing.entity_manager.form_builder.class%
         arguments:
             - @form.factory
             - @doctrine
