@@ -113,13 +113,6 @@ class EmbeddedForm extends ExtendEmbeddedForm
      */
     protected $owner;
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->id = UUIDGenerator::v4();
-    }
-
     /**
      * @return int
      */
@@ -238,6 +231,7 @@ class EmbeddedForm extends ExtendEmbeddedForm
     public function prePersist()
     {
         $this->createdAt = $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->id = UUIDGenerator::v4();
     }
 
     /**

@@ -7,6 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -81,7 +82,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             $date->add(new \DateInterval("P{$ind}Y"));
             $item->datetimeValue = $date;
             //guid
-            $item->guidValue = uniqid();
+            $item->guidValue = UUIDGenerator::v4();
             //object
             $item->objectValue = new \stdClass();
             //phone
