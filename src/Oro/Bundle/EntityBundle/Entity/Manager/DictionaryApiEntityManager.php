@@ -128,6 +128,9 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueByPrimaryKey($keys)
     {
+        if (empty($keys)) {
+            return [];
+        }
         $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
 
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());

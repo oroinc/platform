@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;

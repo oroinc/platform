@@ -15,6 +15,7 @@ class Configuration implements ConfigurationInterface
     const INLINE_EDIT_BLACK_LIST_ID         = 'id';
     const INLINE_EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
     const INLINE_EDIT_BLACK_LIST_UPDATED_AT = 'updatedAt';
+    const DEFAULT_ROUTE                     = 'oro_datagrid_api_rest_entity_patch';
 
     /**
      * @var array
@@ -78,7 +79,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('save_api_accessor')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('route')->defaultValue('orocrm_account_update')->end()
+                        ->scalarNode('route')->defaultValue(self::DEFAULT_ROUTE)->end()
                         ->scalarNode('http_method')->defaultValue('PATCH')->end()
                         ->scalarNode('headers')->end()
                         ->scalarNode('default_route_parameters')->end()
