@@ -5,9 +5,10 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
 
 class EntityManager
@@ -38,31 +39,28 @@ class EntityManager
     }
 
     /**
-     * @param $fieldName
-     * @return bool
+     * @param $entity
+     * @return FormInterface
      */
-    protected function hasAccessEditFiled($fieldName)
+    public function getForm($entity)
     {
-        $blackList = FieldsBlackList::getValues();
-        if ((in_array($fieldName, $blackList))) {
-            return false;
-        }
-
-        return true;
+        return $this->formBuilder->getForm($entity);
     }
 
     /**
      * @param $entity
      * @param $content
+     *
+     * @return FormInterface
      */
-    public function updateFields($entity, $content)
+    public function update($entity, $content)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $formData = [
             'owner' => $entity->getOwner()->getId()
         ];
 
-        $form = $this->formBuilder->getForm($entity);
+        $form = $this->getForm($entity);
 
         foreach ($content as $fieldName => $fieldValue) {
             if ($this->hasAccessEditFiled($fieldName)) {
@@ -75,6 +73,22 @@ class EntityManager
             }
         }
         $this->handler->process($entity, $form, $formData, 'PATCH');
+
+        return $form;
+    }
+
+    /**
+     * @param $fieldName
+     * @return bool
+     */
+    protected function hasAccessEditFiled($fieldName)
+    {
+        $blackList = FieldsBlackList::getValues();
+        if ((in_array($fieldName, $blackList))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
