@@ -5,36 +5,36 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
 
 class EntityManager
 {
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
 
-    /**
-     * @var FormBuilder
-     */
+    /** @var FormBuilder */
     protected $formBuilder;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $em;
+
+    /** @var EntityApiBaseHandler */
+    protected $handler;
 
     /**
      * @param Registry $registry
      * @param FormBuilder $formBuilder
+     * @param EntityApiBaseHandler $handler
      */
-    public function __construct(Registry $registry, FormBuilder $formBuilder)
+    public function __construct(Registry $registry, FormBuilder $formBuilder, EntityApiBaseHandler $handler)
     {
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
+        $this->handler = $handler;
     }
 
     /**
@@ -58,7 +58,7 @@ class EntityManager
     public function updateFields($entity, $content)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
-        $fromData = [
+        $formData = [
             'owner' => $entity->getOwner()->getId()
         ];
 
@@ -70,20 +70,11 @@ class EntityManager
                 $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $fieldValue);
 
-                $fromData[$fieldName] = $oldVakue;
+                $formData[$fieldName] = $oldVakue;
                 $form = $this->formBuilder->add($form, $entity, $fieldName);
             }
         }
-
-        if (count($fromData) > 1) {
-            $form->submit($fromData);
-
-            if ($form->isValid()) {
-                $em = $this->registry->getManager();
-                $em->persist($entity);
-                $em->flush();
-            }
-        }
+        $this->handler->process($entity, $form, $formData, 'PATCH');
     }
 
     /**

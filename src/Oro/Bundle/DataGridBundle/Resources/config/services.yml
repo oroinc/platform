@@ -174,9 +174,11 @@ services:
 
     oro_datagrid.extension.inline_editing.entity.manager:
         class: %oro_datagrid.extension.inline_editing.entity.manager.class%
+        scope: request
         arguments:
             - @doctrine
             - @oro_datagrid.extension.inline_editing.entity_manager.form_builder
+            - @oro_datagrid.extension.inline.base_handler
 
     oro_datagrid.extension.inline_editing.entity_manager.form_builder:
         class: %oro_datagrid.extension.inline_editing.entity_manager.form_builder.class%
@@ -184,7 +186,7 @@ services:
             - @form.factory
             - @doctrine
 
-    oro_datagrid.extension.inline.handler:
+    oro_datagrid.extension.inline.base_handler:
         class: %oro_datagrid.extension.inline.base_handler.class%
         scope: request
         arguments:

@@ -35,11 +35,12 @@ class EntityApiBaseHandler
      *
      * @param $entity
      * @param FormInterface $form
+     * @param array $data
      * @param string $method
      *
      * @return bool True on successful processing, false otherwise
      */
-    public function process($entity, FormInterface $form, $method)
+    public function process($entity, FormInterface $form, $data, $method)
     {
         $handler = $this->processor->getHandlerByClass(ClassUtils::getClass($entity));
 
@@ -48,8 +49,10 @@ class EntityApiBaseHandler
         }
         $form->setData($entity);
 
-        if (in_array($method, array('POST', 'PUT', 'PATCH'), true)) {
-//            $form->submit($this->request);
+        if (
+            count($data) > 1 // refactor
+            && in_array($method, array('POST', 'PUT', 'PATCH'), true)) {
+            $form->submit($data);
 
             if ($form->isValid()) {
                 if ($handler) {

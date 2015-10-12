@@ -36,7 +36,7 @@ class FormBuilder
 
     /**
      * @param $entity
-     * @return Form
+     * @return FormInterface
      */
     public function getForm($entity)
     {
