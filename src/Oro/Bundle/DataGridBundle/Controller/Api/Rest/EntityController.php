@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\FOSRestController;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -13,53 +11,34 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_entity_")
  */
-class EntityController extends RestController
+class EntityController extends FOSRestController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getForm()
-    {
-        return $this->get('oro_datagrid.form.grid_view.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFormHandler()
-    {
-        return $this->get('oro_datagrid.grid_view.form.handler.api');
-    }
-
     /**
      * {@inheritdoc}
      */
     public function getManager()
     {
-        return $this->get('oro_datagrid.entity.manager.api');
+        return $this->get('oro_datagrid.extension.inline_editing.entity.manager');
     }
 
     /**
      * @return SecurityFacade
      */
-    protected function getSecurityFacade()
+    protected function getSecurityService()
     {
-        return $this->get('oro_security.security_facade');
+        return $this->get('security.authorization_checker');
     }
 
     /**
      * @param int $id
      *
      * @return Response
-     * @Rest\Patch("entity/{className}/{entityId}", requirements={"id"="\d+"})
+     * @Rest\Patch("entity/{className}/{id}")
      * @ApiDoc(
      *      description="Update entity property",
      *      resource=true,
@@ -68,23 +47,19 @@ class EntityController extends RestController
      *      }
      * )
      */
-    public function patchAction($className, $entityId)
+    public function patchAction($className, $id)
     {
-        $className = strtr($className, '-', '\\');
-        $entity = $this->getManager()->getEntity($className, $entityId);
+        $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
 
-        if ($this->get('security.authorization_checker')->isGranted('EDIT', $entity)) {
-            $request = $this->get('request_stack')->getCurrentRequest();
-            $content = $request->getContent();
-            $content = json_decode($content, true);
-            foreach ($content as $fieldName => $fieldValue) {
-                $this->getManager()->updateField($entity, $fieldName, $fieldValue);
-            }
-
-            $response = ['status' => true];
-        } else {
-            $response = ['status' => false];
+        if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
+            throw new AccessDeniedException();
         }
+
+        $this->getManager()->updateFields(
+            $entity,
+            json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
+        );
+        $response = ['status' => true];
 
         return new JsonResponse($response);
     }
