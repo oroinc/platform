@@ -12,9 +12,6 @@ class Configuration implements ConfigurationInterface
     const BEHAVIOUR_DEFAULT_VALUE           = 'enable_selected';
     const BEHAVIOUR_ENABLE_ALL_VALUE        = 'enable_all';
     const ENABLED_CONFIG_PATH               = '[inline_editing][enable]';
-    const INLINE_EDIT_BLACK_LIST_ID         = 'id';
-    const INLINE_EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
-    const INLINE_EDIT_BLACK_LIST_UPDATED_AT = 'updatedAt';
     const DEFAULT_ROUTE                     = 'oro_datagrid_api_rest_entity_patch';
 
     /**
@@ -33,22 +30,12 @@ class Configuration implements ConfigurationInterface
     protected $root;
 
     /**
-     * @var array
-     */
-    protected $inlineEditBlackList;
-
-    /**
      * @param string $root
      */
     public function __construct($root)
     {
         $this->root  = $root;
         $this->behaviourConfigValues = [self::BEHAVIOUR_DEFAULT_VALUE, self::BEHAVIOUR_ENABLE_ALL_VALUE];
-        $this->inlineEditBlackList = [
-            self::INLINE_EDIT_BLACK_LIST_ID,
-            self::INLINE_EDIT_BLACK_LIST_CREATED_AT,
-            self::INLINE_EDIT_BLACK_LIST_UPDATED_AT,
-        ];
     }
 
     /**
@@ -96,6 +83,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getBlackList()
     {
-        return $this->inlineEditBlackList;
+        return FieldsBlackList::getValues();
     }
 }

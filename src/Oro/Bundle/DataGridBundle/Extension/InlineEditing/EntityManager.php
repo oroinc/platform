@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditings;
+namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
@@ -18,8 +18,7 @@ class EntityManager
     public function __construct(
         Registry $registry,
         FormBuilder $formBuilder
-    )
-    {
+    ) {
         $this->registry = $registry;
         $this->formBuilder = $formBuilder;
 
@@ -33,11 +32,8 @@ class EntityManager
 
     public function hasAccessEditFiled($fieldName)
     {
-        $deniedFields = [
-            'id'
-        ];
-
-        if (isset($deniedFields[$fieldName])) {
+        $blackList = FieldsBlackList::getValues();
+        if ((in_array($fieldName, $blackList))) {
             return false;
         }
 
