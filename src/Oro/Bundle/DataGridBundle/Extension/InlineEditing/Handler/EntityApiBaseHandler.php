@@ -4,9 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor;
 use Symfony\Component\Form\FormInterface;
+
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor;
 
 class EntityApiBaseHandler
 {
@@ -47,7 +47,7 @@ class EntityApiBaseHandler
 
         if (
             count($data) > 1 // refactor
-            && in_array($method, array('POST', 'PUT', 'PATCH'), true)) {
+            && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
             $form->submit($data);
 
             if ($form->isValid()) {
