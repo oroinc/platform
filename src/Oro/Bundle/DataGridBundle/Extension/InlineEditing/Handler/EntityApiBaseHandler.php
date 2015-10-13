@@ -16,7 +16,7 @@ class EntityApiBaseHandler
     protected $registry;
 
     /**
-     * @var Registry
+     * @var EntityApiHandlerProcessor
      */
     protected $processor;
 
@@ -42,11 +42,7 @@ class EntityApiBaseHandler
      */
     public function process($entity, FormInterface $form, $data, $method)
     {
-        $handler = $this->processor->getHandlerByClass(ClassUtils::getClass($entity));
-
-        if ($handler) {
-            $handler->preProcess($entity);
-        }
+        $this->processor->preProcess($entity);
         $form->setData($entity);
 
         if (
@@ -55,15 +51,13 @@ class EntityApiBaseHandler
             $form->submit($data);
 
             if ($form->isValid()) {
-                if ($handler) {
-                    $handler->onProcess($entity);
-                }
+                $this->processor->beforeProcess($entity);
                 $this->onSuccess($entity);
-                if ($handler) {
-                    $handler->afterProcess($entity);
-                }
+                $this->processor->afterProcess($entity);
 
                 return true;
+            } else {
+                $this->processor->invalidateProcess($entity);
             }
         }
 

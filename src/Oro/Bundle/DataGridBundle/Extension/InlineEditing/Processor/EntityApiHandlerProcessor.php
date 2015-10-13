@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor;
 
+use Doctrine\Common\Util\ClassUtils;
+
 class EntityApiHandlerProcessor
 {
     /**
@@ -42,5 +44,53 @@ class EntityApiHandlerProcessor
         }
 
         return null;
+    }
+
+    /**
+     * @param $entity
+     */
+    public function preProcess($entity)
+    {
+        $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
+
+        if ($handler) {
+            $handler->preProcess($entity);
+        }
+    }
+
+    /**
+     * @param $entity
+     */
+    public function beforeProcess($entity)
+    {
+        $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
+
+        if ($handler) {
+            $handler->beforeProcess($entity);
+        }
+    }
+
+    /**
+     * @param $entity
+     */
+    public function afterProcess($entity)
+    {
+        $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
+
+        if ($handler) {
+            $handler->afterProcess($entity);
+        }
+    }
+
+    /**
+     * @param $entity
+     */
+    public function invalidateProcess($entity)
+    {
+        $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
+
+        if ($handler) {
+            $handler->invalidateProcess($entity);
+        }
     }
 }

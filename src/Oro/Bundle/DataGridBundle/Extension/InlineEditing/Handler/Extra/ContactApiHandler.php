@@ -26,7 +26,7 @@ class ContactApiHandler implements EntityApiHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function onProcess($entity)
+    public function beforeProcess($entity)
     {
         // TODO: Implement process() method.
     }
@@ -37,6 +37,14 @@ class ContactApiHandler implements EntityApiHandlerInterface
     public function afterProcess($entity)
     {
         // TODO: Implement afterProcess() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateProcess($entity)
+    {
+        // TODO: Implement invalidateProcess() method.
     }
 
     /**

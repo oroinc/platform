@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle;
 
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\InlineHandlerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -25,5 +26,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new ActionsPass());
         $container->addCompilerPass(new MassActionsPass());
         $container->addCompilerPass(new GuessPass());
+        $container->addCompilerPass(new InlineHandlerPass());
     }
 }

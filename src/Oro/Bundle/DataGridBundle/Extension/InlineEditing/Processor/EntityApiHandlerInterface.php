@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor;
 interface EntityApiHandlerInterface
 {
     /**
-     * Pre processing action
+     * Pre processing action. Run before data sets
      *
      * @param $entity
      * @return mixed
@@ -13,20 +13,28 @@ interface EntityApiHandlerInterface
     public function preProcess($entity);
 
     /**
-     * On processing action
+     * Before processing action on valid data
      *
      * @param $entity
      * @return mixed
      */
-    public function onProcess($entity);
+    public function beforeProcess($entity);
 
     /**
-     * Post processing action
+     * Post processing action on success main process
      *
      * @param $entity
      * @return mixed
      */
     public function afterProcess($entity);
+
+    /**
+     * Post processing action if invalid data
+     *
+     * @param $entity
+     * @return mixed
+     */
+    public function invalidateProcess($entity);
 
     /**
      * Target entity class
