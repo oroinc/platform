@@ -14,7 +14,10 @@ define(function(require) {
     UserMenuEmailNotificationComponent = EmailNotificationComponent.extend({
         collection: null,
         countModel: null,
-        debouncedNotificationHandler: null,
+        /**
+         * @type {Function}
+         */
+        notificationHandler: null,
         clankEvent: '',
         dropdownContainer: null,
         listen: {
@@ -25,7 +28,6 @@ define(function(require) {
         initialize: function(options) {
             var emails = options.emails || [];
             _.extend(this, _.pick(options, ['clankEvent']));
-            this.debouncedNotificationHandler = _.debounce(_.bind(this._notificationHandler, this), 3000, true);
             if (typeof emails === 'string') {
                 emails = JSON.parse(emails);
             }
@@ -33,7 +35,8 @@ define(function(require) {
             this.countModel = new EmailNotificationCountModel({'unreadEmailsCount': options.count});
             this.dropdownContainer = options._sourceElement.parent();
 
-            sync.subscribe(this.clankEvent, this.debouncedNotificationHandler);
+            this.notificationHandler = _.throttle(_.bind(this._notificationHandler, this), 1000);
+            sync.subscribe(this.clankEvent, this.notificationHandler);
 
             UserMenuEmailNotificationComponent.__super__.initialize.apply(this, arguments);
         },
@@ -52,7 +55,7 @@ define(function(require) {
         },
 
         dispose: function() {
-            sync.unsubscribe(this.clankEvent, this.debouncedNotificationHandler);
+            sync.unsubscribe(this.clankEvent, this.notificationHandler);
             UserMenuEmailNotificationComponent.__super__.dispose.call(this);
         }
     });

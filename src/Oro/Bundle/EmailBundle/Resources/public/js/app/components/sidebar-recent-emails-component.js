@@ -16,7 +16,10 @@ define(function(require) {
         require('oroemail/js/app/models/email-notification/email-notification-count-model');
 
     SidebarRecentEmailsComponent = BaseComponent.extend({
-        debouncedNotificationHandler: null,
+        /**
+         * @type {Function}
+         */
+        notificationHandler: null,
         listen: {
             'change:settings model': 'onSettingsChange',
             'widget_dialog:open mediator': 'onWidgetDialogOpen'
@@ -29,7 +32,6 @@ define(function(require) {
         initialize: function(options) {
             var settings = this.model.get('settings');
             var count = countCache.get(settings.folderId);
-            this.debouncedNotificationHandler = _.debounce(_.bind(this._notificationHandler, this), 3000, true);
             this.model.emailNotificationCountModel = new EmailNotificationCountModel({unreadEmailsCount: count});
             this.listenTo(this.model.emailNotificationCountModel, 'change:unreadEmailsCount', this.updateSidebarCount);
             this.updateSidebarCount();
@@ -41,7 +43,8 @@ define(function(require) {
             this.listenTo(this.model.emailNotificationCollection, 'sync', this.updateModelFromCollection);
             this.model.emailNotificationCollection.fetch();
 
-            sync.subscribe(channel, this.debouncedNotificationHandler);
+            this.notificationHandler = _.throttle(_.bind(this._notificationHandler, this), 1000);
+            sync.subscribe(channel, this.notificationHandler);
         },
 
         updateSidebarCount: function() {
@@ -85,7 +88,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            sync.unsubscribe(channel, this.debouncedNotificationHandler);
+            sync.unsubscribe(channel, this.notificationHandler);
             this.model.emailNotificationCollection.dispose();
             delete this.model;
             SidebarRecentEmailsComponent.__super__.dispose.call(this);
