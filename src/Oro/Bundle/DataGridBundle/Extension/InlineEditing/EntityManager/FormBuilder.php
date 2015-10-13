@@ -3,11 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FormBuilder
 {
@@ -55,8 +56,12 @@ class FormBuilder
      */
     public function add(FormInterface $form, $entity, $fieldName)
     {
-        $fieldType = $this->getAssociationType($entity, $fieldName);
-        $form = $form->add($fieldName, $fieldType);
+        $data = $this->getAssociationType($entity, $fieldName);
+        if (!isset($data['options'])) {
+            $data['options'] = [];
+        }
+
+        $form = $form->add($fieldName, $data['type'], $data['options']);
 
         return $form;
     }
@@ -64,22 +69,69 @@ class FormBuilder
     /**
      * @param $entity
      * @param $fieldName
+     *
      * @return string
      */
     protected function getAssociationType($entity, $fieldName)
     {
-        $className = get_class($entity);
-        $em = $this->registry->getManager();
-        $metaData = $em->getClassMetadata($className);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $fieldInfo = $accessor->getValue($metaData->fieldMappings, '['.$fieldName.']');
-        $fieldType = $fieldInfo['type'];
+        $metaData = $this->getMetaData($entity);
 
-        $type = $fieldType;
-        if (array_key_exists($fieldType, $this->fieldTypeMap)) {
-            $type = $this->fieldTypeMap[$fieldType];
+        $data = $this->findSimpleField($metaData, $fieldName);
+        if (empty($data)) {
+            $data = $this->findRelationField($metaData, $fieldName);
         }
 
-        return $type;
+        if ($data !== false) {
+            $currentType = $data['type'];
+            if (array_key_exists($currentType, $this->fieldTypeMap)) {
+                $data['type'] = $this->fieldTypeMap[$currentType];
+            }
+        }
+
+        return $data;
+    }
+
+    protected function findSimpleField(ClassMetadata $metaData, $fieldName)
+    {
+        $data = false;
+
+        if ($metaData->hasField($fieldName)) {
+            $fieldInfo = $metaData->getFieldMapping($fieldName);
+
+            $data = [
+                'type' => $fieldInfo['type']
+            ];
+        }
+
+        return $data;
+    }
+
+    protected function findRelationField(ClassMetadata $metaData, $fieldName)
+    {
+        $data = false;
+        if ($metaData->hasAssociation($fieldName)) {
+            $fieldInfo = $metaData->getAssociationMapping($fieldName);
+            $data = [
+                'type' => 'entity',
+            ];
+
+            if ($fieldInfo['type'] == 2) {
+                $data['options'] = [
+                    'class' => $fieldInfo['targetEntity'],
+                    'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
+                ];
+            }
+
+        }
+
+        return $data;
+    }
+
+    protected function getMetaData($entity)
+    {
+        $className = ClassUtils::getClass($entity);
+        $em = $this->registry->getManager();
+
+        return $em->getClassMetadata($className);
     }
 }

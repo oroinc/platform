@@ -4,12 +4,15 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 class EntityManager
 {
@@ -25,17 +28,25 @@ class EntityManager
     /** @var EntityApiBaseHandler */
     protected $handler;
 
+    /** @var  EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
     /**
      * @param Registry $registry
      * @param FormBuilder $formBuilder
      * @param EntityApiBaseHandler $handler
      */
-    public function __construct(Registry $registry, FormBuilder $formBuilder, EntityApiBaseHandler $handler)
-    {
+    public function __construct(
+        Registry $registry,
+        FormBuilder $formBuilder,
+        EntityApiBaseHandler $handler,
+        EntityRoutingHelper $entityRoutingHelper
+    ) {
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
         $this->handler = $handler;
+        $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
     /**
@@ -99,17 +110,34 @@ class EntityManager
      */
     protected function prepareFieldValue($entity, $fieldName, $fieldValue)
     {
-        $className = get_class($entity);
-        $em = $this->registry->getManager();
-        $metaData = $em->getClassMetadata($className);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $fieldInfo = $accessor->getValue($metaData->fieldMappings, '['.$fieldName.']');
-        $fieldType = $fieldInfo['type'];
+        /** @var ClassMetadata $metaData */
+        $metaData = $this->getMetaData($entity);
 
-        if ($fieldType === 'datetime') {
-            $fieldValue = new \DateTime($fieldValue);
+        // search simple field
+        if ($metaData->hasField($fieldName)) {
+            $fieldInfo = $metaData->getFieldMapping($fieldName);
+
+            $fieldType = $fieldInfo['type'];
+            if ($fieldType === 'datetime') {
+                $fieldValue = new \DateTime($fieldValue);
+            }
+        }
+
+        if ($metaData->hasAssociation($fieldName)) {
+            $fieldInfo = $metaData->getAssociationMapping($fieldName);
+
+            $entity = $this->entityRoutingHelper->getEntity($fieldInfo['targetEntity'], $fieldValue);
+            $fieldValue = $entity;
         }
 
         return $fieldValue;
+    }
+
+    protected function getMetaData($entity)
+    {
+        $className = ClassUtils::getClass($entity);
+        $em = $this->registry->getManager();
+
+        return $em->getClassMetadata($className);
     }
 }
