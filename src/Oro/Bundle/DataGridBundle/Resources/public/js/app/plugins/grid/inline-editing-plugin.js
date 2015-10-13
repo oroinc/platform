@@ -383,7 +383,9 @@ define(function(require) {
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    this.saveCurrentCell();
+                    if (!this.saveCurrentCell()) {
+                        this.exitEditMode();
+                    }
                 }
                 e.preventDefault();
             }
