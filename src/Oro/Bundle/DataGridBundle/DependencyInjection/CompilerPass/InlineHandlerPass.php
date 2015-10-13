@@ -28,8 +28,6 @@ class InlineHandlerPass implements CompilerPassInterface
         $definition = $container->getDefinition(self::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE);
 
         foreach (array_keys($taggedServices) as $id) {
-//            $definition->addMethodCall('addHandler', [$id]);
-
             $definition->addMethodCall(
                 'addHandler',
                 [new Reference($id)]
