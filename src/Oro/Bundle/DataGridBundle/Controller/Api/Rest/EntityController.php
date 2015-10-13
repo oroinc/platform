@@ -17,15 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SoapBundle\Handler\Context;
 
 /**
  * @Rest\NamePrefix("oro_datagrid_api_rest_entity_")
  */
 class EntityController extends FOSRestController
 {
-    const ACTION_PATCH = 'patch';
-
     /**
      * {@inheritdoc}
      */
@@ -46,6 +43,7 @@ class EntityController extends FOSRestController
      * @param int $id
      *
      * @return Response
+     *
      * @Rest\Patch("entity/{className}/{id}")
      * @ApiDoc(
      *      description="Update entity property",
@@ -59,50 +57,23 @@ class EntityController extends FOSRestController
     {
         $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
 
+        if (!$entity) {
+            return parent::handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        }
         if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
 
-        if ($entity) {
-            $form = $this->getManager()->update(
-                $entity,
-                json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
-            );
-            if ($entity) {
-                $view = $this->view(null, Codes::HTTP_NO_CONTENT);
-            } else {
-                $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
-            }
+        $form = $this->getManager()->update(
+            $entity,
+            json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
+        );
+        if ($form->getErrors()->count() > 0) {
+            $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view($form, Codes::HTTP_NO_CONTENT);
         }
-
-        return $this->buildResponse($view, self::ACTION_PATCH, ['id' => $id, 'entity' => $entity]);
-
-    }
-
-    /**
-     * @param mixed|View $data
-     * @param string     $action
-     * @param array      $contextValues
-     * @param int        $status Used only if data was given in raw format
-     *
-     * @return Response
-     */
-    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
-    {
-        if ($data instanceof View) {
-            $data->setFormat('json');
-            $response = parent::handleView($data);
-        } else {
-            $headers = isset($contextValues['headers']) ? $contextValues['headers'] : [];
-            unset($contextValues['headers']);
-
-            $response = new JsonResponse($data, $status, $headers);
-        }
-
-        $includeHandler = $this->get('oro_soap.handler.include');
-        $includeHandler->handle(new Context($this, $this->get('request'), $response, $action, $contextValues));
+        $response = parent::handleView($view);
 
         return $response;
     }

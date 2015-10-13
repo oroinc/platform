@@ -1,3 +1,7 @@
 oro_datagrid_gridview_api:
     resource: @OroDataGridBundle/Controller/Api/Rest/GridViewController.php
     type: rest
+
+oro_datagrid_api_rest_entity_api:
+    resource: @OroDataGridBundle/Controller/Api/Rest/EntityController.php
+    type: rest
