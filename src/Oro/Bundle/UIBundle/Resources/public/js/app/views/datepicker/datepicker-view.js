@@ -125,6 +125,7 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyPickerWidget: function() {
+            this.$frontDateField.datepicker('hide');
             this.$frontDateField.datepicker('destroy');
         },
 
