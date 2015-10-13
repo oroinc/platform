@@ -20,6 +20,7 @@ datagrid:
             view: orodatagrid/js/app/views/editor/date-editor-view
             view_options:
               placeholder: '<placeholder>'
+              css_class_name: '<class-name>'
               datePickerOptions:
                 altFormat: 'yy-mm-dd'
                 changeMonth: true
@@ -36,6 +37,7 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
 inline_editing.editor.validationRules               | Optional. The client side validation rules

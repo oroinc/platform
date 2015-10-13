@@ -31,6 +31,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/related-id-select-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *               value_field_name: {column-name-value}
      *               # choices: @choiceProvider->getAll
      *               choices: # required
@@ -51,6 +52,7 @@ define(function(require) {
      * inline_editing.editor.view_options.choices          | Key-value set of available choices
      * inline_editing.editor.view_options.value_field_name | Related value field name.
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      *

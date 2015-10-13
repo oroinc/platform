@@ -7,6 +7,7 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var CellIterator = require('../../../datagrid/cell-iterator');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('orodatagrid/js/app/views/editor/text-editor-view');
 
@@ -55,7 +56,7 @@ define(function(require) {
             var originalRender = cell.render;
             var _this = this;
             cell.render = function() {
-                var result = originalRender.apply(this, arguments);
+                originalRender.apply(this, arguments);
                 if (_this.isEditable(cell)) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
@@ -68,7 +69,7 @@ define(function(require) {
                         animation: false
                     });
                 }
-                return result;
+                return this;
             };
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
@@ -149,10 +150,13 @@ define(function(require) {
             }
             this.editModeEnabled = true;
             this.currentCell = cell;
+            this.cellIterator = new CellIterator(this.main, this.currentCell);
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
+
+            this.toggleHeaderCellHighlight(cell, true);
 
             var editor = this.getCellEditorOptions(cell);
             this.editor = editor;
@@ -160,14 +164,19 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
+            var classNames = this.buildClassNames(editor, cell);
             var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
                 viewOptions: $.extend(true, {
                     validationRules: editor.validation_rules
-                }, editor.view_options || {}),
+                }, editor.view_options || {}, {
+                    className: classNames.join(' ')
+                }),
                 fromPreviousCell: fromPreviousCell
             }));
+
+            editorComponent.view.focus(!!fromPreviousCell);
 
             this.editorComponent = editorComponent;
 
@@ -177,6 +186,30 @@ define(function(require) {
             this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
             this.listenTo(editorComponent, 'saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
             this.listenTo(editorComponent, 'cancelAndEditPrevAction', this.editPrevCell);
+        },
+
+        toggleHeaderCellHighlight: function(cell, state) {
+            var columnIndex = this.main.columns.indexOf(cell.column);
+            this.main.header.row.cells[columnIndex].$el.toggleClass('header-cell-highlight', state);
+        },
+
+        buildClassNames: function(editor, cell) {
+            var classNames = [];
+            if (editor.view_options && editor.view_options.css_class_name) {
+                classNames.push(editor.view_options.css_class_name);
+            }
+            if (cell.column.get('name')) {
+                classNames.push(cell.column.get('name') + '-column-editor');
+            }
+
+            if (this.main.name) {
+                classNames.push(this.main.name + '-grid-editor');
+            }
+
+            if (cell.column.get('metadata') && cell.column.get('metadata').type) {
+                classNames.push(cell.column.get('metadata').type + '-frontend-type-editor');
+            }
+            return classNames;
         },
 
         saveCurrentCell: function(exit) {
@@ -217,6 +250,7 @@ define(function(require) {
         exitEditMode: function() {
             this.editModeEnabled = false;
             if (this.currentCell.$el) {
+                this.toggleHeaderCellHighlight(this.currentCell, false);
                 this.currentCell.$el.parent('tr:first').removeClass('row-edit-mode');
                 this.currentCell.$el.addClass('view-mode');
                 this.currentCell.$el.removeClass('edit-mode');
@@ -227,81 +261,43 @@ define(function(require) {
         },
 
         editNextCell: function() {
-            var nextCell = this.findNextEditableCell(this.currentCell);
-            if (nextCell) {
-                this.enterEditMode(nextCell);
-            } else {
-                this.exitEditMode();
+            var _this = this;
+            function checkEditable(cell) {
+                if (!_this.isEditable(cell)) {
+                    return _this.cellIterator.next().then(checkEditable);
+                }
+                return cell;
             }
-        },
-
-        saveCurrentCellAndEditNext: function(data) {
-            this.saveCurrentCell(data, false);
-            this.editNextCell();
+            this.cellIterator.next().then(checkEditable).done(function(cell) {
+                _this.enterEditMode(cell);
+            }).fail(function() {
+                _this.exitEditMode();
+            });
         },
 
         editPrevCell: function() {
-            var nextCell = this.findPrevEditableCell(this.currentCell);
-            if (nextCell) {
-                this.enterEditMode(nextCell, true);
-            } else {
-                this.exitEditMode();
+            var _this = this;
+            function checkEditable(cell) {
+                if (!_this.isEditable(cell)) {
+                    return _this.cellIterator.prev().then(checkEditable);
+                }
+                return cell;
             }
+            this.cellIterator.prev().then(checkEditable).done(function(cell) {
+                _this.enterEditMode(cell);
+            }).fail(function() {
+                _this.exitEditMode();
+            });
+        },
+
+        saveCurrentCellAndEditNext: function(data) {
+            this.saveCurrentCell(false);
+            this.editNextCell();
         },
 
         saveCurrentCellAndEditPrev: function(data) {
-            this.saveCurrentCell(data, false);
+            this.saveCurrentCell(false);
             this.editPrevCell();
-        },
-
-        findNextEditableCell: function(cell) {
-            function next(model) {
-                var index = 1 + model.collection.indexOf(model);
-                if (index < model.collection.length) {
-                    return model.collection.at(index);
-                }
-                return null;
-            }
-            var row = cell.model;
-            var column = next(cell.column);
-            var columns = column.collection;
-            do {
-                while (column) {
-                    var currentCell = this.main.findCell(row, column);
-                    if (this.isEditable(currentCell)) {
-                        return currentCell;
-                    }
-                    column = next(column);
-                }
-                column = columns.at(0);
-                row = next(row);
-            } while (row);
-            return null;
-        },
-
-        findPrevEditableCell: function(cell) {
-            function prev(model) {
-                var index = -1 + model.collection.indexOf(model);
-                if (index >= 0) {
-                    return model.collection.at(index);
-                }
-                return null;
-            }
-            var row = cell.model;
-            var column = prev(cell.column);
-            var columns = column.collection;
-            do {
-                while (column) {
-                    var currentCell = this.main.findCell(row, column);
-                    if (this.isEditable(currentCell)) {
-                        return currentCell;
-                    }
-                    column = prev(column);
-                }
-                column = columns.last();
-                row = prev(row);
-            } while (row);
-            return null;
         },
 
         _onRequireJsError: function() {

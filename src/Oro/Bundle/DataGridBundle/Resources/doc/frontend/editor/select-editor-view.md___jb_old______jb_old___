@@ -1,8 +1,8 @@
 <a name="module_SelectEditorView"></a>
 ## SelectEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-Select cell content editor. The cell value should be a value field.
-The grid will render a corresponding label from the `options.choices` map.
-The editor will use the same mapping
+Select cell content editor. Cell value should be value field.
+Grid will render the corresponding label from the options.choices map.
+Editor will use same map
 
 ### Column configuration samples:
 ``` yml
@@ -28,7 +28,6 @@ datagrid:
             view: orodatagrid/js/app/views/editor/select-editor-view
             view_options:
               placeholder: '<placeholder>'
-              css_class_name: '<class-name>'
           validationRules:
             # jQuery.validate configuration
             required: true
@@ -40,12 +39,11 @@ Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 choices                                             | Key-value set of available choices
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
-inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.validationRules               | Optional. The client side validation rules
+inline_editing.editor.validationRules               | Optional. Client side validation rules
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -61,4 +59,4 @@ inline_editing.editor.validationRules               | Optional. The client side 
 ### selectEditorView.getSelect2Options() ⇒ <code>Object</code>
 Prepares and returns Select2 options
 
-**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>  
+**Kind**: instance method of <code>[SelectEditorView](#module_SelectEditorView)</code>

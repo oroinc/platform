@@ -30,6 +30,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/text-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *           validationRules:
      *             # jQuery.validate configuration
      *             required: true
@@ -41,6 +42,7 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
@@ -76,6 +78,14 @@ define(function(require) {
         TAB_KEY_CODE: 9,
         ENTER_KEY_CODE: 13,
         ESCAPE_KEY_CODE: 27,
+
+        constructor: function(options) {
+            // className adjustment cannot be done in initialize()
+            if (options.className) {
+                options.className += ' ' + _.result(this, 'className');
+            }
+            TextEditorView.__super__.constructor.apply(this, arguments);
+        },
 
         initialize: function(options) {
             this.options = options;

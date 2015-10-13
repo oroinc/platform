@@ -8,6 +8,7 @@ define(function(require) {
     var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
 
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -92,7 +93,6 @@ define(function(require) {
             var widthDecrement = 0;
             var widths = [];
             var self = this;
-            var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
@@ -229,7 +229,8 @@ define(function(require) {
                     this.domCache.thead.css({
                         // show only visible part
                         top: visibleRect.top,
-                        width: visibleRect.right - visibleRect.left,
+                        width: visibleRect.right - visibleRect.left +
+                            (this.scrollStateModel.get('visible') ? scrollBarWidth : 0),
                         height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 
                         // left side should be also tracked
@@ -408,6 +409,7 @@ define(function(require) {
             }
             if (this.currentFloatTheadMode in {relative: true, fixed: true}) {
                 var _this = this;
+                this.fixHeaderCellWidth();
                 scrollHelper.scrollIntoView(cell.el, function(el, rect) {
                     if (_this.domCache.gridScrollableContainer &&
                         _this.domCache.gridScrollableContainer.length &&
