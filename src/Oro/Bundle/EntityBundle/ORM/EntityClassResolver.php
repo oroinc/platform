@@ -71,10 +71,18 @@ class EntityClassResolver
      * Check if given class is real entity class
      *
      * @param string $className
+     *
      * @return bool
      */
     public function isEntity($className)
     {
-        return null !== $this->doctrine->getManagerForClass($className);
+        try {
+            // avoid failing if reflection will throw an exception
+            $manager = $this->doctrine->getManagerForClass($className);
+        } catch (\Exception $e) {
+            $manager = null;
+        }
+
+        return null !== $manager;
     }
 }

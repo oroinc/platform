@@ -22,7 +22,7 @@ class AclPermissionController extends Controller
      * @Route(
      *  "/acl-access-levels/{oid}",
      *  name="oro_security_access_levels",
-     *  requirements={"oid"="\w+:[\w\(\)]+"},
+     *  requirements={"oid"="[\w\+]+:[\w\(\)]+"},
      *  defaults={"_format"="json"}
      * )
      * @Template
@@ -38,6 +38,12 @@ class AclPermissionController extends Controller
             if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
                 $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
             }
+        }
+
+        if (strpos($oid, 'field+') === 0) {
+            $entity = substr($oid, strpos($oid, ':') + 1);
+            $oid = substr($oid, 0, strpos($oid, ':') + 1) .
+                $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
         }
 
         $levels = $this

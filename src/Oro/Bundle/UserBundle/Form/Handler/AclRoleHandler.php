@@ -142,11 +142,13 @@ class AclRoleHandler
      * Create form for role manipulation
      *
      * @param AbstractRole $role
+     * @param null|string  $className
+     *
      * @return FormInterface
      */
-    public function createForm(AbstractRole $role)
+    public function createForm(AbstractRole $role, $className = null)
     {
-        $this->loadPrivilegeConfigPermissions();
+        $this->loadPrivilegeConfigPermissions(false, $className);
 
         $this->form = $this->createRoleFormInstance($role, $this->privilegeConfig);
 
@@ -154,9 +156,10 @@ class AclRoleHandler
     }
 
     /**
-     * @param bool $ignoreShare
+     * @param bool   $ignoreShare
+     * @param string $className
      */
-    protected function loadPrivilegeConfigPermissions($ignoreShare = false)
+    protected function loadPrivilegeConfigPermissions($ignoreShare = false, $className = null)
     {
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
@@ -168,6 +171,10 @@ class AclRoleHandler
             $key = array_search('SHARE', $this->privilegeConfig['entity']['permissions'], true)
         ) {
             unset($this->privilegeConfig['entity']['permissions'][$key]);
+        }
+
+        if ($className) {
+            $this->privilegeConfig = array_intersect_key($this->privilegeConfig, array_flip(['field']));
         }
     }
 
@@ -188,9 +195,11 @@ class AclRoleHandler
      * Save role
      *
      * @param AbstractRole $role
+     * @param null|string  $className
+     *
      * @return bool
      */
-    public function process(AbstractRole $role)
+    public function process(AbstractRole $role, $className = null)
     {
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
@@ -203,8 +212,13 @@ class AclRoleHandler
 
                 return true;
             }
-        } else {
+        } elseif (empty($className)) {
             $this->setRolePrivileges($role);
+        } else {
+            $privileges = $this->getRolePrivileges($role, $className);
+
+            $sortedPrivileges = $this->filterPrivileges($privileges, $this->privilegeConfig['field']['types']);
+            $this->form->get('field')->setData($sortedPrivileges);
         }
 
         return false;
@@ -222,10 +236,11 @@ class AclRoleHandler
 
     /**
      * @param AbstractRole $role
+     * @param null|string  $className
      */
-    protected function setRolePrivileges(AbstractRole $role)
+    protected function setRolePrivileges(AbstractRole $role, $className = null)
     {
-        $privileges = $this->getRolePrivileges($role);
+        $privileges = $this->getRolePrivileges($role, $className);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
@@ -264,11 +279,18 @@ class AclRoleHandler
 
     /**
      * @param AbstractRole $role
-     * @return ArrayCollection|AclPrivilege[]
+     * @param null|string  $className
+     *
+     * @return ArrayCollection|\Oro\Bundle\SecurityBundle\Model\AclPrivilege[]
      */
-    protected function getRolePrivileges(AbstractRole $role)
+    protected function getRolePrivileges(AbstractRole $role, $className = null)
     {
-        return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
+        $securityIdentity = $this->aclManager->getSid($role);
+        if ($className) {
+            return $this->privilegeRepository->getClassFieldsPrivileges($securityIdentity, $className);
+        }
+
+        return $this->privilegeRepository->getPrivileges($securityIdentity);
     }
 
     /**
