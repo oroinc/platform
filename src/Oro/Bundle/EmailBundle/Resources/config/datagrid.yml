@@ -278,6 +278,9 @@ datagrid:
                 data_identifier: eu.id
                 label: oro.email.datagrid.emails.action.mark_as_unread
                 icon: minus
+        options:
+            toolbarOptions:
+                addColumnManager: false
 
     dashboard-recent-emails-grid:
         source:

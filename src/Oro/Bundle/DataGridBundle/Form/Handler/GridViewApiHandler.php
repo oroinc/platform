@@ -41,9 +41,10 @@ class GridViewApiHandler
     {
         $entity->setFiltersData();
         $entity->setSortersData();
+        $entity->setColumnsData();
 
         $this->form->setData($entity);
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $data = $this->request->request->all();
             unset($data['name']);
             if ($this->form->has('owner')) {

@@ -36,6 +36,25 @@ define([
             }
 
             this.listenTo(options.collection, 'reset', this.render);
+            this.listenTo(this.column, 'change:editable change:sortable change:renderable',
+                function(column) {
+                    var changed = column.changedAttributes();
+                    for (var key in changed) {
+                        if (changed.hasOwnProperty(key)) {
+                            this.$el.toggleClass(key, changed[key]);
+                        }
+                    }
+                });
+
+            if (this.column.editable()) {
+                this.$el.addClass('editable');
+            }
+            if (this.column.sortable()) {
+                this.$el.addClass('sortable');
+            }
+            if (this.column.renderable()) {
+                this.$el.addClass('renderable');
+            }
         },
 
         /**
@@ -50,12 +69,11 @@ define([
             var totals = state.totals || {};
 
             if (_.isUndefined(totals[this.options.rowName])) {
-                this.$el.hide();
+                this.$el.removeClass('renderable');
                 return;
             }
             if (!_.isUndefined(totals[this.options.rowName]) &&
                 _.has(totals[this.options.rowName].columns, columnName)) {
-                this.$el.show();
                 var columnTotals = totals[this.options.rowName].columns[columnName];
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
