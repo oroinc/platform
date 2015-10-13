@@ -128,34 +128,36 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
-        $query = $this->em->getRepository('OroEmailBundle:EmailUser')
-            ->getEmailUserByFolder($folder)
-            ->getQuery();
-        $result = $query->getResult();
-
+        $limit = self::BATCH_SIZE;
+        $offset = 0;
         $i = 0;
-        foreach ($result as $emailUser) {
-            /** @var EmailUser $emailUser */
-            $emailUser->removeFolder($folder);
-            $email = $emailUser->getEmail();
-            if ($emailUser->getFolders()->count() === 0) {
-                $this->em->remove($emailUser);
-            }
+        while ($result =
+            $this->em->getRepository('OroEmailBundle:EmailUser')
+                ->getEmailUserByFolder($folder, $limit, $offset)->getQuery()->getResult()
+        ) {
+            foreach ($result as $emailUser) {
+                /** @var EmailUser $emailUser */
+                $emailUser->removeFolder($folder);
+                $email = $emailUser->getEmail();
+                if ($emailUser->getFolders()->count() === 0) {
+                    $this->em->remove($emailUser);
+                }
 
-            $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
-                'email' => $email,
-                'imapFolder' => $imapFolder,
-            ]);
-            foreach ($imapEmails as $imapEmail) {
-                $this->em->remove($imapEmail);
-            }
+                $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
+                    'email' => $email,
+                    'imapFolder' => $imapFolder,
+                ]);
+                foreach ($imapEmails as $imapEmail) {
+                    $this->em->remove($imapEmail);
+                }
 
-            if (($i % self::BATCH_SIZE) === 0) {
-                $this->em->flush();
-                $this->em->clear('OroEmailBundle:EmailUser');
-                $this->em->clear('OroImapBundle:ImapEmail');
+                if (($i % self::BATCH_SIZE) === 0) {
+                    $this->em->flush();
+                    $this->em->clear('OroEmailBundle:EmailUser');
+                    $this->em->clear('OroImapBundle:ImapEmail');
+                }
+                ++$i;
             }
-            ++$i;
         }
         if ($i > 0) {
             $this->logger->notice(
