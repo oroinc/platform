@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_18;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_18;
 
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
+/**
+ * Depends to the UserBundle
+ *
+ * Class UpdateEmailUserQuery
+ * @package Oro\Bundle\UserBundle\Migrations\Schema\v1_18
+ */
 class UpdateEmailUserQuery extends ParametrizedMigrationQuery
 {
     /**

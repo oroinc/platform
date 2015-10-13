@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_18;
+namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_18;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -8,14 +8,20 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AddEmailUserColumn implements Migration, OrderedMigrationInterface
+/**
+ * Depends to the UserBundle
+ *
+ * Class DropEmailUserColumn
+ * @package Oro\Bundle\UserBundle\Migrations\Schema\v1_18
+ */
+class DropEmailUserColumn implements Migration, OrderedMigrationInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getOrder()
     {
-        return 2;
+        return 4;
     }
 
     /**
@@ -35,12 +41,11 @@ class AddEmailUserColumn implements Migration, OrderedMigrationInterface
     public static function updateOroEmailUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_email_origin'),
-            ['origin_id'],
-            ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
-        );
-        $table->addIndex(['origin_id'], 'IDX_91F5CFF656A273CC', []);
+        $table->dropColumn('folder_id');
+        $table = $schema->getTable('oro_email_user_folders');
+        $table->dropIndex('IDX_origin');
+        $table->dropColumn('origin_id');
+        $table->dropIndex('IDX_email');
+        $table->dropColumn('email_id');
     }
 }
