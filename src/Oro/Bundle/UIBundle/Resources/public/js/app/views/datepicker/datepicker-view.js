@@ -116,6 +116,8 @@ define(function(require) {
                 onSelect: _.bind(this.onSelect, this)
             });
             this.$frontDateField.datepicker(widgetOptions);
+            // fix incorrect behaviour with early datepicker dispose
+            $('#ui-datepicker-div').css({display: 'none'});
             if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
                 this.$frontDateField.datepicker('disable');
             }
@@ -125,7 +127,6 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyPickerWidget: function() {
-            this.$frontDateField.datepicker('hide');
             this.$frontDateField.datepicker('destroy');
         },
 
