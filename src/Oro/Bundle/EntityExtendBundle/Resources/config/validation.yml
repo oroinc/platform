@@ -3,8 +3,10 @@ namespaces:
     oro_entity_extend: Oro\Bundle\EntityExtendBundle\Validator\Constraints\
 
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
+    group_sequence: [FieldConfigModel, fieldName]
     constraints:
-        - oro_entity_extend:UniqueExtendEntityField: ~
+        - oro_entity_extend:UniqueExtendEntityField:
+            groups: [fieldName]
     properties:
         fieldName:
             - NotBlank: ~
