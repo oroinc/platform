@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Symfony\Component\Security\Acl\Voter\FieldVote;
-
 class FieldAclExtension extends EntityAclExtension
 {
     /**
@@ -11,7 +9,9 @@ class FieldAclExtension extends EntityAclExtension
      */
     public function supports($type, $id)
     {
-        return FieldVote::class == $type;
+        $supports = parent::supports($type, $id);
+
+        return $supports && strpos($id, 'field') === 0;
     }
 
     /**

@@ -40,10 +40,54 @@ class RoleController extends Controller
      * )
      * @Route("/update/{id}", name="oro_user_role_update", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template
+     *
+     * @param Role $entity
+     *
+     * @return array
      */
     public function updateAction(Role $entity)
     {
         return $this->update($entity);
+    }
+
+    /**
+     * @Acl(
+     *      id="oro_field_acl_update",
+     *      type="entity",
+     *      class="OroUserBundle:Role",
+     *      permission="EDIT"
+     * )
+     * @Route(
+     *     "/update-field/{id}/{className}",
+     *     name="oro_field_acl_update",
+     *     requirements={"id"="\d+", "className"="\S+"},
+     *     defaults={"id"=0}
+     * )
+     * @Template
+     *
+     * @param Role   $entity
+     * @param string $className
+     *
+     * @return array
+     */
+    public function updateFieldAction(Role $entity, $className)
+    {
+        $className = str_replace('_', '\\', $className);
+        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler->createForm($entity, $className);
+
+        $privilegesConfig = $this->container->getParameter('oro_user.privileges');
+        $privilegesConfig = array_intersect_key($privilegesConfig, array_flip(['field']));
+
+        if ($aclRoleHandler->process($entity, $className)) {
+
+        }
+
+        return [
+            'entity'           => $entity,
+            'form'             => $aclRoleHandler->createView(),
+            'privilegesConfig' => $privilegesConfig,
+        ];
     }
 
     /**
@@ -61,7 +105,7 @@ class RoleController extends Controller
      * )
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return array(
             'entity_class' => $this->container->getParameter('oro_user.role.entity.class')

@@ -105,6 +105,7 @@ services:
         arguments:
             - @oro_security.acl.manager
             - @translator
+            - @doctrine
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -578,4 +579,4 @@ services:
             - @oro_security.owner.metadata_provider.chain
             - @oro_security.owner.ownership_decision_maker.chain
         tags:
-            - { name: oro_security.acl.extension, priority: 20 }
+            - { name: oro_security.acl.extension, priority: 15 } # should be before EntityAclExtension

@@ -68,16 +68,18 @@
     {% endfor %}
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-        'title': 'Additional'|trans,
-        'subblocks': [{
-        'title': '',
-        'useSpan': false,
-        'data' : additionalData
-        }]
-        }] ) %}
+                'title': 'Additional'|trans,
+                'subblocks': [{
+                    'title': '',
+                    'useSpan': false,
+                    'data' : additionalData
+                }]
+            }]
+        ) %}
     {% endif %}
 
     {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
+        {% if privilegeBlock != 'field' %} {# do not show field controls here #}
         {% set dataBlocks = dataBlocks|merge([{
             'title': privilegeConfig.label|trans,
             'subblocks': [
@@ -90,6 +92,7 @@
                 }
             ]
         }]) %}
+        {% endif %}
     {% endfor %}
 
     {% set dataBlocks = dataBlocks|merge([{
