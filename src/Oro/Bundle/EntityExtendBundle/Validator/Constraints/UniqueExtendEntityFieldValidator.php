@@ -23,30 +23,54 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
+     * @param FieldConfigModel $value
+     * @param Constraint       $constraint
      */
     public function validate($value, Constraint $constraint)
     {
-        if ($value instanceof FieldConfigModel) {
-            $className    = $value->getEntity()->getClassName();
-            $newFieldName = $this->removeClassifySymbols($value->getFieldName());
+        if (!$value instanceof FieldConfigModel) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel supported only, %s given',
+                    is_object($value) ? get_class($value) : gettype($value)
+                )
+            );
+        }
 
-            $configs = $this->configProvider->getConfigs($className, true);
-            foreach ($configs as $config) {
-                /** @var FieldConfigId $configId */
-                $configId  = $config->getId();
-                $fieldName = $configId->getFieldName();
-                if ($newFieldName === $this->removeClassifySymbols($fieldName)) {
-                    /** @var ExecutionContextInterface $context */
-                    $context = $this->context;
-                    $context->buildViolation($constraint->message)
-                            ->atPath($constraint->path)
-                            ->addViolation();
+        $newFieldName = $this->removeClassifySymbols($value->getFieldName());
 
-                    return;
-                }
+        // Need hardcoded check for the `id`, `serialized_data` fields
+        // cause we do not fetch this information from ConfigProvider.
+        if (in_array($newFieldName, ['id', $this->removeClassifySymbols('serialized_data')], true)) {
+            $this->addViolation($constraint);
+
+            return;
+        }
+
+        $className = $value->getEntity()->getClassName();
+        $configs   = $this->configProvider->getConfigs($className, true);
+        foreach ($configs as $config) {
+            /** @var FieldConfigId $configId */
+            $configId  = $config->getId();
+            $fieldName = $configId->getFieldName();
+            if ($newFieldName === $this->removeClassifySymbols($fieldName)) {
+                $this->addViolation($constraint);
+
+                return;
             }
         }
+    }
+
+    /**
+     * @param Constraint $constraint
+     */
+    protected function addViolation(Constraint $constraint)
+    {
+        /** @var ExecutionContextInterface $context */
+        $context = $this->context;
+        $context->buildViolation($constraint->message)
+            ->atPath($constraint->path)
+            ->addViolation();
     }
 
     /**
