@@ -97,6 +97,8 @@ define(function(require) {
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
+            // fix arrows behaviour
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
         },
 
         onGenericEnterKeydown: function(e) {

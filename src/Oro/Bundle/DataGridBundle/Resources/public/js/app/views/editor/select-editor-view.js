@@ -98,6 +98,8 @@ define(function(require) {
                 _.bind(this.onGenericEnterKeydown, this));
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
                 _.bind(this.onGenericTabKeydown, this));
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
+                _.bind(this.onGenericArrowKeydown, this));
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
@@ -107,6 +109,7 @@ define(function(require) {
                     _this.$('input[name=value]').select2('close');
                     _this.onGenericTabKeydown(e);
                 }
+                _this.onGenericArrowKeydown(e);
             });
         },
 

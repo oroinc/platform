@@ -57,6 +57,7 @@ inline_editing.editor.validationRules               | Optional. The client side 
 
 
 * [TextEditorView](#module_TextEditorView) ⇐ <code>BaseView</code>
+  * [.ARROW_LEFT_KEY_CODE](#module_TextEditorView#ARROW_LEFT_KEY_CODE)
   * [.focus(atEnd)](#module_TextEditorView#focus)
   * [.getValidationRules()](#module_TextEditorView#getValidationRules) ⇒ <code>Object</code>
   * [.getFormattedValue()](#module_TextEditorView#getFormattedValue) ⇒ <code>string</code>
@@ -64,14 +65,20 @@ inline_editing.editor.validationRules               | Optional. The client side 
   * [.getValue()](#module_TextEditorView#getValue) ⇒ <code>string</code>
   * [.rethrowAction()](#module_TextEditorView#rethrowAction) ⇒ <code>string</code>
   * [.isChanged()](#module_TextEditorView#isChanged) ⇒ <code>boolean</code>
+  * [.isValid()](#module_TextEditorView#isValid) ⇒ <code>boolean</code>
   * [.onChange()](#module_TextEditorView#onChange)
-  * [.onKeyDown(e)](#module_TextEditorView#onKeyDown)
   * [.onGenericEnterKeydown(e)](#module_TextEditorView#onGenericEnterKeydown)
   * [.onGenericTabKeydown(e)](#module_TextEditorView#onGenericTabKeydown)
   * [.onGenericEscapeKeydown(e)](#module_TextEditorView#onGenericEscapeKeydown)
+  * [.onGenericArrowKeydown(e)](#module_TextEditorView#onGenericArrowKeydown)
   * [.getServerUpdateData()](#module_TextEditorView#getServerUpdateData) ⇒ <code>Object</code>
   * [.getModelUpdateData()](#module_TextEditorView#getModelUpdateData) ⇒ <code>Object</code>
 
+<a name="module_TextEditorView#ARROW_LEFT_KEY_CODE"></a>
+### textEditorView.ARROW_LEFT_KEY_CODE
+Arrow codes
+
+**Kind**: instance property of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#focus"></a>
 ### textEditorView.focus(atEnd)
 Places focus on the editor
@@ -126,21 +133,16 @@ Sample usage:
 Returns true if the user has changed the value
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+<a name="module_TextEditorView#isValid"></a>
+### textEditorView.isValid() ⇒ <code>boolean</code>
+Returns true if the user entered valid data
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 <a name="module_TextEditorView#onChange"></a>
 ### textEditorView.onChange()
 Change handler. In this realization, it tracks a submit button disabled attribute
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-<a name="module_TextEditorView#onKeyDown"></a>
-### textEditorView.onKeyDown(e)
-Keydown handler for the entire document
-
-**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
-
-| Param | Type |
-| --- | --- |
-| e | <code>$.Event</code> | 
-
 <a name="module_TextEditorView#onGenericEnterKeydown"></a>
 ### textEditorView.onGenericEnterKeydown(e)
 Generic keydown handler, which handles ENTER
@@ -164,6 +166,16 @@ Generic keydown handler, which handles TAB
 <a name="module_TextEditorView#onGenericEscapeKeydown"></a>
 ### textEditorView.onGenericEscapeKeydown(e)
 Generic keydown handler, which handles ESCAPE
+
+**Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
+
+| Param | Type |
+| --- | --- |
+| e | <code>$.Event</code> | 
+
+<a name="module_TextEditorView#onGenericArrowKeydown"></a>
+### textEditorView.onGenericArrowKeydown(e)
+Generic keydown handler, which handles ARROWS
 
 **Kind**: instance method of <code>[TextEditorView](#module_TextEditorView)</code>  
 

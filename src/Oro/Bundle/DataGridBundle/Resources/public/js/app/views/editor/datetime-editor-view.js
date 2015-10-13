@@ -116,6 +116,8 @@ define(function(require) {
                     e.stopPropagation();
                 }
             });
+            // fix arrows behaviour
+            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
             return this;
         },
 

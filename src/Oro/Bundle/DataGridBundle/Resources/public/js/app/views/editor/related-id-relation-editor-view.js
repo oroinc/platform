@@ -122,6 +122,9 @@ define(function(require) {
             var currentTerm = null;
 
             var makeRequest = function(options) {
+                if (_this.disposed) {
+                    return;
+                }
                 var column;
                 if (options.term === '' && options.page === 1 && _.isArray(_this.column.emptyQueryChoices)) {
                     options.callback({
