@@ -195,7 +195,7 @@ class EmailUserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getEmailUserByFolder($folder)
+    public function getEmailUserByFolder($folder, $limit = null, $offset = null)
     {
         $queryBuilder = $this->createQueryBuilder('eu');
         $queryBuilder
@@ -203,6 +203,12 @@ class EmailUserRepository extends EntityRepository
             ->andWhere($queryBuilder->expr()->in('folders', ':folder'))
             ->setParameter('folder', $folder->getId())
             ->groupBy('eu');
+        if ($offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
 
         return $queryBuilder;
     }
