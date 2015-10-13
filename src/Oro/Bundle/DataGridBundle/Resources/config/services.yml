@@ -29,6 +29,10 @@ parameters:
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
 
+    oro_datagrid.extension.inline.base_handler.class:             Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler
+    oro_datagrid.extension.inline.handler_processor.class:        Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor
+    oro_datagrid.extension.inline.handler_contact.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra\ContactApiHandler
+
     oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager
     oro_datagrid.extension.inline_editing.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder
 services:
@@ -170,12 +174,29 @@ services:
 
     oro_datagrid.extension.inline_editing.entity.manager:
         class: %oro_datagrid.extension.inline_editing.entity.manager.class%
+        scope: request
         arguments:
             - @doctrine
             - @oro_datagrid.extension.inline_editing.entity_manager.form_builder
+            - @oro_datagrid.extension.inline.base_handler
 
     oro_datagrid.extension.inline_editing.entity_manager.form_builder:
         class: %oro_datagrid.extension.inline_editing.entity_manager.form_builder.class%
         arguments:
             - @form.factory
             - @doctrine
+
+    oro_datagrid.extension.inline.base_handler:
+        class: %oro_datagrid.extension.inline.base_handler.class%
+        scope: request
+        arguments:
+            - @doctrine
+            - @oro_datagrid.extension.inline.handler_processor
+
+    oro_datagrid.extension.inline.handler_processor:
+        class: %oro_datagrid.extension.inline.handler_processor.class%
+
+    oro_datagrid.extension.inline.handler_contact:
+        class: %oro_datagrid.extension.inline.handler_contact.class%
+        tags:
+            - { name: oro_datagrid.extension.api.handler }

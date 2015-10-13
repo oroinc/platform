@@ -4,6 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\View\View;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -38,6 +43,7 @@ class EntityController extends FOSRestController
      * @param int $id
      *
      * @return Response
+     *
      * @Rest\Patch("entity/{className}/{id}")
      * @ApiDoc(
      *      description="Update entity property",
@@ -51,16 +57,24 @@ class EntityController extends FOSRestController
     {
         $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
 
+        if (!$entity) {
+            return parent::handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        }
         if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
 
-        $this->getManager()->updateFields(
+        $form = $this->getManager()->update(
             $entity,
             json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
         );
-        $response = ['status' => true];
+        if ($form->getErrors()->count() > 0) {
+            $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
+        } else {
+            $view = $this->view($form, Codes::HTTP_NO_CONTENT);
+        }
+        $response = parent::handleView($view);
 
-        return new JsonResponse($response);
+        return $response;
     }
 }
