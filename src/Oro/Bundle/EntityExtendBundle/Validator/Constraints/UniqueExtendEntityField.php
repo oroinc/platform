@@ -9,6 +9,7 @@ class UniqueExtendEntityField extends Constraint
     /** @var string  */
     public $message = 'This value is already used.';
 
+    /** @var string  */
     public $path = 'fieldName';
 
     /**

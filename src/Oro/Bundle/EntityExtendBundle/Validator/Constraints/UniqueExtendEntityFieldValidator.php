@@ -17,14 +17,16 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
     /** @var ConfigProvider  */
     protected $configProvider;
 
+    /**
+     * @param ConfigProvider $configProvider
+     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
     }
 
     /**
-     * @param FieldConfigModel $value
-     * @param Constraint       $constraint
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -37,11 +39,10 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
             );
         }
 
-        $newFieldName = $this->removeClassifySymbols($value->getFieldName());
+        $newFieldName = strtolower(Inflector::classify(($value->getFieldName())));
 
-        // Need hardcoded check for the `id`, `serialized_data` fields
-        // cause we do not fetch this information from ConfigProvider.
-        if (in_array($newFieldName, ['id', $this->removeClassifySymbols('serialized_data')], true)) {
+        // Need hardcoded check for the `id`, `serialized_data` fields.
+        if (in_array($newFieldName, ['id', strtolower(Inflector::classify('serialized_data'))], true)) {
             $this->addViolation($constraint);
 
             return;
@@ -53,7 +54,7 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
             /** @var FieldConfigId $configId */
             $configId  = $config->getId();
             $fieldName = $configId->getFieldName();
-            if ($newFieldName === $this->removeClassifySymbols($fieldName)) {
+            if ($newFieldName === strtolower(Inflector::classify($fieldName))) {
                 $this->addViolation($constraint);
 
                 return;
@@ -71,18 +72,5 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
         $context->buildViolation($constraint->message)
             ->atPath($constraint->path)
             ->addViolation();
-    }
-
-    /**
-     * @param string $text
-     *
-     * @return string
-     */
-    protected function removeClassifySymbols($text)
-    {
-        $text = Inflector::classify($text);
-        $text = str_replace(' ', '', $text);
-
-        return strtolower($text);
     }
 }
