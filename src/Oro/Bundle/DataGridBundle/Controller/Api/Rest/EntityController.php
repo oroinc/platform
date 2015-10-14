@@ -41,6 +41,7 @@ class EntityController extends FOSRestController
 
     /**
      * @param int $id
+     * @param int $className
      *
      * @return Response
      *

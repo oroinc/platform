@@ -22,10 +22,10 @@ datagrid:
 
         inline_editing:
             enable: true
-            entity_name: OroUserBundle:User
+            entity_name: Oro\Bundle\UserBundle\Entity\User
             save_api_accessor:
                 default_route_parameters:
-                    className: Oro_Bundle_UserBundle_Entity_User
+                    className: Oro\Bundle\UserBundle\Entity\User
         columns:
             username:
                 label:         oro.user.username.label
