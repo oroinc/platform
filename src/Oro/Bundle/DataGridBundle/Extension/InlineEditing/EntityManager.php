@@ -13,6 +13,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 
 class EntityManager
 {
@@ -31,26 +33,34 @@ class EntityManager
     /** @var  EntityRoutingHelper */
     protected $entityRoutingHelper;
 
+    /** @var OwnershipMetadataProvider */
+    protected $ownershipMetadataProvider;
+
     /**
      * @param Registry $registry
      * @param FormBuilder $formBuilder
      * @param EntityApiBaseHandler $handler
+     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param OwnershipMetadataProvider $ownershipMetadataProvider
      */
     public function __construct(
         Registry $registry,
         FormBuilder $formBuilder,
         EntityApiBaseHandler $handler,
-        EntityRoutingHelper $entityRoutingHelper
+        EntityRoutingHelper $entityRoutingHelper,
+        OwnershipMetadataProvider $ownershipMetadataProvider
     ) {
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
         $this->handler = $handler;
         $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
      * @param $entity
+     *
      * @return FormInterface
      */
     public function getForm($entity)
@@ -67,29 +77,63 @@ class EntityManager
     public function update($entity, $content)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
-        $formData = [
-            'owner' => $entity->getOwner()->getId()
-        ];
-
         $form = $this->getForm($entity);
+        $data = $this->presetData($entity);
 
         foreach ($content as $fieldName => $fieldValue) {
             if ($this->hasAccessEditFiled($fieldName)) {
-                $oldVakue = $fieldValue;
+                $originValue = $fieldValue;
                 $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $fieldValue);
 
-                $formData[$fieldName] = $oldVakue;
+                $data[$fieldName] = $originValue;
                 $form = $this->formBuilder->add($form, $entity, $fieldName);
             }
         }
-        $this->handler->process($entity, $form, $formData, 'PATCH');
+
+        $this->handler->process($entity, $form, $data, 'PATCH');
 
         return $form;
     }
 
     /**
+     * @param $entity
+     *
+     * @return array
+     */
+    protected function presetData($entity)
+    {
+        $data = [];
+        $metadata = $this->getMetadataConfig($entity);
+        if (!$metadata || $metadata->isGlobalLevelOwned()) {
+            return $data;
+        }
+        $data[$metadata->getOwnerFieldName()] = $entity->getOwner()->getId();
+
+        return $data;
+    }
+
+    /**
+     * @param $entity - object | class name entity
+     *
+     * @return bool|OwnershipMetadataInterface
+     */
+    protected function getMetadataConfig($entity)
+    {
+        if (is_object($entity)) {
+            $entity = ClassUtils::getClass($entity);
+        }
+
+        $metadata = $this->ownershipMetadataProvider->getMetadata($entity);
+
+        return $metadata->hasOwner()
+            ? $metadata
+            : false;
+    }
+
+    /**
      * @param $fieldName
+     *
      * @return bool
      */
     protected function hasAccessEditFiled($fieldName)
@@ -106,6 +150,7 @@ class EntityManager
      * @param $entity
      * @param $fieldName
      * @param $fieldValue
+     *
      * @return \DateTime
      */
     protected function prepareFieldValue($entity, $fieldName, $fieldValue)
@@ -133,6 +178,11 @@ class EntityManager
         return $fieldValue;
     }
 
+    /**
+     * @param $entity
+     *
+     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
     protected function getMetaData($entity)
     {
         $className = ClassUtils::getClass($entity);

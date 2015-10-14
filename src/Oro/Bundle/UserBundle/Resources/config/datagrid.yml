@@ -19,6 +19,13 @@ datagrid:
                     - u.enabled
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
+
+        inline_editing:
+            enable: true
+            entity_name: OroUserBundle:User
+            save_api_accessor:
+                default_route_parameters:
+                    className: Oro_Bundle_UserBundle_Entity_User
         columns:
             username:
                 label:         oro.user.username.label
