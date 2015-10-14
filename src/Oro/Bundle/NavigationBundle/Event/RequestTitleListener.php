@@ -10,17 +10,14 @@ use Symfony\Component\HttpKernel\HttpKernel;
 class RequestTitleListener
 {
     /** @var TitleServiceInterface */
-    private $titleService = false;
-
-    /** @var ContainerInterface */
-    private $container;
+    private $titleService;
 
     /**
-     * @param ContainerInterface $container
+     * @param TitleServiceInterface $titleService
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TitleServiceInterface $titleService)
     {
-        $this->container = $container;
+        $this->titleService = $titleService;
     }
 
     /**
@@ -44,18 +41,6 @@ class RequestTitleListener
 
         $route = $request->get('_route');
 
-        $this->getTitleService()->loadByRoute($route);
-    }
-
-    /**
-     * @return TitleServiceInterface
-     */
-    protected function getTitleService()
-    {
-        if ($this->titleService === false) {
-            $this->titleService = $this->container->get('oro_navigation.title_service');
-        }
-
-        return $this->titleService;
+        $this->titleService->loadByRoute($route);
     }
 }

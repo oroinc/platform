@@ -46,14 +46,7 @@ class RequestTitleListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequestType')
             ->will($this->returnValue($data));
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->setMethods(['get'])
-            ->getMock();
-        $container->expects($this->any())
-            ->method('get')
-            ->willReturn($titleService);
-
-        $listener = new RequestTitleListener($container);
+        $listener = new RequestTitleListener($titleService);
         $listener->onKernelRequest($event);
     }
 
