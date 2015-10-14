@@ -121,6 +121,7 @@ class FormBuilder
      * @param $fieldName
      *
      * @return array
+     *
      * @throws MappingException
      */
     protected function getAssociationTypeOptions(ClassMetadata $metaData, $fieldName)
