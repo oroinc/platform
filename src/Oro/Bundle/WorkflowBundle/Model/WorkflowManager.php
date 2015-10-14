@@ -242,6 +242,49 @@ class WorkflowManager
             throw $e;
         }
     }
+    
+    /**
+     * Transit several workflows in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflowItem' => <workflow identifier: integer|WorkflowItem>,
+     *          'transition'   => <transition name: string>
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massTransitWorkflow(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            foreach ($data as $row) {
+                if (empty($row['workflowItem']) || empty($row['transition'])) {
+                    continue;
+                }
+
+                $workflow = $this->getWorkflow($row['workflowItem']);
+                $workflowItem = $this->getWorkflowItem($row['workflowItem']);
+                $transition = $row['transition'];
+
+                $workflow->transit($workflowItem, $transition);
+                $workflowItem->setUpdated();
+                $em->persist($workflowItem);
+            }
+
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
 
     /**
      * @param object $entity
