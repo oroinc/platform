@@ -93,7 +93,7 @@ class AclPrivilegeRepository
     {
         $extensionKey = 'field';
         $extension = $this->manager->getExtensionSelector()->select(
-            new ObjectIdentity('field', ObjectIdentityFactory::ROOT_IDENTITY_TYPE)
+            'field:' . $className
         );
 
         $entityClass = array_filter(
@@ -107,6 +107,10 @@ class AclPrivilegeRepository
 
         $objectIdentity = new OID($extensionKey, $className);
         $acls = $this->findAcls($sid, [$objectIdentity]);
+
+        // find ACL for the root object identity
+        $rootOid = $objectIdentity;
+        $rootAcl = $this->findAclByOid($acls, $rootOid);
 
         $privileges = new ArrayCollection();
 
@@ -123,7 +127,7 @@ class AclPrivilegeRepository
             ->setGroup($entityClass->getGroup())
             ->setExtensionKey($extensionKey);
 
-            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, null, $fieldName);
+            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $rootAcl, $fieldName);
             $privileges->add($privilege);
         }
 
@@ -199,6 +203,55 @@ class AclPrivilegeRepository
     }
 
     /**
+     * @param SID             $sid
+     * @param OID             $oid
+     * @param ArrayCollection $privileges
+     *
+     * @throws \Exception
+     */
+    public function saveFieldPrivileges(SID $sid, OID $oid, ArrayCollection $privileges)
+    {
+        $extension = $this->manager->getExtensionSelector()->select('field:' . $oid->getType());
+
+        /** @var MaskBuilder[] $maskBuilders */
+        $maskBuilders = [];
+        $this->prepareMaskBuilders($maskBuilders, $extension);
+
+        /** @var AclPrivilege $privilege */
+        foreach ($privileges as $privilege) {
+            // compile masks
+            $masks = $this->getPermissionMasks($privilege->getPermissions(), $extension, $maskBuilders);
+
+            $fieldName = explode('+', explode(':', $privilege->getIdentity()->getId())[0])[1];
+
+            foreach ($this->manager->getAces($sid, $oid, $fieldName) as $ace) {
+                if (!$ace->isGranting()) {
+                    // denying ACE is not supported
+                    continue;
+                }
+
+                // update existing aces
+                //$mask = $this->updateExistingPermissions($sid, $oid, $ace->getMask(), $masks, $rootMasks, $extension);
+
+
+
+
+                // as we have already processed $mask, remove it from $masks collection
+                if ($mask !== false) {
+                    $this->removeMask($masks, $mask);
+                }
+            }
+
+            // check if we have new masks so far, and process them if any
+            foreach ($masks as $mask) {
+                $this->manager->setFieldPermission($sid, $oid, $fieldName, $mask);
+            }
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * Associates privileges with the given security identity.
      *
      * @param SID $sid
@@ -260,7 +313,8 @@ class AclPrivilegeRepository
         // set permissions for other objects
         foreach ($privileges as $privilege) {
             $identity = $privilege->getIdentity()->getId();
-            $extensionKey = substr($identity, 0, strpos($identity, ':'));
+            $extensionKey = $this->getExtensionKeyByIdentity($identity);
+
             /** @var AclExtensionInterface $extension */
             $extension = $context[$extensionKey]['extension'];
             $oid = $extension->getObjectIdentity($identity);
@@ -288,6 +342,23 @@ class AclPrivilegeRepository
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * @param string $identity
+     *
+     * @return string
+     */
+    protected function getExtensionKeyByIdentity($identity)
+    {
+        $extensionKey = substr($identity, 0, strpos($identity, ':'));
+
+        if (strpos($extensionKey, '+')) {
+            // field extension
+            $extensionKey = explode('+', $extensionKey)[0];
+        }
+
+        return $extensionKey;
     }
 
     /**

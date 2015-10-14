@@ -19,6 +19,7 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class AclRoleHandler
 {
@@ -208,7 +209,7 @@ class AclRoleHandler
                 $appendUsers = $this->form->get('appendUsers')->getData();
                 $removeUsers = $this->form->get('removeUsers')->getData();
                 $this->onSuccess($role, $appendUsers, $removeUsers);
-                $this->processPrivileges($role);
+                $this->processPrivileges($role, $className);
 
                 return true;
             }
@@ -295,8 +296,9 @@ class AclRoleHandler
 
     /**
      * @param AbstractRole $role
+     * @param null|string  $className
      */
-    protected function processPrivileges(AbstractRole $role)
+    protected function processPrivileges(AbstractRole $role, $className = null)
     {
         $formPrivileges = array();
         foreach ($this->privilegeConfig as $fieldName => $config) {
@@ -314,10 +316,18 @@ class AclRoleHandler
             }
         );
 
-        $this->privilegeRepository->savePrivileges(
-            $this->aclManager->getSid($role),
-            new ArrayCollection($formPrivileges)
-        );
+        if ($className) {
+            $this->privilegeRepository->saveFieldPrivileges(
+                $this->aclManager->getSid($role),
+                new ObjectIdentity('field', $className),
+                new ArrayCollection($formPrivileges)
+            );
+        } else {
+            $this->privilegeRepository->savePrivileges(
+                $this->aclManager->getSid($role),
+                new ArrayCollection($formPrivileges)
+            );
+        }
     }
 
     /**

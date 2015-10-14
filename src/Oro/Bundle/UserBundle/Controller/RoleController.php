@@ -80,11 +80,24 @@ class RoleController extends Controller
         $privilegesConfig = array_intersect_key($privilegesConfig, array_flip(['field']));
 
         if ($aclRoleHandler->process($entity, $className)) {
+            $this->get('session')->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.user.controller.role.message.saved')
+            );
 
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                [
+                    'route'      => 'oro_field_acl_update',
+                    'parameters' => ['id' => $entity->getId(), 'className' => $className]
+                ],
+                ['route' => 'oro_user_role_update', 'parameters' => ['id' => $entity->getId()]],
+                $entity
+            );
         }
 
         return [
             'entity'           => $entity,
+            'className'        => $className,
             'form'             => $aclRoleHandler->createView(),
             'privilegesConfig' => $privilegesConfig,
         ];

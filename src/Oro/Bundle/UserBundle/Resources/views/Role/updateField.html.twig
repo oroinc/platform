@@ -1,1 +1,69 @@
-<tr><td colspan="6">{{ form_widget(form.children['field']) }}</td></tr>
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+{% set entityId = form.vars.value.id %}
+{% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
+{% set formAction = path('oro_field_acl_update', { 'id': entityId, 'className': className}) %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('oro_user_role_index')) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% if entityId %}
+        {% set breadcrumbs = {
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_user_role_index'),
+            'indexLabel': 'oro.user.role.entity_plural_label'|trans,
+            'entityTitle': form.vars.value.label
+        }
+        %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.role.entity_label'|trans}) %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'role-profile' %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_row(form.label, {read_only: true})
+                ]
+            }
+        ]
+    }] %}
+
+    {% set privilegeBlock = 'field' %}
+    {% set privilegeConfig = privilegesConfig[privilegeBlock] %}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': privilegeConfig.label|trans,
+        'subblocks': [
+            {
+                'title': '',
+                'useSpan': false,
+                'data': [
+                    form_widget(form.children[privilegeBlock])
+                ]
+            }
+        ]
+    }]) %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock content_data %}
