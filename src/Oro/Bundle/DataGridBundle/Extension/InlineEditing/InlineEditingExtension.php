@@ -83,10 +83,12 @@ class InlineEditingExtension extends AbstractExtension
         }
 
         // replace config values by normalized, extra keys passed directly
-        $config->offsetSet(
-            Configuration::BASE_CONFIG_KEY,
-            array_replace_recursive($configItems, $normalizedConfigItems)
-        );
+        $resultConfigItems = array_replace_recursive($configItems, $normalizedConfigItems);
+        if (is_null($resultConfigItems['save_api_accessor']['default_route_parameters']['className'])) {
+            $resultConfigItems['save_api_accessor']['default_route_parameters']['className'] =
+                str_replace('\\', '_', $configItems['entity_name']);
+        }
+        $config->offsetSet(Configuration::BASE_CONFIG_KEY, $resultConfigItems);
 
         //add inline editing where it is possible
         if ($isGranted) {
@@ -185,13 +187,14 @@ class InlineEditingExtension extends AbstractExtension
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
 
         foreach ($columns as $columnName => &$column) {
+            $newColumn = [];
             if ($metadata->hasField($columnName)
                 && !in_array($columnName, $blackList)
                 && !$metadata->hasAssociation($columnName)
             ) {
-                $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
+                $newColumn[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
                 if ($validatorMetadata->hasPropertyMetadata($columnName)) {
-                    $column[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
+                    $newColumn[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
                         $this->getValidationRules($validatorMetadata, $columnName);
                 }
             } elseif ($metadata->hasAssociation($columnName)) {
@@ -200,22 +203,24 @@ class InlineEditingExtension extends AbstractExtension
                     $targetEntity = $metadata->getAssociationTargetClass($columnName);
 
                     $targetEntityMetadata = $this->entityManager->getClassMetadata($targetEntity);
-                    if (isset($column[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'])) {
-                        $labelField = $column[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'];
+                    if (isset($newColumn[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'])) {
+                        $labelField = $newColumn[Configuration::BASE_CONFIG_KEY]['view_options']['value_field_name'];
                     } else {
                         $labelField = $this->guessLabelField($targetEntityMetadata, $columnName);
                     }
 
-                    $column[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
+                    $newColumn[Configuration::BASE_CONFIG_KEY] = ['enable' => true];
                     if ($validatorMetadata->hasPropertyMetadata($columnName)) {
-                        $column[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
+                        $newColumn[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
                             $this->getValidationRules($validatorMetadata, $columnName);
                     }
-                    $column[PropertyInterface::FRONTEND_TYPE_KEY] = 'select';
+                    $newColumn[PropertyInterface::FRONTEND_TYPE_KEY] = 'select';
                     $keyField = $targetEntityMetadata->getSingleIdentifierFieldName();
-                    $column['choices'] = $this->getChoices($targetEntity, $keyField, $labelField);
+                    $newColumn['choices'] = $this->getChoices($targetEntity, $keyField, $labelField);
                 }
             }
+
+            $column = array_replace_recursive($newColumn, $column);
         }
 
         return $columns;
