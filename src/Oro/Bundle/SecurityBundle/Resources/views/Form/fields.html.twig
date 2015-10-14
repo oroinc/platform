@@ -34,7 +34,13 @@
 {% endblock %}
 
 {% block oro_acl_label_widget %}
-    <strong class="{{ form.parent.parent.parent.vars.name }}-identity-label">{{ value|trans }}</strong>
+    <strong>
+        {% if form.vars.roleId|default(false) %}
+        <a href="{{ url('oro_field_acl_update', {id: form.vars.roleId, className: form.vars.className}) }}">{{ value|trans }}</a>
+        {% else %}
+        {{ value|trans }}
+        {% endif %}
+    </strong>
     {% set type = type|default('hidden') %}
     {{ block('form_widget_simple') }}
 {% endblock %}
@@ -45,13 +51,6 @@
 {% endblock %}
 
 {% block oro_acl_collection_widget %}
-    {% if form.vars.name == 'entity' %}
-        {# initialize field-acl component by wrapping another component HTML #}
-        {% set options = {roleId: form.parent.vars.value.id} %}
-        <div data-page-component-module="orosecurity/js/app/components/security-field-acl-component"
-             data-page-component-options="{{ options|json_encode }}">
-    {% endif %}
-
     <div data-page-component-module="{{ page_component_module|escape }}" data-page-component-options="{{ page_component_options|json_encode|escape }}">
         {% if privileges_config.view_type == 'grid' %}
             <table class="table table-striped acl-table">
@@ -80,11 +79,6 @@
             {% endfor %}
         {% endif %}
     </div>
-
-    {% if form.vars.name == 'entity' %}
-        {# end of field-acl component wrapping #}
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block oro_acl_privilege_widget %}

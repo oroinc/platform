@@ -17,6 +17,18 @@ class FieldAclExtension extends EntityAclExtension
     /**
      * {@inheritdoc}
      */
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
+    {
+        parent::parseDescriptor($descriptor, $type, $id, $group);
+
+        if (strpos($id, '+')) {
+            $id = explode('+', $id)[0];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExtensionKey()
     {
         return 'field';
