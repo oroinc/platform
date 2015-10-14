@@ -45,9 +45,7 @@ class EntityApiBaseHandler
         $this->processor->preProcess($entity);
         $form->setData($entity);
 
-        if (
-            count($data) > 1 // refactor
-            && in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
+        if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
             $form->submit($data);
 
             if ($form->isValid()) {

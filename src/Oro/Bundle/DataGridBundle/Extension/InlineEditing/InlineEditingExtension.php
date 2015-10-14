@@ -194,7 +194,7 @@ class InlineEditingExtension extends AbstractExtension
                     $column[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
                         $this->getValidationRules($validatorMetadata, $columnName);
                 }
-            } elseif($metadata->hasAssociation($columnName)) {
+            } elseif ($metadata->hasAssociation($columnName)) {
                 $mapping = $metadata->getAssociationMapping($columnName);
                 if ($mapping['type'] === ClassMetadata::MANY_TO_ONE) {
                     $targetEntity = $metadata->getAssociationTargetClass($columnName);
