@@ -6,9 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
+use Doctrine\ORM\Mapping\MappingException;
 
 class FormBuilder
 {
@@ -38,6 +38,7 @@ class FormBuilder
 
     /**
      * @param $entity
+     *
      * @return FormInterface
      */
     public function getForm($entity)
@@ -71,15 +72,19 @@ class FormBuilder
      * @param $entity
      * @param $fieldName
      *
-     * @return string
+     * @return array|bool
      */
     protected function getAssociationType($entity, $fieldName)
     {
+        $data = false;
         $metaData = $this->getMetaData($entity);
 
-        $data = $this->findSimpleField($metaData, $fieldName);
-        if (empty($data)) {
-            $data = $this->findRelationField($metaData, $fieldName);
+        if ($metaData->hasField($fieldName)) {
+            $data = $this->getSimpleTypeOptions($metaData, $fieldName);
+        }
+
+        if ($metaData->hasAssociation($fieldName)) {
+            $data = $this->getAssociationTypeOptions($metaData, $fieldName);
         }
 
         if ($data !== false) {
@@ -92,42 +97,55 @@ class FormBuilder
         return $data;
     }
 
-    protected function findSimpleField(ClassMetadata $metaData, $fieldName)
+    /**
+     * @param ClassMetadata $metaData
+     * @param $fieldName
+     *
+     * @return array
+     *
+     * @throws MappingException
+     */
+    protected function getSimpleTypeOptions(ClassMetadata $metaData, $fieldName)
     {
-        $data = false;
+        $fieldInfo = $metaData->getFieldMapping($fieldName);
 
-        if ($metaData->hasField($fieldName)) {
-            $fieldInfo = $metaData->getFieldMapping($fieldName);
+        $data = [
+            'type' => $fieldInfo['type']
+        ];
 
-            $data = [
-                'type' => $fieldInfo['type']
+        return $data;
+    }
+
+    /**
+     * @param ClassMetadata $metaData
+     * @param $fieldName
+     *
+     * @return array
+     * @throws MappingException
+     */
+    protected function getAssociationTypeOptions(ClassMetadata $metaData, $fieldName)
+    {
+        $fieldInfo = $metaData->getAssociationMapping($fieldName);
+
+        $data = [
+            'type' => 'entity',
+        ];
+
+        if ($fieldInfo['type'] == 2) {
+            $data['options'] = [
+                'class' => $fieldInfo['targetEntity'],
+                'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
             ];
         }
 
         return $data;
     }
 
-    protected function findRelationField(ClassMetadata $metaData, $fieldName)
-    {
-        $data = false;
-        if ($metaData->hasAssociation($fieldName)) {
-            $fieldInfo = $metaData->getAssociationMapping($fieldName);
-            $data = [
-                'type' => 'entity',
-            ];
-
-            if ($fieldInfo['type'] == 2) {
-                $data['options'] = [
-                    'class' => $fieldInfo['targetEntity'],
-                    'choice_label' => $fieldInfo['joinColumns'][0]['referencedColumnName']
-                ];
-            }
-
-        }
-
-        return $data;
-    }
-
+    /**
+     * @param $entity
+     *
+     * @return ClassMetadata
+     */
     protected function getMetaData($entity)
     {
         $className = ClassUtils::getClass($entity);
