@@ -163,7 +163,7 @@ class EntityManager
             $fieldInfo = $metaData->getFieldMapping($fieldName);
 
             $fieldType = $fieldInfo['type'];
-            if ($fieldType === 'datetime') {
+            if (in_array($fieldType, ['datetime','date'])) {
                 $fieldValue = new \DateTime($fieldValue);
             }
         }
