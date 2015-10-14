@@ -4,12 +4,17 @@ namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 
 class EntityManager
 {
@@ -25,21 +30,37 @@ class EntityManager
     /** @var EntityApiBaseHandler */
     protected $handler;
 
+    /** @var  EntityRoutingHelper */
+    protected $entityRoutingHelper;
+
+    /** @var OwnershipMetadataProvider */
+    protected $ownershipMetadataProvider;
+
     /**
      * @param Registry $registry
      * @param FormBuilder $formBuilder
      * @param EntityApiBaseHandler $handler
+     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param OwnershipMetadataProvider $ownershipMetadataProvider
      */
-    public function __construct(Registry $registry, FormBuilder $formBuilder, EntityApiBaseHandler $handler)
-    {
+    public function __construct(
+        Registry $registry,
+        FormBuilder $formBuilder,
+        EntityApiBaseHandler $handler,
+        EntityRoutingHelper $entityRoutingHelper,
+        OwnershipMetadataProvider $ownershipMetadataProvider
+    ) {
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
         $this->handler = $handler;
+        $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
     /**
      * @param $entity
+     *
      * @return FormInterface
      */
     public function getForm($entity)
@@ -56,29 +77,63 @@ class EntityManager
     public function update($entity, $content)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
-        $formData = [
-            'owner' => $entity->getOwner()->getId()
-        ];
-
         $form = $this->getForm($entity);
+        $data = $this->presetData($entity);
 
         foreach ($content as $fieldName => $fieldValue) {
             if ($this->hasAccessEditFiled($fieldName)) {
-                $oldVakue = $fieldValue;
+                $originValue = $fieldValue;
                 $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $fieldValue);
 
-                $formData[$fieldName] = $oldVakue;
+                $data[$fieldName] = $originValue;
                 $form = $this->formBuilder->add($form, $entity, $fieldName);
             }
         }
-        $this->handler->process($entity, $form, $formData, 'PATCH');
+
+        $this->handler->process($entity, $form, $data, 'PATCH');
 
         return $form;
     }
 
     /**
+     * @param $entity
+     *
+     * @return array
+     */
+    protected function presetData($entity)
+    {
+        $data = [];
+        $metadata = $this->getMetadataConfig($entity);
+        if (!$metadata || $metadata->isGlobalLevelOwned()) {
+            return $data;
+        }
+        $data[$metadata->getOwnerFieldName()] = $entity->getOwner()->getId();
+
+        return $data;
+    }
+
+    /**
+     * @param $entity - object | class name entity
+     *
+     * @return bool|OwnershipMetadataInterface
+     */
+    protected function getMetadataConfig($entity)
+    {
+        if (is_object($entity)) {
+            $entity = ClassUtils::getClass($entity);
+        }
+
+        $metadata = $this->ownershipMetadataProvider->getMetadata($entity);
+
+        return $metadata->hasOwner()
+            ? $metadata
+            : false;
+    }
+
+    /**
      * @param $fieldName
+     *
      * @return bool
      */
     protected function hasAccessEditFiled($fieldName)
@@ -95,21 +150,44 @@ class EntityManager
      * @param $entity
      * @param $fieldName
      * @param $fieldValue
+     *
      * @return \DateTime
      */
     protected function prepareFieldValue($entity, $fieldName, $fieldValue)
     {
-        $className = get_class($entity);
-        $em = $this->registry->getManager();
-        $metaData = $em->getClassMetadata($className);
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $fieldInfo = $accessor->getValue($metaData->fieldMappings, '['.$fieldName.']');
-        $fieldType = $fieldInfo['type'];
+        /** @var ClassMetadata $metaData */
+        $metaData = $this->getMetaData($entity);
 
-        if ($fieldType === 'datetime') {
-            $fieldValue = new \DateTime($fieldValue);
+        // search simple field
+        if ($metaData->hasField($fieldName)) {
+            $fieldInfo = $metaData->getFieldMapping($fieldName);
+
+            $fieldType = $fieldInfo['type'];
+            if (in_array($fieldType, ['datetime','date'])) {
+                $fieldValue = new \DateTime($fieldValue);
+            }
+        }
+
+        if ($metaData->hasAssociation($fieldName)) {
+            $fieldInfo = $metaData->getAssociationMapping($fieldName);
+
+            $entity = $this->entityRoutingHelper->getEntity($fieldInfo['targetEntity'], $fieldValue);
+            $fieldValue = $entity;
         }
 
         return $fieldValue;
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     */
+    protected function getMetaData($entity)
+    {
+        $className = ClassUtils::getClass($entity);
+        $em = $this->registry->getManager();
+
+        return $em->getClassMetadata($className);
     }
 }

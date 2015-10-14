@@ -319,7 +319,7 @@ define(function(require) {
             mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.successMessage'));
         },
 
-        onSaveError: function() {
+        onSaveError: function(jqXHR) {
             if (!this.cell.disposed && this.cell.$el) {
                 var _this = this;
                 this.cell.$el.addClass('save-fail');
@@ -330,8 +330,28 @@ define(function(require) {
             this.cell.model.set(this.oldState);
             this.main.trigger('content:update');
 
-            // @TODO update message
-            mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+            var errors = [];
+            switch (jqXHR.responseJSON.code) {
+                case 400:
+                    var jqXHRerrors = jqXHR.responseJSON.errors.children;
+                    for (var i in jqXHRerrors) {
+                        if (jqXHRerrors[i].errors) {
+                            _.each(jqXHRerrors[i].errors, function(value) {
+                                errors.push(value);
+                            });
+                        }
+                    }
+                    break;
+                case 403:
+                    errors.push(jqXHR.responseJSON.message);
+                    break;
+                default:
+                    errors.push(__('oro.ui.unexpected_error'));
+            }
+
+            _.each(errors, function(value) {
+                mediator.execute('showFlashMessage', 'error', value);
+            });
         }
     });
 

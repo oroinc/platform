@@ -183,6 +183,8 @@ services:
             - @doctrine
             - @oro_datagrid.extension.inline_editing.entity_manager.form_builder
             - @oro_datagrid.extension.inline.base_handler
+            - @oro_entity.routing_helper
+            - @oro_security.owner.ownership_metadata_provider
 
     oro_datagrid.extension.inline_editing.entity_manager.form_builder:
         class: %oro_datagrid.extension.inline_editing.entity_manager.form_builder.class%
