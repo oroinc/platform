@@ -13,7 +13,8 @@ class FormBuilder
 {
     protected $fieldTypeMap = [
         'string' => 'text',
-        'datetime' => 'oro_datatime'
+        'datetime' => 'oro_datetime',
+        'date' => 'oro_date'
     ];
 
     /** @var FormFactory */

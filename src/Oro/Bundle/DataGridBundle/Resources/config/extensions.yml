@@ -44,6 +44,8 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_security.security_facade
+            - @oro_security.acl_helper
+            - @validator
         tags:
             - { name: oro_datagrid.extension }
 
