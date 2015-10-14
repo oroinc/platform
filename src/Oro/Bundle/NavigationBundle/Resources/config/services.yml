@@ -58,7 +58,7 @@ services:
     oro_menu.cache:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_menu.cache" ] ]
+            - [ setNamespace, [ 'oro_menu' ] ]
 
     oro_menu_acl_extension:
         class: %oro_menu.factory.acl_extension.class%
@@ -374,8 +374,7 @@ services:
     oro_navigation.content.doctrine_tag_generator:
         class: %oro_navigation.content.doctrine_tag_generator.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity.orm.entity_class_resolver
+            - @doctrine
         tags:
             - { name: oro_navigation.tag_generator }
 

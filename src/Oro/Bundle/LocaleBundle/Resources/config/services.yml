@@ -41,7 +41,7 @@ services:
     oro_locale.cache:
             parent: oro.cache.abstract
             calls:
-                - [ setNamespace, [ "oro_locale.cache" ] ]
+                - [ setNamespace, [ 'oro_locale' ] ]
 
     oro_locale.settings:
         class: %oro_locale.settings.class%

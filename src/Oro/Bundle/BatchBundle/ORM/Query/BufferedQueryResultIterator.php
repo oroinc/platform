@@ -4,7 +4,6 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
  * Iterates results of Query using buffer, allows to iterate large query
@@ -33,7 +32,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var integer
      */
-    private $requestedHydrationMode = null;
+    private $requestedHydrationMode;
 
     /**
      * The source Query or QueryBuilder
@@ -47,14 +46,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var Query
      */
-    private $query = null;
+    private $query;
 
     /**
      * Total count of records in query
      *
      * @var int
      */
-    private $totalCount = null;
+    private $totalCount;
 
     /**
      * Index of current page
@@ -89,7 +88,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var mixed
      */
-    private $current = null;
+    private $current;
 
     /**
      * @var int

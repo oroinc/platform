@@ -40,7 +40,7 @@
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    <div class="widget_title_widget">
+    <div class="widget-title-widget">
         {{ form_widget(form.title) }}
     </div>
     {{ form_row(form.useDefault) }}
@@ -117,3 +117,32 @@
         });
     </script>
 {% endblock %}
+
+{% block oro_type_widget_date_widget %}
+    <div class="widget-date-widget">
+        {{ form_widget(form.useDate) }}
+    </div>
+    <div class="widget-date-input-widget">
+        {{ form_widget(form.date) }}
+    </div>
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $(function () {
+                var useDate = $('input#{{ form.useDate.vars.id }}');
+
+                if (useDate.prop('checked') !== true) {
+                    $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
+                }
+
+                $(useDate).change(function() {
+                    var date    = $('input#date_selector_{{ form.date.vars.id }}');
+                    if ($(this).is(':checked')) {
+                        $(date).datepicker('enable');
+                    } else {
+                        $(date).datepicker('disable');
+                    }
+                });
+            });
+        })
+    </script>
+{% endblock oro_type_widget_date_widget %}

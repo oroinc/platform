@@ -9,16 +9,17 @@ use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 class ConfigHelper
 {
     private static $configModelClasses = [
-        'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'   => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'           => true,
         'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel'     => true,
         'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel'      => true,
-        'Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue' => true,
+        'Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue' => true
     ];
 
     /**
      * Checks whether the given class is one of entities used to store entity configs or not
      *
      * @param string $className
+     *
      * @return bool
      */
     public static function isConfigModelEntity($className)
@@ -55,6 +56,7 @@ class ConfigHelper
      * @param string $fieldName
      *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public static function getTranslationKey($scope, $propertyName, $className, $fieldName = null)
@@ -91,6 +93,7 @@ class ConfigHelper
      * Extracts module and entity names from the given full class name
      *
      * @param string $className
+     *
      * @return array [$moduleName, $entityName]
      */
     public static function getModuleAndEntityNames($className)
