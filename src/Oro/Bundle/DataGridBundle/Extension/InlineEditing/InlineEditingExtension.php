@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -11,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidatorMetadata;
 
