@@ -22,10 +22,7 @@ datagrid:
 
         inline_editing:
             enable: true
-            entity_name: OroUserBundle:User
-            save_api_accessor:
-                default_route_parameters:
-                    className: Oro_Bundle_UserBundle_Entity_User
+            entity_name: %oro_user.entity.class%
         columns:
             username:
                 label:         oro.user.username.label
@@ -45,9 +42,8 @@ datagrid:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
-
+                   0: Inactive
+                   1: Active
         properties:
             id: ~
             update_link:
