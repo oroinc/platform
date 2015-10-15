@@ -2,6 +2,7 @@
 define(function() {
     'use strict';
 
+    /** @exports persistentStorage */
     var persistentStorage;
 
     try {
