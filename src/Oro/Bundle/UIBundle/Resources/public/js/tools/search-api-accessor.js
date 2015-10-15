@@ -49,6 +49,7 @@ define(function(require) {
          * @inheritDoc
          */
         prepareUrlParameters: function(urlParameters) {
+            SearchApiAccessor.__super__.prepareUrlParameters.call(this, urlParameters);
             urlParameters.name = this.searchHandlerName;
             urlParameters.query = urlParameters.term;
             return urlParameters;

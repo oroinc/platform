@@ -40,6 +40,15 @@ define(function(require) {
      * @param {Object} options.headers - Optional. Allows to provide additional http headers
      * @param {Object} options.default_route_parameters - Optional. Provides default parameters for route,
      *                                                    this defaults will be merged the `urlParameters` to get url
+     * @param {Object} options.route_parameters_rename_map - Optional. Allows to rename urlParameters which came
+     *                                                    into send() function.
+     *
+     *                                                    Please provide here an object with following structure:
+     *                                                    ```javascript
+     *                                                    {
+     *                                                      <old-name>: <new-name>
+     *                                                    }
+     *                                                    ```
      * @param {Array.<string>} options.query_parameter_names - Optional. Array of parameter names to put into query
      *                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
@@ -75,6 +84,7 @@ define(function(require) {
             this.httpMethod = options.http_method || this.DEFAULT_HTTP_METHOD;
             this.headers = _.extend({}, this.DEFAULT_HEADERS, options.headers || {});
             this.formName = options.form_name;
+            this.routeParametersRenameMap = options.route_parameters_rename_map || {};
             // init route model
             if (!options.route) {
                 throw Error('"route" is a required option');
@@ -122,6 +132,14 @@ define(function(require) {
          * @returns {Object}
          */
         prepareUrlParameters: function(urlParameters) {
+            for (var oldName in this.routeParametersRenameMap) {
+                if (this.routeParametersRenameMap.hasOwnProperty(oldName)) {
+                    if (urlParameters[oldName] !== void 0) {
+                        var newName = this.routeParametersRenameMap[oldName];
+                        urlParameters[newName] = urlParameters[oldName];
+                    }
+                }
+            }
             return urlParameters;
         },
 
