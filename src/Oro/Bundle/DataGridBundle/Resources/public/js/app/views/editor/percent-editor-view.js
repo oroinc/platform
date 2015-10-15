@@ -68,10 +68,12 @@ define(function(require) {
         },
 
         getFormattedValue: function() {
-            if (isNaN(this.getModelValue())) {
+
+            var raw = this.getModelValue();
+            if (isNaN(raw)) {
                 return '';
             }
-            return String(this.getModelValue());
+            return String(raw);
         }
 
     });

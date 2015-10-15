@@ -62,7 +62,11 @@ define(function(require) {
         },
 
         getValue: function() {
-            return this.formatter.toRaw(this.$('input[name=value]').val());
+            var userInput = this.$('input[name=value]').val();
+            if (userInput === '') {
+                return NaN;
+            }
+            return this.formatter.toRaw(userInput);
         },
 
         getValidationRules: function() {
