@@ -63,7 +63,7 @@ define(function(require) {
          *
          * @type {Function}
          */
-        percent: require('orodatagrid/js/app/views/editor/number-editor-view'),
+        percent: require('orodatagrid/js/app/views/editor/percent-editor-view'),
 
         /**
          * Please see [select-editor-view](../frontend/editor/select-editor-view.md) for details
