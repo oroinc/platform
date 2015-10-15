@@ -44,7 +44,7 @@ define(function(require) {
      *                                                    into send() function.
      *
      *                                                    Please provide here an object with following structure:
-     *                                                    ```javascript
+     *                                                    ``` javascript
      *                                                    {
      *                                                      <old-name>: <new-name>
      *                                                    }
