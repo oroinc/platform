@@ -15,6 +15,7 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class ImportExportController extends Controller
@@ -68,18 +69,22 @@ class ImportExportController extends Controller
      * @Template
      *
      * @param string $processorAlias
+     *
      * @return array
      */
     public function importValidateAction($processorAlias)
     {
         $processorRegistry = $this->get('oro_importexport.processor.registry');
-        $entityName = $processorRegistry
+        $entityName        = $processorRegistry
             ->getProcessorEntityName(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $processorAlias);
-        $existingAliases = $processorRegistry
+        $existingAliases   = $processorRegistry
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
-        $jobName = $this->getRequest()->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
-        $result = $this->getImportHandler()->handleImportValidation(
+        $jobName                = $this->getRequest()->get(
+            'importValidateJob',
+            JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV
+        );
+        $result                 = $this->getImportHandler()->handleImportValidation(
             $jobName,
             $processorAlias,
             'csv',
@@ -96,12 +101,13 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return JsonResponse
      */
     public function importProcessAction($processorAlias)
     {
         $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
-        $result = $this->getImportHandler()->handleImport(
+        $result  = $this->getImportHandler()->handleImport(
             $jobName,
             $processorAlias,
             'csv',
@@ -117,6 +123,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function instantExportAction($processorAlias)
@@ -130,6 +137,7 @@ class ImportExportController extends Controller
             'csv',
             null,
             array_merge(
+                [FormatterProvider::FORMAT_TYPE => 'excel'],
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
@@ -141,12 +149,13 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function templateExportAction($processorAlias)
     {
         $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
-        $result = $this->getExportHandler()->getExportResult(
+        $result  = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
@@ -163,6 +172,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $fileName
+     *
      * @return Response
      */
     public function downloadExportResultAction($fileName)
@@ -175,16 +185,17 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport")
      *
      * @param string $jobCode
+     *
      * @return Response
      */
     public function errorLogAction($jobCode)
     {
         $jobExecutor = $this->getJobExecutor();
-        $errors  = array_merge(
+        $errors      = array_merge(
             $jobExecutor->getJobFailureExceptions($jobCode),
             $jobExecutor->getJobErrors($jobCode)
         );
-        $content = implode("\r\n", $errors);
+        $content     = implode("\r\n", $errors);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }

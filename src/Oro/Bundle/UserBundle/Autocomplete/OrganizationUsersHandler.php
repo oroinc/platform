@@ -68,8 +68,10 @@ class OrganizationUsersHandler extends UserSearchHandler
         $queryBuilder->join('u.organizations', 'org')
             ->andWhere('org.id = :org')
             ->andWhere('u.id != :currentUser')
+            ->andWhere('u.enabled = :enabled')
             ->setParameter('org', $this->securityFacade->getOrganizationId())
-            ->setParameter('currentUser', $this->securityFacade->getLoggedUserId());
+            ->setParameter('currentUser', $this->securityFacade->getLoggedUserId())
+            ->setParameter('enabled', true);
 
         return $queryBuilder;
     }

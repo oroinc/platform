@@ -1,16 +1,23 @@
-define(['backbone', 'routing', './constants'
-    ], function(Backbone, routing, constants) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  orosidebar/js/model
-     * @class   orosidebar.Model
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var SidebarModel;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var constants = require('./constants');
+
+    SidebarModel = Backbone.Model.extend({
         defaults: {
             position: constants.SIDEBAR_LEFT,
             state: constants.SIDEBAR_MINIMIZED
+        },
+
+        /**
+         * @inheritDoc
+         */
+        initialize: function(data, options) {
+            _.extend(this, _.pick(options, ['urlRoot']));
+            SidebarModel.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -28,4 +35,6 @@ define(['backbone', 'routing', './constants'
             }
         }
     });
+
+    return SidebarModel;
 });

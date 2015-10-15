@@ -1,18 +1,19 @@
-
-define(['jquery', 'underscore', 'backbone', '../constants',
-    'text!./templates/widget-min-template.html',
-    'text!./templates/widget-max-template.html'
-    ], function($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @export  orosidebar/js/widget-container/view
-     * @class   orosidebar.widgetContainer.View
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
-        templateMin: _.template(widgetMinTemplate),
-        templateMax: _.template(widgetMaxTemplate),
+    var WidgetContainerView;
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+    var constants = require('../constants');
+    var widgetMinTemplate = require('tpl!./templates/widget-min-template.html');
+    var widgetMaxTemplate = require('tpl!./templates/widget-max-template.html');
+    var widgetIconTemplate = require('tpl!./templates/icon-template.html');
+    var BaseView = require('oroui/js/app/views/base/view');
+
+    WidgetContainerView = BaseView.extend({
+        templateMin: widgetMinTemplate,
+        templateMax: widgetMaxTemplate,
+        templateIcon: widgetIconTemplate,
 
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
@@ -22,50 +23,67 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             'click .sidebar-widget-close': 'onClickClose'
         },
 
-        initialize: function() {
-            var view = this;
-            view.stopListening(view.model, 'change');
-            view.listenTo(view.model, 'change', view.render);
+        listen: {
+            'change model': 'render',
+            'start-loading model': 'onLoadingStart',
+            'end-loading model': 'onLoadingEnd'
         },
 
         render: function() {
-            var view = this;
-            var model = view.model;
-            var template = null;
+            this.$el.attr('data-cid', this.model.cid);
 
-            if (model.get('state') === constants.WIDGET_MINIMIZED) {
-                template = view.templateMin;
+            if (this.model.get('cssClass')) {
+                this.$el.attr('class', this.model.get('cssClass'));
+            }
+
+            if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                this.$el.addClass('sidebar-widget-popup');
             } else {
-                template = view.templateMax;
+                this.$el.addClass('sidebar-widget-embedded');
             }
 
-            view.$el.html(template(model.toJSON()));
-            view.$el.attr('data-cid', model.cid);
+            this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
 
-            if (view.model.get('cssClass')) {
-                view.$el.attr('class', view.model.get('cssClass'));
+            this.model.loadModule().then(_.bind(this._deferredRender, this));
+
+            return this;
+        },
+
+        getTemplateFunction: function() {
+            var template = this.templateMax;
+            if (this.model.get('state') === constants.WIDGET_MINIMIZED) {
+                template = this.templateMin;
             }
+            return template;
+        },
 
-            if (model.get('state') !== constants.WIDGET_MINIMIZED && model.get('module')) {
-                requirejs([model.get('module')], function(Widget) {
-                    var $widgetContent = view.$el.find('.sidebar-widget-content');
-                    if (!view.contentView) {
-                        view.contentView = new Widget.ContentView({
-                            model: model
-                        });
-                    }
-                    view.contentView.setElement($widgetContent);
-                    view.contentView.render();
+        getTemplateData: function() {
+            var data = WidgetContainerView.__super__.getTemplateData.call(this);
+            if (this.model.module.titleTemplate) {
+                data.title = this.model.module.titleTemplate(data);
+            }
+            data.icon = this.templateIcon(data);
+            return data;
+        },
+
+        /**
+         * Renders the widget content once widget module is loaded
+         *
+         * @protected
+         */
+        _deferredRender: function() {
+            WidgetContainerView.__super__.render.call(this);
+
+            if (this.model.get('state') !== constants.WIDGET_MINIMIZED) {
+                if (this.contentView) {
+                    this.contentView.dispose();
+                }
+                this.contentView = new this.model.module.ContentView({
+                    autoRender: true,
+                    model: this.model,
+                    el: this.$('.sidebar-widget-content')
                 });
             }
-
-            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                view.$el.addClass('sidebar-widget-popup');
-            } else {
-                view.$el.removeClass('sidebar-widget-popup');
-            }
-
-            return view;
         },
 
         setOffset: function(cord) {
@@ -105,6 +123,16 @@ define(['jquery', 'underscore', 'backbone', '../constants',
             e.stopPropagation();
             e.preventDefault();
             Backbone.trigger('closeWidget', this.model.cid);
+        },
+
+        onLoadingStart: function() {
+            this.$('.sidebar-widget-header-icon').addClass('loading');
+        },
+
+        onLoadingEnd: function() {
+            this.$('.sidebar-widget-header-icon').removeClass('loading');
         }
     });
+
+    return WidgetContainerView;
 });

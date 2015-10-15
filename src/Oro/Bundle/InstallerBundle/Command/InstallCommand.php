@@ -226,11 +226,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     }
                 }
             }
+            $commandExecutor
+                ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
+                ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
         }
-
-        $commandExecutor
-            ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
 
         return $this;
     }

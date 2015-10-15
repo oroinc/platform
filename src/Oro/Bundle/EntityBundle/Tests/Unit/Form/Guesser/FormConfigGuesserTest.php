@@ -191,7 +191,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->method('hasAssociation')
             ->with($property)
             ->will($this->returnValue(true));
-        $sourceClassMetadata->expects($this->once())
+        $sourceClassMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with($property)
             ->will($this->returnValue(true));

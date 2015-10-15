@@ -17,15 +17,24 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EmailActivityManager
 {
-    /** @var ActivityManager */
+    /**
+     * @var ActivityManager
+     */
     protected $activityManager;
 
-    /** @var EmailActivityListProvider */
+    /**
+     * @var EmailActivityListProvider
+     */
     protected $activityListProvider;
 
-    /** @var EmailThreadProvider */
+    /**
+     * @var EmailThreadProvider
+     */
     protected $emailThreadProvider;
 
     /**
@@ -35,10 +44,14 @@ class EmailActivityManager
      */
     protected $queueUpdate;
 
-    /** @var TokenStorage */
+    /**
+     * @var TokenStorage
+     */
     protected $tokenStorage;
 
-    /** @var ServiceLink */
+    /**
+     * @var ServiceLink
+     */
     protected $entityOwnerAccessorLink;
 
     /**
@@ -46,7 +59,7 @@ class EmailActivityManager
      * @param EmailActivityListProvider $activityListProvider
      * @param EmailThreadProvider       $emailThreadProvider
      * @param TokenStorage              $tokenStorage
-     * @param EntityOwnerAccessor       $entityOwnerAccessor
+     * @param ServiceLink               $entityOwnerAccessorLink
      */
     public function __construct(
         ActivityManager $activityManager,
@@ -246,10 +259,12 @@ class EmailActivityManager
     protected function changeContexts(EntityManager $em, Email $email, $contexts)
     {
         $oldContexts    = $this->emailActivityListProvider->getTargetEntities($email);
-        $removeContexts = array_diff($oldContexts, $contexts);
+        //please, do not use array_diff because it compares objects as strings and it is not correct
+        $removeContexts = $this->getContextsDiff($oldContexts, $contexts);
         foreach ($removeContexts as $context) {
             $this->removeActivityTarget($email, $context);
         }
+
         foreach ($contexts as $context) {
             $this->addAssociation($email, $context);
         }
@@ -282,5 +297,37 @@ class EmailActivityManager
     public function addEmailToQueue(Email $email)
     {
         $this->queueUpdate[] = $email;
+    }
+
+    /**
+     * @param array $contexts
+     * @param array $anotherContexts
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getContextsDiff(array $contexts, array $anotherContexts)
+    {
+        $result = [];
+
+        foreach ($contexts as $context) {
+            $isPresentInContexts = false;
+            foreach ($anotherContexts as $anotherContext) {
+                if (is_object($anotherContext) && is_object($context)
+                    && get_class($context) === get_class($anotherContext)
+                    && $context->getId() === $anotherContext->getId()
+                ) {
+                    $isPresentInContexts = true;
+                } elseif (is_string($anotherContext) && is_string($context) && $anotherContext == $context) {
+                    $isPresentInContexts = true;
+                }
+            }
+
+            if (!$isPresentInContexts) {
+                $result[] = $context;
+            }
+        }
+
+        return $result;
     }
 }

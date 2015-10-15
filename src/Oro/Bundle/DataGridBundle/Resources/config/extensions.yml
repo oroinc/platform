@@ -11,6 +11,7 @@ parameters:
     oro_datagrid.extension.export.class:           Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension
     oro_datagrid.extension.gridparams.class:       Oro\Bundle\DataGridBundle\Extension\GridParams\GridParamsExtension
     oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
+    oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -97,5 +98,15 @@ services:
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
             - @oro_security.acl_helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.columns:
+        class: %oro_datagrid.extension.columns.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
+            - @oro_datagrid.columns.helper
         tags:
             - { name: oro_datagrid.extension }

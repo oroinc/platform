@@ -276,8 +276,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         );
 
         $emailUser
-            ->setFolder($folder)
+            ->addFolder($folder)
             ->setSeen($isSeen)
+            ->setOrigin($folder->getOrigin())
             ->getEmail()
                 ->setMessageId($email->getMessageId())
                 ->setMultiMessageId($email->getMultiMessageId())
@@ -364,6 +365,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             'Oro\Bundle\EmailBundle\Entity\EmailUser',
             'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
+            'Oro\Bundle\EmailBundle\Entity\EmailBody',
         ];
     }
 

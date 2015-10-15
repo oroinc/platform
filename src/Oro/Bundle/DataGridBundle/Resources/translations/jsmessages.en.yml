@@ -68,3 +68,10 @@ oro:
             successMessage: "Record has been succesfully updated"
             helpMessage: "Double click on cell to edit"
             loadingError: "Cannot load component or view for inline grid editor"
+        column_manager:
+            title: "Table Settings"
+            tooltip: "Use drag and drop to sort items"
+            column:
+                name: "Name"
+                show: "Show"
+                sort: "Sort"
