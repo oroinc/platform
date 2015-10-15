@@ -13,7 +13,7 @@
 
 <a name="exp_module_persistentStorage--persistentStorage"></a>
 ### persistentStorage ⏏
-Provides clint-side storage storage
+Provides clint-side storage
 Uses localStorage if supported, otherwise cookies
 Realizes Storage Interface https://developer.mozilla.org/en-US/docs/Web/API/Storage
 
