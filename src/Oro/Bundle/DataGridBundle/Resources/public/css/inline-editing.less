@@ -48,7 +48,7 @@
         display: none !important;
       }
       &:before {
-        background: url('../../oroui/img/loader-16.gif') no-repeat center center #f5f5f5;
+        background: url('../../oroui/img/loader-16.gif') no-repeat center center rgba(245, 245, 245, 0.7);
         display: block !important;
         content: "";
         position: absolute;
@@ -58,7 +58,11 @@
         height: 29px;
       }
       &:hover:before {
-        background-color: #F4EFD4;
+        background-color: rgba(244, 239, 212, 0.7);;
+      }
+      &.number-cell:before, &.percent-cell:before {
+        right: auto;
+        left: 1px;
       }
     }
   }

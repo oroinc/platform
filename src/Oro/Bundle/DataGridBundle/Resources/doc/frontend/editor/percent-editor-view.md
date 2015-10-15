@@ -1,6 +1,6 @@
-<a name="module_NumberEditorView"></a>
-## NumberEditorView ⇐ <code>[TextEditorView](./text-editor-view.md)</code>
-Number cell content editor.
+<a name="module_PercentEditorView"></a>
+## PercentEditorView ⇐ <code>[NumberEditorView](./number-editor-view.md)</code>
+Percent cell content editor.
 
 ### Column configuration samples:
 ``` yml
@@ -12,19 +12,19 @@ datagrid:
     columns:
       # Sample 1. Mapped by number frontend type
       {column-name-1}:
-        frontend_type: <number/integer/decimal/currency>
+        frontend_type: percent
       # Sample 2. Full configuration
       {column-name-2}:
         inline_editing:
           editor:
-            view: orodatagrid/js/app/views/editor/number-editor-view
+            view: orodatagrid/js/app/views/editor/percent-editor-view
             view_options:
               placeholder: '<placeholder>'
-              css_class_name: '<class-name>'
           validationRules:
             # jQuery.validate configuration
             required: true
-            min: 5
+            min: 0
+            max: 100
 ```
 
 ### Options in yml:
@@ -32,12 +32,11 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
-inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
-**Extends:** <code>[TextEditorView](./text-editor-view.md)</code>  
+**Extends:** <code>[NumberEditorView](./number-editor-view.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |

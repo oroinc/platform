@@ -104,7 +104,7 @@ currency      | [number-editor-view](../../frontend/editor/number-editor-view.md
 number        | [number-editor-view](../../frontend/editor/number-editor-view.md)
 integer       | [number-editor-view](../../frontend/editor/number-editor-view.md)
 decimal       | [number-editor-view](../../frontend/editor/number-editor-view.md)
-percent       | [number-editor-view](../../frontend/editor/number-editor-view.md)
+percent       | [percent-editor-view](../../frontend/editor/percent-editor-view.md)
 select        | [select-editor-view](../../frontend/editor/select-editor-view.md)
 
 Taken from [default-editors.md](../default-editors.md)
@@ -114,7 +114,8 @@ Taken from [default-editors.md](../default-editors.md)
 Editor                                                                      | Description
 :---------------------------------------------------------------------------|:-----------------------------------------------------
 [text-editor-view](../../frontend/editor/text-editor-view.md)                  | Editing text cells
-[number-editor-view](../../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/percent/currency cells
+[number-editor-view](../../frontend/editor/number-editor-view.md)              | Editing number/integer/decimal/currency cells
+[percent-editor-view](../../frontend/editor/percent-editor-view.md)            | Editing percent  cells
 [date-editor-view](../../frontend/editor/date-editor-view.md)                  | Editing date cells
 [datetime-editor-view](../../frontend/editor/datetime-editor-view.md)          | Editing datetime cells
 [select-editor-view](../../frontend/editor/select-editor-view.md)              | Editing select cells (predefined choices)
