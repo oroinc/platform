@@ -44,11 +44,7 @@ define(function(require) {
      *                                                    into send() function.
      *
      *                                                    Please provide here an object with following structure:
-     *                                                    ``` javascript
-     *                                                    {
-     *                                                      <old-name>: <new-name>
-     *                                                    }
-     *                                                    ```
+     *                                                    `{<old-name>: <new-name>, ...}`
      * @param {Array.<string>} options.query_parameter_names - Optional. Array of parameter names to put into query
      *                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
