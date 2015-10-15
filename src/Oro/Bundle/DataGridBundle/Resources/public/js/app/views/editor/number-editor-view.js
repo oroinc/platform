@@ -63,10 +63,7 @@ define(function(require) {
 
         getValue: function() {
             var userInput = this.$('input[name=value]').val();
-            if (userInput === '') {
-                return NaN;
-            }
-            return this.formatter.toRaw(userInput);
+            return this.formatter.toRaw(userInput) || NaN;
         },
 
         getValidationRules: function() {
