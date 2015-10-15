@@ -42,10 +42,8 @@ services:
     oro_datagrid.extension.inline_editing:
         class: %oro_datagrid.extension.inline_editing.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_datagrid.datagrid.inline_edit_column_options_guesser
             - @oro_security.security_facade
-            - @oro_security.acl_helper
-            - @validator
         tags:
             - { name: oro_datagrid.extension }
 

@@ -82,11 +82,10 @@ class EntityManager
 
         foreach ($content as $fieldName => $fieldValue) {
             if ($this->hasAccessEditFiled($fieldName)) {
-                $originValue = $fieldValue;
-                $fieldValue = $this->prepareFieldValue($entity, $fieldName, $fieldValue);
-                $accessor->setValue($entity, $fieldName, $fieldValue);
-
-                $data[$fieldName] = $originValue;
+                $valueForForm = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
+                $valueForEntity = $this->prepareValueForEntity($entity, $fieldName, $fieldValue);
+                $accessor->setValue($entity, $fieldName, $valueForEntity);
+                $data[$fieldName] = $valueForForm;
                 $form = $this->formBuilder->add($form, $entity, $fieldName);
             }
         }
@@ -151,9 +150,35 @@ class EntityManager
      * @param $fieldName
      * @param $fieldValue
      *
+     * @return bool
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+    protected function prepareValueForForm($entity, $fieldName, $fieldValue)
+    {
+        /** @var ClassMetadata $metaData */
+        $metaData = $this->getMetaData($entity);
+
+        // search simple field
+        if ($metaData->hasField($fieldName)) {
+            $fieldInfo = $metaData->getFieldMapping($fieldName);
+
+            $fieldType = $fieldInfo['type'];
+            if (in_array($fieldType, ['boolean'])) {
+                $fieldValue = (bool)$fieldValue;
+            }
+        }
+
+        return $fieldValue;
+    }
+
+    /**
+     * @param $entity
+     * @param $fieldName
+     * @param $fieldValue
+     *
      * @return \DateTime
      */
-    protected function prepareFieldValue($entity, $fieldName, $fieldValue)
+    protected function prepareValueForEntity($entity, $fieldName, $fieldValue)
     {
         /** @var ClassMetadata $metaData */
         $metaData = $this->getMetaData($entity);
@@ -165,6 +190,10 @@ class EntityManager
             $fieldType = $fieldInfo['type'];
             if (in_array($fieldType, ['datetime','date'])) {
                 $fieldValue = new \DateTime($fieldValue);
+            }
+
+            if (in_array($fieldType, ['boolean'])) {
+                $fieldValue = (bool)$fieldValue;
             }
         }
 

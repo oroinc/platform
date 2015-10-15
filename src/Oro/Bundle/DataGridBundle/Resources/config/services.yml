@@ -35,6 +35,10 @@ parameters:
 
     oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager
     oro_datagrid.extension.inline_editing.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder
+
+    oro_datagrid.datagrid.inline_edit_column_options_guesser.class:         Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class:    Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\ChoicesGuesser
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -202,3 +206,23 @@ services:
         class: %oro_datagrid.extension.inline.handler_contact.class%
         tags:
             - { name: oro_datagrid.extension.api.handler }
+
+    oro_datagrid.datagrid.inline_edit_column_options_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options_guesser.class%
+        arguments:
+            - @validator
+
+    oro_datagrid.datagrid.inline_edit_column_options.text_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 100 }
+
+    oro_datagrid.datagrid.inline_edit_column_options.choices_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_security.acl_helper
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 90 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle;
 
+use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\InlineEditColumnOptionsGuesserPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -27,5 +28,6 @@ class OroDataGridBundle extends Bundle
         $container->addCompilerPass(new MassActionsPass());
         $container->addCompilerPass(new GuessPass());
         $container->addCompilerPass(new InlineHandlerPass());
+        $container->addCompilerPass(new InlineEditColumnOptionsGuesserPass());
     }
 }

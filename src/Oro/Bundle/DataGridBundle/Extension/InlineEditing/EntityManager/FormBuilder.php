@@ -15,7 +15,8 @@ class FormBuilder
     protected $fieldTypeMap = [
         'string' => 'text',
         'datetime' => 'oro_datetime',
-        'date' => 'oro_date'
+        'date' => 'oro_date',
+        'boolean' => 'checkbox'
     ];
 
     /** @var FormFactory */
@@ -112,7 +113,6 @@ class FormBuilder
         $data = [
             'type' => $fieldInfo['type']
         ];
-
         return $data;
     }
 
