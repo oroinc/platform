@@ -4,6 +4,7 @@ define(function(require) {
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
+    var EntityError = require('./entity-error');
 
     function Util(entity, data) {
         this.init(entity, data);
@@ -140,11 +141,11 @@ define(function(require) {
                 });
             } catch (e) {
                 Util.errorHandler();
-                chain = [];
+                throw new EntityError('Can not build entity chain by given path "' + path + '"');
             }
 
             // if last item in the chain is a field -- cut it off
-            if (trim && chain[chain.length - 1].entity === undefined) {
+            if (trim && chain[chain.length - 1].entity === void 0) {
                 chain = chain.slice(0, -1);
             }
 
@@ -212,14 +213,20 @@ define(function(require) {
          */
         getApplicableConditions: function(fieldId) {
             var result = {};
+            var chain;
+            var entity;
 
             if (!fieldId) {
                 return result;
             }
 
-            var chain = this.pathToEntityChain(fieldId);
-            var entity = chain[chain.length - 1];
+            try {
+                chain = this.pathToEntityChain(fieldId);
+            } catch (e) {
+                return result;
+            }
 
+            entity = chain[chain.length - 1];
             if (entity) {
                 result = {
                     parent_entity: null,
@@ -312,7 +319,7 @@ define(function(require) {
                 fieldIdParts.push(pathData[pathData.length - 1]);
             } catch (e) {
                 Util.errorHandler();
-                fieldIdParts = [];
+                throw new EntityError('Can not define entity path by given property path "' + pathData + '"');
             }
             return fieldIdParts.join('::');
         }

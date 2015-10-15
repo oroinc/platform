@@ -241,6 +241,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->tree->addUserBusinessUnit('user31', 'org3', 'bu31');
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
+
+        $this->tree->buildTree();
     }
 
     /**

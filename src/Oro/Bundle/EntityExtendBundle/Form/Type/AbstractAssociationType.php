@@ -58,7 +58,8 @@ abstract class AbstractAssociationType extends AbstractConfigType
             if ($this->typeHelper->isAssociationOwningSideEntity($className, $options['association_class'])) {
                 return true;
             }
-            if ($this->typeHelper->isDictionary($className)) {
+            if ($this->typeHelper->isDictionary($className)
+                && !$this->typeHelper->isSupportActivityEnabled($className)) {
                 return true;
             }
         }

@@ -533,6 +533,9 @@ datagrid:
                     - u.enabled
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
+                where:
+                    and:
+                        - u.enabled=true
         columns:
             firstName:
                 label: oro.user.first_name.label

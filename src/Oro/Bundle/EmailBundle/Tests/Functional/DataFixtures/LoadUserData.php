@@ -60,8 +60,11 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $user2 = $userManager->createUser();
         $user2->setUsername('simple_user2')
             ->setPlainPassword('simple_password2')
+            ->setFirstName('Elley')
+            ->setLastName('Towards')
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setEnabled(true);
         $folder2 = new EmailFolder();
         $folder2->setName('sent');

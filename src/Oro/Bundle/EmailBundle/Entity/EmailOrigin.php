@@ -51,6 +51,13 @@ abstract class EmailOrigin
     protected $folders;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="origin", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    protected $emailUsers;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="isActive", type="boolean")
@@ -109,7 +116,8 @@ abstract class EmailOrigin
 
     public function __construct()
     {
-        $this->folders   = new ArrayCollection();
+        $this->folders = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
         $this->syncCount = 0;
     }
 

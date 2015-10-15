@@ -3,8 +3,9 @@ define([
     'backbone',
     'orotranslation/js/translator',
     'oroui/js/mediator',
+    'oroui/js/tools',
     'backbone-bootstrap-modal'
-], function(_, Backbone, __, mediator) {
+], function(_, Backbone, __, mediator, tools) {
     'use strict';
 
     var Modal;
@@ -134,8 +135,10 @@ define([
                 this.$el.trigger('hidden');
             }, this));
 
-            this._fixHeight();
-            $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeight, this));
+            if (tools.isMobile()) {
+                this._fixHeightForMobile();
+                $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeightForMobile, this));
+            }
             mediator.trigger('modal:open', this);
 
             return this;
@@ -148,6 +151,7 @@ define([
             Modal.__super__.close.call(this);
             $(document).off(this._eventNamespace());
             $(window).off(this._eventNamespace());
+            this.stopListening();
             mediator.trigger('modal:close', this);
         },
 
@@ -180,11 +184,11 @@ define([
             return '.delegateEvents' + this.cid;
         },
 
-        _fixHeight: function() {
+        _fixHeightForMobile: function() {
             this.$('.modal-body').height('auto');
-            var height = this.$el[0].clientHeight;
-            if (height < this.$el[0].scrollHeight) {
-                this.$('.modal-body').height(height -
+            var clientHeight = this.$el[0].clientHeight;
+            if (clientHeight < this.$el[0].scrollHeight) {
+                this.$('.modal-body').height(clientHeight -
                     this.$('.modal-header').outerHeight() -
                     this.$('.modal-footer').outerHeight());
             }

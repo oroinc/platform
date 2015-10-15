@@ -17,7 +17,7 @@ define([
     SelectRowCell = Backbone.View.extend({
 
         /** @property */
-        className: 'select-row-cell',
+        className: 'select-row-cell renderable',
 
         /** @property */
         tagName: 'td',
