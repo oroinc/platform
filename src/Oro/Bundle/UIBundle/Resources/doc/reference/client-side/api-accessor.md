@@ -2,7 +2,7 @@
 ## ApiAccessor
 Abstraction of api access point. This class is by design to be initiated from server configuration.
 
-#### Sample usage of api_accessor with a full set of options provided.
+#### Sample usage of api_accessor with a full set of options provided(except `route_parameters_rename_map`).
 Example of configuration provided on the server:
 ``` yml
 save_api_accessor:
@@ -37,6 +37,7 @@ and will put response to console after completion
 | options.form_name | <code>string</code> | Optional. Wraps the request body into a form_name, so request will look like                          `{<form_name>:<request_body>}` |
 | options.headers | <code>Object</code> | Optional. Allows to provide additional http headers |
 | options.default_route_parameters | <code>Object</code> | Optional. Provides default parameters for route,                                                    this defaults will be merged the `urlParameters` to get url |
+| options.route_parameters_rename_map | <code>Object</code> | Optional. Allows to rename incoming parameters, which came                                                    into send() function, to proper names.                                                    Please provide here an object with following structure:                                                    `{<old-name>: <new-name>, ...}` |
 | options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable                          query parameters for client usage, so it is required to specify list of them) |
 
 

@@ -36,6 +36,7 @@ define(function(require) {
         },
 
         prepareUrlParameters: function(urlParameters) {
+            AclUsersSearchApiAccessor.__super__.prepareUrlParameters.call(this, urlParameters);
             if (!urlParameters.id) {
                 throw new Error('`id` url parameter is required');
             }
