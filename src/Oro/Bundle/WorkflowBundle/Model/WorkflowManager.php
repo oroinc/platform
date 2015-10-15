@@ -244,13 +244,13 @@ class WorkflowManager
     }
     
     /**
-     * Transit several workflows in one transaction
+     * Transit several workflow items in one transaction
      *
      * Input data format:
      * array(
      *      array(
-     *          'workflowItem' => <workflow identifier: integer|WorkflowItem>,
-     *          'transition'   => <transition name: string>
+     *          'workflowItem' => <workflow item entity: WorkflowItem>,
+     *          'transition'   => <transition name: string|Transition>
      *      ),
      *      ...
      * )
@@ -258,7 +258,7 @@ class WorkflowManager
      * @param array $data
      * @throws \Exception
      */
-    public function massTransitWorkflow(array $data)
+    public function massTransit(array $data)
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
@@ -269,8 +269,9 @@ class WorkflowManager
                     continue;
                 }
 
-                $workflow = $this->getWorkflow($row['workflowItem']);
+                /** @var WorkflowItem $workflowItem */
                 $workflowItem = $this->getWorkflowItem($row['workflowItem']);
+                $workflow = $this->getWorkflow($workflowItem);
                 $transition = $row['transition'];
 
                 $workflow->transit($workflowItem, $transition);
