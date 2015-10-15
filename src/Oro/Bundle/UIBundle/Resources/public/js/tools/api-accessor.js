@@ -5,7 +5,7 @@ define(function(require) {
     /**
      * Abstraction of api access point. This class is by design to be initiated from server configuration.
      *
-     * #### Sample usage of api_accessor with a full set of options provided.
+     * #### Sample usage of api_accessor with a full set of options provided(except `route_parameters_rename_map`).
      * Example of configuration provided on the server:
      * ``` yml
      * save_api_accessor:
