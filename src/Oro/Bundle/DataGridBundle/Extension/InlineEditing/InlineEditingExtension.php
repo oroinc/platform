@@ -53,6 +53,7 @@ class InlineEditingExtension extends AbstractExtension
             [Configuration::BASE_CONFIG_KEY => $configItems]
         );
 
+        //according to ACL disable inline editing for the whole grid
         if (!$isGranted) {
             $normalizedConfigItems[Configuration::CONFIG_KEY_ENABLE] = false;
         }
@@ -65,28 +66,25 @@ class InlineEditingExtension extends AbstractExtension
         }
         $config->offsetSet(Configuration::BASE_CONFIG_KEY, $resultConfigItems);
 
-        //add inline editing where it is possible
-        if ($isGranted) {
-            $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
+        //add inline editing where it is possible, do not use ACL, because additional parameters for columns needed
+        $columns = $config->offsetGetOr(FormatterConfiguration::COLUMNS_KEY, []);
+        $blackList = $configuration->getBlackList();
 
-            $blackList = $configuration->getBlackList();
+        foreach ($columns as $columnName => &$column) {
+            if (!in_array($columnName, $blackList)) {
+                $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
 
-            foreach ($columns as $columnName => &$column) {
-                if (!in_array($columnName, $blackList)) {
-                    $newColumn = $this->guesser->getColumnOptions($columnName, $configItems['entity_name'], $column);
-
-                    //frontend type key must not be replaced with default value
-                    $typeKey = PropertyInterface::FRONTEND_TYPE_KEY;
-                    if (!empty($newColumn[$typeKey])) {
-                        $column[$typeKey] = $newColumn[$typeKey];
-                    }
-
-                    $column = array_replace_recursive($newColumn, $column);
+                //frontend type key must not be replaced with default value
+                $typeKey = PropertyInterface::FRONTEND_TYPE_KEY;
+                if (!empty($newColumn[$typeKey])) {
+                    $column[$typeKey] = $newColumn[$typeKey];
                 }
-            }
 
-            $config->offsetSet(FormatterConfiguration::COLUMNS_KEY, $columns);
+                $column = array_replace_recursive($newColumn, $column);
+            }
         }
+
+        $config->offsetSet(FormatterConfiguration::COLUMNS_KEY, $columns);
     }
 
     /**
