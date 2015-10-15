@@ -316,7 +316,7 @@ define(function(require) {
         },
 
         editPrevRowCell: function() {
-            this.editCellByIteratorMethod('prevRow', true);
+            this.editCellByIteratorMethod('prevRow', false);
         },
 
         editCellByIteratorMethod: function(iteratorMethod, fromPreviousCell) {
@@ -383,8 +383,12 @@ define(function(require) {
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    if (!this.saveCurrentCell()) {
-                        this.exitEditMode();
+                    if (this.saveCurrentCell(false)) {
+                        if (e.shiftKey) {
+                            this.editPrevRowCell();
+                        } else {
+                            this.editNextRowCell();
+                        }
                     }
                 }
                 e.preventDefault();

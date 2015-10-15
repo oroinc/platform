@@ -250,14 +250,15 @@ define(function(require) {
          */
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
+                var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
                     if (this.validator.form()) {
-                        this.trigger('saveAction');
+                        this.trigger('save' + postfix + 'Action');
                     } else {
                         this.focus();
                     }
                 } else {
-                    this.trigger('cancelAction');
+                    this.trigger('cancel' + postfix + 'Action');
                 }
                 e.stopImmediatePropagation();
                 e.preventDefault();

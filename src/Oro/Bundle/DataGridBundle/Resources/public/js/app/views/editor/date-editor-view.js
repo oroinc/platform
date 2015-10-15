@@ -105,7 +105,11 @@ define(function(require) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
-                    this.$('.hasDatepicker').datepicker('hide');
+                    if (!this.isChanged()) {
+                        DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
+                    } else {
+                        this.$('.hasDatepicker').datepicker('hide');
+                    }
                 } else {
                     DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
                 }

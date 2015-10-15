@@ -63,7 +63,6 @@ define(function(require) {
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var $ = require('jquery');
-    var _ = require('underscore');
     require('jquery.select2');
 
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
@@ -94,12 +93,11 @@ define(function(require) {
             this.$('input[name=value]').select2(this.getSelect2Options());
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericEnterKeydown, this));
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericTabKeydown, this));
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericArrowKeydown, this));
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
+                _this.onGenericEnterKeydown(e);
+                _this.onGenericTabKeydown(e);
+                _this.onGenericArrowKeydown(e);
+            });
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
@@ -110,6 +108,11 @@ define(function(require) {
                     _this.onGenericTabKeydown(e);
                 }
                 _this.onGenericArrowKeydown(e);
+            });
+            this.$('input.select2-input').bind('keydown' + this.eventNamespace(), function(e) {
+                if (!_this.isChanged()) {
+                    SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
+                }
             });
         },
 
