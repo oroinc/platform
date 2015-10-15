@@ -26,7 +26,8 @@ define(function(require) {
      *           validationRules:
      *             # jQuery.validate configuration
      *             required: true
-     *             min: 5
+     *             min: 0
+     *             max: 100
      * ```
      *
      * ### Options in yml:
@@ -46,7 +47,7 @@ define(function(require) {
      * @param {string} options.placeholder - Placeholder for an empty element
      * @param {Object} options.validationRules - Validation rules in a form applicable for jQuery.validate
      *
-     * @augments [NumberEditorView](./text-editor-view.md)
+     * @augments [NumberEditorView](./number-editor-view.md)
      * @exports PercentEditorView
      */
     var PercentEditorView;

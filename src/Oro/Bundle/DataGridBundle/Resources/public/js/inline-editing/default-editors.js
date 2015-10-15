@@ -59,7 +59,7 @@ define(function(require) {
         decimal: require('orodatagrid/js/app/views/editor/number-editor-view'),
 
         /**
-         * Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+         * Please see [percent-editor-view](../frontend/editor/percent-editor-view.md) for details
          *
          * @type {Function}
          */

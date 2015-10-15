@@ -15,7 +15,7 @@ define(function(require) {
      *     columns:
      *       # Sample 1. Mapped by number frontend type
      *       {column-name-1}:
-     *         frontend_type: <number/integer/decimal/percent/currency>
+     *         frontend_type: <number/integer/decimal/currency>
      *       # Sample 2. Full configuration
      *       {column-name-2}:
      *         inline_editing:
