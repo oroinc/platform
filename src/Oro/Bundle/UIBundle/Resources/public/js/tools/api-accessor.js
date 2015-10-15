@@ -130,10 +130,8 @@ define(function(require) {
         prepareUrlParameters: function(urlParameters) {
             for (var oldName in this.routeParametersRenameMap) {
                 if (this.routeParametersRenameMap.hasOwnProperty(oldName)) {
-                    if (urlParameters[oldName] !== void 0) {
-                        var newName = this.routeParametersRenameMap[oldName];
-                        urlParameters[newName] = urlParameters[oldName];
-                    }
+                    var newName = this.routeParametersRenameMap[oldName];
+                    urlParameters[newName] = urlParameters[oldName];
                 }
             }
             return urlParameters;
