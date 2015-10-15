@@ -40,8 +40,8 @@ define(function(require) {
      * @param {Object} options.headers - Optional. Allows to provide additional http headers
      * @param {Object} options.default_route_parameters - Optional. Provides default parameters for route,
      *                                                    this defaults will be merged the `urlParameters` to get url
-     * @param {Object} options.route_parameters_rename_map - Optional. Allows to rename urlParameters which came
-     *                                                    into send() function.
+     * @param {Object} options.route_parameters_rename_map - Optional. Allows to rename incoming parameters, which came
+     *                                                    into send() function, to proper names.
      *
      *                                                    Please provide here an object with following structure:
      *                                                    `{<old-name>: <new-name>, ...}`
