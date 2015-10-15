@@ -24,9 +24,6 @@ use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
  */
 abstract class OroKernel extends Kernel
 {
-    /** @var array */
-    protected $bundlesConfig;
-
     /**
      * {@inheritdoc}
      */
@@ -57,14 +54,14 @@ abstract class OroKernel extends Kernel
         $bundles = array();
 
         if (!$this->getCacheDir()) {
-            $bundleAliases = $this->getBundleClassAliases();
-            foreach ($bundleAliases as $parent => $override) {
-                if (!class_exists($parent, false)) {
-                    class_alias(
-                        $parent,
-                        $override
-                    );
-                }
+            /**
+             * This class alias has done to optimize JMSJobQueueBundle boot.
+             */
+            if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
+                class_alias(
+                    'JMS\JobQueueBundle\JMSJobQueueBundle',
+                    'Oro\Bundle\CronBundle\JobQueueBundle\JMSJobQueueBundle'
+                );
             }
             foreach ($this->collectBundles() as $class => $params) {
                 $bundles[] = $params['kernel']
@@ -76,7 +73,7 @@ abstract class OroKernel extends Kernel
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
-                $dumper = new PhpBundlesDumper($this->collectBundles(), $this->getBundleClassAliases());
+                $dumper = new PhpBundlesDumper($this->collectBundles());
 
                 $cache->write($dumper->dump());
             }
@@ -140,62 +137,32 @@ abstract class OroKernel extends Kernel
      */
     protected function collectBundles()
     {
-        $bundlesConfig = $this->getBundlesConfig();
-        $bundles = array_diff_key($bundlesConfig['bundles'], $bundlesConfig['exclusions']);
+        $files = $this->findBundles(
+            array(
+                $this->getRootDir() . '/../src',
+                $this->getRootDir() . '/../vendor'
+            )
+        );
+
+        $bundles    = array();
+        $exclusions = array();
+        foreach ($files as $file) {
+            $import  = Yaml::parse($file);
+            if (!empty($import)) {
+                if (!empty($import['bundles'])) {
+                    $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+                }
+                if (!empty($import['exclusions'])) {
+                    $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
+                }
+            }
+        }
+
+        $bundles = array_diff_key($bundles, $exclusions);
 
         uasort($bundles, array($this, 'compareBundles'));
 
         return $bundles;
-    }
-
-    protected function getBundleClassAliases()
-    {
-        return $this->getBundlesConfig()['bundleAliases'];
-    }
-
-    /**
-     * @return array
-     *   - bundles - bundles needs to be registered
-     *   - exclusions - bundles needs to be excluded
-     *   - bundleAliases - bundle classes needs to be changed
-     */
-    protected function getBundlesConfig()
-    {
-        if (empty($this->bundlesConfig)) {
-            $files = $this->findBundles(
-                array(
-                    $this->getRootDir() . '/../src',
-                    $this->getRootDir() . '/../vendor'
-                )
-            );
-
-            $bundles    = array();
-            $exclusions = array();
-            $bundleAliases = array();
-            foreach ($files as $file) {
-                $import  = Yaml::parse($file);
-                if (!empty($import)) {
-                    if (!empty($import['bundles'])) {
-                        $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
-                    }
-                    if (!empty($import['exclusions'])) {
-                        $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
-                    }
-                    if (!empty($import['bundleAliases'])) {
-                        $bundleAliases = array_merge(
-                            $bundleAliases,
-                            $import['bundleAliases']
-                        );
-                    }
-                }
-            }
-
-            $this->bundlesConfig['bundles'] = $bundles;
-            $this->bundlesConfig['exclusions'] = $exclusions;
-            $this->bundlesConfig['bundleAliases'] = $bundleAliases;
-        }
-
-        return $this->bundlesConfig;
     }
 
     /**

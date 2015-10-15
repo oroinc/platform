@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\JMSJobQueueBundle;
+namespace Oro\Bundle\CronBundle\JobQueueBundle;
 
 use Doctrine\DBAL\Types\Type;
 
@@ -9,7 +9,7 @@ use JMS\JobQueueBundle\DependencyInjection\CompilerPass\LinkGeneratorsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class OroCronBundle extends Bundle
+class JMSJobQueueBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {

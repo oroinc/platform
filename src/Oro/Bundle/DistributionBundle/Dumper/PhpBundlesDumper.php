@@ -9,17 +9,14 @@ class PhpBundlesDumper
      */
     private $bundles;
 
-    private $bundleAliases;
-
     /**
      * Constructor.
      *
      * @param array $bundles Bundles collection to dump
      */
-    public function __construct($bundles, $bundleAliases = array())
+    public function __construct($bundles)
     {
         $this->bundles = $bundles;
-        $this->bundleAliases = $bundleAliases;
     }
 
     /**
@@ -29,7 +26,16 @@ class PhpBundlesDumper
     {
         return <<<EOF
 <?php
-{$this->generateBundlesAliases()}
+/**
+ * This class alias has done to optimize JMSJobQueueBundle boot.
+ */
+if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
+    class_alias(
+        'JMS\JobQueueBundle\JMSJobQueueBundle',
+        'Oro\Bundle\CronBundle\JobQueueBundle\JMSJobQueueBundle'
+    );
+}
+
 return {$this->generateBundlesArray()}
 
 EOF;
@@ -51,28 +57,5 @@ EOF;
         $bundles .= ');';
 
         return $bundles;
-    }
-
-    private function generateBundlesAliases()
-    {
-        $output = '';
-        if (!empty($this->bundleAliases)) {
-            foreach ($this->bundleAliases as $parent => $override) {
-                $output .= sprintf(
-                    "if (!class_exists('%s', false)) {
-                    class_alias(
-                       '%s',
-                       '%s'
-                    );
-                }\n",
-                    $parent,
-                    $parent,
-                    $override
-                );
-
-            }
-        }
-
-        return $output;
     }
 }
