@@ -28,6 +28,7 @@ datagrid:
             view: orodatagrid/js/app/views/editor/select-editor-view
             view_options:
               placeholder: '<placeholder>'
+              css_class_name: '<class-name>'
           validationRules:
             # jQuery.validate configuration
             required: true
@@ -39,6 +40,7 @@ Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 choices                                             | Key-value set of available choices
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters

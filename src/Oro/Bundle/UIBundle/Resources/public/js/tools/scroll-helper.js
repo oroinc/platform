@@ -44,25 +44,19 @@ define(function(require) {
             }
             current = current.parentNode;
             while (current && current.getBoundingClientRect) {
-                midRect = this.getEditableClientRect(current);
-                if (onAfterGetClientRect) {
-                    onAfterGetClientRect(current, midRect);
-                }
-
-                borders = $.fn.getBorders(current);
-
-                if (tools.isMobile()) {
-                    /**
-                     * Equals header height. Cannot calculate dynamically due to issues on ipad
-                     */
-                    if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && current.id === 'top-page' &&
-                        !$(document.body).hasClass('input-focused')) {
+                /**
+                 * Equals header height. Cannot calculate dynamically due to issues on ipad
+                 */
+                if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && tools.isMobile()) {
+                    if (current.id === 'top-page' && !$(document.body).hasClass('input-focused')) {
                         resultRect.top = layout.MOBILE_HEADER_HEIGHT;
-                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT &&
-                        current.className === 'widget-content') {
+                    } else if (current.className.split(/\s+/).indexOf('widget-content') !== -1) {
                         resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
                     }
                 }
+
+                midRect = this.getFinalVisibleRect(current, onAfterGetClientRect);
+                borders = $.fn.getBorders(current);
 
                 if (resultRect.top < midRect.top + borders.top) {
                     resultRect.top = midRect.top + borders.top;
@@ -86,6 +80,21 @@ define(function(require) {
             return resultRect;
         },
 
+        getFinalVisibleRect: function(current, onAfterGetClientRect) {
+            var rect = this.getEditableClientRect(current);
+            if (onAfterGetClientRect) {
+                onAfterGetClientRect(current, rect);
+            }
+
+            if (current.scrollHeight > current.clientHeight) {
+                rect.bottom -= layout.scrollbarWidth();
+            }
+            if (current.scrollWidth > current.clientWidth) {
+                rect.right -= layout.scrollbarWidth();
+            }
+            return rect;
+        },
+
         getEditableClientRect: function(el) {
             var rect = el.getBoundingClientRect();
             return {
@@ -104,7 +113,7 @@ define(function(require) {
             if (rect.top === rect.bottom || rect.left === rect.right) {
                 return false;
             }
-            var visibleRect = this.getVisibleRect(el, null, true, onAfterGetClientRect);
+            var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
             return visibleRect.top === rect.top &&
                 visibleRect.bottom === rect.bottom &&
                 visibleRect.left === rect.left &&
@@ -123,7 +132,7 @@ define(function(require) {
             if (rect.top === rect.bottom || rect.left === rect.right) {
                 return false;
             }
-            var visibleRect = this.getVisibleRect(el, null, true, onAfterGetClientRect);
+            var visibleRect = this.getVisibleRect(el, null, false, onAfterGetClientRect);
             var scrolls = {
                 vertical: rect.top !== visibleRect.top ? visibleRect.top - rect.top :
                     (rect.bottom !== visibleRect.bottom ? visibleRect.bottom - rect.bottom : 0),

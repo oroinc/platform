@@ -793,6 +793,22 @@ define(function(require) {
                 }
             }
             return null;
+        },
+
+        /**
+         * Finds cell by model and column indexes
+         *
+         * @param {number} modelI
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findCellByIndex: function(modelI, columnI) {
+            try {
+                return this.body.rows[modelI].cells[columnI];
+            } catch (e) {
+                return null;
+            }
+
         }
     });
 
