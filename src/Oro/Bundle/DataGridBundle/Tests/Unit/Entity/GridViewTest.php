@@ -16,7 +16,7 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
         $gridView = new GridView();
 
         call_user_func_array(array($gridView, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals($value, call_user_func_array(array($gridView, 'get' . ucfirst($property)), array()));
+        static::assertEquals($value, call_user_func_array(array($gridView, 'get' . ucfirst($property)), array()));
     }
 
     public function provider()
@@ -31,6 +31,10 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
             ['filtersData', ['k' => 'v']],
             ['sortersData', ['k' => 'v']],
             ['owner', $user],
+            [
+                'columnsData',
+                ['name' => ['order' => 4]]
+            ]
         ];
     }
 
@@ -40,9 +44,16 @@ class GridViewTest extends \PHPUnit_Framework_TestCase
         $gridView->setName('name');
         $gridView->setFiltersData(['f' => 'fv']);
         $gridView->setSortersData(['s' => 'sv']);
+        $gridView->setColumnsData(['name' => ['order' => 4]]);
 
-        $expectedView = new View(null, ['f' => 'fv'], ['s' => 'sv'], GridView::TYPE_PRIVATE);
+        $expectedView = new View(
+            null,
+            ['f' => 'fv'],
+            ['s' => 'sv'],
+            GridView::TYPE_PRIVATE,
+            ['name' => ['order' => 4]]
+        );
         $expectedView->setLabel('name');
-        $this->assertEquals($expectedView, $gridView->createView());
+        static::assertEquals($expectedView, $gridView->createView());
     }
 }

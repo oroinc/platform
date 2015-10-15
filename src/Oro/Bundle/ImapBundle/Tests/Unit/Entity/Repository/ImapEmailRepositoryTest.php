@@ -77,8 +77,8 @@ class ImapEmailRepositoryTest extends OrmTestCase
             . 'INNER JOIN imap_email.imapFolder imap_folder '
             . 'INNER JOIN imap_email.email email '
             . 'INNER JOIN email.emailUsers email_users '
-            . 'INNER JOIN email_users.folder folder '
-            . 'WHERE folder.origin = :origin AND email.messageId IN (:messageIds)',
+            . 'INNER JOIN email_users.folders folders '
+            . 'WHERE folders.origin = :origin AND email.messageId IN (:messageIds)',
             $query->getDQL()
         );
 
