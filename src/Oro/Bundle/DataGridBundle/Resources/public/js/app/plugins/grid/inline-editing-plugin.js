@@ -343,7 +343,7 @@ define(function(require) {
                     }
                     break;
                 case 403:
-                    errors.push(jqXHR.responseJSON.message);
+                    errors.push(__('You do not have permission to perform this action.'));
                     break;
                 default:
                     errors.push(__('oro.ui.unexpected_error'));
