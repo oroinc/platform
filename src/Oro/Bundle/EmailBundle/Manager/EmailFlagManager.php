@@ -49,7 +49,7 @@ class EmailFlagManager implements LoggerAwareInterface
         $emailFlagManager = $this->selectEmailFlagManager($emailUser);
 
         if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setUnseen($emailUser->getFolder(), $emailUser->getEmail());
+            $emailFlagManager->setUnseen($emailUser->getFolders()->first(), $emailUser->getEmail());
         }
     }
 
@@ -65,7 +65,7 @@ class EmailFlagManager implements LoggerAwareInterface
         $emailFlagManager = $this->selectEmailFlagManager($emailUser);
 
         if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setSeen($emailUser->getFolder(), $emailUser->getEmail());
+            $emailFlagManager->setSeen($emailUser->getFolders()->first(), $emailUser->getEmail());
         }
     }
 
@@ -103,8 +103,8 @@ class EmailFlagManager implements LoggerAwareInterface
      */
     protected function selectEmailFlagManager(EmailUser $emailUser)
     {
-        $folder = $emailUser->getFolder();
-        $origin = $folder->getOrigin();
+        $folder = $emailUser->getFolders()->first();
+        $origin = $emailUser->getOrigin();
         if (!$origin || !$origin->isActive()) {
             return null;
         }

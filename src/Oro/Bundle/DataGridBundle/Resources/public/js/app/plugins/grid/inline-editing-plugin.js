@@ -7,11 +7,12 @@ define(function(require) {
     var $ = require('jquery');
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var CellIterator = require('../../../datagrid/cell-iterator');
+    var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('orodatagrid/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
-
         /**
          * true if any cell is in edit mode
          *
@@ -34,6 +35,28 @@ define(function(require) {
          */
         DEFAULT_COLUMN_TYPE: 'text',
 
+        /**
+         * If true interface should not respond to user actions.
+         * Usefull for grid page switching support
+         */
+        lockUserActions: false,
+
+        /**
+         * Key codes
+         */
+        TAB_KEY_CODE: 9,
+        ENTER_KEY_CODE: 13,
+        ESCAPE_KEY_CODE: 27,
+        ARROW_LEFT_KEY_CODE: 37,
+        ARROW_TOP_KEY_CODE: 38,
+        ARROW_RIGHT_KEY_CODE: 39,
+        ARROW_BOTTOM_KEY_CODE: 40,
+
+        constructor: function() {
+            this.onKeyDown = _.bind(this.onKeyDown, this);
+            InlineEditingPlugin.__super__.constructor.apply(this, arguments);
+        },
+
         enable: function() {
             this.listenTo(this.main, 'afterMakeCell', this.onAfterMakeCell);
             if (!this.options.metadata.inline_editing.save_api_accessor) {
@@ -43,11 +66,13 @@ define(function(require) {
             this.saveApiAccessor = new ApiAccesor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
+            $(document).on('keydown', this.onKeyDown);
             InlineEditingPlugin.__super__.enable.call(this);
         },
 
         disable: function() {
-            InlineEditingPlugin.__super__.enable.call(this);
+            InlineEditingPlugin.__super__.disable.call(this);
+            $(document).off('keydown', this.onKeyDown);
             this.main.body.refresh();
         },
 
@@ -55,7 +80,7 @@ define(function(require) {
             var originalRender = cell.render;
             var _this = this;
             cell.render = function() {
-                var result = originalRender.apply(this, arguments);
+                originalRender.apply(this, arguments);
                 if (_this.isEditable(cell)) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
@@ -68,7 +93,7 @@ define(function(require) {
                         animation: false
                     });
                 }
-                return result;
+                return this;
             };
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
@@ -145,14 +170,21 @@ define(function(require) {
 
         enterEditMode: function(cell, fromPreviousCell) {
             if (this.editModeEnabled) {
-                this.exitEditMode();
+                this.exitEditMode(false);
+            } else {
+                if (backdropManager.isReleased(this.backdropId)) {
+                    this.backdropId = backdropManager.hold();
+                }
             }
             this.editModeEnabled = true;
             this.currentCell = cell;
+            this.cellIterator = new CellIterator(this.main, this.currentCell);
             this.main.ensureCellIsVisible(cell);
             cell.$el.parent('tr:first').addClass('row-edit-mode');
             cell.$el.removeClass('view-mode');
             cell.$el.addClass('edit-mode');
+
+            this.toggleHeaderCellHighlight(cell, true);
 
             var editor = this.getCellEditorOptions(cell);
             this.editor = editor;
@@ -160,14 +192,19 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
+            var classNames = this.buildClassNames(editor, cell);
             var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
                 viewOptions: $.extend(true, {
                     validationRules: editor.validation_rules
-                }, editor.view_options || {}),
+                }, editor.view_options || {}, {
+                    className: classNames.join(' ')
+                }),
                 fromPreviousCell: fromPreviousCell
             }));
+
+            editorComponent.view.focus(!!fromPreviousCell);
 
             this.editorComponent = editorComponent;
 
@@ -177,11 +214,46 @@ define(function(require) {
             this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
             this.listenTo(editorComponent, 'saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
             this.listenTo(editorComponent, 'cancelAndEditPrevAction', this.editPrevCell);
+            this.listenTo(editorComponent, 'saveAndEditNextRowAction', this.saveCurrentCellAndEditNextRow);
+            this.listenTo(editorComponent, 'cancelAndEditNextRowAction', this.editNextRowCell);
+            this.listenTo(editorComponent, 'saveAndEditPrevRowAction', this.saveCurrentCellAndEditPrevRow);
+            this.listenTo(editorComponent, 'cancelAndEditPrevRowAction', this.editPrevRowCell);
+        },
+
+        toggleHeaderCellHighlight: function(cell, state) {
+            var columnIndex = this.main.columns.indexOf(cell.column);
+            this.main.header.row.cells[columnIndex].$el.toggleClass('header-cell-highlight', state);
+        },
+
+        buildClassNames: function(editor, cell) {
+            var classNames = [];
+            if (editor.view_options && editor.view_options.css_class_name) {
+                classNames.push(editor.view_options.css_class_name);
+            }
+            if (cell.column.get('name')) {
+                classNames.push(cell.column.get('name') + '-column-editor');
+            }
+
+            if (this.main.name) {
+                classNames.push(this.main.name + '-grid-editor');
+            }
+
+            if (cell.column.get('metadata') && cell.column.get('metadata').type) {
+                classNames.push(cell.column.get('metadata').type + '-frontend-type-editor');
+            }
+            return classNames;
         },
 
         saveCurrentCell: function(exit) {
             if (!this.editModeEnabled) {
                 throw Error('Edit mode disabled');
+            }
+            if (!this.editorComponent.view.isChanged()) {
+                return true;
+            }
+            if (!this.editorComponent.view.isValid()) {
+                this.editorComponent.view.focus();
+                return false;
             }
             var cell = this.currentCell;
             var serverUpdateData = this.editorComponent.view.getServerUpdateData();
@@ -212,11 +284,16 @@ define(function(require) {
             if (exit !== false) {
                 this.exitEditMode(cell);
             }
+            return true;
         },
 
-        exitEditMode: function() {
+        exitEditMode: function(releaseBackdrop) {
             this.editModeEnabled = false;
+            if (releaseBackdrop !== false) {
+                backdropManager.release(this.backdropId);
+            }
             if (this.currentCell.$el) {
+                this.toggleHeaderCellHighlight(this.currentCell, false);
                 this.currentCell.$el.parent('tr:first').removeClass('row-edit-mode');
                 this.currentCell.$el.addClass('view-mode');
                 this.currentCell.$el.removeClass('edit-mode');
@@ -227,85 +304,165 @@ define(function(require) {
         },
 
         editNextCell: function() {
-            var nextCell = this.findNextEditableCell(this.currentCell);
-            if (nextCell) {
-                this.enterEditMode(nextCell);
-            } else {
-                this.exitEditMode();
-            }
+            this.editCellByIteratorMethod('next', false);
         },
 
-        saveCurrentCellAndEditNext: function(data) {
-            this.saveCurrentCell(data, false);
-            this.editNextCell();
+        editNextRowCell: function() {
+            this.editCellByIteratorMethod('nextRow', false);
         },
 
         editPrevCell: function() {
-            var nextCell = this.findPrevEditableCell(this.currentCell);
-            if (nextCell) {
-                this.enterEditMode(nextCell, true);
-            } else {
-                this.exitEditMode();
-            }
+            this.editCellByIteratorMethod('prev', true);
         },
 
-        saveCurrentCellAndEditPrev: function(data) {
-            this.saveCurrentCell(data, false);
+        editPrevRowCell: function() {
+            this.editCellByIteratorMethod('prevRow', false);
+        },
+
+        editCellByIteratorMethod: function(iteratorMethod, fromPreviousCell) {
+            var _this = this;
+            this.lockUserActions = true;
+            function checkEditable(cell) {
+                if (!_this.isEditable(cell)) {
+                    return _this.cellIterator[iteratorMethod]().then(checkEditable);
+                }
+                return cell;
+            }
+            this.exitEditMode(false);
+            this.cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
+                _this.enterEditMode(cell, fromPreviousCell);
+                _this.lockUserActions = false;
+            }).fail(function() {
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                _this.exitEditMode();
+                _this.lockUserActions = false;
+            });
+        },
+
+        saveCurrentCellAndEditNext: function() {
+            this.saveCurrentCell(false);
+            this.editNextCell();
+        },
+
+        saveCurrentCellAndEditPrev: function() {
+            this.saveCurrentCell(false);
             this.editPrevCell();
         },
 
-        findNextEditableCell: function(cell) {
-            function next(model) {
-                var index = 1 + model.collection.indexOf(model);
-                if (index < model.collection.length) {
-                    return model.collection.at(index);
-                }
-                return null;
-            }
-            var row = cell.model;
-            var column = next(cell.column);
-            var columns = column.collection;
-            do {
-                while (column) {
-                    var currentCell = this.main.findCell(row, column);
-                    if (this.isEditable(currentCell)) {
-                        return currentCell;
-                    }
-                    column = next(column);
-                }
-                column = columns.at(0);
-                row = next(row);
-            } while (row);
-            return null;
+        saveCurrentCellAndEditNextRow: function() {
+            this.saveCurrentCell(false);
+            this.editNextRowCell();
         },
 
-        findPrevEditableCell: function(cell) {
-            function prev(model) {
-                var index = -1 + model.collection.indexOf(model);
-                if (index >= 0) {
-                    return model.collection.at(index);
-                }
-                return null;
-            }
-            var row = cell.model;
-            var column = prev(cell.column);
-            var columns = column.collection;
-            do {
-                while (column) {
-                    var currentCell = this.main.findCell(row, column);
-                    if (this.isEditable(currentCell)) {
-                        return currentCell;
-                    }
-                    column = prev(column);
-                }
-                column = columns.last();
-                row = prev(row);
-            } while (row);
-            return null;
+        saveCurrentCellAndEditPrevRow: function() {
+            this.saveCurrentCell(false);
+            this.editPrevRowCell();
         },
 
         _onRequireJsError: function() {
             mediator.execute('showFlashMessage', 'success', __('oro.datagrid.inlineEditing.loadingError'));
+        },
+
+        /**
+         * Keydown handler for the entire document
+         *
+         * @param {$.Event} e
+         */
+        onKeyDown: function(e) {
+            this.onGenericTabKeydown(e);
+            this.onGenericEnterKeydown(e);
+            this.onGenericEscapeKeydown(e);
+            this.onGenericArrowKeydown(e);
+        },
+
+        /**
+         * Generic keydown handler, which handles ENTER
+         *
+         * @param {$.Event} e
+         */
+        onGenericEnterKeydown: function(e) {
+            if (e.keyCode === this.ENTER_KEY_CODE) {
+                if (!this.lockUserActions) {
+                    if (this.saveCurrentCell(false)) {
+                        if (e.shiftKey) {
+                            this.editPrevRowCell();
+                        } else {
+                            this.editNextRowCell();
+                        }
+                    }
+                }
+                e.preventDefault();
+            }
+        },
+
+        /**
+         * Generic keydown handler, which handles TAB
+         *
+         * @param {$.Event} e
+         */
+        onGenericTabKeydown: function(e) {
+            if (e.keyCode === this.TAB_KEY_CODE) {
+                if (!this.lockUserActions) {
+                    if (this.saveCurrentCell(false)) {
+                        if (e.shiftKey) {
+                            this.editPrevCell();
+                        } else {
+                            this.editNextCell();
+                        }
+                    }
+                }
+                e.preventDefault();
+            }
+        },
+
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                if (!this.lockUserActions) {
+                    this.exitEditMode();
+                }
+                e.preventDefault();
+            }
+        },
+
+        /**
+         * Generic keydown handler, which handles ARROWS
+         *
+         * @param {$.Event} e
+         */
+        onGenericArrowKeydown: function(e) {
+            if (e.altKey) {
+                switch (e.keyCode) {
+                    case this.ARROW_LEFT_KEY_CODE:
+                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                            this.editPrevCell();
+                        }
+                        e.preventDefault();
+                        break;
+                    case this.ARROW_RIGHT_KEY_CODE:
+                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                            this.editNextCell();
+                        }
+                        e.preventDefault();
+                        break;
+                    case this.ARROW_TOP_KEY_CODE:
+                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                            this.editPrevRowCell();
+                        }
+                        e.preventDefault();
+                        break;
+                    case this.ARROW_BOTTOM_KEY_CODE:
+                        if (!this.lockUserActions && this.saveCurrentCell(false)) {
+                            this.editNextRowCell();
+                        }
+                        e.preventDefault();
+                        break;
+                }
+            }
         }
     }, {
         onSaveSuccess: function() {

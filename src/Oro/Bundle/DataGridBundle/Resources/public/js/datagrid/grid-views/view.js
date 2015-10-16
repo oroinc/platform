@@ -125,7 +125,8 @@ define([
             }
             this.viewsCollection.get(this.DEFAULT_GRID_VIEW_ID).set({
                 filters: options.collection.initialState.filters,
-                sorters: options.collection.initialState.sorters
+                sorters: options.collection.initialState.sorters,
+                columns: options.collection.initialState.columns
             });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
@@ -157,7 +158,6 @@ define([
             });
             this.listenTo(this.collection, 'updateState', this.render);
             this.listenTo(this.collection, 'beforeFetch', this.render);
-            this.listenTo(this.collection, 'reset', this._onCollectionReset);
             this.listenTo(this.collection, 'reset', this.render);
 
             this.listenTo(this.viewsCollection, 'add', this._onModelAdd);
@@ -227,7 +227,8 @@ define([
             model.save({
                 label: model.get('label'),
                 filters: this.collection.state.filters,
-                sorters: this.collection.state.sorters
+                sorters: this.collection.state.sorters,
+                columns: this.collection.state.columns
             }, {
                 wait: true,
                 success: function() {
@@ -250,6 +251,7 @@ define([
                     grid_name: self.gridName,
                     filters: self.collection.state.filters,
                     sorters: self.collection.state.sorters,
+                    columns: self.collection.state.columns,
                     editable: self.permissions.EDIT,
                     deletable: self.permissions.DELETE
                 });
@@ -415,7 +417,7 @@ define([
         /**
          * @private
          */
-        _onCollectionReset: function() {
+        _checkCurrentState: function() {
             var newState = this._getCurrentState();
             if (_.isEqual(newState, this.prevState)) {
                 return;
@@ -447,6 +449,8 @@ define([
         render: function(o) {
             var html;
             this.$el.empty();
+
+            this._checkCurrentState();
 
             var title = this.titleTemplate({
                 title: this._getCurrentViewLabel(),
@@ -642,7 +646,8 @@ define([
 
             return {
                 filters: model.get('filters'),
-                sorters: model.get('sorters')
+                sorters: model.get('sorters'),
+                columns: model.get('columns')
             };
         },
 
@@ -654,7 +659,8 @@ define([
         _getCurrentState: function() {
             return {
                 filters: this.collection.state.filters,
-                sorters: this.collection.state.sorters
+                sorters: this.collection.state.sorters,
+                columns: this.collection.state.columns
             };
         },
 
@@ -670,7 +676,7 @@ define([
             }
 
             var title = currentView.label;
-            if (currentView.value === '__all__') {
+            if (currentView.value === this.DEFAULT_GRID_VIEW_ID) {
                 title = __('oro.datagrid.gridView.all');
             }
 

@@ -11,7 +11,7 @@ define(function(require) {
         OVERLAY_TOOL_DEFAULTS: {
             position: {
                 my: 'left top',
-                at: 'left-5 top-8',
+                at: 'left-1 top-4',
                 collision: 'flipfit'
             }
         },
@@ -27,8 +27,6 @@ define(function(require) {
             }, this);
 
             CellPopupEditorComponent.__super__.initialize.apply(this, arguments);
-
-            this.view.focus(!!options.fromPreviousCell);
         },
 
         createView: function(options) {
@@ -47,8 +45,25 @@ define(function(require) {
                     of: options.cell.$el
                 }
             });
+            this.resizeToCell(viewInstance);
             this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
             return viewInstance;
+        },
+
+        /**
+         * Resizes editor to cell width
+         */
+        resizeToCell: function(view) {
+            view.$el.width(view.cell.$el.outerWidth() + this.getWidthIncrement());
+        },
+
+        /**
+         * Returns cell editor width increment
+         *
+         * @returns {number}
+         */
+        getWidthIncrement: function() {
+            return 64;
         },
 
         removeView: function() {

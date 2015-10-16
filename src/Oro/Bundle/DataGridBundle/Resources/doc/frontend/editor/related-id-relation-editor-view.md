@@ -29,6 +29,7 @@ datagrid:
             view: orodatagrid/js/app/views/editor/related-id-select-editor-view
             view_options:
               placeholder: '<placeholder>'
+              css_class_name: '<class-name>'
               value_field_name: {column-name-value}
           validationRules:
             # jQuery.validate configuration
@@ -51,6 +52,8 @@ Column option name                                  | Description
 :---------------------------------------------------|:---------------------------------------
 inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
+inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
 inline_editing.editor.validationRules               | Optional. The client side validation rules
 inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
 inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
@@ -63,6 +66,7 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | --- | --- | --- |
 | options | <code>Object</code> | Options container |
 | options.model | <code>Object</code> | Current row model |
+| options.input_delay | <code>Object</code> | Delay before user finished input and request sent to server |
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |

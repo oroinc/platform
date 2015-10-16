@@ -48,7 +48,7 @@
         display: none !important;
       }
       &:before {
-        background: url('../../oroui/img/loader-16.gif') no-repeat center center #f5f5f5;
+        background: url('../../oroui/img/loader-16.gif') no-repeat center center rgba(245, 245, 245, 0.7);
         display: block !important;
         content: "";
         position: absolute;
@@ -58,10 +58,21 @@
         height: 29px;
       }
       &:hover:before {
-        background-color: #F4EFD4;
+        background-color: rgba(244, 239, 212, 0.7);;
+      }
+      &.number-cell:before, &.percent-cell:before {
+        right: auto;
+        left: 1px;
       }
     }
   }
+}
+.grid thead th.header-cell-highlight {
+  background-color: #FFFCEC;
+  background: -webkit-linear-gradient(top, #FFFCEC, #F4EFD4);
+  background: -o-linear-gradient(top, #FFFCEC,#F4EFD4);
+  background: -ms-linear-gradient(top, #FFFCEC,#F4EFD4);
+  background: linear-gradient(to bottom, #FFFCEC,#F4EFD4 );
 }
 .icon-times:before {
   content: "\f00d";
@@ -69,43 +80,42 @@
 
 .inline-editor-wrapper {
   position: absolute;
-  padding: 7px;
+  padding: 3px;
   background-color: white;
   border-radius: 3px;
   border: 1px solid rgba(0,0,0,0.2);
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
   .input-append {
     margin: 0;
+    width: 100%;
+    > input[type=text] {
+      width: calc(~"100% - 73px");
+    }
   }
   .icon-check:before {
     content: "\f00c";
   }
   .validation-failed:last-child {
-    margin-bottom: 0px
-  }
-  &.text-editor {
-    width: 349px;
-    input[name=value] {
-      width: 260px;
-    }
+    margin-bottom: 2px;
   }
   &.number-editor {
-    width: 189px;
+    // about 10+2 digits
+    min-width: 189px;
     input[name=value] {
-      // about 10+2 digits
-      width: 100px;
       text-align: right;
     }
   }
   &.date-editor {
+    min-width: 176px;
     .hasDatepicker {
-      width: 95px;
+      width: calc(~"100% - 73px");
     }
   }
   &.datetime-editor {
-    width: 260px;
+    min-width: 251px;
     .fields-row {
-      display: inline-block
+      display: inline-block;
+      width: calc(~"100% - 59px");
     }
     .hasDatepicker {
       border-top-right-radius: 0;
@@ -115,6 +125,13 @@
     }
     .timepicker-input {
       border-radius: 0;
+      width: calc(~"100% - 122px");
+    }
+  }
+  &.select-editor {
+    min-width: 180px;
+    .select2-container {
+      width: calc(~"100% - 61px")
     }
   }
 }

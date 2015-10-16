@@ -30,6 +30,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/text-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *           validationRules:
      *             # jQuery.validate configuration
      *             required: true
@@ -41,6 +42,7 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
@@ -77,13 +79,28 @@ define(function(require) {
         ENTER_KEY_CODE: 13,
         ESCAPE_KEY_CODE: 27,
 
+        /**
+         * Arrow codes
+         */
+        ARROW_LEFT_KEY_CODE: 37,
+        ARROW_TOP_KEY_CODE: 38,
+        ARROW_RIGHT_KEY_CODE: 39,
+        ARROW_BOTTOM_KEY_CODE: 40,
+
+        constructor: function(options) {
+            // className adjustment cannot be done in initialize()
+            if (options.className) {
+                options.className += ' ' + _.result(this, 'className');
+            }
+            TextEditorView.__super__.constructor.apply(this, arguments);
+        },
+
         initialize: function(options) {
             this.options = options;
             this.cell = options.cell;
             this.column = options.column;
             this.placeholder = options.placeholder;
             this.validationRules = options.validationRules || {};
-            $(document).on('keydown' + this.eventNamespace(), _.bind(this.onKeyDown, this));
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -207,6 +224,15 @@ define(function(require) {
         },
 
         /**
+         * Returns true if the user entered valid data
+         *
+         * @returns {boolean}
+         */
+        isValid: function() {
+            return this.validator.form();
+        },
+
+        /**
          * Change handler. In this realization, it tracks a submit button disabled attribute
          */
         onChange: function() {
@@ -218,39 +244,21 @@ define(function(require) {
         },
 
         /**
-         * Keydown handler for the entire document
-         *
-         * @param {$.Event} e
-         */
-        onKeyDown: function(e) {
-            switch (e.keyCode) {
-                case this.TAB_KEY_CODE:
-                    this.onGenericTabKeydown(e);
-                    break;
-                case this.ENTER_KEY_CODE:
-                    this.onGenericEnterKeydown(e);
-                    break;
-                case this.ESCAPE_KEY_CODE:
-                    this.onGenericEscapeKeydown(e);
-                    break;
-            }
-        },
-
-        /**
          * Generic keydown handler, which handles ENTER
          *
          * @param {$.Event} e
          */
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
+                var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
                     if (this.validator.form()) {
-                        this.trigger('saveAction');
+                        this.trigger('save' + postfix + 'Action');
                     } else {
                         this.focus();
                     }
                 } else {
-                    this.trigger('cancelAction');
+                    this.trigger('cancel' + postfix + 'Action');
                 }
                 e.stopImmediatePropagation();
                 e.preventDefault();
@@ -289,6 +297,44 @@ define(function(require) {
                 this.trigger('cancelAction');
                 e.stopImmediatePropagation();
                 e.preventDefault();
+            }
+        },
+
+        /**
+         * Generic keydown handler, which handles ARROWS
+         *
+         * @param {$.Event} e
+         */
+        onGenericArrowKeydown: function(e) {
+            if (e.altKey) {
+                var postfix;
+                switch (e.keyCode) {
+                    case this.ARROW_LEFT_KEY_CODE:
+                        postfix = 'AndEditPrev';
+                        break;
+                    case this.ARROW_RIGHT_KEY_CODE:
+                        postfix = 'AndEditNext';
+                        break;
+                    case this.ARROW_BOTTOM_KEY_CODE:
+                        postfix = 'AndEditNextRow';
+                        break;
+                    case this.ARROW_TOP_KEY_CODE:
+                        postfix = 'AndEditPrevRow';
+                        break;
+                }
+                if (postfix) {
+                    if (this.isChanged()) {
+                        if (this.validator.form()) {
+                            this.trigger('save' + postfix + 'Action');
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancel' + postfix + 'Action');
+                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
             }
         },
 

@@ -15,7 +15,7 @@ define(function(require) {
      *     columns:
      *       # Sample 1. Mapped by number frontend type
      *       {column-name-1}:
-     *         frontend_type: <number/integer/decimal/percent/currency>
+     *         frontend_type: <number/integer/decimal/currency>
      *       # Sample 2. Full configuration
      *       {column-name-2}:
      *         inline_editing:
@@ -23,6 +23,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/number-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *           validationRules:
      *             # jQuery.validate configuration
      *             required: true
@@ -34,6 +35,7 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
@@ -62,7 +64,8 @@ define(function(require) {
         },
 
         getValue: function() {
-            return this.formatter.toRaw(this.$('input[name=value]').val());
+            var userInput = this.$('input[name=value]').val();
+            return this.formatter.toRaw(userInput) || NaN;
         },
 
         getValidationRules: function() {

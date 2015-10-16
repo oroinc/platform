@@ -51,7 +51,7 @@ Please see [number-editor-view](../frontend/editor/number-editor-view.md) for de
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.percent"></a>
 ### defaultEditors.percent : <code>function</code>
-Please see [number-editor-view](../frontend/editor/number-editor-view.md) for details
+Please see [percent-editor-view](../frontend/editor/percent-editor-view.md) for details
 
 **Kind**: static property of <code>[defaultEditors](#module_defaultEditors)</code>  
 <a name="module_defaultEditors.select"></a>

@@ -31,6 +31,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/select-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *           validationRules:
      *             # jQuery.validate configuration
      *             required: true
@@ -42,6 +43,7 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * choices                                             | Key-value set of available choices
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
@@ -61,7 +63,6 @@ define(function(require) {
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
     var $ = require('jquery');
-    var _ = require('underscore');
     require('jquery.select2');
 
     SelectEditorView = TextEditorView.extend(/** @exports SelectEditorView.prototype */{
@@ -92,10 +93,11 @@ define(function(require) {
             this.$('input[name=value]').select2(this.getSelect2Options());
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericEnterKeydown, this));
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericTabKeydown, this));
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
+                _this.onGenericEnterKeydown(e);
+                _this.onGenericTabKeydown(e);
+                _this.onGenericArrowKeydown(e);
+            });
 
             // must prevent selection on TAB
             this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
@@ -104,6 +106,12 @@ define(function(require) {
                     e.preventDefault();
                     _this.$('input[name=value]').select2('close');
                     _this.onGenericTabKeydown(e);
+                }
+                _this.onGenericArrowKeydown(e);
+            });
+            this.$('input.select2-input').bind('keydown' + this.eventNamespace(), function(e) {
+                if (!_this.isChanged()) {
+                    SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
                 }
             });
         },

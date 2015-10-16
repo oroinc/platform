@@ -12,7 +12,7 @@ datagrid:
     columns:
       # Sample 1. Mapped by number frontend type
       {column-name-1}:
-        frontend_type: <number/integer/decimal/percent/currency>
+        frontend_type: <number/integer/decimal/currency>
       # Sample 2. Full configuration
       {column-name-2}:
         inline_editing:
@@ -20,6 +20,7 @@ datagrid:
             view: orodatagrid/js/app/views/editor/number-editor-view
             view_options:
               placeholder: '<placeholder>'
+              css_class_name: '<class-name>'
           validationRules:
             # jQuery.validate configuration
             required: true
@@ -31,6 +32,7 @@ datagrid:
 Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.validationRules               | Optional. The client side validation rules
 
 ### Constructor parameters

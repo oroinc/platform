@@ -2,6 +2,11 @@
 .table th, .table td {
     /* should center content in cell right */
     line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
+    display: none;
+  }
+  th.renderable, td.renderable {
+    display: table-cell;
+  }
 }
 
 .grid-toolbar .pagination ul li input {
@@ -220,7 +225,7 @@ table .thead-sizing {
   table .dropdown-menu{
     z-index: 898;
   }
-  thead {
+  .grid-container thead {
     z-index: 899;
     &.thead-sizing th {
       border-top: none;
@@ -230,7 +235,7 @@ table .thead-sizing {
     .grid-scrollable-container {
       position: relative;
     }
-    thead:first-child {
+    .grid-container thead:first-child {
       position: absolute;
       width: auto;
       display: block;
@@ -242,12 +247,12 @@ table .thead-sizing {
         }
       }
     }
-    thead.thead-sizing {
+    .grid-container thead.thead-sizing {
       display: table-header-group;
     }
   }
   &.floatThead-fixed{
-    thead:first-child {
+    .grid-container thead:first-child {
       position: fixed;
       display: block;
       overflow: hidden;
@@ -257,7 +262,7 @@ table .thead-sizing {
         display: block;
       }
     }
-    thead.thead-sizing {
+    .grid-container thead.thead-sizing {
       display: table-header-group;
     }
   }

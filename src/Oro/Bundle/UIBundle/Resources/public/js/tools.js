@@ -167,7 +167,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**

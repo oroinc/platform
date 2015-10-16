@@ -15,6 +15,7 @@ define(function(require) {
     var gridContentManager = require('orodatagrid/js/content-manager');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
 
     helpers = {
         cellType: function(type) {
@@ -197,7 +198,8 @@ define(function(require) {
                 url: '\/user\/json',
                 state: _.extend({
                     filters: {},
-                    sorters: {}
+                    sorters: {},
+                    columns: {}
                 }, this.metadata.state),
                 initialState: this.metadata.initialState
             }, this.metadata.options);
@@ -222,7 +224,8 @@ define(function(require) {
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align'];
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                    'order', 'manageable', 'required'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
                 var cellType = modules[helpers.cellType(cell.type)];
@@ -249,6 +252,10 @@ define(function(require) {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
+            }
+
+            if (metadata.options.toolbarOptions.addColumnManager) {
+                plugins.push(ColumnManagerPlugin);
             }
 
             return {

@@ -54,7 +54,7 @@ define([
             this.subviews = {
                 pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
                 pageSize: new this.pageSize(_.defaults({collection: this.collection}, options.pageSize)),
-                actionsPanel: new this.actionsPanel(_.extend({}, options.actionsPanel)),
+                actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
                 extraActionsPanel: new this.extraActionsPanel()
             };
 
