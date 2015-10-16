@@ -15,7 +15,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
+use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
@@ -210,6 +212,7 @@ class AclRoleHandler
      */
     protected function setRolePrivileges(AbstractRole $role)
     {
+        $allPrivileges = array();
         $privileges = $this->getRolePrivileges($role);
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
@@ -230,7 +233,30 @@ class AclRoleHandler
             }
 
             $this->form->get($fieldName)->setData($sortedPrivileges);
+            $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());
         }
+
+        $formPrivileges = [];
+        foreach ($allPrivileges as $key => $privilege) {
+            /** @var AclPrivilege $privilege */
+            $result = [
+                'identity' => [
+                    'id' => $privilege->getIdentity()->getId(),
+                    'name' => $privilege->getIdentity()->getName(),
+                ],
+                'permissions' => [],
+            ];
+            foreach ($privilege->getPermissions() as $permissionName => $permission) {
+                /** @var AclPermission $permission */
+                $result['permissions'][$permissionName] = [
+                    'name' => $permission->getName(),
+                    'accessLevel' => $permission->getAccessLevel(),
+                ];
+            }
+            $formPrivileges[$privilege->getExtensionKey()][$key] = $result;
+        }
+
+        $this->form->get('privileges')->setData(json_encode($formPrivileges));
     }
 
     /**
