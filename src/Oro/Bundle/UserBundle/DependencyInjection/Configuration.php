@@ -52,7 +52,7 @@ class Configuration implements ConfigurationInterface
                                 'show_default'  => true,
                             ),
                             'field'  => array(
-                                'label'         => 'oro.user.privileges.entity.label',
+                                'label'         => 'oro.user.privileges.field.label',
                                 'view_type'     => 'grid',
                                 'types'         => array('field'),
                                 'field_type'    => 'oro_acl_access_level_selector',
