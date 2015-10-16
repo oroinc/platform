@@ -293,6 +293,7 @@ define([
         'oroform/js/validator/length',
         'oroform/js/validator/notblank',
         'oroform/js/validator/notnull',
+        'oroform/js/validator/number',
         'oroform/js/validator/range',
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',

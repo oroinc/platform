@@ -71,6 +71,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
                 containment: this.element.closest('.grid tbody'),
                 items: 'tr',
                 tolerance: 'pointer',
+                handle: '.handle',
                 helper: function(e, ui) {
                     ui.children().each(function() {
                         $(this).width($(this).width());

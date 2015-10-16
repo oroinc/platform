@@ -101,6 +101,10 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function getUsedJoinAliases($joins, $aliases, $rootAlias)
     {
+        if (!isset($joins[$rootAlias])) {
+            return [];
+        }
+
         $joinDependencies = $this->getJoinDependencies($joins[$rootAlias]);
         $needProcessing   = !empty($joinDependencies);
         while ($needProcessing) {

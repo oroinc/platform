@@ -4,37 +4,75 @@ define(function(require) {
 
     var EmailNotificationCollectionView;
     var $ = require('jquery');
+    var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
+    var emailsGridRouteBuilder = require('oroemail/js/util/emails-grid-route-builder');
     var EmailNotificationView = require('./email-notification-item-view');
     var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     var messenger = require('oroui/js/messenger');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     EmailNotificationCollectionView = BaseCollectionView.extend({
+        template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
+        animationDuration: 0,
         listSelector: '.items',
         countNewEmail: 0,
+        folderId: 0,
+        hasMarkAllButton: true,
+        hasMarkVisibleButton: false,
+        loadingMask: null,
+        /**
+         * Id of default action
+         *  1 - reply all
+         *  2 - reply
+         *  3 - forward
+         */
+        defaultActionId: 1,
 
         listen: {
-            'change:seen collection': 'updateViewMode',
-            'reset collection': 'onResetCollection'
+            'change:seen collection': 'onSeenStatusChange',
+            'reset collection': 'onResetCollection',
+            'request collection': 'onCollectionRequest',
+            'sync collection': 'onCollectionSync'
         },
 
         events: {
             'click': 'onClickIconEnvelope',
-            'click button.mark-as-read': 'onClickMarkAsRead'
+            'click button.mark-as-read': 'onClickMarkAsRead',
+            'click button.mark-visible-as-read': 'onClickMarkVisibleAsRead'
         },
 
         initialize: function(options) {
-            BaseCollectionView.__super__.initialize.apply(this, options);
+            EmailNotificationCollectionView.__super__.initialize.call(this, options);
+            _.extend(this, _.pick(options, ['folderId', 'hasMarkAllButton', 'hasMarkVisibleButton']));
             this.countNewEmail = parseInt(options.countNewEmail);
+            if (options.defaultActionId) {
+                this.defaultActionId = parseInt(options.defaultActionId);
+            }
         },
 
         render: function() {
-            BaseCollectionView.__super__.render.apply(this);
+            EmailNotificationCollectionView.__super__.render.call(this);
             this.updateViewMode();
-            this.$el.show();
+        },
+
+        getTemplateData: function() {
+            var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
+            var visibleUnreadEmails = this.collection.filter(function(item) {
+                return item.get('seen') === false;
+            }).length;
+            _.extend(data, _.pick(this, [
+                'defaultActionId',
+                'countNewEmail',
+                'folderId',
+                'hasMarkAllButton',
+                'hasMarkVisibleButton']));
+            data.userEmailsUrl = emailsGridRouteBuilder.generate(this.folderId);
+            data.moreUnreadEmails = Math.max(this.countNewEmail - visibleUnreadEmails, 0);
+            return data;
         },
 
         updateViewMode: function() {
@@ -42,33 +80,56 @@ define(function(require) {
                 var $iconEnvelope = this.$el.find('.oro-dropdown-toggle .icon-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
-                    $iconEnvelope.removeClass('new');
+                    $iconEnvelope.removeClass('highlight');
                 } else {
                     this.setModeDropDownMenu('content');
                     if (this.countNewEmail > 0) {
-                        $iconEnvelope.addClass('new');
+                        $iconEnvelope.addClass('highlight');
                     } else {
-                        $iconEnvelope.removeClass('new');
+                        $iconEnvelope.removeClass('highlight');
                     }
                 }
             }
         },
 
-        onClickMarkAsRead: function() {
-            var self = this;
+        _markAsRead: function(ids) {
             $.ajax({
-                url: routing.generate('oro_email_mark_all_as_seen'),
-                success: function(response) {
-                    self.collection.markAllAsRead();
-                    self.setCount(0);
+                url: routing.generate('oro_email_mark_all_as_seen', ids),
+                success: _.bind(function(response) {
+                    this.collection.markAllAsRead();
+                    this.collection.unreadEmailsCount = 0;
+                    this.countNewEmail = 0;
+                    this.render();
                     if (response.successful) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
-                },
+                }, this),
                 error: function(model, response) {
                     messenger.showErrorMessage(__('oro.email.error.mark_as_read'), response.responseJSON || {});
                 }
             });
+        },
+
+        onClickMarkVisibleAsRead: function() {
+            var ids = [];
+            this.collection.each(function(email) {
+                if (email.get('seen') === false) {
+                    ids.push(email.get('id'));
+                }
+            });
+            this._markAsRead({'ids': ids});
+        },
+
+        onClickMarkAsRead: function() {
+            this._markAsRead({});
+        },
+
+        onSeenStatusChange: function(model, isSeen) {
+            if (isSeen && this.countNewEmail > 0) {
+                this.countNewEmail--;
+            } else {
+                this.countNewEmail++;
+            }
         },
 
         resetModeDropDownMenu: function() {
@@ -87,21 +148,7 @@ define(function(require) {
         },
 
         onResetCollection: function() {
-            this.setCount(0);
-        },
-
-        setCount: function(count) {
-            count = parseInt(count);
-            this.countNewEmail = count;
-            if (count > 10) {
-                count = '10+';
-            }
-
-            if (count === 0) {
-                count = '';
-            }
-            this.$el.find('.icon-envelope span').html(count);
-            this.updateViewMode();
+            this.collection.unreadEmailsCount = 0;
         },
 
         onClickIconEnvelope: function() {
@@ -110,13 +157,6 @@ define(function(require) {
                 this.setModeDropDownMenu('content');
             }
             this.updateViewMode();
-        },
-
-        showNotification: function() {
-            if (!this.isOpen()) {
-                this.open();
-                this.setModeDropDownMenu('notification');
-            }
         },
 
         isOpen: function() {
@@ -129,6 +169,35 @@ define(function(require) {
 
         open: function() {
             this.$el.addClass('open');
+        },
+
+        onCollectionRequest: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+                this.loadingMask.dispose();
+            }
+            this.loadingMask = new LoadingMask({
+                container: this.$('.content')
+            });
+            this.loadingMask.show();
+        },
+
+        onCollectionSync: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+                this.loadingMask.dispose();
+                this.loadingMask = null;
+            }
+            this.render();
+        },
+
+        dispose: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+                this.loadingMask.dispose();
+                this.loadingMask = null;
+            }
+            EmailNotificationCollectionView.__super__.dispose.call(this);
         }
     });
 

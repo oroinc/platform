@@ -11,6 +11,7 @@ define(function(require) {
     var GridHeader = require('./header');
     var GridBody = require('./body');
     var GridFooter = require('./footer');
+    var GridColumns = require('./columns');
     var Toolbar = require('./toolbar');
     var ActionColumn = require('./column/action-column');
     var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
@@ -42,7 +43,7 @@ define(function(require) {
         requestsCount: 0,
 
         /** @property {String} */
-        className: 'clearfix',
+        className: 'oro-datagrid',
 
         /** @property */
         template: _.template(
@@ -98,13 +99,24 @@ define(function(require) {
         defaults: {
             rowClickActionClass:    'row-click-action',
             rowClassName:           '',
-            toolbarOptions:         {addResetAction: true, addRefreshAction: true},
+            toolbarOptions:         {
+                addResetAction: true,
+                addRefreshAction: true,
+                addColumnManager: true,
+                columnManager: {}
+            },
             rowClickAction:         undefined,
             multipleSorting:        true,
             rowActions:             [],
             massActions:            [],
             enableFullScreenLayout: false
         },
+
+        /**
+         * Column indexing starts from this valus in case when 'order' is not specified in column config.
+         * This start index required to display new columns at end of already sorted columns set
+         */
+        DEFAULT_COLUMN_START_INDEX: 1000,
 
         /**
          * Initialize grid
@@ -132,6 +144,9 @@ define(function(require) {
             }
 
             this.trigger('beforeParseOptions', options);
+            if (this.className) {
+                this.$el.addClass(_.result(this, 'className'));
+            }
 
             // Check required options
             if (!opts.collection) {
@@ -163,37 +178,23 @@ define(function(require) {
                 opts.rowClassName = this.rowClickActionClass + ' ' + this.rowClassName;
             }
 
-            this.prepareColumnsOption(opts);
+            this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
             // use columns collection as event bus since there is no alternatives
-            options.columns = new Backgrid.Columns(options.columns);
-            this.listenTo(options.columns, 'afterMakeCell', function(row, cell) {
+            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
                 this.trigger('afterMakeCell', row, cell);
             });
 
+            this.trigger('beforeBackgridInitialize');
             Grid.__super__.initialize.apply(this, arguments);
+            this.trigger('afterBackgridInitialize');
 
             // Listen and proxy events
             this._listenToCollectionEvents();
-            this._listenToBodyEvents();
+            this._listenToContentEvents();
             this._listenToCommands();
-        },
-
-        prepareColumnsOption: function(opts) {
-            for (var i = 0; i < opts.columns.length; i++) {
-                var column = opts.columns[i];
-                column.metadata = _.findWhere(opts.metadata.columns, {name: column.name});
-            }
-
-            if (Object.keys(this.rowActions).length > 0) {
-                opts.columns.push(this._createActionsColumn());
-            }
-
-            if (opts.multiSelectRowEnabled) {
-                opts.columns.unshift(this._createSelectRowColumn());
-            }
         },
 
         /**
@@ -226,6 +227,34 @@ define(function(require) {
         },
 
         /**
+         * Initializes columns collection required to draw grid
+         *
+         * @param {Object} options
+         * @private
+         */
+        _initColumns: function(options) {
+
+            if (Object.keys(this.rowActions).length > 0) {
+                options.columns.push(this._createActionsColumn());
+            }
+
+            if (options.multiSelectRowEnabled) {
+                options.columns.unshift(this._createSelectRowColumn());
+            }
+
+            for (var i = 0; i < options.columns.length; i++) {
+                var column = options.columns[i];
+                if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
+                    column.order = i + this.DEFAULT_COLUMN_START_INDEX;
+                }
+                column.metadata = _.findWhere(options.metadata.columns, {name: column.name});
+            }
+
+            this.columns = options.columns = new GridColumns(options.columns);
+            this.columns.sort();
+        },
+
+        /**
          * Init this.rowActions and this.rowClickAction
          *
          * @private
@@ -249,7 +278,9 @@ define(function(require) {
             column = new this.actionsColumn({
                 datagrid: this,
                 actions:  this.rowActions,
-                massActions: this.massActions
+                massActions: this.massActions,
+                manageable: false,
+                order: Infinity
             });
             return column;
         },
@@ -268,8 +299,10 @@ define(function(require) {
                 renderable: true,
                 sortable:   false,
                 editable:   false,
+                manageable: false,
                 cell:       SelectRowCell,
-                headerCell: SelectAllHeaderCell
+                headerCell: SelectAllHeaderCell,
+                order: -Infinity
             });
             return column;
         },
@@ -306,7 +339,9 @@ define(function(require) {
             };
             _.defaults(toolbarOptions, options);
 
+            this.trigger('beforeToolbarInit', toolbarOptions);
             toolbar = new this.toolbar(toolbarOptions);
+            this.trigger('afterToolbarInit', toolbar);
             return toolbar;
         },
 
@@ -353,7 +388,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.refresh'),
                         className: 'btn',
-                        iconClassName: 'icon-refresh'
+                        iconClassName: 'icon-repeat'
                     }
                 });
 
@@ -383,7 +418,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro_datagrid.action.reset'),
                         className: 'btn',
-                        iconClassName: 'icon-repeat'
+                        iconClassName: 'icon-refresh'
                     }
                 });
 
@@ -468,10 +503,16 @@ define(function(require) {
          *
          * @private
          */
-        _listenToBodyEvents: function() {
+        _listenToContentEvents: function() {
             this.listenTo(this.body, 'rowClicked', function(row) {
                 this.trigger('rowClicked', this, row);
                 this._runRowClickAction(row);
+            });
+            this.listenTo(this.columns, 'change:renderable', function() {
+                this.trigger('content:update');
+            });
+            this.listenTo(this.header.row, 'content:update', function() {
+                this.trigger('content:update');
             });
         },
 
@@ -752,6 +793,22 @@ define(function(require) {
                 }
             }
             return null;
+        },
+
+        /**
+         * Finds cell by model and column indexes
+         *
+         * @param {number} modelI
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findCellByIndex: function(modelI, columnI) {
+            try {
+                return this.body.rows[modelI].cells[columnI];
+            } catch (e) {
+                return null;
+            }
+
         }
     });
 

@@ -341,7 +341,8 @@ class EmailApiHandler extends ApiFormHandler
             $emailUser->setEmail($email);
             $emailUser->setOwner($apiOrigin->getOwner());
             $emailUser->setOrganization($apiOrigin->getOrganization());
-            $emailUser->setFolder($folder);
+            $emailUser->addFolder($folder);
+            $emailUser->setOrigin($origin);
 
             $emailUserList[] = $emailUser;
         }

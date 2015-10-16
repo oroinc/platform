@@ -23,6 +23,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/date-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *               datePickerOptions:
      *                 altFormat: 'yy-mm-dd'
      *                 changeMonth: true
@@ -39,6 +40,7 @@ define(function(require) {
      * Column option name                                  | Description
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
      * inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
@@ -95,13 +97,19 @@ define(function(require) {
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
+            // fix arrows behaviour
+            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
         },
 
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 // there is no other way to get if datepicker is visible
                 if ($('#ui-datepicker-div').is(':visible')) {
-                    this.$('.hasDatepicker').datepicker('hide');
+                    if (!this.isChanged()) {
+                        DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
+                    } else {
+                        this.$('.hasDatepicker').datepicker('hide');
+                    }
                 } else {
                     DateEditorView.__super__.onGenericEnterKeydown.apply(this, arguments);
                 }

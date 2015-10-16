@@ -1,0 +1,85 @@
+.sidebar-widget-recent-emails {
+  .sidebar-widget .sidebar-widget-header-icon {
+    &.loading {
+      .icon-with-counter {
+        .item-counter {
+          display: inline-block;
+          opacity: 0;
+        }
+      }
+    }
+    .item-counter {
+      top: -2px;
+    }
+    .icon-refresh {
+      left: 13px;
+      top: 3px;
+      font-size: 7px;
+      padding: 2px 3px;
+      background: #c4c4c4;
+    }
+  }
+  .sidebar-widget-content {
+    background-color: #e0e0e0;
+    .header {
+      padding: 0 8px;
+      .my-emails {
+        margin-top: 8px;
+      }
+      .mark-as-read, .mark-visible-as-read {
+        i:before {
+          color: #fff;
+        }
+      }
+    }
+    .items {
+      margin: 8px;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .more-unread {
+      display: block;
+      text-align: center;
+      font-size: 11px;
+      line-height: 11px;
+      padding-bottom: 8px;
+      color: #666;
+    }
+  }
+  .icon-envelope.highlight, i.icon-envelope.highlight:before{
+    color: #fabb18;
+    .item-counter, .icon-refresh {
+      background: #eeeeee;
+      font-size: 8px;
+    }
+  }
+  &.sidebar-widget-popup {
+    .sidebar-widget {
+      width: 360px;
+      padding-bottom: 0;
+      .content {
+        overflow: hidden;
+      }
+    }
+    .short-emails-list .items li .footer .reply-all-action,
+    .short-emails-list .items li .footer .reply-action,
+    .short-emails-list .items li .footer .forward-action {
+      display: inline;
+    }
+  }
+  &.sidebar-widget-embedded {
+    .sidebar-widget-content {
+      .short-emails-list {
+        .items {
+          li {
+            padding: 9px 10px 5px;
+            .icon-envelope {
+              right: 7px;
+              top: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
