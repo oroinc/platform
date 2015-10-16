@@ -77,6 +77,13 @@ define(function(require) {
         },
 
         onAfterMakeCell: function(row, cell) {
+            function enterEditModeIfNeeded(e) {
+                if (_this.isEditable(cell)) {
+                    _this.enterEditMode(cell);
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            }
             var originalRender = cell.render;
             var _this = this;
             cell.render = function() {
@@ -95,19 +102,12 @@ define(function(require) {
                 }
                 return this;
             };
-            function enterEditModeIfNeeded(e) {
-                if (_this.isEditable(cell)) {
-                    _this.enterEditMode(cell);
-                }
-                e.preventDefault();
-                e.stopPropagation();
-            }
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
                 'click .icon-edit': enterEditModeIfNeeded
             });
-
             delete cell.events.click;
+            cell.delegateEvents();
         },
 
         isEditable: function(cell) {
@@ -120,8 +120,9 @@ define(function(require) {
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
                         return false;
                     }
-                    return (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
-                        this.options.metadata.inline_editing.default_editors;
+                    return (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
+                        (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                            this.options.metadata.inline_editing.default_editors;
                 case 'enable_selected':
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
                         return true;
@@ -369,10 +370,12 @@ define(function(require) {
          * @param {$.Event} e
          */
         onKeyDown: function(e) {
-            this.onGenericTabKeydown(e);
-            this.onGenericEnterKeydown(e);
-            this.onGenericEscapeKeydown(e);
-            this.onGenericArrowKeydown(e);
+            if (this.editModeEnabled) {
+                this.onGenericTabKeydown(e);
+                this.onGenericEnterKeydown(e);
+                this.onGenericEscapeKeydown(e);
+                this.onGenericArrowKeydown(e);
+            }
         },
 
         /**
@@ -384,10 +387,14 @@ define(function(require) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
                     if (this.saveCurrentCell(false)) {
-                        if (e.shiftKey) {
-                            this.editPrevRowCell();
+                        if (e.ctrlKey) {
+                            this.exitEditMode(true);
                         } else {
-                            this.editNextRowCell();
+                            if (e.shiftKey) {
+                                this.editPrevRowCell();
+                            } else {
+                                this.editNextRowCell();
+                            }
                         }
                     }
                 }
