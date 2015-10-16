@@ -15,7 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class DynamicFieldsExtension extends \Twig_Extension
@@ -25,13 +25,13 @@ class DynamicFieldsExtension extends \Twig_Extension
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $extendProvider;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $entityProvider;
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $viewProvider;
 
     /** @var PropertyAccessor */

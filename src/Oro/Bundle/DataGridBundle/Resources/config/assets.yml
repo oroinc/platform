@@ -2,4 +2,4 @@ css:
   'orodatagrid':
       - 'bundles/orodatagrid/lib/backgrid/backgrid.css'
       - 'bundles/orodatagrid/lib/backgrid/extensions/paginator/backgrid-paginator.css'
-      - 'bundles/orodatagrid/css/oro.grid.less'
+      - 'bundles/orodatagrid/css/less/main.less'

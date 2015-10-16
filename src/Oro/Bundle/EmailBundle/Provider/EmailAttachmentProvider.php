@@ -67,7 +67,7 @@ class EmailAttachmentProvider
 
         /** @var Email $threadEmail */
         foreach ($threadEmails as $threadEmail) {
-            if ($threadEmail->getEmailBody()->getHasAttachments()) {
+            if ($threadEmail->getEmailBody() && $threadEmail->getEmailBody()->getHasAttachments()) {
                 $emailAttachments = $threadEmail->getEmailBody()->getAttachments();
 
                 foreach ($emailAttachments as $emailAttachment) {

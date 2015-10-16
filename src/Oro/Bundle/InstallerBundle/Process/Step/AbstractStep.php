@@ -31,6 +31,15 @@ abstract class AbstractStep extends ControllerStep
     {
         $exitCode = $this->runCommand($command, $params);
 
+        return $this->getAjaxActionResponse($exitCode);
+    }
+
+    /**
+     * @param int $exitCode
+     * @return mixed
+     */
+    protected function getAjaxActionResponse($exitCode)
+    {
         return $this->getRequest()->isXmlHttpRequest()
             ? new JsonResponse(array('result' => true, 'exitCode' => $exitCode))
             : $this->redirect(

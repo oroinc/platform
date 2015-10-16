@@ -5,6 +5,9 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class QueryBuilderTools extends AbstractQueryBuilderTools
 {
     /**
@@ -59,7 +62,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function fixUnusedParameters(QueryBuilder $qb)
     {
-        $dql = $qb->getDQL();
+        $dql            = $qb->getDQL();
         $usedParameters = [];
         /** @var $parameter \Doctrine\ORM\Query\Parameter */
         foreach ($qb->getParameters() as $parameter) {
@@ -75,29 +78,33 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      *
      * @param string $dql
      * @param string $parameterName
+     *
      * @return bool
      */
     public function dqlContainsParameter($dql, $parameterName)
     {
-        if (is_numeric($parameterName)) {
-            $pattern = sprintf('/\?%s[^\w]/', preg_quote($parameterName));
-        } else {
-            $pattern = sprintf('/\:%s[^\w]/', preg_quote($parameterName));
-        }
+        $pattern = is_numeric($parameterName)
+            ? sprintf('/\?%s[^\w]/', preg_quote($parameterName))
+            : sprintf('/\:%s[^\w]/', preg_quote($parameterName));
+
         return (bool)preg_match($pattern, $dql . ' ');
     }
 
     /**
      * Get list of table aliases required for correct join of tables mentioned in required aliases.
      *
-     * @param array $joins
-     * @param array $aliases
+     * @param array  $joins
+     * @param array  $aliases
      * @param string $rootAlias
      *
      * @return array
      */
     public function getUsedJoinAliases($joins, $aliases, $rootAlias)
     {
+        if (!isset($joins[$rootAlias])) {
+            return [];
+        }
+
         $joinDependencies = $this->getJoinDependencies($joins[$rootAlias]);
         $needProcessing   = !empty($joinDependencies);
         while ($needProcessing) {
@@ -137,16 +144,16 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
                 $aliases = array_merge($aliases, $this->getUsedTableAliases($wherePart, $replace));
             }
         } else {
-            $where = (string) $where;
+            $where = (string)$where;
 
             if ($replace) {
-                $where  = $this->replaceAliasesWithJoinPaths($where);
-                $where  = $this->replaceAliasesWithFields($where);
+                $where = $this->replaceAliasesWithJoinPaths($where);
+                $where = $this->replaceAliasesWithFields($where);
             }
             $fields = $this->getFields($where);
             foreach ($fields as $field) {
                 if (strpos($field, '.') !== false) {
-                    $data = explode('.', $field, 2);
+                    $data      = explode('.', $field, 2);
                     $aliases[] = $data[0];
                 }
             }
@@ -160,11 +167,12 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      * Replaces field aliases with real fields.
      *
      * @param string $condition
+     *
      * @return string
      */
     public function replaceAliasesWithFields($condition)
     {
-        $condition = (string) $condition;
+        $condition = (string)$condition;
         foreach ($this->fieldAliases as $alias => $field) {
             $pattern = $this->getRegExpQueryForAlias($alias);
             $preparedCondition = preg_replace($pattern, $field, $condition);
@@ -191,7 +199,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function replaceAliasesWithJoinPaths($condition)
     {
-        $condition = (string) $condition;
+        $condition = (string)$condition;
         foreach ($this->joinTablePaths as $alias => $field) {
             if (strpos($field, '.') !== false) {
                 $condition = preg_replace($this->getRegExpQueryForAlias($alias), $field, $condition);
@@ -205,6 +213,7 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      * Get list of aliases used in condition.
      *
      * @param string|object|array $condition
+     *
      * @return array
      */
     public function getUsedAliases($condition)
@@ -231,14 +240,15 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      * Get regular expression for alias checking.
      *
      * @param string $alias
+     *
      * @return string
      */
     protected function getRegExpQueryForAlias($alias)
     {
         // Do not match string if it is part of another string or parameter (starts with :)
         $searchRegExpParts = [
-            '(?<![\w:.])(' . $alias .')(?=[^\.\w]+)',
-            '(?<![\w:.])(' . $alias .')$'
+            '(?<![\w:.])(' . $alias . ')(?=[^\.\w]+)',
+            '(?<![\w:.])(' . $alias . ')$'
         ];
 
         return '/' . implode('|', $searchRegExpParts) . '/';
@@ -248,12 +258,13 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      * Get field mentioned in condition.
      *
      * @param string $condition
+     *
      * @return array
      */
     public function getFields($condition)
     {
-        $condition = (string) $condition;
-        $fields = [];
+        $condition = (string)$condition;
+        $fields    = [];
 
         preg_match_all('/(\w+\.\w+)/', $condition, $matches);
         if (count($matches) > 1) {
@@ -265,7 +276,8 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
 
     /**
      * @param string $condition
-     * @param array $knownAliases
+     * @param array  $knownAliases
+     *
      * @return array
      */
     public function getTablesUsedInJoinCondition($condition, array $knownAliases)
@@ -314,5 +326,39 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         }
 
         return $joinDependencies;
+    }
+
+    /**
+     * Retrieve alias dependencies including from statement aliases
+     *
+     * @param string      $rootAlias
+     * @param Expr\Join[] $joins
+     *
+     * @return array [joinAlias => [joinType, [dependedByAlias1, dependedByAlias2, ...]]]
+     */
+    public function getAllDependencies($rootAlias, $joins)
+    {
+        $joinDependencies = $this->getJoinDependencies($joins);
+        $fromDependencies = [];
+
+        foreach ($joins as $join) {
+            $joinAlias     = $join->getAlias();
+            $joinType      = $join->getJoinType();
+            $joinCondition = $join->getCondition();
+
+            $dependencies = [];
+            if ($joinCondition && strpos($joinCondition, $rootAlias . ' ') !== false) {
+                $dependencies = [$rootAlias];
+            }
+
+            if (array_key_exists($joinAlias, $joinDependencies)) {
+                $dependencies =
+                    array_merge($dependencies, $joinDependencies[$joinAlias][1]);
+            }
+
+            $fromDependencies[$joinAlias] = [$joinType, array_unique($dependencies)];
+        }
+
+        return $fromDependencies;
     }
 }

@@ -299,4 +299,10 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $this->assertNotInstanceOf('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin', $form->getData());
         $this->assertNull($form->getData());
     }
+
+    public function testGetName()
+    {
+        $type = new ConfigurationType($this->encryptor, $this->securityFacade, $this->translator);
+        $this->assertEquals(ConfigurationType::NAME, $type->getName());
+    }
 }

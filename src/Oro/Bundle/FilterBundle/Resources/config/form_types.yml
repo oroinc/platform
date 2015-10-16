@@ -16,6 +16,7 @@ parameters:
     oro_filter.form.type.filter.selectrow.class: Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType
     oro_filter.form.type.filter.many_to_many.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType
     oro_filter.form.type.filter.dictionary.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType
+    oro_filter.form.type.filter.choice_tree.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType
 
 services:
     oro_filter.form.event_subscriber.date:
@@ -113,3 +114,8 @@ services:
         tags:
             - { name: form.type, alias: oro_type_dictionary_filter }
 
+    oro_filter.form.type.filter.choice_tree:
+        class: %oro_filter.form.type.filter.choice_tree.class%
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_choice_tree_filter }

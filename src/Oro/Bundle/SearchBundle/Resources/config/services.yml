@@ -151,7 +151,8 @@ services:
             - @oro_search.fulltext_index_manager
             - @doctrine
         tags:
-            - { name: kernel.event_listener, event: console.terminate }
+            - { name: kernel.event_listener, event: console.terminate, name: onConsoleTerminate }
+            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
 
     oro_search.event_listener.demo_data_listener:
         class: %oro_search.event_listener.demo_data_listener.class%
@@ -161,6 +162,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
+            - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
 
     oro_search.event_listener.orm.fulltext_index_listener:
         class: %oro_search.event_listener.orm.fulltext_index_listener.class%
