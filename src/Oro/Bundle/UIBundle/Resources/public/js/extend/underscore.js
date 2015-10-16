@@ -14,6 +14,13 @@ define(['underscore'], function(_) {
             var lastSpace = str.lastIndexOf(' ');
             str = useWordBoundary && toLong && lastSpace > 0 ? str.substr(0, lastSpace) : str;
             return toLong ? str + hellip : str;
+        },
+
+        isMobile: function() {
+            var elem = document.getElementsByTagName('body')[0];
+            return elem && (' ' + elem.className + ' ')
+                .replace(/[\t\r\n\f]/g, ' ')
+                .indexOf(' mobile-version ') !== -1;
         }
     });
 

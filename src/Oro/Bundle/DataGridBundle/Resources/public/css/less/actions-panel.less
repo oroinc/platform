@@ -1,0 +1,30 @@
+.grid-toolbar {
+  .action.btn {
+    height: 27px;
+    margin-right: 5px;
+    padding: 0 5px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+.grid-toolbar .actions-panel.pull-right {
+  /* hide text label for actions in right panel */
+  .action {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    [class^="icon-"], [class*=" icon-"] {
+      font: @baseFontSize/26px 'FontAwesome';
+      color: @btnTextColor;
+      &.hide-text {
+        .hide-text();
+      }
+      &:before {
+        line-height: 26px;
+        margin: 0;
+      }
+    }
+  }
+}

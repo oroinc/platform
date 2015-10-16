@@ -1,13 +1,10 @@
 define(function(require) {
     'use strict';
     var $ = require('jquery');
-    var _ = require('underscore');
+    var backdropManager = require('./backdrop-manager');
     var overlayTool = {
-        hasBackdrop: false,
 
         createOverlay: function($overlayContent, options) {
-            this.hasBackdrop = true;
-            $('body').addClass('backdrop');
             $(document.body).append($overlayContent);
             $overlayContent.css({
                 zIndex: 10000
@@ -21,6 +18,9 @@ define(function(require) {
                 overlayTool.updatePosition($overlayContent, options);
             }, 400);
             $overlayContent.data('interval', interval);
+            if (options.backdrop) {
+                $overlayContent.data('backdrop', backdropManager.hold());
+            }
             return {
                 remove: function() {
                     clearInterval(interval);
@@ -48,16 +48,11 @@ define(function(require) {
             if ($overlayContent.data('interval')) {
                 clearInterval($overlayContent.data('interval'));
             }
-            $overlayContent.remove();
-            this.hasBackdrop = false;
-            this.removeBackdrop();
-        },
-
-        removeBackdrop: _.debounce(function() {
-            if (!this.hasBackdrop) {
-                $('body').removeClass('backdrop');
+            if ($overlayContent.data('backdrop')) {
+                backdropManager.release($overlayContent.data('backdrop'));
             }
-        }, 50)
+            $overlayContent.remove();
+        }
     };
     return overlayTool;
 });

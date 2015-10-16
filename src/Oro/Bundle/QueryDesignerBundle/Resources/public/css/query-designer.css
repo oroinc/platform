@@ -110,6 +110,8 @@
     cursor: default;
 }
 .query-designer-grid-container i.icon-list {
-    cursor: pointer;
+    cursor: move;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
     font-size: 14px;
 }

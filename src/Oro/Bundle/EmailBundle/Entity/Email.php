@@ -737,6 +737,8 @@ class Email extends ExtendEmail
     }
 
     /**
+     * todo: remove this method
+     *
      * @param EmailFolder $emailFolder
      *
      * @return EmailUser|null
@@ -745,7 +747,12 @@ class Email extends ExtendEmail
     {
         $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
             /** @var EmailUser $entry */
-            return $entry->getFolder() === $emailFolder;
+            if ($entry->getFolders()) {
+                foreach ($entry->getFolders() as $folder) {
+                    return $folder === $emailFolder;
+                }
+            }
+            return false;
         });
         if ($emailUsers != null && count($emailUsers) > 0) {
             return $emailUsers->first();

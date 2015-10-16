@@ -32,6 +32,7 @@ define(function(require) {
      *             view: orodatagrid/js/app/views/editor/related-id-select-editor-view
      *             view_options:
      *               placeholder: '<placeholder>'
+     *               css_class_name: '<class-name>'
      *               value_field_name: {column-name-value}
      *           validationRules:
      *             # jQuery.validate configuration
@@ -54,6 +55,8 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * inline_editing.editor.view_options.value_field_name | Related value field name.
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
+     * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
+     * inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
      * inline_editing.editor.validationRules               | Optional. The client side validation rules
      * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
      * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
@@ -63,6 +66,7 @@ define(function(require) {
      * @class
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
+     * @param {Object} options.input_delay - Delay before user finished input and request sent to server
      * @param {Backgrid.Cell} options.cell - Current datagrid cell
      * @param {Backgrid.Column} options.column - Current datagrid column
      * @param {string} options.placeholder - Placeholder for an empty element
@@ -114,40 +118,53 @@ define(function(require) {
             };
         },
 
+        addInitialResultItemIfRequired: function(choices) {
+            var id = this.getModelValue();
+            var found = false;
+            for (var i = 0; i < choices.length; i++) {
+                var choice = choices[i];
+                if (choice.id === id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                choices.unshift(this.getInitialResultItem());
+            }
+            return choices;
+        },
+
         getSelect2Options: function() {
             var _this = this;
             var currentRequest = null;
             var currentTerm = null;
 
             var makeRequest = function(options) {
-                var column;
-                if (options.term === '' && options.page === 1 && _.isArray(_this.column.emptyQueryChoices)) {
-                    options.callback({
-                        results: _this.column.emptyQueryChoices,
-                        more: _this.column.emptyQueryMoreChoices
-                    });
+                if (_this.disposed) {
                     return;
                 }
-                currentRequest = _this.autocompleteApiAccessor.send(_.extend(_this.model.toJSON(), {
-                    term: options.term,
-                    page: options.page,
-                    per_page: _this.perPage
-                }));
-                currentRequest.term = options.term;
-                if (options.term === '') {
-                    column = _this.column;
+                if (options.term === '' && options.page === 1 && _this.column.emptyQueryRequest) {
+                    currentRequest = _this.column.emptyQueryRequest;
+                } else {
+                    currentRequest = _this.autocompleteApiAccessor.send(_.extend(_this.model.toJSON(), {
+                        term: options.term,
+                        page: options.page,
+                        per_page: _this.perPage
+                    }));
+                    currentRequest.term = options.term;
+                    if (options.term === '') {
+                        _this.column.emptyQueryRequest = currentRequest;
+                    }
                 }
                 currentRequest.done(function(response) {
-                    // save empty query results even if view is disposed
-                    if (options.term === '') {
-                        column.emptyQueryChoices = response.results;
-                        column.emptyQueryMoreChoices = response.more;
-                    }
                     if (_this.disposed) {
                         return;
                     }
-                    _this.availableChoices = response.results;
+                    _this.availableChoices = _.clone(response.results);
                     if (currentTerm === options.term) {
+                        if (options.term === '') {
+                            _this.availableChoices = _this.addInitialResultItemIfRequired(_this.availableChoices);
+                        }
                         options.callback({
                             results: _this.availableChoices,
                             more: response.more

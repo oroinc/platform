@@ -1,6 +1,6 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set folder = record.getValue('folder') %}
+{% set folders = record.getValue('folders') %}
 {% set thread = record.getValue('email.thread') %}
 {% set isNew = record.getValue('is_new') %}
 
@@ -11,8 +11,8 @@
 {% endif %}
 
 <span class="nowrap">
-{% if folder is not null %}
-    {% if folder.type == 'sent' or folder.type == 'drafts' %}
+{% if folders is not null %}
+    {% if folders[0].type == 'sent' or folders[0].type == 'drafts' %}
         <span class="icon grid">
             <i class="icon-signout"></i>
         </span>

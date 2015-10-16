@@ -1,4 +1,4 @@
-require([
+define([
     'oroui/js/app/controllers/base/controller'
 ], function(BaseController) {
     'use strict';
