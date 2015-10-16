@@ -84,32 +84,30 @@ define(function(require) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            if (this.isEditable(cell)) {
-                var originalRender = cell.render;
-                var _this = this;
-                cell.render = function() {
-                    originalRender.apply(this, arguments);
-                    if (_this.isEditable(cell)) {
-                        this.$el.addClass('editable view-mode');
-                        this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                        this.$el.popover({
-                            content: __('oro.datagrid.inlineEditing.helpMessage'),
-                            container: document.body,
-                            placement: 'bottom',
-                            delay: {show: 1400, hide: 0},
-                            trigger: 'hover',
-                            animation: false
-                        });
-                    }
-                    return this;
-                };
-                cell.events = _.extend({}, cell.events, {
-                    'dblclick': enterEditModeIfNeeded,
-                    'click .icon-edit': enterEditModeIfNeeded
-                });
-                cell.delegateEvents();
-                delete cell.events.click;
-            }
+            var originalRender = cell.render;
+            var _this = this;
+            cell.render = function() {
+                originalRender.apply(this, arguments);
+                if (_this.isEditable(cell)) {
+                    this.$el.addClass('editable view-mode');
+                    this.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    this.$el.popover({
+                        content: __('oro.datagrid.inlineEditing.helpMessage'),
+                        container: document.body,
+                        placement: 'bottom',
+                        delay: {show: 1400, hide: 0},
+                        trigger: 'hover',
+                        animation: false
+                    });
+                }
+                return this;
+            };
+            cell.events = _.extend({}, cell.events, {
+                'dblclick': enterEditModeIfNeeded,
+                'click .icon-edit': enterEditModeIfNeeded
+            });
+            delete cell.events.click;
+            cell.delegateEvents();
         },
 
         isEditable: function(cell) {
