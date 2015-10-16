@@ -34,8 +34,8 @@ definitions:
             - @tree:
                 conditions:
                     @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
+                        - @not_empty: [$origin]
+                        - @equal: [$origin.active, true]
                         - @equal: [$seen, false]
                 actions:
                     - @format_string:
@@ -53,8 +53,8 @@ definitions:
             - @tree:
                 conditions:
                     @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
+                        - @not_empty: [$origin]
+                        - @equal: [$origin.active, true]
                         - @equal: [$seen, true]
                 actions:
                     - @format_string:

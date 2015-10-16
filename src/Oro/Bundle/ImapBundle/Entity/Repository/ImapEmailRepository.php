@@ -88,8 +88,8 @@ class ImapEmailRepository extends EntityRepository
             ->innerJoin('imap_email.imapFolder', 'imap_folder')
             ->innerJoin('imap_email.email', 'email')
             ->innerJoin('email.emailUsers', 'email_users')
-            ->innerJoin('email_users.folder', 'folder')
-            ->where('folder.origin = :origin AND email.messageId IN (:messageIds)')
+            ->innerJoin('email_users.folders', 'folders')
+            ->where('folders.origin = :origin AND email.messageId IN (:messageIds)')
             ->setParameter('origin', $origin)
             ->setParameter('messageIds', $messageIds);
     }
@@ -103,7 +103,7 @@ class ImapEmailRepository extends EntityRepository
     public function getEmailsByMessageIds(EmailOrigin $origin, array $messageIds)
     {
         $rows = $this->getEmailsByMessageIdsQueryBuilder($origin, $messageIds)
-            ->select('imap_email, email, email_users, imap_folder, folder')
+            ->select('imap_email, email, email_users, imap_folder, folders')
             ->getQuery()
             ->getResult();
 
@@ -142,7 +142,8 @@ class ImapEmailRepository extends EntityRepository
         $emailUserIds = $qb->select('email_user.id')
             ->leftJoin('ie.email', 'email')
             ->leftJoin('email.emailUsers', 'email_user')
-            ->andWhere('email_user.folder = :folder')
+            ->leftJoin('email_user.folders', 'folders')
+            ->andWhere($qb->expr()->in('folders', ':folder'))
             ->andWhere($qb->expr()->in('ie.uid', ':uids'))
             ->setParameter('uids', $uids)
             ->setParameter('folder', $folder)

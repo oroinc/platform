@@ -29,7 +29,7 @@ class EmailBody
     protected $id;
 
     /**
-     * @var \DateTime $created
+     * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
