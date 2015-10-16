@@ -77,24 +77,6 @@ define(function(require) {
         },
 
         onAfterMakeCell: function(row, cell) {
-            var originalRender = cell.render;
-            var _this = this;
-            cell.render = function() {
-                originalRender.apply(this, arguments);
-                if (_this.isEditable(cell)) {
-                    this.$el.addClass('editable view-mode');
-                    this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    this.$el.popover({
-                        content: __('oro.datagrid.inlineEditing.helpMessage'),
-                        container: document.body,
-                        placement: 'bottom',
-                        delay: {show: 1400, hide: 0},
-                        trigger: 'hover',
-                        animation: false
-                    });
-                }
-                return this;
-            };
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
                     _this.enterEditMode(cell);
@@ -102,12 +84,32 @@ define(function(require) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            cell.events = _.extend({}, cell.events, {
-                'dblclick': enterEditModeIfNeeded,
-                'click .icon-edit': enterEditModeIfNeeded
-            });
-
-            delete cell.events.click;
+            if (this.isEditable(cell)) {
+                var originalRender = cell.render;
+                var _this = this;
+                cell.render = function() {
+                    originalRender.apply(this, arguments);
+                    if (_this.isEditable(cell)) {
+                        this.$el.addClass('editable view-mode');
+                        this.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                        this.$el.popover({
+                            content: __('oro.datagrid.inlineEditing.helpMessage'),
+                            container: document.body,
+                            placement: 'bottom',
+                            delay: {show: 1400, hide: 0},
+                            trigger: 'hover',
+                            animation: false
+                        });
+                    }
+                    return this;
+                };
+                cell.events = _.extend({}, cell.events, {
+                    'dblclick': enterEditModeIfNeeded,
+                    'click .icon-edit': enterEditModeIfNeeded
+                });
+                cell.delegateEvents();
+                delete cell.events.click;
+            }
         },
 
         isEditable: function(cell) {
@@ -120,8 +122,9 @@ define(function(require) {
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
                         return false;
                     }
-                    return (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
-                        this.options.metadata.inline_editing.default_editors;
+                    return (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
+                        (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                            this.options.metadata.inline_editing.default_editors;
                 case 'enable_selected':
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
                         return true;
@@ -369,10 +372,12 @@ define(function(require) {
          * @param {$.Event} e
          */
         onKeyDown: function(e) {
-            this.onGenericTabKeydown(e);
-            this.onGenericEnterKeydown(e);
-            this.onGenericEscapeKeydown(e);
-            this.onGenericArrowKeydown(e);
+            if (this.editModeEnabled) {
+                this.onGenericTabKeydown(e);
+                this.onGenericEnterKeydown(e);
+                this.onGenericEscapeKeydown(e);
+                this.onGenericArrowKeydown(e);
+            }
         },
 
         /**

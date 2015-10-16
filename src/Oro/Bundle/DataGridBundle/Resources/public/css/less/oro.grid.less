@@ -1,11 +1,18 @@
 @import "./inline-editing";
-.table th, .table td {
-  /* should center content in cell right */
-  line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
-  display: none;
+.table {
+  th, td {
+    /* should center content in cell right */
+    line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
+  }
 }
-th.renderable, td.renderable {
-  display: table-cell;
+
+.oro-datagrid {
+  th, td {
+    display: none;
+  }
+  th.renderable, td.renderable {
+    display: table-cell;
+  }
 }
 
 .grid-toolbar .pagination ul li input {
