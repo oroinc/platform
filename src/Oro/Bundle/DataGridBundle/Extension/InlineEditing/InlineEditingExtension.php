@@ -46,13 +46,13 @@ class InlineEditingExtension extends AbstractExtension
     {
         $configItems    = $config->offsetGetOr(Configuration::BASE_CONFIG_KEY, []);
         $configuration   = new Configuration(Configuration::BASE_CONFIG_KEY);
-        $isGranted = $this->securityFacade->isGranted('EDIT', 'entity:' . $configItems['entity_name']);
 
         $normalizedConfigItems = $this->validateConfiguration(
             $configuration,
             [Configuration::BASE_CONFIG_KEY => $configItems]
         );
 
+        $isGranted = $this->securityFacade->isGranted('EDIT', 'entity:' . $configItems['entity_name']);
         //according to ACL disable inline editing for the whole grid
         if (!$isGranted) {
             $normalizedConfigItems[Configuration::CONFIG_KEY_ENABLE] = false;
