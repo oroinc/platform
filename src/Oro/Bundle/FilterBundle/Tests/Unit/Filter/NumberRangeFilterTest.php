@@ -22,10 +22,10 @@ class NumberRangeFilterTest extends NumberFilterTest
     {
         parent::setUp();
 
-        /* @var $formFactory FormFactoryInterface */
+        /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
         $formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
 
-        /* @var $filterUtility FilterUtility */
+        /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
         $filterUtility = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
 
         $this->filter = new NumberRangeFilter($formFactory, $filterUtility);
@@ -51,7 +51,7 @@ class NumberRangeFilterTest extends NumberFilterTest
      * @param array $inputData
      * @param array $expectedData
      */
-    public function testAppyRange(array $inputData, array $expectedData)
+    public function testApplyRange(array $inputData, array $expectedData)
     {
         $ds = $this->prepareDatasource();
 

@@ -40,10 +40,10 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        /* @var $formFactory FormFactoryInterface */
+        /* @var $formFactory FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject */
         $formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
 
-        /* @var $filterUtility FilterUtility */
+        /* @var $filterUtility FilterUtility|\PHPUnit_Framework_MockObject_MockObject */
         $filterUtility = $this->getMock('Oro\Bundle\FilterBundle\Filter\FilterUtility');
 
         $this->filter = new NumberFilter($formFactory, $filterUtility);
@@ -58,7 +58,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
      * @param array $inputData
      * @param array $expectedData
      */
-    public function testAppy(array $inputData, array $expectedData)
+    public function testApply(array $inputData, array $expectedData)
     {
         $ds = $this->prepareDatasource();
 
@@ -211,7 +211,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareDatasource()
     {
-        /* @var $em EntityManagerInterface */
+        /* @var $em EntityManagerInterface|\PHPUnit_Framework_MockObject_MockObject */
         $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getExpressionBuilder')
@@ -244,7 +244,7 @@ class NumberFilterTest extends \PHPUnit_Framework_TestCase
             $where = str_replace(
                 array_keys($parameters),
                 array_values($parameters),
-                $parts['where']->__toString()
+                (string)$parts['where']
             );
         }
 

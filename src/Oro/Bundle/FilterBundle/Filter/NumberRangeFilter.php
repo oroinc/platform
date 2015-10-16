@@ -59,11 +59,7 @@ class NumberRangeFilter extends NumberFilter
             NumberRangeFilterType::TYPE_NOT_BETWEEN,
         ];
 
-        if (!in_array($data['type'], $types, true)) {
-            return false;
-        }
-
-        return true;
+        return in_array($data['type'], $types, true);
     }
 
     /**
