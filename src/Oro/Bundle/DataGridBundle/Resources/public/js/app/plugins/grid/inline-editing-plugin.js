@@ -89,6 +89,13 @@ define(function(require) {
         },
 
         onAfterMakeCell: function(row, cell) {
+            function enterEditModeIfNeeded(e) {
+                if (_this.isEditable(cell)) {
+                    _this.enterEditMode(cell);
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            }
             var _this = this;
             cell.render = _.wrap(cell.render, function(originalRender) {
                 originalRender.apply(this, _.rest(arguments));
@@ -98,19 +105,12 @@ define(function(require) {
                 }
                 return this;
             });
-            function enterEditModeIfNeeded(e) {
-                if (_this.isEditable(cell)) {
-                    _this.enterEditMode(cell);
-                }
-                e.preventDefault();
-                e.stopPropagation();
-            }
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
                 'click .icon-edit': enterEditModeIfNeeded
             });
-
             delete cell.events.click;
+            cell.delegateEvents();
         },
 
         onGridShown: function() {
@@ -155,8 +155,9 @@ define(function(require) {
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
                         return false;
                     }
-                    return (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
-                        this.options.metadata.inline_editing.default_editors;
+                    return (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
+                        (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                            this.options.metadata.inline_editing.default_editors;
                 case 'enable_selected':
                     if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
                         return true;
@@ -404,10 +405,12 @@ define(function(require) {
          * @param {$.Event} e
          */
         onKeyDown: function(e) {
-            this.onGenericTabKeydown(e);
-            this.onGenericEnterKeydown(e);
-            this.onGenericEscapeKeydown(e);
-            this.onGenericArrowKeydown(e);
+            if (this.editModeEnabled) {
+                this.onGenericTabKeydown(e);
+                this.onGenericEnterKeydown(e);
+                this.onGenericEscapeKeydown(e);
+                this.onGenericArrowKeydown(e);
+            }
         },
 
         /**
