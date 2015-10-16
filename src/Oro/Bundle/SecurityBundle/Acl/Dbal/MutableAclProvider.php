@@ -510,10 +510,10 @@ SELECTCLAUSE;
             );
         } else {
             $pos = strpos($securityIdentifier, '-');
+            $className = substr($securityIdentifier, 0, $pos);
 
-            if ($pos !== false) {
+            if ($pos !== false && class_exists($className)) {
                 $identifier = substr($securityIdentifier, 1 + $pos);
-                $className = substr($securityIdentifier, 0, $pos);
                 $sidReflection = new \ReflectionClass($className);
                 $interfaceNames = $sidReflection->getInterfaceNames();
                 if (in_array(
