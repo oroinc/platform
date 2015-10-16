@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
 
 class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
@@ -26,6 +27,48 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
         $this->createFullConfiguration();
 
         $this->assertParameter(1800, 'oro_user.reset.ttl');
+    }
+
+    public function testPrependNoMainFirewall()
+    {
+        $securityConfig = [
+            'firewalls' => [
+                'not_main' => ['not_main_config'],
+            ]
+        ];
+
+        $containerBuilder = $this->getContainerBuilder([$securityConfig]);
+        $containerBuilder->expects($this->never())
+            ->method('setExtensionConfig');
+
+        $extension = new OroUserExtension();
+        $extension->prepend($containerBuilder);
+    }
+
+    public function testPrependMainFirewall()
+    {
+        $inputSecurityConfig = [
+            'firewalls' => [
+                'main' => ['main_config'],
+                'first' => ['first_config'],
+                'second' => ['second_config'],
+            ]
+        ];
+        $expectedSecurityConfig = [
+            'firewalls' => [
+                'first' => ['first_config'],
+                'second' => ['second_config'],
+                'main' => ['main_config'],
+            ]
+        ];
+
+        $containerBuilder = $this->getContainerBuilder([$inputSecurityConfig]);
+        $containerBuilder->expects($this->once())
+            ->method('setExtensionConfig')
+            ->with('security', [$expectedSecurityConfig]);
+
+        $extension = new OroUserExtension();
+        $extension->prepend($containerBuilder);
     }
 
     protected function createEmptyConfiguration()
@@ -81,6 +124,23 @@ EOF;
     protected function assertParameter($value, $key)
     {
         $this->assertEquals($value, $this->configuration->getParameter($key), sprintf('%s parameter is correct', $key));
+    }
+
+    /**
+     * @param array $securityConfig
+     * @return \PHPUnit_Framework_MockObject_MockObject|ExtendedContainerBuilder
+     */
+    protected function getContainerBuilder(array $securityConfig)
+    {
+        $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $containerBuilder->expects($this->once())
+            ->method('getExtensionConfig')
+            ->with('security')
+            ->willReturn($securityConfig);
+
+        return $containerBuilder;
     }
 
     protected function tearDown()
