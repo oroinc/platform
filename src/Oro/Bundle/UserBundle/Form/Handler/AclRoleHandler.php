@@ -273,9 +273,23 @@ class AclRoleHandler
      */
     protected function processPrivileges(AbstractRole $role)
     {
-        $formPrivileges = array();
+        $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
+        $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
-            $privileges = $this->form->get($fieldName)->getData();
+            $privilegesArray = $decodedPrivileges[$fieldName];
+            $privileges = [];
+            foreach ($privilegesArray as $privilege) {
+                $aclPrivilege = new AclPrivilege();
+                foreach ($privilege['permissions'] as $name => $permission) {
+                    $aclPrivilege->addPermission(new AclPermission($permission['name'], $permission['accessLevel']));
+                }
+                $aclPrivilegeIdentity = new AclPrivilegeIdentity(
+                    $privilege['identity']['id'],
+                    $privilege['identity']['name']
+                );
+                $aclPrivilege->setIdentity($aclPrivilegeIdentity);
+                $privileges[] = $aclPrivilege;
+            }
             if ($config['fix_values']) {
                 $this->fxPrivilegeValue($privileges, $config['default_value']);
             }
