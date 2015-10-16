@@ -384,10 +384,14 @@ define(function(require) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 if (!this.lockUserActions) {
                     if (this.saveCurrentCell(false)) {
-                        if (e.shiftKey) {
-                            this.editPrevRowCell();
+                        if (e.ctrlKey) {
+                            this.exitEditMode(true);
                         } else {
-                            this.editNextRowCell();
+                            if (e.shiftKey) {
+                                this.editPrevRowCell();
+                            } else {
+                                this.editNextRowCell();
+                            }
                         }
                     }
                 }

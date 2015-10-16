@@ -17,6 +17,11 @@ define(function(require) {
     };
 
     BaseClass.prototype = {
+        initialize: function(options) {
+            if (options.events) {
+                this.on(options.events);
+            }
+        },
         dispose: function() {
             this.stopListening();
             delete this._events;
