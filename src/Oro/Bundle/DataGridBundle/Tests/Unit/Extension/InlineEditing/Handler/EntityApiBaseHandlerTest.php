@@ -75,7 +75,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('setData')
             ->with($entity);
-        $form->expects($this->never())
+        $form->expects($this->once())
             ->method('submit')
             ->with($data);
 

@@ -102,12 +102,17 @@ class EntityManager
      */
     protected function presetData($entity)
     {
+        $accessor = PropertyAccess::createPropertyAccessor();
         $data = [];
         $metadata = $this->getMetadataConfig($entity);
         if (!$metadata || $metadata->isGlobalLevelOwned()) {
             return $data;
         }
-        $data[$metadata->getOwnerFieldName()] = $entity->getOwner()->getId();
+
+        $owner = $accessor->getValue($entity, $metadata->getOwnerFieldName());
+        if ($owner) {
+            $data[$metadata->getOwnerFieldName()] = $accessor->getValue($owner, 'id');
+        }
 
         return $data;
     }
