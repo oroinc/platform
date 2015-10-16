@@ -69,7 +69,8 @@ class UpdateEmailUserQuery extends ParametrizedMigrationQuery
         $query  = 'INSERT INTO oro_email_user_folders (email_user_id, folder_id, origin_id, email_id)
             SELECT eu.id, eu.folder_id, eu.origin_id, eu.email_id
             FROM
-                oro_email_user AS eu;';
+                oro_email_user AS eu
+            GROUP BY eu.folder_id, eu.origin_id, eu.email_id;';
         $params = [];
         $types  = [];
         $this->logQuery($logger, $query, $params, $types);
