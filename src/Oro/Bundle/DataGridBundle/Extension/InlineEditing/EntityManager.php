@@ -7,6 +7,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\DataGridBundle\Exception\EntityHasFieldException;
+use Oro\Bundle\DataGridBundle\Exception\FieldUpdateAccessException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -81,7 +83,8 @@ class EntityManager
         $data = $this->presetData($entity);
 
         foreach ($content as $fieldName => $fieldValue) {
-            if ($this->hasAccessEditFiled($fieldName)) {
+            if ($this->validateFieldName($entity, $fieldName)) {
+                $fieldValue = trim($fieldValue);
                 $valueForForm = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
                 $valueForEntity = $this->prepareValueForEntity($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $valueForEntity);
@@ -93,6 +96,27 @@ class EntityManager
         $this->handler->process($entity, $form, $data, 'PATCH');
 
         return $form;
+    }
+
+    /**
+     * @param $entity
+     * @param $fieldName
+     *
+     * @return bool
+     *
+     * @throws FieldUpdateAccessException
+     */
+    protected function validateFieldName($entity, $fieldName)
+    {
+        if (!$this->hasField($entity, $fieldName)) {
+            throw new EntityHasFieldException();
+        }
+
+        if (!$this->hasAccessEditFiled($fieldName)) {
+            throw new FieldUpdateAccessException();
+        }
+
+        return true;
     }
 
     /**
@@ -148,6 +172,18 @@ class EntityManager
         }
 
         return true;
+    }
+
+    protected function hasField($entity, $fieldName)
+    {
+        /** @var ClassMetadata $metaData */
+        $metaData = $this->getMetaData($entity);
+        if ($metaData->hasField($fieldName) ||
+            $metaData->hasAssociation($fieldName)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

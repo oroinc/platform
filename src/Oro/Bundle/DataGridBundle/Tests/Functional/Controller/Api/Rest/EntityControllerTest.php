@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
 
+use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -37,6 +38,51 @@ class EntityControllerTest extends WebTestCase
             $content
         );
 
-        $this->assertEquals(204, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
     }
+
+    public function testChangeSimpleFieldFromBlackList()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+        $className = 'Oro_Bundle_UserBundle_Entity_User';
+        $id = $user->getId();
+        $content = '{"id":10}';
+        $this->client->request(
+            'PATCH',
+            $this->getUrl('oro_datagrid_api_rest_entity_patch', [
+                'className' => $className,
+                'id' => $id
+            ]),
+            [],
+            [],
+            [],
+            $content
+        );
+
+        $this->assertEquals(Codes::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testNotFoundEntity()
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user');
+        $className = 'Oro_Test_Entity';
+        $id = $user->getId();
+        $content = '{"firstName":"Test"}';
+        $this->client->request(
+            'PATCH',
+            $this->getUrl('oro_datagrid_api_rest_entity_patch', [
+                'className' => $className,
+                'id' => $id
+            ]),
+            [],
+            [],
+            [],
+            $content
+        );
+
+        $this->assertEquals(Codes::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+    }
+
 }

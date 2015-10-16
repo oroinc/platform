@@ -92,6 +92,9 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
+    /**
+     * @expectedException Oro\Bundle\DataGridBundle\Exception\FieldUpdateAccessException
+     */
     public function testBlockedFieldNameUpdate()
     {
         $this->initForm([
@@ -102,6 +105,17 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
                 'expected' => $this->never()
             ]
         ]);
+
+        $entityManager = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $metadata = $this->getMetadata([
+            'hasField' => true,
+            'hasAssociation' => false,
+            'getFieldMapping' => ['type' => 'boolean']
+        ]);
+        $entityManager->expects($this->any())->method('getClassMetadata')->willReturn($metadata);
+        $this->registry->expects($this->any())->method('getManager')->willReturn($entityManager);
 
         $metaDataOwnerShip = $this->getMetaDataOwnerShip([
             'hasOwner' => true,
