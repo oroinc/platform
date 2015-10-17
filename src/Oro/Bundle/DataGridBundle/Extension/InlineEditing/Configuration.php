@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
     const BEHAVIOUR_DEFAULT_VALUE           = 'enable_selected';
     const BEHAVIOUR_ENABLE_ALL_VALUE        = 'enable_all';
     const ENABLED_CONFIG_PATH               = '[inline_editing][enable]';
-    const DEFAULT_ROUTE                     = 'oro_datagrid_api_rest_entity_patch';
+    const DEFAULT_ROUTE                     = 'oro_entity_api_rest_entityfieldpatch_patch';
 
     /**
      * @var array

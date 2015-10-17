@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
+namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
 use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -9,7 +9,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @dbIsolation
  */
-class EntityControllerTest extends WebTestCase
+class EntityFieldPatchControllerTest extends WebTestCase
 {
     public function setUp()
     {
@@ -28,7 +28,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"firstName":"Test"}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_datagrid_api_rest_entity_patch', [
+            $this->getUrl('oro_entity_api_rest_entityfieldpatch_patch', [
                 'className' => $className,
                 'id' => $id
             ]),
@@ -50,7 +50,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"id":10}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_datagrid_api_rest_entity_patch', [
+            $this->getUrl('oro_entity_api_rest_entityfieldpatch_patch', [
                 'className' => $className,
                 'id' => $id
             ]),
@@ -72,7 +72,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"firstName":"Test"}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_datagrid_api_rest_entity_patch', [
+            $this->getUrl('oro_entity_api_rest_entityfieldpatch_patch', [
                 'className' => $className,
                 'id' => $id
             ]),
@@ -82,7 +82,6 @@ class EntityControllerTest extends WebTestCase
             $content
         );
 
-        $this->assertEquals(Codes::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
-    }
 
+    }
 }

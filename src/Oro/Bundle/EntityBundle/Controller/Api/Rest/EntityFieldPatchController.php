@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Controller\Api\Rest;
+namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -16,9 +16,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
- * @Rest\NamePrefix("oro_datagrid_api_rest_entity_")
+ * @Rest\NamePrefix("oro_entity_api_rest_entityfieldpatch_")
  */
-class EntityController extends FOSRestController
+class EntityFieldPatchController extends FOSRestController
 {
     /**
      * @param int $id
