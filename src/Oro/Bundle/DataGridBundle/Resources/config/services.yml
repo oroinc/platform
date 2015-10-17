@@ -30,13 +30,6 @@ parameters:
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
     oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
 
-    oro_datagrid.extension.inline.base_handler.class:             Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler
-    oro_datagrid.extension.inline.handler_processor.class:        Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor
-    oro_datagrid.extension.inline.handler_contact.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra\ContactApiHandler
-
-    oro_datagrid.extension.inline_editing.entity.manager.class:                Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager
-    oro_datagrid.extension.inline_editing.entity_manager.form_builder.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder
-
     oro_datagrid.datagrid.inline_edit_column_options_guesser.class:         Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
     oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class:    Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser
     oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\ChoicesGuesser
@@ -176,37 +169,6 @@ services:
             - @request
             - @doctrine
         scope: request
-
-    oro_datagrid.extension.inline_editing.entity.manager:
-        class: %oro_datagrid.extension.inline_editing.entity.manager.class%
-        scope: request
-        arguments:
-            - @doctrine
-            - @oro_datagrid.extension.inline_editing.entity_manager.form_builder
-            - @oro_datagrid.extension.inline.base_handler
-            - @oro_entity.routing_helper
-            - @oro_security.owner.ownership_metadata_provider
-
-    oro_datagrid.extension.inline_editing.entity_manager.form_builder:
-        class: %oro_datagrid.extension.inline_editing.entity_manager.form_builder.class%
-        arguments:
-            - @form.factory
-            - @doctrine
-
-    oro_datagrid.extension.inline.base_handler:
-        class: %oro_datagrid.extension.inline.base_handler.class%
-        scope: request
-        arguments:
-            - @doctrine
-            - @oro_datagrid.extension.inline.handler_processor
-
-    oro_datagrid.extension.inline.handler_processor:
-        class: %oro_datagrid.extension.inline.handler_processor.class%
-
-    oro_datagrid.extension.inline.handler_contact:
-        class: %oro_datagrid.extension.inline.handler_contact.class%
-        tags:
-            - { name: oro_datagrid.extension.api.handler }
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options_guesser.class%

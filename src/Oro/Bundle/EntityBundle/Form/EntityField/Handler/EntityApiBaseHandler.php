@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler;
+namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 
 class EntityApiBaseHandler
 {

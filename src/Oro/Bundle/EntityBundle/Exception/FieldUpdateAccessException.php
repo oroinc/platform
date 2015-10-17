@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Exception;
+namespace Oro\Bundle\EntityBundle\Exception;
 
 class FieldUpdateAccessException extends \Exception
 {

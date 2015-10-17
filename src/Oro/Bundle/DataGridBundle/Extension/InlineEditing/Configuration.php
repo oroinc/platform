@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
+use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -90,6 +91,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getBlackList()
     {
-        return FieldsBlackList::getValues();
+        return EntityFieldBlackList::getValues();
     }
 }

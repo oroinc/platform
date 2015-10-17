@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Processor;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager;
+use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 
 class EntityManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var EntityManager */
+    /** @var EntityFieldManager */
     protected $manager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -30,12 +30,12 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->formBuilder = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder')
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->handler = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler')
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -48,7 +48,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new EntityManager(
+        $this->manager = new EntityFieldManager(
             $this->registry,
             $this->formBuilder,
             $this->handler,
@@ -93,7 +93,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\DataGridBundle\Exception\FieldUpdateAccessException
+     * @expectedException Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException
      */
     public function testBlockedFieldNameUpdate()
     {
@@ -158,9 +158,17 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadataConfig->expects($this->any())->method('hasOwner')->willReturn($options['hasOwner']);
-        $metadataConfig->expects($this->any())->method('isGlobalLevelOwned')->willReturn($options['isGlobalLevelOwned']);
-        $metadataConfig->expects($this->any())->method('getOwnerFieldName')->willReturn($options['getOwnerFieldName']);
+        $metadataConfig
+            ->expects($this->any())->method('hasOwner')
+            ->willReturn($options['hasOwner']);
+
+        $metadataConfig->expects($this->any())
+            ->method('isGlobalLevelOwned')
+            ->willReturn($options['isGlobalLevelOwned']);
+
+        $metadataConfig->expects($this->any())
+            ->method('getOwnerFieldName')
+            ->willReturn($options['getOwnerFieldName']);
 
         return $metadataConfig;
     }

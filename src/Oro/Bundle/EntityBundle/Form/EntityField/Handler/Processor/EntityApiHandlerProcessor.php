@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
 

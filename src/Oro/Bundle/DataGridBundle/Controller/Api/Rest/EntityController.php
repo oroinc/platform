@@ -6,8 +6,10 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\DataGridBundle\Exception\EntityHasFieldException;
-use Oro\Bundle\DataGridBundle\Exception\FieldUpdateAccessException;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -72,7 +74,7 @@ class EntityController extends FOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_datagrid.extension.inline_editing.entity.manager');
+        return $this->get('oro_entity.manager.entity_field_manager');
     }
 
     /**

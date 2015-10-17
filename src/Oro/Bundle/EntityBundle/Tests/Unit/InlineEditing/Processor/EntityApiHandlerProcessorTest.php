@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\InlineEditing\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerInterface;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
 
 class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
@@ -137,7 +137,7 @@ class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getHandlerMock()
     {
-        return $this->getMock('Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerInterface');
+        return $this->getMock('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface');
     }
 
     /**

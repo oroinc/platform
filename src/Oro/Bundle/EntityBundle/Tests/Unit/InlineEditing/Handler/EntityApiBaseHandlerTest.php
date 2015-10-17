@@ -4,8 +4,8 @@ namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
 
 class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
@@ -31,7 +31,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->processor = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerProcessor')
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor')
             ->disableOriginalConstructor()
             ->getMock();
 
