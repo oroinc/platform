@@ -9,6 +9,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OrmLogger
 {
     /** @var array */
@@ -77,6 +80,7 @@ class OrmLogger
     public function getStats()
     {
         $names = [
+            'metadata',
             'getAllMetadata',
             'getMetadataFor',
             'isTransient',
@@ -345,12 +349,18 @@ class OrmLogger
         } else {
             $this->stats[$name] = ['count' => 1, 'time' => 0];
         }
+        if (isset($this->stats['metadata'])) {
+            $this->stats['metadata']['count'] += 1;
+        } else {
+            $this->stats['metadata'] = ['count' => 1, 'time' => 0];
+        }
         // add to an execution time only if there are no nested metadata related methods
         if (empty($this->metadataStack[$name])) {
             unset($this->metadataStack[$name]);
             $this->stats[$name]['time'] += $time;
             // add to a total execution time only if it is standalone metadata related method call
             if (empty($this->metadataStack)) {
+                $this->stats['metadata']['time'] += $time;
                 if (0 === $this->hydrationStack && empty($this->operationStack)) {
                     $this->statsTime += $time;
                 }
