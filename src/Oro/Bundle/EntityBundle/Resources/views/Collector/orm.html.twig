@@ -20,11 +20,11 @@
     </div>
     <div class="sf-toolbar-info-piece">
         <b><abbr title="The number of calls. ClassMetadataFactory::getAllMetadata: {{ collector.stats.getAllMetadata.count }}, ClassMetadataFactory::getMetadataFor: {{ collector.stats.getMetadataFor.count }}, ClassMetadataFactory::isTransient: {{ collector.stats.isTransient.count }}">Metadata</abbr></b>
-        <span>{{ collector.stats.getAllMetadata.count + collector.stats.getMetadataFor.count + collector.stats.isTransient.count }}</span>
+        <span>{{ collector.stats.metadata.count }}</span>
     </div>
     <div class="sf-toolbar-info-piece">
         <b><abbr title="ClassMetadataFactory::getAllMetadata: {{ '%0.2f'|format(collector.stats.getAllMetadata.time * 1000) }} ms, ClassMetadataFactory::getMetadataFor: {{ '%0.2f'|format(collector.stats.getMetadataFor.time * 1000) }} ms, ClassMetadataFactory::isTransient: {{ '%0.2f'|format(collector.stats.isTransient.time * 1000) }} ms">Metadata time</abbr></b>
-        <span>{{ '%0.2f'|format((collector.stats.getAllMetadata.time + collector.stats.getMetadataFor.time + collector.stats.isTransient.time) * 1000) }} ms</span>
+        <span>{{ '%0.2f'|format(collector.stats.metadata.time * 1000) }} ms</span>
     </div>
     <div class="sf-toolbar-info-piece">
         <b>Persists</b>
@@ -113,6 +113,14 @@
             <tr>
                 <th>Hydrated entities</th>
                 <td><pre>{{ collector.hydratedEntities }}</pre></td>
+            </tr>
+            <tr>
+                <th>Metadata calls</th>
+                <td><pre>{{ collector.stats.metadata.count }}</pre></td>
+            </tr>
+            <tr>
+                <th>Metadata time</th>
+                <td><pre>{{ '%0.2f'|format(collector.stats.metadata.time * 1000) }} ms</pre></td>
             </tr>
             <tr>
                 <th>GetAllMetadata calls</th>
