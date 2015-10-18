@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\DataGridBundle\DependencyInjection\CompilerPass\InlineHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\InlineHandlerPass;
 
 class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
 {
