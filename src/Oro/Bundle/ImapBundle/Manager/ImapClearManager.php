@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
