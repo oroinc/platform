@@ -38,6 +38,10 @@ class UserCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
+        if (empty($calendarIds)) {
+            return array();
+        }
+        
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
             ->select('o, owner')
