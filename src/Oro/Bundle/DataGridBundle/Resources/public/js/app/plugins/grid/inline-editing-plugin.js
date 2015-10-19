@@ -64,7 +64,11 @@ define(function(require) {
                 shown: this.onGridShown,
                 rowClicked: this.onGridRowClicked
             });
-            this.listenTo(mediator, 'page:beforeChange', this.exitEditMode);
+            this.listenTo(mediator, 'page:beforeChange', function() {
+                if (this.editModeEnabled) {
+                    this.exitEditMode(true);
+                }
+            });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
@@ -264,7 +268,10 @@ define(function(require) {
 
         toggleHeaderCellHighlight: function(cell, state) {
             var columnIndex = this.main.columns.indexOf(cell.column);
-            this.main.header.row.cells[columnIndex].$el.toggleClass('header-cell-highlight', state);
+            var headerCell = this.main.findHeaderCellByIndex(columnIndex);
+            if (headerCell) {
+                headerCell.$el.toggleClass('header-cell-highlight', state);
+            }
         },
 
         buildClassNames: function(editor, cell) {
@@ -333,6 +340,9 @@ define(function(require) {
         },
 
         exitEditMode: function(releaseBackdrop) {
+            if (!this.editModeEnabled) {
+                throw Error('Edit mode disabled');
+            }
             this.editModeEnabled = false;
             if (this.currentCell.$el) {
                 this.toggleHeaderCellHighlight(this.currentCell, false);

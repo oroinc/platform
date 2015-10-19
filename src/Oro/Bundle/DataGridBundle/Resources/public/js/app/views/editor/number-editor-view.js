@@ -53,6 +53,7 @@ define(function(require) {
      */
     var NumberEditorView;
     var TextEditorView = require('./text-editor-view');
+    var _ = require('underscore');
     var NumberFormatter = require('orofilter/js/formatter/number-formatter');
 
     NumberEditorView = TextEditorView.extend(/** @exports NumberEditorView.prototype */{
@@ -65,7 +66,8 @@ define(function(require) {
 
         getValue: function() {
             var userInput = this.$('input[name=value]').val();
-            return this.formatter.toRaw(userInput) || NaN;
+            var parsed = this.formatter.toRaw(userInput);
+            return _.isNumber(parsed) ? parsed : NaN;
         },
 
         getValidationRules: function() {
@@ -90,7 +92,7 @@ define(function(require) {
 
         isChanged: function() {
             var valueChanged = this.getValue() !== this.getModelValue();
-            return isNaN(this.getValue()) ?
+            return isNaN(this.getModelValue()) ?
                 this.$('input[name=value]').val() !== '' :
                 valueChanged;
         }
