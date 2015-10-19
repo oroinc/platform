@@ -13,6 +13,12 @@ class OroAddressBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        $this->createContinentTables($schema);
+        $this->addForeignKeys($schema);
+    }
+
+    public function createContinentTables(Schema $schema)
+    {
         $table = $schema->createTable('oro_dictionary_continent');
         $table->addColumn('code', 'string', ['length' => 2]);
         $table->addColumn('name', 'string', ['length' => 255]);
@@ -32,5 +38,16 @@ class OroAddressBundle implements Migration
         $table = $schema->getTable('oro_dictionary_country');
         $table->addColumn('continent_code', 'string', ['notnull' => false, 'length' => 2]);
         $table->addIndex(['continent_code'], 'IDX_6128B64616C569B', []);
+    }
+
+    public function addForeignKeys(Schema $schema)
+    {
+        $table = $schema->getTable('oro_dictionary_country');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_dictionary_continent'),
+            ['continent_code'],
+            ['code'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
     }
 }

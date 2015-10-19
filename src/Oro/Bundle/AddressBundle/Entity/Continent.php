@@ -160,6 +160,29 @@ class Continent implements Translatable
     }
 
     /**
+     * Set locale
+     *
+     * @param string $locale
+     * @return Country
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Returns locale code
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * @return string
      */
     public function __toString()

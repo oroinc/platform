@@ -14,6 +14,8 @@ use Oro\Bundle\AddressBundle\Entity\Country;
 
 class LoadContinentData extends AbstractTranslatableEntityFixture implements VersionedFixtureInterface, DependentFixtureInterface
 {
+    const CONTINENT_PREFIX = 'continent';
+
     /**
      * @var string
      */
@@ -83,10 +85,17 @@ class LoadContinentData extends AbstractTranslatableEntityFixture implements Ver
     {
         $countryRepository = $manager->getRepository('OroAddressBundle:Country');
 
+        $translationLocales = $this->getTranslationLocales();
         foreach ($continents as $continentData) {
             $continent = new Continent($continentData['code']);
-            $continent->setName($continentData['name']);
-            $manager->persist($continent);
+
+            foreach ($translationLocales as $locale) {
+                $name = $this->translate($continentData['code'], static::CONTINENT_PREFIX, $locale);
+                $continent
+                    ->setLocale($locale)
+                    ->setName($name);
+                $manager->persist($continent);
+            }
 
             foreach ($continentData['countries'] as $countryCode) {
                 $country = $countryRepository->findOneBy(array('iso2Code' => $countryCode));
@@ -108,6 +117,6 @@ class LoadContinentData extends AbstractTranslatableEntityFixture implements Ver
      */
     function getDependencies()
     {
-        return 'Oro\Bundle\AddressBundle\Migrations\Data\ORM\LoadCountryData';
+        return array('Oro\Bundle\AddressBundle\Migrations\Data\ORM\LoadCountryData');
     }
 }

@@ -15,7 +15,6 @@ AF:
         - DJ
         - DZ
         - EG
-        - EH
         - ER
         - ET
         - GA
@@ -39,7 +38,6 @@ AF:
         - NA
         - NE
         - NG
-        - RE
         - RW
         - SC
         - SD
@@ -47,7 +45,6 @@ AF:
         - SL
         - SN
         - SO
-        - SS
         - ST
         - SZ
         - TD
@@ -55,7 +52,6 @@ AF:
         - TN
         - TZ
         - UG
-        - YT
         - ZA
         - ZM
         - ZW
@@ -71,16 +67,12 @@ AS:
         - BH
         - BN
         - BT
-        - CC
         - CN
-        - CX
         - CY
         - GE
-        - HK
         - ID
         - IL
         - IN
-        - IO
         - IQ
         - IR
         - JO
@@ -124,7 +116,6 @@ EU:
         - AD
         - AL
         - AT
-        - AX
         - BA
         - BE
         - BG
@@ -136,11 +127,9 @@ EU:
         - EE
         - ES
         - FI
-        - FO
         - FR
         - GB
         - GG
-        - GI
         - GR
         - HR
         - HU
@@ -153,7 +142,6 @@ EU:
         - LT
         - LU
         - LV
-        - MC
         - MD
         - ME
         - MK
@@ -167,56 +155,38 @@ EU:
         - RU
         - SE
         - SI
-        - SJ
         - SK
         - SM
         - UA
-        - VA
 
 NA:
     code: NA
     countries:
         - AG
-        - AI
-        - AW
         - BB
         - BL
-        - BM
-        - BQ
         - BS
         - BZ
         - CA
         - CR
         - CU
-        - CW
         - DM
         - DO
         - GD
         - GL
-        - GP
         - GT
         - HN
         - HT
         - JM
         - KN
-        - KY
-        - LC
         - MF
-        - MQ
-        - MS
         - MX
         - NI
         - PA
-        - PM
-        - PR
         - SV
-        - SX
-        - TC
         - TT
         - US
         - VC
-        - VG
-        - VI
 
 SA:
     code: SA
@@ -227,8 +197,6 @@ SA:
         - CL
         - CO
         - EC
-        - FK
-        - GF
         - GY
         - PE
         - PY
@@ -239,38 +207,18 @@ SA:
 OC:
     code: OC
     countries:
-        - AS
         - AU
-        - CK
         - FJ
         - FM
-        - GU
         - KI
         - MH
-        - MP
-        - NC
-        - NF
         - NR
-        - NU
         - NZ
-        - PF
         - PG
-        - PN
         - PW
         - SB
-        - TK
         - TO
         - TV
         - UM
         - VU
-        - WF
         - WS
-
-AN:
-    code: AN
-    countries:
-        - AQ
-        - BV
-        - GS
-        - HM
-        - TF
