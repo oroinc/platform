@@ -66,6 +66,12 @@
       }
     }
   }
+  tr.mouse-down{
+    // allow user to select text under icon
+    .editable.view-mode > .icon-edit {
+      display: none !important;
+    }
+  }
 }
 .grid thead th.header-cell-highlight {
   background-color: #FFFCEC;

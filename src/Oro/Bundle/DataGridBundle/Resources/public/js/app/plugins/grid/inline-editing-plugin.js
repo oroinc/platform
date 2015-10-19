@@ -54,6 +54,7 @@ define(function(require) {
 
         constructor: function() {
             this.onKeyDown = _.bind(this.onKeyDown, this);
+            this.hidePopover = _.bind(this.hidePopover, this);
             InlineEditingPlugin.__super__.constructor.apply(this, arguments);
         },
 
@@ -63,6 +64,7 @@ define(function(require) {
                 shown: this.onGridShown,
                 rowClicked: this.onGridRowClicked
             });
+            this.listenTo(mediator, 'page:beforeChange', this.exitEditMode);
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
@@ -74,7 +76,11 @@ define(function(require) {
         },
 
         disable: function() {
+            if (this.editModeEnabled) {
+                this.exitEditMode(true);
+            }
             InlineEditingPlugin.__super__.disable.call(this);
+            this.hidePopover();
             this.main.body.refresh();
         },
 
@@ -105,7 +111,8 @@ define(function(require) {
             });
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
-                'click .icon-edit': enterEditModeIfNeeded
+                'mouseleave': this.hidePopover,
+                'mousedown .icon-edit': enterEditModeIfNeeded
             });
             delete cell.events.click;
             cell.delegateEvents();
