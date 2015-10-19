@@ -36,7 +36,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
 
-class OroBatchBundle extends Bundle
+class AcmeTextRepresentationBundle extends Bundle
 {
     /**
      * {@inheritdoc}
@@ -133,63 +133,12 @@ class ObjectToStringConverter
 }
 ```
 
-- Implement a simple processor that will represents an object as `class name - object id`
-
-```php
-<?php
-
-namespace Acme\Bundle\TextRepresentationBundle\Processor;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-
-class BuildClassNameIdPair implements ProcessorInterface
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContextInterface $context)
-    {
-        if ($context->hasResult()) {
-            return;
-        }
-        $object = $context->get('object');
-        $context->setResult($this->formatResult($context->get('class'), $this->getObjectId($object)));
-    }
-
-    /**
-     * @param string $className
-     * @param mixed  $objectId
-     *
-     * @return string
-     */
-    protected function formatResult($className, $objectId)
-    {
-        return sprintf('%s - %s', $className, $objectId);
-    }
-
-    /**
-     * @param object $object
-     *
-     * @return mixed
-     */
-    protected function getObjectId($object)
-    {
-        if (!method_exists($object, 'getId')) {
-            throw new \RuntimeException(sprintf('Expected "%s::getId()"', get_class($object)));
-        }
-
-        return $object->getId();
-    }
-}
-```
-
 - Register services in DI container
 
 ```yaml
 services:
     text_representation.object_to_string_converter:
-        class: Oro\Bundle\BatchBundle\ObjectToStringConverter
+        class: Acme\Bundle\TextRepresentationBundle\ObjectToStringConverter
         arguments:
             - @text_representation.processor
 
@@ -221,11 +170,74 @@ services:
         public: false
         arguments:
             - @service_container
+```
 
-    text_representation.processor.build_class_name_id_pair:
-        class: Acme\Bundle\TextRepresentationBundle\Processor\BuildClassNameIdPair
+- Implement a simple processor that will get an object identifier and register it in `prepare_data` group
+
+```php
+<?php
+
+namespace Acme\Bundle\TextRepresentationBundle\Processor;
+
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+
+class GetObjectId implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        if ($context->has('objectId')) {
+            return;
+        }
+        $object = $context->get('object');
+        if (!method_exists($object, 'getId')) {
+            throw new \RuntimeException(sprintf('Expected "%s::getId()"', get_class($object)));
+        }
+        $context->set('objectId', $object->getId());
+    }
+}
+```
+
+```yaml
+    text_representation.processor.get_object_id:
+        class: Acme\Bundle\TextRepresentationBundle\Processor\GetObjectId
         tags:
-             - { name: text_representation.processor, action: get_text_representation, priority: -10 }
+             - { name: text_representation.processor, action: get_text_representation, group: prepare_data, priority: -10 }
+```
+
+- Implement a simple processor that will represents an object as `class name - object id` and register it in `format` group
+
+```php
+<?php
+
+namespace Acme\Bundle\TextRepresentationBundle\Processor;
+
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+
+class FormatClassNameIdPair implements ProcessorInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context)
+    {
+        if ($context->hasResult()) {
+            return;
+        }
+        $context->setResult(sprintf('%s - %s', $context->get('class'), $context->get('objectId')));
+    }
+}
+```
+
+```yaml
+    text_representation.processor.format_class_name_id_pair:
+        class: Acme\Bundle\TextRepresentationBundle\Processor\FormatClassNameIdPair
+        tags:
+             - { name: text_representation.processor, action: get_text_representation, group: format, priority: -10 }
 ```
 
 Now we can get a test representation for almost all entities:
@@ -244,28 +256,33 @@ But what if some bundle has an entity which does not have `getId()`, but have `g
 ```php
 <?php
 
-namespace Acme\Bundle\AnotherBundle\Processor\TextRepresentation;
+namespace Acme\Bundle\AnotherBundle\Processor;
 
-use Acme\Bundle\TextRepresentationBundle\Processor\BuildClassNameIdPair;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class BuildClassNameIdPairForTestEntity extends BuildClassNameIdPair
+class GetObjectIdForTestEntity implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
-    protected function getObjectId($object)
+    public function process(ContextInterface $context)
     {
-        return $object->getCode();
+        if ($context->has('objectId')) {
+            return;
+        }
+        $object = $context->get('object');
+        $context->set('objectId', $object->getCode());
     }
 }
 ```
 
 ```yaml
 services:
-    text_representation.processor.build_class_name_id_pair.test_entity:
-        class: Acme\Bundle\AnotherBundle\Processor\TextRepresentation\BuildClassNameIdPairForTestEntity
+    text_representation.processor.get_object_id_for_test_entity:
+        class: Acme\Bundle\AnotherBundle\Processor\GetObjectIdForTestEntity
         tags:
-             - { name: text_representation.processor, action: get_text_representation, class: Acme\Bundle\AnotherBundle\Entity\User }
+             - { name: text_representation.processor, action: get_text_representation, group: prepare_data, class: Acme\Bundle\AnotherBundle\Entity\TestEntity }
 ```
 
 Next, lets imagine that some bundle need to change a text representation from `class name - object id` to `[class name - object id]`. This can be achieved by adding a processor that will be executed after a processor built the previous representation:
@@ -273,32 +290,28 @@ Next, lets imagine that some bundle need to change a text representation from `c
 ```php
 <?php
 
-namespace Acme\Bundle\AnotherBundle\Processor\TextRepresentation;
+namespace Acme\Bundle\AnotherBundle\Processor;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
-class BuildDecoratedClassNameIdPair implements ProcessorInterface
+class DecorateClassNameIdPair implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        if (!$context->hasResult()) {
-            return;
-        }
         $context->setResult(sprintf('[%s]', $context->getResult()));
     }
 }
 ```
 
 ```yaml
-services:
-    text_representation.processor.build_decorated_class_name_id_pair:
-        class: Acme\Bundle\AnotherBundle\Processor\TextRepresentation\BuildDecoratedClassNameIdPair
+    text_representation.processor.decorate_class_name_id_pair:
+        class: Acme\Bundle\AnotherBundle\Processor\DecorateClassNameIdPair
         tags:
-             - { name: text_representation.processor, action: get_text_representation, priority: -20 }
+             - { name: text_representation.processor, action: get_text_representation, group: format, priority: -20 }
 ```
 
 This was just an example how the Oro ChainProcessor component may be used. The next section provides a list of key classes that may help you to investigate this component. Also you can find advanced usage of it in Oro Platform.
