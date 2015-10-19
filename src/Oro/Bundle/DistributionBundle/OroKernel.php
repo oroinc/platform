@@ -56,15 +56,6 @@ abstract class OroKernel extends Kernel
         $bundles = array();
 
         if (!$this->getCacheDir()) {
-            /**
-             * This class alias has done to optimize JMSJobQueueBundle boot.
-             */
-            if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
-                class_alias(
-                    'JMS\JobQueueBundle\JMSJobQueueBundle',
-                    'Oro\Bundle\CronBundle\JobQueueBundle\JMSJobQueueBundle'
-                );
-            }
             foreach ($this->collectBundles() as $class => $params) {
                 $bundles[] = $params['kernel']
                     ? new $class($this)

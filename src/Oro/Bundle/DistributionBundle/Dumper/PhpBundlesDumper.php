@@ -26,15 +26,6 @@ class PhpBundlesDumper
     {
         return <<<EOF
 <?php
-/**
- * This class alias has done to optimize JMSJobQueueBundle boot.
- */
-if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
-    class_alias(
-        'JMS\JobQueueBundle\JMSJobQueueBundle',
-        'Oro\Bundle\CronBundle\JobQueueBundle\JMSJobQueueBundle'
-    );
-}
 
 return {$this->generateBundlesArray()}
 
