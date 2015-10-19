@@ -27,7 +27,11 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         );
 
         // original security config
-        $securityConfig = $container->getExtensionConfig('security');
+        $securityConfig = null;
+        $securityModified = false;
+        if ($container->hasExtension('security')) {
+            $securityConfig = $container->getExtensionConfig('security');
+        }
 
         $resources    = $configLoader->load();
         $extensions   = $container->getExtensions();
@@ -36,6 +40,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                 if (!empty($extensions[$name])) {
                     if ($name === 'security') {
                         $this->mergeConfigIntoOne($container, $name, $config);
+                        $securityModified = true;
                     } else {
                         $container->prependExtensionConfig($name, $config);
                     }
@@ -44,7 +49,9 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         }
 
         // original security config has highest priority
-        $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
+        if ($securityConfig && $securityModified) {
+            $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
+        }
 
         $this->preparePostgreSql($container);
     }
