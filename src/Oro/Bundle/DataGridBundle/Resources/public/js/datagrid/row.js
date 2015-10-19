@@ -56,7 +56,7 @@ define([
             }
 
             this.$el.html(fragment);
-            this.trigger('content:update');
+            this.trigger('columns:reorder');
         },
 
         className: function() {

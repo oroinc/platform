@@ -110,7 +110,9 @@ define(function(require) {
                 _this.onGenericArrowKeydown(e);
             });
             this.$('input.select2-input').bind('keydown' + this.eventNamespace(), function(e) {
-                if (!_this.isChanged()) {
+                // Due to this view can be already disposed in bound first handler,
+                // we have to check if it's disposed
+                if (!_this.disposed && !_this.isChanged()) {
                     SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
                 }
             });
