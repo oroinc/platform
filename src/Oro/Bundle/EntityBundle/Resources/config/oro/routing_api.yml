@@ -9,7 +9,3 @@ oro_entity_field_api:
 oro_entity_alias_api:
     resource: "@OroEntityBundle/Controller/Api/Rest/EntityAliasController.php"
     type:     rest
-
-oro_entity_field_patch_api:
-    resource: @OroEntityBundle/Controller/Api/Rest/EntityFieldPatchController.php
-    type: rest

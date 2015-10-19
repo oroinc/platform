@@ -7,11 +7,11 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
-use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
