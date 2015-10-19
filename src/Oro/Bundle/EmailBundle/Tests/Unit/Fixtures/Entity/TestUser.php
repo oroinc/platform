@@ -11,6 +11,8 @@ use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareInterface, EmailHolderInterface
 {
+    private $id;
+
     private $email;
 
     private $firstName;
@@ -62,6 +64,12 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
 
     public function getId()
     {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function getFullname($format = '')

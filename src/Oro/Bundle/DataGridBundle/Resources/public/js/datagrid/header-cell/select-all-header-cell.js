@@ -22,7 +22,7 @@ define([
      */
     SelectAllHeaderCell = Backbone.View.extend({
         /** @property */
-        className: 'select-all-header-cell',
+        className: 'select-all-header-cell renderable',
 
         /** @property */
         tagName: 'th',

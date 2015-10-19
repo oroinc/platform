@@ -59,10 +59,10 @@ define(function(require) {
 
             var dialog = new WidgetPickerModal({
                 content: $('#available-dashboard-widgets').html(),
-                className: 'modal dashboard-widgets-wrapper',
+                className: 'modal oro-modal-normal dashboard-widgets-wrapper',
                 title: __('oro.dashboard.add_dashboard_widgets.title'),
                 loadWidget: _.bind(this.loadWidget, this),
-                cancelText: __('Close'),
+                cancelText: __('Close')
             });
             dialog.open();
         }

@@ -4,9 +4,9 @@
 {% set step = 'schema' %}
 {% set steps = ['cache'] %}
 {% if dropDatabase %}
-    {% set steps = steps|merge(['schema-drop']) %}
+    {% set steps = steps|merge(['schema-drop', 'clear-config', 'clear-extend']) %}
 {% endif %}
-{% set steps = steps|merge(['clear-config', 'clear-extend', 'schema-update', 'workflows', 'processes', 'fixtures']) %}
+{% set steps = steps|merge(['schema-update', 'workflows', 'processes', 'fixtures']) %}
 
 {% block title %}{{ 'process.step.schema.header'|trans }} - {{ parent() }}{% endblock %}
 

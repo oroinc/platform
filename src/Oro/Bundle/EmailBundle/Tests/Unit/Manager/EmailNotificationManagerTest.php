@@ -87,12 +87,14 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
         $this->repository->expects($this->once())->method('getNewEmails')->willReturn($testEmails);
         $this->emailCacheManager->expects($this->exactly(2))->method('ensureEmailBodyCached')->willReturn(true);
         $maxEmailsDisplay = 1;
-        $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay);
+        $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
 
         $this->assertEquals(
             [
                 [
-                    'route' => 'oro_email_email_reply',
+                    'replyRoute' => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply',
+                    'forwardRoute' => 'oro_email_email_reply',
                     'id' => 1,
                     'seen' => 0,
                     'subject' => 'subject',
@@ -101,7 +103,9 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
                     'linkFromName' => 'oro_email_email_reply',
                 ],
                 [
-                    'route' => 'oro_email_email_reply',
+                    'replyRoute' => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply',
+                    'forwardRoute' => 'oro_email_email_reply',
                     'id' => 2,
                     'seen' => 1,
                     'subject' => 'subject_1',
@@ -121,7 +125,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();
-        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization);
+        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization, null);
         $this->assertEquals(1, $count);
     }
 
@@ -155,7 +159,7 @@ class EmailNotificationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')->disableOriginalConstructor()
             ->getMock();
-        $email->expects($this->exactly(2))->method('getId')->willReturn($values['getId']);
+        $email->expects($this->exactly(1))->method('getId')->willReturn($values['getId']);
         $email->expects($this->once())->method('getSubject')->willReturn($values['getSubject']);
         $email->expects($this->once())->method('getFromName')->willReturn($values['getFromName']);
         $emailAddress = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAddress')
