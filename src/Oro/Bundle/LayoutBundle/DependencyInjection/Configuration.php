@@ -148,6 +148,7 @@ class Configuration implements ConfigurationInterface
         $parentNode
             ->append($node)
             ->children()
+                ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('active_theme')
                     ->info('The identifier of the theme that should be used by default')
                 ->end()

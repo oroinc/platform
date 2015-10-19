@@ -18,12 +18,17 @@ class ThemeListener implements EventSubscriberInterface
     /** @var string */
     protected $masterRequestRoute;
 
+    /** @var bool */
+    protected $debug;
+
     /**
      * @param string $defaultActiveTheme
+     * @param bool $debug
      */
-    public function __construct($defaultActiveTheme)
+    public function __construct($defaultActiveTheme, $debug)
     {
         $this->defaultActiveTheme = $defaultActiveTheme;
+        $this->debug = $debug;
     }
 
     /**
@@ -34,13 +39,15 @@ class ThemeListener implements EventSubscriberInterface
         $request = $event->getRequest();
         if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
             // remember the theme of the master request
-            if ($request->query->has('_theme')) {
-                $this->masterRequestTheme = $request->query->get('_theme');
-            } else {
-                $this->masterRequestTheme = $this->defaultActiveTheme;
-                // set the default theme to the master request
-                $request->attributes->set('_theme', $this->masterRequestTheme);
+            if ($this->debug && $request->query->has('_theme')) {
+                $theme = $request->query->get('_theme');
+                $request->attributes->set('_theme', $theme);
             }
+            if (!$request->attributes->has('_theme')) {
+                $request->attributes->set('_theme', $this->defaultActiveTheme);
+            }
+            // set the default theme to the master request
+            $this->masterRequestTheme = $request->attributes->get('_theme');
             // remember the route of the master request
             $this->masterRequestRoute = $request->attributes->get('_route');
         } else {
