@@ -104,12 +104,12 @@ define(function(require) {
          * @param {boolean|string} options.preventWindowUnload - Prevent window from being unloaded without user
          *                          confirmation until request is finished.
          *                          If true provided - page unload will be prevented with default message.
-         *                          If string provided - this message will be shown with others.
+         *                          If string provided - please describe change in it. This string will be added to
+         *                              list on changes.
          *
          *                          Default message will be like:
          *                            Server is being updated the following changes might be lost:
-         *                            - {your-message}
-         *                            - ...
+         *                            {messages list, each on new line}
          *
          * @returns {$.Promise} - $.Promise instance with abort() support
          */
