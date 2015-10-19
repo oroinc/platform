@@ -70,6 +70,7 @@ define(function(require) {
             this.saveApiAccessor = new ApiAccesor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
+
             InlineEditingPlugin.__super__.enable.call(this);
         },
 
