@@ -54,6 +54,7 @@ define(function(require) {
 
         constructor: function() {
             this.onKeyDown = _.bind(this.onKeyDown, this);
+            this.hidePopover = _.bind(this.hidePopover, this);
             InlineEditingPlugin.__super__.constructor.apply(this, arguments);
         },
 
@@ -106,6 +107,7 @@ define(function(require) {
             });
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
+                'mouseleave': this.hidePopover,
                 'mousedown .icon-edit': enterEditModeIfNeeded
             });
             delete cell.events.click;
