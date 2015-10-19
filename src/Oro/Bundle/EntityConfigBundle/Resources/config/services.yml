@@ -1,4 +1,5 @@
 parameters:
+    oro_entity_config.entity.entity_field.class:                Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel
     oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.tools.command_executor.class:             Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor
