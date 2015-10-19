@@ -267,8 +267,7 @@ class DoctrineHelper
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
-            ->getRepository($entityClass)
+            ->getEntityRepository($entityClass)
             ->find($entityId);
     }
 

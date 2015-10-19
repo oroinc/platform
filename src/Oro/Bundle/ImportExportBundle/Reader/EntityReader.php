@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
@@ -83,10 +84,13 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceEntityName($entityName, Organization $organization = null)
     {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->registry->getRepository($entityName)->createQueryBuilder('o');
+        /** @var EntityManager $entityManager */
+        $entityManager  = $this->registry
+            ->getManagerForClass($entityName)
+            ->getRepository($entityName);
+        $queryBuilder = $entityManager->createQueryBuilder('o');
 
-        $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityName);
+        $metadata = $entityManager->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
             // can't join with *-to-many relations because they affects query pagination
             if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
