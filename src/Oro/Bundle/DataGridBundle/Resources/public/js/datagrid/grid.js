@@ -511,8 +511,10 @@ define(function(require) {
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
             });
-            this.listenTo(this.header.row, 'content:update', function() {
-                this.trigger('content:update');
+            this.listenTo(this.header.row, 'columns:reorder', function() {
+                // triggers content:update event in separate process
+                // to give time body's rows to finish reordering
+                _.defer(_.bind(this.trigger, this, 'content:update'));
             });
         },
 
@@ -804,7 +806,9 @@ define(function(require) {
          */
         findCellByIndex: function(modelI, columnI) {
             try {
-                return this.body.rows[modelI].cells[columnI];
+                return _.findWhere(this.body.rows[modelI].cells, {
+                    column: this.columns.at(columnI)
+                });
             } catch (e) {
                 return null;
             }
