@@ -337,6 +337,9 @@ define(function(require) {
         },
 
         exitEditMode: function(releaseBackdrop) {
+            if (!this.editModeEnabled) {
+                throw Error('Edit mode disabled');
+            }
             this.editModeEnabled = false;
             if (this.currentCell.$el) {
                 this.toggleHeaderCellHighlight(this.currentCell, false);

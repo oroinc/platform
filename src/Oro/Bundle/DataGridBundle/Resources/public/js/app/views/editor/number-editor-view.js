@@ -92,7 +92,7 @@ define(function(require) {
 
         isChanged: function() {
             var valueChanged = this.getValue() !== this.getModelValue();
-            return isNaN(this.getValue()) ?
+            return isNaN(this.getModelValue()) ?
                 this.$('input[name=value]').val() !== '' :
                 valueChanged;
         }
