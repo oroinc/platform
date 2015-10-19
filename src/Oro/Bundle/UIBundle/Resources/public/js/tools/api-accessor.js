@@ -49,15 +49,17 @@ define(function(require) {
      *                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
      *                          query parameters for client usage, so it is required to specify list of them)
-     * @augment BaseClass
+     * @augments [BaseClass](./base-class.md)
      * @exports ApiAccessor
      */
     var ApiAccessor;
 
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var BaseClass = require('../base-class');
     var RouteModel = require('../app/models/route-model');
+    var apiAccessorUnloadMessagesGroup = require('./api-accessor-unload-messages-group');
 
     ApiAccessor = BaseClass.extend(/** @exports ApiAccessor.prototype */{
         DEFAULT_HEADERS: {
@@ -97,9 +99,21 @@ define(function(require) {
          * @param {Object} urlParameters - Url parameters to compose the url
          * @param {Object} body - Request body
          * @param {Object} headers - Headers to send with the request
+         * @param {Object} options - Additional options
+         * @param {string} options.processingMessage - Shows notification message while request is going
+         * @param {boolean|string} options.preventWindowUnload - Prevent window from being unloaded without user
+         *                          confirmation until request is finished.
+         *                          If true provided - page unload will be prevented with default message.
+         *                          If string provided - please describe change in it. This string will be added to
+         *                              list on changes.
+         *
+         *                          Default message will be like:
+         *                            Server is being updated and the following changes might be lost:
+         *                            {messages list, each on new line}
+         *
          * @returns {$.Promise} - $.Promise instance with abort() support
          */
-        send: function(urlParameters, body, headers) {
+        send: function(urlParameters, body, headers, options) {
             var promise = $.ajax({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
@@ -107,6 +121,15 @@ define(function(require) {
                 data: JSON.stringify(this.formatBody(body))
             });
             var resultPromise = promise.then(_.bind(this.formatResult, this));
+            if (options && options.processingMessage) {
+                mediator.execute('showProcessingMessage', options.processingMessage, resultPromise);
+            }
+            if (options && options.preventWindowUnload) {
+                apiAccessorUnloadMessagesGroup.hold(options.preventWindowUnload);
+                resultPromise.always(function() {
+                    apiAccessorUnloadMessagesGroup.release(options.preventWindowUnload);
+                });
+            }
             resultPromise.abort = _.bind(promise.abort, promise);
             return resultPromise;
         },

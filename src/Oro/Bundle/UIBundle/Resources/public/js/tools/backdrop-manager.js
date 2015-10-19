@@ -3,7 +3,7 @@ define(function(require) {
     var $ = require('jquery');
     var MultiUseResourceManager = require('./multi-use-resource-manager');
     var backdropManager = new MultiUseResourceManager({
-        events: {
+        listen: {
             'construct': function() {
                 $(document.body).addClass('backdrop');
             },
