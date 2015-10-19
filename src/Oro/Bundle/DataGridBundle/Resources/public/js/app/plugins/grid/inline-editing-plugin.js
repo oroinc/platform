@@ -33,7 +33,7 @@ define(function(require) {
         /**
          * This view is used by default for editing
          */
-        DEFAULT_COLUMN_TYPE: 'text',
+        DEFAULT_COLUMN_TYPE: 'string',
 
         /**
          * If true interface should not respond to user actions.
@@ -210,7 +210,7 @@ define(function(require) {
             this.editorComponent = editorComponent;
 
             this.listenTo(editorComponent, 'saveAction', this.saveCurrentCell);
-            this.listenTo(editorComponent, 'cancelAction', this.exitEditMode);
+            this.listenTo(editorComponent, 'cancelAction', this.exitEditMode, true);
             this.listenTo(editorComponent, 'saveAndEditNextAction', this.saveCurrentCellAndEditNext);
             this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
             this.listenTo(editorComponent, 'saveAndEditPrevAction', this.saveCurrentCellAndEditPrev);
@@ -276,7 +276,10 @@ define(function(require) {
                 newData[this.editor.save_api_accessor.initialOptions.field_name] = serverUpdateData[keys[0]];
                 serverUpdateData = newData;
             }
-            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData)
+            this.editor.save_api_accessor.send(cell.model.toJSON(), serverUpdateData, {}, {
+                    processingMessage: __('oro.datagrid.inlineEditing.saving_progress'),
+                    preventWindowUnload: __('oro.datagrid.inlineEditing.inline_edits')
+                })
                 .done(_.bind(InlineEditingPlugin.onSaveSuccess, ctx))
                 .fail(_.bind(InlineEditingPlugin.onSaveError, ctx))
                 .always(function() {
@@ -290,9 +293,6 @@ define(function(require) {
 
         exitEditMode: function(releaseBackdrop) {
             this.editModeEnabled = false;
-            if (releaseBackdrop !== false) {
-                backdropManager.release(this.backdropId);
-            }
             if (this.currentCell.$el) {
                 this.toggleHeaderCellHighlight(this.currentCell, false);
                 this.currentCell.$el.parent('tr:first').removeClass('row-edit-mode');
@@ -301,6 +301,9 @@ define(function(require) {
             }
             this.stopListening(this.editorComponent);
             this.editorComponent.dispose();
+            if (releaseBackdrop !== false) {
+                backdropManager.release(this.backdropId);
+            }
             delete this.editorComponent;
         },
 
@@ -430,7 +433,7 @@ define(function(require) {
         onGenericEscapeKeydown: function(e) {
             if (e.keyCode === this.ESCAPE_KEY_CODE) {
                 if (!this.lockUserActions) {
-                    this.exitEditMode();
+                    this.exitEditMode(true);
                 }
                 e.preventDefault();
             }

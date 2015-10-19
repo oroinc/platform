@@ -4,6 +4,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var Backbone = require('backbone');
+    var Chaplin = require('chaplin');
 
     /**
      * Base class that implement extending in backbone way.
@@ -18,9 +19,10 @@ define(function(require) {
 
     BaseClass.prototype = {
         initialize: function(options) {
-            if (options.events) {
-                this.on(options.events);
+            if (options.listen) {
+                this.on(options.listen);
             }
+            this.delegateListeners();
         },
         dispose: function() {
             this.stopListening();
@@ -28,7 +30,11 @@ define(function(require) {
         }
     };
 
-    _.extend(BaseClass.prototype, Backbone.Events);
+    _.extend(BaseClass.prototype, Backbone.Events, {
+        constructor: BaseClass,
+        delegateListeners: Chaplin.View.prototype.delegateListeners,
+        delegateListener: Chaplin.View.prototype.delegateListener
+    });
 
     BaseClass.extend = Backbone.Model.extend;
 

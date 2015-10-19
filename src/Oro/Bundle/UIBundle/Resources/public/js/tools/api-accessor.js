@@ -55,9 +55,11 @@ define(function(require) {
     var ApiAccessor;
 
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var $ = require('jquery');
     var BaseClass = require('../base-class');
     var RouteModel = require('../app/models/route-model');
+    var apiAccessorUnloadMessagesGroup = require('./api-accessor-unload-messages-group');
 
     ApiAccessor = BaseClass.extend(/** @exports ApiAccessor.prototype */{
         DEFAULT_HEADERS: {
@@ -97,9 +99,21 @@ define(function(require) {
          * @param {Object} urlParameters - Url parameters to compose the url
          * @param {Object} body - Request body
          * @param {Object} headers - Headers to send with the request
+         * @param {Object} options - Additional options
+         * @param {string} options.processingMessage - Shows notification message while request is going
+         * @param {boolean|string} options.preventWindowUnload - Prevent window from being unloaded without user
+         *                          confirmation until request is finished.
+         *                          If true provided - page unload will be prevented with default message.
+         *                          If string provided - this message will be shown with others.
+         *
+         *                          Default message is:
+         *                            Server is being updated the following changes might be lost:
+         *                            - <your-message>
+         *                            - ...
+         *
          * @returns {$.Promise} - $.Promise instance with abort() support
          */
-        send: function(urlParameters, body, headers) {
+        send: function(urlParameters, body, headers, options) {
             var promise = $.ajax({
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
@@ -107,6 +121,15 @@ define(function(require) {
                 data: JSON.stringify(this.formatBody(body))
             });
             var resultPromise = promise.then(_.bind(this.formatResult, this));
+            if (options && options.processingMessage) {
+                mediator.execute('showProcessingMessage', options.processingMessage, resultPromise);
+            }
+            if (options && options.preventWindowUnload) {
+                apiAccessorUnloadMessagesGroup.hold(options.preventWindowUnload);
+                resultPromise.always(function() {
+                    apiAccessorUnloadMessagesGroup.release(options.preventWindowUnload);
+                });
+            }
             resultPromise.abort = _.bind(promise.abort, promise);
             return resultPromise;
         },
