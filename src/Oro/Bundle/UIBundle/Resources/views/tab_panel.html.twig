@@ -33,7 +33,7 @@
                     'url': tab.url
                 } %}
 
-                {% if isFirstLoop %}
+                {% if tab.content|default('') or isFirstLoop %}
                     {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
                 {% endif %}
 
@@ -60,7 +60,11 @@
         {% for tab in tabs %}
             {% set isFirstLoop = loop.index == 1 %}
             <div class="tab-pane{% if isFirstLoop %} active{% endif %}" id="{{ tab.alias }}">
-                {% if isFirstLoop %}{{ oro_widget_render(tab) }}{% endif %}
+                {% if tab.content|default('') %}
+                    {{ tab.content|raw }}
+                {% elseif isFirstLoop %}
+                    {{ oro_widget_render(tab) }}
+                {% endif %}
             </div>
         {% endfor %}
     </div>
