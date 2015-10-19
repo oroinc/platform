@@ -43,7 +43,7 @@ and will put response to console after completion
 
 * [ApiAccessor](#module_ApiAccessor)
   * [.initialize(Options)](#module_ApiAccessor#initialize)
-  * [.send(urlParameters, body, headers)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
+  * [.send(urlParameters, body, headers, options)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
   * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>Object</code>
   * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>Object</code>
   * [.getUrl(urlParameters)](#module_ApiAccessor#getUrl) ⇒ <code>string</code>
@@ -59,7 +59,7 @@ and will put response to console after completion
 | Options | <code>Object</code> | passed to the constructor |
 
 <a name="module_ApiAccessor#send"></a>
-### apiAccessor.send(urlParameters, body, headers) ⇒ <code>$.Promise</code>
+### apiAccessor.send(urlParameters, body, headers, options) ⇒ <code>$.Promise</code>
 Sends request to the server and returns $.Promise instance with abort() support
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
@@ -70,6 +70,9 @@ Sends request to the server and returns $.Promise instance with abort() support
 | urlParameters | <code>Object</code> | Url parameters to compose the url |
 | body | <code>Object</code> | Request body |
 | headers | <code>Object</code> | Headers to send with the request |
+| options | <code>Object</code> | Additional options |
+| options.processingMessage | <code>string</code> | Shows notification message while request is going |
+| options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - this message will be shown with others.                          Default message is:                            Server is being updated the following changes might be lost:                            - <your-message>                            - ... |
 
 <a name="module_ApiAccessor#getHeaders"></a>
 ### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>
