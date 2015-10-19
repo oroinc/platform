@@ -94,7 +94,8 @@ define(function(require) {
             var View = this.view;
             this.view = new View(this.getViewOptions());
             // fix enter behaviour
-            this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEnterKeydown, this));
+            this.$('.hasDatepicker').bindFirst('keydown' + this.eventNamespace(),
+                _.bind(this.onGenericEnterKeydown, this));
             // fix esc behaviour
             this.$('.hasDatepicker').on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
             // fix arrows behaviour
