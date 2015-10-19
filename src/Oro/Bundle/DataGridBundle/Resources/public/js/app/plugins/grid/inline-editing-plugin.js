@@ -268,7 +268,10 @@ define(function(require) {
 
         toggleHeaderCellHighlight: function(cell, state) {
             var columnIndex = this.main.columns.indexOf(cell.column);
-            this.main.header.row.cells[columnIndex].$el.toggleClass('header-cell-highlight', state);
+            var headerCell = this.main.findHeaderCellByIndex(columnIndex);
+            if (headerCell) {
+                headerCell.$el.toggleClass('header-cell-highlight', state);
+            }
         },
 
         buildClassNames: function(editor, cell) {

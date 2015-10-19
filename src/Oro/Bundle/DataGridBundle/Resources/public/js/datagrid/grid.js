@@ -812,7 +812,22 @@ define(function(require) {
             } catch (e) {
                 return null;
             }
+        },
 
+        /**
+         * Finds header cell by column index
+         *
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findHeaderCellByIndex: function(columnI) {
+            try {
+                return _.findWhere(this.header.row.cells, {
+                    column: this.columns.at(columnI)
+                });
+            } catch (e) {
+                return null;
+            }
         }
     });
 
