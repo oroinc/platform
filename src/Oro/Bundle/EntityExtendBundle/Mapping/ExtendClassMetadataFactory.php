@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Mapping;
 
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 
-class ExtendClassMetadataFactory extends ClassMetadataFactory
+class ExtendClassMetadataFactory extends OroClassMetadataFactory
 {
     /**
      * {@inheritdoc}
