@@ -44,6 +44,26 @@ define(function(require) {
                 }
             };
         },
+
+        getNextPage: function() {
+            if (this.rows.hasNext()) {
+                return this.rows.getNextPage();
+            } else if (this.rows.state.firstPage !== this.rows.state.currentPage) {
+                return this.rows.getPage(this.rows.state.firstPage);
+            }
+            return this.toResolvedPromise({});
+        },
+
+        getPreviousPage: function() {
+            // navigate to prev page
+            if (this.rows.hasPrevious()) {
+                return this.rows.getPreviousPage();
+            } else if (this.rows.state.lastPage !== this.rows.state.currentPage) {
+                return this.rows.getPage(this.rows.state.lastPage);
+            }
+            return this.toResolvedPromise({});
+        },
+
         next: function() {
             var info = this.getCurrentCellInfo();
             var columnI;
@@ -53,17 +73,10 @@ define(function(require) {
             if (info.column.last) {
                 if (info.row.last) {
                     // navigate to next page
-                    if (this.rows.hasNext()) {
-                        return this.rows.getNextPage().then(function() {
-                            _this.current = _this.grid.findCellByIndex(0, 0);
-                            return _this.current;
-                        });
-                    } else {
-                        return this.rows.getPage(this.rows.state.firstPage).then(function() {
-                            _this.current = _this.grid.findCellByIndex(0, 0);
-                            return _this.current;
-                        });
-                    }
+                    return this.getNextPage().then(function() {
+                        _this.current = _this.grid.findCellByIndex(0, 0);
+                        return _this.current;
+                    });
                 }
                 rowI = info.row.i + 1;
                 columnI = 0;
@@ -87,17 +100,10 @@ define(function(require) {
 
             if (info.row.last) {
                 // navigate to next page
-                if (this.rows.hasNext()) {
-                    return this.rows.getNextPage().then(function() {
-                        _this.current = _this.grid.findCellByIndex(0, columnI);
-                        return _this.current;
-                    });
-                } else {
-                    return this.rows.getPage(this.rows.state.firstPage).then(function() {
-                        _this.current = _this.grid.findCellByIndex(0, columnI);
-                        return _this.current;
-                    });
-                }
+                return this.getNextPage().then(function() {
+                    _this.current = _this.grid.findCellByIndex(0, columnI);
+                    return _this.current;
+                });
             }
 
             this.current = this.grid.findCellByIndex(rowI, columnI);
@@ -113,17 +119,10 @@ define(function(require) {
             if (info.column.first) {
                 if (info.row.first) {
                     // navigate to prev page
-                    if (this.rows.hasPrevious()) {
-                        return this.rows.getPreviousPage().then(function() {
-                            _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, _this.columns.length - 1);
-                            return _this.current;
-                        });
-                    } else {
-                        return this.rows.getPage(this.rows.state.lastPage).then(function() {
-                            _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, _this.columns.length - 1);
-                            return _this.current;
-                        });
-                    }
+                    return this.getPreviousPage().then(function() {
+                        _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, _this.columns.length - 1);
+                        return _this.current;
+                    });
                 }
                 rowI = info.row.i - 1;
                 columnI = this.columns.length - 1;
@@ -148,17 +147,10 @@ define(function(require) {
 
             if (info.row.first) {
                 // navigate to prev page
-                if (this.rows.hasPrevious()) {
-                    return this.rows.getPreviousPage().then(function() {
-                        _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, columnI);
-                        return _this.current;
-                    });
-                } else {
-                    return this.rows.getPage(this.rows.state.lastPage).then(function() {
-                        _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, columnI);
-                        return _this.current;
-                    });
-                }
+                return this.getPreviousPage().then(function() {
+                    _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, columnI);
+                    return _this.current;
+                });
             }
 
             this.current = this.grid.findCellByIndex(rowI, columnI);

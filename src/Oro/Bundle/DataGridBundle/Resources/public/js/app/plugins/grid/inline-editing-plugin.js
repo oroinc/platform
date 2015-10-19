@@ -174,7 +174,6 @@ define(function(require) {
                 if (backdropManager.isReleased(this.backdropId)) {
                     this.backdropId = backdropManager.hold();
                     $(document).on('keydown', this.onKeyDown);
-                    $(document).on('keydown', this.onKeyDown);
                 }
             }
             this.editModeEnabled = true;
