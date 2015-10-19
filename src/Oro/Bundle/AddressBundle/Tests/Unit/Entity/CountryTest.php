@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Entity;
 
+use Oro\Bundle\AddressBundle\Entity\Continent;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
@@ -11,10 +12,12 @@ class CountryTest extends \PHPUnit_Framework_TestCase
      * @dataProvider provider
      * @param string $property
      */
-    public function testSettersAndGetters($property)
+    public function testSettersAndGetters($property, $value = null)
     {
         $obj = new Country('iso2code');
-        $value = 'testValue';
+        if (is_null($value)) {
+            $value = 'testValue';
+        }
 
         call_user_func_array(array($obj, 'set' . ucfirst($property)), array($value));
         $this->assertEquals($value, call_user_func_array(array($obj, 'get' . ucfirst($property)), array()));
@@ -39,6 +42,7 @@ class CountryTest extends \PHPUnit_Framework_TestCase
             array('iso3code'),
             array('regions'),
             array('locale'),
+            array('continent', new Continent('iso2code')),
         );
     }
 
