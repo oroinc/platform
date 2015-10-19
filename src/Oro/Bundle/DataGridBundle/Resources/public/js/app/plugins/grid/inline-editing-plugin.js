@@ -75,6 +75,9 @@ define(function(require) {
         },
 
         disable: function() {
+            if (this.editModeEnabled) {
+                this.exitEditMode(true);
+            }
             InlineEditingPlugin.__super__.disable.call(this);
             this.hidePopover();
             this.main.body.refresh();
@@ -116,6 +119,10 @@ define(function(require) {
 
         onGridShown: function() {
             this.initPopover();
+        },
+
+        onGridRowClicked: function() {
+            this.hidePopover();
         },
 
         initPopover: function() {
