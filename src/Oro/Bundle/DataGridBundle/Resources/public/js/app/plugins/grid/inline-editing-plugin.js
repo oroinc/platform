@@ -534,10 +534,8 @@ define(function(require) {
                 case 400:
                     var jqXHRerrors = jqXHR.responseJSON.errors.children;
                     for (var i in jqXHRerrors) {
-                        if (jqXHRerrors[i].errors) {
-                            _.each(jqXHRerrors[i].errors, function(value) {
-                                errors.push(value);
-                            });
+                        if (jqXHRerrors.hasOwnProperty(i) && jqXHRerrors[i].errors) {
+                            errors.push.apply(errors, _.values(jqXHRerrors[i].errors));
                         }
                     }
                     break;
