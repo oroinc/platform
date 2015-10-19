@@ -79,9 +79,9 @@ define(function(require) {
             if (this.editModeEnabled) {
                 this.exitEditMode(true);
             }
-            InlineEditingPlugin.__super__.disable.call(this);
             this.hidePopover();
             this.main.body.refresh();
+            InlineEditingPlugin.__super__.disable.call(this);
         },
 
         dispose: function() {
