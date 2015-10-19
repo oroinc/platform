@@ -43,9 +43,17 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
         public: false
 
-    oro_api.entity_serializer.config_bag:
-        class: Oro\Bundle\ApiBundle\Serializer\EntitySerializerConfigBag
+    oro_api.config_bag:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
+        arguments:
+            - []
+
+    oro_api.config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ConfigProvider
+        public: false
+        arguments:
+            - @oro_api.get_config.processor
 
     oro_api.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer

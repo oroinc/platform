@@ -7,25 +7,25 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
-use Oro\Bundle\ApiBundle\Serializer\EntitySerializerConfigBag;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 
 class LoadDataByEntitySerializer implements ProcessorInterface
 {
-    /** @var EntitySerializerConfigBag */
-    protected $configBag;
+    /** @var ConfigProvider */
+    protected $configProvider;
 
     /** @var EntitySerializer */
     protected $entitySerializer;
 
     /**
-     * @param EntitySerializerConfigBag $configBag
-     * @param EntitySerializer          $entitySerializer
+     * @param ConfigProvider   $configProvider
+     * @param EntitySerializer $entitySerializer
      */
     public function __construct(
-        EntitySerializerConfigBag $configBag,
+        ConfigProvider $configProvider,
         EntitySerializer $entitySerializer
     ) {
-        $this->configBag        = $configBag;
+        $this->configProvider   = $configProvider;
         $this->entitySerializer = $entitySerializer;
     }
 
@@ -48,17 +48,19 @@ class LoadDataByEntitySerializer implements ProcessorInterface
         }
 
         $entityClass = $context->getClassName();
-        $version     = $context->getVersion();
-        if (!$entityClass || !$this->configBag->hasConfig($entityClass, $version)) {
+        if (!$entityClass) {
+            // no entity type specified
+            return;
+        }
+
+        $config = $this->configProvider->getConfig($entityClass, $context->getVersion());
+        if (!$config) {
             // an entity does not have a configuration for the EntitySerializer
             return;
         }
 
         $context->setResult(
-            $this->entitySerializer->serialize(
-                $query,
-                $this->configBag->getConfig($entityClass, $version)
-            )
+            $this->entitySerializer->serialize($query, $config)
         );
 
         // data returned by the EntitySerializer are already normalized

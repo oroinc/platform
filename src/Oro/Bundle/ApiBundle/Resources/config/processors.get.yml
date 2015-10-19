@@ -1,6 +1,7 @@
 services:
     oro_api.get.processor:
         class: Oro\Bundle\ApiBundle\Processor\GetProcessor
+        public: false
         arguments:
             - @oro_api.processor_bag
 
@@ -59,7 +60,7 @@ services:
     oro_api.get.load_data_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByEntitySerializer
         arguments:
-            - @oro_api.entity_serializer.config_bag
+            - @oro_api.config_provider
             - @oro_api.entity_serializer
         tags:
              - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
