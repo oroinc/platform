@@ -21,4 +21,15 @@ require([
         mediator.on('page:beforeChange', layout.pageRendering, layout);
         mediator.on('page:afterChange', layout.pageRendered, layout);
     });
+
+    /**
+     * Remove selection after page change
+     */
+    mediator.on('page:beforeChange', function clearSelection() {
+        if (document.selection) {
+            document.selection.empty();
+        } else if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+    });
 });

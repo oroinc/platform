@@ -75,6 +75,7 @@ define(function(require) {
 
         disable: function() {
             InlineEditingPlugin.__super__.disable.call(this);
+            this.hidePopover();
             this.main.body.refresh();
         },
 
@@ -105,7 +106,7 @@ define(function(require) {
             });
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
-                'click .icon-edit': enterEditModeIfNeeded
+                'mousedown .icon-edit': enterEditModeIfNeeded
             });
             delete cell.events.click;
             cell.delegateEvents();
@@ -113,10 +114,6 @@ define(function(require) {
 
         onGridShown: function() {
             this.initPopover();
-        },
-
-        onGridRowClicked: function() {
-            this.hidePopover();
         },
 
         initPopover: function() {
