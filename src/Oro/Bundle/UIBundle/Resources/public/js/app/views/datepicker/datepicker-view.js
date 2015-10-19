@@ -103,6 +103,7 @@ define(function(require) {
             this.$frontDateField.attr(options.dateInputAttrs);
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$el.after(this.$frontDateField);
+            this.$el.attr('data-format', 'backend');
         },
 
         /**

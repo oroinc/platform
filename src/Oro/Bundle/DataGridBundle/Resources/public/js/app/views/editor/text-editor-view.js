@@ -252,7 +252,7 @@ define(function(require) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
                 if (this.isChanged()) {
-                    if (this.validator.form()) {
+                    if (this.isValid()) {
                         this.trigger('save' + postfix + 'Action');
                     } else {
                         this.focus();
@@ -274,7 +274,7 @@ define(function(require) {
             if (e.keyCode === this.TAB_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrev' : 'AndEditNext';
                 if (this.isChanged()) {
-                    if (this.validator.form()) {
+                    if (this.isValid()) {
                         this.trigger('save' + postfix + 'Action');
                     } else {
                         this.focus();
@@ -324,7 +324,7 @@ define(function(require) {
                 }
                 if (postfix) {
                     if (this.isChanged()) {
-                        if (this.validator.form()) {
+                        if (this.isValid()) {
                             this.trigger('save' + postfix + 'Action');
                         } else {
                             this.focus();
