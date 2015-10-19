@@ -64,6 +64,7 @@ define(function(require) {
                 shown: this.onGridShown,
                 rowClicked: this.onGridRowClicked
             });
+            this.listenTo(mediator, 'page:beforeChange', this.exitEditMode);
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
@@ -71,7 +72,6 @@ define(function(require) {
             this.saveApiAccessor = new ApiAccesor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
-            this.listenTo(mediator, 'page:beforeChange', this.exitEditMode);
         },
 
         disable: function() {
