@@ -25,6 +25,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             'oro_app_config',
             new YamlCumulativeFileLoader('Resources/config/oro/app.yml')
         );
+
+        // original security config
+        $securityConfig = $container->getExtensionConfig('security');
+
         $resources    = $configLoader->load();
         $extensions   = $container->getExtensions();
         foreach ($resources as $resource) {
@@ -38,6 +42,9 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                 }
             }
         }
+
+        // original security config has highest priority
+        $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
 
         $this->preparePostgreSql($container);
     }

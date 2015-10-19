@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Bundle\SecurityBundle\DependencyInjection\Extension\SecurityExtensionHelper;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -39,17 +40,7 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
-        $securityConfig = $container->getExtensionConfig('security');
-        if (!isset($securityConfig[0]['firewalls']['main'])) {
-            return;
-        }
-
-        // main firewall is the most general firewall, so it should be the last in list
-        $mainFirewall = $securityConfig[0]['firewalls']['main'];
-        unset($securityConfig[0]['firewalls']['main']);
-        $securityConfig[0]['firewalls']['main'] = $mainFirewall;
-
         /** @var ExtendedContainerBuilder $container */
-        $container->setExtensionConfig('security', $securityConfig);
+        SecurityExtensionHelper::makeFirewallLatest($container, 'main');
     }
 }

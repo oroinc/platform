@@ -38,7 +38,7 @@ security:
                 path:                       oro_user_security_logout
             organization-remember-me:
                 key:                        %secret%
-                name:                       CRMRM
+                name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
             anonymous:                      false
