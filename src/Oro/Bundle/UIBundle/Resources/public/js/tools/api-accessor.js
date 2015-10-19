@@ -49,7 +49,7 @@ define(function(require) {
      *                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).
      *                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable
      *                          query parameters for client usage, so it is required to specify list of them)
-     * @augment BaseClass
+     * @augments [BaseClass](./base-class.md)
      * @exports ApiAccessor
      */
     var ApiAccessor;
@@ -106,9 +106,9 @@ define(function(require) {
          *                          If true provided - page unload will be prevented with default message.
          *                          If string provided - this message will be shown with others.
          *
-         *                          Default message is:
+         *                          Default message will be like:
          *                            Server is being updated the following changes might be lost:
-         *                            - <your-message>
+         *                            - {your-message}
          *                            - ...
          *
          * @returns {$.Promise} - $.Promise instance with abort() support

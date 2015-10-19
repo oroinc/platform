@@ -1,4 +1,4 @@
-/** @lends StdClass */
+/** @lends BaseClass */
 define(function(require) {
     'use strict';
 
@@ -8,10 +8,13 @@ define(function(require) {
 
     /**
      * Base class that implement extending in backbone way.
-     * Also connects events API by default
+     * Also connects [Backbone events API](http://backbonejs.org/#Events) and
+     * [Chaplin's declarative event bindings](https://goo.gl/9bEXVT) by default.
      *
      * @class
-     * @exports StdClass
+     * @param {Object} options - Options container
+     * @param {string} options.listen - Optional. Events to bind
+     * @exports BaseClass
      */
     var BaseClass = function() {
         this.initialize.apply(this, arguments);

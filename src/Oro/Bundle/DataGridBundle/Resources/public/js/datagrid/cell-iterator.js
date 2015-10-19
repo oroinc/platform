@@ -4,6 +4,7 @@ define(function(require) {
     /**
      * Cell iterator
      * @class
+     * @augments [BaseClass](../../../../UIBundle/Resources/doc/reference/client-side/base-class.md)
      */
     var CellIterator;
     var BaseClass = require('oroui/js/base-class');

@@ -1,5 +1,5 @@
 <a name="module_ApiAccessor"></a>
-## ApiAccessor
+## ApiAccessor ⇐ <code>[BaseClass](./base-class.md)</code>
 Abstraction of api access point. This class is by design to be initiated from server configuration.
 
 #### Sample usage of api_accessor with a full set of options provided(except `route_parameters_rename_map`).
@@ -27,7 +27,7 @@ apiAP.send({id: 321}, {name: 'new name'}).then(function(result) {
 Will raise POST request to `/api/opportunity/23/tasks/321?action=patch` with body == `{name: 'new name'}`
 and will put response to console after completion
 
-**Augment**: BaseClass  
+**Extends:** <code>[BaseClass](./base-class.md)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -41,7 +41,7 @@ and will put response to console after completion
 | options.query_parameter_names | <code>Array.&lt;string&gt;</code> | Optional. Array of parameter names to put into query                          string (e.g. `?<parameter-name>=<value>&<parameter-name>=<value>`).                          (The reason of adding this argument is that FOSRestBundle doesn’t provides acceptable                          query parameters for client usage, so it is required to specify list of them) |
 
 
-* [ApiAccessor](#module_ApiAccessor)
+* [ApiAccessor](#module_ApiAccessor) ⇐ <code>[BaseClass](./base-class.md)</code>
   * [.initialize(Options)](#module_ApiAccessor#initialize)
   * [.send(urlParameters, body, headers, options)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
   * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>Object</code>
@@ -72,7 +72,7 @@ Sends request to the server and returns $.Promise instance with abort() support
 | headers | <code>Object</code> | Headers to send with the request |
 | options | <code>Object</code> | Additional options |
 | options.processingMessage | <code>string</code> | Shows notification message while request is going |
-| options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - this message will be shown with others.                          Default message is:                            Server is being updated the following changes might be lost:                            - <your-message>                            - ... |
+| options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - this message will be shown with others.                          Default message will be like:                            Server is being updated the following changes might be lost:                            - {your-message}                            - ... |
 
 <a name="module_ApiAccessor#getHeaders"></a>
 ### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>

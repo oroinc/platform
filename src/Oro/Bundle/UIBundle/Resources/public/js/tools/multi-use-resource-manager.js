@@ -1,21 +1,58 @@
+/** @lends MultiUseResourceManager */
 define(function(require) {
     'use strict';
     var BaseClass = require('../base-class');
     /**
+     * Allows to create/remove resource that could be used by multiple holders.
+     *
+     * Use case:
+     * ```javascript
+     * var backdropManager = new MultiUseResourceManager({
+     *     listen: {
+     *         'construct': function() {
+     *             $(document.body).addClass('backdrop');
+     *         },
+     *         'dispose': function() {
+     *             $(document.body).removeClass('backdrop');
+     *         }
+     *     }
+     * });
+     *
+     * // 1. case with Ids
+     * var holderId = backdropManager.hold();
+     * // then somewhere
+     * backdropManager.release(holderId);
+     *
+     * // 2. case with holder object
+     * backdropManager.hold(this);
+     * // then somewhere, please note that link to the same object should be provided
+     * backdropManager.release(this);
+     *
+     * // 2. case with holder identifier
+     * backdropManager.hold(this.cid);
+     * // then somewhere, please note that link to the same object should be provided
+     * backdropManager.release(this.cid);
+     * ```
+     *
      * @class
+     * @augments [BaseClass](./base-class.md)
+     * @exports MultiUseResourceManager
      */
-    var MultiUseResourceManager = BaseClass.extend({
+    var MultiUseResourceManager = BaseClass.extend(/** @exports MultiUseResourceManager.prototype */{
         /**
-         * @type {number} holders counter
+         * Holders counter
+         * @type {number}
          * @protected
          */
         counter: 0,
         /**
-         * @type {boolean} true if resource is created
+         * True if resource is created
+         * @type {boolean}
          */
         isCreated: false,
         /**
-         * @type {Array} array of ids of current resource holders
+         * Array of ids of current resource holders
+         * @type {Array}
          */
         holders: null,
 
