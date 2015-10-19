@@ -72,7 +72,7 @@ Sends request to the server and returns $.Promise instance with abort() support
 | headers | <code>Object</code> | Headers to send with the request |
 | options | <code>Object</code> | Additional options |
 | options.processingMessage | <code>string</code> | Shows notification message while request is going |
-| options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - please describe change in it. This string will be added to                              list on changes.                          Default message will be like:                            Server is being updated the following changes might be lost:                            {messages list, each on new line} |
+| options.preventWindowUnload | <code>boolean</code> &#124; <code>string</code> | Prevent window from being unloaded without user                          confirmation until request is finished.                          If true provided - page unload will be prevented with default message.                          If string provided - please describe change in it. This string will be added to                              list on changes.                          Default message will be like:                            Server is being updated and the following changes might be lost:                            {messages list, each on new line} |
 
 <a name="module_ApiAccessor#getHeaders"></a>
 ### apiAccessor.getHeaders(headers) ⇒ <code>Object</code>

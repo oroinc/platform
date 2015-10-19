@@ -108,7 +108,7 @@ define(function(require) {
          *                              list on changes.
          *
          *                          Default message will be like:
-         *                            Server is being updated the following changes might be lost:
+         *                            Server is being updated and the following changes might be lost:
          *                            {messages list, each on new line}
          *
          * @returns {$.Promise} - $.Promise instance with abort() support
