@@ -192,7 +192,7 @@ class AssociationManager
         $callback = null
     ) {
         $em       = $this->doctrineHelper->getEntityManager($associationOwnerClass);
-        $criteria = $this->doctrineHelper->normalizeCriteria($filters);
+        $criteria = QueryUtils::normalizeCriteria($filters);
 
         $selectStmt = null;
         $subQueries = [];
@@ -208,7 +208,7 @@ class AssociationManager
                     )
                 )
                 ->innerJoin('e.' . $fieldName, 'target');
-            $this->doctrineHelper->applyJoins($subQb, $joins);
+            QueryUtils::applyJoins($subQb, $joins);
 
             $subQb->addCriteria($criteria);
             if (null !== $callback && is_callable($callback)) {
@@ -242,7 +242,7 @@ class AssociationManager
         if (null !== $limit) {
             $qb->setMaxResults($limit);
             if (null !== $page) {
-                $qb->setFirstResult($this->doctrineHelper->getPageOffset($page, $limit));
+                $qb->setFirstResult(QueryUtils::getPageOffset($page, $limit));
             }
         }
         if ($orderBy) {
@@ -312,7 +312,7 @@ class AssociationManager
         $callback = null
     ) {
         $em       = $this->doctrineHelper->getEntityManager($associationTargetClass);
-        $criteria = $this->doctrineHelper->normalizeCriteria($filters);
+        $criteria = QueryUtils::normalizeCriteria($filters);
 
         $selectStmt        = null;
         $subQueries        = [];
@@ -329,7 +329,7 @@ class AssociationManager
                     )
                 )
                 ->innerJoin('e.' . $fieldName, 'target');
-            $this->doctrineHelper->applyJoins($subQb, $joins);
+            QueryUtils::applyJoins($subQb, $joins);
 
             $subQb->addCriteria($criteria);
             if (null !== $callback && is_callable($callback)) {
@@ -363,7 +363,7 @@ class AssociationManager
         if (null !== $limit) {
             $qb->setMaxResults($limit);
             if (null !== $page) {
-                $qb->setFirstResult($this->doctrineHelper->getPageOffset($page, $limit));
+                $qb->setFirstResult(QueryUtils::getPageOffset($page, $limit));
             }
         }
         if ($orderBy) {
