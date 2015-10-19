@@ -196,10 +196,20 @@ define(function(require) {
                 editor.save_api_accessor = this.saveApiAccessor;
             }
 
-            editor.validation_rules = (columnMetadata.inline_editing &&
+            var validationRules = (columnMetadata.inline_editing &&
                 columnMetadata.inline_editing.validation_rules) ?
                 columnMetadata.inline_editing.validation_rules :
                 {};
+
+            _.each(validationRules, function(params, ruleName) {
+                // normalize rule's params, in case is it was defined as 'NotBlank: ~'
+                validationRules[ruleName] = params || {};
+            });
+
+            editor.viewOptions = $.extend(true, {}, editor.view_options || {}, {
+                className: this.buildClassNames(editor, cell).join(' '),
+                validationRules: validationRules
+            });
 
             return editor;
         },
@@ -228,15 +238,10 @@ define(function(require) {
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
-            var classNames = this.buildClassNames(editor, cell);
             var editorComponent = new CellEditorComponent(_.extend({}, editor.component_options, {
                 cell: cell,
                 view: CellEditorView,
-                viewOptions: $.extend(true, {
-                    validationRules: editor.validation_rules
-                }, editor.view_options || {}, {
-                    className: classNames.join(' ')
-                }),
+                viewOptions: editor.viewOptions,
                 fromPreviousCell: fromPreviousCell
             }));
 

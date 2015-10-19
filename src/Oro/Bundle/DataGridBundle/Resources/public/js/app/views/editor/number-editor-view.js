@@ -24,7 +24,7 @@ define(function(require) {
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
-     *           validationRules:
+     *           validation_rules:
      *             # jQuery.validate configuration
      *             required: true
      *             min: 5
@@ -36,7 +36,7 @@ define(function(require) {
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     * inline_editing.editor.validation_rules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
      *

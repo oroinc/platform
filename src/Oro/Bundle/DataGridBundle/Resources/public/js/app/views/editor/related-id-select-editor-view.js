@@ -37,7 +37,7 @@ define(function(require) {
      *               choices: # required
      *                 key-1: First
      *                 key-2: Second
-     *           validationRules:
+     *           validation_rules:
      *             # jQuery.validate configuration
      *             required: true
      *     properties:
@@ -53,7 +53,7 @@ define(function(require) {
      * inline_editing.editor.view_options.value_field_name | Related value field name.
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     * inline_editing.editor.validation_rules               | Optional. The client side validation rules
      *
      *
      * ### Constructor parameters
