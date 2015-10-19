@@ -58,7 +58,11 @@ define(function(require) {
         },
 
         enable: function() {
-            this.listenTo(this.main, 'afterMakeCell', this.onAfterMakeCell);
+            this.listenTo(this.main, {
+                afterMakeCell: this.onAfterMakeCell,
+                shown: this.onGridShown,
+                rowClicked: this.onGridRowClicked
+            });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
@@ -76,6 +80,14 @@ define(function(require) {
             this.main.body.refresh();
         },
 
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+            this.destroyPopover();
+            return InlineEditingPlugin.__super__.dispose.call(this);
+        },
+
         onAfterMakeCell: function(row, cell) {
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
@@ -84,30 +96,53 @@ define(function(require) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            var originalRender = cell.render;
             var _this = this;
-            cell.render = function() {
-                originalRender.apply(this, arguments);
+            cell.render = _.wrap(cell.render, function(originalRender) {
+                originalRender.apply(this, _.rest(arguments));
                 if (_this.isEditable(cell)) {
                     this.$el.addClass('editable view-mode');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
-                    this.$el.popover({
-                        content: __('oro.datagrid.inlineEditing.helpMessage'),
-                        container: document.body,
-                        placement: 'bottom',
-                        delay: {show: 1400, hide: 0},
-                        trigger: 'hover',
-                        animation: false
-                    });
                 }
                 return this;
-            };
+            });
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
                 'click .icon-edit': enterEditModeIfNeeded
             });
             delete cell.events.click;
             cell.delegateEvents();
+        },
+
+        onGridShown: function() {
+            this.initPopover();
+        },
+
+        onGridRowClicked: function() {
+            this.hidePopover();
+        },
+
+        initPopover: function() {
+            this.main.$el.popover({
+                content: __('oro.datagrid.inlineEditing.helpMessage'),
+                container: document.body,
+                selector: 'td.editable',
+                placement: 'bottom',
+                delay: {show: 1400, hide: 0},
+                trigger: 'hover',
+                animation: false
+            });
+        },
+
+        hidePopover: function() {
+            if (this.main.$el.data('popover')) {
+                this.main.$el.popover('hide');
+            }
+        },
+
+        destroyPopover: function() {
+            if (this.main.$el.data('popover')) {
+                this.main.$el.popover('destroy');
+            }
         },
 
         isEditable: function(cell) {
