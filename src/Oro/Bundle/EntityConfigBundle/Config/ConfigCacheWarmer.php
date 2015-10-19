@@ -159,7 +159,10 @@ class ConfigCacheWarmer
             $data      = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
 
             $classMap[$entityId]  = $className;
-            $entities[$className] = $isHidden;
+            $entities[$className] = [
+                'i' => $entityId,
+                'h' => $isHidden
+            ];
 
             $this->cache->saveEntityConfigValues($data, $className);
         }
@@ -177,11 +180,12 @@ class ConfigCacheWarmer
     {
         $connection = $this->configManager->getEntityManager()->getConnection();
         $fieldRows  = $connection
-            ->executeQuery('SELECT entity_id, field_name, type, mode, data FROM oro_entity_config_field');
+            ->executeQuery('SELECT id, entity_id, field_name, type, mode, data FROM oro_entity_config_field');
 
         $configurable = [];
         $fields       = [];
         foreach ($fieldRows as $row) {
+            $fieldId  = (int)$row['id'];
             $entityId = (int)$row['entity_id'];
             if (!isset($classMap[$entityId])) {
                 continue;
@@ -193,7 +197,11 @@ class ConfigCacheWarmer
             $data      = array_merge($this->getEmptyData(), $connection->convertToPHPValue($row['data'], 'array'));
 
             $configurable[$entityId][$fieldName] = true;
-            $fields[$className][$fieldName]      = ['t' => $fieldType, 'h' => $isHidden];
+            $fields[$className][$fieldName]      = [
+                'i' => $fieldId,
+                'h' => $isHidden,
+                't' => $fieldType
+            ];
 
             $this->cache->saveFieldConfigValues($data, $className, $fieldName, $fieldType);
         }
@@ -239,7 +247,7 @@ class ConfigCacheWarmer
     protected function loadVirtualFields()
     {
         $entities = $this->cache->getEntities();
-        foreach ($entities as $className => $isHidden) {
+        foreach ($entities as $className => $entityData) {
             $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
             if (!empty($virtualFields)) {
                 foreach ($virtualFields as $fieldName) {
