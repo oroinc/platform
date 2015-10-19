@@ -1,0 +1,86 @@
+services:
+    oro_api.get.processor:
+        class: Oro\Bundle\ApiBundle\Processor\GetProcessor
+        arguments:
+            - @oro_api.processor_bag
+
+    #
+    # initialize
+    #
+
+    oro_api.get.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+             - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
+
+    oro_api.get.normalize_entity_id:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+             - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
+
+    #
+    # security_check
+    #
+
+    oro_api.get.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @security.authorization_checker
+            - @oro_entity.doctrine_helper
+            - VIEW
+        tags:
+             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
+
+    #
+    # build_query
+    #
+
+    oro_api.get.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_security.acl_helper
+            - VIEW
+        tags:
+             - { name: oro.api.processor, action: get, group: build_query, priority: 50 }
+
+    oro_api.get.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+             - { name: oro.api.processor, action: get, group: build_query, priority: -10 }
+
+    #
+    # load_data
+    #
+
+    oro_api.get.load_data_by_entity_serializer:
+        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByEntitySerializer
+        arguments:
+            - @oro_api.entity_serializer.config_bag
+            - @oro_api.entity_serializer
+        tags:
+             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
+
+    oro_api.get.load_data_by_orm_query:
+        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByOrmQuery
+        tags:
+             - { name: oro.api.processor, action: get, group: load_data, priority: -20 }
+
+    #
+    # normalize_data
+    #
+
+    oro_api.get.initialize_entity_proxy:
+        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeEntityProxy
+        tags:
+             - { name: oro.api.processor, action: get, group: normalize_data, priority: 10 }
+
+    oro_api.get.normalize_data:
+        class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
+        arguments:
+            - @oro_api.item_normalizer
+        tags:
+             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }

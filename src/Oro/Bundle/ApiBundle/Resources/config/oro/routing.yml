@@ -1,0 +1,4 @@
+oro_rest_api:
+    resource: Oro\Bundle\ApiBundle\Controller\RestApiController
+    type: rest
+    prefix: api/

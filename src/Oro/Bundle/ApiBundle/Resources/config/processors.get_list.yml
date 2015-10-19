@@ -1,0 +1,119 @@
+services:
+    oro_api.get_list.processor:
+        class: Oro\Bundle\ApiBundle\Processor\GetListProcessor
+        arguments:
+            - @oro_api.processor_bag
+
+    #
+    # initialize
+    #
+
+    oro_api.get_list.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+             - { name: oro.api.processor, action: get_list, group: initialize, priority: 50 }
+
+    oro_api.get_list.set_default_paging:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\SetDefaultPaging
+        tags:
+             - { name: oro.api.processor, action: get_list, group: initialize, priority: -10 }
+
+    oro_api.get_list.set_default_sorting:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\SetDefaultSorting
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+             - { name: oro.api.processor, action: get_list, group: initialize, priority: -20 }
+
+    #
+    # security_check
+    #
+
+    oro_api.get_list.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @security.authorization_checker
+            - @oro_entity.doctrine_helper
+            - VIEW
+        tags:
+             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
+
+    #
+    # build_query
+    #
+
+    oro_api.get_list.normalize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeCriteria
+        tags:
+             - { name: oro.api.processor, action: get_list, group: initialize, priority: 60 }
+
+    oro_api.get_list.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_security.acl_helper
+            - VIEW
+        tags:
+             - { name: oro.api.processor, action: get_list, group: build_query, priority: 50 }
+
+    oro_api.get_list.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+             - { name: oro.api.processor, action: get_list, group: build_query, priority: -10 }
+
+    #
+    # load_data
+    #
+
+    oro_api.get_list.load_data_by_entity_serializer:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByEntitySerializer
+        arguments:
+            - @oro_api.entity_serializer.config_bag
+            - @oro_api.entity_serializer
+        tags:
+             - { name: oro.api.processor, action: get_list, group: load_data, priority: -10 }
+
+    oro_api.get_list.load_data_by_orm_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByOrmQuery
+        tags:
+             - { name: oro.api.processor, action: get_list, group: load_data, priority: -20 }
+
+    oro_api.get_list.load_data_by_sql_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataBySqlQuery
+        tags:
+             - { name: oro.api.processor, action: get_list, group: load_data, priority: -30 }
+
+    oro_api.get_list.load_data_by_search_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataBySearchQuery
+        arguments:
+            - @oro_search.index
+        tags:
+             - { name: oro.api.processor, action: get_list, group: load_data, priority: -40 }
+
+    #
+    # normalize_data
+    #
+
+    oro_api.get_list.initialize_entity_proxy:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\InitializeEntityProxy
+        tags:
+             - { name: oro.api.processor, action: get_list, group: normalize_data, priority: 10 }
+
+    oro_api.get_list.normalize_data:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeData
+        arguments:
+            - @oro_api.item_normalizer
+        tags:
+             - { name: oro.api.processor, action: get_list, group: normalize_data, priority: -10 }
+
+    #
+    # finalize
+    #
+
+    oro_api.get_list.set_total_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\SetTotalCountHeader
+        arguments:
+            - @oro_batch.orm.query_builder.count_query_optimizer
+        tags:
+             - { name: oro.api.processor, action: get_list, group: finalize, priority: -10 }

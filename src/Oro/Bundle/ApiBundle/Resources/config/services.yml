@@ -1,0 +1,74 @@
+services:
+    oro_api.action_handler:
+        class: Oro\Bundle\ApiBundle\Handler\ActionHandler
+
+    oro_api.processor_bag:
+        class: Oro\Component\ChainProcessor\ProcessorBag
+        public: false
+        arguments:
+            - @oro_api.processor_factory
+
+    oro_api.processor_factory:
+        class: Oro\Component\ChainProcessor\ChainProcessorFactory
+        public: false
+        calls:
+            - [addFactory, [@oro_api.simple_processor_factory, 10]]
+            - [addFactory, [@oro_api.di_processor_factory]]
+
+    oro_api.simple_processor_factory:
+        class: Oro\Component\ChainProcessor\SimpleProcessorFactory
+        public: false
+
+    oro_api.di_processor_factory:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+        public: false
+        arguments:
+            - @service_container
+
+    oro_api.item_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\ItemNormalizer
+        public: false
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_api.entity_accessor
+        calls:
+            - [addNormalizer, [@oro_api.search_item_normalizer, 50]]
+            - [addNormalizer, [@oro_api.datetime_normalizer]]
+
+    oro_api.datetime_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer
+        public: false
+
+    oro_api.search_item_normalizer:
+        class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
+        public: false
+
+    oro_api.entity_serializer.config_bag:
+        class: Oro\Bundle\ApiBundle\Serializer\EntitySerializerConfigBag
+        public: false
+
+    oro_api.entity_serializer:
+        class: Oro\Component\EntitySerializer\EntitySerializer
+        public: false
+        arguments:
+            - @doctrine
+            - @oro_api.entity_field_filter
+            - @oro_api.entity_accessor
+            - @oro_api.entity_data_transformer
+            - @oro_entity.query_hint_resolver
+
+    oro_api.entity_field_filter:
+        class: Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
+    oro_api.entity_accessor:
+        class: Oro\Component\EntitySerializer\EntityDataAccessor
+        public: false
+
+    oro_api.entity_data_transformer:
+        class: Oro\Component\EntitySerializer\EntityDataTransformer
+        public: false
+        arguments:
+            - @service_container
