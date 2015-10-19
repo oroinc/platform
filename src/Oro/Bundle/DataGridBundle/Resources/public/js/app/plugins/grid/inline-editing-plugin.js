@@ -66,13 +66,11 @@ define(function(require) {
             this.saveApiAccessor = new ApiAccesor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
-            $(document).on('keydown', this.onKeyDown);
             InlineEditingPlugin.__super__.enable.call(this);
         },
 
         disable: function() {
             InlineEditingPlugin.__super__.disable.call(this);
-            $(document).off('keydown', this.onKeyDown);
             this.main.body.refresh();
         },
 
@@ -175,6 +173,8 @@ define(function(require) {
             } else {
                 if (backdropManager.isReleased(this.backdropId)) {
                     this.backdropId = backdropManager.hold();
+                    $(document).on('keydown', this.onKeyDown);
+                    $(document).on('keydown', this.onKeyDown);
                 }
             }
             this.editModeEnabled = true;
@@ -303,6 +303,7 @@ define(function(require) {
             this.editorComponent.dispose();
             if (releaseBackdrop !== false) {
                 backdropManager.release(this.backdropId);
+                $(document).off('keydown', this.onKeyDown);
             }
             delete this.editorComponent;
         },
