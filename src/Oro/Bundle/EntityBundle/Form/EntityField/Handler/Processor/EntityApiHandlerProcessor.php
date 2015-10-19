@@ -78,8 +78,10 @@ class EntityApiHandlerProcessor
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
 
         if ($handler) {
-            $handler->afterProcess($entity);
+            return $handler->afterProcess($entity);
         }
+
+        return false;
     }
 
     /**

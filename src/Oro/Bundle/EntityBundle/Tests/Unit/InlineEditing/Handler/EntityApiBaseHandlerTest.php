@@ -79,6 +79,13 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('submit')
             ->with($data);
 
+        $this->initChangeSet([
+            'firstName' => [
+                0 => 1,
+                1 => 2
+            ]
+        ]);
+
         $this->assertFalse($this->handler->process($entity, $form, $data, $method));
     }
 
@@ -116,9 +123,12 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('invalidateProcess')
             ->with($entity);
 
-        $this->registry
-            ->expects($this->never())
-            ->method('getManager');
+        $this->initChangeSet([
+            'firstName' => [
+                0 => 1,
+                1 => 2
+            ]
+        ]);
 
         $this->assertFalse($this->handler->process($entity, $form, $data, $method));
     }
@@ -157,19 +167,42 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('invalidateProcess')
             ->with($entity);
 
-        $om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->initChangeSet([
+            'firstName' => [
+                0 => 1,
+                1 => 2
+            ]
+        ]);
+
+        $this->assertEquals([
+            'Oro_Bundle_DatagridBundle_Tests_Unit_Stub_SomeEntity' => [
+                'entityClass' => 'Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity',
+                'fields' => [
+                    'firstName' => 2
+                ]
+            ]
+        ], $this->handler->process($entity, $form, $data, $method));
+    }
+
+    protected function initChangeSet($changeSet)
+    {
+        $manager = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry
-            ->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($om));
-        $om->expects($this->once())
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')->disableOriginalConstructor()->getMock();
+        $uow->expects($this->once())->method('computeChangeSets')->willReturn(true);
+        $uow->expects($this->once())->method('getEntityChangeSet')->willReturn($changeSet);
+
+        $manager->expects($this->once())->method('getUnitOfWork')->willReturn($uow);
+
+        $manager->expects($this->any())
             ->method('persist');
-        $om->expects($this->once())
+        $manager->expects($this->any())
             ->method('flush');
 
-        $this->assertTrue($this->handler->process($entity, $form, $data, $method));
+
+        $this->registry->expects($this->any())->method('getManager')->willReturn($manager);
+
     }
 }

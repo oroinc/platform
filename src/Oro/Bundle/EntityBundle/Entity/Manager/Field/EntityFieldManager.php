@@ -93,9 +93,12 @@ class EntityFieldManager
             }
         }
 
-        $this->handler->process($entity, $form, $data, 'PATCH');
+        $changeSet = $this->handler->process($entity, $form, $data, 'PATCH');
 
-        return $form;
+        return [
+            'form' => $form,
+            'changeSet' => $changeSet
+        ];
     }
 
     /**

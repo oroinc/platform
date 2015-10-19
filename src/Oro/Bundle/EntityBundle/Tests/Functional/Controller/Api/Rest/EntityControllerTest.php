@@ -38,7 +38,7 @@ class EntityControllerTest extends WebTestCase
             $content
         );
 
-        $this->assertEquals(Codes::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Codes::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
     public function testChangeSimpleFieldFromBlackList()

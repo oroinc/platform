@@ -130,15 +130,18 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         }
 
         try {
-            $form = $this->getManager()->update(
+            $result = $this->getManager()->update(
                 $entity,
                 json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
             );
 
+            $form = $result['form'];
+            $changeSet = $result['changeSet'];
+
             if ($form->getErrors()->count() > 0) {
                 $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
             } else {
-                $view = $this->view($form, Codes::HTTP_NO_CONTENT);
+                $view = $this->view($changeSet, Codes::HTTP_OK);
             }
 
 
@@ -168,5 +171,4 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
     {
         return $this->get('security.authorization_checker');
     }
-
 }

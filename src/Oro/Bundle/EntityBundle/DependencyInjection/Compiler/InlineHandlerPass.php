@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class InlineHandlerPass implements CompilerPassInterface
 {
-    const INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE = 'oro_datagrid.extension.inline.handler_processor';
+    const INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
     const TAG = 'oro_datagrid.extension.api.handler';
 
     /**
