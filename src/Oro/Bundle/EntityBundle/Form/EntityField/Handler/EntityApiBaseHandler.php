@@ -3,31 +3,38 @@
 namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityApiBaseHandler
 {
-    /**
-     * @var Registry
-     */
+    /** @var Registry */
     protected $registry;
 
-    /**
-     * @var EntityApiHandlerProcessor
-     */
+    /** @var EntityApiHandlerProcessor */
     protected $processor;
+
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /**
      * @param Registry $registry
      * @param EntityApiHandlerProcessor $processor
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
-    public function __construct(Registry $registry, EntityApiHandlerProcessor $processor)
-    {
+    public function __construct(
+        Registry $registry,
+        EntityApiHandlerProcessor $processor,
+        EntityClassNameHelper $entityClassNameHelper
+    ) {
         $this->registry = $registry;
         $this->processor = $processor;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -72,12 +79,13 @@ class EntityApiBaseHandler
      */
     protected function initChangeSet($entity)
     {
+        /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $uow = $em->getUnitOfWork();
         $uow->computeChangeSets();
         $changeSet = $uow->getEntityChangeSet($entity);
 
-        $keyEntity = str_replace('\\', '_', get_class($entity));
+        $keyEntity = $this->entityClassNameHelper->getUrlSafeClassName(ClassUtils::getClass($entity));
 
         $response = [
             $keyEntity => [

@@ -5,10 +5,10 @@ namespace Oro\Bundle\EntityBundle\Form\EntityField;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
-use Doctrine\ORM\Mapping\MappingException;
 
 class FormBuilder
 {
@@ -60,11 +60,13 @@ class FormBuilder
     public function add(FormInterface $form, $entity, $fieldName)
     {
         $data = $this->getAssociationType($entity, $fieldName);
-        if (!isset($data['options'])) {
-            $data['options'] = [];
-        }
+        if (is_array($data)) {
+            if (!array_key_exists('options', $data)) {
+                $data['options'] = [];
+            }
 
-        $form = $form->add($fieldName, $data['type'], $data['options']);
+            $form = $form->add($fieldName, $data['type'], $data['options']);
+        }
 
         return $form;
     }
@@ -88,7 +90,7 @@ class FormBuilder
             $data = $this->getAssociationTypeOptions($metaData, $fieldName);
         }
 
-        if ($data !== false) {
+        if (is_array($data)) {
             $currentType = $data['type'];
             if (array_key_exists($currentType, $this->fieldTypeMap)) {
                 $data['type'] = $this->fieldTypeMap[$currentType];

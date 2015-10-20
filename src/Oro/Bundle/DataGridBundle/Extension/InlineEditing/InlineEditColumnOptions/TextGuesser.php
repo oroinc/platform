@@ -25,11 +25,7 @@ class TextGuesser implements GuesserInterface
     }
 
     /**
-     * @param string $columnName
-     * @param string $entityName
-     * @param array $column
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function guessColumnOptions($columnName, $entityName, $column)
     {

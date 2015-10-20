@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
+use Symfony\Component\Validator\PropertyMetadataContainerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 
 /**
  * Class InlineEditColumnOptionsGuesser
@@ -17,10 +20,13 @@ class InlineEditColumnOptionsGuesser
     protected $validator;
 
     /**
-     * @var array
+     * @var GuesserInterface[]
      */
     protected $guessers;
 
+    /**
+     * @param ValidatorInterface $validator
+     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->guessers = [];
@@ -44,7 +50,7 @@ class InlineEditColumnOptionsGuesser
      */
     public function getColumnOptions($columnName, $entityName, $column)
     {
-        /** @var ValidatorMetadata $validatorMetadata */
+        /** @var ValidatorInterface $validatorMetadata */
         $validatorMetadata = $this->validator->getMetadataFor($entityName);
 
         foreach ($this->guessers as $guesser) {
@@ -64,8 +70,9 @@ class InlineEditColumnOptionsGuesser
     }
 
     /**
-     * @param ValidatorMetadata $validatorMetadata
-     * @param string            $columnName
+     * @param ClassMetadataInterface $validatorMetadata
+     * @param string $columnName
+     *
      * @return array
      */
     protected function getValidationRules($validatorMetadata, $columnName)

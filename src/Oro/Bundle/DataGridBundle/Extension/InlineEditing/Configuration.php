@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 
 class Configuration implements ConfigurationInterface
 {

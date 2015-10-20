@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -21,7 +21,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
 use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @RouteResource("entity")
@@ -146,9 +146,9 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
 
 
         } catch (FieldUpdateAccessException $e) {
-            throw new AccessDeniedException("You does not have access to edit this field name");
+            throw new AccessDeniedException('oro.entity.controller.message.access_denied');
         } catch (EntityHasFieldException $e) {
-            $view = $this->view(['message'=> 'Field Name is not founded in entity'], Codes::HTTP_NOT_FOUND);
+            $view = $this->view(['message'=> 'oro.entity.controller.message.field_not_found'], Codes::HTTP_NOT_FOUND);
         }
 
         $response = parent::handleView($view);

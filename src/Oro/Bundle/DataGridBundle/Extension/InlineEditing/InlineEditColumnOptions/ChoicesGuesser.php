@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
@@ -35,13 +36,7 @@ class ChoicesGuesser implements GuesserInterface
     }
 
     /**
-     * @param string $columnName
-     * @param string $entityName
-     * @param array  $column
-     *
-     * @return array
-     *
-     * @throws \Exception
+     * {@inheritdoc}
      */
     public function guessColumnOptions($columnName, $entityName, $column)
     {

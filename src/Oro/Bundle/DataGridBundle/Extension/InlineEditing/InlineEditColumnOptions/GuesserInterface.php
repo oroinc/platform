@@ -14,6 +14,8 @@ interface GuesserInterface
      * @param array  $column
      *
      * @return array
+     *
+     * @throws \Exception
      */
     public function guessColumnOptions($columnName, $entityName, $column);
 }

@@ -21,6 +21,10 @@ class InlineEditingExtension extends AbstractExtension
      */
     protected $securityFacade;
 
+    /**
+     * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
         SecurityFacade $securityFacade

@@ -187,8 +187,7 @@ class EntityFieldManager
     {
         /** @var ClassMetadata $metaData */
         $metaData = $this->getMetaData($entity);
-        if ($metaData->hasField($fieldName) ||
-            $metaData->hasAssociation($fieldName)) {
+        if ($metaData->hasField($fieldName) || $metaData->hasAssociation($fieldName)) {
             return true;
         }
 
