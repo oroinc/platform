@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Handler;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
-use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
@@ -162,7 +162,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('invalidateProcess')
             ->with($entity);
-
+      
         $this->initManager();
 
         $this->assertEquals([
