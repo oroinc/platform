@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +26,11 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected $registry;
 
+    /**
+     * @var EntityClassNameHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityClassNameHelper;
+
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -34,8 +40,12 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->entityClassNameHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor);
+        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, $this->entityClassNameHelper);
     }
 
     public function testProcessUnsupportedMethod()
@@ -166,6 +176,10 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('invalidateProcess')
             ->with($entity);
+        $this->entityClassNameHelper
+            ->expects($this->once())
+            ->method('getUrlSafeClassName')
+            ->willReturn('Oro_Bundle_DatagridBundle_Tests_Unit_Stub_SomeEntity');
 
         $this->initChangeSet([
             'firstName' => [
