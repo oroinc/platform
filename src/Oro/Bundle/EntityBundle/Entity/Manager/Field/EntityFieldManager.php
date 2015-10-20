@@ -79,7 +79,7 @@ class EntityFieldManager
      * @param $entity
      * @param $content
      *
-     * @return FormInterface
+     * @return array
      */
     public function update($entity, $content)
     {

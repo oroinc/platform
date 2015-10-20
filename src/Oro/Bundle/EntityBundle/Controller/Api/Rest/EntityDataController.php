@@ -59,14 +59,12 @@ class EntityDataController extends FOSRestController
                 $entity,
                 json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
             );
-
             $form = $result['form'];
-            $changeSet = $result['changeSet'];
 
             if ($form->getErrors()->count() > 0) {
                 $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
             } else {
-                $view = $this->view($changeSet, Codes::HTTP_OK);
+                $view = $this->view($form, Codes::HTTP_NO_CONTENT);
             }
         } catch (FieldUpdateAccessException $e) {
             throw new AccessDeniedException('oro.entity.controller.message.access_denied');
