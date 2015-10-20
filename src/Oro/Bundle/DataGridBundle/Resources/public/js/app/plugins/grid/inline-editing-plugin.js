@@ -255,6 +255,7 @@ define(function(require) {
             this.editorComponent = editorComponent;
 
             this.listenTo(editorComponent, 'saveAction', this.saveCurrentCell);
+            this.listenTo(editorComponent, 'saveAndExitAction', this.saveCurrentCellAndExit);
             this.listenTo(editorComponent, 'cancelAction', this.exitEditMode, true);
             this.listenTo(editorComponent, 'saveAndEditNextAction', this.saveCurrentCellAndEditNext);
             this.listenTo(editorComponent, 'cancelAndEditNextAction', this.editNextCell);
@@ -357,6 +358,12 @@ define(function(require) {
                 $(document).off('keydown', this.onKeyDown);
             }
             delete this.editorComponent;
+        },
+
+        saveCurrentCellAndExit: function() {
+            if (this.saveCurrentCell(false)) {
+                this.exitEditMode(true);
+            }
         },
 
         editNextCell: function() {
