@@ -23,12 +23,10 @@ class ThemeListener implements EventSubscriberInterface
 
     /**
      * @param string $defaultActiveTheme
-     * @param bool $debug
      */
-    public function __construct($defaultActiveTheme, $debug)
+    public function __construct($defaultActiveTheme)
     {
         $this->defaultActiveTheme = $defaultActiveTheme;
-        $this->debug = $debug;
     }
 
     /**
@@ -71,5 +69,13 @@ class ThemeListener implements EventSubscriberInterface
             // may be already added by other bundle, for example by OroNavigationBundle
             KernelEvents::REQUEST => ['onKernelRequest', -20]
         ];
+    }
+
+    /**
+     * @param bool $debug
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
     }
 }

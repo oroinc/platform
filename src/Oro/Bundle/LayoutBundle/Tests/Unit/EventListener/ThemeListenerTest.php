@@ -16,7 +16,7 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->listener = new ThemeListener('defaultTheme', false);
+        $this->listener = new ThemeListener('defaultTheme');
     }
 
     public function testGetSubscribedEvents()
@@ -51,7 +51,7 @@ class ThemeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetSubRequestThemeFromMasterRequestQueryStringWithDebugTrue()
     {
-        $this->listener = new ThemeListener('defaultTheme', true);
+        $this->listener->setDebug(true);
 
         $masterRequestEvent = $this->createMasterRequestEvent(['_theme' => 'testTheme'], ['_route' => 'testRoute']);
         $this->listener->onKernelRequest($masterRequestEvent);
