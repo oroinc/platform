@@ -77,3 +77,4 @@ oro:
                 name: "Name"
                 show: "Show"
                 sort: "Sort"
+        not_number: Not a number

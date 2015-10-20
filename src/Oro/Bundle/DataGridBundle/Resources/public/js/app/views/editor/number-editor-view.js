@@ -95,6 +95,18 @@ define(function(require) {
             return isNaN(this.getModelValue()) ?
                 this.$('input[name=value]').val() !== '' :
                 valueChanged;
+        },
+
+        getServerUpdateData: function() {
+            var data = {};
+            data[this.column.get('name')] = isNaN(this.getValue()) ? null : this.getValue();
+            return data;
+        },
+
+        getModelUpdateData: function() {
+            var data = {};
+            data[this.column.get('name')] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
+            return data;
         }
     });
 
