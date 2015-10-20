@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\InlineHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DictionaryValueListProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityAliasProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityClassNameProviderPass;
@@ -49,6 +49,6 @@ class OroEntityBundle extends Bundle
         $container->addCompilerPass(new VirtualRelationProvidersCompilerPass());
         $container->addCompilerPass(new DictionaryValueListProviderPass());
         $container->addCompilerPass(new QueryHintResolverPass());
-        $container->addCompilerPass(new InlineHandlerPass());
+        $container->addCompilerPass(new EntityFieldHandlerPass());
     }
 }

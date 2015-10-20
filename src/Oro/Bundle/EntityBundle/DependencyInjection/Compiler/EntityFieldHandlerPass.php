@@ -6,17 +6,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
-class InlineHandlerPass implements CompilerPassInterface
+class EntityFieldHandlerPass implements CompilerPassInterface
 {
-    const INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
-    const TAG = 'oro_datagrid.extension.api.handler';
+    const HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
+    const TAG = 'oro_entity.form.entity_field.handler';
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE)) {
+        if (!$container->hasDefinition(self::HANDLER_PROCESSOR_SERVICE)) {
             return;
         }
 
@@ -25,7 +25,7 @@ class InlineHandlerPass implements CompilerPassInterface
             return;
         }
 
-        $definition = $container->getDefinition(self::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE);
+        $definition = $container->getDefinition(self::HANDLER_PROCESSOR_SERVICE);
 
         foreach (array_keys($taggedServices) as $id) {
             $definition->addMethodCall(

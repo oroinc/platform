@@ -18,6 +18,11 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 
+/**
+ * Class EntityFieldManager
+ * @package Oro\Bundle\EntityBundle\Entity\Manager\Field
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class EntityFieldManager
 {
     /** @var Registry */
@@ -108,6 +113,7 @@ class EntityFieldManager
      * @return bool
      *
      * @throws FieldUpdateAccessException
+     * @throws EntityHasFieldException
      */
     protected function validateFieldName($entity, $fieldName)
     {

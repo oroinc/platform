@@ -378,4 +378,4 @@ services:
     oro_entity.form.entity_field.handler.extra.handler_contact:
         class: %oro_entity.form.entity_field.handler.extra.handler_contact.class%
         tags:
-            - { name: oro_datagrid.extension.api.handler }
+            - { name: oro_entity.form.entity_field.handler }

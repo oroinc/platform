@@ -4,12 +4,12 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\InlineHandlerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\EntityFieldHandlerPass;
 
 class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var InlineHandlerPass
+     * @var EntityFieldHandlerPass
      */
     protected $compilerPass;
 
@@ -24,14 +24,14 @@ class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->getMock();
 
-        $this->compilerPass = new InlineHandlerPass();
+        $this->compilerPass = new EntityFieldHandlerPass();
     }
 
     public function testServiceNotExists()
     {
         $this->container->expects($this->once())
             ->method('hasDefinition')
-            ->with($this->equalTo(InlineHandlerPass::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE))
+            ->with($this->equalTo(EntityFieldHandlerPass::HANDLER_PROCESSOR_SERVICE))
             ->will($this->returnValue(false));
 
         $this->container->expects($this->never())
@@ -47,12 +47,12 @@ class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->expects($this->once())
             ->method('hasDefinition')
-            ->with($this->equalTo(InlineHandlerPass::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE))
+            ->with($this->equalTo(EntityFieldHandlerPass::HANDLER_PROCESSOR_SERVICE))
             ->will($this->returnValue(true));
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with($this->equalTo(InlineHandlerPass::TAG))
+            ->with($this->equalTo(EntityFieldHandlerPass::TAG))
             ->will($this->returnValue([]));
 
         $this->container->expects($this->never())
@@ -65,19 +65,19 @@ class InlineHandlerPassTest extends \PHPUnit_Framework_TestCase
     {
         $this->container->expects($this->once())
             ->method('hasDefinition')
-            ->with($this->equalTo(InlineHandlerPass::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE))
+            ->with($this->equalTo(EntityFieldHandlerPass::HANDLER_PROCESSOR_SERVICE))
             ->will($this->returnValue(true));
 
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with($this->equalTo(InlineHandlerPass::TAG))
+            ->with($this->equalTo(EntityFieldHandlerPass::TAG))
             ->will($this->returnValue(['service' => ['class' => '\stdClass']]));
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
 
         $this->container->expects($this->once())
             ->method('getDefinition')
-            ->with($this->equalTo(InlineHandlerPass::INLINE_EXTENSION_HANDLER_PROCESSOR_SERVICE))
+            ->with($this->equalTo(EntityFieldHandlerPass::HANDLER_PROCESSOR_SERVICE))
             ->will($this->returnValue($definition));
 
         $definition->expects($this->once())
