@@ -154,3 +154,23 @@
 .filter-end-date {
   display: inline-block;
 }
+.number-range-filter {
+  vertical-align: top;
+  .filter-start {
+    display: inline-block;
+    input[type=text]  {
+      width: 100px !important;
+      border-right-width: 1px !important;
+    }
+  }
+  .filter-end {
+    display: inline-block;
+    input[type=text]  {
+      width: 100px !important;
+      border-left-width: 1px !important;
+    }
+  }
+  .filter-separator {
+    position: static;
+  }
+}

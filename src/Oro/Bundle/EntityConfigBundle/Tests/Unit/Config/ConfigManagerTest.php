@@ -1015,15 +1015,22 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'metadataMode'                => null,
                 'expectedMode'                => ConfigModel::MODE_DEFAULT,
                 'cachedEntities'              => [],
-                'expectedSavedCachedEntities' => [self::ENTITY_CLASS => false]
+                'expectedSavedCachedEntities' => [
+                    self::ENTITY_CLASS => ['i' => null, 'h' => false]
+                ]
             ],
             [
                 'mode'                        => ConfigModel::MODE_HIDDEN,
                 'hasMetadata'                 => false,
                 'metadataMode'                => null,
                 'expectedMode'                => ConfigModel::MODE_HIDDEN,
-                'cachedEntities'              => ['Test\AnotherEntity' => false],
-                'expectedSavedCachedEntities' => ['Test\AnotherEntity' => false, self::ENTITY_CLASS => true]
+                'cachedEntities'              => [
+                    'Test\AnotherEntity' => ['i' => 123, 'h' => false]
+                ],
+                'expectedSavedCachedEntities' => [
+                    'Test\AnotherEntity' => ['i' => 123, 'h' => false],
+                    self::ENTITY_CLASS   => ['i' => null, 'h' => true]
+                ]
             ]
         ];
     }
@@ -1214,7 +1221,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'expectedMode'              => ConfigModel::MODE_DEFAULT,
                 'cachedFields'              => [],
                 'expectedSavedCachedFields' => [
-                    'id' => ['t' => 'int', 'h' => false]
+                    'id' => ['i' => null, 'h' => false, 't' => 'int']
                 ]
             ],
             [
@@ -1223,11 +1230,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'metadataMode'              => null,
                 'expectedMode'              => ConfigModel::MODE_HIDDEN,
                 'cachedFields'              => [
-                    'anotherField' => ['t' => 'string', 'h' => false]
+                    'anotherField' => ['i' => 123, 'h' => false, 't' => 'string']
                 ],
                 'expectedSavedCachedFields' => [
-                    'anotherField' => ['t' => 'string', 'h' => false],
-                    'id'           => ['t' => 'int', 'h' => true]
+                    'anotherField' => ['i' => 123, 'h' => false, 't' => 'string'],
+                    'id'           => ['i' => null, 'h' => true, 't' => 'int']
                 ]
             ]
         ];
