@@ -3,13 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityApiBaseHandler
 {
@@ -19,22 +17,16 @@ class EntityApiBaseHandler
     /** @var EntityApiHandlerProcessor */
     protected $processor;
 
-    /** @var EntityClassNameHelper */
-    protected $entityClassNameHelper;
-
     /**
      * @param Registry $registry
      * @param EntityApiHandlerProcessor $processor
-     * @param EntityClassNameHelper $entityClassNameHelper
      */
     public function __construct(
         Registry $registry,
-        EntityApiHandlerProcessor $processor,
-        EntityClassNameHelper $entityClassNameHelper
+        EntityApiHandlerProcessor $processor
     ) {
         $this->registry = $registry;
         $this->processor = $processor;
-        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -53,7 +45,6 @@ class EntityApiBaseHandler
         $form->setData($entity);
 
         if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
-            $changeSet = $this->initChangeSet($entity);
             $form->submit($data);
 
             if ($form->isValid()) {
@@ -61,6 +52,7 @@ class EntityApiBaseHandler
 
                 $this->onSuccess($entity);
 
+                $changeSet = $this->initChangeSet($entity, $data);
                 $changeSet = $this->updateChangeSet($changeSet, $this->processor->afterProcess($entity));
 
                 return $changeSet;
@@ -77,25 +69,14 @@ class EntityApiBaseHandler
      *
      * @return array
      */
-    protected function initChangeSet($entity)
+    protected function initChangeSet($entity, $data)
     {
-        /** @var EntityManager $em */
-        $em = $this->registry->getManager();
-        $uow = $em->getUnitOfWork();
-        $uow->computeChangeSets();
-        $changeSet = $uow->getEntityChangeSet($entity);
-
-        $keyEntity = $this->entityClassNameHelper->getUrlSafeClassName(ClassUtils::getClass($entity));
-
+        $accessor = PropertyAccess::createPropertyAccessor();
         $response = [
-            $keyEntity => [
-                'entityClass' => get_class($entity),
-                'fields' => []
-            ]
+            'fields' => $data
         ];
-
-        foreach ($changeSet as $key => $item) {
-            $response[$keyEntity]['fields'][$key] = $item[1];
+        if ($accessor->isReadable($entity, 'updatedAt')) {
+            $response['fields']['updatedAt'] = $accessor->getValue($entity, 'updatedAt');
         }
 
         return $response;

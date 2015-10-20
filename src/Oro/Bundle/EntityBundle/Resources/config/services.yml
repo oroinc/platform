@@ -369,7 +369,6 @@ services:
         arguments:
             - @doctrine
             - @oro_entity.form.entity_field.handler.processor.handler_processor
-            - @oro_entity.entity_class_name_helper
 
     oro_entity.form.entity_field.handler.processor.handler_processor:
         class: %oro_entity.form.entity_field.handler.processor.handler_processor.class%
