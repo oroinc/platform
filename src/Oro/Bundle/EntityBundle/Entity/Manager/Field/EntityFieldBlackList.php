@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
+namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
-class FieldsBlackList
+class EntityFieldBlackList
 {
     const INLINE_EDIT_BLACK_LIST_ID         = 'id';
     const INLINE_EDIT_BLACK_LIST_CREATED_AT = 'createdAt';
@@ -14,9 +14,9 @@ class FieldsBlackList
     public static function getValues()
     {
         return [
-            FieldsBlackList::INLINE_EDIT_BLACK_LIST_ID,
-            FieldsBlackList::INLINE_EDIT_BLACK_LIST_CREATED_AT,
-            FieldsBlackList::INLINE_EDIT_BLACK_LIST_UPDATED_AT,
+            EntityFieldBlackList::INLINE_EDIT_BLACK_LIST_ID,
+            EntityFieldBlackList::INLINE_EDIT_BLACK_LIST_CREATED_AT,
+            EntityFieldBlackList::INLINE_EDIT_BLACK_LIST_UPDATED_AT,
         ];
     }
 }

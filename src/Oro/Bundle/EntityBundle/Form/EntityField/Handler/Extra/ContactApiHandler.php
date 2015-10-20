@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\Extra;
+namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler\Extra;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor\EntityApiHandlerInterface;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface;
 
 /**
  * Test handler. Remove it in future.

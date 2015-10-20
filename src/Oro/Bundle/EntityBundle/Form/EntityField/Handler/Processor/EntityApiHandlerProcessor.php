@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor;
 
 use Doctrine\Common\Util\ClassUtils;
 
@@ -78,8 +78,10 @@ class EntityApiHandlerProcessor
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
 
         if ($handler) {
-            $handler->afterProcess($entity);
+            return $handler->afterProcess($entity);
         }
+
+        return false;
     }
 
     /**

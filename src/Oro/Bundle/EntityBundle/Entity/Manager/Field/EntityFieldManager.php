@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
+namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -10,13 +10,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Handler\EntityApiBaseHandler;
-use Oro\Bundle\DataGridBundle\Extension\InlineEditing\EntityManager\FormBuilder;
+use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
+use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
+use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 
-class EntityManager
+class EntityFieldManager
 {
     /** @var Registry */
     protected $registry;
@@ -81,7 +83,8 @@ class EntityManager
         $data = $this->presetData($entity);
 
         foreach ($content as $fieldName => $fieldValue) {
-            if ($this->hasAccessEditFiled($fieldName)) {
+            if ($this->validateFieldName($entity, $fieldName)) {
+                $fieldValue = trim($fieldValue);
                 $valueForForm = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
                 $valueForEntity = $this->prepareValueForEntity($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $valueForEntity);
@@ -90,9 +93,33 @@ class EntityManager
             }
         }
 
-        $this->handler->process($entity, $form, $data, 'PATCH');
+        $changeSet = $this->handler->process($entity, $form, $data, 'PATCH');
 
-        return $form;
+        return [
+            'form' => $form,
+            'changeSet' => $changeSet
+        ];
+    }
+
+    /**
+     * @param $entity
+     * @param $fieldName
+     *
+     * @return bool
+     *
+     * @throws FieldUpdateAccessException
+     */
+    protected function validateFieldName($entity, $fieldName)
+    {
+        if (!$this->hasField($entity, $fieldName)) {
+            throw new EntityHasFieldException();
+        }
+
+        if (!$this->hasAccessEditFiled($fieldName)) {
+            throw new FieldUpdateAccessException();
+        }
+
+        return true;
     }
 
     /**
@@ -102,12 +129,17 @@ class EntityManager
      */
     protected function presetData($entity)
     {
+        $accessor = PropertyAccess::createPropertyAccessor();
         $data = [];
         $metadata = $this->getMetadataConfig($entity);
         if (!$metadata || $metadata->isGlobalLevelOwned()) {
             return $data;
         }
-        $data[$metadata->getOwnerFieldName()] = $entity->getOwner()->getId();
+
+        $owner = $accessor->getValue($entity, $metadata->getOwnerFieldName());
+        if ($owner) {
+            $data[$metadata->getOwnerFieldName()] = $accessor->getValue($owner, 'id');
+        }
 
         return $data;
     }
@@ -137,12 +169,24 @@ class EntityManager
      */
     protected function hasAccessEditFiled($fieldName)
     {
-        $blackList = FieldsBlackList::getValues();
+        $blackList = EntityFieldBlackList::getValues();
         if ((in_array($fieldName, $blackList))) {
             return false;
         }
 
         return true;
+    }
+
+    protected function hasField($entity, $fieldName)
+    {
+        /** @var ClassMetadata $metaData */
+        $metaData = $this->getMetaData($entity);
+        if ($metaData->hasField($fieldName) ||
+            $metaData->hasAssociation($fieldName)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
