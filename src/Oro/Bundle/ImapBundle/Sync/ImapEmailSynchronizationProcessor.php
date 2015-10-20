@@ -371,16 +371,20 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $existingImapEmail = $this->findExistingImapEmail($relatedExistingImapEmails, $folder->getType());
             if ($this->isMovableToOtherFolder($existingImapEmail, $isMultiFolder, $email)) {
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
-            } elseif (!isset($existingEmailUsers[$email->getMessageId()])) {
+            } else {
                 try {
-                    $emailUser = $this->addEmailUser(
-                        $email,
-                        $folder,
-                        $email->hasFlag("\\Seen"),
-                        $this->currentUser,
-                        $this->currentOrganization
-                    );
-
+                    if (!isset($existingEmailUsers[$email->getMessageId()])) {
+                        $emailUser = $this->addEmailUser(
+                            $email,
+                            $folder,
+                            $email->hasFlag("\\Seen"),
+                            $this->currentUser,
+                            $this->currentOrganization
+                        );
+                    } else {
+                        $emailUser = $existingEmailUsers[$email->getMessageId()];
+                        $emailUser->addFolder($folder);
+                    }
                     $imapEmail = $this->createImapEmail($email->getId()->getUid(), $emailUser->getEmail(), $imapFolder);
                     $newImapEmails[] = $imapEmail;
                     $this->em->persist($imapEmail);
@@ -551,8 +555,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         );
 
         $emailUser = $imapEmail->getEmail()->getEmailUserByFolder($imapEmail->getImapFolder()->getFolder());
-        if ($emailUser != null) {
-            $emailUser->setFolder($newImapFolder->getFolder());
+        if ($emailUser !== null) {
+            $emailUser->addFolder($newImapFolder->getFolder());
         }
         $imapEmail->setImapFolder($newImapFolder);
         $imapEmail->setUid($newUid);

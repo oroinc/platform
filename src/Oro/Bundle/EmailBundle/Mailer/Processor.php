@@ -150,7 +150,7 @@ class Processor
         $this->processSend($message, $origin);
 
         $emailUser = $this->createEmailUser($model, $messageDate, $origin);
-        $emailUser->setFolder($this->getFolder($model->getFrom(), $origin));
+        $emailUser->addFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );
@@ -201,10 +201,13 @@ class Processor
             $origin->getOwner(),
             $origin->getOrganization()
         );
+        $emailUser->setOrigin($origin);
 
-        if ($origin instanceof UserEmailOrigin && $origin->getMailbox() !== null) {
-            $emailUser->setOwner(null);
-            $emailUser->setMailboxOwner($origin->getMailbox());
+        if ($origin instanceof UserEmailOrigin) {
+            if ($origin->getMailbox() !== null) {
+                $emailUser->setOwner(null);
+                $emailUser->setMailboxOwner($origin->getMailbox());
+            }
         }
 
         return $emailUser;
