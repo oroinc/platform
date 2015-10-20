@@ -26,6 +26,7 @@ config:
         'oro/filter/multiselect-filter': 'bundles/orofilter/js/filter/multiselect-filter.js'
         'oro/filter/none-filter': 'bundles/orofilter/js/filter/none-filter.js'
         'oro/filter/number-filter': 'bundles/orofilter/js/filter/number-filter.js'
+        'oro/filter/number-range-filter': 'bundles/orofilter/js/filter/number-range-filter.js'
         'oro/filter/select-filter': 'bundles/orofilter/js/filter/select-filter.js'
         'oro/filter/select-row-filter': 'bundles/orofilter/js/filter/select-row-filter.js'
         'oro/filter/text-filter': 'bundles/orofilter/js/filter/text-filter.js'

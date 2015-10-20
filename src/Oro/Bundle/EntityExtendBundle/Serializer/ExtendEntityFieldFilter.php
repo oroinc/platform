@@ -30,13 +30,12 @@ class ExtendEntityFieldFilter implements EntityFieldFilterInterface
      */
     public function isApplicableField($className, $fieldName)
     {
-        $fieldModel = $this->configManager->getConfigFieldModel($className, $fieldName);
-        if (!$fieldModel) {
+        if (null === $this->configManager->getConfigModelId($className, $fieldName)) {
             // this serializer works with non configurable entities as well
             return true;
         }
 
-        if ($fieldModel->isHidden()) {
+        if (true === $this->configManager->isHiddenModel($className, $fieldName)) {
             // exclude hidden fields
             return false;
         }
