@@ -103,10 +103,14 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * Patch entity field/s data by new values
+     *
      * @param int $id
      * @param int $className
      *
      * @return Response
+     *
+     * @throws AccessDeniedException
      *
      * @Rest\Patch("entity/{className}/{id}")
      * @ApiDoc(
@@ -124,11 +128,9 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
         } catch (\Exception $e) {
             return parent::handleView($this->view(['message'=>$e->getMessage()], Codes::HTTP_NOT_FOUND));
         }
-
         if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
-
         try {
             $result = $this->getManager()->update(
                 $entity,
@@ -143,8 +145,6 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
             } else {
                 $view = $this->view($changeSet, Codes::HTTP_OK);
             }
-
-
         } catch (FieldUpdateAccessException $e) {
             throw new AccessDeniedException('oro.entity.controller.message.access_denied');
         } catch (EntityHasFieldException $e) {
