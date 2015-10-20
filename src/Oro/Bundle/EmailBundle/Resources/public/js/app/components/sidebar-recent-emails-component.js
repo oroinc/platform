@@ -43,7 +43,7 @@ define(function(require) {
             this.listenTo(this.model.emailNotificationCollection, 'sync', this.updateModelFromCollection);
             this.model.emailNotificationCollection.fetch();
 
-            this.notificationHandler = _.throttle(_.bind(this._notificationHandler, this), 1000);
+            this.notificationHandler = _.debounce(_.bind(this._notificationHandler, this), 1000);
             sync.subscribe(channel, this.notificationHandler);
         },
 
