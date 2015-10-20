@@ -74,7 +74,7 @@ datagrid:
                     save_api_accessor:
                         # see main save_api_accessor, additonally supports field_name option
                         # which allows to override field name that sent to server
-                        # {<form_name>:{<field_name>: <new_value>}}
+                        # {<field_name>: <new_value>}
                     editor:
                         component: my-bundle/js/app/components/cell-editor-component
                         component_options:
