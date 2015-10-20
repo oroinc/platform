@@ -28,7 +28,7 @@ define([
             'click': 'onClick'
         },
 
-        DOUBLE_CLICK_WAIT_TIMEOUT: 250,
+        DOUBLE_CLICK_WAIT_TIMEOUT: 170,
 
         /**
          * @inheritDoc
@@ -68,6 +68,9 @@ define([
             if (this.disposed) {
                 return;
             }
+            if (this.clickTimeout) {
+                clearTimeout(this.clickTimeout);
+            }
             _.each(this.cells, function(cell) {
                 cell.dispose();
             });
@@ -77,6 +80,15 @@ define([
         },
 
         onMouseDown: function(e) {
+            if (this.clickTimeout) {
+                // if timeout is set, it means that user makes double click
+                clearTimeout(this.clickTimeout);
+                delete this.clickTimeout;
+                // prevent second click handler launch
+                this.mouseDownSelection = null;
+                this.mouseDownTarget = null;
+                return;
+            }
             // remember selection and target
             this.mouseDownSelection = this.getSelectedText();
             this.mouseDownTarget = $(e.target).closest('td');
@@ -110,10 +122,6 @@ define([
 
         onClick: function(e) {
             var _this = this;
-            if (this.clickTimeout) {
-                clearTimeout(this.clickTimeout);
-                return;
-            }
             if (this.clickPermit) {
                 this.clickTimeout = setTimeout(function() {
                     if (_this.disposed) {
@@ -127,6 +135,7 @@ define([
                         }
                     }
                     _this.$el.removeClass('mouse-down');
+                    delete _this.clickTimeout;
                 }, this.DOUBLE_CLICK_WAIT_TIMEOUT);
             }
         },
