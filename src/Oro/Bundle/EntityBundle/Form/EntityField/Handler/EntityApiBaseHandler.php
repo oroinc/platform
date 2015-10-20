@@ -37,7 +37,7 @@ class EntityApiBaseHandler
      * @param array $data
      * @param string $method
      *
-     * @return bool True on successful processing, false otherwise
+     * @return array changset
      */
     public function process($entity, FormInterface $form, $data, $method)
     {
@@ -61,7 +61,7 @@ class EntityApiBaseHandler
             }
         }
 
-        return false;
+        return [];
     }
 
     /**

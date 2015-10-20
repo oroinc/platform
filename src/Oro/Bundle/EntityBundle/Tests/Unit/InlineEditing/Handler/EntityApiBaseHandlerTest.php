@@ -67,7 +67,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('submit')
             ->with($data);
 
-        $this->assertFalse($this->handler->process($entity, $form, $data, $method));
+        $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
     public function testProcessDataEmpty()
@@ -89,7 +89,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('submit')
             ->with($data);
 
-        $this->assertFalse($this->handler->process($entity, $form, $data, $method));
+        $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
     public function testProcessInvalid()
@@ -126,7 +126,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('invalidateProcess')
             ->with($entity);
 
-        $this->assertFalse($this->handler->process($entity, $form, $data, $method));
+        $this->assertEquals([], $this->handler->process($entity, $form, $data, $method));
     }
 
     public function testProcessValid()
