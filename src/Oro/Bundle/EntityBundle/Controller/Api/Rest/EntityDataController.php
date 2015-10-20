@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
+use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -47,33 +48,13 @@ class EntityDataController extends FOSRestController
     public function patchAction($className, $id)
     {
         try {
-            $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
+            $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+            $data = $this->getManager()->patch($className, $id, $data);
+
+            $view = $this->view($data, Codes::HTTP_OK);
         } catch (\Exception $e) {
-            return parent::handleView($this->view(['message' => $e->getMessage()], Codes::HTTP_NOT_FOUND));
+            $view = $this->view($e->getMessage(), $e->getCode());
         }
-        if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
-            throw new AccessDeniedException();
-        }
-        try {
-            $result = $this->getManager()->update(
-                $entity,
-                json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
-            );
-
-            $form = $result['form'];
-            $changeSet = $result['changeSet'];
-
-            if ($form->getErrors()->count() > 0) {
-                $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
-            } else {
-                $view = $this->view($changeSet, Codes::HTTP_OK);
-            }
-        } catch (FieldUpdateAccessException $e) {
-            throw new AccessDeniedException('oro.entity.controller.message.access_denied');
-        } catch (EntityHasFieldException $e) {
-            $view = $this->view(['message' => 'oro.entity.controller.message.field_not_found'], Codes::HTTP_NOT_FOUND);
-        }
-
         $response = parent::handleView($view);
 
         return $response;
@@ -84,14 +65,6 @@ class EntityDataController extends FOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_entity.manager.entity_field_manager');
-    }
-
-    /**
-     * @return SecurityFacade
-     */
-    protected function getSecurityService()
-    {
-        return $this->get('security.authorization_checker');
+        return $this->get('oro_entity.manager.api.enitty_data_api_manager');
     }
 }

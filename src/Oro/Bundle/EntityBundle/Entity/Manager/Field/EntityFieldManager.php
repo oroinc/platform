@@ -7,6 +7,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use FOS\RestBundle\Util\Codes;
+
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -118,11 +120,11 @@ class EntityFieldManager
     protected function validateFieldName($entity, $fieldName)
     {
         if (!$this->hasField($entity, $fieldName)) {
-            throw new EntityHasFieldException();
+            throw new EntityHasFieldException('oro.entity.controller.message.field_not_found', Codes::HTTP_NOT_FOUND);
         }
 
         if (!$this->hasAccessEditFiled($fieldName)) {
-            throw new FieldUpdateAccessException();
+            throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Codes::HTTP_FORBIDDEN);
         }
 
         return true;

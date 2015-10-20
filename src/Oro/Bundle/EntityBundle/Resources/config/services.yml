@@ -41,6 +41,8 @@ parameters:
     # managers
     oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
     oro_entity.manager.entity_field_manager.class:           Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager
+    # managers/api
+    oro_entity.manager.api.enitty_data_api_manager.class:         Oro\Bundle\EntityBundle\Manager\Api\EntityDataAPIManager
 
     # form
     oro_entity.form.entity_field.form_builder.class:         Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder
@@ -372,3 +374,11 @@ services:
 
     oro_entity.form.entity_field.handler.processor.handler_processor:
         class: %oro_entity.form.entity_field.handler.processor.handler_processor.class%
+
+    oro_entity.manager.api.enitty_data_api_manager:
+        class: %oro_entity.manager.api.enitty_data_api_manager.class%
+        scope: request
+        arguments:
+            - @oro_entity.manager.entity_field_manager
+            - @security.authorization_checker
+            - @oro_entity.routing_helper
