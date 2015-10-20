@@ -134,12 +134,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                 'entity_name' => $entityName,
                 'behaviour' => 'enable_selected',
                 'save_api_accessor' => [
-                    'route' => 'oro_datagrid_api_rest_entity_patch',
+                    'route' => 'oro_api_patch_entity',
                     'http_method' => 'PATCH',
                     'default_route_parameters' => ['className' => 'OroCRM_Bundle_ContactBundle_Entity_Contact'],
                     'query_parameter_names' => [],
                 ],
-
             ],
             FormatterConfiguration::COLUMNS_KEY => [
                 'testText' => [
