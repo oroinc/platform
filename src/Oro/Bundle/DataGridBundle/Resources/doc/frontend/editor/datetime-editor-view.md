@@ -30,7 +30,7 @@ datagrid:
                 showButtonPanel: true
               timePickerOptions:
                 # See https://github.com/jonthornton/jquery-timepicker#options
-          validationRules:
+          validation_rules:
             # jQuery.validate configuration
             required: true
 ```
@@ -45,7 +45,7 @@ inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for t
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
 inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
 inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://goo.gl/MP6Unb)
-inline_editing.editor.validationRules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules               | Optional. The client side validation rules
 
 ### Constructor parameters
 
