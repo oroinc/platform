@@ -81,7 +81,7 @@ class EntityFieldManager
      * @param $entity
      * @param $content
      *
-     * @return FormInterface
+     * @return array
      */
     public function update($entity, $content)
     {
@@ -91,7 +91,7 @@ class EntityFieldManager
 
         foreach ($content as $fieldName => $fieldValue) {
             if ($this->validateFieldName($entity, $fieldName)) {
-                $fieldValue = trim($fieldValue);
+                $fieldValue = $this->cleanupValue($fieldValue);
                 $valueForForm = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
                 $valueForEntity = $this->prepareValueForEntity($entity, $fieldName, $fieldValue);
                 $accessor->setValue($entity, $fieldName, $valueForEntity);
@@ -269,5 +269,18 @@ class EntityFieldManager
         $em = $this->registry->getManager();
 
         return $em->getClassMetadata($className);
+    }
+
+    /**
+     * @param $fieldValue
+     * @return string
+     */
+    protected function cleanupValue($fieldValue)
+    {
+        if (is_string($fieldValue)) {
+            $fieldValue = trim($fieldValue);
+        }
+
+        return $fieldValue;
     }
 }

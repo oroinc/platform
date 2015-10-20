@@ -31,7 +31,7 @@ define(function(require) {
      *             view_options:
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
-     *           validationRules:
+     *           validation_rules:
      *             # jQuery.validate configuration
      *             required: true
      *             minlen: 5
@@ -43,7 +43,7 @@ define(function(require) {
      * :---------------------------------------------------|:-----------
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     * inline_editing.editor.validation_rules               | Optional. The client side validation rules
      *
      * ### Constructor parameters
      *
@@ -251,14 +251,18 @@ define(function(require) {
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE) {
                 var postfix = e.shiftKey ? 'AndEditPrevRow' : 'AndEditNextRow';
-                if (this.isChanged()) {
-                    if (this.isValid()) {
-                        this.trigger('save' + postfix + 'Action');
-                    } else {
-                        this.focus();
-                    }
+                if (e.ctrlKey) {
+                    this.trigger('saveAndExitAction');
                 } else {
-                    this.trigger('cancel' + postfix + 'Action');
+                    if (this.isChanged()) {
+                        if (this.validator.form()) {
+                            this.trigger('save' + postfix + 'Action');
+                        } else {
+                            this.focus();
+                        }
+                    } else {
+                        this.trigger('cancel' + postfix + 'Action');
+                    }
                 }
                 e.stopImmediatePropagation();
                 e.preventDefault();

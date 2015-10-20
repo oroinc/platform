@@ -27,7 +27,7 @@ datagrid:
                 changeYear: true
                 yearRange: '-80:+1'
                 showButtonPanel: true
-          validationRules:
+          validation_rules:
             # jQuery.validate configuration
             required: true
 ```
@@ -40,7 +40,7 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
-inline_editing.editor.validationRules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules               | Optional. The client side validation rules
 
 ### Constructor parameters
 

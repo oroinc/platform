@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerInterface;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
-use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 
 class EntityApiHandlerProcessorTest extends \PHPUnit_Framework_TestCase
 {
