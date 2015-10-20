@@ -203,8 +203,13 @@ abstract class AbstractEntityOwnershipDecisionMaker implements
             return $organizationId ? $ownerId === $organizationId : in_array($ownerId, $userOrganizationIds, true);
         }
 
-        return in_array(
-            $this->getObjectId($this->getEntityOwnerAccessor()->getOrganization($domainObject)),
+        $ownerOrganization = $this->getEntityOwnerAccessor()->getOrganization($domainObject);
+
+        // in case when entity has no owner yet (e.g. checking for new object)
+        $noOwnerExistsYet = is_null($ownerOrganization);
+
+        return $noOwnerExistsYet || in_array(
+            $this->getObjectId($ownerOrganization),
             $allowedOrganizationIds,
             true
         );

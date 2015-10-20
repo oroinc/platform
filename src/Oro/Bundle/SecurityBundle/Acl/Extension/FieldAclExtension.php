@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
@@ -57,7 +59,11 @@ class FieldAclExtension extends EntityAclExtension
     {
         $supports = parent::supports($type, $id);
 
-        return $supports && strpos($id, 'field') === 0;
+        // if entity extension supports AND
+        // rather id starts with 'field' (e.g. field+fieldName)
+        // or id is null (checking for new entity)
+
+        return $supports && (0 === strpos($id, 'field') || null === $id);
     }
 
     /**
@@ -70,6 +76,20 @@ class FieldAclExtension extends EntityAclExtension
         if (strpos($id, '+')) {
             $id = explode('+', $id)[0];
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getObjectIdentity($val)
+    {
+        $identity = parent::getObjectIdentity($val);
+
+        if (null === $identity->getIdentifier()) {
+            $identity = new ObjectIdentity('field', $identity->getType());
+        }
+
+        return $identity;
     }
 
     /**

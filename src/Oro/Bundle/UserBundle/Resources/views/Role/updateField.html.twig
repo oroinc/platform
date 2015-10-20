@@ -2,8 +2,8 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
-{% set formAction = path('oro_field_acl_update', { 'id': entityId, 'className': className}) %}
+{% oro_title_set({params : { "%role%": form.vars.value.label, "%className%": entityName } }) %}
+{% set formAction = path('oro_field_acl_update', {'id': entityId, 'className': className}) %}
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
@@ -20,7 +20,14 @@
             'entity':      form.vars.value,
             'indexPath':   path('oro_user_role_index'),
             'indexLabel': 'oro.user.role.entity_plural_label'|trans,
-            'entityTitle': form.vars.value.label
+            'entityTitle': entityName,
+            'additional': [
+                {
+                    'entity':      form.vars.value,
+                    'indexPath':   path('oro_user_role_update', {'id': entityId}),
+                    'indexLabel':  form.vars.value.label,
+                }
+            ]
         }
         %}
         {{ parent() }}

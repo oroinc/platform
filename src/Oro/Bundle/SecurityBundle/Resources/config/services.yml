@@ -69,6 +69,7 @@ parameters:
     oro_security.listener.console_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\ConsoleContextListener
 
     oro_security.form.extension.aclprotected_type.class:       Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension
+    oro_security.form.extension.aclprotected_fields_type:      Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedFieldTypeExtension
     oro_security.field_filter.class:                           Oro\Bundle\SecurityBundle\Filter\FieldFilter
 
 services:
@@ -530,6 +531,13 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: form.type_extension, alias: entity }
+
+    oro_security.form.extension.aclprotected_fields_type:
+        class: %oro_security.form.extension.aclprotected_fields_type%
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: form.type_extension, alias: form }
 
     oro_security.listener.search_listener:
           class: %oro_security.listener.search_listener.class%

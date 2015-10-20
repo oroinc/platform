@@ -98,6 +98,7 @@ class RoleController extends Controller
         return [
             'entity'           => $entity,
             'className'        => $className,
+            'entityName'       => substr($className, strrpos($className, '\\') + 1), // short entity name
             'form'             => $aclRoleHandler->createView(),
             'privilegesConfig' => $privilegesConfig,
         ];

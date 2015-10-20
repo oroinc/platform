@@ -230,14 +230,11 @@ class AclPrivilegeRepository
                     continue;
                 }
 
-                // update existing aces
-                //$mask = $this->updateExistingPermissions($sid, $oid, $ace->getMask(), $masks, $rootMasks, $extension);
-
-
-
+                $mask = $this->findSimilarMask($masks, $ace->getMask(), $extension);
 
                 // as we have already processed $mask, remove it from $masks collection
                 if ($mask !== false) {
+                    $this->manager->setFieldPermission($sid, $oid, $fieldName, $mask);
                     $this->removeMask($masks, $mask);
                 }
             }
