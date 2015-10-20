@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Processor;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Processor;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 

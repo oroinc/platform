@@ -6,10 +6,10 @@ use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGue
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * Class InlineEditingExtensionTest
@@ -77,7 +77,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessConfigs()
     {
-        $entityName = 'OroCRM\Bundle\ContactBundle\Entity\Contact';
+        $entityName = 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity';
         $configValues = [
             Configuration::BASE_CONFIG_KEY => [
                 'enable' => true,
@@ -134,9 +134,10 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                 'entity_name' => $entityName,
                 'behaviour' => 'enable_selected',
                 'save_api_accessor' => [
-                    'route' => 'oro_api_patch_entity',
+                    'route' => 'oro_api_patch_entity_data',
                     'http_method' => 'PATCH',
-                    'default_route_parameters' => ['className' => 'OroCRM_Bundle_ContactBundle_Entity_Contact'],
+                    'default_route_parameters' =>
+                        ['className' => 'Oro_Bundle_EntityBundle_Tests_Unit_Fixtures_Stub_SomeEntity'],
                     'query_parameter_names' => [],
                 ],
             ],

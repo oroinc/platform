@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\Extension\InlineEditing\Handler;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Handler;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
-use Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
@@ -179,7 +179,7 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
         $this->entityClassNameHelper
             ->expects($this->once())
             ->method('getUrlSafeClassName')
-            ->willReturn('Oro_Bundle_DatagridBundle_Tests_Unit_Stub_SomeEntity');
+            ->willReturn('Oro_Bundle_EntityBundle_Tests_Unit_Fixtures_Stub_SomeEntity');
 
         $this->initChangeSet([
             'firstName' => [
@@ -189,8 +189,8 @@ class EntityApiBaseHandlerTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->assertEquals([
-            'Oro_Bundle_DatagridBundle_Tests_Unit_Stub_SomeEntity' => [
-                'entityClass' => 'Oro\Bundle\DatagridBundle\Tests\Unit\Stub\SomeEntity',
+            'Oro_Bundle_EntityBundle_Tests_Unit_Fixtures_Stub_SomeEntity' => [
+                'entityClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity',
                 'fields' => [
                     'firstName' => 2
                 ]
