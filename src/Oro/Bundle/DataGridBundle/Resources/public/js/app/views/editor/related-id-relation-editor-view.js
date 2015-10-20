@@ -118,19 +118,21 @@ define(function(require) {
             };
         },
 
-        addInitialResultItemIfRequired: function(choices) {
-            var id = this.getModelValue();
-            var found = false;
+        filterInitialResultItem: function(choices) {
+            choices = _.clone(choices);
+            var id = String(this.getModelValue());
             for (var i = 0; i < choices.length; i++) {
-                var choice = choices[i];
-                if (choice.id === id) {
-                    found = true;
+                if (String(choices[i].id) === id) {
+                    choices.splice(i, 1);
                     break;
                 }
             }
-            if (!found) {
-                choices.unshift(this.getInitialResultItem());
-            }
+            return choices;
+        },
+
+        addInitialResultItem: function(choices) {
+            choices = this.filterInitialResultItem(choices);
+            choices.unshift(this.getInitialResultItem());
             return choices;
         },
 
@@ -152,7 +154,7 @@ define(function(require) {
                         per_page: _this.perPage
                     }));
                     currentRequest.term = options.term;
-                    if (options.term === '') {
+                    if (options.term === '' && options.page === 1) {
                         _this.column.emptyQueryRequest = currentRequest;
                     }
                 }
@@ -160,10 +162,13 @@ define(function(require) {
                     if (_this.disposed) {
                         return;
                     }
-                    _this.availableChoices = _.clone(response.results);
                     if (currentTerm === options.term) {
-                        if (options.term === '') {
-                            _this.availableChoices = _this.addInitialResultItemIfRequired(_this.availableChoices);
+                        if (options.term === '' && options.page === 1) {
+                            _this.availableChoices = _this.addInitialResultItem(response.results);
+                        } else if (options.term === '' && options.page !== 1) {
+                            _this.availableChoices = _this.filterInitialResultItem(response.results);
+                        } else {
+                            _this.availableChoices = _.clone(response.results);
                         }
                         options.callback({
                             results: _this.availableChoices,
