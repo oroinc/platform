@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @dbIsolation
  */
-class EntityControllerTest extends WebTestCase
+class EntityDataControllerTest extends WebTestCase
 {
     public function setUp()
     {
@@ -29,7 +29,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"firstName":"Test"}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity', [
+            $this->getUrl('oro_api_patch_entity_data', [
                 'className' => $className,
                 'id' => $id
             ]),
@@ -51,7 +51,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"id":10}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity', [
+            $this->getUrl('oro_api_patch_entity_data', [
                 'className' => $className,
                 'id' => $id
             ]),
@@ -73,7 +73,7 @@ class EntityControllerTest extends WebTestCase
         $content = '{"firstName":"Test"}';
         $this->client->request(
             'PATCH',
-            $this->getUrl('oro_api_patch_entity', [
+            $this->getUrl('oro_api_patch_entity_data', [
                 'className' => $className,
                 'id' => $id
             ]),

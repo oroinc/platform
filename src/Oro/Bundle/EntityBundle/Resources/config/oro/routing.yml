@@ -24,3 +24,13 @@ oro_entity_dictionary_api:
         version:  latest
     options:
         group: dictionary_entity
+
+oro_entity_data_api:
+    resource: "@OroEntityBundle/Controller/Api/Rest/EntityDataController.php"
+    type:         rest
+    prefix:       api/rest/{version}
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest
