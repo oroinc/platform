@@ -51,7 +51,7 @@ class EntityDataController extends FOSRestController
             $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
             $data = $this->getManager()->patch($className, $id, $data);
 
-            $view = $this->view($data, Codes::HTTP_OK);
+            $view = $this->view($data, Codes::HTTP_NO_CONTENT);
         } catch (\Exception $e) {
             $view = $this->view($e->getMessage(), $e->getCode());
         }
