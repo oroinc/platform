@@ -34,7 +34,7 @@ define(function(require) {
      *               placeholder: '<placeholder>'
      *               css_class_name: '<class-name>'
      *               value_field_name: {column-name-value}
-     *           validationRules:
+     *           validation_rules:
      *             # jQuery.validate configuration
      *             required: true
      *         autocomplete_api_accessor:
@@ -57,7 +57,7 @@ define(function(require) {
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
-     * inline_editing.editor.validationRules               | Optional. The client side validation rules
+     * inline_editing.editor.validation_rules               | Optional. The client side validation rules
      * inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
      * inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
      *
