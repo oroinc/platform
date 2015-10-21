@@ -85,7 +85,7 @@ class EntityReader extends IteratorBasedReader
     public function setSourceEntityName($entityName, Organization $organization = null)
     {
         /** @var EntityManager $entityManager */
-        $entityManager  = $this->registry
+        $entityManager = $this->registry
             ->getManagerForClass($entityName)
             ->getRepository($entityName);
         $queryBuilder = $entityManager->createQueryBuilder('o');

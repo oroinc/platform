@@ -111,6 +111,6 @@ class EntityDetachFixer
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityClass);
 
-        return  $entityManager->getUnitOfWork()->getEntityState($entity) == UnitOfWork::STATE_DETACHED;
+        return $entityManager->getUnitOfWork()->getEntityState($entity) === UnitOfWork::STATE_DETACHED;
     }
 }
