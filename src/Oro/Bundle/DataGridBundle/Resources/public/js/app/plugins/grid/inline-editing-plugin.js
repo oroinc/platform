@@ -8,6 +8,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
+    var ApiAccessor = require('oroui/js/tools/api-accessor');
     var backdropManager = require('oroui/js/tools/backdrop-manager');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('orodatagrid/js/app/views/editor/text-editor-view');
@@ -72,8 +73,8 @@ define(function(require) {
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
             }
-            var ApiAccesor = this.options.metadata.inline_editing.save_api_accessor['class'];
-            this.saveApiAccessor = new ApiAccesor(
+            var ConcreteApiAccessor = this.options.metadata.inline_editing.save_api_accessor['class'];
+            this.saveApiAccessor = new ConcreteApiAccessor(
                 _.omit(this.options.metadata.inline_editing.save_api_accessor, 'class'));
             this.main.body.refresh();
             InlineEditingPlugin.__super__.enable.call(this);
@@ -159,23 +160,28 @@ define(function(require) {
             if (!columnMetadata) {
                 return false;
             }
+            var editable;
+            var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
+            // validateUrlParameters
             switch (this.options.metadata.inline_editing.behaviour) {
                 case 'enable_all':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
-                        return false;
+                    if (enableConfigValue !== false) {
+                        editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
+                            (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                                this.options.metadata.inline_editing.default_editors;
+                    } else {
+                        editable = false;
                     }
-                    return (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                        (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
-                            this.options.metadata.inline_editing.default_editors;
+                    break;
                 case 'enable_selected':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
-                        return true;
-                    }
+                    editable = enableConfigValue === true;
                     break;
                 default:
                     throw new Error('Unknown behaviour');
             }
-            return false;
+            return editable ?
+                this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
+                false;
         },
 
         getCellEditorOptions: function(cell) {
@@ -196,10 +202,14 @@ define(function(require) {
             }
 
             if (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.save_api_accessor) {
-                var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
-                    columnMetadata.inline_editing.save_api_accessor);
-                var ApiAccesor = saveApiOptions.class;
-                editor.save_api_accessor = new ApiAccesor(_.omit(saveApiOptions, 'class'));
+                if (!(columnMetadata.inline_editing.save_api_accessor instanceof ApiAccessor)) {
+                    var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
+                        columnMetadata.inline_editing.save_api_accessor);
+                    var ConcreteApiAccessor = saveApiOptions.class;
+                    columnMetadata.inline_editing.save_api_accessor = new ConcreteApiAccessor(
+                        _.omit(saveApiOptions, 'class'));
+                }
+                editor.save_api_accessor = columnMetadata.inline_editing.save_api_accessor;
             } else {
                 // use main
                 editor.save_api_accessor = this.saveApiAccessor;
