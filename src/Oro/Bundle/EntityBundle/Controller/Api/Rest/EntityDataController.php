@@ -15,10 +15,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
-use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-
 /**
  * @RouteResource("entity_data")
  * @NamePrefix("oro_api_")
@@ -47,31 +43,17 @@ class EntityDataController extends FOSRestController
     public function patchAction($className, $id)
     {
         try {
-            $entity = $this->get('oro_entity.routing_helper')->getEntity($className, $id);
-        } catch (\Exception $e) {
-            return parent::handleView($this->view(['message' => $e->getMessage()], Codes::HTTP_NOT_FOUND));
-        }
-        if (!$this->getSecurityService()->isGranted('EDIT', $entity)) {
-            throw new AccessDeniedException();
-        }
-        try {
-            $result = $this->getManager()->update(
-                $entity,
-                json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true)
-            );
-            $form = $result['form'];
+            $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+            list($form, $data) = $this->getManager()->patch($className, $id, $data);
 
             if ($form->getErrors()->count() > 0) {
                 $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
             } else {
-                $view = $this->view($form, Codes::HTTP_NO_CONTENT);
+                $view = $this->view($data, Codes::HTTP_NO_CONTENT);
             }
-        } catch (FieldUpdateAccessException $e) {
-            throw new AccessDeniedException('oro.entity.controller.message.access_denied');
-        } catch (EntityHasFieldException $e) {
-            $view = $this->view(['message' => 'oro.entity.controller.message.field_not_found'], Codes::HTTP_NOT_FOUND);
+        } catch (\Exception $e) {
+            $view = $this->view($e->getMessage(), $e->getCode());
         }
-
         $response = parent::handleView($view);
 
         return $response;
@@ -82,14 +64,6 @@ class EntityDataController extends FOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_entity.manager.entity_field_manager');
-    }
-
-    /**
-     * @return SecurityFacade
-     */
-    protected function getSecurityService()
-    {
-        return $this->get('security.authorization_checker');
+        return $this->get('oro_entity.manager.api.enitty_data_api_manager');
     }
 }

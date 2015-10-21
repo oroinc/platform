@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Processor;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
+use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
 class EntityManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +25,9 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipMetadataProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $validator;
 
     protected function setUp()
     {
@@ -48,22 +53,27 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->validator = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+
         $this->manager = new EntityFieldManager(
             $this->registry,
             $this->formBuilder,
             $this->handler,
             $this->entityRoutingHelper,
-            $this->ownershipMetadataProvider
+            $this->ownershipMetadataProvider,
+            $this->validator
         );
     }
 
     public function testUpdate()
     {
         $this->initForm([
-            'getForm' => [
-                'expected' => $this->once()
-            ],
-            'add' => [
+            'build' => [
                 'expected' => $this->once()
             ]
         ]);
@@ -97,15 +107,6 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testBlockedFieldNameUpdate()
     {
-        $this->initForm([
-            'getForm' => [
-                'expected' => $this->once()
-            ],
-            'add' => [
-                'expected' => $this->never()
-            ]
-        ]);
-
         $entityManager = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -124,6 +125,8 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->ownershipMetadataProvider->expects($this->any())->method('getMetaData')->willReturn($metaDataOwnerShip);
 
+        $this->validator->expects($this->once())->method('validate')->will($this->throwException(new FieldUpdateAccessException()));
+
         $this->manager->update($this->getEntity(), [
             'id' => 10,
             'updatedAt' => 10,
@@ -134,8 +137,7 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
     protected function initForm($options)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\FormInterface')->disableOriginalConstructor()->getMock();
-        $this->formBuilder->expects($options['getForm']['expected'])->method('getForm')->willReturn($form);
-        $this->formBuilder->expects($options['add']['expected'])->method('add')->willReturn($form);
+        $this->formBuilder->expects($options['build']['expected'])->method('build')->willReturn($form);
     }
 
     protected function getMetaDataOwnerShip($options)
