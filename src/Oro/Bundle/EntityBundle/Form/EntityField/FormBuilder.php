@@ -37,9 +37,17 @@ class FormBuilder
         $this->registry = $registry;
     }
 
-    public function build($entity, $fields) {
+    /**
+     * @param $entity
+     * @param $fields
+     *
+     * @return FormInterface
+     */
+    public function build($entity, $fields)
+    {
         $form = $this->getForm($entity);
-        foreach ($fields as $fieldName => $fieldValue) {
+        $keys = array_keys($fields);
+        foreach ($keys as $fieldName) {
             $form = $this->add($form, $entity, $fieldName);
         }
 

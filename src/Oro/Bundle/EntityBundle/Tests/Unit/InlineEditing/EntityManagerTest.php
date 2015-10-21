@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Extension\InlineEditing\Processor;
 
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
-use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
 use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
 class EntityManagerTest extends \PHPUnit_Framework_TestCase
@@ -125,7 +124,8 @@ class EntityManagerTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->ownershipMetadataProvider->expects($this->any())->method('getMetaData')->willReturn($metaDataOwnerShip);
 
-        $this->validator->expects($this->once())->method('validate')->will($this->throwException(new FieldUpdateAccessException()));
+        $this->validator->expects($this->once())->method('validate')
+            ->will($this->throwException(new FieldUpdateAccessException()));
 
         $this->manager->update($this->getEntity(), [
             'id' => 10,
