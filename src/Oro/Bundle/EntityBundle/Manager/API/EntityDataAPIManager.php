@@ -17,6 +17,10 @@ class EntityDataAPIManager
     /** @var  AuthorizationChecker */
     protected $securityService;
 
+    /**
+     * @param EntityFieldManager $entityDataManager
+     * @param AuthorizationChecker $securityService
+     */
     public function __construct(
         EntityFieldManager $entityDataManager,
         AuthorizationChecker $securityService
@@ -25,6 +29,14 @@ class EntityDataAPIManager
         $this->securityService = $securityService;
     }
 
+    /**
+     * @param $entity
+     * @param $data
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
     public function patch($entity, $data)
     {
         if (!$this->securityService->isGranted('EDIT', $entity)) {
