@@ -5,6 +5,7 @@ parameters:
     oro_layout.request.listener.theme.class:           Oro\Bundle\LayoutBundle\EventListener\ThemeListener
 
     oro_layout.default_active_theme:    ~
+    oro_layout.debug:    ~
     oro_layout.theme_updates_resources: []
     oro_layout.cache_dir:               %kernel.cache_dir%/layouts
 
@@ -114,5 +115,7 @@ services:
         class: %oro_layout.request.listener.theme.class%
         arguments:
             - %oro_layout.default_active_theme%
+        calls:
+            - [setDebug, [%oro_layout.debug%]]
         tags:
             - { name: kernel.event_subscriber }
