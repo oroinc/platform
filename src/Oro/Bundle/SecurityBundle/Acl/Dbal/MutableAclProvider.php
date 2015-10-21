@@ -28,6 +28,8 @@ use Oro\Bundle\SecurityBundle\Event\UpdateAcl;
  *       especially updateSecurityIdentity.
  * @see https://github.com/symfony/symfony/pull/8305
  * @see https://github.com/symfony/symfony/pull/8650
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MutableAclProvider extends BaseMutableAclProvider
 {
@@ -383,6 +385,8 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     protected function getInsertAccessControlEntrySql(
         $classId,

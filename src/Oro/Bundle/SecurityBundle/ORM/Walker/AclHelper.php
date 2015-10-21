@@ -146,18 +146,7 @@ class AclHelper
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
             }
 
-            if ($shareCondition) {
-                $hints = $query->getHints();
-                if (!empty($hints[Query::HINT_CUSTOM_TREE_WALKERS])) {
-                    $customHints = !in_array(self::ORO_ACL_WALKER, $hints[Query::HINT_CUSTOM_TREE_WALKERS])
-                        ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], [self::ORO_ACL_WALKER])
-                        : $hints[Query::HINT_CUSTOM_TREE_WALKERS];
-                } else {
-                    $customHints = [self::ORO_ACL_WALKER];
-                }
-                $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
-                $query->setHint(AclWalker::ORO_ACL_SHARE_CONDITION, $shareCondition);
-            }
+            $this->addShareConditionToQuery($query, $shareCondition);
 
             if (!empty($this->queryComponents)) {
                 $query->setHint(SqlWalker::ORO_ACL_QUERY_COMPONENTS, $this->queryComponents);
@@ -520,6 +509,28 @@ class AclHelper
             }
 
             $this->queryComponents[$dqlAlias] = $queryComponent;
+        }
+    }
+
+    /**
+     * Add to query share condition
+     *
+     * @param Query     $query
+     * @param Node|null $shareCondition
+     */
+    protected function addShareConditionToQuery(Query $query, $shareCondition)
+    {
+        if ($shareCondition) {
+            $hints = $query->getHints();
+            if (!empty($hints[Query::HINT_CUSTOM_TREE_WALKERS])) {
+                $customHints = !in_array(self::ORO_ACL_WALKER, $hints[Query::HINT_CUSTOM_TREE_WALKERS])
+                    ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], [self::ORO_ACL_WALKER])
+                    : $hints[Query::HINT_CUSTOM_TREE_WALKERS];
+            } else {
+                $customHints = [self::ORO_ACL_WALKER];
+            }
+            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
+            $query->setHint(AclWalker::ORO_ACL_SHARE_CONDITION, $shareCondition);
         }
     }
 }

@@ -41,10 +41,16 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
      * @var PermissionGrantingStrategy
      */
     private $strategy;
+
     /**
      * @var UserSecurityIdentity
      */
     private $sid;
+
+    /**
+     * @var RoleSecurityIdentity
+     */
+    private $rsid;
 
     /**
      * @var PermissionGrantingStrategyContext
@@ -150,6 +156,8 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $user->setUsername('TestUser');
         $this->sid = new UserSecurityIdentity('TestUser', get_class($user));
 
+        $this->rsid = new RoleSecurityIdentity('TestRole');
+
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
             ->method('getUser')
@@ -195,11 +203,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->get();
 
         $acl = $this->getAcl(ObjectIdentity::fromDomainObject($obj));
-        $acl->insertClassAce($this->sid, $aceMask);
-        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $acl->insertClassAce($this->rsid, $aceMask);
+        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->rsid)));
 
         $this->metadataProvider->setMetadata(get_class($obj), $this->getOrganizationMetadata());
-        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->rsid)));
         $this->metadataProvider->setMetadata(get_class($obj), $this->getBusinessUnitMetadata());
         $this->metadataProvider->setMetadata(get_class($obj), $this->getUserMetadata());
     }

@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\Formatter\ShareFormatter;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -114,20 +115,8 @@ class SecurityIndexer
             $tables[] = $metadata->getTableName();
         }
         $searchResults = $this->indexer->simpleSearch($searchString, $offset, $maxResults, $tables);
-        $userIds = $buIds = $orgIds = [];
-        foreach ($searchResults->getElements() as $item) {
-            $className = $item->getEntityName();
-            if (ClassUtils::getRealClass($user) === $className && $user->getId() === $item->getRecordId()) {
-                continue;
-            }
-            if ($className === 'Oro\Bundle\UserBundle\Entity\User') {
-                $userIds[] = $item->getRecordId();
-            } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
-                $buIds[] = $item->getRecordId();
-            } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\Organization') {
-                $orgIds[] = $item->getRecordId();
-            }
-        }
+        list($userIds, $buIds, $orgIds) = $this->getIdsByClass($searchResults, $user);
+
         if ($orgIds) {
             $organizations = $this->em->getRepository('OroOrganizationBundle:Organization')
                 ->getEnabledOrganizations($orgIds);
@@ -143,6 +132,34 @@ class SecurityIndexer
         }
 
         return $objects;
+    }
+
+    /**
+     * Get id of entities excluded passed user
+     *
+     * @param Result $searchResults
+     * @param User $user
+     *
+     * @return array
+     */
+    protected function getIdsByClass(Result $searchResults, User $user)
+    {
+        $userIds = $buIds = $orgIds = [];
+        foreach ($searchResults->getElements() as $item) {
+            $className = $item->getEntityName();
+            if (ClassUtils::getRealClass($user) === $className && $user->getId() === $item->getRecordId()) {
+                continue;
+            }
+            if ($className === 'Oro\Bundle\UserBundle\Entity\User') {
+                $userIds[] = $item->getRecordId();
+            } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit') {
+                $buIds[] = $item->getRecordId();
+            } elseif ($className === 'Oro\Bundle\OrganizationBundle\Entity\Organization') {
+                $orgIds[] = $item->getRecordId();
+            }
+        }
+
+        return [$userIds, $buIds, $orgIds];
     }
 
     /**

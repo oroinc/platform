@@ -149,10 +149,11 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor(),
-            new EntityOwnerAccessor($this->metadataProvider),
+            $entityOwnerAccessor, //new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
         $this->decisionMaker->setContainer($container);
@@ -163,6 +164,8 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             new ObjectIdAccessor(),
             $this->decisionMaker
         );
+
+        $this->extension->setEntityOwnerAccessor($entityOwnerAccessor);
     }
 
     private function buildTestTree()
