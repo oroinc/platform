@@ -138,16 +138,25 @@ define(function(require) {
             for (var i = 0; i < requiredParameters.length; i++) {
                 var parameterName = requiredParameters[i];
                 var parameterValue = routeParameters[parameterName];
-                if (_.isString(parameterValue) && parameterValue !== '') {
-                    continue;
+                if (_.isString(parameterValue)) {
+                    if (parameterValue !== '') {
+                        continue;
+                    } else {
+                        return false;
+                    }
                 }
-                if (_.isNumber(parameterValue) && !isNaN(parameterValue)) {
-                    continue;
+                if (_.isNumber(parameterValue)) {
+                    if (!isNaN(parameterValue)) {
+                        continue;
+                    } else {
+                        return false;
+                    }
                 }
                 if (parameterValue !== null && String(parameterValue) !== '[object Object]') {
                     continue;
+                } else {
+                    return false;
                 }
-                return false;
             }
             return true;
         }
