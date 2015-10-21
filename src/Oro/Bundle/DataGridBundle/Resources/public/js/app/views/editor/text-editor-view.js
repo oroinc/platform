@@ -87,6 +87,8 @@ define(function(require) {
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
 
+        UNSET_FIELD_VALUE: {'#unset': true},
+
         constructor: function(options) {
             // className adjustment cannot be done in initialize()
             if (options.className) {
