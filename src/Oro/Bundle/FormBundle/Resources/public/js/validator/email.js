@@ -3,7 +3,7 @@ define(function(require) {
 
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var emailRegExp = require('oroui/js/tools/email-regexp');
+    var emailRegExp = require('oroui/js/tools/patterns').email;
     require('jquery.validate');
 
     var defaultParam = {

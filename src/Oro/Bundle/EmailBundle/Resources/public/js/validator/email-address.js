@@ -4,7 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var __ = require('orotranslation/js/translator');
-    var emailRegExp = require('oroui/js/tools/email-regexp');
+    var emailRegExp = require('oroui/js/tools/patterns').email;
     var emailUtil = require('oroemail/js/util/email');
     require('jquery.validate');
 
