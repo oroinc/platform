@@ -64,6 +64,6 @@ class EntityDataController extends FOSRestController
      */
     public function getManager()
     {
-        return $this->get('oro_entity.manager.api.enitty_data_api_manager');
+        return $this->get('oro_entity.manager.api.entity_data_api_manager');
     }
 }
