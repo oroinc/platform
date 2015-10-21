@@ -94,10 +94,10 @@ define(function(require) {
         },
 
         /**
-         * Sends request to the server and returns $.Promise instance with abort() support
+         * Validates url parameters
          *
          * @param {Object} urlParameters - Url parameters to compose the url
-         * @returns {boolean} - true, if parameters are valid
+         * @returns {boolean} - true, if parameters are valid and route url could be built
          */
         validateUrlParameters: function(urlParameters) {
             return this.route.validateParameters(this.prepareUrlParameters(urlParameters));

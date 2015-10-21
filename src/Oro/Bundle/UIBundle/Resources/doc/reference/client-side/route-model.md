@@ -62,11 +62,7 @@ List of acceptable query parameter names for this route
 **Kind**: instance property of <code>[RouteModel](#module_RouteModel)</code>  
 <a name="module_RouteModel#getRequiredParameters"></a>
 ### routeModel.getRequiredParameters() ⇒ <code>Array.&lt;string&gt;</code>
-Return list of parameter names accepted by this route.
-Includes both query and route parameters,
-
-E.g. for route `api/rest/latest/<relationClass>/<relationId/comments?page=<page>&limit=<limit>`
-this function will return `['relationClass', 'relationId', 'page', 'limit']`
+Return list of parameter names required by this route
 
 **Kind**: instance method of <code>[RouteModel](#module_RouteModel)</code>  
 <a name="module_RouteModel#getAcceptableParameters"></a>

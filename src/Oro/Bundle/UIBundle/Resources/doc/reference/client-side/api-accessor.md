@@ -61,10 +61,10 @@ and will put response to console after completion
 
 <a name="module_ApiAccessor#validateUrlParameters"></a>
 ### apiAccessor.validateUrlParameters(urlParameters) ⇒ <code>boolean</code>
-Sends request to the server and returns $.Promise instance with abort() support
+Validates url parameters
 
 **Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
-**Returns**: <code>boolean</code> - - true, if parameters are valid  
+**Returns**: <code>boolean</code> - - true, if parameters are valid and route url could be built  
 
 | Param | Type | Description |
 | --- | --- | --- |
