@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
+use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
@@ -10,7 +11,6 @@ use Symfony\Component\Security\Acl\Model\AuditLoggerInterface;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 
 /**
  * The ACL extensions based permission granting strategy to apply to the access control list.
@@ -182,19 +182,18 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                         if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
 
-                            // give an additional chance for the appropriate ACL extension to decide
-                            // whether an access to a domain object is granted or not
-                            $aclExtension = $this->getContext()->getAclExtension();
-                            if ($aclExtension instanceof AceAwareModelInterface) {
-                                $aclExtension->setAce($ace);
-                            }
-                            $decisionResult = $aclExtension->decideIsGranting(
-                                $requiredMask,
-                                $this->getContext()->getObject(),
-                                $this->getContext()->getSecurityToken()
-                            );
-                            if (!$decisionResult) {
-                                $isGranting = !$isGranting;
+                            if ($sid instanceof RoleSecurityIdentity) {
+                                // give an additional chance for the appropriate ACL extension to decide
+                                // whether an access to a domain object is granted or not
+                                $aclExtension = $this->getContext()->getAclExtension();
+                                $decisionResult = $aclExtension->decideIsGranting(
+                                    $requiredMask,
+                                    $this->getContext()->getObject(),
+                                    $this->getContext()->getSecurityToken()
+                                );
+                                if (!$decisionResult) {
+                                    $isGranting = !$isGranting;
+                                }
                             }
 
                             if ($isGranting) {

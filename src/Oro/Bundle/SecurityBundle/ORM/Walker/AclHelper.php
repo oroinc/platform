@@ -127,10 +127,10 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions, $shareCondition) = $this->processSelect($ast, $permission, $query);
+            list ($whereConditions, $joinConditions, $shareCondition) = $this->processSelect($ast, $permission);
             $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
-                $this->processSubselects($ast, $conditionStorage, $permission, $query);
+                $this->processSubselects($ast, $conditionStorage, $permission);
             }
 
             // We have access level check conditions. So mark query for acl walker.

@@ -4,27 +4,28 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Model\AceAwareModelInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EntityAclExtension extends AbstractAclExtension implements AceAwareModelInterface
+class EntityAclExtension extends AbstractAclExtension
 {
     /**
      * @var ObjectIdAccessor
@@ -52,6 +53,11 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
     protected $decisionMaker;
 
     /**
+     * @var EntityOwnerAccessor
+     */
+    protected $entityOwnerAccessor;
+
+    /**
      * key = Permission
      * value = The identity of a permission mask builder
      *
@@ -66,11 +72,6 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
      * @var string[]
      */
     protected $maskBuilderClassNames = array();
-
-    /**
-     * @var EntryInterface
-     */
-    protected $ace;
 
     /**
      * Constructor
@@ -148,6 +149,14 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
                 EntityMaskBuilder::MASK_SHARE_SYSTEM,
             ),
         );
+    }
+
+    /**
+     * @param EntityOwnerAccessor $entityOwnerAccessor
+     */
+    public function setEntityOwnerAccessor(EntityOwnerAccessor $entityOwnerAccessor)
+    {
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
     }
 
     /**
@@ -439,13 +448,21 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
      */
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
-        $accessLevel = $this->getAccessLevel($triggeredMask);
-        if ($accessLevel === AccessLevel::SYSTEM_LEVEL) {
+        // check whether we check permissions for a domain object
+        if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
             return true;
         }
 
-        // check whether we check permissions for a domain object
-        if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
+        $organization = null;
+        if ($securityToken instanceof OrganizationContextTokenInterface) {
+            if ($this->checkOrganizationContext($object, $securityToken) === VoterInterface::ACCESS_DENIED) {
+                return false;
+            }
+            $organization = $securityToken->getOrganizationContext();
+        }
+
+        $accessLevel = $this->getAccessLevel($triggeredMask);
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         }
 
@@ -454,15 +471,7 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
             return true;
         }
 
-        $organization = null;
-        if ($securityToken instanceof OrganizationContextTokenInterface) {
-            $organization = $securityToken->getOrganizationContext();
-        }
-
         $result = false;
-        if ($this->decisionMaker instanceof AceAwareModelInterface && $this->ace) {
-            $this->decisionMaker->setAce($this->ace);
-        }
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
@@ -503,14 +512,6 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setAce(EntryInterface $ace)
-    {
-        $this->ace = $ace;
     }
 
     /**
@@ -703,5 +704,33 @@ class EntityAclExtension extends AbstractAclExtension implements AceAwareModelIn
         $maskBuilderClassName = $this->maskBuilderClassNames[$maskBuilderIdentity];
 
         return $maskBuilderClassName::getConst($constName);
+    }
+
+    /**
+     * Check organization. If user try to access entity what was created in organization this user do not have access -
+     *  deny access. We should check organization for all the entities what have ownership
+     *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types)
+     *
+     * @param mixed $object
+     * @param OrganizationContextTokenInterface $securityToken
+     * @return int
+     */
+    protected function checkOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
+    {
+        try {
+            // try to get entity organization value
+            $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+
+            // check entity organization with current organization
+            if ($objectOrganization
+                && $objectOrganization->getId() !== $securityToken->getOrganizationContext()->getId()
+            ) {
+                return VoterInterface::ACCESS_DENIED;
+            }
+        } catch (InvalidEntityException $e) {
+            // in case if entity has no organization field (none ownership type)
+        }
+
+        return VoterInterface::ACCESS_ABSTAIN;
     }
 }

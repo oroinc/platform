@@ -74,18 +74,4 @@ interface AccessLevelOwnershipDecisionMakerInterface
      * @return bool
      */
     public function supports();
-
-    /**
-     * Return TRUE if maker decided that Object was shared
-     *
-     * @return bool
-     */
-    public function isShared();
-
-    /**
-     * Set shared to default value FALSE
-     *
-     * @return mixed
-     */
-    public function resetShared();
 }
