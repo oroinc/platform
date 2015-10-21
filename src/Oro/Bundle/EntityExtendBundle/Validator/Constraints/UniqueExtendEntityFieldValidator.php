@@ -14,7 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class UniqueExtendEntityFieldValidator extends ConstraintValidator
 {
-    /** @var ConfigProvider  */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /**
@@ -41,8 +41,8 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
 
         $newFieldName = strtolower(Inflector::classify(($value->getFieldName())));
 
-        // Need hardcoded check for the `id`, `serialized_data` fields.
-        if (in_array($newFieldName, ['id', strtolower(Inflector::classify('serialized_data'))], true)) {
+        // Need hardcoded check for `id` field.
+        if ($newFieldName === 'id') {
             $this->addViolation($constraint);
 
             return;
