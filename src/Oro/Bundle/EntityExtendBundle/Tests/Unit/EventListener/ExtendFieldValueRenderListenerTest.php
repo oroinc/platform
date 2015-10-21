@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener;
@@ -30,17 +31,22 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fieldTypeHelper;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $entityManager;
+    protected $registry;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $extendProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $facade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityClassNameHelper;
 
     public function setUp()
     {
@@ -55,335 +61,39 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->extendProvider));
         $this->router = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
 
-        $this->fieldTypeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper')
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+
+        $this->facade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->target = new ExtendFieldValueRenderListener(
             $this->configManger,
             $this->router,
-            $this->fieldTypeHelper,
-            $this->entityManager
+            $this->registry,
+            $this->facade,
+            $this->entityClassNameHelper
         );
     }
 
     /**
      * @dataProvider collectionDataProvider
+     *
+     * @param array $data
+     * @param array $expected
      */
-    public function testBeforeValueRenderProceedCollectionOfCustomEntities($expectedValues)
+    public function testBeforeValueRenderProceedCollection(array $data, array $expected)
     {
         $entity = $this->getMock('\StdClass');
-        $first = current($expectedValues);
-        $value = $this->getCollectionValue($expectedValues);
+        $value = $this->getCollectionValue($data['shownFields'], $data['entities']);
 
-        $expectedClass = 'Oro\Bundle\UserBundle\Entity\User';
-        $routeExpectedClass = 'Oro_Bundle_UserBundle_Entity_User';
+        $entityClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $classParam = 'Oro_Bundle_UserBundle_Entity_User';
 
-        $fieldConfig = $this->getCollectionFieldConfig(
-            array(
-                $first['firstField'],
-                $first['secondField']
-            ),
-            $expectedClass
-        );
-
-        $iteration = 0;
-        foreach ($expectedValues as $expectedValue) {
-            $this->router->expects($this->at($iteration++))
-                ->method('generate')
-                ->with(
-                    ExtendFieldValueRenderListener::ENTITY_VIEW_ROUTE,
-                    array('entityName' => $routeExpectedClass, 'id' => $expectedValue['id']),
-                    UrlGeneratorInterface::ABSOLUTE_PATH
-                )
-                ->will($this->returnValue($expectedValue['route']));
-        }
-
-        $this->setupExtendRelationConfig($expectedClass);
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertArrayHasKey('values', $value);
-
-        $actualValues = $value['values'];
-
-        reset($expectedValues);
-        foreach ($actualValues as $actual) {
-            $expected = current($expectedValues);
-
-            $this->assertEquals($expected['id'], $actual['id']);
-            $this->assertEquals($expected['route'], $actual['link']);
-            $this->assertEquals("{$expected['firstFieldValue']} {$expected['secondFieldValue']}", $actual['title']);
-
-            next($expectedValues);
-        }
-    }
-
-    /**
-     * @dataProvider collectionDataProvider
-     */
-    public function testBeforeValueRenderProceedCollection($expectedValues)
-    {
-        $entity = $this->getMock('\StdClass');
-        $first = current($expectedValues);
-        $routeName = 'test_route_name';
-        $value = $this->getCollectionValue($expectedValues);
-        $class = 'Oro\Bundle\UserBundle\Entity\User';
-
-        $fieldConfig = $this->getCollectionFieldConfig(
-            array(
-                $first['firstField'],
-                $first['secondField']
-            ),
-            $class
-        );
-
-        $this->setupEntityMetadata($routeName, $class);
-
-        $iteration = 0;
-        foreach ($expectedValues as $expectedValue) {
-            $this->router->expects($this->at($iteration++))
-                ->method('generate')
-                ->with(
-                    $routeName,
-                    array('id' => $expectedValue['id']),
-                    UrlGeneratorInterface::ABSOLUTE_PATH
-                )
-                ->will($this->returnValue($expectedValue['route']));
-        }
-
-        $this->setupExtendRelationConfig($class, false);
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertArrayHasKey('values', $value);
-
-        $actualValues = $value['values'];
-
-        reset($expectedValues);
-        foreach ($actualValues as $actual) {
-            $expected = current($expectedValues);
-
-            $this->assertEquals($expected['id'], $actual['id']);
-            $this->assertEquals($expected['route'], $actual['link']);
-            $this->assertEquals("{$expected['firstFieldValue']} {$expected['secondFieldValue']}", $actual['title']);
-
-            next($expectedValues);
-        }
-    }
-
-    public function testBeforeValueRenderProceedManyToOneReturnEmptyStingIfEntityClassNotFound()
-    {
-        $entity = $this->getMock('\StdClass');
-        $value = $this->getMock('\StdClass');
-        $fieldType = 'manyToOne';
-        $field = 'test';
-
-        $fieldConfig = $this->getManyToOneFieldConfig($fieldType);
-
-        $this->setupManyToOneExtendConfig($field, null, $fieldConfig);
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertEmpty($value);
-    }
-
-    public function testBeforeValueRenderProceedManyToOneReturnStingIfRouteNotFound()
-    {
-        $entity = $this->getMock('\StdClass');
-        $value = $this->getMock('\StdClass', array('getId'));
-        $fieldType = 'manyToOne';
-        $field = 'test';
-        $id = 42;
-        $title = 'test title';
-        $class = 'Oro\Bundle\UserBundle\Entity\User';
-
-        $value->$field = $title;
-        $value->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($id));
-
-        $fieldConfig = $this->getManyToOneFieldConfig($fieldType);
-
-        $this->setupManyToOneExtendConfig($field, $class, $fieldConfig);
-        $this->setupManyToOneMetadata($class);
-        $this->setupExtendRelationConfig($class, false);
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertEquals($value, $title);
-    }
-
-    public function testBeforeValueRenderProceedManyToOne()
-    {
-        $entity = $this->getMock('\StdClass');
-        $value = $this->getMock('\StdClass', array('getId'));
-        $fieldType = 'manyToOne';
-        $field = 'test';
-        $routeName = 'test_route_name';
-        $id = 42;
-        $title = 'test title';
-        $class = 'Oro\Bundle\UserBundle\Entity\User';
-        $route = '/test-route/42';
-
-        $value->$field = $title;
-        $value->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($id));
-
-        $fieldConfig = $this->getManyToOneFieldConfig($fieldType);
-
-        $this->setupManyToOneExtendConfig($field, $class, $fieldConfig);
-        $this->setupManyToOneMetadata($class);
-        $this->setupExtendRelationConfig($class, false);
-        $this->setupEntityMetadata($routeName, $class);
-
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(
-                $routeName,
-                array('id' => $id)
-            )
-            ->will($this->returnValue($route));
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertArrayHasKey('title', $value);
-        $this->assertEquals($value['title'], $title);
-        $this->assertArrayHasKey('link', $value);
-        $this->assertEquals($value['link'], $route);
-    }
-
-    public function testBeforeValueRenderProceedManyToOneWithCustomEntity()
-    {
-        $entity = $this->getMock('\StdClass');
-        $value = $this->getMock('\StdClass', array('getId'));
-        $fieldType = 'manyToOne';
-        $field = 'test';
-        $id = 42;
-        $title = 'test title';
-        $expectedClass = 'Oro\Bundle\UserBundle\Entity\User';
-        $routeExpectedClass = 'Oro_Bundle_UserBundle_Entity_User';
-        $route = '/test-route/42';
-
-        $value->$field = $title;
-        $value->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($id));
-
-        $fieldConfig = $this->getManyToOneFieldConfig($fieldType);
-
-        $this->setupManyToOneExtendConfig($field, $expectedClass, $fieldConfig);
-        $this->setupManyToOneMetadata($expectedClass);
-        $this->setupExtendRelationConfig($expectedClass);
-
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(
-                ExtendFieldValueRenderListener::ENTITY_VIEW_ROUTE,
-                array('entityName' => $routeExpectedClass, 'id' => $id)
-            )
-            ->will($this->returnValue($route));
-
-        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
-        $this->target->beforeValueRender($event);
-        $value = $event->getFieldViewValue();
-
-        $this->assertArrayHasKey('title', $value);
-        $this->assertEquals($value['title'], $title);
-        $this->assertArrayHasKey('link', $value);
-        $this->assertEquals($value['link'], $route);
-    }
-
-    public function collectionDataProvider()
-    {
-        return array(
-            array(
-                'expectedValues' => array(
-                    array(
-                        'firstField'       => 'FirstName',
-                        'firstFieldValue'  => 'john',
-                        'secondField'      => 'LastName',
-                        'secondFieldValue' => 'Doe',
-                        'id'               => 42,
-                        'route'            => '/test-route/42'
-                    ),
-                    array(
-                        'firstField'       => 'FirstName',
-                        'firstFieldValue'  => 'jack',
-                        'secondField'      => 'LastName',
-                        'secondFieldValue' => 'smith',
-                        'id'               => 84,
-                        'route'            => '/test-route/84'
-                    )
-                )
-            )
-        );
-    }
-
-    /**
-     * @param array $fields
-     * @return ArrayCollection
-     */
-    protected function getCollectionValue(array $fields)
-    {
-        $value = new ArrayCollection();
-        foreach ($fields as $field) {
-            $firstFieldName = ucfirst($field['firstField']);
-            $secondFieldName = ucfirst($field['secondField']);
-            $item = $this->getMock('\StdClass', array("get{$firstFieldName}", "get{$secondFieldName}", 'getId'));
-            $item->expects($this->once())
-                ->method("get{$firstFieldName}")
-                ->will($this->returnValue($field['firstFieldValue']));
-            $item->expects($this->once())
-                ->method("get{$secondFieldName}")
-                ->will($this->returnValue($field['secondFieldValue']));
-            $item->expects($this->any())
-                ->method('getId')
-                ->will($this->returnValue($field['id']));
-
-            $value->add($item);
-        }
-        return $value;
-    }
-
-    /**
-     * @param string $expectedClass
-     * @param bool   $isCustomEntity
-     */
-    protected function setupExtendRelationConfig($expectedClass, $isCustomEntity = true)
-    {
-        $relationExtendConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $relationExtendConfig->expects($this->once())
-            ->method('is')
-            ->will($this->returnValue($isCustomEntity));
-        $this->extendProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($expectedClass)
-            ->will($this->returnValue($relationExtendConfig));
-    }
-
-    /**
-     * @param array $titles
-     * @param string $expectedClass
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getCollectionFieldConfig(array $titles, $expectedClass)
-    {
         $fieldConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
             ->disableOriginalConstructor()
             ->getMock();
@@ -394,10 +104,10 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('target_title', false, null, $titles),
-                        array('target_entity', false, null, $expectedClass),
-                    )
+                    [
+                        ['target_title', false, null, $data['shownFields']],
+                        ['target_entity', false, null, $entityClass],
+                    ]
                 )
             );
 
@@ -405,39 +115,53 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getConfigById')
             ->with($fieldConfig)
             ->will($this->returnValue($extendConfig));
-        return $fieldConfig;
+
+        $this->entityClassNameHelper->expects($this->any())
+            ->method('getUrlSafeClassName')
+            ->willReturn($classParam);
+
+        if (isset($data['viewPageRoute'])) {
+            $this->setupEntityMetadataStub($data['viewPageRoute'], $entityClass);
+            $this->setupRouterStub($data['viewPageRoute'], $data['entities'], $data['isCustomEntity'], $classParam);
+        }
+
+        $this->setupExtendRelationConfigStub($entityClass, $data['isCustomEntity']);
+
+        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
+        $this->target->beforeValueRender($event);
+        $value = $event->getFieldViewValue();
+
+        $this->assertArrayHasKey('values', $value);
+
+        $this->assertEquals($expected, $value['values']);
     }
 
     /**
-     * @param string $field
-     * @param string $expectedClass
-     * @param FieldConfigId $fieldConfig
+     * @dataProvider relationsDataProvider
+     *
+     * @param array        $data
+     * @param array|string $expected
      */
-    protected function setupManyToOneExtendConfig($field, $expectedClass, FieldConfigId $fieldConfig)
+    public function testBeforeValueRenderProceedSingleRelations(array $data, $expected)
     {
-        $extendConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $extendConfig->expects($this->exactly(2))
-            ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('target_field', false, null, $field),
-                        array('target_entity', false, null, $expectedClass),
-                    )
-                )
-            );
-        $this->extendProvider->expects($this->once())
-            ->method('getConfigById')
-            ->with($fieldConfig)
-            ->will($this->returnValue($extendConfig));
-    }
+        $entity = $this->getMock('\StdClass');
+        $value = $this->getMock('\StdClass', ['getId']);
+        $fieldType = 'manyToOne';
 
-    /**
-     * @param string $fieldType
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getManyToOneFieldConfig($fieldType)
-    {
+        if (!empty($data['field'])) {
+            $value->$data['field'] = $data['title'];
+        }
+        $value->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue($data['id']));
+
+        if (isset($data['permissionsGranted'])) {
+            $this->facade->expects($this->once())
+                ->method('isGranted')
+                ->with('VIEW', $value)
+                ->willReturn(true);
+        }
+
         $fieldConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
             ->disableOriginalConstructor()
             ->getMock();
@@ -445,25 +169,269 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldType')
             ->will($this->returnValue($fieldType));
 
-        $this->fieldTypeHelper->expects($this->once())
-            ->method('getUnderlyingType')
-            ->with($fieldType)
-            ->will($this->returnValue('manyToOne'));
-        return $fieldConfig;
+        $this->setupManyToOneExtendConfigMock($data['field'], $data['class'], $fieldConfig);
+        $this->setupManyToOneMetadataStub($data['class']);
+        $this->setupExtendRelationConfigStub($data['class'], $data['isCustomEntity']);
+
+        if (isset($data['viewPageRoute'])) {
+            $this->setupEntityMetadataStub($data['viewPageRoute'], $data['class']);
+            if ($data['routeClassParam']) {
+                $this->entityClassNameHelper->expects($this->any())
+                    ->method('getUrlSafeClassName')
+                    ->willReturn($data['routeClassParam']);
+            }
+            $this->setupRouterStub($data['viewPageRoute'], [$data], $data['isCustomEntity'], $data['routeClassParam']);
+        }
+
+        $event = new ValueRenderEvent($entity, $value, $fieldConfig);
+        $this->target->beforeValueRender($event);
+        $actual = $event->getFieldViewValue();
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function collectionDataProvider()
+    {
+        return [
+            'custom entities' => [
+                'data'     => [
+                    'viewPageRoute'  => ExtendFieldValueRenderListener::ENTITY_VIEW_ROUTE,
+                    'isCustomEntity' => true,
+                    'shownFields'    => ['FirstName', 'LastName'],
+                    'entities'       => [
+                        [
+                            'shownFieldValues' => ['FirstName' => 'john', 'LastName' => 'Doe'],
+                            'id'               => 42,
+                            'url'              => '/test-route/42',
+                            'permitted'        => true
+                        ],
+                        [
+                            'shownFieldValues' => ['FirstName' => 'jack', 'LastName' => 'smith'],
+                            'id'               => 84,
+                            'permitted'        => false,
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    [
+                        'id'    => 42,
+                        'title' => 'john Doe',
+                        'link'  => '/test-route/42',
+                    ],
+                    [
+                        'id'    => 84,
+                        'title' => 'jack smith',
+                    ]
+                ]
+            ],
+            'regular entities' => [
+                'data'     => [
+                    'viewPageRoute'  => 'test',
+                    'isCustomEntity' => false,
+                    'shownFields'    => ['FirstName', 'LastName'],
+                    'entities'       => [
+                        [
+                            'shownFieldValues' => ['FirstName' => 'john', 'LastName' => 'Doe'],
+                            'id'               => 42,
+                            'url'              => '/test-route/42',
+                            'permitted'        => true
+                        ],
+                        [
+                            'shownFieldValues' => ['FirstName' => 'jack', 'LastName' => 'smith'],
+                            'id'               => 84,
+                            'permitted'        => false,
+                        ]
+                    ],
+                ],
+                'expected' => [
+                    [
+                        'id'    => 42,
+                        'title' => 'john Doe',
+                        'link'  => '/test-route/42',
+                    ],
+                    [
+                        'id'    => 84,
+                        'title' => 'jack smith',
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function relationsDataProvider()
+    {
+        return [
+            'entity class not exist' => [
+                'data' => [
+                    'isCustomEntity' => false,
+                    'class' => null,
+                    'id' => null,
+                    'field' => null
+                ],
+                'expected' => ''
+            ],
+            'If Route Not Found will return text' => [
+                'data' => [
+                    'isCustomEntity' => false,
+                    'class' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'id' => 42,
+                    'field' => 'username',
+                    'title' => $expectedTitle = 'test title'
+                ],
+                'expected' => $expectedTitle
+            ],
+            'entity class exists, route exists, permission granted' => [
+                'data' => [
+                    'viewPageRoute'  => 'test',
+                    'isCustomEntity' => false,
+                    'id' => $id = 54,
+                    'url' => $link = "/test-route/{$id}",
+                    'class' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'routeClassParam' => null,
+                    'field' => 'username',
+                    'title' => $expectedTitle = 'test title',
+                    'permissionsGranted' => true
+                ],
+                'expected' => [
+                    'link' => $link,
+                    'title' => $expectedTitle
+                ]
+            ],
+            'entity class exists, route exist, but permission not granted' => [
+                'data' => [
+                    'viewPageRoute'  => 'test',
+                    'isCustomEntity' => false,
+                    'id' => $id = 54,
+                    'url' => $link = "/test-route/{$id}",
+                    'class' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'routeClassParam' => null,
+                    'field' => 'username',
+                    'title' => $expectedTitle = 'test title'
+                ],
+                'expected' => $expectedTitle
+            ],
+            'entity class extend, permission granted' => [
+                'data' => [
+                    'viewPageRoute'  => ExtendFieldValueRenderListener::ENTITY_VIEW_ROUTE,
+                    'isCustomEntity' => true,
+                    'id' => $id = 22,
+                    'url' => $link = "/test-route/{$id}",
+                    'class' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'routeClassParam' => 'Oro_Bundle_UserBundle_Entity_User',
+                    'field' => 'username',
+                    'title' => $expectedTitle = 'test title',
+                    'permissionsGranted' => true
+                ],
+                'expected' => [
+                    'link' => $link,
+                    'title' => $expectedTitle
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param array $shownFields
+     * @param array $relatedEntitiesList
+     *
+     * @return ArrayCollection
+     */
+    protected function getCollectionValue(array $shownFields, array $relatedEntitiesList)
+    {
+        $value = new ArrayCollection();
+        $grantedEntitiesMap = [];
+
+        foreach ($relatedEntitiesList as $entity) {
+            $entityMethods = ['getId'];
+            foreach ($shownFields as $field) {
+                $entityMethods[] = "get{$field}";
+            }
+            $item = $this->getMock('\StdClass', $entityMethods);
+
+            foreach ($shownFields as $field) {
+                $item->expects($this->once())
+                    ->method("get{$field}")
+                    ->will($this->returnValue($entity['shownFieldValues'][$field]));
+            }
+
+            if ($entity['permitted']) {
+                $grantedEntitiesMap[] = ['VIEW', $item, true];
+            }
+            $item->expects($this->any())
+                ->method('getId')
+                ->will($this->returnValue($entity['id']));
+            $value->add($item);
+        }
+        $this->facade->expects($this->any())
+            ->method('isGranted')
+            ->willReturnMap($grantedEntitiesMap);
+
+
+        return $value;
+    }
+
+    /**
+     * @param string $expectedClass
+     * @param bool   $isCustomEntity
+     */
+    protected function setupExtendRelationConfigStub($expectedClass, $isCustomEntity = true)
+    {
+        $relationExtendConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $relationExtendConfig->expects($this->any())
+            ->method('is')
+            ->willReturnMap([
+                ['owner', ExtendScope::OWNER_CUSTOM, $isCustomEntity]
+            ]);
+        $this->extendProvider->expects($this->any())
+            ->method('getConfig')
+            ->with($expectedClass)
+            ->will($this->returnValue($relationExtendConfig));
+    }
+
+    /**
+     * @param string        $field
+     * @param string        $expectedClass
+     * @param FieldConfigId $fieldConfig
+     */
+    protected function setupManyToOneExtendConfigMock($field, $expectedClass, FieldConfigId $fieldConfig)
+    {
+        $extendConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $extendConfig->expects($this->exactly(2))
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['target_field', false, null, $field],
+                        ['target_entity', false, null, $expectedClass],
+                    ]
+                )
+            );
+        $this->extendProvider->expects($this->once())
+            ->method('getConfigById')
+            ->with($fieldConfig)
+            ->will($this->returnValue($extendConfig));
     }
 
     /**
      * @param string $expectedClass
      */
-    protected function setupManyToOneMetadata($expectedClass)
+    protected function setupManyToOneMetadataStub($expectedClass)
     {
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadata->expects($this->once())
+        $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->will($this->returnValue('id'));
-        $this->entityManager->expects($this->once())
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($entityManager);
+
+        $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($expectedClass)
             ->will($this->returnValue($metadata));
@@ -473,15 +441,40 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
      * @param string $routeName
      * @param string $class
      */
-    protected function setupEntityMetadata($routeName, $class)
+    protected function setupEntityMetadataStub($routeName, $class)
     {
         $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()
             ->getMock();
         $metadata->routeView = $routeName;
-        $this->configManger->expects($this->once())
+        $this->configManger->expects($this->any())
             ->method('getEntityMetadata')
             ->with($class)
             ->will($this->returnValue($metadata));
+    }
+
+    /**
+     * @param string $routeName
+     * @param array  $entities
+     * @param bool   $isCustomEntity
+     * @param string $entityNameParam
+     */
+    protected function setupRouterStub($routeName, array $entities, $isCustomEntity = false, $entityNameParam = '')
+    {
+        $map = [];
+        foreach ($entities as $expectedValue) {
+            if (isset($expectedValue['url'])) {
+                $routeParams = [];
+                if ($isCustomEntity) {
+                    $routeParams['entityName'] = $entityNameParam;
+                }
+                $routeParams['id'] = $expectedValue['id'];
+
+                $map[] = [$routeName, $routeParams, UrlGeneratorInterface::ABSOLUTE_PATH, $expectedValue['url']];
+            }
+        }
+        $this->router->expects($this->any())
+            ->method('generate')
+            ->willReturnMap($map);
     }
 }
