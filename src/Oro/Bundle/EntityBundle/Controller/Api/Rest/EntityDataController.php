@@ -31,7 +31,7 @@ class EntityDataController extends FOSRestController
      *
      * @throws AccessDeniedException
      *
-     * @Rest\Patch("entity/{className}/{id}")
+     * @Rest\Patch("entity_data/{className}/{id}")
      * @ApiDoc(
      *      description="Update entity property",
      *      resource=true,
