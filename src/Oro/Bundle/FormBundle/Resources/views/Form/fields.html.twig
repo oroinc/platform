@@ -339,7 +339,7 @@
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
-                    {% for i in 0..(form.vars.row_count - 1) %}
+                    {% for i in 0..(form.vars.row_count_initial - 1) %}
                         {{ prototype_html|replace({(prototype_name): i})|raw }}
                     {% endfor %}
                 {% endif %}
