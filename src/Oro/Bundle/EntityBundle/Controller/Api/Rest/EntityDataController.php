@@ -42,17 +42,13 @@ class EntityDataController extends FOSRestController
      */
     public function patchAction($className, $id)
     {
-        try {
-            $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
-            list($form, $data) = $this->getManager()->patch($className, $id, $data);
+        $data = json_decode($this->get('request_stack')->getCurrentRequest()->getContent(), true);
+        list($form, $data) = $this->getManager()->patch($className, $id, $data);
 
-            if ($form->getErrors()->count() > 0) {
-                $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
-            } else {
-                $view = $this->view($data, Codes::HTTP_NO_CONTENT);
-            }
-        } catch (\Exception $e) {
-            $view = $this->view($e->getMessage(), $e->getCode());
+        if ($form->getErrors()->count() > 0) {
+            $view = $this->view($form, Codes::HTTP_BAD_REQUEST);
+        } else {
+            $view = $this->view($data, Codes::HTTP_NO_CONTENT);
         }
         $response = parent::handleView($view);
 
