@@ -22,9 +22,19 @@ class EntityFieldValidator
         $this->registry = $registry;
     }
 
+    /**
+     * @param $entity
+     * @param $content
+     *
+     * @return bool
+     *
+     * @throws EntityHasFieldException
+     * @throws FieldUpdateAccessException
+     */
     public function validate($entity, $content)
     {
-        foreach ($content as $fieldName => $fieldValue) {
+        $keys = array_keys($content);
+        foreach ($keys as $fieldName) {
             $this->validateFieldName($entity, $fieldName);
         }
 
