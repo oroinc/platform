@@ -319,7 +319,7 @@ define(function(require) {
                 cell: cell,
                 oldState: _.pick(cell.model.toJSON(), _.keys(modelUpdateData))
             };
-            cell.model.set(modelUpdateData);
+            this.updateModel(cell.model, this.editorComponent, modelUpdateData);
             this.main.trigger('content:update');
             if (this.editor.save_api_accessor.initialOptions.field_name) {
                 var keys = _.keys(serverUpdateData);
@@ -343,6 +343,19 @@ define(function(require) {
                 this.exitEditMode(cell);
             }
             return true;
+        },
+
+        updateModel: function(model, editorComponent, updateData) {
+            // assume "undefined" as delete value request
+            for (var key in updateData) {
+                if (updateData.hasOwnProperty(key)) {
+                    if (updateData[key] === editorComponent.view.UNSET_FIELD_VALUE) {
+                        model.unset(key);
+                        delete updateData[key];
+                    }
+                }
+            }
+            model.set(updateData);
         },
 
         exitEditMode: function(releaseBackdrop) {
