@@ -87,7 +87,7 @@ datagrid:
             type: orm
             query:
                 select:
-                    - partial eu.{id, email, folder}
+                    - partial eu.{id, email}
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END as is_new
                 from:
                     - { table: OroEmailBundle:EmailUser, alias: eu }
@@ -116,7 +116,7 @@ datagrid:
                             conditionType: WITH
                             condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc'
                         -
-                            join: eu.folder
+                            join: eu.folders
                             alias: f
                         -
                             join: f.origin
@@ -299,7 +299,7 @@ datagrid:
                             join: eu.email
                             alias: e
                     inner:
-                        - { join: eu.folder, alias: f }
+                        - { join: eu.folders, alias: f }
                         - { join: f.origin, alias: o }
                         - { join: e.fromEmailAddress, alias: a }
         properties:

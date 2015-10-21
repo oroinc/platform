@@ -17,6 +17,9 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EmailActivityManager
 {
     /**
@@ -56,7 +59,7 @@ class EmailActivityManager
      * @param EmailActivityListProvider $activityListProvider
      * @param EmailThreadProvider       $emailThreadProvider
      * @param TokenStorage              $tokenStorage
-     * @param EntityOwnerAccessor       $entityOwnerAccessor
+     * @param ServiceLink               $entityOwnerAccessorLink
      */
     public function __construct(
         ActivityManager $activityManager,
