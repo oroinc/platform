@@ -7,13 +7,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use FOS\RestBundle\Util\Codes;
-
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
-use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -45,19 +40,24 @@ class EntityFieldManager
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
 
+    /** @var EntityFieldValidator */
+    protected $entityFieldValidator;
+
     /**
      * @param Registry $registry
      * @param FormBuilder $formBuilder
      * @param EntityApiBaseHandler $handler
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
+     * @param EntityFieldValidator $entityFieldValidator
      */
     public function __construct(
         Registry $registry,
         FormBuilder $formBuilder,
         EntityApiBaseHandler $handler,
         EntityRoutingHelper $entityRoutingHelper,
-        OwnershipMetadataProvider $ownershipMetadataProvider
+        OwnershipMetadataProvider $ownershipMetadataProvider,
+        EntityFieldValidator $entityFieldValidator
     ) {
         $this->registry = $registry;
         $this->em = $this->registry->getManager();
@@ -65,16 +65,7 @@ class EntityFieldManager
         $this->handler = $handler;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-    }
-
-    /**
-     * @param $entity
-     *
-     * @return FormInterface
-     */
-    public function getForm($entity)
-    {
-        return $this->formBuilder->getForm($entity);
+        $this->entityFieldValidator = $entityFieldValidator;
     }
 
     /**
@@ -85,49 +76,30 @@ class EntityFieldManager
      */
     public function update($entity, $content)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $form = $this->getForm($entity);
-        $data = $this->presetData($entity);
+        $this->entityFieldValidator->validate($entity, $content);
 
-        foreach ($content as $fieldName => $fieldValue) {
-            if ($this->validateFieldName($entity, $fieldName)) {
-                $fieldValue = $this->cleanupValue($fieldValue);
-                $valueForForm = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
-                $valueForEntity = $this->prepareValueForEntity($entity, $fieldName, $fieldValue);
-                $accessor->setValue($entity, $fieldName, $valueForEntity);
-                $data[$fieldName] = $valueForForm;
-                $form = $this->formBuilder->add($form, $entity, $fieldName);
-            }
-        }
-
-        $changeSet = $this->handler->process($entity, $form, $data, 'PATCH');
-
-        return [
-            'form' => $form,
-            'changeSet' => $changeSet
-        ];
+        return $this->processUpdate($entity, $content);
     }
 
     /**
      * @param $entity
-     * @param $fieldName
+     * @param $content
      *
-     * @return bool
-     *
-     * @throws FieldUpdateAccessException
-     * @throws EntityHasFieldException
+     * @return array
      */
-    protected function validateFieldName($entity, $fieldName)
+    protected function processUpdate($entity, $content)
     {
-        if (!$this->hasField($entity, $fieldName)) {
-            throw new EntityHasFieldException('oro.entity.controller.message.field_not_found', Codes::HTTP_NOT_FOUND);
+        $form = $this->formBuilder->build($entity, $content);
+        $data = $this->presetData($entity);
+
+        foreach ($content as $fieldName => $fieldValue) {
+            $fieldValue = $this->cleanupValue($fieldValue);
+            $data[$fieldName] = $this->prepareValueForForm($entity, $fieldName, $fieldValue);
         }
 
-        if (!$this->hasAccessEditFiled($fieldName)) {
-            throw new FieldUpdateAccessException('oro.entity.controller.message.access_denied', Codes::HTTP_FORBIDDEN);
-        }
+        $changeSet = $this->handler->process($entity, $form, $data, 'PATCH');
 
-        return true;
+        return array($form, $changeSet);
     }
 
     /**
@@ -171,32 +143,6 @@ class EntityFieldManager
     }
 
     /**
-     * @param $fieldName
-     *
-     * @return bool
-     */
-    protected function hasAccessEditFiled($fieldName)
-    {
-        $blackList = EntityFieldBlackList::getValues();
-        if ((in_array($fieldName, $blackList))) {
-            return false;
-        }
-
-        return true;
-    }
-
-    protected function hasField($entity, $fieldName)
-    {
-        /** @var ClassMetadata $metaData */
-        $metaData = $this->getMetaData($entity);
-        if ($metaData->hasField($fieldName) || $metaData->hasAssociation($fieldName)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @param $entity
      * @param $fieldName
      * @param $fieldValue
@@ -217,42 +163,6 @@ class EntityFieldManager
             if (in_array($fieldType, ['boolean'])) {
                 $fieldValue = (bool)$fieldValue;
             }
-        }
-
-        return $fieldValue;
-    }
-
-    /**
-     * @param $entity
-     * @param $fieldName
-     * @param $fieldValue
-     *
-     * @return \DateTime
-     */
-    protected function prepareValueForEntity($entity, $fieldName, $fieldValue)
-    {
-        /** @var ClassMetadata $metaData */
-        $metaData = $this->getMetaData($entity);
-
-        // search simple field
-        if ($metaData->hasField($fieldName)) {
-            $fieldInfo = $metaData->getFieldMapping($fieldName);
-
-            $fieldType = $fieldInfo['type'];
-            if (in_array($fieldType, ['datetime','date'])) {
-                $fieldValue = new \DateTime($fieldValue);
-            }
-
-            if (in_array($fieldType, ['boolean'])) {
-                $fieldValue = (bool)$fieldValue;
-            }
-        }
-
-        if ($metaData->hasAssociation($fieldName)) {
-            $fieldInfo = $metaData->getAssociationMapping($fieldName);
-
-            $entity = $this->entityRoutingHelper->getEntity($fieldInfo['targetEntity'], $fieldValue);
-            $fieldValue = $entity;
         }
 
         return $fieldValue;
