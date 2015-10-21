@@ -61,7 +61,7 @@ class EntityDataControllerTest extends WebTestCase
             $content
         );
 
-        $this->assertEquals(Codes::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Codes::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
     }
 
     public function testNotFoundEntity()
@@ -83,6 +83,6 @@ class EntityDataControllerTest extends WebTestCase
             $content
         );
 
-        $this->assertEquals(Codes::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(Codes::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
     }
 }
