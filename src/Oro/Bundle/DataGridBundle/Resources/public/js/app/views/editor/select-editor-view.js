@@ -126,7 +126,7 @@ define(function(require) {
         getSelect2Options: function() {
             return {
                 placeholder: this.placeholder || ' ',
-                allowClear: true,
+                allowClear: !this.getValidationRules().NotBlank,
                 selectOnBlur: false,
                 openOnEnter: false,
                 data: {results: this.availableChoices}
