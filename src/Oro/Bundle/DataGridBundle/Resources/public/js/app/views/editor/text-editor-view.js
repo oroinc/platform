@@ -135,7 +135,7 @@ define(function(require) {
                     this.trigger('saveAction');
                 }, this),
                 errorPlacement: function(error, element) {
-                    error.appendTo(element.closest('.inline-editor-wrapper'));
+                    error.appendTo($(element).closest('.inline-editor-wrapper'));
                 },
                 rules: {
                     value: this.getValidationRules()
