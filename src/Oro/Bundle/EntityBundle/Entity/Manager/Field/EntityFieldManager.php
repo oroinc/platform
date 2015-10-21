@@ -248,9 +248,11 @@ class EntityFieldManager
 
         if ($metaData->hasAssociation($fieldName)) {
             $fieldInfo = $metaData->getAssociationMapping($fieldName);
-
-            $entity = $this->entityRoutingHelper->getEntity($fieldInfo['targetEntity'], $fieldValue);
-            $fieldValue = $entity;
+            $fieldValue = null;
+            if (!empty($fieldValue)) {
+                $entity = $this->entityRoutingHelper->getEntity($fieldInfo['targetEntity'], $fieldValue);
+                $fieldValue = $entity;
+            }
         }
 
         return $fieldValue;
