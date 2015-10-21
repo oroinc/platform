@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 /**
  * Class InlineEditingExtensionTest
@@ -28,6 +29,11 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|EntityClassNameHelper
+     */
+    protected $entityClassNameHelper;
+
+    /**
      * @var InlineEditingExtension
      */
     protected $extension;
@@ -43,7 +49,15 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new InlineEditingExtension($this->guesser, $this->securityFacade);
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new InlineEditingExtension(
+            $this->guesser,
+            $this->securityFacade,
+            $this->entityClassNameHelper
+        );
     }
 
     public function testIsApplicable()
@@ -125,6 +139,9 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
         $this->guesser->expects($this->any())
             ->method('getColumnOptions')
             ->will($this->returnCallback($callback));
+        $this->entityClassNameHelper->expects($this->any())
+            ->method('getUrlSafeClassName')
+            ->willReturn('Oro_Bundle_EntityBundle_Tests_Unit_Fixtures_Stub_SomeEntity');
 
         $this->extension->processConfigs($config);
 

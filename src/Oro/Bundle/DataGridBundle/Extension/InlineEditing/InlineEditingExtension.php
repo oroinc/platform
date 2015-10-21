@@ -2,35 +2,38 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class InlineEditingExtension extends AbstractExtension
 {
-    /**
-     * @var InlineEditColumnOptionsGuesser
-     */
+    /** @var InlineEditColumnOptionsGuesser */
     protected $guesser;
 
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /**
      * @param InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser
      * @param SecurityFacade $securityFacade
+     * @param EntityClassNameHelper $entityClassNameHelper
      */
     public function __construct(
         InlineEditColumnOptionsGuesser $inlineEditColumnOptionsGuesser,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        EntityClassNameHelper $entityClassNameHelper
     ) {
         $this->securityFacade = $securityFacade;
         $this->guesser = $inlineEditColumnOptionsGuesser;
+        $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
     /**
@@ -66,7 +69,7 @@ class InlineEditingExtension extends AbstractExtension
         $resultConfigItems = array_replace_recursive($configItems, $normalizedConfigItems);
         if (is_null($resultConfigItems['save_api_accessor']['default_route_parameters']['className'])) {
             $resultConfigItems['save_api_accessor']['default_route_parameters']['className'] =
-                str_replace('\\', '_', $configItems['entity_name']);
+                $this->entityClassNameHelper->getUrlSafeClassName($configItems['entity_name']);
         }
         $config->offsetSet(Configuration::BASE_CONFIG_KEY, $resultConfigItems);
 

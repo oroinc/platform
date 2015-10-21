@@ -45,6 +45,7 @@ services:
         arguments:
             - @oro_datagrid.datagrid.inline_edit_column_options_guesser
             - @oro_security.security_facade
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: oro_datagrid.extension }
 
