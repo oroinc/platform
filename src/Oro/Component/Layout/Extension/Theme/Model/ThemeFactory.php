@@ -34,6 +34,9 @@ class ThemeFactory implements ThemeFactoryInterface
         if (isset($themeDefinition['groups'])) {
             $theme->setGroups((array)$themeDefinition['groups']);
         }
+        if (isset($themeDefinition['description'])) {
+            $theme->setDescription($themeDefinition['description']);
+        }
 
         return $theme;
     }

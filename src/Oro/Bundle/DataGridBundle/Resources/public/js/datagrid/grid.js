@@ -391,12 +391,11 @@ define(function(require) {
                         iconClassName: 'icon-repeat'
                     }
                 });
-
-                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
+                this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, _.debounce(function() {
                     if (this.$el.is(':visible')) {
                         this.refreshAction.execute();
                     }
-                });
+                }, 100));
 
                 this.listenTo(this.refreshAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:refresh:' + this.name, [action, options]);
@@ -422,11 +421,11 @@ define(function(require) {
                     }
                 });
 
-                this.listenTo(mediator, 'datagrid:doReset:' + this.name, function() {
+                this.listenTo(mediator, 'datagrid:doReset:' + this.name, _.debounce(function() {
                     if (this.$el.is(':visible')) {
                         this.resetAction.execute();
                     }
-                });
+                }, 100));
 
                 this.listenTo(this.resetAction, 'preExecute', function(action, options) {
                     this.$el.trigger('preExecute:reset:' + this.name, [action, options]);
