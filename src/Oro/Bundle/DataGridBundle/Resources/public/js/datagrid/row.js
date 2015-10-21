@@ -32,6 +32,33 @@ define([
             hasSelectedText: false
         },
 
+        /**
+         * @inheritDoc
+         */
+        initialize: function(options) {
+            Row.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.columns, 'sort', this.updateCellsOrder);
+        },
+
+        /**
+         * Handles columns sort event and updates order of cells
+         */
+        updateCellsOrder: function() {
+            var cell;
+            var fragment = document.createDocumentFragment();
+
+            for (var i = 0; i < this.columns.length; i++) {
+                cell = _.find(this.cells, {column: this.columns.at(i)});
+                if (cell) {
+                    fragment.appendChild(cell.el);
+                }
+            }
+
+            this.$el.html(fragment);
+            this.trigger('content:update');
+        },
+
         className: function() {
             return this.model.get('row_class_name');
         },

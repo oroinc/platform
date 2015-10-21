@@ -7,11 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -35,7 +33,7 @@ class ConfigScopeType extends AbstractType
     protected $configManager;
 
     /**
-     * @var AbstractConfigModel
+     * @var ConfigModel
      */
     protected $configModel;
 
@@ -54,7 +52,7 @@ class ConfigScopeType extends AbstractType
         $items,
         ConfigInterface $config,
         ConfigManager $configManager,
-        AbstractConfigModel $configModel
+        ConfigModel $configModel
     ) {
         $this->items         = $items;
         $this->config        = $config;

@@ -11,7 +11,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class AttributeGuesser
@@ -27,12 +28,12 @@ class AttributeGuesser
     protected $managerRegistry;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $entityConfigProvider;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $formConfigProvider;
 
@@ -52,16 +53,16 @@ class AttributeGuesser
     protected $formTypeMapping = array();
 
     /**
-     * @param FormRegistry $formRegistry
+     * @param FormRegistry    $formRegistry
      * @param ManagerRegistry $managerRegistry
-     * @param ConfigProviderInterface $entityConfigProvider
-     * @param ConfigProviderInterface $formConfigProvider
+     * @param ConfigProvider  $entityConfigProvider
+     * @param ConfigProvider  $formConfigProvider
      */
     public function __construct(
         FormRegistry $formRegistry,
         ManagerRegistry $managerRegistry,
-        ConfigProviderInterface $entityConfigProvider,
-        ConfigProviderInterface $formConfigProvider
+        ConfigProvider $entityConfigProvider,
+        ConfigProvider $formConfigProvider
     ) {
         $this->formRegistry = $formRegistry;
         $this->managerRegistry = $managerRegistry;
@@ -204,8 +205,8 @@ class AttributeGuesser
         $formOptions = array();
         if ($this->formConfigProvider->hasConfig($entityClass)) {
             $formConfig = $this->formConfigProvider->getConfig($entityClass);
-            $formType = $formConfig->has('form_type') ? $formConfig->get('form_type') : null;
-            $formOptions = $formConfig->has('form_options') ? $formConfig->get('form_options') : array();
+            $formType = $formConfig->get('form_type');
+            $formOptions = $formConfig->get('form_options', false, array());
         }
         if (!$formType) {
             $formType = 'entity';
@@ -287,9 +288,6 @@ class AttributeGuesser
 
         $entityConfig = $this->entityConfigProvider->getConfig($class, $field);
         $labelOption = $multiple ? 'plural_label' : 'label';
-        if (!$entityConfig->has($labelOption)) {
-            return null;
-        }
 
         return $entityConfig->get($labelOption);
     }

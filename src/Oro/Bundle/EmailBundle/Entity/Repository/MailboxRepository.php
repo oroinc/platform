@@ -120,7 +120,7 @@ class MailboxRepository extends EntityRepository
         $qb->select('mb')
            ->from('OroEmailBundle:Mailbox', 'mb')
            ->leftJoin('mb.emailUsers', 'eu')
-           ->leftJoin('eu.folder', 'f')
+           ->leftJoin('eu.folders', 'f')
            ->leftJoin('mb.processSettings', 'ps')
            ->where($qb->expr()->isInstanceOf('ps', $settingsClass))
            ->andWhere('eu.email = :email')

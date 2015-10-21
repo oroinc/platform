@@ -31,7 +31,8 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
      */
     public function setContext(ContextInterface $context)
     {
-        foreach ($this->getProviders() as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             if ($provider instanceof ContextAwareInterface) {
                 $provider->setContext($context);
             }
@@ -43,7 +44,8 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
      */
     public function getPaths(array $existingPaths)
     {
-        foreach ($this->getProviders() as $provider) {
+        $providers = $this->getProviders();
+        foreach ($providers as $provider) {
             $existingPaths = $provider->getPaths($existingPaths);
         }
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,6 +16,9 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     /** @var InputOptionProvider */
@@ -104,9 +109,18 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
+        $dropDatabase = 'none';
+        if ($forceInstall) {
+            if ($input->getOption('drop-database')) {
+                $dropDatabase = 'full';
+            } elseif ($isInstalled) {
+                $dropDatabase = 'app';
+            }
+        }
+
         $this
             ->checkStep($output)
-            ->prepareStep($commandExecutor, $input->getOption('drop-database'))
+            ->prepareStep($commandExecutor, $dropDatabase)
             ->loadDataStep($commandExecutor, $output)
             ->finalStep($commandExecutor, $output, $input);
 
@@ -189,27 +203,51 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * Drop schema, clear entity config and extend caches
      *
      * @param CommandExecutor $commandExecutor
-     * @param bool            $dropFullDatabase
+     * @param string          $dropDatabase Can be 'none', 'app' or 'full'
      *
      * @return InstallCommand
      */
-    protected function prepareStep(CommandExecutor $commandExecutor, $dropFullDatabase = false)
+    protected function prepareStep(CommandExecutor $commandExecutor, $dropDatabase = 'none')
     {
-        $schemaDropOptions = [
-            '--force'             => true,
-            '--process-isolation' => true,
-        ];
-
-        if ($dropFullDatabase) {
-            $schemaDropOptions['--full-database'] = true;
+        if ($dropDatabase !== 'none') {
+            $schemaDropOptions = [
+                '--force'             => true,
+                '--process-isolation' => true
+            ];
+            if ($dropDatabase === 'full') {
+                $schemaDropOptions['--full-database'] = true;
+                $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+            } else {
+                $managers = $this->getContainer()->get('doctrine')->getManagers();
+                foreach ($managers as $name => $manager) {
+                    if ($manager instanceof EntityManager) {
+                        $schemaDropOptions['--em'] = $name;
+                        $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+                    }
+                }
+            }
+            $commandExecutor
+                ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
+                ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
         }
 
-        $commandExecutor
-            ->runCommand('doctrine:schema:drop', $schemaDropOptions)
-            ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
-
         return $this;
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return callable
+     */
+    protected function getNotBlankValidator($message)
+    {
+        return function ($value) use ($message) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception($message);
+            }
+
+            return $value;
+        };
     }
 
     /**
@@ -219,27 +257,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $emailValidator     = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The email must be specified');
-            }
-
-            return $value;
-        };
-        $firstNameValidator = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The first name must be specified');
-            }
-
-            return $value;
-        };
-        $lastNameValidator  = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The last name must be specified');
-            }
-
-            return $value;
-        };
+        $emailValidator     = $this->getNotBlankValidator('The email must be specified');
+        $firstNameValidator = $this->getNotBlankValidator('The first name must be specified');
+        $lastNameValidator  = $this->getNotBlankValidator('The last name must be specified');
         $passwordValidator  = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');

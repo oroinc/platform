@@ -190,10 +190,11 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $header = $this->getHeadersName();
         $data = array();
+        $gridPath = $this->getDataGridPath();
         foreach ($rows as $row) {
             /** @var  $row \PHPUnit_Extensions_Selenium2TestCase_Element */
             $columns = $row->elements(
-                $this->test->using('xpath')->value("//td[not(contains(@style, 'display: none;'))]")
+                $this->test->using('xpath')->value("{$gridPath}//td[not(contains(@style, 'display: none;'))]")
             );
 
             $rowData = array();
@@ -204,6 +205,19 @@ abstract class AbstractPageGrid extends AbstractPage
             $data[] = array_combine($header, $rowData);
         }
         return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDataGridPath()
+    {
+        if ($this->gridPath) {
+            $gridPath = $this->gridPath;
+        } else {
+            $gridPath = "//div[contains(@class,'grid-container')]";
+        }
+        return $gridPath;
     }
 
     /**
@@ -328,9 +342,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getHeaders()
     {
+        $gridPath = $this->getDataGridPath();
         $records = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/thead[not(contains(@class,'thead-sizing'))]/tr/th")
+                ->value("{$gridPath}//table/thead[not(contains(@class,'thead-sizing'))]/tr/th")
         );
         return $records;
     }

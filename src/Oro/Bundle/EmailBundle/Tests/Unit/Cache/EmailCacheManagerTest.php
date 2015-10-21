@@ -69,7 +69,8 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
-        $emailUser->setFolder($folder);
+        $emailUser->setOrigin($origin);
+        $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
         $loader = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface');
@@ -118,7 +119,8 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
-        $emailUser->setFolder($folder);
+        $emailUser->setOrigin($origin);
+        $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
         $exception = new \Exception('some exception');
@@ -167,7 +169,8 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
         $origin = new TestEmailOrigin();
         $folder = new EmailFolder();
         $folder->setOrigin($origin);
-        $emailUser->setFolder($folder);
+        $emailUser->setOrigin($origin);
+        $emailUser->addFolder($folder);
         $email->addEmailUser($emailUser);
 
         $exception = new EmailBodyNotFoundException($email);
