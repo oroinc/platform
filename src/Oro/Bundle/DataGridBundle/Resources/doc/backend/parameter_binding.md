@@ -20,9 +20,9 @@ datagrid:
                     - u
                 from:
                     { table: AcmeDemoBundle:User, alias:u }
-            where:
-                and:
-                    - u.group = :group_id
+                where:
+                    and:
+                        - u.group = :group_id
             bind_parameters:
                 # Get parameter "group_id" from datagrid
                 # and set it's value to "group_id" parameter in datasource query
@@ -42,9 +42,9 @@ datagrid:
                     - u
                 from:
                     { table: AcmeDemoBundle:User, alias:u }
-            where:
-                and:
-                    - u.group = :group_id
+                where:
+                    and:
+                        - u.group = :group_id
             bind_parameters:
                 # Get parameter "groupId" from datagrid
                 # and set it's value to "group_id" parameter in datasource query
