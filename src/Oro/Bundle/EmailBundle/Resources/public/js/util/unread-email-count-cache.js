@@ -3,7 +3,9 @@ define(function(require) {
 
     var _ = require('underscore');
     var module = require('module');
-    var cache = _.result(module.config(), 'unreadEmailsCount') || [];
+    // for some reason module configuration sometimes comes as Object, despite it is defined as Array
+    // defined {unreadEmailsCount: [{"num":"0","id":0}]}, but comes {unreadEmailsCount: {{"num":"0","id":0}}},
+    var cache = _.toArray(_.result(module.config(), 'unreadEmailsCount'));
     var hasInitState = true;
     return {
         hasInitState: function() {
