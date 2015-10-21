@@ -32,8 +32,7 @@ datagrid:
               css_class_name: '<class-name>'
               value_field_name: {column-name-value}
           validation_rules:
-            # jQuery.validate configuration
-            required: true
+            NotBlank: ~
         autocomplete_api_accessor:
           # class: oroentity/js/tools/entity-select-search-api-accessor
           # entity_select is default search api
@@ -54,7 +53,7 @@ inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.input_delay      | Delay before user finished input and request sent to server
-inline_editing.editor.validation_rules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 inline_editing.editor.autocomplete_api_accessor     | Required. Specifies available choices
 inline_editing.editor.autocomplete_api_accessor.class | One of the [list of search APIs](../search-apis.md)
 
@@ -70,7 +69,7 @@ inline_editing.editor.autocomplete_api_accessor.class | One of the [list of sear
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.value_field_name | <code>Object</code> | Related value field name |
 | options.autocomplete_api_accessor | <code>Object</code> | Autocomplete API specification.                                      Please see [list of search API's](../search-apis.md) |
 
