@@ -131,7 +131,7 @@ define([
                     for (var i = 0; i < _this.cells.length; i++) {
                         var cell = _this.cells[i];
                         if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
-                            cell.onRowClicked();
+                            cell.onRowClicked(_this, e);
                         }
                     }
                     _this.$el.removeClass('mouse-down');
