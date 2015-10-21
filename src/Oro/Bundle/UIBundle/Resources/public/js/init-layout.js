@@ -414,11 +414,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         e.preventDefault();
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var collectionInfo = getOroCollectionInfo($listContainer);
-        $listContainer.append(collectionInfo.nextItemHtml)
-            .trigger('content:changed')
-            .data('last-index', collectionInfo.nextIndex + 1);
-
+        var rowCountAdd = $(containerSelector).data('row-count-add');
+        for (var i = 0; i < rowCountAdd; i++) {
+            var collectionInfo = getOroCollectionInfo($listContainer);
+            $listContainer.append(collectionInfo.nextItemHtml)
+                .trigger('content:changed')
+                .data('last-index', collectionInfo.nextIndex + 1);
+        }
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
