@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 
-class EntityDataAPIManager
+class EntityDataApiManager
 {
     /** @var  EntityFieldManager */
     protected $entityDataManager;
