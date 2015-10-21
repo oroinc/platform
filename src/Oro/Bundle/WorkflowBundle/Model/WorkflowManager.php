@@ -210,7 +210,6 @@ class WorkflowManager
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
             }
-
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {
@@ -234,7 +233,7 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdated();
+            $workflowItem->setUpdated(); // transition might not change workflow item
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {
@@ -265,20 +264,20 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             foreach ($data as $row) {
-                if (empty($row['workflowItem']) || empty($row['transition'])) {
+                if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
+                    || empty($row['transition'])
+                ) {
                     continue;
                 }
 
                 /** @var WorkflowItem $workflowItem */
-                $workflowItem = $this->getWorkflowItem($row['workflowItem']);
+                $workflowItem = $row['workflowItem'];
                 $workflow = $this->getWorkflow($workflowItem);
                 $transition = $row['transition'];
 
                 $workflow->transit($workflowItem, $transition);
-                $workflowItem->setUpdated();
-                $em->persist($workflowItem);
+                $workflowItem->setUpdated(); // transition might not change workflow item
             }
-
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {

@@ -39,3 +39,6 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
+
+####WorklfowBundle
+ - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have method `massTransit` to perform several transition in one transaction, can be used to improve workflow performance
