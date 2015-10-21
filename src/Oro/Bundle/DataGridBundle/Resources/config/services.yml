@@ -28,6 +28,7 @@ parameters:
     oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
+    oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
 
 services:
     oro_datagrid.datagrid.manager:
@@ -165,3 +166,11 @@ services:
             - @request
             - @doctrine
         scope: request
+
+    oro_datagrid.handler.export:
+        class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
+        arguments:
+            - @oro_importexport.file.mime_type_guesser
+
+    oro_datagrid.columns.helper:
+        class: %oro_datagrid.columns.helper.class%

@@ -97,6 +97,51 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider isActivitySupport
+     */
+    public function testIsActivitySupport($dictionaryOptions, $expected)
+    {
+        $className = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('activity_support')
+            ->will($this->returnValue($dictionaryOptions));
+
+        $configProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('dictionary')
+            ->will($this->returnValue($configProvider));
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className)
+            ->will($this->returnValue($config));
+
+        $this->assertEquals(
+            $expected,
+            $this->typeHelper->isSupportActivityEnabled($className)
+        );
+    }
+
+    public function isActivitySupport()
+    {
+        return [
+            [null, false],
+            [['some'], false],
+            ['true', true],
+            ['false', false],
+        ];
+    }
+
     public function testIsAssociationOwningSideEntityForNotOwningSideEntity()
     {
         $className        = 'Test\Entity1';

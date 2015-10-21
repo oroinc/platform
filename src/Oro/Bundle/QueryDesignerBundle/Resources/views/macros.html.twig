@@ -93,7 +93,7 @@
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
             {% if ('column' in showItems) %}
-            <td class="name-cell"><%= name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             {% endif %}
             {% if ('label' in showItems) %}
             <td class="label-cell"><%- label %></td>
@@ -126,7 +126,7 @@
 {% macro query_designer_grouping_item_template(id) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
-            <td class="name-cell"><%= name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"

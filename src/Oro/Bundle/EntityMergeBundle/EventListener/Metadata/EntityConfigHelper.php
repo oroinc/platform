@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -92,7 +92,7 @@ class EntityConfigHelper
     }
 
     /**
-     * @return ConfigProviderInterface
+     * @return ConfigProvider
      */
     protected function getExtendConfigProvider()
     {

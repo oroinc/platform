@@ -22,10 +22,14 @@ class DoctrineTagEventListener
     /** @var array */
     protected $collectedTags = [];
 
+    /**
+     * @param TopicSender      $sender
+     * @param bool|string|null $isApplicationInstalled
+     */
     public function __construct(TopicSender $sender, $isApplicationInstalled)
     {
         $this->sender                 = $sender;
-        $this->isApplicationInstalled = $isApplicationInstalled;
+        $this->isApplicationInstalled = !empty($isApplicationInstalled);
     }
 
     /**
@@ -59,7 +63,7 @@ class DoctrineTagEventListener
 
         $generator = $this->sender->getGenerator();
         foreach ($entities as $entity) {
-            if (!in_array(ClassUtils::getClass($entity), $this->skipTrackingFor)) {
+            if (!isset($this->skipTrackingFor[ClassUtils::getClass($entity)])) {
                 // invalidate collection view pages only when entity has been added or removed
                 $includeCollectionTag = $uow->isScheduledForInsert($entity)
                     || $uow->isScheduledForDelete($entity);
@@ -76,6 +80,8 @@ class DoctrineTagEventListener
 
     /**
      * Send collected tags to publisher
+     *
+     * @param PostFlushEventArgs $event
      */
     public function postFlush(PostFlushEventArgs $event)
     {
@@ -87,16 +93,18 @@ class DoctrineTagEventListener
      * Add this method call to service declaration in case when you need
      * to do not send update tags whenever your entity modified
      *
-     * @param string $entityFQCN
+     * @param string $className The FQCN of an entity to be skipped
      *
-     * @throws \LogicException
+     * @throws \InvalidArgumentException
      */
-    public function markSkipped($entityFQCN)
+    public function markSkipped($className)
     {
-        if (is_string($entityFQCN) && class_exists($entityFQCN)) {
-            $this->skipTrackingFor[] = $entityFQCN;
-        } else {
-            throw new \LogicException('Invalid entity class name given');
+        if (!class_exists($className)) {
+            throw new \InvalidArgumentException(
+                sprintf('The class "%s" does not exist.', $className)
+            );
         }
+
+        $this->skipTrackingFor[$className] = true;
     }
 }

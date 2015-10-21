@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -413,8 +414,10 @@ class ActivityListChainProvider
             ));
             $this->setDate($entity, $provider, $list);
             $list->setOwner($provider->getOwner($entity));
-            $list->setUpdatedBy($provider->getUpdatedBy($entity));
-            if ($this->hasGrouping($provider)) {
+            if ($provider instanceof ActivityListUpdatedByProviderInterface) {
+                $list->setUpdatedBy($provider->getUpdatedBy($entity));
+            }
+            if ($provider instanceof ActivityListGroupProviderInterface) {
                 $list->setHead($provider->isHead($entity));
             }
             $list->setVerb($verb);
@@ -445,26 +448,6 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param ActivityListProviderInterface $provider
-     *
-     * @return bool
-     */
-    protected function hasCustomDate(ActivityListProviderInterface $provider)
-    {
-        return $provider instanceof ActivityListDateProviderInterface;
-    }
-
-    /**
-     * @param ActivityListProviderInterface $provider
-     *
-     * @return bool
-     */
-    protected function hasGrouping(ActivityListProviderInterface $provider)
-    {
-        return $provider instanceof ActivityListGroupProviderInterface;
-    }
-
-    /**
      * Set Create and Update fields
      *
      * @param $entity
@@ -473,7 +456,7 @@ class ActivityListChainProvider
      */
     protected function setDate($entity, ActivityListProviderInterface $provider, $list)
     {
-        if ($this->hasCustomDate($provider)) {
+        if ($provider instanceof ActivityListDateProviderInterface) {
             if ($provider->getCreatedAt($entity)) {
                 $list->setCreatedAt($provider->getCreatedAt($entity));
             }

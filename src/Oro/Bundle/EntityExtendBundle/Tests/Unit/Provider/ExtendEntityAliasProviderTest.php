@@ -6,7 +6,6 @@ use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityAliasProvider;
@@ -55,9 +54,9 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'Test\Entity';
 
         $this->configManager->expects($this->once())
-            ->method('getConfigEntityModel')
+            ->method('hasConfig')
             ->with($entityClass)
-            ->willReturn(null);
+            ->willReturn(false);
 
         $result = $this->entityAliasProvider->getEntityAlias($entityClass);
         $this->assertNull($result);
@@ -68,9 +67,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityAliasForEnum($entityClass, $expectedAlias)
     {
-        $entityConfigModel = new EntityConfigModel();
-        $entityConfigModel->setClassName($entityClass);
-
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -78,9 +74,9 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         $enumConfig->set('code', 'test_enum');
 
         $this->configManager->expects($this->once())
-            ->method('getConfigEntityModel')
+            ->method('hasConfig')
             ->with($entityClass)
-            ->willReturn($entityConfigModel);
+            ->willReturn(true);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
@@ -117,9 +113,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityAliasForDictionary($entityClass, $expectedAlias)
     {
-        $entityConfigModel = new EntityConfigModel();
-        $entityConfigModel->setClassName($entityClass);
-
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -132,9 +125,9 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         $groupingConfig->set('groups', [GroupingScope::GROUP_DICTIONARY]);
 
         $this->configManager->expects($this->once())
-            ->method('getConfigEntityModel')
+            ->method('hasConfig')
             ->with($entityClass)
-            ->willReturn($entityConfigModel);
+            ->willReturn(true);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->willReturnMap(
@@ -179,10 +172,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityAliasForHiddenEntity($entityClass, $expectedAlias)
     {
-        $entityConfigModel = new EntityConfigModel();
-        $entityConfigModel->setClassName($entityClass);
-        $entityConfigModel->setMode(ConfigModelManager::MODE_HIDDEN);
-
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -194,9 +183,13 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         $groupingConfig         = new Config(new EntityConfigId('grouping', $entityClass));
 
         $this->configManager->expects($this->once())
-            ->method('getConfigEntityModel')
+            ->method('hasConfig')
             ->with($entityClass)
-            ->willReturn($entityConfigModel);
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(true);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->willReturnMap(
@@ -241,10 +234,6 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityAliasForCustomEntity($entityClass, $expectedAlias)
     {
-        $entityConfigModel = new EntityConfigModel();
-        $entityConfigModel->setClassName($entityClass);
-        $entityConfigModel->setMode(ConfigModelManager::MODE_DEFAULT);
-
         $enumConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -256,9 +245,13 @@ class ExtendEntityAliasProviderTest extends \PHPUnit_Framework_TestCase
         $groupingConfig         = new Config(new EntityConfigId('grouping', $entityClass));
 
         $this->configManager->expects($this->once())
-            ->method('getConfigEntityModel')
+            ->method('hasConfig')
             ->with($entityClass)
-            ->willReturn($entityConfigModel);
+            ->willReturn(true);
+        $this->configManager->expects($this->once())
+            ->method('isHiddenModel')
+            ->with($entityClass)
+            ->willReturn(false);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->willReturnMap(

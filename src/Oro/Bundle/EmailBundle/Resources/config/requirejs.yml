@@ -26,6 +26,8 @@ config:
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/components/email-attachment-component': 'bundles/oroemail/js/app/components/email-attachment-component.js'
         'oroemail/js/app/components/email-notification-component': 'bundles/oroemail/js/app/components/email-notification-component.js'
+        'oroemail/js/app/components/user-menu-email-notification-component': 'bundles/oroemail/js/app/components/user-menu-email-notification-component.js'
+        'oroemail/js/app/components/new-email-message-component': 'bundles/oroemail/js/app/components/new-email-message-component.js'
         'oroemail/js/app/components/mark-unread-button': 'bundles/oroemail/js/app/components/mark-unread-button.js'
         'oro/select2-email-recipients-component': 'bundles/oroemail/js/app/components/select2-email-recipients-component.js'
 
@@ -45,6 +47,8 @@ config:
         'oro/filter/multiselect-originfolder-filter': 'bundles/oroemail/js/filter/multiselect-originfolder-filter.js'
 
         'oroemail/js/app/modules/views-module': 'oroemail/js/app/modules/views-module.js'
+
+        'oroemail/sidebar_widgets/recent_emails/js/widget': 'bundles/oroemail/sidebar_widgets/recent_emails/js/widget.js'
     appmodules:
         - oroemail/js/app/modules/views-module
         - oroemail/js/app/modules/email-module

@@ -3,6 +3,7 @@ parameters:
     oro_filter.string_filter.class:               Oro\Bundle\FilterBundle\Filter\StringFilter
     oro_filter.select_row_filter.class:           Oro\Bundle\FilterBundle\Filter\SelectRowFilter
     oro_filter.number_filter.class:               Oro\Bundle\FilterBundle\Filter\NumberFilter
+    oro_filter.number_range_filter.class:         Oro\Bundle\FilterBundle\Filter\NumberRangeFilter
     oro_filter.percent_filter.class:              Oro\Bundle\FilterBundle\Filter\PercentFilter
     oro_filter.currency_filter.class:             Oro\Bundle\FilterBundle\Filter\CurrencyFilter
     oro_filter.choice_filter.class:               Oro\Bundle\FilterBundle\Filter\ChoiceFilter
@@ -14,6 +15,7 @@ parameters:
     oro_filter.datetime_range_filter.class:       Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
     oro_filter.many_to_many_filter.class:         Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
     oro_filter.dictionary_filter.class:           Oro\Bundle\FilterBundle\Filter\DictionaryFilter
+    oro_filter.choice_tree_filter.class:          Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter
 
 services:
     oro_filter.filter_utility:
@@ -42,6 +44,14 @@ services:
             - @oro_filter.filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: number }
+
+    oro_filter.number_range_filter:
+        class: %oro_filter.number_range_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: number-range }
 
     oro_filter.percent_filter:
         class: %oro_filter.percent_filter.class%
@@ -129,3 +139,14 @@ services:
             - @oro_filter.filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: dictionary }
+
+    oro_filter.choice_tree_filter:
+        class: %oro_filter.choice_tree_filter.class%
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @doctrine
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: choice-tree }
+
+
