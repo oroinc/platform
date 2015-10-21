@@ -97,6 +97,7 @@ define(function(require) {
         },
 
         onAfterMakeCell: function(row, cell) {
+            var _this = this;
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
                     _this.enterEditMode(cell);
@@ -104,15 +105,15 @@ define(function(require) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            var _this = this;
-            cell.render = _.wrap(cell.render, function(originalRender) {
-                originalRender.apply(this, _.rest(arguments));
+            var originalRender = cell.render;
+            cell.render = function() {
+                originalRender.apply(this, arguments);
                 if (_this.isEditable(cell)) {
-                    this.$el.addClass('editable view-mode');
+                    this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
                 }
                 return this;
-            });
+            };
             cell.events = _.extend({}, cell.events, {
                 'dblclick': enterEditModeIfNeeded,
                 'mouseleave': this.hidePopover,

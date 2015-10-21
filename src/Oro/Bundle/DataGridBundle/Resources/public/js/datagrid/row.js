@@ -87,6 +87,10 @@ define([
                 // prevent second click handler launch
                 this.mouseDownSelection = null;
                 this.mouseDownTarget = null;
+                // prevent text selection on double click
+                if ($(e.target).closest('.prevent-text-selection-on-dblclick').length) {
+                    e.preventDefault();
+                }
                 return;
             }
             // remember selection and target
