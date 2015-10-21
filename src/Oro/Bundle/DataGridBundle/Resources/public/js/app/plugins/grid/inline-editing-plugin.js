@@ -160,30 +160,28 @@ define(function(require) {
             if (!columnMetadata) {
                 return false;
             }
-            var editable = false;
+            var editable;
+            var enableConfigValue = columnMetadata.inline_editing && columnMetadata.inline_editing.enable;
             // validateUrlParameters
             switch (this.options.metadata.inline_editing.behaviour) {
                 case 'enable_all':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === false) {
-                        editable = false;
-                    } else {
+                    if (enableConfigValue !== false) {
                         editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
                             (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
                                 this.options.metadata.inline_editing.default_editors;
+                    } else {
+                        editable = false;
                     }
                     break;
                 case 'enable_selected':
-                    if (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) {
-                        editable = true;
-                    }
+                    editable = enableConfigValue === true;
                     break;
                 default:
                     throw new Error('Unknown behaviour');
             }
-            if (editable) {
-                return this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON());
-            }
-            return false;
+            return editable ?
+                this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
+                false;
         },
 
         getCellEditorOptions: function(cell) {
