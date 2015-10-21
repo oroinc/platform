@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Controller\Api\Rest;
 
-use Rhumsaa\Uuid\Console\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -15,10 +14,6 @@ use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
-use Oro\Bundle\EntityBundle\Exception\EntityHasFieldException;
-use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * @RouteResource("entity_data")
