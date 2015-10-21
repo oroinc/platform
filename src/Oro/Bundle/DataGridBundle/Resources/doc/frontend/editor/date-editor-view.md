@@ -28,8 +28,7 @@ datagrid:
                 yearRange: '-80:+1'
                 showButtonPanel: true
           validation_rules:
-            # jQuery.validate configuration
-            required: true
+            NotBlank: true
 ```
 
 ### Options in yml:
@@ -40,7 +39,7 @@ inline_editing.editor.view_options.placeholder      | Optional. Placeholder for 
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
 inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for the date HTML input element
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
-inline_editing.editor.validation_rules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
 ### Constructor parameters
 
@@ -53,7 +52,7 @@ inline_editing.editor.validation_rules               | Optional. The client side
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
 

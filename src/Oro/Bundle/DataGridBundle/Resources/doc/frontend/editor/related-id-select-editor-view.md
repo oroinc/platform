@@ -35,8 +35,7 @@ datagrid:
                 key-1: First
                 key-2: Second
           validation_rules:
-            # jQuery.validate configuration
-            required: true
+            NotBlank: ~
     properties:
       # this line is required to add {column-name-value} to data sent to client
       {column-name-value}: ~
@@ -50,7 +49,7 @@ inline_editing.editor.view_options.choices          | Key-value set of available
 inline_editing.editor.view_options.value_field_name | Related value field name.
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.validation_rules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
 
 ### Constructor parameters
@@ -64,7 +63,7 @@ inline_editing.editor.validation_rules               | Optional. The client side
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.choices | <code>Object</code> | Key-value set of available choices |
 | options.value_field_name | <code>Object</code> | Related value field name |
 

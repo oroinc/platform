@@ -22,9 +22,7 @@ datagrid:
               placeholder: '<placeholder>'
               css_class_name: '<class-name>'
           validation_rules:
-            # jQuery.validate configuration
-            required: true
-            min: 5
+            NotBlank: ~
 ```
 
 ### Options in yml:
@@ -33,7 +31,7 @@ Column option name                                  | Description
 :---------------------------------------------------|:-----------
 inline_editing.editor.view_options.placeholder      | Optional. Placeholder for an empty element
 inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
-inline_editing.editor.validation_rules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
 ### Constructor parameters
 
@@ -46,5 +44,5 @@ inline_editing.editor.validation_rules               | Optional. The client side
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 

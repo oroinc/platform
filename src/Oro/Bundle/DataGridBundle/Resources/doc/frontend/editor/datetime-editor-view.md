@@ -31,8 +31,7 @@ datagrid:
               timePickerOptions:
                 # See https://github.com/jonthornton/jquery-timepicker#options
           validation_rules:
-            # jQuery.validate configuration
-            required: true
+            NotBlank: ~
 ```
 
 ### Options in yml:
@@ -45,7 +44,7 @@ inline_editing.editor.view_options.dateInputAttrs   | Optional. Attributes for t
 inline_editing.editor.view_options.datePickerOptions| Optional. See [documentation here](http://goo.gl/pddxZU)
 inline_editing.editor.view_options.timeInputAttrs   | Optional. Attributes for the time HTML input element
 inline_editing.editor.view_options.timePickerOptions| Optional. See [documentation here](https://goo.gl/MP6Unb)
-inline_editing.editor.validation_rules               | Optional. The client side validation rules
+inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
 
 ### Constructor parameters
 
@@ -58,7 +57,7 @@ inline_editing.editor.validation_rules               | Optional. The client side
 | options.cell | <code>Backgrid.Cell</code> | Current datagrid cell |
 | options.column | <code>Backgrid.Column</code> | Current datagrid column |
 | options.placeholder | <code>string</code> | Placeholder for an empty element |
-| options.validationRules | <code>Object</code> | Validation rules in a form applicable for jQuery.validate |
+| options.validationRules | <code>Object</code> | Validation rules. See [documentation here](https://goo.gl/j9dj4Y) |
 | options.dateInputAttrs | <code>Object</code> | Attributes for date HTML input element |
 | options.datePickerOptions | <code>Object</code> | See [documentation here](http://goo.gl/pddxZU) |
 | options.timeInputAttrs | <code>Object</code> | Attributes for time HTML input element |
