@@ -72,7 +72,11 @@ define(function(require) {
         },
 
         /**
-         * Return list of parameter names required by this route
+         * Return list of parameter names required by this route (Route parameters are required to build valid url, all
+         * query parameters assumed as filters and are not required)
+         *
+         * E.g. for route `api/rest/latest/<relationClass>/<relationId/comments`
+         * This function will return `['relationClass', 'relationId']`
          *
          * @returns {Array.<string>}
          */
