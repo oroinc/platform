@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
@@ -380,7 +381,7 @@ class ApiEntityManager
      */
     protected function normalizeCriteria($criteria)
     {
-        return $this->doctrineHelper->normalizeCriteria($criteria);
+        return QueryUtils::normalizeCriteria($criteria);
     }
 
     /**
@@ -391,7 +392,7 @@ class ApiEntityManager
      */
     protected function applyJoins($qb, $joins)
     {
-        $this->doctrineHelper->applyJoins($qb, $joins);
+        QueryUtils::applyJoins($qb, $joins);
     }
 
     /**
@@ -415,7 +416,7 @@ class ApiEntityManager
      */
     protected function getOffset($page, $limit)
     {
-        return $this->doctrineHelper->getPageOffset($page, $limit);
+        return QueryUtils::getPageOffset($page, $limit);
     }
 
     /**
