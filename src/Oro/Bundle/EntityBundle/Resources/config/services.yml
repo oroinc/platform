@@ -44,7 +44,7 @@ parameters:
     oro_entity.manager.entity_field_validator.class:         Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator
 
     # managers/api
-    oro_entity.manager.api.enitty_data_api_manager.class:         Oro\Bundle\EntityBundle\Manager\Api\EntityDataAPIManager
+    oro_entity.manager.api.enitty_data_api_manager.class:    Oro\Bundle\EntityBundle\Manager\Api\EntityDataAPIManager
 
     # form
     oro_entity.form.entity_field.form_builder.class:         Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder
