@@ -157,7 +157,7 @@ define([
                 var _this = this;
                 if (!groupedMessages[message]) {
                     groupedMessages[message] = new MultiUseResourceManager({
-                        events: {
+                        listen: {
                             'construct': function() {
                                 this.alert = _this.notificationMessage(type, message, {flash: false});
                             },
