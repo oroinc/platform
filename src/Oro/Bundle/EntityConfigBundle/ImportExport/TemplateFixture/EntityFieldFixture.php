@@ -14,7 +14,7 @@ class EntityFieldFixture extends AbstractTemplateRepository implements TemplateF
      */
     public function getEntityClass()
     {
-        return  'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
+        return 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
     }
 
     /**
@@ -34,7 +34,7 @@ class EntityFieldFixture extends AbstractTemplateRepository implements TemplateF
     }
 
     /**
-     * @param string  $key
+     * @param string $key
      * @param FieldConfigModel $entity
      */
     public function fillEntityData($key, $entity)

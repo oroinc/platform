@@ -29,24 +29,6 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
 
     /**
      * @param FieldConfigModel $entity
-     * @return FieldConfigModel
-     */
-    protected function beforeProcessEntity($entity)
-    {
-        return parent::beforeProcessEntity($entity);
-    }
-
-    /**
-     * @param FieldConfigModel $entity
-     * @return FieldConfigModel
-     */
-    protected function afterProcessEntity($entity)
-    {
-        return parent::afterProcessEntity($entity);
-    }
-
-    /**
-     * @param FieldConfigModel $entity
      * @return FieldConfigModel|null
      *
      * {@inheritdoc}

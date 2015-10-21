@@ -2,9 +2,7 @@ parameters:
     oro_entity_config.importexport.data_converter.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter\EntityFieldDataConverter
     oro_entity_config.importexport.normalizer.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer
     oro_entity_config.importexport.strategy.entity_field.add_or_replace.class: Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy
-    oro_entity_config.importexport.reader.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Reader\EntityFieldReader
     oro_entity_config.importexport.template_fixture.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture
-    oro_entity_config.importexport.writer.entity_field.class: Oro\Bundle\EntityConfigBundle\ImportExport\Writer\EntityFieldWriter
 
 services:
     # Converter

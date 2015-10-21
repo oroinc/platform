@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
@@ -18,13 +19,13 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class EntityDetachFixer
 {
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    protected $entityManager;
+    protected $registry;
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->entityManager = $entityManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -38,8 +39,10 @@ class EntityDetachFixer
         if ($level < 0) {
             return;
         }
-
-        $metadata = $this->entityManager->getClassMetadata(ClassUtils::getClass($entity));
+        $entityClass = ClassUtils::getClass($entity);
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityClass);
+        $metadata = $entityManager->getClassMetadata($entityClass);
         foreach ($metadata->getAssociationMappings() as $associationMapping) {
             $fieldName = $associationMapping['fieldName'];
             $value = PropertyAccess::createPropertyAccessor()->getValue($entity, $fieldName);
@@ -92,8 +95,10 @@ class EntityDetachFixer
     protected function reloadEntity($entity)
     {
         $entityClass = ClassUtils::getClass($entity);
-        $id = $this->entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
-        return $this->entityManager->find($entityClass, $id);
+        $entityManager = $this->registry->getManagerForClass($entityClass);
+        $id = $entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
+
+        return $entityManager->find($entityClass, $id);
     }
 
     /**
@@ -102,6 +107,10 @@ class EntityDetachFixer
      */
     protected function isEntityDetached($entity)
     {
-        return $this->entityManager->getUnitOfWork()->getEntityState($entity) == UnitOfWork::STATE_DETACHED;
+        $entityClass = ClassUtils::getClass($entity);
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityClass);
+
+        return $entityManager->getUnitOfWork()->getEntityState($entity) === UnitOfWork::STATE_DETACHED;
     }
 }
