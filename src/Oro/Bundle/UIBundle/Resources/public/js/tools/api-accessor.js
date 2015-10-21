@@ -97,6 +97,16 @@ define(function(require) {
          * Sends request to the server and returns $.Promise instance with abort() support
          *
          * @param {Object} urlParameters - Url parameters to compose the url
+         * @returns {boolean} - true, if parameters are valid
+         */
+        validateUrlParameters: function(urlParameters) {
+            return this.route.validateParameters(this.prepareUrlParameters(urlParameters));
+        },
+
+        /**
+         * Sends request to the server and returns $.Promise instance with abort() support
+         *
+         * @param {Object} urlParameters - Url parameters to compose the url
          * @param {Object} body - Request body
          * @param {Object} headers - Headers to send with the request
          * @param {Object} options - Additional options

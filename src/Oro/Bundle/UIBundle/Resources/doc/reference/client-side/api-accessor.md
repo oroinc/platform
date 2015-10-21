@@ -43,6 +43,7 @@ and will put response to console after completion
 
 * [ApiAccessor](#module_ApiAccessor) ⇐ <code>[BaseClass](./base-class.md)</code>
   * [.initialize(Options)](#module_ApiAccessor#initialize)
+  * [.validateUrlParameters(urlParameters)](#module_ApiAccessor#validateUrlParameters) ⇒ <code>boolean</code>
   * [.send(urlParameters, body, headers, options)](#module_ApiAccessor#send) ⇒ <code>$.Promise</code>
   * [.getHeaders(headers)](#module_ApiAccessor#getHeaders) ⇒ <code>Object</code>
   * [.prepareUrlParameters(urlParameters)](#module_ApiAccessor#prepareUrlParameters) ⇒ <code>Object</code>
@@ -57,6 +58,17 @@ and will put response to console after completion
 | Param | Type | Description |
 | --- | --- | --- |
 | Options | <code>Object</code> | passed to the constructor |
+
+<a name="module_ApiAccessor#validateUrlParameters"></a>
+### apiAccessor.validateUrlParameters(urlParameters) ⇒ <code>boolean</code>
+Sends request to the server and returns $.Promise instance with abort() support
+
+**Kind**: instance method of <code>[ApiAccessor](#module_ApiAccessor)</code>  
+**Returns**: <code>boolean</code> - - true, if parameters are valid  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| urlParameters | <code>Object</code> | Url parameters to compose the url |
 
 <a name="module_ApiAccessor#send"></a>
 ### apiAccessor.send(urlParameters, body, headers, options) ⇒ <code>$.Promise</code>
