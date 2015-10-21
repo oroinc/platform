@@ -61,7 +61,8 @@ class FormBuilder
      */
     public function getForm($entity)
     {
-        $form = $this->formFactory->createBuilder('form', $entity, array('csrf_protection' => false))
+        $form = $this->formFactory
+            ->createBuilder('form', $entity, ['csrf_protection' => false])
             ->getForm();
 
         return $form;
