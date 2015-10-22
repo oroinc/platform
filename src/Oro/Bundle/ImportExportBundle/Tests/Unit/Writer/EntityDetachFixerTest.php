@@ -19,7 +19,6 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityFieldProvider;
 
-
     /**
      * @var EntityDetachFixer
      */
