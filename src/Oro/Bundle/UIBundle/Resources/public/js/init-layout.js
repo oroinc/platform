@@ -414,7 +414,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         e.preventDefault();
         var containerSelector = $(this).data('container') || '.collection-fields-list';
         var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
-        var rowCountAdd = $(containerSelector).data('row-count-add');
+        var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
         for (var i = 0; i < rowCountAdd; i++) {
             var collectionInfo = getOroCollectionInfo($listContainer);
             $listContainer.append(collectionInfo.nextItemHtml)
