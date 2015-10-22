@@ -45,6 +45,8 @@ definitions:
         enabled: true
         order: 150
         entity: Oro\Bundle\EmailBundle\Entity\EmailFolder
+        pre_conditions:
+            @equal: [$syncEnabled, false]
         actions_configuration:
             - @assign_constant_value:
                 attribute: $.command
@@ -72,7 +74,6 @@ definitions:
             - @tree:
                 conditions:
                     @and:
-                        - @equal: [$syncEnabled, false]
                         - @empty: [$.pendingJob]
                         - @empty: [$.runningJob]
                 actions:
@@ -85,7 +86,6 @@ definitions:
             - @tree:
                 conditions:
                     @and:
-                        - @equal: [$syncEnabled, false]
                         - @empty: [$.pendingJob]
                         - @not_empty: [$.runningJob]
                 actions:
