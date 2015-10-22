@@ -36,6 +36,18 @@ define([
         },
 
         /**
+         * @inheritDoc
+         */
+        enterEditMode: function(e) {
+            BooleanCell.__super__.enterEditMode.apply(this, arguments);
+            if (this.column.get('editable')) {
+                var $editor = this.currentEditor.$el;
+                $editor.prop('checked', !$editor.prop('checked')).change();
+                e.stopPropagation();
+            }
+        },
+
+        /**
          * @param {Backgrid.Row} row
          * @param {Event} e
          */
