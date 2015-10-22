@@ -12,6 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
+/**
+ * Validates field name for uniqueness. When generating setter and getter methods, characters `_` and `-` are removed
+ * and as result e.g for names `id` and `i_d` methods names are identical.
+ */
 class UniqueExtendEntityFieldValidator extends ConstraintValidator
 {
     /** @var ConfigProvider */
@@ -53,7 +57,17 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
         foreach ($configs as $config) {
             /** @var FieldConfigId $configId */
             $configId  = $config->getId();
+            $isDeleted = $config->is('is_deleted');
             $fieldName = $configId->getFieldName();
+            // For deleted field we do not generate setter/getter methods.
+            if ($isDeleted) {
+                if (strtolower($value->getFieldName()) === strtolower($fieldName)) {
+                    $this->addViolation($constraint);
+
+                    return;
+                }
+                continue;
+            }
             if ($newFieldName === strtolower(Inflector::classify($fieldName))) {
                 $this->addViolation($constraint);
 
