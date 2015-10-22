@@ -302,6 +302,11 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 /** @var ProcessData $data */
                 $data = $entityProcess['data'];
 
+                if (!$this->handler->isTriggerApplicable($trigger, $data)) {
+                    $this->logger->debug('Trigger pre-conditions declined process scheduling', $trigger, $data);
+                    continue;
+                }
+
                 if ($trigger->isQueued() || $this->forceQueued) {
                     $processJob = $this->queueProcess($trigger, $data);
                     $entityManager->persist($processJob);
@@ -440,10 +445,6 @@ class ProcessCollectorListener implements OptionalListenerInterface
 
         if (!$this->schedulePolicy->isScheduleAllowed($trigger, $data)) {
             $this->logger->debug('Policy declined process scheduling', $trigger, $data);
-            return;
-        }
-        if (!$this->handler->isTriggerApplicable($trigger, $data)) {
-            $this->logger->debug('Trigger pre-conditions declined process scheduling', $trigger, $data);
             return;
         }
 
