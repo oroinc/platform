@@ -1,8 +1,8 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set tabsOptions = {
+{% set options = {
     useDropdown: false
-}|merge(tabsOptions|default({})) %}
+}|merge(options|default({})) %}
 
 {% set containerAlias = 'tab' %}
 {% for tab in tabs %}
@@ -11,7 +11,7 @@
 
 <div class="oro-tabs"
      data-page-component-module="oroui/js/app/components/tabs-component"
-     data-page-component-options="{{ tabsOptions|json_encode }}">
+     data-page-component-options="{{ options|json_encode }}">
     <ul class="nav nav-tabs">
         {% for tab in tabs %}
             {% set isFirstLoop = loop.index == 1 %}
@@ -37,16 +37,16 @@
                     {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
                 {% endif %}
 
-                {% set options = tab|merge({
+                {% set tabOptions = tab|merge({
                     'widget': widgetOptions,
                     'dataAttributes': dataAttributes,
                     'label': tab.label
                 }) %}
 
-                {{ UI.clientLink(options) }}
+                {{ UI.clientLink(tabOptions) }}
             </li>
         {% endfor %}
-        {% if tabsOptions.useDropdown %}
+        {% if options.useDropdown %}
             <li class="dropdown pull-right">
                 <a href="#" id="{{ containerAlias }}-dropdown" class="dropdown-toggle" data-toggle="dropdown">
                     {{ 'View more...'|trans }} <b class="caret"></b>
