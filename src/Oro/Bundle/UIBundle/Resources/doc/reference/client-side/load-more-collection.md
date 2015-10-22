@@ -1,6 +1,9 @@
 <a name="module_LoadMoreCollection"></a>
 ## LoadMoreCollection
-Collection with "load more" functionality support. Any add/remove actions will be considered like already doneon the server and collection will update `state.totalItemsQuantity` and `route.limit`Requires API route which accepts `limit` query parameter
+Collection with "load more" functionality support. Any add/remove actions will be considered like already done
+on the server and collection will update `state.totalItemsQuantity` and `route.limit`
+
+Requires API route which accepts `limit` query parameter
 
 **Augment**: RoutingCollection  
 
