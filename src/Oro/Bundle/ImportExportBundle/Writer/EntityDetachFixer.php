@@ -53,6 +53,10 @@ class EntityDetachFixer
 
         // we should use entityFieldProvider to get relations data to avoid deleted relations in result list
         $relations = $this->entityFieldProvider->getRelations(ClassUtils::getClass($entity));
+        if (!$relations) {
+            return;
+        }
+
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($relations as $associationMapping) {
             $fieldName = $associationMapping['name'];
