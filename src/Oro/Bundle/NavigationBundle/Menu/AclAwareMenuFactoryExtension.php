@@ -3,11 +3,14 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Doctrine\Common\Cache\CacheProvider;
+
 use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
@@ -82,15 +85,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     {
         $this->processAcl($options);
 
-        $checkAccess = !isset($options['check_access']) || $options['check_access'] === true;
-        if (!$this->securityFacade->hasLoggedUser() && $checkAccess) {
-            $hasNonAuth = array_key_exists('showNonAuthorized', $options['extras']);
-            $options['extras']['isAllowed'] = $hasNonAuth && $options['extras']['showNonAuthorized'];
-        }
-
-        if ($options['extras']['isAllowed']) {
-            $this->processRoute($options);
-        }
+        $this->processRoute($options);
 
         return $options;
     }
@@ -99,40 +94,52 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      * Check ACL based on acl_resource_id, route or uri.
      *
      * @param array $options
+     *
+     * @return void
      */
     protected function processAcl(array &$options = array())
     {
-        $needCheck = (!isset($options['check_access']) || $options['check_access'] === true)
-            && $this->securityFacade->hasLoggedUser();
+        $isAllowed                      = self::DEFAULT_ACL_POLICY;
+        $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
 
-        $isAllowed = self::DEFAULT_ACL_POLICY;
-        if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
-            $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+        if (isset($options['check_access']) && $options['check_access'] === false) {
+            return;
         }
 
-        if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
-            if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
-                $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
-            } else {
-                if ($needCheck) {
-                    $isAllowed =  $this->securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
-                }
-
-                $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+        if (!$this->securityFacade->hasLoggedUser()) {
+            if (isset($options['extras'])
+                && array_key_exists('showNonAuthorized', $options['extras'])
+                && $options['extras']['showNonAuthorized']
+            ) {
+                return;
             }
+
+            $isAllowed = false;
         } else {
-            $routeInfo = $this->getRouteInfo($options);
-            if ($routeInfo) {
-                if (array_key_exists($routeInfo['key'], $this->aclCache)) {
-                    $isAllowed = $this->aclCache[$routeInfo['key']];
+            if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
+                $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+            }
+
+            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
+                if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
+                    $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
                 } else {
-                    if ($needCheck) {
+                    $isAllowed = $this->securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
+                    $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+                }
+            } else {
+                $routeInfo = $this->getRouteInfo($options);
+                if ($routeInfo) {
+                    if (array_key_exists($routeInfo['key'], $this->aclCache)) {
+                        $isAllowed = $this->aclCache[$routeInfo['key']];
+                    } else {
                         $isAllowed = $this->securityFacade->isClassMethodGranted(
                             $routeInfo['controller'],
                             $routeInfo['action']
                         );
+
+                        $this->aclCache[$routeInfo['key']] = $isAllowed;
                     }
-                    $this->aclCache[$routeInfo['key']] = $isAllowed;
                 }
             }
         }
