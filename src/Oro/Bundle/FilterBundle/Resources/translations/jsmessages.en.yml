@@ -35,3 +35,6 @@ oro:
                 field_to_value: field
             select:
                 field_to_value: field value is
+        choice-tree:
+            all: All
+            selected: Selected

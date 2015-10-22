@@ -336,7 +336,7 @@ class ConfigFieldGridController extends Controller
                 }
             }
             if ($hasChanges) {
-                $configProvider->persist($config);
+                $configManager->persist($config);
                 $indexedValues = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
                 $fieldModel->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
             }

@@ -47,6 +47,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @doctrine
             - @oro_segment.query.dynamic_segment.query_builder.link
             - @oro_segment.query.static_segment.query_builder.link
             - @oro_segment.entity_name_provider

@@ -47,7 +47,7 @@ class AbstractConfigVirtualProvider
             $hierarchy = $this->entityHierarchyProvider->getHierarchy();
             foreach ($hierarchy as $hierarchyClassName => $hierarchyParents) {
                 foreach ($items as $className => $fields) {
-                    if (in_array($className, $hierarchyParents)) {
+                    if (in_array($className, $hierarchyParents, true)) {
                         if (!isset($items[$hierarchyClassName])) {
                             $items[$hierarchyClassName] = [];
                         }

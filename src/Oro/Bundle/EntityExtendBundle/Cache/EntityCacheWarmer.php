@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -15,14 +16,22 @@ class EntityCacheWarmer extends CacheWarmer
     /** @var ConfigManager */
     private $configManager;
 
+    /** @var ConfigCacheWarmer */
+    private $configCacheWarmer;
+
     /**
      * @param ExtendConfigDumper $dumper
      * @param ConfigManager      $configManager
+     * @param ConfigCacheWarmer  $configCacheWarmer
      */
-    public function __construct(ExtendConfigDumper $dumper, ConfigManager $configManager)
-    {
-        $this->dumper        = $dumper;
-        $this->configManager = $configManager;
+    public function __construct(
+        ExtendConfigDumper $dumper,
+        ConfigManager $configManager,
+        ConfigCacheWarmer $configCacheWarmer
+    ) {
+        $this->dumper            = $dumper;
+        $this->configManager     = $configManager;
+        $this->configCacheWarmer = $configCacheWarmer;
     }
 
     /**
@@ -30,8 +39,8 @@ class EntityCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
-        $this->configManager->clearCache();
-        $this->configManager->clearConfigurableCache();
+        $this->configManager->flushAllCaches();
+        $this->configCacheWarmer->warmUpCache(ConfigCacheWarmer::MODE_CONFIGURABLE_ENTITY_ONLY);
         $this->dumper->dump();
     }
 

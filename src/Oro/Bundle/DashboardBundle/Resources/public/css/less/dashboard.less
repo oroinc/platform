@@ -485,33 +485,7 @@
   .modal-body{
     padding: 0;
   }
-  .modal-header {
-    padding: 5px 15px 1px;
-    background-color: #404952;
-    background-image: linear-gradient(to bottom, #47505A, #363E47);
-    background-repeat: repeat-x;
-    border-bottom: 1px solid #000000;
-    border-radius: 4px 4px 0 0;
-    color: #ffffff;
-    a.close{
-      color: #ffffff;
-      margin-top: 4px;
-      font-size: 25px;
-      text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
-      opacity: 0.9;
-      &:hover,
-      &:focus {
-        color: #ffffff;
-        opacity: 0.6;
-      }
-    }
-    h3 {
-      font-size: 16px;
-    }
-  }
   .modal-footer {
-    height: 55px;
-    border-radius: 0 0 4px 4px;
     a.ok{
       display: none;
     }
@@ -533,7 +507,7 @@
   .items-selector-widget {
     margin-right: 20px;
   }
-  .widget_title_widget{
+  .widget-title-widget{
     float: left;
     margin-right: 20px;
   }
@@ -571,6 +545,14 @@
       &.table-bordered td:first-child {
         border-left: none;
       }
+    }
+  }
+  .widget-date-widget {
+    margin: 4px 0 10px;
+  }
+  .widget-date-input-widget {
+    input[type="text"] {
+      max-width: 110px;
     }
   }
 }

@@ -88,8 +88,7 @@ class RelationBuilder
             }
             $sourceEntityConfig->set('relation', $relations);
 
-            $extendConfigProvider = $this->configManager->getProvider('extend');
-            $extendConfigProvider->persist($sourceEntityConfig);
+            $this->configManager->persist($sourceEntityConfig);
         }
 
         return $relationKey;
@@ -156,8 +155,7 @@ class RelationBuilder
             }
             $sourceEntityConfig->set('relation', $relations);
 
-            $extendConfigProvider = $this->configManager->getProvider('extend');
-            $extendConfigProvider->persist($sourceEntityConfig);
+            $this->configManager->persist($sourceEntityConfig);
         }
 
         return $relationKey;
@@ -175,8 +173,7 @@ class RelationBuilder
         $relationName,
         $relationKey
     ) {
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig         = $extendConfigProvider->getConfig($targetEntityName);
+        $extendConfig = $this->configManager->getProvider('extend')->getConfig($targetEntityName);
 
         // add relation to config
         $relations = $extendConfig->get('relation', false, []);
@@ -191,7 +188,7 @@ class RelationBuilder
         ];
         $extendConfig->set('relation', $relations);
 
-        $extendConfigProvider->persist($extendConfig);
+        $this->configManager->persist($extendConfig);
     }
 
     /**
@@ -221,9 +218,8 @@ class RelationBuilder
     protected function updateConfigs($className, $options, $fieldName = null)
     {
         foreach ($options as $scope => $scopeValues) {
-            $configProvider = $this->configManager->getProvider($scope);
-            $config         = $configProvider->getConfig($className, $fieldName);
-            $hasChanges     = false;
+            $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
+            $hasChanges = false;
             foreach ($scopeValues as $code => $val) {
                 if (!$config->is($code, $val)) {
                     $config->set($code, $val);
@@ -231,7 +227,7 @@ class RelationBuilder
                 }
             }
             if ($hasChanges) {
-                $configProvider->persist($config);
+                $this->configManager->persist($config);
             }
         }
     }

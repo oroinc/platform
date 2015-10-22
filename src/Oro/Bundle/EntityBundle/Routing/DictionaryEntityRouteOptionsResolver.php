@@ -67,7 +67,7 @@ class DictionaryEntityRouteOptionsResolver implements RouteOptionsResolverInterf
      * @param RouteCollectionAccessor $routes
      * @param string[]                $entities
      *
-     * @return string[] Entity rActivityAssociationRouteOptionsResolverTestequirements for the default controller
+     * @return string[] Entity requirements for the default controller
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
