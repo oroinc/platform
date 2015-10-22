@@ -17,6 +17,11 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 class WorkflowManager
 {
     /**
+     * Limit of workflows items to make a flush 
+     */
+    const LIMIT_WORKFLOWS_TO_PROCESS = 50;
+    
+    /**
      * @var ManagerRegistry
      */
     protected $registry;
@@ -188,16 +193,17 @@ class WorkflowManager
      *      ...
      * )
      *
-     * @param array $data
+     * @param array $workflowList
      * @throws \Exception
      */
-    public function massStartWorkflow(array $data)
+    public function massStartWorkflow(array $workflowList)
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            foreach ($data as $row) {
+            $i = 1;
+            foreach ($workflowList as $row) {
                 if (empty($row['workflow']) || empty($row['entity'])) {
                     continue;
                 }
@@ -209,6 +215,11 @@ class WorkflowManager
 
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
+                
+                if ($i % self::LIMIT_WORKFLOWS_TO_PROCESS == 0) {
+                    $em->flush();
+                }
+                ++$i;
             }
             $em->flush();
             $em->commit();

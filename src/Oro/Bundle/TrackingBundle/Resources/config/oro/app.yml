@@ -1,0 +1,6 @@
+security:
+    firewalls:
+        tracking_data:
+            pattern:   ^/tracking/data/create
+            provider:  chain_provider
+            anonymous: true
