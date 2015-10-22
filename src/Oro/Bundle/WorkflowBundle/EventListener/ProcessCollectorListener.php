@@ -442,6 +442,10 @@ class ProcessCollectorListener implements OptionalListenerInterface
             $this->logger->debug('Policy declined process scheduling', $trigger, $data);
             return;
         }
+        if (!$this->handler->isTriggerApplicable($trigger, $data)) {
+            $this->logger->debug('Trigger pre-conditions declined process scheduling', $trigger, $data);
+            return;
+        }
 
         $this->scheduledProcesses[$entityClass][] = array('trigger' => $trigger, 'data' => $data);
     }

@@ -14,7 +14,6 @@ use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Event\ProcessEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\ProcessCollectorListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
@@ -98,6 +97,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entityClass = self::ENTITY;
         $entity = new $entityClass();
 
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
+
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
         $this->prepareSchedulePolicy($triggers['create'], true);
@@ -127,6 +130,28 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
         $this->prepareSchedulePolicy($triggers['create'], false);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $this->getEntityManager());
+
+        $expectedTriggers = $this->getExpectedTriggers($triggers);
+
+        $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
+        $this->assertAttributeEmpty('scheduledProcesses', $this->listener);
+    }
+
+    public function testPrePersistNotMetPreconditions()
+    {
+        $entityClass = self::ENTITY;
+        $entity = new $entityClass();
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(false));
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareSchedulePolicy($triggers['create'], true);
         $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_CREATE);
 
         $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $this->getEntityManager());
@@ -176,6 +201,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $oldValue    = 1;
         $newValue    = 2;
         $changeSet   = [self::FIELD => [$oldValue, $newValue]];
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
 
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
@@ -251,6 +280,34 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEmpty('scheduledProcesses', $this->listener);
     }
 
+    public function testPreUpdateNotMetPreconditions()
+    {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+        $oldValue    = 1;
+        $newValue    = 2;
+        $changeSet   = [self::FIELD => [$oldValue, $newValue]];
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(false));
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareSchedulePolicy(
+            array($triggers['updateEntity'], $triggers['updateField']),
+            true
+        );
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_UPDATE);
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_UPDATE, $entity, $this->getEntityManager(), $changeSet);
+
+        $expectedTriggers = $this->getExpectedTriggers($triggers);
+
+        $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
+        $this->assertAttributeEmpty('scheduledProcesses', $this->listener);
+    }
+
     public function testPreUpdateNoTriggers()
     {
         $entityClass = self::ENTITY;
@@ -270,6 +327,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entityClass = self::ENTITY;
         $entity      = new $entityClass();
         $entityId    = 1;
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
 
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
@@ -303,6 +364,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entity      = new $entityClass();
         $entityId    = 1;
 
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
+
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
         $this->prepareSchedulePolicy($triggers['delete'], false);
@@ -321,6 +386,33 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
     }
 
+    public function testPreRemoveNotMetPreConditions()
+    {
+        $entityClass = self::ENTITY;
+        $entity      = new $entityClass();
+        $entityId    = 1;
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(false));
+
+        $triggers = $this->getTriggers();
+        $this->prepareRegistry($triggers);
+        $this->prepareSchedulePolicy($triggers['delete'], true);
+        $this->prepareTriggerCache($entityClass, ProcessTrigger::EVENT_DELETE);
+
+        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->with($entity, false)
+            ->will($this->returnValue($entityId));
+
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, $this->getEntityManager());
+
+        $expectedTriggers = $this->getExpectedTriggers($triggers);
+        $expectedEntityHashes = array(ProcessJob::generateEntityHash($entityClass, $entityId));
+
+        $this->assertAttributeEquals($expectedTriggers, 'triggers', $this->listener);
+        $this->assertAttributeEmpty('scheduledProcesses', $this->listener);
+        $this->assertAttributeEquals($expectedEntityHashes, 'removedEntityHashes', $this->listener);
+    }
 
     public function testPreRemoveNoTriggers()
     {
@@ -343,6 +435,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
     {
         // prepare environment
         $entityClass = self::ENTITY;
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
 
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);
@@ -399,6 +495,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entityClass = self::ENTITY;
         $entity = new $entityClass();
 
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
+
         $triggers = $this->getTriggers();
         $expectedTrigger = $triggers['create'];
 
@@ -436,6 +536,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $entityManager = $this->getEntityManager();
         $expectedData  = $this->createProcessData(array('data' => $entity));
         $triggers      = array();
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
 
         foreach ($entityParams as $entityParam) {
             $expectedTrigger = $this->getCustomQueuedTrigger($entityParam);
@@ -625,6 +729,10 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
 
         $entityClass = self::ENTITY;
         $entity      = new $entityClass();
+
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->will($this->returnValue(true));
 
         $triggers = $this->getTriggers();
         $this->prepareRegistry($triggers);

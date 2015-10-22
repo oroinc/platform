@@ -84,9 +84,9 @@ class ProcessDefinition implements DomainObjectInterface
     /**
      * @var array
      *
-     * @ORM\Column(name="pre_conditions", type="array")
+     * @ORM\Column(name="pre_conditions_configuration", type="array", nullable=true)
      */
-    protected $preConditions;
+    protected $preConditionsConfiguration;
 
     /**
      * @var array
@@ -240,18 +240,18 @@ class ProcessDefinition implements DomainObjectInterface
     /**
      * @return array
      */
-    public function getPreConditions()
+    public function getPreConditionsConfiguration()
     {
-        return $this->preConditions;
+        return $this->preConditionsConfiguration;
     }
 
     /**
-     * @param array $preConditions
+     * @param array $configuration
      * @return ProcessDefinition
      */
-    public function setPreConditions($preConditions)
+    public function setPreConditionsConfiguration($configuration)
     {
-        $this->preConditions = $preConditions;
+        $this->preConditionsConfiguration = $configuration;
 
         return $this;
     }
@@ -343,7 +343,7 @@ class ProcessDefinition implements DomainObjectInterface
             ->setExecutionOrder($definition->getExecutionOrder())
             ->setActionsConfiguration($definition->getActionsConfiguration())
             ->setExcludeDefinitions($definition->getExcludeDefinitions())
-            ->setPreConditions($definition->getPreConditions());
+            ->setPreConditionsConfiguration($definition->getPreConditionsConfiguration());
 
         return $this;
     }

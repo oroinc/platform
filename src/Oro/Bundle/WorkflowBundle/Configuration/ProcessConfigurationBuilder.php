@@ -37,7 +37,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         $order = $this->getConfigurationOption($configuration, 'order', 0);
         $excludeDefinitions = $this->getConfigurationOption($configuration, 'exclude_definitions', array());
         $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', array());
-        $preConditions = $this->getConfigurationOption($configuration, 'pre_conditions', array());
+        $preConditionsConfiguration = $this->getConfigurationOption($configuration, 'pre_conditions', array());
 
         $definition = new ProcessDefinition();
         $definition
@@ -48,7 +48,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             ->setExecutionOrder($order)
             ->setExcludeDefinitions($excludeDefinitions)
             ->setActionsConfiguration($actionsConfiguration)
-            ->setPreConditions($preConditions);
+            ->setPreConditionsConfiguration($preConditionsConfiguration);
 
         return $definition;
     }
