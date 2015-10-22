@@ -35,6 +35,15 @@ define(function(require) {
         backendFormat: datetimeFormatter.backendFormats.date,
 
         /**
+         * Flag to prevent frontend field update once origin field is changed
+         *
+         * e.g. user manually enters date and it is temporary invalid:
+         *  - origin field gets empty value (no valid value entered yet)
+         *  - frontend field has not finished value and user keeps changing it
+         */
+        _preventFrontendUpdate: false,
+
+        /**
          * Initializes view
          *  - creates front field
          *  - updates front field
@@ -150,8 +159,9 @@ define(function(require) {
          */
         updateOrigin: function(e) {
             if (this.$el.val() !== this.getBackendFormattedValue()) {
-                this.$el.val(this.getBackendFormattedValue());
-                this.$el.trigger('change');
+                this._preventFrontendUpdate = true;
+                this.$el.val(this.getBackendFormattedValue()).trigger('change');
+                this._preventFrontendUpdate = false;
             }
         },
 
@@ -159,6 +169,9 @@ define(function(require) {
          * Update front date field value
          */
         updateFront: function() {
+            if (this._preventFrontendUpdate) {
+                return;
+            }
             this.$frontDateField.val(this.getFrontendFormattedDate());
         },
 
