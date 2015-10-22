@@ -34,7 +34,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Manager\UserConfigManager')
+        $this->userConfigManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
     }

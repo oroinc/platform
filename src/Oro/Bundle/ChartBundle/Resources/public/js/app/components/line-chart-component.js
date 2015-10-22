@@ -43,7 +43,7 @@ define(function(require) {
                 }
                 var yValue = dataFormatter.parseValue(this.data[i].value, this.options.data_schema.value.type);
                 yValue = yValue === null ? parseInt(i) : yValue;
-                var xValue = dataFormatter.parseValue(this.data[i].label, this.data_schema.label.type);
+                var xValue = dataFormatter.parseValue(this.data[i].label, this.options.data_schema.label.type);
                 xValue = xValue === null ? parseInt(i) : xValue;
                 if (limits.xMax === null) {
                     limits.xMax = xValue;

@@ -6,9 +6,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\EntityBundle\Helper\DictionaryHelper;
+use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class DictionaryApiEntityManager extends ApiEntityManager
 {
@@ -19,18 +22,34 @@ class DictionaryApiEntityManager extends ApiEntityManager
     protected $dictionaryHelper;
 
     /**
+     * @var ConfigManager
+     */
+    protected $entityConfigManager;
+
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
      * @param ObjectManager $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param DictionaryHelper $dictionaryHelper
+     * @param ConfigManager $entityConfigManager
+     * @param PropertyAccessor $propertyAccessor
      */
     public function __construct(
         ObjectManager $om,
         ChainDictionaryValueListProvider $dictionaryProvider,
-        DictionaryHelper $dictionaryHelper
+        DictionaryHelper $dictionaryHelper,
+        ConfigManager $entityConfigManager,
+        PropertyAccessor $propertyAccessor
     ) {
         parent::__construct(null, $om);
         $this->dictionaryProvider = $dictionaryProvider;
         $this->dictionaryHelper = $dictionaryHelper;
+        $this->entityConfigManager = $entityConfigManager;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -76,13 +95,18 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueBySearchQuery($searchQuery)
     {
+        $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
+
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+        $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
+        $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
 
         $qb = $this->getListQueryBuilder(10, 1, [], null, []);
         if (!empty($searchQuery)) {
-            $qb->andWhere('e.' . $labelField . ' LIKE :translated_title')
-                ->setParameter('translated_title', '%' . $searchQuery . '%');
+            foreach ($searchFields as $searchField) {
+                $qb->orWhere('e.' . $searchField . ' LIKE :translated_title');
+            }
+            $qb->setParameter('translated_title', '%' . $searchQuery . '%');
         }
 
         $query = $qb->getQuery();
@@ -92,7 +116,7 @@ class DictionaryApiEntityManager extends ApiEntityManager
         );
         $results = $query->getResult();
 
-        return $this->prepareData($results, $keyField, $labelField);
+        return $this->prepareData($results, $keyField, $searchFields, $representationField);
     }
 
     /**
@@ -104,41 +128,53 @@ class DictionaryApiEntityManager extends ApiEntityManager
      */
     public function findValueByPrimaryKey($keys)
     {
+        if (empty($keys)) {
+            return [];
+        }
+        $entityMetadata = $this->entityConfigManager->getEntityMetadata($this->class);
+
         $keyField = $this->dictionaryHelper->getNamePrimaryKeyField($this->getMetadata());
-        $labelField = $this->dictionaryHelper->getNameLabelField($this->getMetadata());
+        $searchFields = $this->dictionaryHelper->getSearchFields($this->getMetadata(), $entityMetadata);
+        $representationField = $this->dictionaryHelper->getRepresentationField($this->getMetadata(), $entityMetadata);
 
         $qb = $this->getListQueryBuilder(-1, 1, [], null, []);
-        $qb->andWhere('e.' . $keyField . ' in (:keys)')
-           ->setParameter('keys', $keys);
+        $qb->andWhere('e.' . $keyField . ' in (:keys)');
+        $qb->setParameter('keys', $keys);
 
         $query = $qb->getQuery();
         $results = $query->getResult();
 
-        return $this->prepareData($results, $keyField, $labelField);
+        return $this->prepareData($results, $keyField, $searchFields, $representationField);
     }
 
     /**
-     * Transform Entity data to array
-     *
      * @param array $results
      * @param string $keyField
-     * @param string $labelField
+     * @param array $searchFields
+     * @param string $representationField
      *
      * @return array
      */
-    protected function prepareData($results, $keyField, $labelField)
+    protected function prepareData($results, $keyField, $searchFields, $representationField)
     {
-        $resultsData = [];
-        $methodGetPK = 'get' . ucfirst($keyField);
-        $methodGetLabel = 'get' . ucfirst($labelField);
+        $prepared = [];
         foreach ($results as $result) {
-            $resultsData[] = [
-                'id' => $result->$methodGetPK(),
-                'value' => $result->$methodGetPK(),
-                'text' => $result->$methodGetLabel()
+            $id = $value = $this->propertyAccessor->getValue($result, $keyField);
+            if ($representationField !== null) {
+                $text = $this->propertyAccessor->getValue($result, $representationField);
+            } else {
+                $text = implode(' ', array_map(function ($field) use ($result) {
+                    return $this->propertyAccessor->getValue($result, $field);
+                }, $searchFields));
+            }
+
+            $prepared[] = [
+                'id' => $id,
+                'value' => $value,
+                'text' => $text,
             ];
         }
 
-        return $resultsData;
+        return $prepared;
     }
 }

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -71,7 +71,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
             $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
-                if (!$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+                if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
                     continue;
                 }
 
@@ -190,7 +190,10 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $schema['property'][$snapshotFieldName] = $snapshotFieldName;
+                    $schema['property'][$snapshotFieldName] = [];
+                    if ($fieldConfig->is('is_deleted')) {
+                        $schema['property'][$snapshotFieldName]['private'] = true;
+                    }
 
                     $schema['doctrine'][$mappingClassName]['fields'][$snapshotFieldName] = [
                         'column'   => $this->nameGenerator->generateMultiEnumSnapshotColumnName($fieldName),
@@ -240,7 +243,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         }
 
         // create entity
-        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModelManager::MODE_HIDDEN);
+        $this->configManager->createConfigEntityModel($enumValueClassName, ConfigModel::MODE_HIDDEN);
         $this->relationBuilder->updateEntityConfigs(
             $enumValueClassName,
             [

@@ -4,11 +4,10 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
@@ -16,13 +15,13 @@ use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,19 +31,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $container;
+    protected $eventDispatcher;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $eventDispatcher;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
-
-    /** @var ConfigProviderBag */
-    protected $configProviderBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $modelManager;
@@ -62,39 +55,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getScope')
             ->willReturn('entity');
 
-        $this->configProviderBag = new ConfigProviderBag();
-        $this->configProviderBag->addProvider($this->configProvider);
-        $this->container = $this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
-            ->method('has')
-            ->willReturnCallback(
-                function ($id) {
-                    switch ($id) {
-                        case 'ConfigProviderBag':
-                            return true;
-                        default:
-                            return false;
-                    }
-                }
-            );
-        $configProviderBag = $this->configProviderBag;
-        $this->container->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(
-                function ($id) use (&$configProviderBag) {
-                    switch ($id) {
-                        case 'ConfigProviderBag':
-                            return $configProviderBag;
-                        default:
-                            return null;
-                    }
-                }
-            );
-
-        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
+        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->metadataFactory = $this->getMockBuilder('Metadata\MetadataFactory')
             ->disableOriginalConstructor()
             ->getMock();
         $this->modelManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
@@ -108,18 +72,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configManager = new ConfigManager(
-            $this->metadataFactory,
             $this->eventDispatcher,
-            new ServiceLink($this->container, 'ConfigProviderBag'),
+            $this->metadataFactory,
             $this->modelManager,
             $this->auditManager,
             $this->configCache
         );
-    }
 
-    public function testGetProviderBag()
-    {
-        $this->assertTrue($this->configManager->getProviderBag() === $this->configProviderBag);
+        $this->configManager->addProvider($this->configProvider);
     }
 
     public function testGetProviders()
@@ -218,33 +178,89 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function hasConfigProvider()
     {
         return [
-            'no database'          => [false, false, null, null, self::ENTITY_CLASS, null],
-            'no database (field)'  => [false, false, null, null, self::ENTITY_CLASS, 'id'],
-            'cached false'         => [false, true, false, null, self::ENTITY_CLASS, null],
-            'cached false (field)' => [false, true, false, null, self::ENTITY_CLASS, 'id'],
-            'cached true'          => [true, true, true, null, self::ENTITY_CLASS, null],
-            'cached true (field)'  => [true, true, true, null, self::ENTITY_CLASS, 'id'],
-            'no model'             => [false, true, null, null, self::ENTITY_CLASS, null],
-            'no model (field)'     => [false, true, null, null, self::ENTITY_CLASS, 'id'],
+            'no database'          => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => false,
+                'cachedResult'        => null,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'no database (field)'  => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => false,
+                'cachedResult'        => null,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'cached false'         => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'cached false (field)' => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => false,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'cached true'          => [
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => true,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'cached true (field)'  => [
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => true,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
+            'no model'             => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
+            ],
+            'no model (field)'     => [
+                'expectedResult'      => false,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'findModelResult'     => null,
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
+            ],
             'has model'            => [
-                true,
-                true,
-                null,
-                $this->createEntityConfigModel(self::ENTITY_CLASS),
-                self::ENTITY_CLASS,
-                null
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'findModelResult'     => $this->createEntityConfigModel(self::ENTITY_CLASS),
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => null
             ],
             'has model (field)'    => [
-                true,
-                true,
-                null,
-                $this->createFieldConfigModel(
+                'expectedResult'      => true,
+                'checkDatabaseResult' => true,
+                'cachedResult'        => null,
+                'findModelResult'     => $this->createFieldConfigModel(
                     $this->createEntityConfigModel(self::ENTITY_CLASS),
                     'id',
                     'int'
                 ),
-                self::ENTITY_CLASS,
-                'id'
+                'className'           => self::ENTITY_CLASS,
+                'fieldName'           => 'id'
             ],
         ];
     }
@@ -305,7 +321,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expectedConfig, $config);
-        $this->assertAttributeEmpty('originalConfigs', $this->configManager);
+        $this->configManager->calculateConfigChangeSet($config);
+        $this->assertEquals(
+            [
+                'translatable' => [null, 'labelVal'],
+                'other'        => [null, 'otherVal']
+            ],
+            $this->configManager->getConfigChangeSet($config)
+        );
     }
 
     /**
@@ -337,20 +360,21 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configManager->getConfig($configId);
 
         $this->assertSame($cachedConfig, $result);
-        $this->assertArrayHasKey(
-            $this->buildConfigKey($configId),
-            $this->readAttribute($this->configManager, 'originalConfigs')
+        $this->configManager->calculateConfigChangeSet($result);
+        $this->assertEquals(
+            [],
+            $this->configManager->getConfigChangeSet($result)
         );
     }
 
     public function getConfigCacheProvider()
     {
         return [
-            [
+            'entity' => [
                 new EntityConfigId('entity', self::ENTITY_CLASS),
                 $this->getConfig(new EntityConfigId('entity', self::ENTITY_CLASS))
             ],
-            [
+            'field'  => [
                 new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'),
                 $this->getConfig(new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'))
             ],
@@ -365,16 +389,24 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->modelManager->expects($this->any())
             ->method('checkDatabase')
             ->willReturn(true);
-        $this->configCache->expects($this->once())
-            ->method('getConfigurable')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(true);
         if ($configId instanceof FieldConfigId) {
+            $this->configCache->expects($this->exactly(2))
+                ->method('getConfigurable')
+                ->willReturnMap(
+                    [
+                        [$configId->getClassName(), null, true],
+                        [$configId->getClassName(), $configId->getFieldName(), true],
+                    ]
+                );
             $this->configCache->expects($this->once())
                 ->method('getFieldConfig')
                 ->with($configId->getScope(), $configId->getClassName(), $configId->getFieldName())
                 ->willReturn(null);
         } else {
+            $this->configCache->expects($this->once())
+                ->method('getConfigurable')
+                ->with($configId->getClassName())
+                ->willReturn(true);
             $this->configCache->expects($this->once())
                 ->method('getEntityConfig')
                 ->with($configId->getScope(), $configId->getClassName())
@@ -402,21 +434,22 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configManager->getConfig($configId);
 
         $this->assertEquals($expectedConfig, $result);
-        $this->assertArrayHasKey(
-            $this->buildConfigKey($configId),
-            $this->readAttribute($this->configManager, 'originalConfigs')
+        $this->configManager->calculateConfigChangeSet($result);
+        $this->assertEquals(
+            [],
+            $this->configManager->getConfigChangeSet($result)
         );
     }
 
     public function getConfigNotCachedProvider()
     {
         return [
-            [
+            'entity' => [
                 new EntityConfigId('entity', self::ENTITY_CLASS),
                 $this->createEntityConfigModel(self::ENTITY_CLASS),
                 $this->getConfig(new EntityConfigId('entity', self::ENTITY_CLASS))
             ],
-            [
+            'field'  => [
                 new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'),
                 $this->createFieldConfigModel(
                     $this->createEntityConfigModel(self::ENTITY_CLASS),
@@ -426,6 +459,60 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 $this->getConfig(new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int'))
             ],
         ];
+    }
+
+    public function testConfigChangeSet()
+    {
+        $configId       = new EntityConfigId('entity', self::ENTITY_CLASS);
+        $originalConfig = $this->getConfig(
+            $configId,
+            [
+                'item1'  => true,
+                'item11' => true,
+                'item12' => true,
+                'item2'  => 123,
+                'item21' => 123,
+                'item22' => 123,
+                'item3'  => 'val2',
+                'item4'  => 'val4',
+                'item6'  => null,
+                'item7'  => 'val7'
+            ]
+        );
+        $this->configCache->expects($this->once())
+            ->method('getEntityConfig')
+            ->willReturn($originalConfig);
+        $this->configManager->getConfig($configId);
+
+        $changedConfig = $this->getConfig(
+            $configId,
+            [
+                'item1'  => true,
+                'item11' => 1,
+                'item12' => false,
+                'item2'  => 123,
+                'item21' => '123',
+                'item22' => 456,
+                'item3'  => 'val21',
+                'item5'  => 'val5',
+                'item6'  => 'val6',
+                'item7'  => null
+            ]
+        );
+        $this->configManager->persist($changedConfig);
+
+        $this->configManager->calculateConfigChangeSet($changedConfig);
+        $this->assertEquals(
+            [
+                'item12' => [true, false],
+                'item22' => [123, 456],
+                'item3'  => ['val2', 'val21'],
+                'item5'  => [null, 'val5'],
+                'item6'  => [null, 'val6'],
+                'item7'  => ['val7', null]
+            ],
+            $this->configManager->getConfigChangeSet($changedConfig)
+        );
     }
 
     public function testGetIdsNoDatabase()
@@ -445,11 +532,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -457,7 +546,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
 
         $result = $this->configManager->getIds($scope, $className, $withHidden);
@@ -474,6 +563,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new EntityConfigId('entity', 'EntityClass1'),
                     new EntityConfigId('entity', 'EntityClass2'),
+                    new EntityConfigId('entity', 'HiddenEntity'),
                 ]
             ],
             [
@@ -492,6 +582,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     new FieldConfigId('entity', 'EntityClass1', 'f1', 'int'),
                     new FieldConfigId('entity', 'EntityClass1', 'f2', 'int'),
+                    new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int'),
                 ]
             ],
             [
@@ -514,11 +605,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $models      = [
             $this->createEntityConfigModel('EntityClass1'),
             $this->createEntityConfigModel('EntityClass2'),
+            $this->createEntityConfigModel('HiddenEntity', ConfigModel::MODE_HIDDEN),
         ];
         $entityModel = $this->createEntityConfigModel('EntityClass1');
         $fieldModels = [
             $this->createFieldConfigModel($entityModel, 'f1', 'int'),
             $this->createFieldConfigModel($entityModel, 'f2', 'int'),
+            $this->createFieldConfigModel($entityModel, 'hiddenField', 'int', ConfigModel::MODE_HIDDEN),
         ];
 
         $this->modelManager->expects($this->any())
@@ -529,7 +622,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
         $this->modelManager->expects($this->once())
             ->method('getModels')
-            ->with($className, $withHidden)
+            ->with($className)
             ->willReturn($className ? $fieldModels : $models);
         if ($className) {
             $this->modelManager->expects($this->any())
@@ -538,6 +631,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         [$className, 'f1', $fieldModels[0]],
                         [$className, 'f2', $fieldModels[1]],
+                        [$className, 'hiddenField', $fieldModels[2]],
                     ]
                 );
         } else {
@@ -547,6 +641,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         ['EntityClass1', $models[0]],
                         ['EntityClass2', $models[1]],
+                        ['HiddenEntity', $models[2]],
                     ]
                 );
         }
@@ -565,6 +660,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass1')),
                     $this->getConfig(new EntityConfigId('entity', 'EntityClass2')),
+                    $this->getConfig(new EntityConfigId('entity', 'HiddenEntity')),
                 ]
             ],
             [
@@ -583,6 +679,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 [
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f1', 'int')),
                     $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'f2', 'int')),
+                    $this->getConfig(new FieldConfigId('entity', 'EntityClass1', 'hiddenField', 'int')),
                 ]
             ],
             [
@@ -722,10 +819,29 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findEntityModel');
         $this->modelManager->expects($this->once())
             ->method('createEntityModel')
-            ->with($className, ConfigModelManager::MODE_DEFAULT)
+            ->with($className, ConfigModel::MODE_DEFAULT)
             ->willReturn($model);
 
         $result = $this->configManager->createConfigEntityModel($className);
+        $this->assertSame($model, $result);
+    }
+
+    /**
+     * @dataProvider emptyNameProvider
+     */
+    public function testCreateConfigEntityModelForEmptyClassNameAndMode($className)
+    {
+        $mode  = ConfigModel::MODE_HIDDEN;
+        $model = $this->createEntityConfigModel($className, $mode);
+
+        $this->modelManager->expects($this->never())
+            ->method('findEntityModel');
+        $this->modelManager->expects($this->once())
+            ->method('createEntityModel')
+            ->with($className, $mode)
+            ->willReturn($model);
+
+        $result = $this->configManager->createConfigEntityModel($className, $mode);
         $this->assertSame($model, $result);
     }
 
@@ -744,14 +860,30 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($model, $result);
     }
 
-    public function testCreateConfigEntityModel()
-    {
+    /**
+     * @dataProvider createConfigEntityModelProvider
+     */
+    public function testCreateConfigEntityModel(
+        $mode,
+        $hasMetadata,
+        $metadataMode,
+        $expectedMode,
+        $cachedEntities,
+        $expectedSavedCachedEntities
+    ) {
         $configId = new EntityConfigId('entity', self::ENTITY_CLASS);
-        $model    = $this->createEntityConfigModel(self::ENTITY_CLASS);
-        $metadata = $this->getEntityMetadata(
-            self::ENTITY_CLASS,
-            ['translatable' => 'labelVal', 'other' => 'otherVal']
-        );
+        $model    = $this->createEntityConfigModel(self::ENTITY_CLASS, $expectedMode);
+
+        $metadata = null;
+        if ($hasMetadata) {
+            $metadata = $this->getEntityMetadata(
+                self::ENTITY_CLASS,
+                ['translatable' => 'labelVal', 'other' => 'otherVal']
+            );
+            if (null !== $metadataMode) {
+                $metadata->mode = $metadataMode;
+            }
+        }
 
         $this->modelManager->expects($this->once())
             ->method('findEntityModel')
@@ -759,7 +891,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
         $this->modelManager->expects($this->once())
             ->method('createEntityModel')
-            ->with(self::ENTITY_CLASS, ConfigModelManager::MODE_DEFAULT)
+            ->with(self::ENTITY_CLASS, $expectedMode)
             ->willReturn($model);
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
@@ -777,32 +909,130 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfigContainer);
+
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::NEW_ENTITY_CONFIG,
+                Events::CREATE_ENTITY,
                 new EntityConfigEvent(self::ENTITY_CLASS, $this->configManager)
             );
 
         $config = $this->getConfig(
             $configId,
             [
-                'other'          => 'otherVal',
-                'translatable'   => 'labelVal',
+                'translatable'   => 'oro.entityconfig.tests.unit.fixture.demoentity.entity_translatable',
                 'other10'        => 'otherVal10',
                 'translatable10' => 'labelVal10',
                 'auto_generated' => 'oro.entityconfig.tests.unit.fixture.demoentity.entity_auto_generated'
             ]
         );
+        if ($metadata) {
+            $config->set('other', 'otherVal');
+            $config->set('translatable', 'labelVal');
+        }
 
         $this->configCache->expects($this->once())
             ->method('saveConfig')
             ->with($config, true);
 
-        $result = $this->configManager->createConfigEntityModel(self::ENTITY_CLASS);
+        $this->configCache->expects($this->once())
+            ->method('saveConfigurable')
+            ->with(true, self::ENTITY_CLASS, null, true);
+
+        $this->configCache->expects($this->once())
+            ->method('getEntities')
+            ->with(true)
+            ->willReturn($cachedEntities);
+        if (null === $expectedSavedCachedEntities) {
+            $this->configCache->expects($this->never())
+                ->method('saveEntities');
+        } else {
+            $this->configCache->expects($this->once())
+                ->method('saveEntities')
+                ->with($expectedSavedCachedEntities, true);
+        }
+
+        $result = $this->configManager->createConfigEntityModel(self::ENTITY_CLASS, $mode);
 
         $this->assertEquals($model, $result);
         $this->assertEquals([$config], $this->configManager->getUpdateConfig());
+    }
+
+    public function createConfigEntityModelProvider()
+    {
+        return [
+            [
+                'mode'                        => null,
+                'hasMetadata'                 => false,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_DEFAULT,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => null,
+                'hasMetadata'                 => true,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_DEFAULT,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => null,
+                'hasMetadata'                 => true,
+                'metadataMode'                => ConfigModel::MODE_HIDDEN,
+                'expectedMode'                => ConfigModel::MODE_HIDDEN,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'                 => false,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_HIDDEN,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'                 => true,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_HIDDEN,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => ConfigModel::MODE_DEFAULT,
+                'hasMetadata'                 => true,
+                'metadataMode'                => ConfigModel::MODE_HIDDEN,
+                'expectedMode'                => ConfigModel::MODE_DEFAULT,
+                'cachedEntities'              => null,
+                'expectedSavedCachedEntities' => null
+            ],
+            [
+                'mode'                        => null,
+                'hasMetadata'                 => false,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_DEFAULT,
+                'cachedEntities'              => [],
+                'expectedSavedCachedEntities' => [
+                    self::ENTITY_CLASS => ['i' => null, 'h' => false]
+                ]
+            ],
+            [
+                'mode'                        => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'                 => false,
+                'metadataMode'                => null,
+                'expectedMode'                => ConfigModel::MODE_HIDDEN,
+                'cachedEntities'              => [
+                    'Test\AnotherEntity' => ['i' => 123, 'h' => false]
+                ],
+                'expectedSavedCachedEntities' => [
+                    'Test\AnotherEntity' => ['i' => 123, 'h' => false],
+                    self::ENTITY_CLASS   => ['i' => null, 'h' => true]
+                ]
+            ]
+        ];
     }
 
     public function testCreateConfigFieldModelForExistingModel()
@@ -824,17 +1054,35 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($model, $result);
     }
 
-    public function testCreateConfigFieldModel()
-    {
-        $configId        = new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int');
-        $model           = $this->createFieldConfigModel(
+    /**
+     * @dataProvider createConfigFieldModelProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCreateConfigFieldModel(
+        $mode,
+        $hasMetadata,
+        $metadataMode,
+        $expectedMode,
+        $cachedFields,
+        $expectedSavedCachedFields
+    ) {
+        $configId = new FieldConfigId('entity', self::ENTITY_CLASS, 'id', 'int');
+        $model    = $this->createFieldConfigModel(
             $this->createEntityConfigModel(self::ENTITY_CLASS),
             'id',
             'int'
         );
-        $metadata        = $this->getEntityMetadata(self::ENTITY_CLASS);
-        $idFieldMetadata = $this->getFieldMetadata(self::ENTITY_CLASS, 'id');
-        $metadata->addPropertyMetadata($idFieldMetadata);
+
+        $metadata = null;
+        if ($hasMetadata) {
+            $metadata                                 = $this->getEntityMetadata(self::ENTITY_CLASS);
+            $idFieldMetadata                          = $this->getFieldMetadata(self::ENTITY_CLASS, 'id');
+            $idFieldMetadata->defaultValues['entity'] = ['translatable' => 'labelVal', 'other' => 'otherVal'];
+            $metadata->addPropertyMetadata($idFieldMetadata);
+            if (null !== $metadataMode) {
+                $idFieldMetadata->mode = $metadataMode;
+            }
+        }
 
         $this->modelManager->expects($this->once())
             ->method('findFieldModel')
@@ -842,13 +1090,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
         $this->modelManager->expects($this->once())
             ->method('createFieldModel')
-            ->with(self::ENTITY_CLASS, 'id', 'int', ConfigModelManager::MODE_DEFAULT)
+            ->with(self::ENTITY_CLASS, 'id', 'int', $expectedMode)
             ->willReturn($model);
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($metadata);
-        $idFieldMetadata->defaultValues['entity'] = ['translatable' => 'labelVal', 'other' => 'otherVal'];
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataForClass')
             ->with(self::ENTITY_CLASS)
@@ -868,32 +1115,129 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::NEW_FIELD_CONFIG,
+                Events::CREATE_FIELD,
                 new FieldConfigEvent(self::ENTITY_CLASS, 'id', $this->configManager)
             );
 
         $config = $this->getConfig(
             $configId,
             [
+                'translatable'   => 'oro.entityconfig.tests.unit.fixture.demoentity.id.translatable',
                 'other10'        => 'otherVal10',
                 'translatable10' => 'labelVal10',
-                'other'          => 'otherVal',
-                'translatable'   => 'labelVal',
                 'auto_generated' => 'oro.entityconfig.tests.unit.fixture.demoentity.id.auto_generated'
             ]
         );
+        if ($metadata) {
+            $config->set('other', 'otherVal');
+            $config->set('translatable', 'labelVal');
+        }
 
         $this->configCache->expects($this->once())
             ->method('saveConfig')
             ->with($config, true);
 
-        $result = $this->configManager->createConfigFieldModel(self::ENTITY_CLASS, 'id', 'int');
+        $this->configCache->expects($this->once())
+            ->method('saveConfigurable')
+            ->with(true, self::ENTITY_CLASS, 'id', true);
+
+        $this->configCache->expects($this->once())
+            ->method('getFields')
+            ->with(self::ENTITY_CLASS, true)
+            ->willReturn($cachedFields);
+        if (null === $expectedSavedCachedFields) {
+            $this->configCache->expects($this->never())
+                ->method('saveFields');
+        } else {
+            $this->configCache->expects($this->once())
+                ->method('saveFields')
+                ->with(self::ENTITY_CLASS, $expectedSavedCachedFields, true);
+        }
+
+        $result = $this->configManager->createConfigFieldModel(self::ENTITY_CLASS, 'id', 'int', $mode);
 
         $this->assertEquals($model, $result);
         $this->assertEquals(
             [$config],
             $this->configManager->getUpdateConfig()
         );
+    }
+
+    public function createConfigFieldModelProvider()
+    {
+        return [
+            [
+                'mode'                      => null,
+                'hasMetadata'               => false,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_DEFAULT,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => null,
+                'hasMetadata'               => true,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_DEFAULT,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => null,
+                'hasMetadata'               => true,
+                'metadataMode'              => ConfigModel::MODE_HIDDEN,
+                'expectedMode'              => ConfigModel::MODE_HIDDEN,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'               => false,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_HIDDEN,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'               => true,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_HIDDEN,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => ConfigModel::MODE_DEFAULT,
+                'hasMetadata'               => true,
+                'metadataMode'              => ConfigModel::MODE_HIDDEN,
+                'expectedMode'              => ConfigModel::MODE_DEFAULT,
+                'cachedFields'              => null,
+                'expectedSavedCachedFields' => null
+            ],
+            [
+                'mode'                      => null,
+                'hasMetadata'               => false,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_DEFAULT,
+                'cachedFields'              => [],
+                'expectedSavedCachedFields' => [
+                    'id' => ['i' => null, 'h' => false, 't' => 'int']
+                ]
+            ],
+            [
+                'mode'                      => ConfigModel::MODE_HIDDEN,
+                'hasMetadata'               => false,
+                'metadataMode'              => null,
+                'expectedMode'              => ConfigModel::MODE_HIDDEN,
+                'cachedFields'              => [
+                    'anotherField' => ['i' => 123, 'h' => false, 't' => 'string']
+                ],
+                'expectedSavedCachedFields' => [
+                    'anotherField' => ['i' => 123, 'h' => false, 't' => 'string'],
+                    'id'           => ['i' => null, 'h' => true, 't' => 'int']
+                ]
+            ]
+        ];
     }
 
     public function testUpdateConfigEntityModelWithNoForce()
@@ -943,7 +1287,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::UPDATE_ENTITY_CONFIG);
+            ->with(Events::UPDATE_ENTITY);
 
         $expectedConfig = $this->getConfig(
             $configId,
@@ -958,17 +1302,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $actualConfig = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
-
         $this->configManager->updateConfigEntityModel(self::ENTITY_CLASS);
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     public function testUpdateConfigEntityModelWithForce()
@@ -1029,17 +1367,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $actualConfig = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
-
         $this->configManager->updateConfigEntityModel(self::ENTITY_CLASS, true);
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     /**
@@ -1091,14 +1423,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($config);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::UPDATE_ENTITY_CONFIG);
+            ->with(Events::UPDATE_ENTITY);
         $extendConfig = $this->getConfig(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->getConfigProviderMock();
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
-        $this->configProviderBag->addProvider($extendConfigProvider);
+        $this->configManager->addProvider($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
@@ -1133,17 +1465,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 'auto_generated' => 'oro.entityconfig.tests.unit.fixture.demoentity.entity_auto_generated'
             ]
         );
-        $actualConfig   = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
 
         $this->configManager->updateConfigEntityModel(self::ENTITY_CLASS, true);
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     public function testUpdateConfigFieldModelWithNoForce()
@@ -1203,17 +1530,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $actualConfig = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
-
         $this->configManager->updateConfigFieldModel(self::ENTITY_CLASS, 'id');
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     public function testUpdateConfigFieldModelWithForce()
@@ -1273,17 +1594,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $actualConfig = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
-
         $this->configManager->updateConfigFieldModel(self::ENTITY_CLASS, 'id', true);
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     public function testUpdateConfigFieldModelWithForceForCustomField()
@@ -1336,7 +1651,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $extendConfigProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
-        $this->configProviderBag->addProvider($extendConfigProvider);
+        $this->configManager->addProvider($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS, 'id')
@@ -1373,17 +1688,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $actualConfig = null;
-        $this->configProvider->expects($this->once())
-            ->method('persist')
-            ->willReturnCallback(
-                function ($c) use (&$actualConfig) {
-                    $actualConfig = $c;
-                }
-            );
-
         $this->configManager->updateConfigFieldModel(self::ENTITY_CLASS, 'id', true);
-        $this->assertEquals($expectedConfig, $actualConfig);
+        $this->assertEquals(
+            $expectedConfig,
+            $this->configManager->getUpdateConfig()[0]
+        );
     }
 
     public function testPersistAndMerge()
@@ -1402,7 +1711,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function createEntityConfigModel(
         $className,
-        $mode = ConfigModelManager::MODE_DEFAULT
+        $mode = ConfigModel::MODE_DEFAULT
     ) {
         $result = new EntityConfigModel($className);
         $result->setMode($mode);
@@ -1414,7 +1723,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         EntityConfigModel $entityConfigModel,
         $fieldName,
         $fieldType,
-        $mode = ConfigModelManager::MODE_DEFAULT
+        $mode = ConfigModel::MODE_DEFAULT
     ) {
         $result = new FieldConfigModel($fieldName, $fieldType);
         $result->setEntity($entityConfigModel);
@@ -1432,7 +1741,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function getEntityMetadata($className, $defaultValues = null)
     {
         $metadata       = new EntityMetadata($className);
-        $metadata->mode = ConfigModelManager::MODE_DEFAULT;
+        $metadata->mode = ConfigModel::MODE_DEFAULT;
         if (null !== $defaultValues) {
             $metadata->defaultValues['entity'] = $defaultValues;
         }
@@ -1499,16 +1808,5 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             [null],
             [''],
         ];
-    }
-
-    /**
-     * @param ConfigIdInterface $configId
-     * @return string
-     */
-    protected function buildConfigKey(ConfigIdInterface $configId)
-    {
-        return $configId instanceof FieldConfigId
-            ? $configId->getScope() . '.' . $configId->getClassName() . '.' . $configId->getFieldName()
-            : $configId->getScope() . '.' . $configId->getClassName();
     }
 }

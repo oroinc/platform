@@ -14,9 +14,9 @@ class EmailRepository extends EntityRepository
     /**
      * Gets emails by ids
      *
-     * @param array $ids
+     * @param int[] $ids
      *
-     * @return array
+     * @return Email[]
      */
     public function findEmailsByIds($ids)
     {
@@ -49,24 +49,31 @@ class EmailRepository extends EntityRepository
     /**
      * Get $limit last emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
-     * @param $limit
+     * @param int          $limit
+     * @param int|null     $folderId
      *
      * @return mixed
      */
-    public function getNewEmails(User $user, Organization $organization, $limit)
+    public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, eu.seen')
             ->leftJoin('e.emailUsers', 'eu')
-            ->where('eu.organization = :organizationId')
-            ->andWhere('eu.owner = :ownerId')
+            ->where($this->getAclWhereCondition($user, $organization))
             ->groupBy('e, eu.seen')
-            ->orderBy('e.sentAt', 'DESC')
-            ->setParameter('organizationId', $organization->getId())
-            ->setParameter('ownerId', $user->getId())
+            ->orderBy('eu.seen', 'ASC')
+            ->addOrderBy('e.sentAt', 'DESC')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
             ->setMaxResults($limit);
+
+        if ($folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+               ->andWhere('f.id = :folderId')
+               ->setParameter('folderId', $folderId);
+        }
 
         return $qb->getQuery()->getResult();
     }
@@ -74,24 +81,53 @@ class EmailRepository extends EntityRepository
     /**
      * Get count new emails
      *
-     * @param User $user
+     * @param User         $user
      * @param Organization $organization
+     * @param int|null     $folderId
      *
      * @return mixed
      */
-    public function getCountNewEmails(User $user, Organization $organization)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->select('COUNT(DISTINCT e)')
             ->leftJoin('e.emailUsers', 'eu')
-            ->where('eu.organization = :organizationId')
-            ->andWhere('eu.owner = :ownerId')
+            ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
-            ->setParameter('organizationId', $organization->getId())
-            ->setParameter('ownerId', $user->getId())
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
+            ->setParameter('seen', false);
+
+        if ($folderId !== null && $folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+                ->andWhere('f.id = :folderId')
+                ->setParameter('folderId', $folderId);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get count new emails per folders
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @return array
+     */
+    public function getCountNewEmailsPerFolders(User $user, Organization $organization)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(DISTINCT e) num, f.id')
+            ->leftJoin('e.emailUsers', 'eu')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
             ->setParameter('seen', false)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->leftJoin('eu.folders', 'f')
+            ->groupBy('f.id');
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -99,6 +135,7 @@ class EmailRepository extends EntityRepository
      *
      * @param object $entity
      * @param string $ownerColumnName
+     *
      * @return array
      */
     public function getEmailsByOwnerEntity($entity, $ownerColumnName)
@@ -113,5 +150,33 @@ class EmailRepository extends EntityRepository
             ->setParameter('hasOwner', true);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param User         $user
+     * @param Organization $organization
+     *
+     * @return \Doctrine\ORM\Query\Expr\Orx
+     */
+    protected function getAclWhereCondition(User $user, Organization $organization)
+    {
+        $mailboxes = $this->getEntityManager()->getRepository('OroEmailBundle:Mailbox')
+            ->findAvailableMailboxIds($user, $organization);
+
+        $expr = $this->getEntityManager()->createQueryBuilder()->expr();
+
+        $andExpr = $expr->andX(
+            'eu.owner = :owner',
+            'eu.organization = :organization'
+        );
+
+        if ($mailboxes) {
+            return $expr->orX(
+                $andExpr,
+                $expr->in('eu.mailboxOwner', $mailboxes)
+            );
+        } else {
+            return $andExpr;
+        }
     }
 }

@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -158,7 +158,7 @@ class ExtendConfigProcessor
             } else {
                 $this->createEntityModel(
                     $className,
-                    isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    isset($configs['mode']) ? $configs['mode'] : ConfigModel::MODE_DEFAULT,
                     $configs['configs']
                 );
             }
@@ -181,21 +181,30 @@ class ExtendConfigProcessor
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
-            if (isset($configs['configs'])) {
-                $this->updateFieldModel($className, $fieldName, $configs['configs']);
+            $needUpdateState = false;
+            if (isset($configs['configs']) && $this->updateFieldModel($className, $fieldName, $configs['configs'])) {
+                $needUpdateState = true;
             }
-            if (isset($configs['type'])) {
-                $this->changeFieldType($className, $fieldName, $configs['type']);
+            if (isset($configs['type']) && $this->changeFieldType($className, $fieldName, $configs['type'])) {
+                $needUpdateState = true;
             }
             if (isset($configs['mode'])) {
                 $this->changeFieldMode($className, $fieldName, $configs['mode']);
+            }
+            if ($needUpdateState) {
+                $extendConfigProvider = $this->configManager->getProvider('extend');
+                $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
+                if (!$extendConfig->is('state', ExtendScope::STATE_UPDATE)) {
+                    $extendConfig->set('state', ExtendScope::STATE_UPDATE);
+                    $this->configManager->persist($extendConfig);
+                }
             }
         } else {
             $this->createFieldModel(
                 $className,
                 $fieldName,
                 $configs['type'],
-                isset($configs['mode']) ? $configs['mode'] : ConfigModelManager::MODE_DEFAULT,
+                isset($configs['mode']) ? $configs['mode'] : ConfigModel::MODE_DEFAULT,
                 isset($configs['configs']) ? $configs['configs'] : [],
                 $isExtendEntity
             );
@@ -248,16 +257,16 @@ class ExtendConfigProcessor
         if ($hasChanges) {
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className);
-            if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+            if (!$extendConfig->is('state', ExtendScope::STATE_UPDATE)) {
                 $extendConfig->set('state', ExtendScope::STATE_UPDATE);
+                $this->configManager->persist($extendConfig);
             }
-            $this->configManager->persist($extendConfig);
         }
     }
 
     /**
      * @param string $className
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
      */
     protected function changeEntityMode($className, $mode)
     {
@@ -311,6 +320,8 @@ class ExtendConfigProcessor
      * @param string $className
      * @param string $fieldName
      * @param array  $configs
+     *
+     * @return bool TRUE if a config was changed; otherwise, FALSE
      */
     protected function updateFieldModel($className, $fieldName, array $configs)
     {
@@ -319,22 +330,15 @@ class ExtendConfigProcessor
             ['configs' => $configs]
         );
 
-        $hasChanges = $this->updateConfigs($configs, $className, $fieldName);
-
-        if ($hasChanges) {
-            $extendConfigProvider = $this->configManager->getProvider('extend');
-            $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
-            if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATE);
-            }
-            $this->configManager->persist($extendConfig);
-        }
+        return $this->updateConfigs($configs, $className, $fieldName);
     }
 
     /**
      * @param string $className
      * @param string $fieldName
      * @param string $fieldType
+     *
+     * @return bool TRUE if the type was changed; otherwise, FALSE
      */
     protected function changeFieldType($className, $fieldName, $fieldType)
     {
@@ -342,14 +346,19 @@ class ExtendConfigProcessor
             $this->logger->notice(
                 sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
             );
-            $this->configManager->changeFieldType($className, $fieldName, $fieldType);
+
+            return $this->configManager->changeFieldType($className, $fieldName, $fieldType);
         }
+
+        return false;
     }
 
     /**
      * @param string $className
      * @param string $fieldName
-     * @param string $mode      Can be the value of one of ConfigModelManager::MODE_* constants
+     * @param string $mode      Can be the value of one of ConfigModel::MODE_* constants
+     *
+     * @return bool TRUE if the mode was changed; otherwise, FALSE
      */
     protected function changeFieldMode($className, $fieldName, $mode)
     {
@@ -357,8 +366,11 @@ class ExtendConfigProcessor
             $this->logger->notice(
                 sprintf('Update a mode of field "%s" to "%s". Entity: %s.', $fieldName, $mode, $className)
             );
-            $this->configManager->changeFieldMode($className, $fieldName, $mode);
+
+            return $this->configManager->changeFieldMode($className, $fieldName, $mode);
         }
+
+        return false;
     }
 
     /**

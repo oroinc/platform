@@ -1,3 +1,5 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 {% if sidebarsGetURL is not defined %}
     {% set sidebarsGetURL = path('oro_api_get_sidebars', {'position': 'SIDEBAR_' ~ placement|upper}) %}
 {% endif %}
@@ -15,46 +17,19 @@
 {% endif %}
 
 {% if isDesktopVersion() and oro_config_value('oro_sidebar.sidebar_' ~ placement ~ '_active') == true %}
-<div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"></div>
+    {% set pageComponent = {
+        sidebarData: render(sidebarsGetURL),
+        widgetsData: render(widgetsGetURL),
+        availableWidgets: oro_sidebar_get_available_widgets(placement),
+        urlRoot: sidebarPostURL,
+        url: widgetPostURL
+    } %}
+    {% if pageComponent.sidebarData is empty %}
+        {% set pageComponent = pageComponent|merge({
+            sidebarData: {position: 'SIDEBAR_' ~ placement|upper}|json_encode
+        }) %}
+    {% endif %}
 
-<script type="text/javascript">
-    require(['jquery', 'orosidebar/js/model', 'orosidebar/js/view',
-        'orosidebar/js/widget-container/collection', 'orosidebar/js/constants'],
-    function($, SidebarModel, SidebarView, WidgetContainerCollection, constants) {
-        'use strict';
-
-        $(function () {
-            {%- set sidebarData -%}
-                {{ render(sidebarsGetURL)|raw }}
-            {%- endset -%}
-            {% if sidebarData is not empty %}
-            var sidebarData = {{ sidebarData }};
-            {% else %}
-            var sidebarData = {position: constants.SIDEBAR_{{ placement|upper }} };
-            {% endif %}
-            var sidebarModel = new SidebarModel(sidebarData);
-            var widgets = new WidgetContainerCollection();
-            var availableWidgets = {{ oro_sidebar_get_available_widgets(placement)|json_encode|raw }};
-
-            sidebarModel.urlRoot = {{ sidebarPostURL|json_encode|raw }};
-            widgets.url = {{ widgetPostURL|json_encode|raw }};
-
-            new SidebarView({
-                model: sidebarModel,
-                availableWidgets: availableWidgets,
-                widgets: widgets,
-                el: '#sidebar-{{ placement }}',
-                $main: $('#main')
-            });
-
-            widgets.reset({{ render(widgetsGetURL) }});
-
-            widgets.each(function (widget) {
-                var name = widget.get('widgetName');
-                var originalWidget = availableWidgets[name];
-                widget.update(originalWidget);
-            });
-        });
-    });
-</script>
+<div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"
+     data-page-component-options="{{ pageComponent|json_encode }}"></div>
 {% endif %}

@@ -82,7 +82,9 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $notExtendedEntityConfig->expects($this->any())->method('is')->with('is_extend')
             ->will($this->returnValue(false));
 
-        $extendConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $hasConfigMap = array(
             array($workflowAwareClass, null, false),
             array($extendedClass, null, true),

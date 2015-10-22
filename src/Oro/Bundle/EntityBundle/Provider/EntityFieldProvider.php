@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -255,7 +254,7 @@ class EntityFieldProvider
                 $result,
                 $fieldName,
                 $fieldConfigId->getFieldType(),
-                $this->getFieldLabel($className, $fieldName),
+                $this->getFieldLabel($metadata, $fieldName),
                 $metadata->isIdentifier($fieldName),
                 $translate
             );
@@ -284,9 +283,9 @@ class EntityFieldProvider
             }
 
             $query      = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-            $fieldLabel = isset($query['select']['label'])
+            $fieldLabel = !empty($query['select']['label'])
                 ? $query['select']['label']
-                : $this->getFieldLabel($className, $fieldName);
+                : $this->getFieldLabel($metadata, $fieldName);
 
             $this->addField(
                 $result,
@@ -329,11 +328,9 @@ class EntityFieldProvider
             $fieldType = $virtualRelation['relation_type'];
             $targetClassName = $this->entityClassResolver->getEntityClass($virtualRelation['related_entity_name']);
 
-            if (empty($virtualRelation['label'])) {
-                $label = $this->getFieldLabel($className, $associationName);
-            } else {
-                $label = $virtualRelation['label'];
-            }
+            $label = !empty($virtualRelation['label'])
+                ? $virtualRelation['label']
+                : $this->getFieldLabel($metadata, $associationName);
 
             $this->addRelation(
                 $result,
@@ -434,7 +431,7 @@ class EntityFieldProvider
                 $result,
                 $associationName,
                 $fieldType,
-                $this->getFieldLabel($className, $associationName),
+                $this->getFieldLabel($metadata, $associationName),
                 $this->getRelationType($fieldType),
                 $targetClassName,
                 $withEntityDetails,
@@ -675,13 +672,19 @@ class EntityFieldProvider
     /**
      * Gets a field label
      *
-     * @param string $className
-     * @param string $fieldName
+     * @param ClassMetadata $metadata
+     * @param string        $fieldName
      *
      * @return string
      */
-    protected function getFieldLabel($className, $fieldName)
+    protected function getFieldLabel(ClassMetadata $metadata, $fieldName)
     {
+        $className = $metadata->getName();
+        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
+            // virtual field or relation
+            return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        }
+
         $label = $this->entityConfigProvider->hasConfig($className, $fieldName)
             ? $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
             : null;

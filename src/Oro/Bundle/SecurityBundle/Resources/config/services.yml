@@ -34,7 +34,6 @@ parameters:
     oro_security.acl.annotation_loader.class:                  Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
     oro_security.acl.config_loader.class:                      Oro\Bundle\SecurityBundle\Annotation\Loader\AclConfigLoader
 
-    oro_security.entity_security_config_subscriber.class:      Oro\Bundle\SecurityBundle\EventListener\EntitySecurityMetadataConfigSubscriber
     oro_security.acl.annotation_provider.cache.warmer.class:   Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheWarmer
     oro_security.acl.annotation_provider.cache.clearer.class:  Oro\Bundle\SecurityBundle\Cache\AclAnnotationCacheClearer
     oro_security.action_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\ActionMetadataCacheWarmer
@@ -117,7 +116,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl" ] ]
+            - [ setNamespace, [ 'oro_acl' ] ]
 
     oro_security.acl.ace_provider:
         public: false
@@ -244,7 +243,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_entities.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_entities' ] ]
 
     oro_security.action_metadata_provider:
         public: false
@@ -257,7 +256,7 @@ services:
         public: false
         parent: oro.file_cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_actions.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_actions' ] ]
 
     oro_security.acl.annotation_provider:
         class: %oro_security.acl.annotation_provider.class%
@@ -268,7 +267,7 @@ services:
         public: false
         parent: oro.file_cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_annotations.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_annotations' ] ]
 
     oro_security.acl.annotation_loader:
         public: false
@@ -284,12 +283,12 @@ services:
         tags:
             - { name: oro_security.acl.config_loader }
 
-    oro_security.entity_security_config_subscriber:
-        class: %oro_security.entity_security_config_subscriber.class%
+    oro_security.entity_security_config_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\EntitySecurityMetadataConfigListener
         arguments:
             - @oro_security.entity_security_metadata_provider
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     oro_security.acl.annotation_provider.cache.warmer:
         public: false
@@ -423,7 +422,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_acl_owner_tree.cache" ] ]
+            - [ setNamespace, [ 'oro_acl_owner_tree' ] ]
 
     oro_security.ownership_tree.cache.warmer:
         public: false
@@ -486,7 +485,7 @@ services:
     oro_security.listener.context_listener:
         class: %oro_security.listener.context_listener.class%
         arguments:
-            - @security.context
+            - @security.token_storage
             - @oro_organization.organization_manager
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
@@ -550,7 +549,7 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalkerHintProvider
         arguments:
-             - @security.context
+             - @security.token_storage
 
     oro_security.query_hint.filter_by_current_user:
         public: false

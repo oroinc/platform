@@ -103,7 +103,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
-                new \DateTime('now'),
+                new \DateTime($template['SentAt']),
                 new \DateTime('now'),
                 new \DateTime('now'),
                 Email::NORMAL_IMPORTANCE,
@@ -111,12 +111,13 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-            $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+            $emailUser->addFolder($origin->getFolder(FolderType::SENT));
             $emailUser->getEmail()->addActivityTarget($owner);
             $emailUser->getEmail()->addActivityTarget($simpleUser2);
             $emailUser->getEmail()->setHead(true);
             $emailUser->setOrganization($owner->getOrganization());
             $emailUser->setOwner($owner);
+            $emailUser->setOrigin($origin);
 
             $emailBody = $this->emailEntityBuilder->body(
                 "Hi,\n" . $template['Text'],

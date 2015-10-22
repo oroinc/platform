@@ -20,18 +20,8 @@ class EntityProcessor
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var array */
-    protected $commands = [
-        'oro:entity-extend:update-config' => [],
-        'oro:entity-extend:cache:warmup'  => [],
-        'oro:entity-extend:update-schema' => []
-    ];
-
-    /** @var array */
-    protected $updateRoutingCommands = [
-        'router:cache:clear'  => [],
-        'fos:js-routing:dump' => ['--target' => 'web/js/routes.js']
-    ];
+    /** @var Profiler */
+    protected $profiler;
 
     /**
      * @param MaintenanceMode $maintenance
@@ -54,11 +44,13 @@ class EntityProcessor
     /**
      * Updates database and all related caches according to changes of extended entities
      *
-     * @param bool $updateRouting
+     * @param bool $warmUpConfigCache Whether the entity config cache should be warmed up
+     *                                after database schema is changed
+     * @param bool $updateRouting     Whether routes should be updated after database schema is changed
      *
      * @return bool
      */
-    public function updateDatabase($updateRouting = false)
+    public function updateDatabase($warmUpConfigCache = false, $updateRouting = false)
     {
         set_time_limit(0);
 
@@ -70,12 +62,30 @@ class EntityProcessor
 
         $this->maintenance->activate();
 
-        $isSuccess = $this->executeCommands($this->commands);
-        if ($isSuccess && $updateRouting) {
-            $isSuccess = $this->executeCommands($this->updateRoutingCommands);
+        $commands = [
+            'oro:entity-extend:update-config' => [],
+            'oro:entity-extend:cache:warmup'  => [],
+            'oro:entity-extend:update-schema' => []
+        ];
+        if ($warmUpConfigCache) {
+            $commands = array_merge(
+                $commands,
+                [
+                    'oro:entity-config:cache:warmup' => []
+                ]
+            );
+        }
+        if ($updateRouting) {
+            $commands = array_merge(
+                $commands,
+                [
+                    'router:cache:clear'  => [],
+                    'fos:js-routing:dump' => []
+                ]
+            );
         }
 
-        return $isSuccess;
+        return $this->executeCommands($commands);
     }
 
     /**
