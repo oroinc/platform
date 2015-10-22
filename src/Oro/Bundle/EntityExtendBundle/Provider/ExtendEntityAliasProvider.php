@@ -34,8 +34,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
      */
     public function getEntityAlias($entityClass)
     {
-        $model = $this->configManager->getConfigEntityModel($entityClass);
-        if ($model) {
+        if ($this->configManager->hasConfig($entityClass)) {
             // check for enums
             $enumCode = $this->configManager->getProvider('enum')->getConfig($entityClass)->get('code');
             if ($enumCode) {
@@ -55,7 +54,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
             }
 
             // exclude hidden entities
-            if ($model->isHidden()) {
+            if ($this->configManager->isHiddenModel($entityClass)) {
                 return false;
             }
 
