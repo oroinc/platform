@@ -58,4 +58,5 @@ UPGRADE FROM 1.8 to 1.9
  - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
 
 ####WorklfowBundle
- - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have method `massTransit` to perform several transition in one transaction, can be used to improve workflow performance
+ - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
+ - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have properties `massStartBatchSize` and `massTransitBatchSize` to specify maximum size of batch in `massStartWorkflow` and `massTransit` methods, default values are 100 for both properties
