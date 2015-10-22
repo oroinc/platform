@@ -2,16 +2,43 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldTypeProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Converter\RelationCalculatorInterface;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class EntityFieldDataConverter extends ConfigurableTableDataConverter implements ContextAwareInterface
 {
-    /**
-     * @var ContextInterface
-     */
+    /** @var ExtendFieldTypeProvider */
+    protected $extendFieldTypeProvider;
+
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /** @var ContextInterface */
     protected $context;
+
+    /**
+     * @param FieldHelper $fieldHelper
+     * @param RelationCalculatorInterface $relationCalculator
+     * @param ExtendFieldTypeProvider $extendFieldTypeProvider
+     * @param ConfigManager $configManager
+     */
+    public function __construct(
+        FieldHelper $fieldHelper,
+        RelationCalculatorInterface $relationCalculator,
+        ExtendFieldTypeProvider $extendFieldTypeProvider,
+        ConfigManager $configManager
+    ) {
+        parent::__construct($fieldHelper, $relationCalculator);
+
+        $this->extendFieldTypeProvider = $extendFieldTypeProvider;
+        $this->configManager = $configManager;
+    }
 
     /**
      * {@inheritdoc}
@@ -34,18 +61,61 @@ class EntityFieldDataConverter extends ConfigurableTableDataConverter implements
     }
 
     /**
+     * @return array
+     */
+    protected function receiveBackendHeader()
+    {
+        return $this->backendHeader = $this->getBackendHeader();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getBackendHeader()
     {
-        return [
-            'fieldName', 'is_serialized', 'type', 'entity.label', 'entity.description', 'importexport.header',
-            'importexport.order', 'importexport.identity', 'importexport.excluded', 'email.available_in_template',
-            'datagrid.is_visible', 'form.is_enabled', 'view.is_displayable', 'view.priority', 'search.searchable',
-            'datagrid.show_filter', 'dataaudit.auditable', 'attachment.maxsize',
-            'enum.enum_options.0.label', 'enum.enum_options.0.is_default',
-            'enum.enum_options.1.label', 'enum.enum_options.1.is_default',
-            'enum.enum_options.2.label', 'enum.enum_options.2.is_default',
-        ];
+        $header = ['fieldName', 'is_serialized', 'type'];
+
+        foreach ($this->extendFieldTypeProvider->getSupportedFieldTypes() as $fieldType) {
+            $properties = $this->getProperties($fieldType);
+
+            foreach ($properties as $scope => $fields) {
+                foreach ($fields as $code => $config) {
+                    $field = sprintf('%s.%s', $scope, $code);
+
+                    if (!in_array($field, $header, true)) {
+                        $header[] = $field;
+                    }
+                }
+            }
+        }
+
+        return $header;
+    }
+
+    /**
+     * @param string $fieldType
+     * @return array
+     */
+    protected function getProperties($fieldType)
+    {
+        $configType = PropertyConfigContainer::TYPE_FIELD;
+        $properties = [];
+
+        foreach ($this->configManager->getProviders() as $provider) {
+            $propertyConfig = $provider->getPropertyConfig();
+
+            if ($propertyConfig->hasForm($configType, $fieldType)) {
+                $items = $propertyConfig->getFormItems($configType, $fieldType);
+                $scope = $provider->getScope();
+
+                foreach ($items as $code => $config) {
+                    if (!isset($properties[$scope][$code])) {
+                        $properties[$scope][$code] = $config;
+                    }
+                }
+            }
+        }
+
+        return $properties;
     }
 }
