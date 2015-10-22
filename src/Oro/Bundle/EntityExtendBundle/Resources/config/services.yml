@@ -164,7 +164,7 @@ services:
     oro_entity_extend.validator.unique_extend_entity_field_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator
         arguments:
-             - @oro_entity_config.provider.entity
+             - @oro_entity_config.provider.extend
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
