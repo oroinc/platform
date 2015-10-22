@@ -17,17 +17,7 @@ define([
         /**
          @property {(Backgrid.CellFormatter|Object|string)}
          */
-        formatter: new CellFormatter(),
-
-        /**
-         * @inheritDoc
-         */
-        enterEditMode: function(e) {
-            if (this.column.get('editable')) {
-                e.stopPropagation();
-            }
-            return StringCell.__super__.enterEditMode.apply(this, arguments);
-        }
+        formatter: new CellFormatter()
     });
 
     return StringCell;
