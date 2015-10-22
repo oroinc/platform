@@ -17,7 +17,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 class WorkflowManager
 {
     /**
-     * Limit of workflows items to make a flush 
+     * Limit of workflows items to make a flush
      */
     const LIMIT_WORKFLOWS_TO_PROCESS = 50;
     
