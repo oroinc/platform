@@ -25,7 +25,7 @@ define([
         /** @property */
         events: {
             'change :checkbox': 'onChange',
-            click: 'enterEditMode'
+            'click': 'updateCheckbox'
         },
 
         /**
@@ -61,8 +61,10 @@ define([
 
         /**
          * Focuses the checkbox.
+         *
+         * @param e
          */
-        enterEditMode: function(e) {
+        updateCheckbox: function(e) {
             if (this.$checkbox[0] !== e.target) {
                 this.$checkbox.prop('checked', !this.$checkbox.prop('checked')).change();
             }

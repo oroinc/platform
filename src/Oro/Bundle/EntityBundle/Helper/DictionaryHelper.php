@@ -4,11 +4,10 @@ namespace Oro\Bundle\EntityBundle\Helper;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Rhumsaa\Uuid\Console\Exception;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-
 use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Oro\Bundle\EntityBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class DictionaryHelper
 {
@@ -30,7 +29,7 @@ class DictionaryHelper
     {
         $idNames = $metadata->getIdentifierFieldNames();
         if (count($idNames) !== 1) {
-            throw new Exception(
+            throw new RuntimeException(
                 sprintf('Primary key for entity %s is absent or contains more than one field', $metadata->getName())
             );
         }
