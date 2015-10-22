@@ -16,6 +16,10 @@ UPGRADE FROM 1.8 to 1.9
 - Removed method `loadStoredSettings` of `Oro\Bundle\ConfigBundle\Config\ConfigManager`.
 - Removed class `Oro\Bundle\ConfigBundle\Manager\UserConfigManager` and service `oro_config.user_config_manager`. Use `oro_config.user` service instead.
 
+####EntityBundle
+- Methods `getSingleRootAlias`, `getPageOffset`, `applyJoins` and `normalizeCriteria` of `Oro\Bundle\EntityBundle\ORM\DoctrineHelper` marked as deprecated. Use corresponding methods of `Oro\Bundle\EntityBundle\ORM\QueryUtils` instead.
+
+
 ####EntityConfigBundle
 - Removed `optionSet` field type deprecated since v1.4. Existing options sets are converted to `Select` or `Multi-Select` automatically during the Platform update.
 - `Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface` marked as deprecated. Use `Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider` instead.
@@ -35,3 +39,20 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
+- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
+
+####EmbeddedFormBundle
+ - Bundle now contains configuration of security firewall `embedded_form` 
+
+####PlatformBundle
+ - Bundle now has priority `-200` and it is loaded right after main Symfony bundles
+
+####SoapBundle
+ - Bundle now contains configuration of security firewall `wsse_secured` 
+
+####TrackingBundle
+ - Bundle now contains configuration of security firewall `tracking_data` 
+
+####UserBundle
+ - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
+ - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
