@@ -35,12 +35,25 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $cache;
 
+    /**
+     * @var bool
+     */
+    protected $hasLoggedUser = true;
+
     protected function setUp()
     {
         $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
             ->getMock();
+
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacade
+            ->expects($this->any())
+            ->method('hasLoggedUser')
+            ->willReturn($this->hasLoggedUser);
+
         $this->factoryExtension = new AclAwareMenuFactoryExtension($this->router, $this->securityFacade);
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
@@ -100,6 +113,53 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             'not allowed with route and uri' => array(
                 array('aclResourceId' => 'test', 'uri' => '#', 'route' => 'test'),
                 false
+            ),
+        );
+    }
+
+    /**
+     * @param array   $options
+     * @param boolean $isAllowed
+     *
+     * @dataProvider optionsWithoutLoggedUser
+     */
+    public function testBuildOptionsWithoutLoggedUser($options, $isAllowed)
+    {
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacade->expects($this->any())
+            ->method('hasLoggedUser')
+            ->willReturn(false);
+
+        $factoryExtension = new AclAwareMenuFactoryExtension($this->router, $securityFacade);
+        $factory = new MenuFactory();
+        $factory->addExtension($factoryExtension);
+
+        $item = $factory->createItem('test', $options);
+
+        $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
+        $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
+    }
+
+    /**
+     * @return array
+     */
+    public function optionsWithoutLoggedUser()
+    {
+        return array(
+            'show non authorized' => array(
+                array('extras' => array('showNonAuthorized' => true)),
+                true,
+            ),
+            'do not show non authorized' => array(
+                array('extras' => array()),
+                false,
+            ),
+            'do not check access' => array(
+                array('check_access' => false, 'extras' => array()),
+                true,
             ),
         );
     }

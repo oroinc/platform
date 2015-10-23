@@ -1,7 +1,13 @@
-.oro-datagrid {
+@import "./inline-editing";
+.table {
   th, td {
     /* should center content in cell right */
     line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
+  }
+}
+
+.oro-datagrid {
+  th, td {
     display: none;
   }
   th.renderable, td.renderable {
@@ -18,7 +24,6 @@
   border-left: none;
   border-color: #dddddd;
   border-radius: 0;
-
 }
 
 .no-data {
