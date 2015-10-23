@@ -62,9 +62,14 @@ oro_datagrid.action.refresh: "Refresh"
 "oro.datagrid.gridView.actions": "Options"
 "oro.datagrid.gridView.data_edited": "Edited"
 "oro.datagrid.gridView.save_name": "Save"
-
 oro:
     datagrid:
+        inlineEditing:
+            inline_edits: "Inline edits"
+            successMessage: "Record has been succesfully updated"
+            helpMessage: "Double click on cell to edit"
+            loadingError: "Cannot load component or view for inline grid editor"
+            saving_progress: "Inline edits are being saved"
         column_manager:
             title: "Table Settings"
             tooltip: "Use drag and drop to sort items"
@@ -72,3 +77,4 @@ oro:
                 name: "Name"
                 show: "Show"
                 sort: "Sort"
+        not_number: Not a number
