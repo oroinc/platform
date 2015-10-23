@@ -92,7 +92,7 @@ class Process
 
     /**
      * @param mixed $context
-     * @return bool|mixed
+     * @return bool
      */
     public function isApplicable($context)
     {

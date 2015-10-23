@@ -303,7 +303,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 $data = $entityProcess['data'];
 
                 if (!$this->handler->isTriggerApplicable($trigger, $data)) {
-                    $this->logger->debug('Trigger pre-conditions declined process scheduling', $trigger, $data);
+                    $this->logger->debug('Process trigger is not applicable', $trigger, $data);
                     continue;
                 }
 

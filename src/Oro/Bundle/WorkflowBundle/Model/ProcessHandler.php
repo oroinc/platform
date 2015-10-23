@@ -105,7 +105,7 @@ class ProcessHandler
     /**
      * @param ProcessTrigger $processTrigger
      * @param ProcessData $processData
-     * @return bool|mixed
+     * @return bool
      */
     public function isTriggerApplicable(ProcessTrigger $processTrigger, ProcessData $processData)
     {

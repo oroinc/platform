@@ -98,10 +98,6 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             $entityManager->beginTransaction();
 
             try {
-                $processHandler->handleJob($processJob);
-                $entityManager->remove($processJob);
-                $entityManager->flush();
-
                 $processDefinition = $processJob->getProcessTrigger()->getDefinition();
 
                 $start = microtime(true);
@@ -115,13 +111,17 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
                     )
                 );
 
+                $processHandler->handleJob($processJob);
+                $entityManager->remove($processJob);
+                $entityManager->flush();
+
                 $processHandler->finishJob($processJob);
                 $entityManager->clear();
                 $entityManager->commit();
 
                 $output->writeln(
                     sprintf(
-                        '<info>[%s] Process job #%d %s successfully finished in %d ms</info>',
+                        '<info>[%s] Process job #%d %s successfully finished in %f s</info>',
                         (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                         $processJobId,
                         $processDefinition->getName(),

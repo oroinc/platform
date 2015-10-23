@@ -56,3 +56,8 @@ UPGRADE FROM 1.8 to 1.9
 ####UserBundle
  - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
  - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
+
+####WorkflowBundle
+ - Constructor of `Oro\Bundle\WorkflowBundle\Model\Process` changed. New argument: `ConditionFactory $conditionFactory`
+ - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
+ - Added new process definition option `pre_conditions`

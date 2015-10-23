@@ -467,7 +467,7 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $expectedData = $this->createProcessData(array('data' => $entity));
 
         $this->logger->expects($this->once())->method('debug')
-            ->with('Trigger pre-conditions declined process scheduling', $expectedTrigger, $expectedData);
+            ->with('Process trigger is not applicable', $expectedTrigger, $expectedData);
         $this->handler->expects($this->never())->method('handleTrigger')
             ->with($expectedTrigger, $expectedData);
         $entityManager->expects($this->never())->method('flush');
