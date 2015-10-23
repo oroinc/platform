@@ -18,7 +18,7 @@ class BigNumberFormatter
     }
 
     /**
-     * @param mixed  $value
+     * @param float  $value
      * @param string $type
      * @param bool   $isDeviant
      *
@@ -46,7 +46,7 @@ class BigNumberFormatter
                 $value = $this->numberFormatter->formatDecimal($value);
         }
 
-        return $isDeviant && !is_null($sign) ? sprintf('%s%s', $sign, $value) : $value;
+        return !is_null($sign) ? sprintf('%s%s', $sign, $value) : $value;
     }
 
     /**
@@ -71,9 +71,10 @@ class BigNumberFormatter
             $deviation = $value - $pastResult;
             $result['deviation'] = '';
 
+            // Check that deviation won't be formatted as zero
             if (round($deviation, 2) != 0) {
                 $result['deviation'] = $this->formatValue($deviation, $dataType, true);
-                $result['isPositive'] = ($previousData['lessIsBetter'] xor $deviation > 0);
+                $result['isPositive'] = ($previousData['lessIsBetter'] xor ($deviation > 0));
 
                 if ($pastResult != 0 && $dataType !== 'percent') {
                     $deviationPercent = $deviation / $pastResult;

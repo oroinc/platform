@@ -6,7 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class BigNumberPass implements CompilerPassInterface
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
+class BigNumberProviderPass implements CompilerPassInterface
 {
     const TAG                  = 'oro_dashboard.big_number.provider';
     const PROCESSOR_SERVICE_ID = 'oro_dashboard.provider.big_number.processor';
@@ -26,6 +28,12 @@ class BigNumberPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
+                if (empty($attributes['alias'])) {
+                    throw new InvalidConfigurationException(
+                        sprintf('Tag attribute "alias" is required for "%s" service', $id)
+                    );
+                }
+
                 $definition->addMethodCall(
                     'addValueProvider',
                     [new Reference($id), $attributes['alias']]

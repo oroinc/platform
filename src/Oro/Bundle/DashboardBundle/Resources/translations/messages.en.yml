@@ -86,3 +86,6 @@ oro:
             big_number:
                 choose_metrics: Choose Metrics
                 metricName: Metric name
+                no_changes: No changes
+                compare_to.label: Compare to
+                no_available_metrics: No available metrics

@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
-use DateTime;
-use DateTimeZone;
-
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
@@ -33,7 +30,7 @@ class BigNumberDateHelper
      * @param string $entity
      * @param string $field
      *
-     * @return DateTime[]
+     * @return \DateTime[]
      */
     public function getPeriod($dateRange, $entity, $field)
     {
@@ -46,7 +43,7 @@ class BigNumberDateHelper
                 ->createQueryBuilder('e')
                 ->select(sprintf('MIN(e.%s) as val', $field));
             $start = $this->aclHelper->apply($qb)->getSingleScalarResult();
-            $start = new DateTime($start, new DateTimeZone('UTC'));
+            $start = new \DateTime($start, new \DateTimeZone('UTC'));
         }
 
         return [$start, $end];
@@ -55,11 +52,11 @@ class BigNumberDateHelper
     /**
      * @param integer $weeksDiff
      *
-     * @return DateTime[]
+     * @return \DateTime[]
      */
     public function getLastWeekPeriod($weeksDiff = 0)
     {
-        $end = new DateTime('last Saturday', new DateTimeZone('UTC'));
+        $end = new \DateTime('last Saturday', new \DateTimeZone('UTC'));
         $end->setTime(23, 59, 59);
 
         $start = clone $end;

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
-use LogicException;
-
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 class BigNumberProcessor
@@ -71,12 +69,12 @@ class BigNumberProcessor
      * @param string $getterName
      *
      * @return callable
-     * @throws LogicException
+     * @throws \LogicException
      */
     protected function getGetter($providerAlias, $getterName)
     {
         if (!isset($this->valueProviders[$providerAlias])) {
-            throw new LogicException(sprintf('BigNumber provider "%s" was not found', $providerAlias));
+            throw new \LogicException(sprintf('BigNumber provider "%s" was not found', $providerAlias));
         }
 
         $callback = [$this->valueProviders[$providerAlias], $getterName];
@@ -85,7 +83,7 @@ class BigNumberProcessor
             return $callback;
         }
 
-        throw new LogicException(
+        throw new \LogicException(
             sprintf('Getter "%s" for BigNumber provider "%s" was not found', $getterName, $providerAlias)
         );
     }

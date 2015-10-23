@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle;
 
-use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\BigNumberPass;
+use Oro\Bundle\DashboardBundle\DependencyInjection\Compiler\BigNumberProviderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -18,6 +18,6 @@ class OroDashboardBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ValueConvertersPass());
-        $container->addCompilerPass(new BigNumberPass());
+        $container->addCompilerPass(new BigNumberProviderPass());
     }
 }

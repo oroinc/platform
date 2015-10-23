@@ -4,7 +4,7 @@
 <div class="deviation">
     <span class="deviation {% if item.value.isPositive is defined %}{% if item.value.isPositive %}positive{% else %}negative{% endif %}{% endif %}">
         {% if item.value.deviation is empty %}
-            {{ 'orocrm.magento.dashboard.e_commerce_statistic.no_changes'|trans }}
+            {{ 'oro.dashboard.widget.big_number.no_changes'|trans }}
         {% else %}
             {{ item.value.deviation|raw }}
         {% endif %}
@@ -12,7 +12,7 @@
 </div>
 <div class="deviation">
     <span class="deviation">
-        {{ 'orocrm.magento.dashboard.e_commerce_statistic.compare_to.label'|trans }}:
+        {{ 'oro.dashboard.widget.big_number.compare_to.label'|trans }}:
     </span>
     <span class="date-range">{{ item.value.previousRange.start|oro_format_date }} - {{ item.value.previousRange.end|oro_format_date }}</span>
 </div>
