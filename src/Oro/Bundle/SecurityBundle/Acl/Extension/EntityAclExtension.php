@@ -7,7 +7,6 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
-use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -455,7 +454,7 @@ class EntityAclExtension extends AbstractAclExtension
 
         $organization = null;
         if ($securityToken instanceof OrganizationContextTokenInterface) {
-            if ($this->checkOrganizationContext($object, $securityToken) === VoterInterface::ACCESS_DENIED) {
+            if ($this->isAccessDeniedByOrganizationContext($object, $securityToken)) {
                 return false;
             }
             $organization = $securityToken->getOrganizationContext();
@@ -713,9 +712,9 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @param mixed $object
      * @param OrganizationContextTokenInterface $securityToken
-     * @return int
+     * @return bool
      */
-    protected function checkOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
+    protected function isAccessDeniedByOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
     {
         try {
             // try to get entity organization value
@@ -725,12 +724,12 @@ class EntityAclExtension extends AbstractAclExtension
             if ($objectOrganization
                 && $objectOrganization->getId() !== $securityToken->getOrganizationContext()->getId()
             ) {
-                return VoterInterface::ACCESS_DENIED;
+                return true;
             }
         } catch (InvalidEntityException $e) {
             // in case if entity has no organization field (none ownership type)
         }
 
-        return VoterInterface::ACCESS_ABSTAIN;
+        return false;
     }
 }

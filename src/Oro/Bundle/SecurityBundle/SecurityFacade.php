@@ -298,7 +298,7 @@ class SecurityFacade
     }
 
     /**
-     * Determines if object is shared with current user context.
+     * Determines if object is shared with logged user.
      *
      * @param $object
      *
@@ -310,7 +310,7 @@ class SecurityFacade
     }
 
     /**
-     * Determines if object is shared exactly for given user. If no UserInterface entity is passed
+     * Determines if object is shared with given user exactly. If no UserInterface entity is passed
      * then user will be taken from current context.
      *
      * @param $object
@@ -328,7 +328,7 @@ class SecurityFacade
     }
 
     /**
-     * Determines if user has relation to those records which are shared exactly for given user.
+     * Determines if user has shared entity records exactly by UserSecurityIdentity.
      * If no UserInterface entity is passed then user will be taken from current context.
      *
      * @param UserInterface|null $user

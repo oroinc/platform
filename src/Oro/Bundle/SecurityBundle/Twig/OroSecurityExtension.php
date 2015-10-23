@@ -132,7 +132,7 @@ class OroSecurityExtension extends \Twig_Extension
     }
 
     /**
-     * @param $object
+     * @param object $object
      *
      * @return string
      *

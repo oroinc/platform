@@ -22,11 +22,7 @@ class SecurityIdentityRetrievalStrategy extends BaseStrategy
             $user = $token->getUser();
             if ($user instanceof User) {
                 foreach ($user->getBusinessUnits() as $businessUnit) {
-                    try {
-                        $sids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($businessUnit);
-                    } catch (\InvalidArgumentException $invalid) {
-                        // ignore, user has not business unit security identity
-                    }
+                    $sids[] = BusinessUnitSecurityIdentity::fromBusinessUnit($businessUnit);
                 }
             }
         }

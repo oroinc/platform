@@ -356,8 +356,7 @@ class MutableAclProvider extends BaseMutableAclProvider
     /**
      * {@inheritdoc}
      *
-     * Property updatedAcl uses in method getInsertAccessControlEntrySql to take record id.
-     * Method getInsertAccessControlEntrySql executes in parent method updateAcl
+     * Inject shared record id to acl SQL queries (such as InsertAccessControlEntrySql) via property updatedAcl.
      */
     public function updateAcl(MutableAclInterface $acl)
     {

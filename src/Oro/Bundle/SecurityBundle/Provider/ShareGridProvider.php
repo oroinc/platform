@@ -5,9 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Provider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ShareGridProvider
@@ -15,36 +13,36 @@ class ShareGridProvider
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var EntityRoutingHelper */
-    protected $routingHelper;
+    /** @var EntityClassNameHelper */
+    protected $entityClassNameHelper;
 
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var AclHelper */
-    protected $helper;
+    /** @var ShareScopeProvider */
+    protected $shareScopeProvider;
 
     /** @var TranslatorInterface */
     protected $translator;
 
     /**
      * @param SecurityFacade $securityFacade
-     * @param EntityRoutingHelper $routingHelper
+     * @param EntityClassNameHelper $entityClassNameHelper
      * @param ConfigManager $configManager
-     * @param AclHelper $helper
+     * @param ShareScopeProvider $shareScopeProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        EntityRoutingHelper $routingHelper,
+        EntityClassNameHelper $entityClassNameHelper,
         ConfigManager $configManager,
-        AclHelper $helper,
+        ShareScopeProvider $shareScopeProvider,
         TranslatorInterface $translator
     ) {
         $this->securityFacade = $securityFacade;
-        $this->routingHelper = $routingHelper;
+        $this->entityClassNameHelper = $entityClassNameHelper;
         $this->configManager = $configManager;
-        $this->helper = $helper;
+        $this->shareScopeProvider = $shareScopeProvider;
         $this->translator = $translator;
     }
 
@@ -55,17 +53,16 @@ class ShareGridProvider
      */
     public function getSupportedGridsInfo($entityClass)
     {
-        $entityClass = $this->routingHelper->resolveEntityClass($entityClass);
+        $entityClass = $this->entityClassNameHelper->resolveEntityClass($entityClass);
         $results = [];
         if (!$this->configManager->hasConfig($entityClass)) {
             return $results;
         }
-        $entityConfigId = new EntityConfigId('security', $entityClass);
-        $shareScopes = $this->configManager->getConfig($entityConfigId)->get('share_scopes');
+        $shareScopes = $this->configManager->getProvider('security')->getConfig($entityClass)->get('share_scopes');
         if (!$shareScopes) {
             return $results;
         }
-        $classNames = $this->helper->getClassNamesBySharingScopes($shareScopes);
+        $classNames = $this->shareScopeProvider->getClassNamesBySharingScopes($shareScopes);
         foreach ($classNames as $className) {
             $results[] = [
                 'isGranted' => $this->securityFacade->isGranted('VIEW', 'entity:' . $className),
@@ -97,8 +94,7 @@ class ShareGridProvider
         if (!$this->configManager->hasConfig($className)) {
             return null;
         }
-        $entityConfigId = new EntityConfigId('entity', $className);
-        $label = $this->configManager->getConfig($entityConfigId)->get('label');
+        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }
@@ -110,12 +106,11 @@ class ShareGridProvider
      */
     public function getGridName($className)
     {
-        $className = $this->routingHelper->resolveEntityClass($className);
+        $className = $this->entityClassNameHelper->resolveEntityClass($className);
         if (!$this->configManager->hasConfig($className)) {
             return null;
         }
-        $entityConfigId = new EntityConfigId('entity', $className);
 
-        return $this->configManager->getConfig($entityConfigId)->get('share_with_datagrid');
+        return $this->configManager->getProvider('security')->getConfig($className)->get('share_grid');
     }
 }

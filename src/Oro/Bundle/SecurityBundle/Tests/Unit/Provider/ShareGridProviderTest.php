@@ -15,16 +15,19 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $routingHelper;
+    protected $entityClassNameHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $helper;
+    protected $shareScopeProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configProvider;
 
     /** @var ShareGridProvider */
     protected $provider;
@@ -41,13 +44,19 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->method('isGranted')
             ->with('VIEW')
             ->willReturn(true);
-        $this->routingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
+        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->helper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturn($this->configProvider);
+        $this->shareScopeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Provider\ShareScopeProvider')
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
@@ -55,16 +64,16 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->provider = new ShareGridProvider(
             $this->securityFacade,
-            $this->routingHelper,
+            $this->entityClassNameHelper,
             $this->configManager,
-            $this->helper,
+            $this->shareScopeProvider,
             $this->translator
         );
     }
 
     public function testGetSupportedGridsInfoWhenNoClassConfig()
     {
-        $this->routingHelper->expects($this->once())
+        $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn(self::ENTITY_CLASS);
@@ -78,7 +87,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSupportedGridsInfoWhenNoSharingScopes()
     {
-        $this->routingHelper->expects($this->once())
+        $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn(self::ENTITY_CLASS);
@@ -93,7 +102,7 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('share_scopes')
             ->willReturn(null);
-        $this->configManager->expects($this->once())
+        $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->willReturn($config);
 
@@ -102,11 +111,11 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSupportedGridsInfo()
     {
-        $this->routingHelper->expects($this->exactly(2))
+        $this->entityClassNameHelper->expects($this->exactly(2))
             ->method('resolveEntityClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn(self::ENTITY_CLASS);
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->any())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn(true);
@@ -117,13 +126,9 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('share_scopes')
             ->willReturn([self::SHARE_SCOPE]);
-        $this->configManager->expects($this->at(1))
+        $this->configProvider->expects($this->at(0))
             ->method('getConfig')
             ->willReturn($shareScopesConfig);
-        $this->configManager->expects($this->at(2))
-            ->method('hasConfig')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(true);
         $labelConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -131,24 +136,20 @@ class ShareGridProviderTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('label')
             ->willReturn(self::ENTITY_LABEL);
-        $this->configManager->expects($this->at(3))
+        $this->configProvider->expects($this->at(1))
             ->method('getConfig')
             ->willReturn($labelConfig);
-        $this->configManager->expects($this->at(4))
-            ->method('hasConfig')
-            ->with(self::ENTITY_CLASS)
-            ->willReturn(true);
         $shareGridConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $shareGridConfig->expects($this->once())
             ->method('get')
-            ->with('share_with_datagrid')
+            ->with('share_grid')
             ->willReturn(self::GRID_NAME);
-        $this->configManager->expects($this->at(5))
+        $this->configProvider->expects($this->at(2))
             ->method('getConfig')
             ->willReturn($shareGridConfig);
-        $this->helper->expects($this->once())
+        $this->shareScopeProvider->expects($this->once())
             ->method('getClassNamesBySharingScopes')
             ->with([self::SHARE_SCOPE])
             ->willReturn([self::ENTITY_CLASS]);

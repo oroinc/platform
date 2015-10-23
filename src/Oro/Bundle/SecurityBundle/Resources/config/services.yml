@@ -48,6 +48,7 @@ parameters:
 
     oro_security.provider.share_grid_provider.class:           Oro\Bundle\SecurityBundle\Provider\ShareGridProvider
     oro_security.provider.share_provider.class:                Oro\Bundle\SecurityBundle\Provider\ShareProvider
+    oro_security.provider.share_scope_provider.class:          Oro\Bundle\SecurityBundle\Provider\ShareScopeProvider
 
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
     oro_security.twig.security_organization_extension:         Oro\Bundle\SecurityBundle\Twig\OroSecurityOrganizationExtension
@@ -393,9 +394,9 @@ services:
         class: %oro_security.provider.share_grid_provider.class%
         arguments:
             - @oro_security.security_facade
-            - @oro_entity.routing_helper
+            - @oro_entity.entity_class_name_helper
             - @oro_entity_config.config_manager
-            - @oro_security.search.acl_helper
+            - @oro_security.provider.share_scope_provider
             - @translator
 
     oro_security.provider.share_provider:
@@ -404,6 +405,11 @@ services:
             - @doctrine
             - @security.acl.provider
             - @security.acl.security_identity_retrieval_strategy
+
+    oro_security.provider.share_scope_provider:
+        class: %oro_security.provider.share_scope_provider.class%
+        arguments:
+            - @oro_entity_config.config_manager
 
     oro_security.twig.security_organization_extension:
         class: %oro_security.twig.security_organization_extension%

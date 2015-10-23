@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SecurityBundle\EventListener\SearchListener;
-use Oro\Bundle\SecurityBundle\Form\Model\Share;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -99,25 +98,6 @@ class AclHelper
         $this->addOrganizationLimits($query, $expr);
 
         return $query;
-    }
-
-    /**
-     * @param array $shareScopes
-     *
-     * @return array
-     */
-    public function getClassNamesBySharingScopes(array $shareScopes)
-    {
-        $result = [];
-        foreach ($shareScopes as $shareScope) {
-            if ($shareScope === Share::SHARE_SCOPE_USER) {
-                array_push($result, 'Oro\Bundle\UserBundle\Entity\User');
-            } elseif ($shareScope === Share::SHARE_SCOPE_BUSINESS_UNIT) {
-                array_unshift($result, 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
-            }
-        }
-
-        return $result;
     }
 
     /**

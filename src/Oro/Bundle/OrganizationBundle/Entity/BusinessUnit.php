@@ -30,8 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *              "activity_support"="true"
  *          },
  *          "entity"={
- *              "icon"="icon-building",
- *              "share_with_datagrid"="share-with-business-units-datagrid"
+ *              "icon"="icon-building"
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
@@ -42,7 +41,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "share_grid"="share-with-business-units-datagrid"
  *          }
  *      }
  * )

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Twig;
 
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
 
 class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
@@ -154,5 +157,104 @@ class OroSecurityExtensionTest extends \PHPUnit_Framework_TestCase
             'business_unit_label_translated, user_label_translated',
             $this->twigExtension->formatShareScopes(['business_unit', 'user'])
         );
+    }
+
+    public function testGetShareCountNotZero()
+    {
+        $object = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\DomainObjectInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $object->expects($this->any())
+            ->method('getObjectIdentifier')
+            ->will($this->returnValue(1));
+
+        $aces = [1];
+        $acl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $acl->expects($this->any())
+            ->method('getObjectAces')
+            ->will($this->returnValue($aces));
+
+        $this->aclCache->expects($this->once())
+            ->method('getFromCacheByIdentity')
+            ->will($this->returnValue($acl));
+
+
+        $this->assertEquals(1, $this->twigExtension->getShareCount($object));
+    }
+
+    public function testGetShareCountZero()
+    {
+        $object = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\DomainObjectInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $object->expects($this->any())
+            ->method('getObjectIdentifier')
+            ->will($this->returnValue(1));
+
+        $aces = [];
+        $acl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $acl->expects($this->any())
+            ->method('getObjectAces')
+            ->will($this->returnValue($aces));
+
+        $this->aclCache->expects($this->once())
+            ->method('getFromCacheByIdentity')
+            ->will($this->returnValue($acl));
+
+
+        $this->assertEquals(0, $this->twigExtension->getShareCount($object));
+    }
+
+    public function testGetSharedWithName()
+    {
+        $object = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\DomainObjectInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $object->expects($this->any())
+            ->method('getObjectIdentifier')
+            ->will($this->returnValue(1));
+
+        $user = new User(1);
+        $user->setUsername('TestUser');
+        $sid = new UserSecurityIdentity('TestUser', get_class($user));
+
+        $ace = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Entry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ace->expects($this->any())
+            ->method('getSecurityIdentity')
+            ->will($this->returnValue($sid));
+
+        $aces = [$ace];
+        $acl = $this->getMockBuilder('Symfony\Component\Security\Acl\Domain\Acl')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $acl->expects($this->any())
+            ->method('getObjectAces')
+            ->will($this->returnValue($aces));
+
+        $this->aclCache->expects($this->once())
+            ->method('getFromCacheByIdentity')
+            ->will($this->returnValue($acl));
+
+        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->any())
+            ->method('findOneBy')
+            ->will($this->returnValue($user));
+
+        $this->manager->expects($this->any())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+        $this->nameFormatter->expects($this->any())
+            ->method('format')
+            ->will($this->returnValue($user->getUsername()));
+
+        $this->assertEquals($user->getUsername(), $this->twigExtension->getSharedWithName($object));
     }
 }

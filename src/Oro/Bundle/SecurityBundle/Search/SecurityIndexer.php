@@ -9,10 +9,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\Formatter\ShareFormatter;
+use Oro\Bundle\SecurityBundle\Provider\ShareScopeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class SecurityIndexer
@@ -29,11 +29,11 @@ class SecurityIndexer
     /** @var Indexer */
     protected $indexer;
 
-    /** @var AclHelper */
-    protected $searchAclHelper;
-
     /** @var ShareFormatter */
     protected $shareFormatter;
+
+    /** @var ShareScopeProvider */
+    protected $shareScopeProvider;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -43,23 +43,23 @@ class SecurityIndexer
      * @param \Twig_Environment $twig
      * @param ConfigManager $configManager
      * @param Indexer $indexer
-     * @param AclHelper $searchAclHelper
      * @param ShareFormatter $shareFormatter
+     * @param ShareScopeProvider $shareScopeProvider
      */
     public function __construct(
         ObjectManager $em,
         \Twig_Environment $twig,
         ConfigManager $configManager,
         Indexer $indexer,
-        AclHelper $searchAclHelper,
-        ShareFormatter $shareFormatter
+        ShareFormatter $shareFormatter,
+        ShareScopeProvider $shareScopeProvider
     ) {
         $this->em = $em;
         $this->twig = $twig;
         $this->configManager = $configManager;
         $this->indexer = $indexer;
-        $this->searchAclHelper = $searchAclHelper;
         $this->shareFormatter = $shareFormatter;
+        $this->shareScopeProvider = $shareScopeProvider;
     }
 
     /**
@@ -105,7 +105,7 @@ class SecurityIndexer
         if (!$this->configManager->hasConfig($entityClass)) {
             return $objects;
         }
-        $classNames = $this->getClassNamesBySharingScopeConfig($entityClass);
+        $classNames = $this->shareScopeProvider->getClassNamesBySharingScopeConfig($entityClass);
         if (!$classNames) {
             return $objects;
         }
@@ -163,26 +163,6 @@ class SecurityIndexer
     }
 
     /**
-     * Returns class names according to share scopes using entity config. The goal is to determine on which
-     * database tables search should be performed.
-     *
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    protected function getClassNamesBySharingScopeConfig($entityClass)
-    {
-        $classNames = [];
-        $entityConfig = new EntityConfigId('security', $entityClass);
-        $shareScopes = $this->configManager->getConfig($entityConfig)->get('share_scopes');
-        if (!$shareScopes) {
-            return $classNames;
-        }
-
-        return $this->searchAclHelper->getClassNamesBySharingScopes($shareScopes);
-    }
-
-    /**
      * Returns rows which are structured for "oro_share_select" form type
      *
      * @param object[] $objects
@@ -226,7 +206,7 @@ class SecurityIndexer
     protected function getGroupedRows($rows, $entityClass)
     {
         $result = [];
-        $classNames = $this->getClassNamesBySharingScopeConfig($entityClass);
+        $classNames = $this->shareScopeProvider->getClassNamesBySharingScopeConfig($entityClass);
         if (!$classNames) {
             return $result;
         }
