@@ -469,21 +469,27 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $entityManager->expects($this->once())->method('beginTransaction');
 
-        foreach ($expected as $iteration => $row) {
-            $workflowName = $row['workflow'];
-            $workflow = $this->createWorkflow($workflowName);
-            $workflowItem = $this->createWorkflowItem($workflowName);
+        if ($expected) {
+            foreach ($expected as $iteration => $row) {
+                $workflowName = $row['workflow'];
+                $workflow = $this->createWorkflow($workflowName);
+                $workflowItem = $this->createWorkflowItem($workflowName);
 
-            $workflow->expects($this->once())->method('start')->with($row['entity'], $row['data'], $row['transition'])
-                ->will($this->returnValue($workflowItem));
+                $workflow->expects($this->once())->method('start')
+                    ->with($row['entity'], $row['data'], $row['transition'])
+                    ->will($this->returnValue($workflowItem));
 
-            $this->workflowRegistry->expects($this->at($iteration))->method('getWorkflow')->with($workflowName)
-                ->will($this->returnValue($workflow));
+                $this->workflowRegistry->expects($this->at($iteration))->method('getWorkflow')->with($workflowName)
+                    ->will($this->returnValue($workflow));
 
-            $entityManager->expects($this->at($iteration + 1))->method('persist')->with($workflowItem);
+                $entityManager->expects($this->at($iteration + 1))->method('persist')->with($workflowItem);
+            }
+        } else {
+            $this->workflowRegistry->expects($this->never())->method('getWorkflow');
+            $entityManager->expects($this->never())->method('persist');
         }
 
-        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($expected ? $this->once() : $this->never())->method('flush');
         $entityManager->expects($this->once())->method('commit');
 
         $this->workflowManager->massStartWorkflow($source);
@@ -533,6 +539,19 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMassStartWorkflowBatch()
+    {
+        $defaultBatchSize = $this->workflowManager->getMassStartBatchSize();
+        $this->assertNotEmpty($defaultBatchSize);
+        $this->assertGreaterThan(0, $defaultBatchSize);
+
+        $customBatchSize = 42;
+        $this->workflowManager->setMassStartBatchSize($customBatchSize);
+        $this->assertEquals($customBatchSize, $this->workflowManager->getMassStartBatchSize());
+
+        $this->markTestIncomplete('Should be finished in scope of BAP-9236');
+    }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage Mass start workflow exception message
@@ -543,6 +562,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->once())->method('beginTransaction');
         $entityManager->expects($this->once())->method('rollback');
         $entityManager->expects($this->never())->method('persist');
+        $entityManager->expects($this->never())->method('commit');
 
         $this->registry->expects($this->once())
             ->method('getManager')
@@ -626,6 +646,182 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityManager));
 
         $this->workflowManager->transit($workflowItem, 'test_transition');
+    }
+
+    /**
+     * @param array $source
+     * @param array $expected
+     * @dataProvider massTransitDataProvider
+     */
+    public function testMassTransit(array $source, array $expected)
+    {
+        $entityManager = $this->createEntityManager();
+        $this->registry->expects($this->once())->method('getManager')
+            ->willReturn($entityManager);
+
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        /** @var WorkflowItem[] $workflowItems */
+        $workflowItems = [];
+
+        if ($expected) {
+            foreach ($expected as $iteration => $row) {
+                $workflowName = $row['workflow'];
+                $workflow = $this->createWorkflow($workflowName);
+                $workflowItem = $source[$iteration]['workflowItem'];
+                $workflowItems[] = $workflowItem;
+                $transition = $row['transition'];
+
+                $workflow->expects($this->once())->method('transit')->with($workflowItem, $transition)
+                    ->willReturn($workflowItem);
+
+                $this->workflowRegistry->expects($this->at($iteration))->method('getWorkflow')->with($workflowName)
+                    ->willReturn($workflow);
+            }
+        } else {
+            $this->workflowRegistry->expects($this->never())->method('getWorkflow');
+        }
+
+        $entityManager->expects($expected ? $this->once() : $this->never())->method('flush');
+        $entityManager->expects($this->once())->method('commit');
+
+        $this->workflowManager->massTransit($source);
+
+        foreach ($workflowItems as $workflowItem) {
+            $this->assertNotEmpty($workflowItem->getUpdated());
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function massTransitDataProvider()
+    {
+        return [
+            'no data' => [
+                'source' => [],
+                'expected' => []
+            ],
+            'invalid data' => [
+                'source' => [
+                    ['transition' => 'test'],
+                    ['workflowItem' => null, 'transition' => 'test'],
+                    ['workflowItem' => new \stdClass(), 'transition' => 'test'],
+                    ['workflowItem' => $this->createWorkflowItem('test'), 'transition' => null],
+                    ['workflowItem' => $this->createWorkflowItem('test')],
+                ],
+                'expected' => []
+            ],
+            'valid data' => [
+                'source' => [
+                    ['workflowItem' => $this->createWorkflowItem('flow1'), 'transition' => 'transition1'],
+                    ['workflowItem' => $this->createWorkflowItem('flow2'), 'transition' => 'transition2'],
+                ],
+                'expected' => [
+                    ['workflow' => 'flow1', 'transition' => 'transition1'],
+                    ['workflow' => 'flow2', 'transition' => 'transition2'],
+                ],
+            ]
+        ];
+    }
+
+    /**
+     * @param int $numberOfRows
+     * @param int $numberOfFlushes
+     * @param int|null $batchSize
+     * @dataProvider massTransitBatchDataProvider
+     */
+    public function testMassTransitBatch($numberOfRows, $numberOfFlushes, $batchSize = null)
+    {
+        if ($batchSize) {
+            $this->workflowManager->setMassTransitBatchSize($batchSize);
+            $this->assertEquals($batchSize, $this->workflowManager->getMassTransitBatchSize());
+        } else {
+            $batchSize = $this->workflowManager->getMassTransitBatchSize();
+            $this->assertNotEmpty($batchSize);
+            $this->assertGreaterThan(0, $batchSize);
+        }
+
+        $entityManager = $this->createEntityManager();
+        $this->registry->expects($this->once())->method('getManager')
+            ->willReturn($entityManager);
+
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        $workflow = $this->createWorkflow();
+        $this->workflowRegistry->expects($this->any())->method('getWorkflow')
+            ->willReturn($workflow);
+
+        $entityManager->expects($this->exactly($numberOfFlushes))->method('flush');
+        $entityManager->expects($this->once())->method('commit');
+
+        $data = [];
+        for ($i = 0; $i < $numberOfRows; $i++) {
+            $data[] = ['workflowItem' => $this->createWorkflowItem(), 'transition' => 'test'];
+        }
+
+        $this->workflowManager->massTransit($data);
+    }
+
+    /**
+     * @return array
+     */
+    public function massTransitBatchDataProvider()
+    {
+        return [
+            'no data' => [
+                'numberOfRows' => 0,
+                'numberOfFlushes' => 0,
+            ],
+            'exactly one batch' => [
+                'numberOfRows' => 10,
+                'numberOfFlushes' => 1,
+                'batchSize' => 10,
+            ],
+            'one batch and one row' => [
+                'numberOfRows' => 11,
+                'numberOfFlushes' => 2,
+                'batchSize' => 10,
+            ],
+            'exactly two batches' => [
+                'numberOfRows' => 20,
+                'numberOfFlushes' => 2,
+                'batchSize' => 10,
+            ],
+            'two batches and one more' => [
+                'numberOfRows' => 21,
+                'numberOfFlushes' => 3,
+                'batchSize' => 10,
+            ],
+        ];
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Mass transit exception message
+     */
+    public function testMassTransitException()
+    {
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())->method('beginTransaction');
+        $entityManager->expects($this->once())->method('rollback');
+        $entityManager->expects($this->never())->method('commit');
+
+        $this->registry->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($entityManager));
+
+        $workflow = $this->createWorkflow();
+        $workflowItem = $this->createWorkflowItem();
+        $transition = 'test_transition';
+
+        $workflow->expects($this->once())->method('transit')->with($workflowItem, $transition)
+            ->willThrowException(new \Exception('Mass transit exception message'));
+
+        $this->workflowRegistry->expects($this->once())->method('getWorkflow')
+            ->willReturn($workflow);
+
+        $this->workflowManager->massTransit([['workflowItem' => $workflowItem, 'transition' => $transition]]);
     }
 
     public function testGetApplicableWorkflow()

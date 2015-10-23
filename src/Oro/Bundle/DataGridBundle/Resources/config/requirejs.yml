@@ -70,6 +70,9 @@ config:
 
         'orodatagrid/js/app/components/datagrid-component': 'bundles/orodatagrid/js/app/components/datagrid-component.js'
 
+        'orodatagrid/js/inline-editing/builder': 'bundles/orodatagrid/js/inline-editing/builder.js'
+        'orodatagrid/js/app/plugins/grid/inline-editing-plugin': 'bundles/orodatagrid/js/app/plugins/grid/inline-editing-plugin.js'
+        'orodatagrid/js/inline-editing/default-editors': 'bundles/orodatagrid/js/inline-editing/default-editors.js'
 build:
     paths:
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with

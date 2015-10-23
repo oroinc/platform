@@ -83,6 +83,9 @@ define(['underscore', './abstract-formatter'
          * a number.
          */
         toRaw: function(formattedData) {
+            if (/^\s+$/.test(formattedData) || formattedData === '') {
+                return void 0;
+            }
             var rawData = '';
             var i;
 
