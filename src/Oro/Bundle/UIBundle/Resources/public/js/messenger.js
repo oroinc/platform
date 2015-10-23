@@ -2,9 +2,10 @@ define([
     'jquery',
     'underscore',
     'oroui/js/tools',
+    'oroui/js/tools/multi-use-resource-manager',
     'cryptojs/sha256',
     'bootstrap'
-], function($, _, tools, CryptoJS) {
+], function($, _, tools, MultiUseResourceManager, CryptoJS) {
     'use strict';
 
     var defaults = {
@@ -14,6 +15,7 @@ define([
         insertMethod: 'appendTo'
     };
     var queue = [];
+    var groupedMessages = {};
     var notFlashTypes = ['error', 'danger', 'warning', 'alert'];
     var console = window.console;
 
@@ -146,6 +148,31 @@ define([
                 var actions = {close: $.noop};
 
                 queue.push([args, actions]);
+            },
+
+            showProcessingMessage: function(message, promise, type) {
+                if (!type) {
+                    type = 'process';
+                }
+                var _this = this;
+                if (!groupedMessages[message]) {
+                    groupedMessages[message] = new MultiUseResourceManager({
+                        listen: {
+                            'construct': function() {
+                                this.alert = _this.notificationMessage(type, message, {flash: false});
+                            },
+                            'dispose': function() {
+                                this.alert.close();
+                                groupedMessages[message].dispose();
+                                delete groupedMessages[message];
+                            }
+                        }
+                    });
+                }
+                var holderId = groupedMessages[message].hold();
+                promise.always(function() {
+                    groupedMessages[message].release(holderId);
+                });
             },
 
             /**

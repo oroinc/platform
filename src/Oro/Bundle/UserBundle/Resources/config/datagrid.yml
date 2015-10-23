@@ -19,6 +19,10 @@ datagrid:
                     - u.enabled
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
+
+        inline_editing:
+            enable: true
+            entity_name: %oro_user.entity.class%
         columns:
             username:
                 label:         oro.user.username.label
@@ -38,9 +42,8 @@ datagrid:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   - Inactive
-                   - Active
-
+                   0: Inactive
+                   1: Active
         properties:
             id: ~
             update_link:
