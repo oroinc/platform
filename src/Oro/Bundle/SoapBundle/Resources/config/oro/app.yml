@@ -1,0 +1,9 @@
+security:
+    firewalls:
+        wsse_secured:
+            pattern: ^/api/(rest|soap).*
+            wsse:
+                lifetime: 3600
+                realm:    "Secured API"
+                profile:  "UsernameToken"
+            context: main
