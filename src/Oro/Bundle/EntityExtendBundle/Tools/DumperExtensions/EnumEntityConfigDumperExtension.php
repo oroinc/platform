@@ -191,7 +191,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     }
 
                     $schema['property'][$snapshotFieldName] = [];
-                    if ($fieldConfig->is('is_deleted')) {
+                    if ($fieldConfig->is('is_deleted') || $fieldConfig->is('state', ExtendScope::STATE_DELETE)) {
                         $schema['property'][$snapshotFieldName]['private'] = true;
                     }
 

@@ -302,7 +302,7 @@ class ExtendConfigDumper
             $fieldConfigId = $fieldConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
             $fieldType     = $fieldConfigId->getFieldType();
-            $isDeleted     = $fieldConfig->is('is_deleted');
+            $isDeleted     = $fieldConfig->is('is_deleted') || $fieldConfig->is('state', ExtendScope::STATE_DELETE);
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
             if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations, true)) {
@@ -411,9 +411,12 @@ class ExtendConfigDumper
             }
 
             $fieldName = $fieldId->getFieldName();
-            $isDeleted = $configProvider->hasConfig($fieldId->getClassName(), $fieldName)
-                ? $configProvider->getConfig($fieldId->getClassName(), $fieldName)->is('is_deleted')
-                : false;
+            $isDeleted = false;
+            if ($configProvider->hasConfig($fieldId->getClassName(), $fieldName)) {
+                $config    = $configProvider->getConfig($fieldId->getClassName(), $fieldName);
+                $isDeleted = $config->is('is_deleted') || $config->is('state', ExtendScope::STATE_DELETE);
+            }
+
             if (!isset($relationProperties[$fieldName])) {
                 $relationProperties[$fieldName] = [];
                 if ($isDeleted) {
