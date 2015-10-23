@@ -2,6 +2,7 @@
 define(function() {
     'use strict';
 
+    /** @exports persistentStorage */
     var persistentStorage;
 
     try {
@@ -16,7 +17,7 @@ define(function() {
         // https://developer.mozilla.org/en-US/docs/Web/API/Storage/LocalStorage
 
         /**
-         * Provides clint-side storage storage
+         * Provides clint-side storage
          * Uses localStorage if supported, otherwise cookies
          * Realizes Storage Interface https://developer.mozilla.org/en-US/docs/Web/API/Storage
          */

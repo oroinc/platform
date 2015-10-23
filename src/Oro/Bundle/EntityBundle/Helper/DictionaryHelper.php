@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 
 class DictionaryHelper
 {
