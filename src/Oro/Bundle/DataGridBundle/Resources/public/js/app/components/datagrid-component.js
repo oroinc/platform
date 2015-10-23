@@ -48,6 +48,7 @@ define(function(require) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
+            options.builders.push('orodatagrid/js/inline-editing/builder');
 
             var self = this;
             this._deferredInit();
@@ -219,7 +220,7 @@ define(function(require) {
             };
             var modules = this.modules;
             var metadata = this.metadata;
-            var plugins = [];
+            var plugins = this.metadata.plugins || [];
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
