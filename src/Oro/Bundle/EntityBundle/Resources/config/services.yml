@@ -40,6 +40,17 @@ parameters:
 
     # managers
     oro_entity.manager.dictionary.api.class:                 Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager
+    oro_entity.manager.entity_field_manager.class:           Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager
+    oro_entity.manager.entity_field_validator.class:         Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator
+
+    # managers/api
+    oro_entity.manager.api.entity_data_api_manager.class:    Oro\Bundle\EntityBundle\Manager\Api\EntityDataApiManager
+
+    # form
+    oro_entity.form.entity_field.form_builder.class:         Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder
+
+    oro_entity.form.entity_field.handler.base_handler.class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler
+    oro_entity.form.entity_field.handler.processor.handler_processor.class:  Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor
 
     # halpers
     oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
@@ -339,3 +350,44 @@ services:
 
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
+
+    oro_entity.manager.entity_field_manager:
+        class: %oro_entity.manager.entity_field_manager.class%
+        scope: request
+        arguments:
+            - @doctrine
+            - @oro_entity.form.entity_field.form_builder
+            - @oro_entity.form.entity_field.handler.base_handler
+            - @oro_entity.routing_helper
+            - @oro_security.owner.ownership_metadata_provider
+            - @oro_entity.manager.entity_field_validator
+
+    oro_entity.form.entity_field.form_builder:
+            class: %oro_entity.form.entity_field.form_builder.class%
+            arguments:
+                - @form.factory
+                - @doctrine
+
+    oro_entity.form.entity_field.handler.base_handler:
+        class: %oro_entity.form.entity_field.handler.base_handler.class%
+        scope: request
+        arguments:
+            - @doctrine
+            - @oro_entity.form.entity_field.handler.processor.handler_processor
+
+    oro_entity.form.entity_field.handler.processor.handler_processor:
+        class: %oro_entity.form.entity_field.handler.processor.handler_processor.class%
+
+    oro_entity.manager.api.entity_data_api_manager:
+        class: %oro_entity.manager.api.entity_data_api_manager.class%
+        scope: request
+        arguments:
+            - @oro_entity.manager.entity_field_manager
+            - @security.authorization_checker
+            - @oro_entity.routing_helper
+
+    oro_entity.manager.entity_field_validator:
+        class: %oro_entity.manager.entity_field_validator.class%
+        scope: request
+        arguments:
+            - @doctrine

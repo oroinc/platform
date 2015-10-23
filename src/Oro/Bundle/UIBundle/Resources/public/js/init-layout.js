@@ -20,6 +20,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
+    /**
+     * Remove selection after page change
+     */
+    mediator.on('page:beforeChange', function clearSelection() {
+        if (document.selection) {
+            document.selection.empty();
+        } else if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+    });
+
     /* ============================================================
      * from layout.js
      * ============================================================ */
