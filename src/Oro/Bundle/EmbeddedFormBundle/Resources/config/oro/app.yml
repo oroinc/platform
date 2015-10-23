@@ -1,0 +1,6 @@
+security:
+    firewalls:
+        embedded_form:
+            pattern:   ^/embedded-form/(submit|success)
+            provider:  chain_provider
+            anonymous: true

@@ -151,6 +151,9 @@ define(function(require) {
          * Update front date and time fields values
          */
         updateFront: function() {
+            if (this._preventFrontendUpdate) {
+                return;
+            }
             this._super().updateFront.call(this);
             this.$frontTimeField.val(this.getFrontendFormattedTime());
             this.updateTimeFieldState();
