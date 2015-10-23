@@ -4,23 +4,27 @@ namespace Oro\Bundle\SecurityBundle\Form\Extension;
 
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
+    /** whether remove restricted field's data from submitted */
+    const IS_REMOVE_RESTRICTED = false;
+
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /**
-     * @param SecurityFacade $securityFacade
-     */
-    public function __construct(SecurityFacade $securityFacade)
-    {
-        $this->securityFacade = $securityFacade;
+    /** @var array forbidden form field names */
+    protected $forbiddenFields = [];
+
+    public function __construct(SecurityFacade $securityFacade) {
+        $this->securityFacade  = $securityFacade;
     }
 
     /**
@@ -41,49 +45,111 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             return;
         }
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        // Filter submitted data and ignore data for restricted fields
+        if (static::IS_REMOVE_RESTRICTED) {
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
+        }
+
+        // Check for restricted fields and add error messages if any
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'validateForbiddenFields']);
     }
 
     /**
+     * Method could be safely removed if there's no need to cleanup submitted data
+     *
      * {@inheritdoc}
      */
     public function preSubmit(FormEvent $event)
     {
-        $form = $event->getForm();
         $data = $event->getData();
         if (empty($data)) {
             return;
         }
 
-        $className = $form->getConfig()->getDataClass();
-        $securityFacade = $this->securityFacade;
-
-        $isGranted = function ($fieldName) use ($form, $className, $securityFacade) {
-//            $propertyPath = $childConfig->getPropertyPath();
-//            $isRequired = $childConfig->getRequired();
-            $childName = $fieldName; // TODO: guess field name from property path
-
-            $childConfig = $form->get($childName)->getConfig();
-            $isMapped = $childConfig->getMapped();
-
-            $entity = $form->getData();
-            if (false === $isMapped || !$entity instanceof $className) {
-                $isGranted = true;
-            } else {
-                $isGranted = $securityFacade->isGranted('EDIT', new FieldVote($form->getData(), $fieldName));
+        $forbiddenFields = [];
+        foreach ($event->getForm()->all() as $childForm) {
+            if ($this->isGranted($childForm)) {
+                continue;
             }
 
-            return $isGranted;
-        };
+            $forbiddenFields[] = $childForm->getName();
+        }
 
-        $allowedKeys = array_filter(
-            array_keys($data),
-            function ($childName) use ($isGranted) {
-                return $isGranted($childName);
-            }
-        );
-        $data = array_intersect_key($data, array_flip($allowedKeys));
+        // cache forbidden field names
+        $this->forbiddenFields = array_flip($forbiddenFields);
 
+        // remove restricted data from submitted data
+        $data = array_diff_key($data, $this->forbiddenFields);
         $event->setData($data);
+    }
+
+    /**
+     * Used on post submit to add validation errors
+     *
+     * @param FormEvent $event
+     */
+    public function validateForbiddenFields(FormEvent $event)
+    {
+        foreach ($event->getForm()->all() as $childForm) {
+            if (static::IS_REMOVE_RESTRICTED) {
+                $isGranted = !isset($this->forbiddenFields[$childForm->getName()]);
+            } else {
+                $isGranted = $this->isGranted($childForm);
+            }
+
+            if ($isGranted) {
+                continue;
+            }
+
+            // add violation to form
+            $childForm->addError(
+                new FormError(
+                    null,
+                    'You are not allowed to modify \'%%field%%\' field.',
+                    ['%%field%%' => $childForm->getName()]
+                )
+            );
+        }
+    }
+
+    /**
+     * Check if current session allowed to modify form
+     *
+     * @param FormInterface $form
+     *
+     * @return bool
+     */
+    protected function isGranted(FormInterface $form)
+    {
+        $mainForm  = $form->getParent();
+        $isMapped  = $form->getConfig()->getMapped();
+        $className = $mainForm->getConfig()->getDataClass();
+        $entity    = $mainForm->getData();
+
+        if (false === $isMapped || !$entity instanceof $className) {
+            $isGranted = true;
+        } else {
+            $isGranted = $this->securityFacade->isGranted(
+                'EDIT',
+                new FieldVote($entity, $this->getPropertyByForm($form))
+            );
+        }
+
+        return $isGranted;
+    }
+
+    /**
+     * Return class property form mapped to
+     *
+     * @param FormInterface $form
+     *
+     * @return string
+     */
+    protected function getPropertyByForm(FormInterface $form)
+    {
+        $propertyPath = $form->getConfig()->getPropertyPath();
+        $isMapped  = $form->getConfig()->getMapped();
+
+        return $isMapped && $propertyPath && $propertyPath->getLength() == 1 ? (string)$propertyPath : $form->getName();
     }
 }
