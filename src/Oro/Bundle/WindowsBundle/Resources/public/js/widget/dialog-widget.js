@@ -12,6 +12,8 @@ define(function(require) {
     var layout = require('oroui/js/layout');
     var AbstractWidget = require('oroui/js/widget/abstract-widget');
     var StateModel = require('orowindows/js/dialog/state/model');
+    var DialogManager = require('orowindows/js/widget/dialog-manager');
+    var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
 
     /**
@@ -80,6 +82,8 @@ define(function(require) {
             dialogOptions.beforeClose = _.bind(this.closeHandler, this, dialogOptions.close);
             dialogOptions.close = undefined;
 
+            dialogManager.add(this);
+
             this.initializeWidget(options);
         },
 
@@ -126,6 +130,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            dialogManager.remove(this);
             if (this.model) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
@@ -264,9 +269,6 @@ define(function(require) {
             var dialogOptions;
             if (!this.widget) {
                 dialogOptions = _.extend({}, this.options.dialogOptions);
-                if (typeof dialogOptions.position === 'undefined') {
-                    dialogOptions.position = this._getWindowPlacement();
-                }
                 dialogOptions.stateChange = _.bind(this.handleStateChange, this);
                 if (dialogOptions.state !== 'minimized') {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
@@ -293,6 +295,7 @@ define(function(require) {
         },
 
         _afterLayoutInit: function() {
+            this.resetDialogPosition();
             this.widget.closest('.invisible').removeClass('invisible');
             if (this.deferredRender) {
                 this._resolveDeferredRender();
@@ -339,36 +342,88 @@ define(function(require) {
         },
 
         /**
-         * Get next window position based
-         *
-         * @returns {{my: string, at: string, of: (*|jQuery|HTMLElement), within: (*|jQuery|HTMLElement)}}
-         * @private
+         * Resets dialog position to default
          */
-        _getWindowPlacement: function() {
-            var prototype = DialogWidget.prototype;
+        resetDialogPosition: function() {
+            if (this.options.position) {
+                this.setPosition(_.extend(this.options.position, {
+                    of: '#container',
+                    collision: 'fit'
+                }));
+            }
             if (!this.options.incrementalPosition) {
-                return {
+                this.setPosition({
                     my: 'center center',
-                    at: prototype.defaultPos
-                };
-            }
-            var offset = 'center+' + prototype.windowX + ' center+' + prototype.windowY;
-
-            prototype.openedWindows++;
-            if (prototype.openedWindows % prototype.windowsPerRow === 0) {
-                var rowNum = prototype.openedWindows / prototype.windowsPerRow;
-                prototype.windowX = rowNum * prototype.windowsPerRow * prototype.windowOffsetX;
-                prototype.windowY = 0;
-
+                    at: this.defaultPos,
+                    of: '#container',
+                    collision: 'fit'
+                });
             } else {
-                prototype.windowX += prototype.windowOffsetX;
-                prototype.windowY += prototype.windowOffsetY;
+                dialogManager.updateIncrementalPosition(this);
             }
+        },
 
-            return {
-                my: offset,
-                at: prototype.defaultPos
-            };
+        setPosition: function(position) {
+            if (!this.widget) {
+                throw new Error('this function must be called only after dialog is created');
+            }
+            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+            var dialog = this.widget.closest('.ui-dialog');
+            dialog.css({
+                maxWidth: containerEl.clientWidth,
+                maxHeight: containerEl.clientHeight
+            });
+            dialog.position(position);
+            /*
+             * Left and Width adjustments
+             * **************************
+             */
+            // containerEl.offsetLeft will only work if offsetParent is document.body
+            var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
+            var width = parseFloat(dialog.css('width'));
+            var minWidth = parseFloat(dialog.css('min-width'));
+            if (left < 0) {
+                dialog.css('left', containerEl.offsetLeft);
+                left = 0;
+            }
+            if (left + width > containerEl.clientWidth) {
+                if (containerEl.clientWidth - left < this.options.dialogOptions.minWidth &&
+                    this.options.dialogOptions.minWidth <= containerEl.clientWidth) {
+                    dialog.css('left', containerEl.clientWidth - this.options.dialogOptions.minWidth +
+                        containerEl.offsetLeft);
+                    dialog.css('width', this.options.dialogOptions.minWidth);
+                    return;
+                }
+                dialog.css('width', containerEl.clientWidth - left);
+                if (minWidth > containerEl.clientWidth - left) {
+                    dialog.css('min-width', containerEl.clientWidth - left);
+                }
+            }
+            /*
+             * Top and Height adjustments
+             * **************************
+             */
+            // containerEl.offsetTop will only work if offsetParent is document.body
+            var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
+            var height = parseFloat(dialog.css('height'));
+            var minHeight = parseFloat(dialog.css('min-height'));
+            if (top < 0) {
+                dialog.css('top', containerEl.offsetTop);
+                top = 0;
+            }
+            if (top + height > containerEl.clientHeight) {
+                if (containerEl.clientHeight - top < this.options.dialogOptions.minHeight &&
+                    this.options.dialogOptions.minHeight <= containerEl.clientHeight) {
+                    dialog.css('top', containerEl.clientHeight - this.options.dialogOptions.minHeight +
+                        containerEl.offsetTop);
+                    dialog.css('height', this.options.dialogOptions.minHeight);
+                    return;
+                }
+                dialog.css('height', containerEl.clientHeight - top);
+                if (minHeight > containerEl.clientHeight - top) {
+                    dialog.css('min-height', containerEl.clientHeight - top);
+                }
+            }
         },
 
         /**
