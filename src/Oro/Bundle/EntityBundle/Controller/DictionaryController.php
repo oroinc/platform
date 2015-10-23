@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use Rhumsaa\Uuid\Console\Exception;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

@@ -35,6 +35,15 @@ define(function(require) {
         backendFormat: datetimeFormatter.backendFormats.date,
 
         /**
+         * Flag to prevent frontend field update once origin field is changed
+         *
+         * e.g. user manually enters date and it is temporary invalid:
+         *  - origin field gets empty value (no valid value entered yet)
+         *  - frontend field has not finished value and user keeps changing it
+         */
+        _preventFrontendUpdate: false,
+
+        /**
          * Initializes view
          *  - creates front field
          *  - updates front field
@@ -87,7 +96,9 @@ define(function(require) {
          * @param {string} value
          */
         setValue: function(value) {
-            this.$el.val(value).trigger('change');
+            if (this.$el.val() !== value) {
+                this.$el.val(value).trigger('change');
+            }
         },
 
         /**
@@ -101,6 +112,7 @@ define(function(require) {
             this.$frontDateField.attr(options.dateInputAttrs);
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$el.after(this.$frontDateField);
+            this.$el.attr('data-format', 'backend');
         },
 
         /**
@@ -114,6 +126,8 @@ define(function(require) {
                 onSelect: _.bind(this.onSelect, this)
             });
             this.$frontDateField.datepicker(widgetOptions);
+            // fix incorrect behaviour with early datepicker dispose
+            $('#ui-datepicker-div').css({display: 'none'});
             if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
                 this.$frontDateField.datepicker('disable');
             }
@@ -144,13 +158,20 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            this.$el.val(this.getBackendFormattedValue());
+            if (this.$el.val() !== this.getBackendFormattedValue()) {
+                this._preventFrontendUpdate = true;
+                this.$el.val(this.getBackendFormattedValue()).trigger('change');
+                this._preventFrontendUpdate = false;
+            }
         },
 
         /**
          * Update front date field value
          */
         updateFront: function() {
+            if (this._preventFrontendUpdate) {
+                return;
+            }
             this.$frontDateField.val(this.getFrontendFormattedDate());
         },
 

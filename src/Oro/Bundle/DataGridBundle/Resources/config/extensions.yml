@@ -4,6 +4,7 @@ parameters:
     oro_datagrid.extension.orm_pager.class:        Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension
     oro_datagrid.extension.pager.orm.pager.class:  Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager
     oro_datagrid.extension.orm_sorter.class:       Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension
+    oro_datagrid.extension.inline_editing.class:   Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingExtension
     oro_datagrid.extension.action.class:           Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension
     oro_datagrid.extension.mass_action.class:      Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension
     oro_datagrid.extension.views.class:            Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension
@@ -36,6 +37,15 @@ services:
 
     oro_datagrid.extension.orm_sorter:
         class: %oro_datagrid.extension.orm_sorter.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.inline_editing:
+        class: %oro_datagrid.extension.inline_editing.class%
+        arguments:
+            - @oro_datagrid.datagrid.inline_edit_column_options_guesser
+            - @oro_security.security_facade
+            - @oro_entity.entity_class_name_helper
         tags:
             - { name: oro_datagrid.extension }
 
