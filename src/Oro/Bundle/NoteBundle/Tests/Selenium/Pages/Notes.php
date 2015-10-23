@@ -136,7 +136,7 @@ class Notes extends AbstractPageEntity
             "//*[@class='message-item message'][contains(., '{$note}')]".
             "/parent::*/*[@class='actions']//a[contains(., '{$action}')]";
 
-//        $this->test->moveto($this->test->byXPath($actionMenu));
+        $this->test->moveto($this->test->byXPath($actionMenu));
         $this->test->byXPath($actionMenu)->click();
         $this->test->byXPath($actionMenu)->click();
         $this->test->byXPath($selectedAction)->click();
