@@ -178,6 +178,40 @@ class ConfigManager
      * @param string      $className
      * @param string|null $fieldName
      *
+     * @return int|null
+     */
+    public function getConfigModelId($className, $fieldName = null)
+    {
+        $item = $fieldName
+            ? $this->findField($className, $fieldName)
+            : $this->findEntity($className);
+
+        return null !== $item
+            ? $item['i']
+            : null;
+    }
+
+    /**
+     * @param string      $className
+     * @param string|null $fieldName
+     *
+     * @return bool|null
+     */
+    public function isHiddenModel($className, $fieldName = null)
+    {
+        $item = $fieldName
+            ? $this->findField($className, $fieldName)
+            : $this->findEntity($className);
+
+        return null !== $item
+            ? $item['h']
+            : null;
+    }
+
+    /**
+     * @param string      $className
+     * @param string|null $fieldName
+     *
      * @return bool
      */
     public function hasConfig($className, $fieldName = null)
@@ -724,7 +758,10 @@ class ConfigManager
                 // if needed, update the list of entities in a local cache
                 $entities = $this->cache->getEntities(true);
                 if (null !== $entities && !isset($entities[$className])) {
-                    $entities[$className] = $mode === ConfigModel::MODE_HIDDEN;
+                    $entities[$className] = [
+                        'i' => null,
+                        'h' => $mode === ConfigModel::MODE_HIDDEN
+                    ];
                     $this->cache->saveEntities($entities, true);
                 }
 
@@ -784,7 +821,11 @@ class ConfigManager
             // if needed, update the list of fields in a local cache
             $fields = $this->cache->getFields($className, true);
             if (null !== $fields && !isset($fields[$fieldName])) {
-                $fields[$fieldName] = ['t' => $fieldType, 'h' => $mode === ConfigModel::MODE_HIDDEN];
+                $fields[$fieldName] = [
+                    'i' => null,
+                    'h' => $mode === ConfigModel::MODE_HIDDEN,
+                    't' => $fieldType,
+                ];
                 $this->cache->saveFields($className, $fields, true);
             }
 
@@ -1239,8 +1280,8 @@ class ConfigManager
 
         $entities = $this->cache->getEntities();
         if (null !== $entities) {
-            foreach ($entities as $class => $isHidden) {
-                if ($withHidden || !$isHidden) {
+            foreach ($entities as $class => $data) {
+                if ($withHidden || !$data['h']) {
                     $result[] = $callback($scope, $class);
                 }
             }
@@ -1252,12 +1293,47 @@ class ConfigManager
                 $isHidden = $model->isHidden();
                 $class    = $model->getClassName();
 
-                $entities[$class] = $isHidden;
+                $entities[$class] = [
+                    'i' => $model->getId(),
+                    'h' => $isHidden
+                ];
                 if ($withHidden || !$isHidden) {
                     $result[] = $callback($scope, $class);
                 }
             }
             $this->cache->saveEntities($entities);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return array|null ['i' => entity_model_id, 'h' => is_hidden_model]
+     */
+    protected function findEntity($className)
+    {
+        $result = null;
+
+        $entities = $this->cache->getEntities();
+        if (null === $entities && $this->modelManager->checkDatabase()) {
+            $models   = $this->modelManager->getModels();
+            $entities = [];
+            /** @var EntityConfigModel $model */
+            foreach ($models as $model) {
+                $isHidden = $model->isHidden();
+                $class    = $model->getClassName();
+
+                $entities[$class] = [
+                    'i' => $model->getId(),
+                    'h' => $isHidden
+                ];
+            }
+            $this->cache->saveEntities($entities);
+        }
+        if (null !== $entities && isset($entities[$className])) {
+            $result = $entities[$className];
         }
 
         return $result;
@@ -1291,12 +1367,51 @@ class ConfigManager
                 $field    = $model->getFieldName();
                 $type     = $model->getType();
 
-                $fields[$field] = ['t' => $type, 'h' => $isHidden];
+                $fields[$field] = [
+                    'i' => $model->getId(),
+                    'h' => $isHidden,
+                    't' => $type,
+                ];
                 if ($withHidden || !$isHidden) {
                     $result[] = $callback($scope, $className, $field, $type);
                 }
             }
             $this->cache->saveFields($className, $fields);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return array|null ['i' => field_model_id, 'h' => is_hidden_model, 't' => field_type]
+     */
+    protected function findField($className, $fieldName)
+    {
+        $result = null;
+
+        $fields = $this->cache->getFields($className);
+        if (null === $fields && $this->modelManager->checkDatabase()) {
+            $models = $this->modelManager->getModels($className);
+            $fields = [];
+            /** @var FieldConfigModel $model */
+            foreach ($models as $model) {
+                $isHidden = $model->isHidden();
+                $field    = $model->getFieldName();
+                $type     = $model->getType();
+
+                $fields[$field] = [
+                    'i' => $model->getId(),
+                    'h' => $isHidden,
+                    't' => $type,
+                ];
+            }
+            $this->cache->saveFields($className, $fields);
+        }
+        if (null !== $fields && isset($fields[$fieldName])) {
+            $result = $fields[$fieldName];
         }
 
         return $result;
