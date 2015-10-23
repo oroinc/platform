@@ -14,6 +14,9 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
+
     /**
      * @var EntityDetachFixer
      */
@@ -21,10 +24,23 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fixer = new EntityDetachFixer($this->entityManager);
+
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
+        $this->fixer = new EntityDetachFixer($this->registry);
     }
 
     public function testFixEntityAssociationFieldsLevel()

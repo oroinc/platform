@@ -86,9 +86,11 @@ class EntityReader extends IteratorBasedReader
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry
-            ->getManagerForClass($entityName)
-            ->getRepository($entityName);
-        $queryBuilder = $entityManager->createQueryBuilder('o');
+            ->getManagerForClass($entityName);
+
+        $queryBuilder = $entityManager
+            ->getRepository($entityName)
+            ->createQueryBuilder('o');
 
         $metadata = $entityManager->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {

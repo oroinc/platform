@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class EntityWriterTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $detachFixer;
@@ -20,9 +24,21 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
 
         $this->detachFixer = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer')
             ->disableOriginalConstructor()
@@ -30,7 +46,7 @@ class EntityWriterTest extends \PHPUnit_Framework_TestCase
 
         $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
 
-        $this->writer = new EntityWriter($this->entityManager, $this->detachFixer, $this->contextRegistry);
+        $this->writer = new EntityWriter($this->registry, $this->detachFixer, $this->contextRegistry);
     }
 
     /**
