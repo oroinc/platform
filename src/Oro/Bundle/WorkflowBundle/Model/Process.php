@@ -51,6 +51,9 @@ class Process
         $this->processDefinition = $processDefinition;
     }
 
+    /**
+     * @return ActionInterface
+     */
     protected function getAction()
     {
         if (!$this->action) {

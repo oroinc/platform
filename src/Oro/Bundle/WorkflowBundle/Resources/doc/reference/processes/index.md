@@ -81,7 +81,7 @@ definitions:                                                 # list of definitio
         order: 20                                            # processing order
         exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
         pre_conditions:                                      # List of preconditions to check before scheduling process
-            @equal: [$status, 'open']                        # Perform process only for entities with 'open' status
+            @equal: [$source.name, 'other']                  # Perform process only for entities that have "other" source
         actions_configuration:                               # list of actions to perform
             - @find_entity:                                  # find existing entity
                 conditions:                                  # action conditions
