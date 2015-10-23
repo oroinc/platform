@@ -12,10 +12,10 @@
 <div class="oro-tabs"
      data-page-component-module="oroui/js/app/components/tabs-component"
      data-page-component-options="{{ options|json_encode }}">
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs{{ options.useDropdown ? ' nav-tabs-dropdown' }}">
         {% for tab in tabs %}
             {% set isFirstLoop = loop.index == 1 %}
-            <li{% if isFirstLoop %} class="active"{% endif %}>
+            <li class="tab {% if isFirstLoop %} active{% endif %}">
                 {% set widgetOptions = {
                     'type': 'block',
                     'event': 'shown.bs.tab',
@@ -47,9 +47,9 @@
             </li>
         {% endfor %}
         {% if options.useDropdown %}
-            <li class="dropdown pull-right">
+            <li class="dropdown" style="display: none">
                 <a href="#" id="{{ containerAlias }}-dropdown" class="dropdown-toggle" data-toggle="dropdown">
-                    {{ 'View more...'|trans }} <b class="caret"></b>
+                    <span>{{ 'View more...'|trans }}</span> <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="{{ containerAlias }}-dropdown"></ul>
             </li>
