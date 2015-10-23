@@ -65,7 +65,6 @@
         "monolog/monolog": "1.8.*",
         "ocramius/proxy-manager": "0.4.*",
         "knplabs/knp-gaufrette-bundle": "0.1.*",
-        "rhumsaa/uuid": "2.7.*",
         "oro/doctrine-extensions": "1.0.*",
         "tinymce/tinymce": "4.1.*",
         "ezyang/htmlpurifier": "4.6.0",

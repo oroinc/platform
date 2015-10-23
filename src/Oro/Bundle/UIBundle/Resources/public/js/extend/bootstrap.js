@@ -97,4 +97,32 @@ define([
     $.fn.typeahead.defaults = origFnTypeahead.defaults;
     $.fn.typeahead.Constructor = Typeahead;
     $.fn.typeahead.noConflict = origFnTypeahead.noConflict;
+
+    /**
+     * Customization for Tooltip/Popover
+     *  - propagate hide action to delegated tooltips/popovers
+     *  - propagate destroy action to delegated tooltips/popovers
+     */
+    var Tooltip = $.fn.tooltip.Constructor;
+    var Popover = $.fn.popover.Constructor;
+
+    var delegateAction = function(method, action) {
+        return function() {
+            var type = this.type;
+            // Tooltip/Popover delegates initialization to element -- propagate action them first
+            if (this.options.selector) {
+                this.$element.find(this.options.selector).each(function() {
+                    if ($(this).data(type)) {
+                        $(this).popover(action);
+                    }
+                });
+            }
+            return method.apply(this, arguments);
+        };
+    };
+
+    Popover.prototype.hide = delegateAction(Popover.prototype.hide, 'hide');
+    Popover.prototype.destroy = delegateAction(Popover.prototype.destroy, 'destroy');
+    Tooltip.prototype.hide = delegateAction(Tooltip.prototype.hide, 'hide');
+    Tooltip.prototype.destroy = delegateAction(Tooltip.prototype.destroy, 'destroy');
 });
