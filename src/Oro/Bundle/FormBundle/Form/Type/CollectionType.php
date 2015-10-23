@@ -39,6 +39,7 @@ class CollectionType extends AbstractType
                 'add_label'            => $options['add_label'],
                 'allow_add_after'      => $options['allow_add_after'],
                 'row_count_add'        => $options['row_count_add'],
+                'row_count_initial'    => $options['row_count_initial'],
             ]
         );
     }
@@ -61,6 +62,7 @@ class CollectionType extends AbstractType
                 'show_form_when_empty' => true,
                 'add_label'            => '',
                 'row_count_add'        => 1,
+                'row_count_initial'    => 1,
             ]
         );
         $resolver->setRequired(['type']);
