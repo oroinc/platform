@@ -9,8 +9,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Form\Util\UniqueFieldNameHelper;
 
 /**
  * Validates field name for uniqueness. When generating setter and getter methods, characters `_` and `-` are removed
@@ -18,15 +17,15 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
  */
 class UniqueExtendEntityFieldValidator extends ConstraintValidator
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
+    /** @var UniqueFieldNameHelper */
+    protected $uniqueFieldNameHelper;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param UniqueFieldNameHelper $uniqueFieldNameHelper
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(UniqueFieldNameHelper $uniqueFieldNameHelper)
     {
-        $this->configProvider = $configProvider;
+        $this->uniqueFieldNameHelper = $uniqueFieldNameHelper;
     }
 
     /**
@@ -43,36 +42,18 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
             );
         }
 
-        $newFieldName = strtolower(Inflector::classify(($value->getFieldName())));
+        $className = $value->getEntity()->getClassName();
+        $fieldName = $value->getFieldName();
 
         // Need hardcoded check for `id` field.
-        if ($newFieldName === 'id') {
+        if (strtolower(Inflector::classify(($fieldName))) === 'id') {
             $this->addViolation($constraint);
 
             return;
         }
 
-        $className = $value->getEntity()->getClassName();
-        $configs   = $this->configProvider->getConfigs($className, true);
-        foreach ($configs as $config) {
-            /** @var FieldConfigId $configId */
-            $configId  = $config->getId();
-            $isDeleted = $config->is('is_deleted');
-            $fieldName = $configId->getFieldName();
-            // For deleted field we do not generate setter/getter methods.
-            if ($isDeleted) {
-                if (strtolower($value->getFieldName()) === strtolower($fieldName)) {
-                    $this->addViolation($constraint);
-
-                    return;
-                }
-                continue;
-            }
-            if ($newFieldName === strtolower(Inflector::classify($fieldName))) {
-                $this->addViolation($constraint);
-
-                return;
-            }
+        if (!$this->uniqueFieldNameHelper->isFieldNameUnique($className, $fieldName)) {
+            $this->addViolation($constraint);
         }
     }
 
