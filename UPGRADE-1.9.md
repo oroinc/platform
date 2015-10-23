@@ -39,3 +39,24 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
+- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
+
+####EmbeddedFormBundle
+ - Bundle now contains configuration of security firewall `embedded_form` 
+
+####PlatformBundle
+ - Bundle now has priority `-200` and it is loaded right after main Symfony bundles
+
+####SoapBundle
+ - Bundle now contains configuration of security firewall `wsse_secured` 
+
+####TrackingBundle
+ - Bundle now contains configuration of security firewall `tracking_data` 
+
+####UserBundle
+ - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
+ - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
+
+####WorklfowBundle
+ - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
+ - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have properties `massStartBatchSize` and `massTransitBatchSize` to specify maximum size of batch in `massStartWorkflow` and `massTransit` methods, default values are 100 for both properties

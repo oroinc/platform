@@ -12,6 +12,7 @@ use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class OroPlatformExtension extends Extension implements PrependExtensionInterface
 {
@@ -24,6 +25,14 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             'oro_app_config',
             new YamlCumulativeFileLoader('Resources/config/oro/app.yml')
         );
+
+        // original security config
+        $securityConfig = null;
+        $securityModified = false;
+        if ($container->hasExtension('security')) {
+            $securityConfig = $container->getExtensionConfig('security');
+        }
+
         $resources    = $configLoader->load();
         $extensions   = $container->getExtensions();
         foreach ($resources as $resource) {
@@ -31,11 +40,17 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
                 if (!empty($extensions[$name])) {
                     if ($name === 'security') {
                         $this->mergeConfigIntoOne($container, $name, $config);
+                        $securityModified = true;
                     } else {
                         $container->prependExtensionConfig($name, $config);
                     }
                 }
             }
+        }
+
+        // original security config has highest priority
+        if ($securityConfig && $securityModified) {
+            $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
 
         $this->preparePostgreSql($container);
@@ -96,10 +111,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $originalConfig[] = array();
         }
 
-        $mergedConfig = array_merge_recursive($originalConfig[0], $config);
+        $mergedConfig = ArrayUtils::arrayMergeRecursiveDistinct($originalConfig[0], $config);
         $originalConfig[0] = $mergedConfig;
 
-        $container->setExtensionConfig('security', $originalConfig);
+        $container->setExtensionConfig($name, $originalConfig);
     }
 
     /**

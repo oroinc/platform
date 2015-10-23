@@ -17,11 +17,6 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 class WorkflowManager
 {
     /**
-     * Limit of workflows items to make a flush 
-     */
-    const LIMIT_WORKFLOWS_TO_PROCESS = 50;
-    
-    /**
      * @var ManagerRegistry
      */
     protected $registry;
@@ -40,6 +35,16 @@ class WorkflowManager
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var int
+     */
+    protected $massStartBatchSize = 100;
+
+    /**
+     * @var int
+     */
+    protected $massTransitBatchSize = 100;
 
     /**
      * @param ManagerRegistry $registry
@@ -202,7 +207,7 @@ class WorkflowManager
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $i = 1;
+            $i = 0;
             foreach ($workflowList as $row) {
                 if (empty($row['workflow']) || empty($row['entity'])) {
                     continue;
@@ -215,14 +220,15 @@ class WorkflowManager
 
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
-                
-                if ($i % self::LIMIT_WORKFLOWS_TO_PROCESS == 0) {
+
+                $i++;
+                if ($i % $this->massStartBatchSize == 0) {
                     $em->flush();
                 }
-                ++$i;
             }
-
-            $em->flush();
+            if ($i % $this->massStartBatchSize > 0) {
+                $em->flush();
+            }
             $em->commit();
         } catch (\Exception $e) {
             $em->rollback();
@@ -245,8 +251,60 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdated();
+            $workflowItem->setUpdated(); // transition might not change workflow item
             $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * Transit several workflow items in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflowItem' => <workflow item entity: WorkflowItem>,
+     *          'transition'   => <transition name: string|Transition>
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massTransit(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            $i = 0;
+            foreach ($data as $row) {
+                if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
+                    || empty($row['transition'])
+                ) {
+                    continue;
+                }
+
+                /** @var WorkflowItem $workflowItem */
+                $workflowItem = $row['workflowItem'];
+                $workflow = $this->getWorkflow($workflowItem);
+                $transition = $row['transition'];
+
+                $workflow->transit($workflowItem, $transition);
+                $workflowItem->setUpdated(); // transition might not change workflow item
+
+                $i++;
+                if ($i % $this->massTransitBatchSize == 0) {
+                    $em->flush();
+                }
+            }
+            if ($i % $this->massTransitBatchSize > 0) {
+                $em->flush();
+            }
             $em->commit();
         } catch (\Exception $e) {
             $em->rollback();
@@ -398,6 +456,38 @@ class WorkflowManager
 
         return $activeWorkflow && $currentWorkflowItem &&
                $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
+    }
+
+    /**
+     * @return int
+     */
+    public function getMassStartBatchSize()
+    {
+        return $this->massStartBatchSize;
+    }
+
+    /**
+     * @param int $massStartBatchSize
+     */
+    public function setMassStartBatchSize($massStartBatchSize)
+    {
+        $this->massStartBatchSize = $massStartBatchSize;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMassTransitBatchSize()
+    {
+        return $this->massTransitBatchSize;
+    }
+
+    /**
+     * @param int $massTransitBatchSize
+     */
+    public function setMassTransitBatchSize($massTransitBatchSize)
+    {
+        $this->massTransitBatchSize = $massTransitBatchSize;
     }
 
     /**
