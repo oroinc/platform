@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
@@ -12,10 +12,11 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
+
+    /** @var ConfigManager */
+    protected $configManager;
 
     /**
      * @param ManagerRegistry $registry
@@ -23,6 +24,14 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     public function setRegistry(ManagerRegistry $registry)
     {
         $this->registry = $registry;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -40,11 +49,22 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             return ['id' => $object->getId()];
         }
 
-        return [
+        $result = [
             'id' => $object->getId(),
             'fieldName' => $object->getFieldName(),
             'type' => $object->getType(),
         ];
+
+        foreach ($this->configManager->getProviders() as $provider) {
+            $scope = $provider->getScope();
+            $values = $object->toArray($scope);
+
+            foreach ($values as $code => $value) {
+                $result[sprintf('%s.%s', $scope, $code)] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**
