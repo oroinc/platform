@@ -2,3 +2,13 @@ oro_security:
     resource:     "@OroSecurityBundle/Controller"
     type:         annotation
     prefix:       /security
+
+oro_security_share_api:
+    resource: Oro\Bundle\SecurityBundle\Controller\Api\ShareController
+    type: rest
+    prefix: api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json|html
+    defaults:
+        version: latest
