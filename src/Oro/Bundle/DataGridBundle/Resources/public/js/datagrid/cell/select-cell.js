@@ -32,6 +32,41 @@ define([
                 throw new Error('Column metadata must have choices specified');
             }
             SelectCell.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
+                this.enterEditMode();
+
+                this.$el.find('select').uniform();
+            });
+        },
+
+        /**
+         * @inheritDoc
+         */
+        render: function() {
+            var render = SelectCell.__super__.render.apply(this, arguments);
+
+            this.enterEditMode();
+
+            return render;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        enterEditMode: function() {
+            if (this.column.get('editable')) {
+                SelectCell.__super__.enterEditMode.apply(this, arguments);
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
+        exitEditMode: function() {
+            this.$el.removeClass('error');
+            this.stopListening(this.currentEditor);
+            delete this.currentEditor;
         }
     });
 

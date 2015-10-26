@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
@@ -26,9 +25,6 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Class Indexer
- * @package Oro\Bundle\SearchBundle\Engine
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -256,7 +252,7 @@ class Indexer
     }
 
     /**
-     * @param User   $user
+     * @param User $user
      * @param string $searchString
      * @return array
      */
