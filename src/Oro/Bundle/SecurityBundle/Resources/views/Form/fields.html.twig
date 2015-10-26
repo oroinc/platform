@@ -103,3 +103,81 @@
         </td>
     {% endfor %}
 {% endblock %}
+
+{% block oro_share_scope_widget %}
+    {{ form_widget(form, {'attr': {'class': 'share-scopes'}}) }}
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'], function ($, _, __, Modal) {
+            $(function () {
+                var anyElementChanged = false;
+                $('.share-scopes :checked').each(function (index, el) {
+                    $(el).on('change', function (e) {
+                        if (!anyElementChanged) {
+                            var confirmModal = new Modal({
+                                title: __("oro.security.share_scopes.confirmModal.title"),
+                                okText: __("oro.security.share_scopes.confirmModal.okText"),
+                                cancelText: __("oro.security.share_scopes.confirmModal.cancelText"),
+                                content: __("oro.security.share_scopes.confirmModal.content", {
+                                    scope_name: $(el).parent().find('label').text().trim(),
+                                    entity_name_plural: $('input[name="oro_entity_config_type[entity][plural_label]"]').val().trim(),
+                                    entity_name: $('input[name="oro_entity_config_type[entity][label]"]').val().trim()
+                                }),
+                                className: 'modal oro-modal-danger',
+                                okButtonClass: 'btn-primary btn-large',
+                                handleClose: true
+                            });
+                            confirmModal.on('ok', function(){
+                                anyElementChanged = true;
+                            });
+                            confirmModal.on('cancel', function(){
+                                $(el).prop('checked', true);
+                            });
+                            confirmModal.on('close', function(){
+                                $(el).prop('checked', true);
+                            });
+                            confirmModal.open();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block oro_share_select_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set isButtonsEnabled = not disabled and not read_only %}
+    <div id="{{ id }}-el"
+         {% if isButtonsEnabled %}class="entity-create-or-select-container"{% endif %}>
+        <div {% if isButtonsEnabled %}class="input-append"{% endif %}>
+            {{ form_widget(form) }}
+
+            {% if isButtonsEnabled %}
+                <button class="add-on btn entity-select-btn"
+                        data-url="{{ path('oro_share_with_dialog', {
+                            entityClass: form.vars.entityClass
+                        }) }}"
+                        {{ UI.renderWidgetDataAttributes({
+                            'type': 'dialog',
+                            'multiple': true,
+                            'options': {
+                                'alias': 'share-with-dialog',
+                                'dialogOptions': {
+                                    'title': 'oro.security.action.share_with'|trans,
+                                    'allowMaximize': true,
+                                    'allowMinimize': true,
+                                    'modal': true,
+                                    'dblclick': 'maximize',
+                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                    'width': 1000,
+                                    'height': 600
+                                }
+                            }
+                        }) }}>
+                    <i class="icon-bars"></i>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

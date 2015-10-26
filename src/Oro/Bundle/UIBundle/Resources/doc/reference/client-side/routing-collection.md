@@ -72,7 +72,8 @@ Access to route attributes should be realized in descendants. (e.g. `setPage()` 
 **Access:** protected  
 <a name="module_RoutingCollection#_state"></a>
 ### routingCollection._state : <code>BaseModel</code>
-State of the collection. Must contain both settings and server response parts such as totalItemsQuantity of items
+State of the collection. Must contain both settings and server response parts such as
+totalItemsQuantity of items
 on server. Attributes will be available at the view as `<%= state.totalItemsQuantity %>`.
 
 The `stateChange` event is fired when state is changed.
