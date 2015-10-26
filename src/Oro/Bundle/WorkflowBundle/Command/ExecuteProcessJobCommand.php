@@ -98,14 +98,36 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
             $entityManager->beginTransaction();
 
             try {
+                $processDefinition = $processJob->getProcessTrigger()->getDefinition();
+
+                $start = microtime(true);
+                $output->writeln(
+                    sprintf(
+                        '<info>[%s] Executing process job #%d "%s" (%s)</info>',
+                        (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                        $processJobId,
+                        $processDefinition->getLabel(),
+                        $processDefinition->getName()
+                    )
+                );
+
                 $processHandler->handleJob($processJob);
                 $entityManager->remove($processJob);
                 $entityManager->flush();
+
                 $processHandler->finishJob($processJob);
                 $entityManager->clear();
                 $entityManager->commit();
 
-                $output->writeln(sprintf('<info>Process job %s successfully finished</info>', $processJobId));
+                $output->writeln(
+                    sprintf(
+                        '<info>[%s] Process job #%d %s successfully finished in %f s</info>',
+                        (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                        $processJobId,
+                        $processDefinition->getName(),
+                        microtime(true) - $start
+                    )
+                );
             } catch (\Exception $e) {
                 $processHandler->finishJob($processJob);
                 $entityManager->clear();
@@ -116,7 +138,14 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
                     $firstException = $e;
                 }
 
-                $output->writeln(sprintf('<error>Process job %s failed: %s</error>', $processJobId, $e->getMessage()));
+                $output->writeln(
+                    sprintf(
+                        '<error>[%s] Process job #%s failed: %s</error>',
+                        (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+                        $processJobId,
+                        $e->getMessage()
+                    )
+                );
             }
         }
 
