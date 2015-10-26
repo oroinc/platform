@@ -58,6 +58,10 @@ class EntityFieldFixture implements TemplateFixtureInterface
      */
     public function fillEntityData($key, $entity)
     {
+        if (!$entity instanceof FieldConfigModel) {
+            return;
+        }
+
         /** @var FieldConfigModel $entity */
         $entity
             ->setType($key)
