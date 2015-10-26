@@ -66,8 +66,8 @@ class AclManager extends AbstractAclManager
      * Constructor
      *
      * @param ObjectIdentityFactory $objectIdentityFactory
-     * @param AclExtensionSelector $extensionSelector
-     * @param MutableAclProvider $aclProvider
+     * @param AclExtensionSelector  $extensionSelector
+     * @param MutableAclProvider    $aclProvider
      * @param AceManipulationHelper $aceProvider
      */
     public function __construct(

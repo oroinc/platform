@@ -33,8 +33,10 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function edit()
     {
-        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($menu);
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+            $this->test->moveto($menu);
+        }
         $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -45,8 +47,10 @@ class Tags extends AbstractPageFilteredGrid
     public function checkContextMenu($tagName, $contextName)
     {
         $this->filterBy('Tag', $tagName);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
-        $this->waitForAjax();
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
+            $this->waitForAjax();
+        }
         $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
     }
 }

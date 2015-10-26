@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker\Condition;
 
 use Doctrine\ORM\Query\AST\PathExpression;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 
 class AclConditionTest extends \PHPUnit_Framework_TestCase

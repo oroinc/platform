@@ -1,0 +1,14 @@
+definitions:
+    oro_security_change_share_scope:
+        label:   'Remove ACE out of entity share scope'
+        enabled: true
+        entity:  Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel
+        actions_configuration:
+            - @remove_ace_share_scope: ~
+
+triggers:
+    oro_security_change_share_scope:
+        -
+            event:    update
+            queued:   false
+            field:    data
