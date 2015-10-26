@@ -67,4 +67,3 @@ UPGRADE FROM 1.8 to 1.9
  - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
  - Added new process definition option `pre_conditions`
  - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
- - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have properties `massStartBatchSize` and `massTransitBatchSize` to specify maximum size of batch in `massStartWorkflow` and `massTransit` methods, default values are 100 for both properties
