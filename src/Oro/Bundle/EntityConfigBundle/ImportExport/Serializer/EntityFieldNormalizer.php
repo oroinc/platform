@@ -177,28 +177,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         return $field;
     }
 
-    protected function updateFieldConfigs(ConfigManager $configManager, FieldConfigModel $fieldModel, $options)
-    {
-        $className = $fieldModel->getEntity()->getClassName();
-        $fieldName = $fieldModel->getFieldName();
-        foreach ($options as $scope => $scopeValues) {
-            $configProvider = $configManager->getProvider($scope);
-            $config         = $configProvider->getConfig($className, $fieldName);
-            $hasChanges     = false;
-            foreach ($scopeValues as $code => $val) {
-                if (!$config->is($code, $val)) {
-                    $config->set($code, $val);
-                    $hasChanges = true;
-                }
-            }
-            if ($hasChanges) {
-                $configManager->persist($config);
-                $indexedValues = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
-                $fieldModel->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
-            }
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
