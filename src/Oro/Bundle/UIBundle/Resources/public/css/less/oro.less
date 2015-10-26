@@ -2898,7 +2898,8 @@ span.validation-failed {
 .oro-tabs {
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
-  .nav-tabs > li > a:focus {
+  .nav-tabs > li > a:focus,
+  .nav-tabs-dropdown > li.dropdown.open > a {
     color: @gray;
     background-color: #fafafa;
     border-bottom: 1px solid #ddd;
@@ -2909,10 +2910,32 @@ span.validation-failed {
     margin-right: 0px;
   }
 
+  .nav-tabs-dropdown {
+    height: 38px;
+    overflow: hidden;
+    .dropdown-toggle:focus {
+      font-weight: normal;
+    }
+
+    li.dropdown.open .caret {
+      border-top-color: @linkColor !important;
+      border-bottom-color: @linkColor !important;
+    }
+
+    li.dropdown.open.active .caret {
+      border-top-color: @gray !important;
+      border-bottom-color: @gray !important;
+    }
+  }
+
   .nav-tabs > .active > a,
   .nav-tabs > .active > a:hover,
-  .nav-tabs > .active > a:focus {
+  .nav-tabs > .active > a:focus,
+  .nav-tabs > li.dropdown.open.active > a {
+    color: @gray;
     border-bottom: 1px solid #fff;
+    border-right-color: #ddd;
+    border-top-color: #ddd;
     background-color: transparent;
   }
 
