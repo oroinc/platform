@@ -166,8 +166,8 @@ class ImportStrategyHelper
     /**
      * Check if given class field is deleted
      *
-     * @param $className
-     * @param $fieldName
+     * @param string $className FQCN
+     * @param string $fieldName
      *
      * @return bool
      */
