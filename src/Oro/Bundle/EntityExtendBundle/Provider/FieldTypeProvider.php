@@ -69,4 +69,49 @@ class FieldTypeProvider
 
         return $properties;
     }
+
+    /**
+     * @param array $config
+     * @param mixed $value
+     * @return mixed
+     */
+    public function denormalizeFieldValue($config, $value)
+    {
+        if (!isset($config['type'])) {
+            return $value;
+        }
+
+        if ($value === null && isset($config['default'])) {
+            $value = $config['default'];
+        }
+
+        switch ($config['type']) {
+            case 'boolean':
+                $lvalue = strtolower($value);
+                if (in_array($lvalue, ['yes', 'no', 'true', 'false'])) {
+                    $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
+                }
+
+                return (bool)$value;
+
+            case 'integer':
+                return (int)$value;
+
+            case 'array':
+                if (!isset($config['items'])) {
+                    return $value;
+                }
+
+                $items = $config['items'];
+                foreach ($value as $key => $subvalue) {
+                    foreach ($items as $subfield => $subconfig) {
+                        $value[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $value[$key][$subfield]);
+                    }
+                }
+                return $value;
+            case 'string':
+            default:
+                return (string)$value;
+        }
+    }
 }

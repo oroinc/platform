@@ -439,6 +439,16 @@ oro_entity_config:
                 # as part of schema update procedure a value of this attribute is moved to a table
                 # is used to store enum values
                 enum_options: # array
+                    import_options:
+                        type: array
+                        items:
+                            label:
+                                type: string
+                            is_default:
+                                type: boolean
+                                default: false
+                            priority:
+                                type: integer
                     options:
                         allowed_type:       [enum, multiEnum]
                         auditable:          false

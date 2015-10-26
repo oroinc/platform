@@ -25,6 +25,8 @@ oro_entity_config:
         field:
             items:
                 auditable:
+                    import_options:
+                        type: boolean
                     options:
                         priority:           60
                         default_value:      false

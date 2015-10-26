@@ -19,6 +19,8 @@ oro_entity_config:
                             tooltip:        oro.importexport.entity_config.header.tooltip
                 # field order in result file
                 order:
+                    import_options:
+                        type: integer
                     options: []
                     form:
                         type:               integer
@@ -30,6 +32,8 @@ oro_entity_config:
                             block:          import_export
                 # is filed will be used to find existing entity
                 identity:
+                    import_options:
+                        type: boolean
                     options:
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
                     form:
@@ -44,6 +48,8 @@ oro_entity_config:
                             block:          import_export
                 # is field must be excluded from import/export
                 excluded:
+                    import_options:
+                        type: boolean
                     options: []
                     form:
                         type:               choice

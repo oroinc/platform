@@ -123,6 +123,9 @@ oro_entity_config:
         field:
             items:
                 is_visible:
+                    import_options:
+                        type: boolean
+                        default: true
                     options:
                         require_schema_update: true
                         default_value:      true
@@ -141,6 +144,8 @@ oro_entity_config:
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
 
                 show_filter:
+                    import_options:
+                        type: boolean
                     options:
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
@@ -177,6 +182,9 @@ oro_entity_config:
                         auditable: false
                 # is form enabled for specific field
                 is_enabled:
+                    import_options:
+                        type: boolean
+                        default: true
                     options:
                         default_value:      true
                         required_property:
@@ -197,6 +205,9 @@ oro_entity_config:
         field:
             items:
                 is_displayable:
+                    import_options:
+                        type: boolean
+                        default: true
                     options:
                         default_value:      true
                         required_property:
@@ -213,6 +224,8 @@ oro_entity_config:
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.is_displayable
                 priority:
+                    import_options:
+                        type: integer
                     options:
                         required_property:
                             config_id:
