@@ -3,18 +3,16 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldTypeProvider;
+use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
-use Oro\Bundle\ImportExportBundle\Converter\RelationCalculatorInterface;
-use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
 
-class EntityFieldDataConverter extends ConfigurableTableDataConverter implements ContextAwareInterface
+class EntityFieldDataConverter extends AbstractTableDataConverter implements ContextAwareInterface
 {
-    /** @var ExtendFieldTypeProvider */
-    protected $extendFieldTypeProvider;
+    /** @var FieldTypeProvider */
+    protected $fieldTypeProvider;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -22,21 +20,16 @@ class EntityFieldDataConverter extends ConfigurableTableDataConverter implements
     /** @var ContextInterface */
     protected $context;
 
+    /** @var array */
+    protected $excludedFields = ['enum.enum_options', 'attachment.attachment'];
+
     /**
-     * @param FieldHelper $fieldHelper
-     * @param RelationCalculatorInterface $relationCalculator
-     * @param ExtendFieldTypeProvider $extendFieldTypeProvider
+     * @param FieldTypeProvider $fieldTypeProvider
      * @param ConfigManager $configManager
      */
-    public function __construct(
-        FieldHelper $fieldHelper,
-        RelationCalculatorInterface $relationCalculator,
-        ExtendFieldTypeProvider $extendFieldTypeProvider,
-        ConfigManager $configManager
-    ) {
-        parent::__construct($fieldHelper, $relationCalculator);
-
-        $this->extendFieldTypeProvider = $extendFieldTypeProvider;
+    public function __construct(FieldTypeProvider $fieldTypeProvider, ConfigManager $configManager)
+    {
+        $this->fieldTypeProvider = $fieldTypeProvider;
         $this->configManager = $configManager;
     }
 
@@ -61,61 +54,58 @@ class EntityFieldDataConverter extends ConfigurableTableDataConverter implements
     }
 
     /**
-     * @return array
-     */
-    protected function receiveBackendHeader()
-    {
-        return $this->backendHeader = $this->getBackendHeader();
-    }
-
-    /**
      * {@inheritdoc}
      */
     protected function getBackendHeader()
     {
         $header = ['fieldName', 'is_serialized', 'type'];
 
-        foreach ($this->extendFieldTypeProvider->getSupportedFieldTypes() as $fieldType) {
-            $properties = $this->getProperties($fieldType);
+        foreach ($this->fieldTypeProvider->getSupportedFieldTypes() as $fieldType) {
+            $properties = $this->fieldTypeProvider->getFieldProperties($fieldType);
 
             foreach ($properties as $scope => $fields) {
                 foreach ($fields as $code => $config) {
                     $field = sprintf('%s.%s', $scope, $code);
 
-                    if (!in_array($field, $header, true)) {
-                        $header[] = $field;
+                    if (in_array($code, $this->excludedFields, true) || in_array($field, $header, true)) {
+                        continue;
                     }
+                    $header[] = $field;
                 }
             }
         }
+
+        $header = array_merge(
+            $header,
+            [
+                'enum.enum_options.0.label',
+                'enum.enum_options.0.is_default',
+                'enum.enum_options.1.label',
+                'enum.enum_options.1.is_default',
+                'enum.enum_options.2.label',
+                'enum.enum_options.2.is_default'
+            ]
+        );
 
         return $header;
     }
 
     /**
-     * @param string $fieldType
-     * @return array
+     * {@inheritdoc}
      */
-    protected function getProperties($fieldType)
+    protected function fillEmptyColumns(array $header, array $data)
     {
-        $configType = PropertyConfigContainer::TYPE_FIELD;
-        $properties = [];
+        $dataDiff = array_diff(array_keys($data), $header);
+        $data = array_diff_key($data, array_flip($dataDiff));
 
-        foreach ($this->configManager->getProviders() as $provider) {
-            $propertyConfig = $provider->getPropertyConfig();
+        return parent::fillEmptyColumns($header, $data);
+    }
 
-            if ($propertyConfig->hasForm($configType, $fieldType)) {
-                $items = $propertyConfig->getFormItems($configType, $fieldType);
-                $scope = $provider->getScope();
-
-                foreach ($items as $code => $config) {
-                    if (!isset($properties[$scope][$code])) {
-                        $properties[$scope][$code] = $config;
-                    }
-                }
-            }
-        }
-
-        return $properties;
+    /**
+     * {@inheritdoc}
+     */
+    protected function getHeaderConversionRules()
+    {
+        return [];
     }
 }
