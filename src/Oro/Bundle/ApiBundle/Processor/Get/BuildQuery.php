@@ -48,10 +48,10 @@ class BuildQuery implements ProcessorInterface
         if ($criteria) {
             $query->addCriteria($criteria);
         }
-        $query->setMaxResults(2);
 
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNames($entityClass);
         if (count($idFields) === 1) {
+            // single identifier
             if (is_array($entityId)) {
                 throw new \RuntimeException(
                     sprintf(
@@ -64,6 +64,7 @@ class BuildQuery implements ProcessorInterface
                 ->andWhere(sprintf('e.%s = :id', reset($idFields)))
                 ->setParameter('id', $entityId);
         } else {
+            // combined identifier
             if (!is_array($entityId)) {
                 throw new \RuntimeException(
                     sprintf(

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
@@ -42,55 +44,93 @@ class NormalizeEntityId implements ProcessorInterface
         $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $idFields = $metadata->getIdentifierFieldNames();
         if (count($idFields) === 1) {
+            // single identifier
             if ($metadata->getTypeOfField(reset($idFields)) === 'integer') {
-                $context->setId((int)$entityId);
+                $normalizedId = (int)$entityId;
+                if (((string)$normalizedId) !== $entityId) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Expected integer identifier value for the entity "%s". Given "%s".',
+                            $entityClass,
+                            $entityId
+                        )
+                    );
+                }
+                $context->setId($normalizedId);
             }
         } else {
-            $fieldMap   = array_flip($idFields);
-            $normalized = [];
-            foreach (explode(',', $entityId) as $item) {
-                $val = explode('=', $item);
-                if (count($val) !== 2) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
-                            $entityId,
-                            $entityClass
-                        )
-                    );
-                }
+            // combined identifier
+            $context->setId($this->normalizeCombinedEntityId($entityId, $idFields, $metadata));
+        }
+    }
 
-                $key = $val[0];
-                $val = $val[1];
-
-                if (!isset($fieldMap[$key])) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'The entity identifier contains the key "%s" '
-                            . 'which is not defined in composite primary key of the entity "%s".',
-                            $key,
-                            $entityClass
-                        )
-                    );
-                }
-
-                if ($metadata->getTypeOfField($key) === 'integer') {
-                    $val = (int)$val;
-                }
-                $normalized[$key] = $val;
-
-                unset($fieldMap[$key]);
-            }
-            if (!empty($fieldMap)) {
+    /**
+     * @param string        $entityId
+     * @param string[]      $idFields
+     * @param ClassMetadata $metadata
+     *
+     * @return array
+     *
+     * @throws \RuntimeException if the given entity id cannot be normalized
+     */
+    protected function normalizeCombinedEntityId($entityId, $idFields, ClassMetadata $metadata)
+    {
+        $fieldMap   = array_flip($idFields);
+        $normalized = [];
+        foreach (explode(',', $entityId) as $item) {
+            $val = explode('=', $item);
+            if (count($val) !== 2) {
                 throw new \RuntimeException(
                     sprintf(
-                        'The entity identifier does not contain all keys '
-                        . 'defined in composite primary key of the entity "%s".',
-                        $entityClass
+                        'Unexpected identifier value "%s" for composite primary key of the entity "%s".',
+                        $entityId,
+                        $metadata->getName()
                     )
                 );
             }
-            $context->setId($normalized);
+
+            $key = $val[0];
+            $val = $val[1];
+
+            if (!isset($fieldMap[$key])) {
+                throw new \RuntimeException(
+                    sprintf(
+                        'The entity identifier contains the key "%s" '
+                        . 'which is not defined in composite primary key of the entity "%s".',
+                        $key,
+                        $metadata->getName()
+                    )
+                );
+            }
+
+            if ($metadata->getTypeOfField($key) === 'integer') {
+                $normalizedVal = (int)$val;
+                if (((string)$normalizedVal) !== $val) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Expected integer identifier value for the key "%s" of the entity "%s". Given "%s".',
+                            $key,
+                            $metadata->getName(),
+                            $entityId
+                        )
+                    );
+                }
+                $val = (int)$normalizedVal;
+            }
+            $normalized[$key] = $val;
+
+            unset($fieldMap[$key]);
         }
+        if (!empty($fieldMap)) {
+            throw new \RuntimeException(
+                sprintf(
+                    'The entity identifier does not contain all keys '
+                    . 'defined in composite primary key of the entity "%s".',
+                    $metadata->getName()
+                )
+            );
+        }
+
+        return $normalized;
     }
 }
