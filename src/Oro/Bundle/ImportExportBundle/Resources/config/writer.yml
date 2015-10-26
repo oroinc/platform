@@ -29,12 +29,12 @@ services:
     oro_importexport.writer.dummy:
         class: %oro_importexport.writer.dummy.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
 
     oro_importexport.writer.doctrine_clear:
         class: %oro_importexport.writer.doctrine_clear.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
 
     oro_importexport.writer.echo.csv:
         class: %oro_importexport.writer.echo.csv.class%
