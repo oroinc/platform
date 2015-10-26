@@ -53,6 +53,9 @@ UPGRADE FROM 1.8 to 1.9
 ####TrackingBundle
  - Bundle now contains configuration of security firewall `tracking_data` 
 
+####UiBundle
+ - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
+
 ####UserBundle
  - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
  - Bundle DI extension `OroUserExtension` has been updated to make sure that `main` security firewall is always the last in list
