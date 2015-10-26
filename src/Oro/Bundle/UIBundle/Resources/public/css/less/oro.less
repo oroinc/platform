@@ -1352,7 +1352,11 @@ footer {
     height: 24px;
     line-height: 24px;
   }
-  > .row > div{
+  > .row > .pull-left{
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  > .row > .pull-right{
     margin-top: 10px;
     margin-bottom: 5px;
   }
@@ -1846,16 +1850,14 @@ footer {
   &.customer-simple {
     padding:0 4px 0 0;
   }
-  .top-row {
-    overflow: hidden;
-  }
   .sub-title {
     font-size: 17px;
     color: #999;
-    display: inline-block;
+    float: left;
     margin-bottom: 3px;
   }
   .separator {
+    float: left;
     padding: 0 3px;
     color: #999;
     font-size: 18px;
@@ -1865,8 +1867,7 @@ footer {
     font-size: 19px;
     min-height: 15px;
     line-height: 22px;
-    display: inline-block;
-    float: none !important;
+    float: left;
     font: bold 17px/18px Helvetica, Arial, sans-serif;
 
   }
@@ -1897,7 +1898,6 @@ footer {
     color: #777;
     li {
       padding: 0 10px;
-      margin-bottom: 4px;
       border-left: 1px solid #e6e6e6;
       font-size: 11px;
       line-height: 14px;
