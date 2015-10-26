@@ -42,7 +42,7 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function toGrid()
     {
-        $this->test->byXPath("//div[@class='customer-content']/div[1]//a")->click();
+        $this->test->byXPath("//div[@class='customer-content pull-left']/div[1]//a")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
