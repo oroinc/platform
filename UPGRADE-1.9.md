@@ -41,7 +41,10 @@ UPGRADE FROM 1.8 to 1.9
 - Added parameters `Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider` to constructor of `Oro\Bundle\EntityExtendBundle\Form\Type\FieldType`
 
 ####ImportExportBundle
-- Bundle now using @doctrine (Doctrine\Common\Persistence\ManagerRegistry) instead of @doctrine.orm.entity_manager (Doctrine\ORM\EntityManager). It allows work with entities of different Managers
+- `Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer`: the first argument of constructor (EntityManager $entityManager) replaced by (ManagerRegistry $registry)
+- `Oro\Bundle\ImportExportBundle\Writer\EntityWriter`: the first argument of constructor (EntityManager $entityManager) replaced by (ManagerRegistry $registry)
+- `Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter`: the first argument of constructor (EntityManager $entityManager) replaced by (ManagerRegistry $registry)
+- `Oro\Bundle\ImportExportBundle\Writer\DummyWriter`: the first argument of constructor (EntityManager $entityManager) replaced by (ManagerRegistry $registry)
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
