@@ -14,6 +14,7 @@ parameters:
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
+    oro_form.type.oro_entity_autocomplete.class:                 Oro\Bundle\FormBundle\Form\Type\OroEntityAutocompleteType
     oro_form.type.simple_color_picker.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType
     oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
     oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
@@ -238,6 +239,11 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
+
+    oro_form.type.oro_entity_autocomplete:
+        class: %oro_form.type.oro_entity_autocomplete.class%
+        tags:
+            - { name: form.type, alias: oro_entity_autocomplete }
 
     oro_form.type.link:
         class: %oro_form.type.link.class%

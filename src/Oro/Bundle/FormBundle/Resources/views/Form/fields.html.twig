@@ -407,6 +407,19 @@
     {% endspaceless %}
 {% endblock %}
 
+{% block oro_entity_autocomplete_widget %}
+    {% if autocomplete.result_template_twig is defined and autocomplete.result_template_twig %}
+        {% set componentOptions = componentOptions|merge({
+            result_template: include(autocomplete.result_template_twig)
+        }) %}
+    {% endif %}
+    {% set attr = attr|merge({
+        'data-page-component-module': componentModule,
+        'data-page-component-options': componentOptions|json_encode
+    }) %}
+    {{ form_widget(form, {attr: attr}) }}
+{% endblock oro_entity_autocomplete_widget %}
+
 {% block oro_entity_create_or_select_widget %}
     {% set currentMode = form.mode.vars.value|default('create') %}
     {% set btnGroupId = form.vars.id ~ '-btn-group' %}
