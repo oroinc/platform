@@ -59,4 +59,3 @@ UPGRADE FROM 1.8 to 1.9
 
 ####WorklfowBundle
  - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
- - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now have properties `massStartBatchSize` and `massTransitBatchSize` to specify maximum size of batch in `massStartWorkflow` and `massTransit` methods, default values are 100 for both properties

@@ -16,6 +16,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -489,7 +491,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $entityManager->expects($this->never())->method('persist');
         }
 
-        $entityManager->expects($expected ? $this->once() : $this->never())->method('flush');
+        $entityManager->expects($this->once())->method('flush');
         $entityManager->expects($this->once())->method('commit');
 
         $this->workflowManager->massStartWorkflow($source);
@@ -537,19 +539,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                 ),
             )
         );
-    }
-
-    public function testMassStartWorkflowBatch()
-    {
-        $defaultBatchSize = $this->workflowManager->getMassStartBatchSize();
-        $this->assertNotEmpty($defaultBatchSize);
-        $this->assertGreaterThan(0, $defaultBatchSize);
-
-        $customBatchSize = 42;
-        $this->workflowManager->setMassStartBatchSize($customBatchSize);
-        $this->assertEquals($customBatchSize, $this->workflowManager->getMassStartBatchSize());
-
-        $this->markTestIncomplete('Should be finished in scope of BAP-9236');
     }
 
     /**
@@ -682,7 +671,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             $this->workflowRegistry->expects($this->never())->method('getWorkflow');
         }
 
-        $entityManager->expects($expected ? $this->once() : $this->never())->method('flush');
+        $entityManager->expects($this->once())->method('flush');
         $entityManager->expects($this->once())->method('commit');
 
         $this->workflowManager->massTransit($source);
@@ -722,77 +711,6 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
                     ['workflow' => 'flow2', 'transition' => 'transition2'],
                 ],
             ]
-        ];
-    }
-
-    /**
-     * @param int $numberOfRows
-     * @param int $numberOfFlushes
-     * @param int|null $batchSize
-     * @dataProvider massTransitBatchDataProvider
-     */
-    public function testMassTransitBatch($numberOfRows, $numberOfFlushes, $batchSize = null)
-    {
-        if ($batchSize) {
-            $this->workflowManager->setMassTransitBatchSize($batchSize);
-            $this->assertEquals($batchSize, $this->workflowManager->getMassTransitBatchSize());
-        } else {
-            $batchSize = $this->workflowManager->getMassTransitBatchSize();
-            $this->assertNotEmpty($batchSize);
-            $this->assertGreaterThan(0, $batchSize);
-        }
-
-        $entityManager = $this->createEntityManager();
-        $this->registry->expects($this->once())->method('getManager')
-            ->willReturn($entityManager);
-
-        $entityManager->expects($this->once())->method('beginTransaction');
-
-        $workflow = $this->createWorkflow();
-        $this->workflowRegistry->expects($this->any())->method('getWorkflow')
-            ->willReturn($workflow);
-
-        $entityManager->expects($this->exactly($numberOfFlushes))->method('flush');
-        $entityManager->expects($this->once())->method('commit');
-
-        $data = [];
-        for ($i = 0; $i < $numberOfRows; $i++) {
-            $data[] = ['workflowItem' => $this->createWorkflowItem(), 'transition' => 'test'];
-        }
-
-        $this->workflowManager->massTransit($data);
-    }
-
-    /**
-     * @return array
-     */
-    public function massTransitBatchDataProvider()
-    {
-        return [
-            'no data' => [
-                'numberOfRows' => 0,
-                'numberOfFlushes' => 0,
-            ],
-            'exactly one batch' => [
-                'numberOfRows' => 10,
-                'numberOfFlushes' => 1,
-                'batchSize' => 10,
-            ],
-            'one batch and one row' => [
-                'numberOfRows' => 11,
-                'numberOfFlushes' => 2,
-                'batchSize' => 10,
-            ],
-            'exactly two batches' => [
-                'numberOfRows' => 20,
-                'numberOfFlushes' => 2,
-                'batchSize' => 10,
-            ],
-            'two batches and one more' => [
-                'numberOfRows' => 21,
-                'numberOfFlushes' => 3,
-                'batchSize' => 10,
-            ],
         ];
     }
 
