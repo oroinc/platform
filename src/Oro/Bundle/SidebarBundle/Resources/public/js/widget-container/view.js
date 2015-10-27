@@ -99,9 +99,13 @@ define(function(require) {
             var content = this.$el.find('.sidebar-widget-content').get(0);
             var windowHeight = $('html').height();
             if (content) {
-                rect = content.getBoundingClientRect();
-                contentMargin = $(content).outerHeight(true) - rect.height;
-                $(content).css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                    rect = content.getBoundingClientRect();
+                    contentMargin = $(content).outerHeight(true) - rect.height;
+                    $(content).css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                } else {
+                    $(content).css('max-height', 'none');
+                }
             }
         },
 

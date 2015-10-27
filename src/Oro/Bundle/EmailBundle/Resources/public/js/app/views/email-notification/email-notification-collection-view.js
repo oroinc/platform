@@ -36,7 +36,8 @@ define(function(require) {
             'change:seen collection': 'onSeenStatusChange',
             'reset collection': 'onResetCollection',
             'request collection': 'onCollectionRequest',
-            'sync collection': 'onCollectionSync'
+            'sync collection': 'onCollectionSync',
+            'layout:reposition mediator': 'adjustMaxHeight'
         },
 
         events: {
@@ -57,6 +58,7 @@ define(function(require) {
         render: function() {
             EmailNotificationCollectionView.__super__.render.call(this);
             this.updateViewMode();
+            _.defer(_.bind(this.adjustMaxHeight, this));
         },
 
         getTemplateData: function() {
@@ -88,6 +90,22 @@ define(function(require) {
                     } else {
                         $iconEnvelope.removeClass('highlight');
                     }
+                }
+            }
+        },
+
+        adjustMaxHeight: function() {
+            var rect;
+            var contentRect;
+            var maxHeight;
+            var $items;
+            if (this.el) {
+                maxHeight = parseInt(this.$el.css('max-height'));
+                $items = this.$el.find('.items');
+                if ($items.length === 1 && !isNaN(maxHeight)) {
+                    rect = this.$el[0].getBoundingClientRect();
+                    contentRect = this.$el.find('.content')[0].getBoundingClientRect();
+                    $items.css('max-height', rect.top + maxHeight + $items.height() - contentRect.bottom + 'px');
                 }
             }
         },
