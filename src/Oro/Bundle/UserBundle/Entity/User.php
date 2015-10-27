@@ -38,7 +38,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
  *      defaultValues={
- *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
+ *          "entity"={
+ *              "icon"="icon-user",
+ *              "context-grid"="users-for-context-grid"
+ *          },
  *          "grouping"={
  *              "groups"={"dictionary"}
  *          },
@@ -58,7 +61,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "dataaudit"={"auditable"=true},
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "share_grid"="share-with-users-datagrid"
  *          },
  *          "form"={
  *              "form_type"="oro_user_select",

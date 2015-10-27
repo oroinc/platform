@@ -2,10 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query\AST\PathExpression;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
+use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -16,8 +23,12 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Entity\AclClass;
+use Oro\Bundle\SecurityBundle\Form\Model\Share;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 /**
@@ -25,6 +36,18 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
  */
 class OwnershipConditionDataBuilder
 {
+    const ACL_ENTRIES_SCHEMA_NAME = 'Oro\Bundle\SecurityBundle\Entity\AclEntry';
+    const ACL_ENTRIES_ALIAS = 'entries';
+    const ACL_ENTRIES_SHARE_RECORD = 'recordId';
+    const ACL_ENTRIES_CLASS_ID = 'class';
+    const ACL_ENTRIES_SECURITY_ID = 'securityIdentity';
+
+    protected $shareAccessLevels = [
+        AccessLevel::BASIC_LEVEL,
+        AccessLevel::LOCAL_LEVEL,
+        AccessLevel::DEEP_LEVEL,
+    ];
+
     /** @var ServiceLink */
     protected $securityContextLink;
 
@@ -47,11 +70,33 @@ class OwnershipConditionDataBuilder
     protected $aclGroupProvider;
 
     /**
+     * @var ConfigProvider
+     */
+    protected $configProvider;
+
+    /** @var null|mixed */
+    protected $user = null;
+
+    /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /** @var SecurityIdentityRetrievalStrategyInterface */
+    protected $sidStrategy;
+
+    /** @var array|null */
+    protected $sids = null;
+
+    /**
      * @param ServiceLink                    $securityContextLink
      * @param ObjectIdAccessor               $objectIdAccessor
      * @param EntitySecurityMetadataProvider $entityMetadataProvider
      * @param MetadataProviderInterface      $metadataProvider
      * @param OwnerTreeProviderInterface     $treeProvider
+     * @param ManagerRegistry                $registry
+     * @param ConfigProvider                 $configProvider
+     * @param SecurityIdentityRetrievalStrategyInterface $sidStrategy
      * @param AclVoter                       $aclVoter
      */
     public function __construct(
@@ -60,6 +105,9 @@ class OwnershipConditionDataBuilder
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
+        ManagerRegistry $registry,
+        ConfigProvider $configProvider,
+        SecurityIdentityRetrievalStrategyInterface $sidStrategy,
         AclVoter $aclVoter = null
     ) {
         $this->securityContextLink    = $securityContextLink;
@@ -68,6 +116,9 @@ class OwnershipConditionDataBuilder
         $this->entityMetadataProvider = $entityMetadataProvider;
         $this->metadataProvider       = $metadataProvider;
         $this->treeProvider           = $treeProvider;
+        $this->registry               = $registry;
+        $this->configProvider         = $configProvider;
+        $this->sidStrategy            = $sidStrategy;
     }
 
     /**
@@ -221,20 +272,17 @@ class OwnershipConditionDataBuilder
     /**
      * Gets the id of logged in user
      *
-     * @return int|string
+     * @return int|string|null
      */
     public function getUserId()
     {
-        $token = $this->getSecurityContext()->getToken();
-        if (!$token) {
-            return null;
-        }
-        $user = $token->getUser();
-        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
-            return null;
+        $user = $this->getUser();
+
+        if ($user) {
+            return $this->objectIdAccessor->getId($user);
         }
 
-        return $this->objectIdAccessor->getId($user);
+        return null;
     }
 
     /**
@@ -426,5 +474,249 @@ class OwnershipConditionDataBuilder
     protected function getTree()
     {
         return $this->treeProvider->getTree();
+    }
+
+    /**
+     * Get ACL sql conditions and join statements to check shared records
+     *
+     * @param string $entityName
+     * @param string $entityAlias
+     * @param mixed $permissions
+     *
+     * @return array
+     */
+    public function getAclShareData($entityName, $entityAlias, $permissions = BasicPermissionMap::PERMISSION_VIEW)
+    {
+        if ($permissions !== BasicPermissionMap::PERMISSION_VIEW) {
+            return null;
+        }
+
+        $aclClass = $this->getObjectManager()->getRepository('OroSecurityBundle:AclClass')
+            ->findOneBy(['classType' => $entityName]);
+
+        if (!$aclClass) {
+            return null;
+        }
+
+        $shareConfig = null;
+
+        if ($this->configProvider->hasConfig($entityName)) {
+            $shareConfig = $this->configProvider->getConfig($entityName)->get('share_scopes');
+        }
+
+        if (!$shareConfig) {
+            return null;
+        }
+
+        $aclSIds = $this->getSecurityIdentityIds((array) $shareConfig);
+
+        if (empty($aclSIds)) {
+            return null;
+        }
+
+        $observer = new OneShotIsGrantedObserver();
+        $this->aclVoter->addOneShotIsGrantedObserver($observer);
+        $isGranted = $this->getSecurityContext()->isGranted($permissions, 'entity:' . $entityName);
+
+        if (!$isGranted || !in_array($observer->getAccessLevel(), $this->shareAccessLevels)) {
+            return null;
+        }
+
+        $shareCondition = [
+            'existsSubselect' => [
+                'select' => 1,
+                'from'   => ['schemaName' => self::ACL_ENTRIES_SCHEMA_NAME, 'alias' => self::ACL_ENTRIES_ALIAS],
+                'where'  => $this->getShareSubselectWhereConditions($entityAlias, $aclSIds, $aclClass)
+            ],
+            'not'             => false,
+        ];
+
+        //Add query components for OutputSqlWalker
+        $queryComponents[self::ACL_ENTRIES_ALIAS] = [
+            'metadata'     => $this->getObjectManager()->getClassMetadata(
+                self::ACL_ENTRIES_SCHEMA_NAME
+            ),
+            'parent'       => null,
+            'relation'     => null,
+            'map'          => null,
+            'nestingLevel' => null,
+            'token'        => null
+        ];
+
+        return [$shareCondition, $queryComponents];
+    }
+
+    /**
+     * Get all Security Identity Ids
+     *
+     * @param array $shareScope
+     *
+     * @return array|int
+     */
+    protected function getSecurityIdentityIds(array $shareScope)
+    {
+        if ($this->sids !== null) {
+            $sidIds = $this->getSecurityIdentityIdsByScope($this->sids, $shareScope);
+            return count($sidIds) === 1 ? $sidIds[0] : $sidIds;
+        }
+
+        $sids = $this->sidStrategy->getSecurityIdentities($this->getSecurityContext()->getToken());
+        $sidByDb = [];
+
+        foreach ($sids as $sid) {
+            $entitySid = $this->getSecurityIdentityId($sid);
+            if ($entitySid) {
+                $sidByDb[$entitySid->getId()] = $sid;
+            }
+        }
+
+        $this->sids = $sidByDb;
+        $sidIds = $this->getSecurityIdentityIdsByScope($this->sids, $shareScope);
+
+        return count($sidIds) === 1 ? $sidIds[0] : $sidIds;
+    }
+
+    /**
+     * Get only Security Identity ids that can be shared by entity share scope
+     *
+     * @param array $sids
+     * @param array $shareScope
+     *
+     * @return array
+     */
+    protected function getSecurityIdentityIdsByScope(array $sids, array $shareScope)
+    {
+        $sidIds = [];
+
+        foreach ($sids as $key => $sid) {
+            $sharedToScope = false;
+
+            if ($sid instanceof UserSecurityIdentity) {
+                $sharedToScope = Share::SHARE_SCOPE_USER;
+            } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+                $sharedToScope = Share::SHARE_SCOPE_BUSINESS_UNIT;
+            }
+
+            if (in_array($sharedToScope, $shareScope)) {
+                $sidIds[] = $key;
+            }
+        }
+
+        return $sidIds;
+    }
+
+    /**
+     * @param SecurityIdentityInterface $sid
+     *
+     * @return mixed
+     */
+    protected function getSecurityIdentityId(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            $identifier = $sid->getClass() . '-' . $sid->getUsername();
+            $username = true;
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            //skip Role SID because we didn't share records for Role
+            return null;
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            $identifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
+        } else {
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity ' .
+                'or BusinessUnitSecurityIdentity.'
+            );
+        }
+
+        return $this->getObjectManager()->getRepository('OroSecurityBundle:AclSecurityIdentity')
+            ->findOneBy([
+                'identifier' => $identifier,
+                'username' => $username,
+            ]);
+    }
+
+    /**
+     * @return ObjectManager
+     */
+    protected function getObjectManager()
+    {
+        return $this->registry->getManager();
+    }
+
+    /**
+     * Gets the logged user
+     *
+     * @return null|mixed
+     */
+    public function getUser()
+    {
+        if ($this->user) {
+            return $this->user;
+        }
+
+        $token = $this->getSecurityContext()->getToken();
+        if (!$token) {
+            return null;
+        }
+        $user = $token->getUser();
+        if (!is_object($user) || !is_a($user, $this->metadataProvider->getBasicLevelClass())) {
+            return null;
+        }
+
+        $this->user = $user;
+
+        return $this->user;
+    }
+
+    /**
+     * @param string    $entityAlias
+     * @param int|array $aclSIds
+     * @param AclClass  $aclClass
+     *
+     * @return array
+     */
+    protected function getShareSubselectWhereConditions($entityAlias, $aclSIds, AclClass $aclClass)
+    {
+        return [
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => $entityAlias,
+                    'field' => 'id',
+                    'typeOperand' => PathExpression::TYPE_STATE_FIELD
+                ],
+                'right' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_SHARE_RECORD,
+                    'typeOperand' => PathExpression::TYPE_STATE_FIELD
+                ],
+                'operation' => '='
+            ],
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_SECURITY_ID,
+                    'typeOperand' => PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                ],
+                'right' => [
+                    'value' => $aclSIds
+                ],
+                'operation' => is_array($aclSIds) ? 'IN' : '='
+            ],
+            [
+                'left' => [
+                    'expectedType' => AclWalker::EXPECTED_TYPE,
+                    'entityAlias' => self::ACL_ENTRIES_ALIAS,
+                    'field' => self::ACL_ENTRIES_CLASS_ID,
+                    'typeOperand' => PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                ],
+                'right' => [
+                    'value' => $aclClass->getId()
+                ],
+                'operation' => '='
+            ]
+        ];
     }
 }

@@ -244,8 +244,8 @@ services:
 
     oro_user.form.handler.abstract.acl_role:
         class:                        %oro_user.form.handler.acl_role.class%
-        abstract:                     true
-        arguments:                    ["@form.factory", %oro_user.privileges%]
+        scope:                        prototype
+        arguments:                    ["@form.factory", @security.acl.cache.doctrine, %oro_user.privileges%]
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]

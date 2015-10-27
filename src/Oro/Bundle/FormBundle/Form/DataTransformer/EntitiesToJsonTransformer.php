@@ -1,18 +1,22 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
+namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
-class ContextsToModelTransformer implements DataTransformerInterface
+class EntitiesToJsonTransformer implements DataTransformerInterface
 {
     /**
      * @var EntityManager
      */
     protected $entityManager;
 
+    /**
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -23,6 +27,21 @@ class ContextsToModelTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
+        if (!$value) {
+            return '';
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $target) {
+                $result[] = json_encode([
+                    'entityClass' => ClassUtils::getClass($target),
+                    'entityId'    => $target->getId(),
+                ]);
+            }
+
+            $value = implode(';', $result);
+        }
+
         return $value;
     }
 

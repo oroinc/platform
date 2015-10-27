@@ -1,0 +1,30 @@
+datagrid:
+    # todo datagrid doesn't consider acl
+    shared-datagrid:
+        source:
+            type: share
+        properties:
+            id: ~
+        columns:
+            entity:
+                label: Name
+                type: twig
+                frontend_type: html
+                template: OroSecurityBundle:Share:Property/entity.html.twig
+        actions:
+            remove:
+                type: frontend
+                label: oro.security.datagrid.actions.remove.label
+                icon: trash
+                selector: share-item-remove
+        mass_actions:
+            remove:
+                type: frontend
+                label: oro.security.datagrid.mass_actions.remove.label
+                icon: trash
+                selector: share-items-remove
+        options:
+            toolbarOptions:
+                hide: true
+                pagination:
+                    hide: true

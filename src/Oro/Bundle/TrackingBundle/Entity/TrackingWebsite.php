@@ -22,7 +22,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "icon"="icon-external-link"
  *      },
  *      "security"={
- *          "type"="ACL"
+ *          "type"="ACL",
+ *          "share_scopes"={
+ *              "user"
+ *          }
  *      },
  *      "ownership"={
  *          "owner_type"="USER",
