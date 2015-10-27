@@ -161,7 +161,10 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         /* @var $entity EntityConfigModel */
         $entity = $this->registry->getManagerForClass($entityClassName)->find($entityClassName, $data['entity']['id']);
 
-        $field = $this->configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
+        $field = $this->configManager->createConfigFieldModel($entity->getClassName(), null, $fieldType);
+        $field
+            ->setFieldName($fieldName)
+            ->setCreated(new \DateTime());
 
         foreach ($options as $scope => $scopeValues) {
             $configProvider = $this->configManager->getProvider($scope);
@@ -169,9 +172,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             $indexedValues  = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
             $field->fromArray($scope, $scopeValues, $indexedValues);
         }
-
-        $field->setCreated(new \DateTime());
-        $field->setUpdated(new \DateTime());
 
         return $field;
     }

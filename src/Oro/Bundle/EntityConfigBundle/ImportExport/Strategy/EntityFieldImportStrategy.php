@@ -2,70 +2,81 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 
 class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
 {
-    const PROCESSED_ENTITIES_HASH = 'processedEntitiesHash';
-
     /**
-     * @var TranslatorInterface
+     * {@inheritdoc}
      */
-    protected $translator;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @return EntityFieldImportStrategy
-     */
-    public function setTranslator(TranslatorInterface $translator)
+    protected function findExistingEntity($entity, array $searchContext = [])
     {
-        $this->translator = $translator;
+        $existingEntity = parent::findExistingEntity($entity, $searchContext);
 
-        return $this;
+        if (!$existingEntity and $entity instanceof FieldConfigModel) {
+            $existingEntity = $this->databaseHelper->findOneBy(
+                'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
+                [
+                    'fieldName' => $entity->getFieldName(),
+                    'type' => $entity->getType(),
+                    'entity' => $entity->getEntity()
+                ]
+            );
+        }
+
+        return $existingEntity;
     }
 
     /**
-     * @param FieldConfigModel $entity
-     * @return FieldConfigModel|null
-     *
      * {@inheritdoc}
+     */
+    protected function importExistingEntity(
+        $entity,
+        $existingEntity,
+        $itemData = null,
+        array $excludedFields = array()
+    ) {
+        $excludedFields[] = 'fieldName';
+        $excludedFields[] = 'type';
+        $excludedFields[] = 'entity';
+
+        parent::importExistingEntity($entity, $existingEntity, $itemData, $excludedFields);
+    }
+
+    /**
+     * @param object $entity
+     * @return null|object
      */
     protected function validateAndUpdateContext($entity)
     {
-        $validatedEntity = parent::validateAndUpdateContext($entity);
+        // validate entity
+        $validationErrors = $this->strategyHelper->validateEntity($entity, ['FieldConfigModel']);
+        if ($validationErrors) {
+            $this->context->incrementErrorEntriesCount();
+            $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
 
-        if (null !== $validatedEntity) {
-            $processedEntities = (array)$this->context->getValue(self::PROCESSED_ENTITIES_HASH);
-            $hash = $this->getEntityHashByUniqueFields($entity);
-
-            if (!empty($processedEntities[$hash])) {
-                $validatedEntity = null;
-            } else {
-                $processedEntities[$hash] = true;
-                $this->context->setValue(self::PROCESSED_ENTITIES_HASH, $processedEntities);
-            }
+            return null;
         }
 
-        return $validatedEntity;
+        $this->updateContextCounters($entity);
+
+        return $entity;
     }
 
     /**
-     * @param FieldConfigModel $entity
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getEntityHashByUniqueFields(FieldConfigModel $entity)
+    protected function updateContextCounters($entity)
     {
-        return md5(
-            implode(
-                ':',
-                [
-                    $entity->getFieldName(),
-                    $entity->getEntity() ? $entity->getEntity()->getClassName() : null,
-                ]
-            )
-        );
+        // increment context counter
+        $identifier = $this->databaseHelper->getIdentifier($entity);
+        if ($identifier) {
+            $this->context->incrementUpdateCount();
+        } else {
+            $this->context->incrementAddCount();
+        }
+
+        return $entity;
     }
 }

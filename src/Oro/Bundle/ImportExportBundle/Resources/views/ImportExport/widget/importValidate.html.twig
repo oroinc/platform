@@ -167,7 +167,7 @@
                         );
 
                         widget.trigger('beforeContentLoad', widget);
-                        $.getJSON({{ path('oro_importexport_import_process', {processorAlias: processorAlias, options: options})|json_encode|raw }}, function(data) {
+                        $.getJSON({{ path('oro_importexport_import_process', {processorAlias: processorAlias, importJob: importJob, options: options})|json_encode|raw }}, function(data) {
                             widget.trigger('contentLoad', '', widget);
                             widget.trigger('importComplete', data);
                             var message = data.message;

@@ -37,14 +37,14 @@ class ImportType extends AbstractType
             'file',
             array(
                 'required' => true,
-                'constraints' => [
+                /*'constraints' => [
                     new File(
                         [
                             'mimeTypes' => ['text/plain', 'text/csv'],
                             'mimeTypesMessage' => 'This file type is not allowed.'
                         ]
                     ),
-                ]
+                ]*/
             )
         );
 
