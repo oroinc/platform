@@ -34,6 +34,10 @@
             ) }}
             {{ ui.renderProperty('Ownership Type'|trans, entity_owner_type) }}
             {{ ui.renderProperty('Module'|trans, module_name) }}
+            {{ ui.renderProperty(
+                'oro.security.share_scopes.label'|trans,
+                format_share_scopes(security_config.get('share_scopes'))
+            ) }}
         </div>
     </div>
 </div>

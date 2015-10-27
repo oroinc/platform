@@ -41,10 +41,16 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
      * @var PermissionGrantingStrategy
      */
     private $strategy;
+
     /**
      * @var UserSecurityIdentity
      */
     private $sid;
+
+    /**
+     * @var RoleSecurityIdentity
+     */
+    private $rsid;
 
     /**
      * @var PermissionGrantingStrategyContext
@@ -81,6 +87,13 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->ownerTree));
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
@@ -106,6 +119,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
                             'oro_security.owner.entity_owner_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
                             new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                        [
+                            'oro_entity_config.provider.security',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $configProvider
                         ],
                     ]
                 )
@@ -135,7 +153,10 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setContext($contextLink);
 
         $user = new User(1);
+        $user->setUsername('TestUser');
         $this->sid = new UserSecurityIdentity('TestUser', get_class($user));
+
+        $this->rsid = new RoleSecurityIdentity('TestRole');
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
@@ -182,11 +203,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->get();
 
         $acl = $this->getAcl(ObjectIdentity::fromDomainObject($obj));
-        $acl->insertClassAce($this->sid, $aceMask);
-        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $acl->insertClassAce($this->rsid, $aceMask);
+        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->rsid)));
 
         $this->metadataProvider->setMetadata(get_class($obj), $this->getOrganizationMetadata());
-        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->rsid)));
         $this->metadataProvider->setMetadata(get_class($obj), $this->getBusinessUnitMetadata());
         $this->metadataProvider->setMetadata(get_class($obj), $this->getUserMetadata());
     }

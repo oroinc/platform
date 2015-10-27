@@ -4,15 +4,20 @@ namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
 use Doctrine\DBAL\Driver\Connection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Dbal\MutableAclProvider as BaseMutableAclProvider;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\AclCacheInterface;
+use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
+
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+use Oro\Bundle\SecurityBundle\Event\UpdateAcl;
 
 /**
  * This class extends the standard Symfony MutableAclProvider.
@@ -23,6 +28,8 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  *       especially updateSecurityIdentity.
  * @see https://github.com/symfony/symfony/pull/8305
  * @see https://github.com/symfony/symfony/pull/8650
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MutableAclProvider extends BaseMutableAclProvider
 {
@@ -30,6 +37,19 @@ class MutableAclProvider extends BaseMutableAclProvider
      * @var PermissionGrantingStrategyInterface
      */
     protected $permissionStrategy;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @var MutableAclInterface
+     */
+    protected $updatedAcl;
+
+    /** @var array|null */
+    protected $sids = null;
 
     /**
      * Constructor.
@@ -48,6 +68,14 @@ class MutableAclProvider extends BaseMutableAclProvider
         $this->permissionStrategy = $permissionGrantingStrategy;
         parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
 
+    }
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -175,6 +203,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL for updating a security identity.
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
      *
      * @param SecurityIdentityInterface $sid
      * @param string $oldName
@@ -197,11 +226,21 @@ class MutableAclProvider extends BaseMutableAclProvider
             $oldIdentifier = $oldName;
             $newIdentifier = $sid->getRole();
             $username = false;
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            if ($sid->getId() === $oldName) {
+                throw new \InvalidArgumentException('There are no changes.');
+            }
+            $oldIdentifier = $sid->getClass() . '-' . $oldName;
+            $newIdentifier = $sid->getClass() . '-' . $sid->getId();
+            $username = false;
         } else {
             throw new \InvalidArgumentException(
-                '$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.'
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
             );
         }
+
+        $this->sids = null;
 
         return sprintf(
             'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
@@ -214,6 +253,7 @@ class MutableAclProvider extends BaseMutableAclProvider
 
     /**
      * Constructs the SQL to delete a security identity.
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
      *
      * @param SecurityIdentityInterface $sid
      * @throws \InvalidArgumentException
@@ -223,6 +263,8 @@ class MutableAclProvider extends BaseMutableAclProvider
     {
         $select = $this->getSelectSecurityIdentityIdSql($sid);
         $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        $this->sids = null;
 
         return $delete;
     }
@@ -239,5 +281,254 @@ class MutableAclProvider extends BaseMutableAclProvider
         $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
 
         return $delete;
+    }
+
+    /**
+     * Constructs the SQL for inserting a security identity.
+     * Clear Sids cache, therefore method hydrateSecurityIdentities updates Sids cache
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
+    {
+        list($identifier, $username) = $this->getSecurityIdentifier($sid);
+
+        $this->sids = null;
+
+        return sprintf(
+            'INSERT INTO %s (identifier, username) VALUES (%s, %s)',
+            $this->options['sid_table_name'],
+            $this->connection->quote($identifier),
+            $this->connection->getDatabasePlatform()->convertBooleans($username)
+        );
+    }
+
+    /**
+     * Constructs the SQL for selecting the primary key of a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
+    {
+        list($identifier, $username) = $this->getSecurityIdentifier($sid);
+
+        return sprintf(
+            'SELECT id FROM %s WHERE identifier = %s AND username = %s',
+            $this->options['sid_table_name'],
+            $this->connection->quote($identifier),
+            $this->connection->getDatabasePlatform()->convertBooleans($username)
+        );
+    }
+
+    /**
+     * Get Security Identifier and Username flag to create SQL queries
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return array
+     */
+    protected function getSecurityIdentifier(SecurityIdentityInterface $sid)
+    {
+        if ($sid instanceof UserSecurityIdentity) {
+            return [$sid->getClass().'-'.$sid->getUsername(), true];
+        } elseif ($sid instanceof RoleSecurityIdentity) {
+            return [$sid->getRole(), false];
+        } elseif ($sid instanceof BusinessUnitSecurityIdentity) {
+            return [$sid->getClass() . '-' . $sid->getId(), false];
+        } else {
+            throw new \InvalidArgumentException(
+                '$sid must either be an instance of UserSecurityIdentity or RoleSecurityIdentity' .
+                ' or BusinessUnitSecurityIdentity.'
+            );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Inject shared record id to acl SQL queries (such as InsertAccessControlEntrySql) via property updatedAcl.
+     */
+    public function updateAcl(MutableAclInterface $acl)
+    {
+        $this->updatedAcl = $acl;
+        $this->connection->beginTransaction();
+        try {
+            $event = new UpdateAcl($acl);
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(UpdateAcl::NAME_BEFORE, $event);
+            }
+            parent::updateAcl($acl);
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(UpdateAcl::NAME_AFTER, $event);
+            }
+            $this->connection->commit();
+        } catch (\Exception $e) {
+            $this->updatedAcl = null;
+            $this->connection->rollBack();
+
+            throw $e;
+        }
+
+        $this->updatedAcl = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
+    protected function getInsertAccessControlEntrySql(
+        $classId,
+        $objectIdentityId,
+        $field,
+        $aceOrder,
+        $securityIdentityId,
+        $strategy,
+        $mask,
+        $granting,
+        $auditSuccess,
+        $auditFailure
+    ) {
+        $recordId = $this->updatedAcl && $this->updatedAcl->getObjectIdentity()
+            ? $this->updatedAcl->getObjectIdentity()->getIdentifier()
+            : null;
+
+        $query = <<<QUERY
+            INSERT INTO %s (
+                class_id,
+                object_identity_id,
+                field_name,
+                ace_order,
+                security_identity_id,
+                mask,
+                granting,
+                granting_strategy,
+                audit_success,
+                audit_failure,
+                record_id
+            )
+            VALUES (%d, %s, %s, %d, %d, %d, %s, %s, %s, %s, %s)
+QUERY;
+
+        return sprintf(
+            $query,
+            $this->options['entry_table_name'],
+            $classId,
+            null === $objectIdentityId ? 'NULL' : (int) $objectIdentityId,
+            null === $field ? 'NULL' : $this->connection->quote($field),
+            $aceOrder,
+            $securityIdentityId,
+            $mask,
+            $this->connection->getDatabasePlatform()->convertBooleans($granting),
+            $this->connection->quote($strategy),
+            $this->connection->getDatabasePlatform()->convertBooleans($auditSuccess),
+            $this->connection->getDatabasePlatform()->convertBooleans($auditFailure),
+            null === $recordId ? 'NULL' : (int) $recordId
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findAcls(array $oids, array $sids = array())
+    {
+        $sids = $this->hydrateSecurityIdentities($sids);
+
+        return parent::findAcls($oids, $sids);
+    }
+
+    /**
+     * Make SIDs before find ACLs
+     *
+     * @param array $sids
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function hydrateSecurityIdentities(array $sids = array())
+    {
+        if ($this->sids !== null) {
+            return array_merge($this->sids, $sids);
+        }
+
+        $sql = $this->getSelectAllSidsSql();
+        $stmt = $this->connection->executeQuery($sql);
+        $stmtResult = $stmt->fetchAll(\PDO::FETCH_NUM);
+
+        foreach ($stmtResult as $data) {
+            list($username, $securityIdentifier) = $data;
+            $key = ($username ? '1' : '0').$securityIdentifier;
+
+            if (!isset($sids[$key])) {
+                $sids[$key] = $this->getSecurityIdentityFromString($securityIdentifier, $username);
+            }
+        }
+
+        $this->sids = $sids;
+
+        return $sids;
+    }
+
+    /**
+     * Constructs the query used for looking up all security identities.
+     *
+     * @return string
+     */
+    protected function getSelectAllSidsSql()
+    {
+        $sql = <<<SELECTCLAUSE
+            SELECT
+                s.username,
+                s.identifier as security_identifier
+            FROM
+                {$this->options['sid_table_name']} s
+SELECTCLAUSE;
+
+        return $sql;
+    }
+
+    /**
+     * @param string  $securityIdentifier
+     * @param boolean $isUsername
+     *
+     * @return BusinessUnitSecurityIdentity|RoleSecurityIdentity
+     */
+    protected function getSecurityIdentityFromString($securityIdentifier, $isUsername)
+    {
+        if ($isUsername) {
+            return new UserSecurityIdentity(
+                substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
+                substr($securityIdentifier, 0, $pos)
+            );
+        } else {
+            $pos = strpos($securityIdentifier, '-');
+            $className = substr($securityIdentifier, 0, $pos);
+
+            if ($pos !== false && class_exists($className)) {
+                $identifier = substr($securityIdentifier, 1 + $pos);
+                $sidReflection = new \ReflectionClass($className);
+                $interfaceNames = $sidReflection->getInterfaceNames();
+                if (in_array(
+                    'Oro\Bundle\OrganizationBundle\Entity\BusinessUnitInterface',
+                    (array) $interfaceNames,
+                    true
+                )) {
+                    return new BusinessUnitSecurityIdentity($identifier, $className);
+                }
+            }
+
+            return new RoleSecurityIdentity($securityIdentifier);
+        }
     }
 }
