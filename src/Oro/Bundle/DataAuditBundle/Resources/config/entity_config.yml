@@ -25,9 +25,8 @@ oro_entity_config:
         field:
             items:
                 auditable:
-                    import_options:
-                        type: boolean
                     options:
+                        value_type:         boolean
                         priority:           60
                         default_value:      false
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one]

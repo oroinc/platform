@@ -3,10 +3,8 @@ oro_entity_config:
         field:
             items:
                 available_in_template:
-                    import_options:
-                        type: boolean
-                        default: true
                     options:
+                        value_type: boolean
                         default_value:      true
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne]
                     form:

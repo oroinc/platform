@@ -15,6 +15,14 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    const TYPE_BOOLEAN  = 'boolean';
+    const TYPE_INTEGER  = 'integer';
+    const TYPE_STRING   = 'string';
+    const TYPE_ENUM     = 'enum';
+
+    const CONFIG_TYPE       = 'value_type';
+    const CONFIG_DEFAULT    = 'default_value';
+
     /** @var ManagerRegistry */
     protected $registry;
 
@@ -49,8 +57,22 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     }
 
     /**
-     * @param AbstractEnumValue $object
-     *
+     * {@inheritdoc}
+     */
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    {
+        return is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null, array $context = [])
+    {
+        return $data instanceof FieldConfigModel;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function normalize($object, $format = null, array $context = [])
@@ -79,32 +101,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         }
 
         return $result;
-    }
-
-    /**
-     * @param array $array
-     * @param string $key
-     * @param mixed $value
-     * @return boolean
-     */
-    protected function extractAndAppendKeyValue(&$array, $key, $value)
-    {
-        if (false === strpos($key, '.')) {
-            return false;
-        }
-
-        $parts = explode('.', $key);
-
-        $current = &$array;
-        foreach ($parts as $part) {
-            if (!isset($current[$part])) {
-                $current[$part] = [];
-            }
-            $current = &$current[$part];
-        }
-        $current = $value;
-
-        return true;
     }
 
     /**
@@ -150,9 +146,12 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
                         $options[$scope] = [];
                     }
 
-                    $importOptions = isset($config['import_options']) ? $config['import_options'] : [];
+                    $importOptions = isset($config['options']) ? $config['options'] : [];
 
-                    $options[$scope][$code] = $this->fieldTypeProvider->denormalizeFieldValue($importOptions, $configOptions[$scope][$code]);
+                    $options[$scope][$code] = $this->denormalizeFieldValue(
+                        $importOptions,
+                        $configOptions[$scope][$code]
+                    );
                 }
             }
         }
@@ -178,18 +177,86 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $config
+     * @param mixed $value
+     * @return mixed
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
+    public function denormalizeFieldValue($config, $value)
     {
-        return is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+        if (!isset($config[self::CONFIG_TYPE])) {
+            return $value;
+        }
+
+        if ($value === null && isset($config[self::CONFIG_DEFAULT])) {
+            $value = $config[self::CONFIG_DEFAULT];
+        }
+
+        switch ($config[self::CONFIG_TYPE]) {
+            case self::TYPE_BOOLEAN:
+                $lvalue = strtolower($value);
+                if (in_array($lvalue, ['yes', 'no', 'true', 'false'])) {
+                    $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
+                }
+
+                return (bool)$value;
+
+            case self::TYPE_INTEGER:
+                return (int)$value;
+
+            case self::TYPE_ENUM:
+                $updatedValue = [];
+                foreach ($value as $key => $subvalue) {
+                    foreach ($this->getEnumConfig() as $subfield => $subconfig) {
+                        $updatedValue[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $value[$key][$subfield]);
+                    }
+                }
+                return $updatedValue;
+
+            case self::TYPE_STRING:
+            default:
+                return (string)$value;
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $array
+     * @param string $key
+     * @param mixed $value
+     * @return boolean
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    protected function extractAndAppendKeyValue(&$array, $key, $value)
     {
-        return $data instanceof FieldConfigModel;
+        if (false === strpos($key, '.')) {
+            return false;
+        }
+
+        $parts = explode('.', $key);
+
+        $current = &$array;
+        foreach ($parts as $part) {
+            if (!isset($current[$part])) {
+                $current[$part] = [];
+            }
+            $current = &$current[$part];
+        }
+        $current = $value;
+
+        return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getEnumConfig()
+    {
+        return [
+            'label' => [
+                self::CONFIG_TYPE => self::TYPE_STRING
+            ],
+            'is_default' => [
+                self::CONFIG_TYPE => self::TYPE_BOOLEAN,
+                self::CONFIG_DEFAULT => false,
+            ],
+        ];
     }
 }
