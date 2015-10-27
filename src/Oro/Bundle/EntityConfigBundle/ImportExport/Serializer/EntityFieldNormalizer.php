@@ -187,8 +187,8 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             return $value;
         }
 
-        if ($value === null && isset($config[self::CONFIG_DEFAULT])) {
-            $value = $config[self::CONFIG_DEFAULT];
+        if ($value === null && array_key_exists(self::CONFIG_DEFAULT, $config)) {
+            return $config[self::CONFIG_DEFAULT];
         }
 
         switch ($config[self::CONFIG_TYPE]) {
