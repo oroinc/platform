@@ -39,12 +39,12 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
      */
     public function reverseTransform($value)
     {
-        if (!is_array($value) && !$value instanceof \Traversable) {
-            throw new UnexpectedTypeException($value, 'array');
-        }
-
         if (!$value) {
             return array();
+        }
+
+        if (!is_array($value) && !$value instanceof \Traversable) {
+            throw new UnexpectedTypeException($value, 'array');
         }
 
         $entities = $this->loadEntitiesByIds($value);
