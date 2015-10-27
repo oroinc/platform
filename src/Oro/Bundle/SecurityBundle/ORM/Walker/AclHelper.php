@@ -5,13 +5,15 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\QueryException;
+use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
 use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -31,8 +33,9 @@ use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
  */
 class AclHelper
 {
-    const ORO_ACL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
-    const ORO_USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    const ORO_ACL_WALKER            = 'Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker';
+    const ORO_ACL_OUTPUT_SQL_WALKER = 'Oro\Bundle\SecurityBundle\ORM\Walker\SqlWalker';
+    const ORO_USER_CLASS            = 'Oro\Bundle\UserBundle\Entity\User';
 
     /**
      * @var OwnershipConditionDataBuilder
@@ -49,6 +52,9 @@ class AclHelper
 
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
+
+    /** @var array */
+    protected $queryComponents = [];
 
     /**
      * @param OwnershipConditionDataBuilder $builder
@@ -111,6 +117,8 @@ class AclHelper
     public function apply($query, $permission = 'VIEW', $checkRelations = true)
     {
         $this->entityAliases = [];
+        $this->queryComponents = [];
+
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery();
         }
@@ -119,10 +127,10 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
+            list ($whereConditions, $joinConditions, $shareCondition) = $this->processSelect($ast, $permission);
             $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
-                $this->processSubselects($ast, $conditionStorage, $permission, $query);
+                $this->processSubselects($ast, $conditionStorage, $permission);
             }
 
             // We have access level check conditions. So mark query for acl walker.
@@ -136,6 +144,13 @@ class AclHelper
                     $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
                 }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
+            }
+
+            $this->addShareConditionToQuery($query, $shareCondition);
+
+            if (!empty($this->queryComponents)) {
+                $query->setHint(SqlWalker::ORO_ACL_QUERY_COMPONENTS, $this->queryComponents);
+                $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_ACL_OUTPUT_SQL_WALKER);
             }
         }
 
@@ -217,7 +232,7 @@ class AclHelper
      * @param Subselect|SelectStatement $select
      * @param string                    $permission
      *
-     * @return array [whereConditions, joinConditions]
+     * @return array [whereConditions, joinConditions, shareCondition]
      */
     protected function processSelect($select, $permission)
     {
@@ -229,6 +244,7 @@ class AclHelper
 
         $whereConditions = [];
         $joinConditions  = [];
+        $shareCondition = null;
         $fromClause      = $isSubRequest ? $select->subselectFromClause : $select->fromClause;
 
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
@@ -240,6 +256,10 @@ class AclHelper
             );
             if ($condition) {
                 $whereConditions[] = $condition;
+                $shareCondition = $this->processRangeVariableDeclarationShare(
+                    $identificationVariableDeclaration->rangeVariableDeclaration,
+                    $permission
+                );
             }
 
             // check joins
@@ -276,7 +296,7 @@ class AclHelper
         $whereConditions = $event->getWhereConditions();
         $joinConditions  = $event->getJoinConditions();
 
-        return [$whereConditions, $joinConditions];
+        return [$whereConditions, $joinConditions, $shareCondition];
     }
 
     /**
@@ -445,5 +465,72 @@ class AclHelper
         }
 
         return $joinConditions;
+    }
+
+    /**
+     * Process where and join statements
+     *
+     * @param RangeVariableDeclaration $rangeVariableDeclaration
+     * @param string                   $permission
+     *
+     * @return Node|null
+     */
+    protected function processRangeVariableDeclarationShare(
+        RangeVariableDeclaration $rangeVariableDeclaration,
+        $permission
+    ) {
+        $entityName = $rangeVariableDeclaration->abstractSchemaName;
+        $entityAlias = $rangeVariableDeclaration->aliasIdentificationVariable;
+
+        $resultData = $this->builder->getAclShareData($entityName, $entityAlias, $permission);
+
+        if (!empty($resultData)) {
+            list($shareCondition, $queryComponents) = $resultData;
+            $this->addQueryComponents($queryComponents);
+            return $shareCondition;
+        }
+
+        return null;
+    }
+
+    /**
+     * Add query components which will add to query hints
+     *
+     * @param array $queryComponents
+     * @throws QueryException
+     */
+    protected function addQueryComponents(array $queryComponents)
+    {
+        $requiredKeys = array('metadata', 'parent', 'relation', 'map', 'nestingLevel', 'token');
+
+        foreach ($queryComponents as $dqlAlias => $queryComponent) {
+            if (array_diff($requiredKeys, array_keys($queryComponent))) {
+                throw QueryException::invalidQueryComponent($dqlAlias);
+            }
+
+            $this->queryComponents[$dqlAlias] = $queryComponent;
+        }
+    }
+
+    /**
+     * Add to query share condition
+     *
+     * @param Query     $query
+     * @param Node|null $shareCondition
+     */
+    protected function addShareConditionToQuery(Query $query, $shareCondition)
+    {
+        if ($shareCondition) {
+            $hints = $query->getHints();
+            if (!empty($hints[Query::HINT_CUSTOM_TREE_WALKERS])) {
+                $customHints = !in_array(self::ORO_ACL_WALKER, $hints[Query::HINT_CUSTOM_TREE_WALKERS])
+                    ? array_merge($hints[Query::HINT_CUSTOM_TREE_WALKERS], [self::ORO_ACL_WALKER])
+                    : $hints[Query::HINT_CUSTOM_TREE_WALKERS];
+            } else {
+                $customHints = [self::ORO_ACL_WALKER];
+            }
+            $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $customHints);
+            $query->setHint(AclWalker::ORO_ACL_SHARE_CONDITION, $shareCondition);
+        }
     }
 }

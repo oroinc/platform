@@ -37,6 +37,11 @@ parameters:
     oro_dashboard.form.type.widget_business_unit_select.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetBusinessUnitSelect
     oro_dashboard.widget_config_value.widget_business_unit_select.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetBusinessUnitSelectConverter
 
+    # BigNumber
+    oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
+    oro_dashboard.provider.big_number.formatter.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberFormatter
+    oro_dashboard.provider.big_number.date_helper.class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper
+
 services:
     oro_datagrid.datagrid.name_strategy:
         class: %oro_datagrid.datagrid.name_strategy.class%
@@ -242,3 +247,21 @@ services:
         class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
+
+    # BigNumber
+    oro_dashboard.provider.big_number.processor:
+        class: %oro_dashboard.provider.big_number.processor.class%
+        arguments:
+            - @oro_dashboard.provider.big_number.formatter
+            - @oro_dashboard.provider.big_number.date_helper
+
+    oro_dashboard.provider.big_number.formatter:
+        class: %oro_dashboard.provider.big_number.formatter.class%
+        arguments:
+            - @oro_locale.formatter.number
+
+    oro_dashboard.provider.big_number.date_helper:
+        class: %oro_dashboard.provider.big_number.date_helper.class%
+        arguments:
+            - @doctrine
+            - @oro_security.acl_helper

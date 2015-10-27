@@ -24,26 +24,27 @@ datagrid:
             enable: true
             entity_name: %oro_user.entity.class%
         columns:
-            username:
-                label:         oro.user.username.label
-            email:
-                label:         oro.user.email.label
             firstName:
                 label:         oro.user.first_name.label
             lastName:
                 label:         oro.user.last_name.label
-            createdAt:
-                label:         oro.ui.created_at
-                frontend_type: datetime
-            updatedAt:
-                label:         oro.ui.updated_at
-                frontend_type: datetime
+            email:
+                label:         oro.user.email.label
+            username:
+                label:         oro.user.username.label
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
                    0: Inactive
                    1: Active
+            createdAt:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+            updatedAt:
+                label:         oro.ui.updated_at
+                frontend_type: datetime
+
         properties:
             id: ~
             update_link:
@@ -82,24 +83,18 @@ datagrid:
 
         filters:
             columns:
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
-                createdAt:
-                    type: datetime
-                    data_name: u.createdAt
-                updatedAt:
-                    type: datetime
-                    data_name: u.updatedAt
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
                 enabled:
                     type: choice
                     data_name: u.enabled
@@ -108,6 +103,12 @@ datagrid:
                             choices:
                                 'false': Inactive
                                 'true':  Active
+                createdAt:
+                    type: datetime
+                    data_name: u.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: u.updatedAt
 
         actions:
             view:
@@ -263,6 +264,7 @@ datagrid:
                     - u.email
                     - u.firstName
                     - u.lastName
+                    - u.enabled
                 from:
                     - { table: OroUserBundle:User, alias: u }
 
@@ -313,10 +315,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label:         oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         filters:
             columns:
                 has_role:
@@ -328,12 +336,20 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active
         sorters:
             multiple_sorting: true
             columns:
@@ -379,10 +395,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label:         oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         filters:
             columns:
                 has_group:
@@ -394,12 +416,20 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active
         sorters:
             multiple_sorting: true
             columns:
@@ -435,14 +465,14 @@ datagrid:
                 from:
                     - { table: %oro_user.entity.class%, alias: u }
         columns:
-            username:
-                label: oro.user.username.label
-            email:
-                label: oro.user.email.label
             firstName:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
+            email:
+                label: oro.user.email.label
+            username:
+                label: oro.user.username.label
             enabled:
                 label: oro.user.enabled.label
                 frontend_type: select
@@ -468,18 +498,18 @@ datagrid:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
                 enabled:
                     type: choice
                     data_name: u.enabled
@@ -500,6 +530,7 @@ datagrid:
             query:
                 select:
                     - u.id
+                    - u.email
                     - u.username
                     - u.firstName
                     - u.lastName
@@ -510,12 +541,14 @@ datagrid:
                     and:
                         - u.enabled=true
         columns:
-            username:
-                label: oro.user.username.label
             firstName:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
+            email:
+                label: oro.user.email.label
+            username:
+                label: oro.user.username.label
             enabled:
                 label: oro.user.enabled.label
                 frontend_type: select
@@ -526,27 +559,32 @@ datagrid:
             id: ~
         sorters:
             columns:
-                username:
-                    data_name: u.username
                 firstName:
                     data_name: u.firstName
                 lastName:
                     data_name: u.lastName
+                email:
+                    data_name: u.email
+                username:
+                    data_name: u.username
                 enabled:
                     data_name: u.enabled
             default:
                 username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
-                username:
-                    type: string
-                    data_name: u.username
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
                 enabled:
                     type: choice
                     data_name: u.enabled
@@ -591,16 +629,14 @@ datagrid:
                     and:
                         - u.id != @oro_security.security_facade->getLoggedUserId
         columns:
-            id:
-                label:         oro.user.id.label
-            username:
-                label:         oro.user.username.label
-            email:
-                label:         oro.user.email.label
             firstName:
                 label:         oro.user.first_name.label
             lastName:
                 label:         oro.user.last_name.label
+            email:
+                label:         oro.user.email.label
+            username:
+                label:         oro.user.username.label
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
@@ -609,14 +645,14 @@ datagrid:
                    - Active
         sorters:
             columns:
-                username:
-                    data_name: u.username
-                email:
-                    data_name: u.email
                 firstName:
                     data_name: u.firstName
                 lastName:
                     data_name: u.lastName
+                email:
+                    data_name: u.email
+                username:
+                    data_name: u.username
                 enabled:
                     data_name: u.enabled
             default:
@@ -624,18 +660,119 @@ datagrid:
 
         filters:
             columns:
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active
+
+    share-with-users-datagrid:
+        extended_entity_name: %oro_user.entity.class%
+        options:
+            entityHint: user
+            entity_pagination: true
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10
+            routerEnabled: false
+
+        source:
+            acl_resource: oro_user_user_view
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.firstName
+                    - u.lastName
+                    - u.email
+                    - u.username
+                    - u.enabled
+                    - bu.name as businessUnit
+                    - organizationOwner.name as organization
+                from:
+                    - { table: %oro_user.entity.class%, alias: u }
+                join:
+                    inner:
+                        - { join: u.owner, alias: bu }
+                        - { join: bu.organization, alias: organizationOwner }
+
+                where:
+                    and:
+                        - u.id != @oro_security.security_facade->getLoggedUserId
+        columns:
+            firstName:
+                label:         oro.user.first_name.label
+            lastName:
+                label:         oro.user.last_name.label
+            email:
+                label:         oro.user.email.label
+            username:
+                label:         oro.user.username.label
+            enabled:
+                label:         oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+            businessUnit:
+                label:         oro.user.business_unit.label
+            organization:
+                label:         oro.user.organization.label
+        properties:
+            id: ~
+            entity:
+                type: twig
+                frontend_type: html
+                template: OroUserBundle:Share:Property/entity.html.twig
+                data_name: u
+        sorters:
+            columns:
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                email:
+                    data_name: u.email
+                username:
+                    data_name: u.username
+                enabled:
+                    data_name: u.enabled
+                businessUnit:
+                    data_name: bu.name
+                organization:
+                    data_name: organizationOwner.name
+            default:
+                enabled: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+        filters:
+            columns:
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                email:
+                    type: string
+                    data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
                 enabled:
                     type: choice
                     data_name: u.enabled

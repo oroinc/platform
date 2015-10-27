@@ -1,0 +1,70 @@
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+<div class="widget-content">
+    {% if saved %}
+        <script type="text/javascript">
+        require([
+            'orotranslation/js/translator',
+            'oroui/js/widget-manager',
+            'oroui/js/messenger',
+            'oroui/js/mediator'
+        ],
+        function(__, widgetManager, messenger, mediator) {
+            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                messenger.notificationFlashMessage('success', __('oro.security.action.shared'));
+                widget.remove();
+                mediator.execute('refreshPage');
+            });
+        });
+        </script>
+    {% else %}
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/mediator'],
+                function($, mediator) {
+                    $('.btn.btn-primary.shared-dialog-apply').on('click', function () {
+                        mediator.trigger('widget:shared-dialog:apply');
+                    });
+                });
+        </script>
+        {% if not form.vars.valid and form.vars.errors|length %}
+            <div class="alert alert-error">
+                <div class="message">
+                    {{ form_errors(form) }}
+                </div>
+            </div>
+        {% endif %}
+        <div class="form-container">
+            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post">
+                <fieldset class="form-horizontal">
+                    {{ form_row(form.entityClass) }}
+                    {{ form_row(form.entityId) }}
+                    {{ form_row(form.entities) }}
+                    <div class="shared-datagrid control-group">
+                        <h5 class="shared-datagrid-title">{{ 'oro.security.datagrid.shared_datagrid.title'|trans }}</h5>
+                        {% set gridName = 'shared-datagrid' %}
+                        <div class="entity-create-or-select-container">
+                            {{ dataGrid.renderGrid(
+                                gridName,
+                                {'entityId': form.vars.entityId, 'entityClass': form.vars.entityClass},
+                                {'cssClass': gridName}
+                            ) }}
+                        </div>
+                        {% set options = {
+                            gridName: gridName,
+                            entityId: form.vars.entityId,
+                            entityClass: form.vars.entityClass|url_encode
+                        } %}
+                        <div data-page-component-module="orosecurity/js/app/components/shared-datagrid-component"
+                             data-page-component-options="{{ options|json_encode }}"></div>
+                        <div class="widget-actions form-actions" style="display: none;">
+                            <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                            <button class="btn btn-primary shared-dialog-apply" type="button">{{ 'Apply'|trans }}</button>
+                        </div>
+                    </div>
+                    {{ form_rest(form) }}
+                </fieldset>
+            </form>
+            {{ oro_form_js_validation(form) }}
+        </div>
+    {% endif %}
+</div>

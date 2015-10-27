@@ -4,14 +4,13 @@ definitions:
         enabled: true
         entity:  Oro\Bundle\IntegrationBundle\Entity\Channel
         order:   10
+        pre_conditions:
+            @equal: [$enabled, true]
         actions_configuration:
             - @assign_constant_value:
                 attribute: $.commandName
                 value: Oro\Bundle\IntegrationBundle\Command\SyncCommand::COMMAND_NAME
             - @tree:
-                conditions:
-                    @and:
-                        - @equal: [$enabled, true]
                 actions:
                     - @format_string:
                         attribute: $.channelArguments

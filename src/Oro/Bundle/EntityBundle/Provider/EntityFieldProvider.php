@@ -128,6 +128,44 @@ class EntityFieldProvider
     }
 
     /**
+     * Returns relations for the given entity
+     *
+     * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
+     * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
+     * @param bool   $translate          Flag means that label, plural label should be translated
+     *                                   .       'name'          - field name
+     *                                   .       'type'          - field type
+     *                                   .       'label'         - field label
+     *                                   .       'related_entity_name' - entity full class name
+     *                                   .       'relation_type'       - relation type
+     *                                   If $withEntityDetails = true the following attributes are added:
+     *                                   .       'related_entity_label'        - entity label
+     *                                   .       'related_entity_plural_label' - entity plural label
+     *                                   .       'related_entity_icon'         - an icon associated with an entity
+     *
+     * @return array of relations
+     */
+    public function getRelations(
+        $entityName,
+        $withEntityDetails = false,
+        $applyExclusions = true,
+        $translate = true
+    ) {
+        $className = $this->entityClassResolver->getEntityClass($entityName);
+        if (!$this->entityConfigProvider->hasConfig($className)) {
+            // only configurable entities are supported
+            return [];
+        }
+
+        $result = [];
+
+        $this->addRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
+
+        return $result;
+    }
+
+    /**
      * Returns fields for the given entity
      *
      * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
