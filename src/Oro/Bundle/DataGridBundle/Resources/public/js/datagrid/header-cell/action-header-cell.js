@@ -18,7 +18,7 @@ define([
      */
     ActionHeaderCell = Backbone.View.extend({
         /** @property */
-        className: 'action-column',
+        className: 'action-column renderable',
 
         /** @property */
         tagName: 'th',

@@ -52,20 +52,28 @@ class EmailRepository extends EntityRepository
      * @param User         $user
      * @param Organization $organization
      * @param int          $limit
+     * @param int|null     $folderId
      *
      * @return mixed
      */
-    public function getNewEmails(User $user, Organization $organization, $limit)
+    public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
         $qb = $this->createQueryBuilder('e')
             ->select('e, eu.seen')
             ->leftJoin('e.emailUsers', 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->groupBy('e, eu.seen')
-            ->orderBy('e.sentAt', 'DESC')
+            ->orderBy('eu.seen', 'ASC')
+            ->addOrderBy('e.sentAt', 'DESC')
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
             ->setMaxResults($limit);
+
+        if ($folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+               ->andWhere('f.id = :folderId')
+               ->setParameter('folderId', $folderId);
+        }
 
         return $qb->getQuery()->getResult();
     }
@@ -75,21 +83,51 @@ class EmailRepository extends EntityRepository
      *
      * @param User         $user
      * @param Organization $organization
+     * @param int|null     $folderId
      *
      * @return mixed
      */
-    public function getCountNewEmails(User $user, Organization $organization)
+    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->select('COUNT(DISTINCT e)')
             ->leftJoin('e.emailUsers', 'eu')
             ->where($this->getAclWhereCondition($user, $organization))
             ->andWhere('eu.seen = :seen')
             ->setParameter('organization', $organization)
             ->setParameter('owner', $user)
+            ->setParameter('seen', false);
+
+        if ($folderId !== null && $folderId > 0) {
+            $qb->leftJoin('eu.folders', 'f')
+                ->andWhere('f.id = :folderId')
+                ->setParameter('folderId', $folderId);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Get count new emails per folders
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @return array
+     */
+    public function getCountNewEmailsPerFolders(User $user, Organization $organization)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->select('COUNT(DISTINCT e) num, f.id')
+            ->leftJoin('e.emailUsers', 'eu')
+            ->where($this->getAclWhereCondition($user, $organization))
+            ->andWhere('eu.seen = :seen')
+            ->setParameter('organization', $organization)
+            ->setParameter('owner', $user)
             ->setParameter('seen', false)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->leftJoin('eu.folders', 'f')
+            ->groupBy('f.id');
+
+        return $qb->getQuery()->getResult();
     }
 
     /**

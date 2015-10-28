@@ -20,13 +20,11 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 {
     const BUSINESS_UNIT = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit';
-    const ORGANIZATION = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
-    const USER = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
-    const TEST_ENTITY = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
+    const ORGANIZATION  = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization';
+    const USER          = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User';
+    const TEST_ENTITY   = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity';
 
-    /**
-     * @var OwnershipConditionDataBuilder
-     */
+    /** @var OwnershipConditionDataBuilder */
     private $builder;
 
     /** @var OwnershipMetadataProviderStub */
@@ -34,6 +32,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $securityContext;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $aclVoter;
@@ -85,6 +86,11 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $strategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
 
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
@@ -92,6 +98,9 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             $entityMetadataProvider,
             $this->metadataProvider,
             $treeProvider,
+            $this->registry,
+            $configProvider,
+            $strategy,
             $this->aclVoter
         );
     }
@@ -146,6 +155,8 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
         $this->tree->addBusinessUnitRelation('bu4', null);
         $this->tree->addBusinessUnitRelation('bu41', 'bu4');
         $this->tree->addBusinessUnitRelation('bu411', 'bu41');
+
+        $this->tree->buildTree();
 
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');

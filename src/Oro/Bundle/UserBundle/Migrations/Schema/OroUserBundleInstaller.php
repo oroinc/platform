@@ -24,6 +24,10 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\SetOwnerForEmail;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
 
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
+
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -116,6 +120,13 @@ class OroUserBundleInstaller implements
         AddRelationToMailbox::createOroEmailMailboxUsersTable($schema);
         AddRelationToMailbox::createOroEmailMailboxRolesTable($schema);
         AddRelationToMailbox::addOroEmailMailboxUsersAndRolesForeignKeys($schema);
+
+        // depends to the UserBundle
+        ChangeEmailUserFolderRelation::createOroEmailUserFoldersTable($schema);
+        ChangeEmailUserFolderRelation::addOroEmailUserFoldersForeignKeys($schema);
+        ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
+        AddEmailUserColumn::updateOroEmailUserTable($schema);
+        DropEmailUserColumn::updateOroEmailUserTable($schema);
     }
 
     /**

@@ -37,16 +37,6 @@ define([
          */
         createFormatter: function() {
             return new this.formatterPrototype({style: this.style});
-        },
-
-        /**
-         * @inheritDoc
-         */
-        enterEditMode: function(e) {
-            if (this.column.get('editable')) {
-                e.stopPropagation();
-            }
-            return NumberCell.__super__.enterEditMode.apply(this, arguments);
         }
     });
 

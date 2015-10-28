@@ -56,7 +56,7 @@ class EmailUserRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('eu');
         $qb
-            ->join('eu.folder', 'f')
+            ->join('eu.folders', 'f')
             ->join('f.origin', 'o')
             ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
             ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
@@ -86,7 +86,8 @@ class EmailUserRepository extends EntityRepository
         $qb = $this->createQueryBuilder('email_user');
 
         $qb->select('email_user.id')
-            ->andWhere('email_user.folder = :folder')
+            ->leftJoin('email_user.folders', 'folders')
+            ->andWhere($qb->expr()->in('folders', ':folder'))
             ->setParameter('folder', $folder);
 
         if ($ids) {
@@ -128,17 +129,22 @@ class EmailUserRepository extends EntityRepository
      * @param Organization $organization
      * @return mixed
      */
-    public function findUnseenUserEmail(User $user, Organization $organization)
+    public function findUnseenUserEmail(User $user, Organization $organization, $ids = [])
     {
         $qb = $this->createQueryBuilder('eu');
-
-        return $qb
-            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+        $qb->andWhere($qb->expr()->eq('eu.owner', ':owner'))
             ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
             ->setParameter('owner', $user)
             ->setParameter('organization', $organization)
             ->setParameter('seen', false);
+
+        if (!empty($ids)) {
+            $qb->andWhere($qb->expr()->in('eu.email', ':ids'))
+                ->setParameter('ids', $ids);
+        }
+
+        return $qb;
     }
 
     /**
@@ -189,11 +195,20 @@ class EmailUserRepository extends EntityRepository
      *
      * @return QueryBuilder
      */
-    public function getEmailUserByFolder($folder)
+    public function getEmailUserByFolder($folder, $limit = null, $offset = null)
     {
-        $queryBuilder = $this->createQueryBuilder('eu')
-            ->andWhere('eu.folder = :folder')
-            ->setParameter('folder', $folder);
+        $queryBuilder = $this->createQueryBuilder('eu');
+        $queryBuilder
+            ->leftJoin('eu.folders', 'folders')
+            ->andWhere($queryBuilder->expr()->in('folders', ':folder'))
+            ->setParameter('folder', $folder->getId())
+            ->groupBy('eu');
+        if ($offset) {
+            $queryBuilder->setFirstResult($offset);
+        }
+        if ($limit) {
+            $queryBuilder->setMaxResults($limit);
+        }
 
         return $queryBuilder;
     }
@@ -206,10 +221,12 @@ class EmailUserRepository extends EntityRepository
     public function getEmailUsersByFolderAndMessageIds(EmailFolder $folder, array $messages)
     {
         return $this
-            ->getEmailUserByFolder($folder)
+            ->createQueryBuilder('eu')
             ->leftJoin('eu.email', 'email')
             ->andWhere('email.messageId IN (:messageIds)')
+            ->andWhere('eu.origin IN (:origin)')
             ->setParameter('messageIds', $messages)
+            ->setParameter('origin', $folder->getOrigin())
             ->getQuery()
             ->getResult();
     }
@@ -248,7 +265,7 @@ class EmailUserRepository extends EntityRepository
      */
     protected function applyFolderFilter(QueryBuilder $queryBuilder, $type)
     {
-        $queryBuilder->join('eu.folder', 'f');
+        $queryBuilder->join('eu.folders', 'f');
 
         if (!is_array($type)) {
             $type = [$type];

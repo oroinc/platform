@@ -4,10 +4,10 @@ definitions:
         enabled: true
         order:   100
         entity:  Oro\Bundle\EmailBundle\Entity\Email
+        pre_conditions:
+            @blank: [$emailBody]
         actions_configuration:
             - @tree:
-                conditions:
-                    @blank: [$emailBody]
                 actions:
                     - @format_string:
                         attribute: $.arguments
@@ -30,13 +30,14 @@ definitions:
         enabled: true
         order:   50
         entity:  Oro\Bundle\EmailBundle\Entity\EmailUser
+        pre_conditions:
+            @and:
+                - @not_empty: [$origin]
+                - @equal: [$origin.active, true]
         actions_configuration:
             - @tree:
                 conditions:
-                    @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
-                        - @equal: [$seen, false]
+                    @equal: [$seen, false]
                 actions:
                     - @format_string:
                         attribute: $.arguments
@@ -52,10 +53,7 @@ definitions:
                             - ['--seen=false', $.arguments]
             - @tree:
                 conditions:
-                    @and:
-                        - @not_empty: [$folder.origin]
-                        - @equal: [$folder.origin.active, true]
-                        - @equal: [$seen, true]
+                    @equal: [$seen, true]
                 actions:
                     - @format_string:
                         attribute: $.arguments

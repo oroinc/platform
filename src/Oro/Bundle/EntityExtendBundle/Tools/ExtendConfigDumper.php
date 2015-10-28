@@ -391,6 +391,7 @@ class ExtendConfigDumper
             ? $configProvider->getConfigs($className, true)
             : $configProvider->filter($filter, $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
+            $this->updateFieldState($fieldConfig);
             $this->checkFieldSchema(
                 $entityName,
                 $fieldConfig,
@@ -399,7 +400,6 @@ class ExtendConfigDumper
                 $properties,
                 $doctrine
             );
-            $this->updateFieldState($fieldConfig);
         }
 
         $relations = $extendConfig->get('relation', false, []);

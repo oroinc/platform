@@ -1436,6 +1436,30 @@ footer {
 
 .modal {
   .border-radius(8px 8px 6px 6px);
+  .modal-header {
+    padding: 10px 5px 10px 20px;
+    .border-radius(6px 6px 0 0);
+    .box-shadow(0 0 6px 0 rgba(0, 0, 0, 0.5));
+    .close {
+      font-size: 25px;
+      height: 32px;
+      width: 32px;
+      margin-top: -6px;
+      color: @white;
+      text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
+      opacity: 0.9;
+      text-align: center;
+      line-height: 32px;
+      &:hover,
+      &:focus {
+        color: @white;
+        opacity: 0.6;
+      }
+    }
+    h3 {
+      font: bold 16px/18px @baseFontFamily;
+    }
+  }
 }
 
 .oro-modal-danger {
@@ -1445,32 +1469,11 @@ footer {
   .modal-header {
     background-color: #fdcece;
     border-bottom: 1px solid #d59c9c;
-    padding: 14px 15px 14px 20px;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-
   }
   .modal-body {
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-  }
-  .modal-header .close {
-    margin-top: -6px;
-    color: @white;
-    font-size: 25px;
-    text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
-    opacity: 0.9;
-    height: 32px;
-    width: 32px;
-    text-align: center;
-    line-height: 32px;
-    &:hover,
-    &:focus {
-      color: @white;
-      opacity: 0.6;
-    }
   }
   .modal-footer {
     background: none;
@@ -1480,41 +1483,21 @@ footer {
     box-shadow:  none;
     padding: 15px 15px 35px;
   }
-  .modal-header h3 {
-    font:bold 16px/18px @baseFontFamily;
-  }
 }
-.oro-modal-normal{
+.oro-modal-normal {
   background-color: #fff;
   width: 700px;
   margin-left: -350px;
-  height: 450px;
   top: 20%;
   .modal-header{
     background-color: #303944;
     border-bottom: 1px solid #303944;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
     color: #fff;
   }
   .modal-body{
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-    height: 87%;
-    overflow: hidden;
-  }
-  .modal-header .close{
-    color: @white;
-    font-size: 25px;
-    text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
-    opacity: 0.9;
-    &:hover,
-    &:focus {
-      color: @white;
-      opacity: 0.6;
-    }
   }
 }
 .modal-primary {
@@ -1525,18 +1508,11 @@ footer {
     background-color: #fcfcfc;
     #gradient > .vertical(#fcfcfc, #ebebeb);
     border-bottom: 1px solid #b2b2b2;
-    padding: 14px 15px 14px 20px;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
   }
   .modal-body {
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-  }
-  .modal-header .close {
-    font-size: 25px;
   }
   .modal-footer {
     background: none;
@@ -1545,9 +1521,6 @@ footer {
     -webkit-box-shadow:  none;
     box-shadow:  none;
     padding: 15px 15px 35px;
-  }
-  .modal-header h3 {
-    font:bold 16px/18px @baseFontFamily;
   }
 }
 .dropup:after,
@@ -2400,74 +2373,6 @@ div.uploader.focus,
 .alert-error > ul{
   margin-bottom: 0;
 }
-#flash-messages,
-.flash-messages {
-  position: relative;
-  .alert {
-    margin: 3px 0 0;
-    background-color: @warningBackground;
-    background-image: url('../../img/warning-ico.png');
-    background-position: 10px 48%;
-    background-repeat: no-repeat;
-    padding: 3px 35px 1px 37px;
-    border:1px solid rgba(241,216,103,.3);
-    text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    .close {
-      font-size: 18px;
-      color: @warningClose;
-      opacity: 1;
-    }
-  }
-  .alert-success {
-    background-color: @successBackground;
-    background-image: url('../../img/sucsses-ico.png');
-    border:1px solid rgba(77,161,36,.3);
-    color: @successText;
-    .close {
-      color: @successClose;
-    }
-  }
-  .alert-danger,
-  .alert-error {
-    background-image: url('../../img/error-ico.png');
-    background-color: @errorBackground;
-    border:1px solid rgba(203,17,17,.3);
-    color: @errorText;
-    .close {
-      color: @errorClose;
-    }
-  }
-  .alert-warning {
-    background-image: none;
-    padding-left: 20px;
-  }
-  .alert-info {
-    background-color: @infoBackground;
-    border-color: @infoBorder;
-    color: @infoText;
-    background-image: none;
-    padding-left: 20px;
-    .close {
-      color: @infoClose;
-    }
-  }
-  .alert-empty {
-    display: none;
-  }
-}
-.flash-messages-frame {
-  position: absolute;
-  left: 25%;
-  z-index: 500;
-  width: 50%;
-
-  .box-sizing(border-box);
-  padding: 0 10px;
-  opacity: 0.9;
-}
-.flash-messages-holder {
-  /*width: 100%; ticket/BAP-1733*/
-}
 .oro-multiselect {
   display: inline-block;
   width: auto;
@@ -2993,7 +2898,8 @@ span.validation-failed {
 .oro-tabs {
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
-  .nav-tabs > li > a:focus {
+  .nav-tabs > li > a:focus,
+  .nav-tabs-dropdown > li.dropdown.open > a {
     color: @gray;
     background-color: #fafafa;
     border-bottom: 1px solid #ddd;
@@ -3004,10 +2910,32 @@ span.validation-failed {
     margin-right: 0px;
   }
 
+  .nav-tabs-dropdown {
+    height: 38px;
+    overflow: hidden;
+    .dropdown-toggle:focus {
+      font-weight: normal;
+    }
+
+    li.dropdown.open .caret {
+      border-top-color: @linkColor !important;
+      border-bottom-color: @linkColor !important;
+    }
+
+    li.dropdown.open.active .caret {
+      border-top-color: @gray !important;
+      border-bottom-color: @gray !important;
+    }
+  }
+
   .nav-tabs > .active > a,
   .nav-tabs > .active > a:hover,
-  .nav-tabs > .active > a:focus {
+  .nav-tabs > .active > a:focus,
+  .nav-tabs > li.dropdown.open.active > a {
+    color: @gray;
     border-bottom: 1px solid #fff;
+    border-right-color: #ddd;
+    border-top-color: #ddd;
     background-color: transparent;
   }
 
@@ -3023,6 +2951,7 @@ span.validation-failed {
   }
 
   .tab-content {
+    overflow: initial;
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
     border-left: 1px solid #ddd;
@@ -3224,5 +3153,21 @@ label .popover-content {
   &.in {
     // fixes expand in FF
     min-height: 1px;
+  }
+}
+.icon-with-counter {
+  position: relative;
+  white-space: nowrap;
+  .item-counter {
+    font-size: 9px;
+    width: auto;
+    display: inline-block;
+    border-radius: 8px;
+    position: relative;
+    margin-left: -7px;
+    margin-right: -5px;
+    top: -1px;
+    line-height: 10px;
+    padding: 0 3px;
   }
 }

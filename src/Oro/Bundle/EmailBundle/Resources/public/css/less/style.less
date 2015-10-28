@@ -1,4 +1,8 @@
 @import "../../../oroui/css/less/mixins";
+@import "./header";
+@import "./email-notification-menu";
+@import "./short-emails-list";
+@import "./sidebar-widget";
 
 .auto-response-rules {
   .select-all-header-cell .all-visible {
@@ -599,12 +603,9 @@ a.attachment .icon .icon-link {
   cursor: pointer;
   padding: 0 7px 0 7px;
   white-space: nowrap;
-  .active {
-    background-color: #ebebeb;
-  }
 }
 
-.context-item:hover {
+.context-item:hover, .context-item.active {
   background-color: #ebebeb;
 }
 
@@ -735,183 +736,6 @@ a.sync-btn span.dots {
   width: 10px;
   display: inline-block;
   text-align: left;
-}
-
-.desktop-version #oroplatform-header .nav.user-menu .email-notification-menu.dropdown > .dropdown-menu {
-  right: 6px;
-}
-
-#oroplatform-header .nav.pull-right {
-  li.email-notification-menu.dropdown .dropdown-menu li a {
-    padding: 0;
-  }
-}
-
-.email-notification-menu {
-  .oro-dropdown-toggle {
-    .icon-envelope {
-      position: relative;
-      padding-top: 3px;
-      span {
-        font-size: 9px;
-        width: 23px;
-        display: inline-block;
-        background: #36424c;
-        border-radius: 8px;
-        position: absolute;
-        left: 12px;
-        top: 6px;
-        line-height: 10px;
-        padding-left: 3px;
-      }
-    }
-  }
-  .dropdown-menu {
-    width: 335px !important;
-    padding: 0;
-    outline: none;
-
-    .header {
-      padding: 0 17px;
-    }
-  }
-
-  .mark-as-read {
-    cursor: pointer;
-    height: 19px;
-    padding: 0 10px 0 8px;
-    margin-top: 8PX;
-    font-size: 12px;
-    line-height: 15px;
-    i {
-      float: left;
-      margin-top: 1px;
-      margin-right: 5px;
-      font-size: 13px;
-    }
-  }
-
-  .icon-envelope {
-    color: #FFFFFF;
-  }
-  .oro-dropdown-toggle {
-    .icon-envelope.new {
-      width: 25px;
-    }
-  }
-  .icon-envelope.new {
-    color: #fabb18;
-  }
-
-  .dropdown-menu {
-    .content {
-      display: none;
-    }
-    .empty {
-      display: none;
-    }
-    .notification {
-      display: none;
-    }
-  }
-
-  .dropdown-menu.content {
-    .content {
-      display: block;
-    }
-  }
-
-  .dropdown-menu.empty {
-    width: 200px !important;
-    .empty {
-      display: block;
-    }
-  }
-
-  .dropdown-menu.notification {
-    width: 160px !important;
-    .notification {
-      display: block;
-    }
-  }
-
-  .dropdown-menu {
-    .empty, .notification {
-      padding: 5px 10px
-    }
-  }
-  .items {
-    .icon-envelope {
-      &.new {
-        color: #fabb18;
-      }
-      color: #b4b4b4;
-    }
-    list-style-type: none;
-    margin: 0;
-
-    li {
-      border-bottom: 1px solid #f5eff3;
-      padding: 10px 17px 10px;
-      position: relative;
-      .icon-envelope {
-        position: absolute;
-        right: 18px;
-        top: 12px;
-      }
-      &.new {
-        background: #fff9e9;
-        .title {
-          color: #a38c62;
-        }
-        .description {
-          color: #615642;
-        }
-        .footer {
-          color: #c5b382;
-          a {
-            &:hover {
-              color: #a59364;
-            }
-            color: #c5b382;
-          }
-        }
-      }
-      .info {
-        cursor: pointer;
-      }
-      .body {
-        padding-right: 20px;
-      }
-      .title {
-        color: #4d4c4c;
-        line-height: 14px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .description {
-        color: #777777;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-      }
-      .footer {
-        font-size: 12px;
-        color: #b4b4b4;
-        a {
-          &:hover {
-            color: #777777;
-          }
-          color: #b4b4b4;
-          padding: 0;
-        }
-        .icon-reply {
-          display: none !important;
-        }
-      }
-    }
-  }
 }
 
 .ui-multiselect-menu.select-filter-widget.multiselect-origin-folder {

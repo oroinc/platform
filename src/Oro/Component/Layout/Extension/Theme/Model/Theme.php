@@ -23,6 +23,9 @@ class Theme
     protected $screenshot;
 
     /** @var string */
+    protected $description;
+
+    /** @var string */
     protected $directory;
 
     /** @var string[] */
@@ -124,6 +127,22 @@ class Theme
     public function setScreenshot($screenshot)
     {
         $this->screenshot = $screenshot;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**

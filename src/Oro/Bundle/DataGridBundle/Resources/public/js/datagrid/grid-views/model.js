@@ -18,6 +18,7 @@ define([
         defaults: {
             filters: [],
             sorters: [],
+            columns: {},
             deletable: false,
             editable:  false
         },
@@ -67,6 +68,7 @@ define([
             return {
                 filters:  this.get('filters'),
                 sorters:  this.get('sorters'),
+                columns:  this.get('columns'),
                 gridView: this.get('name')
             };
         },

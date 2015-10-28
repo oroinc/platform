@@ -7,6 +7,10 @@ placeholders:
         items:
             email_filter_templates:
                 order: 5
+    requirejs_config_extend:
+        items:
+            email_requirejs_config:
+                order: 100
 
 items:
     oro_send_email_button:
@@ -20,3 +24,6 @@ items:
         applicable: @oro_user.placeholder.filter->isUserApplicable()
     email_filter_templates:
         template: OroEmailBundle:Js:default_templates.js.twig
+    email_requirejs_config:
+        template: OroEmailBundle::requirejs.config.js.twig
+        applicable: @oro_user.placeholder.filter->isUserApplicable()
