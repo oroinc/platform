@@ -34,22 +34,22 @@ class FieldAclExtension extends EntityAclExtension
             'VIEW' => EntityMaskBuilder::IDENTITY,
             'EDIT' => EntityMaskBuilder::IDENTITY,
         ];
-        $this->map = array(
-            'VIEW'   => array(
+        $this->map                             = [
+            'VIEW' => [
                 EntityMaskBuilder::MASK_VIEW_BASIC,
                 EntityMaskBuilder::MASK_VIEW_LOCAL,
                 EntityMaskBuilder::MASK_VIEW_DEEP,
                 EntityMaskBuilder::MASK_VIEW_GLOBAL,
                 EntityMaskBuilder::MASK_VIEW_SYSTEM,
-            ),
-            'EDIT'   => array(
+            ],
+            'EDIT' => [
                 EntityMaskBuilder::MASK_EDIT_BASIC,
                 EntityMaskBuilder::MASK_EDIT_LOCAL,
                 EntityMaskBuilder::MASK_EDIT_DEEP,
                 EntityMaskBuilder::MASK_EDIT_GLOBAL,
                 EntityMaskBuilder::MASK_EDIT_SYSTEM,
-            ),
-        );
+            ],
+        ];
     }
 
     /**

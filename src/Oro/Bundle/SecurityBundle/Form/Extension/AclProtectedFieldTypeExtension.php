@@ -104,9 +104,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             // add violation to form
             $childForm->addError(
                 new FormError(
-                    null,
-                    'You are not allowed to modify \'%%field%%\' field.',
-                    ['%%field%%' => $childForm->getName()]
+                    sprintf('You are not allowed to modify \'%s\' field.', $childForm->getName())
+                    // do not use message template and 'message parameters' params here
+                    // they are not processed in SOAP responses, only message will be used
                 )
             );
         }
