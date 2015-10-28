@@ -2,26 +2,39 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
 
 class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
 {
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param FieldConfigModel $entity
+     *
      * {@inheritdoc}
      */
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         $existingEntity = parent::findExistingEntity($entity, $searchContext);
 
-        if (!$existingEntity and $entity instanceof FieldConfigModel) {
+        if (!$existingEntity) {
             $existingEntity = $this->databaseHelper->findOneBy(
                 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
-                [
-                    'fieldName' => $entity->getFieldName(),
-                    'type' => $entity->getType(),
-                    'entity' => $entity->getEntity()
-                ]
+                ['fieldName' => $entity->getFieldName(), 'entity' => $entity->getEntity()]
             );
         }
 
@@ -29,24 +42,44 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
     }
 
     /**
+     * @param FieldConfigModel $entity
+     * @param FieldConfigModel $existingEntity
+     *
      * {@inheritdoc}
      */
-    protected function importExistingEntity(
-        $entity,
-        $existingEntity,
-        $itemData = null,
-        array $excludedFields = array()
-    ) {
-        $excludedFields[] = 'fieldName';
-        $excludedFields[] = 'type';
-        $excludedFields[] = 'entity';
+    protected function importExistingEntity($entity, $existingEntity, $itemData = null, array $excludedFields = [])
+    {
+        if ($this->isSystemField($existingEntity)) {
+            return null;
+        }
 
-        parent::importExistingEntity($entity, $existingEntity, $itemData, $excludedFields);
+        if ($entity->getType() !== $existingEntity->getType()) {
+            $this->context->incrementErrorEntriesCount();
+            $this->strategyHelper->addValidationErrors(
+                [$this->translator->trans('oro.entity_config.importexport.message.invelid_field_type')],
+                $this->context
+            );
+
+            return null;
+        }
+
+        $entity->fromArray(
+            'extend',
+            array_merge($existingEntity->toArray('extend'), ['state' => ExtendScope::STATE_UPDATE]),
+            []
+        );
+
+        /** @var ConfigManager $configManager */
+        parent::importExistingEntity(
+            $entity,
+            $existingEntity,
+            $itemData,
+            array_merge($excludedFields, ['fieldName', 'type', 'entity'])
+        );
     }
 
     /**
-     * @param object $entity
-     * @return null|object
+     * {@inheritdoc}
      */
     protected function validateAndUpdateContext($entity)
     {
@@ -78,5 +111,16 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
         }
 
         return $entity;
+    }
+
+    /**
+     * @param FieldConfigModel $entity
+     * @return bool
+     */
+    protected function isSystemField(FieldConfigModel $entity)
+    {
+        $extend = $entity->toArray('extend');
+
+        return $extend['owner'] === ExtendScope::OWNER_SYSTEM;
     }
 }

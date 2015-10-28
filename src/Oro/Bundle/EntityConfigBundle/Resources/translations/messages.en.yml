@@ -55,3 +55,7 @@ oro:
         form:
             name.label: Name
             type.label: Type
+
+        importexport:
+            message:
+                invelid_field_type:  Invalid field type

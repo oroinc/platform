@@ -17,6 +17,8 @@ services:
     oro_entity_config.importexport.strategy.entity_field.add_or_replace:
         class: %oro_entity_config.importexport.strategy.entity_field.add_or_replace.class%
         parent: oro_importexport.strategy.configurable_add_or_replace
+        calls:
+            - [setTranslator, [@translator]]
 
     # Template Fixture
     oro_entity_config.importexport.template_fixture.entity_field:
@@ -57,7 +59,5 @@ services:
     oro_entity_config.importexport.writer.entity_field:
         class: %oro_entity_config.importexport.writer.entity_field.class%
         arguments:
-            - @doctrine
             - @oro_entity_config.config_manager
-            - @translator.default
-            - @oro_translation.database_translation.metadata.cache
+            - @oro_entity_config.translation.helper

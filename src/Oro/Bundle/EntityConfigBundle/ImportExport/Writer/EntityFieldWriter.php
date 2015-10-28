@@ -2,69 +2,28 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
-
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 
-class EntityFieldWriter implements ItemWriterInterface, StepExecutionAwareInterface
+class EntityFieldWriter implements ItemWriterInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
-    protected $translator;
+    /** @var ConfigTranslationHelper */
+    protected $translationHelper;
 
     /**
-     * @var DynamicTranslationMetadataCache
+     * @param ConfigManager $configManager
+     * @param ConfigTranslationHelper $translationHelper
      */
-    protected $dbTranslationMetadataCache;
-
-    /** @var StepExecution */
-    protected $stepExecution;
-
-    /**
-     * @param ManagerRegistry                 $doctrine
-     * @param ConfigManager                   $configManager
-     * @param Translator                      $translator
-     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
-     */
-    public function __construct(
-        ManagerRegistry $doctrine,
-        ConfigManager $configManager,
-        Translator $translator,
-        DynamicTranslationMetadataCache $dbTranslationMetadataCache
-    ) {
-        $this->doctrine                   = $doctrine;
-        $this->configManager              = $configManager;
-        $this->translator                 = $translator;
-        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
-    }
-
-    /**
-     * @param StepExecution $stepExecution
-     */
-    public function setStepExecution(StepExecution $stepExecution)
+    public function __construct(ConfigManager $configManager, ConfigTranslationHelper $translationHelper)
     {
-        $this->stepExecution = $stepExecution;
+        $this->configManager = $configManager;
+        $this->translationHelper = $translationHelper;
     }
 
     /**
@@ -82,61 +41,37 @@ class EntityFieldWriter implements ItemWriterInterface, StepExecutionAwareInterf
      */
     protected function writeItem(FieldConfigModel $configModel)
     {
-        $labelsToBeUpdated = [];
+        $translations = [];
+
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
-
             $data = $configModel->toArray($scope);
 
-            if (!empty($data)) {
-                $configId = $this->configManager->getConfigIdByModel($configModel, $scope);
-                $config   = $provider->getConfigById($configId);
+            if (!$data) {
+                continue;
+            }
 
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
-                foreach ($data as $code => $value) {
-                    if (in_array($code, $translatable, true)) {
-                        // check if a label text was changed
-                        $labelKey = $config->get($code);
-                        if (!$configModel->getId()) {
-                            $labelsToBeUpdated[$labelKey] = $value;
-                        } elseif ($value != $this->translator->trans($labelKey)) {
-                            $labelsToBeUpdated[$labelKey] = $value;
-                        }
-                        // replace label text with label name in $value variable
-                        $value = $config->get($code);
+            $configId = $this->configManager->getConfigIdByModel($configModel, $scope);
+            $config = $provider->getConfigById($configId);
+            $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
+
+            foreach ($data as $code => $value) {
+                if (in_array($code, $translatable, true)) {
+                    // check if a label text was changed
+                    $labelKey = $config->get($code);
+
+                    if (!$configModel->getId() || !$this->translationHelper->isTranslationEqual($labelKey, $value)) {
+                        $translations[$labelKey] = $value;
                     }
-                    $config->set($code, $value);
+                    // replace label text with label name in $value variable
+                    $value = $labelKey;
                 }
-
-                $this->configManager->persist($config);
+                $config->set($code, $value);
             }
-        }
-
-        // update changed labels if any
-        if (!empty($labelsToBeUpdated)) {
-            /** @var EntityManager $translationEm */
-            $translationEm = $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
-            /** @var TranslationRepository $translationRepo */
-            $translationRepo = $translationEm->getRepository(Translation::ENTITY_NAME);
-
-            $values = [];
-            $locale = $this->translator->getLocale();
-            foreach ($labelsToBeUpdated as $labelKey => $labelText) {
-                // save into translation table
-                $values[] = $translationRepo->saveValue(
-                    $labelKey,
-                    $labelText,
-                    $locale,
-                    TranslationRepository::DEFAULT_DOMAIN,
-                    Translation::SCOPE_UI
-                );
-            }
-            // mark translation cache dirty
-            $this->dbTranslationMetadataCache->updateTimestamp($locale);
-
-            $translationEm->flush($values);
+            $this->configManager->persist($config);
         }
 
         $this->configManager->flush();
+        $this->translationHelper->saveTranslations($translations);
     }
 }

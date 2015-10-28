@@ -197,7 +197,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      * @param mixed $value
      * @return mixed
      */
-    public function denormalizeFieldValue($config, $value)
+    protected function denormalizeFieldValue($config, $value)
     {
         if (!isset($config[self::CONFIG_TYPE])) {
             return $value;
