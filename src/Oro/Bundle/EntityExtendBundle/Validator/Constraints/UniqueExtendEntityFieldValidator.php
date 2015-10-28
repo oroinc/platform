@@ -9,20 +9,23 @@ use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Form\Util\UniqueFieldNameHelper;
 
+/**
+ * Validates field name for uniqueness. When generating setter and getter methods, characters `_` and `-` are removed
+ * and as result e.g for names `id` and `i_d` methods names are identical.
+ */
 class UniqueExtendEntityFieldValidator extends ConstraintValidator
 {
-    /** @var ConfigProvider  */
-    protected $configProvider;
+    /** @var UniqueFieldNameHelper */
+    protected $uniqueFieldNameHelper;
 
     /**
-     * @param ConfigProvider $configProvider
+     * @param UniqueFieldNameHelper $uniqueFieldNameHelper
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(UniqueFieldNameHelper $uniqueFieldNameHelper)
     {
-        $this->configProvider = $configProvider;
+        $this->uniqueFieldNameHelper = $uniqueFieldNameHelper;
     }
 
     /**
@@ -39,26 +42,18 @@ class UniqueExtendEntityFieldValidator extends ConstraintValidator
             );
         }
 
-        $newFieldName = strtolower(Inflector::classify(($value->getFieldName())));
+        $className = $value->getEntity()->getClassName();
+        $fieldName = $value->getFieldName();
 
-        // Need hardcoded check for the `id`, `serialized_data` fields.
-        if (in_array($newFieldName, ['id', strtolower(Inflector::classify('serialized_data'))], true)) {
+        // Need hardcoded check for `id` field.
+        if (strtolower(Inflector::classify(($fieldName))) === 'id') {
             $this->addViolation($constraint);
 
             return;
         }
 
-        $className = $value->getEntity()->getClassName();
-        $configs   = $this->configProvider->getConfigs($className, true);
-        foreach ($configs as $config) {
-            /** @var FieldConfigId $configId */
-            $configId  = $config->getId();
-            $fieldName = $configId->getFieldName();
-            if ($newFieldName === strtolower(Inflector::classify($fieldName))) {
-                $this->addViolation($constraint);
-
-                return;
-            }
+        if (!$this->uniqueFieldNameHelper->isFieldNameUnique($className, $fieldName)) {
+            $this->addViolation($constraint);
         }
     }
 

@@ -134,6 +134,7 @@ oro:
             related_entity.label:         Related entity
             datagrid.view:                View
             exclude_definitions.label:    Exclude Definitions
+            pre_conditions_configuration.label: Pre-conditons configuration
 
         processtrigger:
             entity_label:         Process Trigger
