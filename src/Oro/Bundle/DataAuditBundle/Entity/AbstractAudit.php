@@ -47,8 +47,6 @@ abstract class AbstractAudit extends AbstractLogEntry
 
     /**
      * @var AbstractAuditField[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="AbstractAuditField", mappedBy="audit", cascade={"persist"})
      */
     protected $fields;
 
