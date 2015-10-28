@@ -263,6 +263,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     {
         $updatedValue = [];
         foreach ($value as $key => $subvalue) {
+            $updatedValue[$key] = [];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
                 $updatedValue[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
             }
