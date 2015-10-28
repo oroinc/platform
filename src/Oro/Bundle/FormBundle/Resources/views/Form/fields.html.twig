@@ -408,9 +408,9 @@
 {% endblock %}
 
 {% block oro_autocomplete_widget %}
-    {% if autocomplete.result_template_twig is defined and autocomplete.result_template_twig %}
+    {% if autocomplete.selection_template_twig is defined and autocomplete.selection_template_twig %}
         {% set componentOptions = componentOptions|merge({
-            result_template: include(autocomplete.result_template_twig)
+            selection_template: include(autocomplete.selection_template_twig)
         }) %}
     {% endif %}
     {% set attr = attr|merge({

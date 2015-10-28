@@ -242,6 +242,8 @@ services:
 
     oro_form.type.oro_autocomplete:
         class: %oro_form.type.oro_autocomplete.class%
+        arguments:
+            - @oro_form.autocomplete.search_registry
         tags:
             - { name: form.type, alias: oro_autocomplete }
 

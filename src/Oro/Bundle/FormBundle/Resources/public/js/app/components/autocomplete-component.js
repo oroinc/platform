@@ -14,6 +14,7 @@ define(function(require) {
         options: {
             route_name: '',
             route_parameters: {},
+            properties: [],
             timeout: 500
         },
 
@@ -39,6 +40,7 @@ define(function(require) {
             AutocompleteComponent.__super__.initialize.apply(this, arguments);
 
             var thisOptions = {
+                selection_template: _.bind(this.renderSelection, this),
                 config: {
                     source: _.bind(this.source, this),
                     matcher: _.bind(this.matcher, this),
@@ -55,8 +57,8 @@ define(function(require) {
                 );
             }
 
-            if (!_.isFunction(this.options.result_template)) {
-                this.options.result_template = _.template(this.options.result_template);
+            if (!_.isFunction(this.options.selection_template) && !_.isEmpty(this.options.selection_template)) {
+                this.options.selection_template = _.template(this.options.selection_template);
             }
 
             this.$el.typeahead(this.options.config);
@@ -108,7 +110,7 @@ define(function(require) {
             var self = this;
             this.resultsMapping = {};
             return _.map(response.results || [], function(item) {
-                var result = $.trim(self.renderResult(item));
+                var result = $.trim(self.options.selection_template(item));
                 self.resultsMapping[result] = item;
                 return result;
             });
@@ -118,8 +120,22 @@ define(function(require) {
          * @param {Object} result
          * @returns {String}
          */
-        renderResult: function(result) {
-            return this.options.result_template(result);
+        renderSelection: function(result) {
+            var title = '';
+            if (result) {
+                if (this.options.properties.length === 0) {
+                    if (result.text !== undefined) {
+                        title = result.text;
+                    }
+                } else {
+                    var values = [];
+                    _.each(this.options.properties, function(property) {
+                        values.push(result[property]);
+                    });
+                    title = values.join(' ');
+                }
+            }
+            return title;
         }
     });
 
