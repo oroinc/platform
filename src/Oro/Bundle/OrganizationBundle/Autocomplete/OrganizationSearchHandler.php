@@ -9,6 +9,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 
 class OrganizationSearchHandler implements SearchHandlerInterface
 {
@@ -58,9 +59,10 @@ class OrganizationSearchHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage, $searchById = false)
     {
         $user = $this->securityContextLink->getService()->getToken()->getUser();
+        /** @var OrganizationRepository $repository */
         $repository = $this->managerRegistry->getRepository($this->className);
         if (!$searchById) {
-            $items = $repository->getEnabledUserOrganizationsByName($user, $query);
+            $items = $repository->getEnabledByUserAndName($user, $query);
         } else {
             $items = $repository->getEnabledUserOrganizationById($user, $query);
         }

@@ -37,16 +37,6 @@ class WorkflowManager
     protected $configManager;
 
     /**
-     * @var int
-     */
-    protected $massStartBatchSize = 100;
-
-    /**
-     * @var int
-     */
-    protected $massTransitBatchSize = 100;
-
-    /**
      * @param ManagerRegistry $registry
      * @param WorkflowRegistry $workflowRegistry
      * @param DoctrineHelper $doctrineHelper
@@ -198,17 +188,16 @@ class WorkflowManager
      *      ...
      * )
      *
-     * @param array $workflowList
+     * @param array $data
      * @throws \Exception
      */
-    public function massStartWorkflow(array $workflowList)
+    public function massStartWorkflow(array $data)
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $i = 0;
-            foreach ($workflowList as $row) {
+            foreach ($data as $row) {
                 if (empty($row['workflow']) || empty($row['entity'])) {
                     continue;
                 }
@@ -220,15 +209,9 @@ class WorkflowManager
 
                 $workflowItem = $workflow->start($entity, $data, $transition);
                 $em->persist($workflowItem);
+            }
 
-                $i++;
-                if ($i % $this->massStartBatchSize == 0) {
-                    $em->flush();
-                }
-            }
-            if ($i % $this->massStartBatchSize > 0) {
-                $em->flush();
-            }
+            $em->flush();
             $em->commit();
         } catch (\Exception $e) {
             $em->rollback();
@@ -259,7 +242,7 @@ class WorkflowManager
             throw $e;
         }
     }
-    
+
     /**
      * Transit several workflow items in one transaction
      *
@@ -281,7 +264,6 @@ class WorkflowManager
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $i = 0;
             foreach ($data as $row) {
                 if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
                     || empty($row['transition'])
@@ -296,15 +278,9 @@ class WorkflowManager
 
                 $workflow->transit($workflowItem, $transition);
                 $workflowItem->setUpdated(); // transition might not change workflow item
+            }
 
-                $i++;
-                if ($i % $this->massTransitBatchSize == 0) {
-                    $em->flush();
-                }
-            }
-            if ($i % $this->massTransitBatchSize > 0) {
-                $em->flush();
-            }
+            $em->flush();
             $em->commit();
         } catch (\Exception $e) {
             $em->rollback();
@@ -456,38 +432,6 @@ class WorkflowManager
 
         return $activeWorkflow && $currentWorkflowItem &&
                $currentWorkflowItem->getWorkflowName() !== $activeWorkflow->getName();
-    }
-
-    /**
-     * @return int
-     */
-    public function getMassStartBatchSize()
-    {
-        return $this->massStartBatchSize;
-    }
-
-    /**
-     * @param int $massStartBatchSize
-     */
-    public function setMassStartBatchSize($massStartBatchSize)
-    {
-        $this->massStartBatchSize = $massStartBatchSize;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMassTransitBatchSize()
-    {
-        return $this->massTransitBatchSize;
-    }
-
-    /**
-     * @param int $massTransitBatchSize
-     */
-    public function setMassTransitBatchSize($massTransitBatchSize)
-    {
-        $this->massTransitBatchSize = $massTransitBatchSize;
     }
 
     /**

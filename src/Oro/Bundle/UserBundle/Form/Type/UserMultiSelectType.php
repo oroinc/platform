@@ -28,6 +28,10 @@ class UserMultiSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // The event listener fixes transformation from empty string to array with empty string.
+        // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
+        // Example: explode(',', '') => array(0=>'').
+        // @todo remove after vendor fixation
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {

@@ -10,6 +10,8 @@ services:
             - @validator
             - @translator
             - @oro_importexport.field.field_helper
+        calls:
+            - [setConfigProvider, [@oro_entity_config.provider.extend]]
 
     oro_importexport.strategy.add:
         abstract: true

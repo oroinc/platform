@@ -118,6 +118,7 @@ oro:
         statuses.label:              Statuses
         username.label:              Username
         organization.label:          Organization
+        business_unit.label:         Business Unit
 
         # extended field added in migrations
         title.label:                 Title

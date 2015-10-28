@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
@@ -113,5 +112,35 @@ class UserRepository extends EntityRepository implements EmailAwareRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * @param array $usernames
+     *
+     * @return array
+     */
+    public function findUsersByUsernames(array $usernames)
+    {
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('u');
+        $queryBuilder->where($queryBuilder->expr()->in('u.username', $usernames))
+            ->orderBy('u.username');
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param array $ids
+     *
+     * @return array
+     */
+    public function findUsersByIds(array $ids)
+    {
+        $queryBuilder = $this->createQueryBuilder('u')
+            ->select('u');
+        $queryBuilder->where($queryBuilder->expr()->in('u.id', $ids))
+            ->orderBy('u.username');
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }
