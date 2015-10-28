@@ -38,9 +38,9 @@ class BigNumberFormatter
                 $value = $this->numberFormatter->formatCurrency($value);
                 break;
             case 'percent':
-                $precision = 2;
+                $precision = 4;
                 if ($isDeviant) {
-                    $precision = 4;
+                    $precision = 2;
                 }
                 $value = round($value, $precision);
                 $value = $this->numberFormatter->formatPercent($value);
