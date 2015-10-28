@@ -9,7 +9,9 @@ oro_entity_config:
             items:
                 # custom field header, by default field label is used
                 header:
-                    options: []
+                    options:
+                        value_type:         string
+                        default_value:      null
                     form:
                         type:               text
                         options:
@@ -21,6 +23,7 @@ oro_entity_config:
                 order:
                     options:
                         value_type:         integer
+                        default_value:      null
                     form:
                         type:               integer
                         options:

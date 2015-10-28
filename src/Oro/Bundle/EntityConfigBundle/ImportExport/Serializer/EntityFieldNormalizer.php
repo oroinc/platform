@@ -7,7 +7,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
@@ -15,13 +14,13 @@ use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 
 class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterface
 {
-    const TYPE_BOOLEAN  = 'boolean';
-    const TYPE_INTEGER  = 'integer';
-    const TYPE_STRING   = 'string';
-    const TYPE_ENUM     = 'enum';
+    const TYPE_BOOLEAN = 'boolean';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_STRING = 'string';
+    const TYPE_ENUM = 'enum';
 
-    const CONFIG_TYPE       = 'value_type';
-    const CONFIG_DEFAULT    = 'default_value';
+    const CONFIG_TYPE = 'value_type';
+    const CONFIG_DEFAULT= 'default_value';
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -115,63 +114,82 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $fieldName = $data['fieldName'];
         $fieldType = $data['type'];
 
-        $configOptions = [];
-        foreach ($data as $key => $value) {
-            $this->extractAndAppendKeyValue($configOptions, $key, $value);
-        }
-
         $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
 
         if (!in_array($fieldType, $supportedTypes, true)) {
             return false;
         }
 
-        $options = [
-            'extend' => [
-                'owner'     => ExtendScope::OWNER_CUSTOM,
-                'state'     => ExtendScope::STATE_NEW,
-                'origin'    => ExtendScope::ORIGIN_CUSTOM,
-                'is_extend' => true,
-                'is_deleted' => false,
-                'is_serialized' => false,
-            ]
-        ];
-
-        $fieldProperties = $this->fieldTypeProvider->getFieldProperties($fieldType);
-
-        foreach ($fieldProperties as $scope => $properties) {
-            foreach ($properties as $code => $config) {
-                if (array_key_exists($scope, $configOptions) && array_key_exists($code, $configOptions[$scope])) {
-                    if (!isset($options[$scope])) {
-                        $options[$scope] = [];
-                    }
-
-                    $importOptions = isset($config['options']) ? $config['options'] : [];
-
-                    $options[$scope][$code] = $this->denormalizeFieldValue(
-                        $importOptions,
-                        $configOptions[$scope][$code]
-                    );
-                }
-            }
+        $configOptions = [];
+        foreach ($data as $key => $value) {
+            $this->extractAndAppendKeyValue($configOptions, $key, $value);
         }
 
-        $entityClassName = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
+        $options = $this->getDefaultScopeOptions();
 
-        /* @var $entity EntityConfigModel */
-        $entity = $this->registry->getManagerForClass($entityClassName)->find($entityClassName, $data['entity']['id']);
+        $fieldProperties = $this->fieldTypeProvider->getFieldProperties($fieldType);
+        foreach ($fieldProperties as $scope => $properties) {
+            $this->updateScopeOptions($options, $configOptions, $scope, $properties);
+        }
+
+        $entity = $this->getEntityConfigModel($data['entity']['id']);
 
         $field = $this->configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
-        $field->setCreated(new \DateTime());
 
+        $this->updateFieldConfig($field, $options);
+
+        $field->setCreated(new \DateTime());
+        $field->setUpdated(new \DateTime());
+
+        return $field;
+    }
+
+    /**
+     * @param int $entityId
+     * @return EntityConfigModel
+     */
+    protected function getEntityConfigModel($entityId)
+    {
+        $entityClassName = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
+
+        return $this->registry->getManagerForClass($entityClassName)->find($entityClassName, $entityId);
+    }
+
+    /**
+     * @param array $options
+     * @param array $configOptions
+     * @param string $scope
+     * @param array $properties
+     */
+    protected function updateScopeOptions(&$options, $configOptions, $scope, $properties)
+    {
+        foreach ($properties as $code => $config) {
+            if (!array_key_exists($scope, $configOptions) || !array_key_exists($code, $configOptions[$scope])) {
+                continue;
+            }
+
+            if (!isset($options[$scope])) {
+                $options[$scope] = [];
+            }
+
+            $importOptions = isset($config['options']) ? $config['options'] : [];
+
+            $options[$scope][$code] = $this->denormalizeFieldValue($importOptions, $configOptions[$scope][$code]);
+        }
+    }
+
+    /**
+     * @param FieldConfigModel $field
+     * @param array $options
+     */
+    protected function updateFieldConfig(FieldConfigModel $field, array $options)
+    {
         foreach ($options as $scope => $scopeValues) {
             $configProvider = $this->configManager->getProvider($scope);
-            $config         = $configProvider->getConfig($entity->getClassName(), $fieldName);
+            $config         = $configProvider->getConfig($field->getEntity()->getClassName(), $field->getFieldName());
             $indexedValues  = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
             $field->fromArray($scope, $scopeValues, $indexedValues);
         }
-
-        return $field;
     }
 
     /**
@@ -185,35 +203,73 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             return $value;
         }
 
-        if ($value === null && isset($config[self::CONFIG_DEFAULT])) {
-            $value = $config[self::CONFIG_DEFAULT];
+        if ($value === null && array_key_exists(self::CONFIG_DEFAULT, $config)) {
+            return $config[self::CONFIG_DEFAULT];
         }
 
         switch ($config[self::CONFIG_TYPE]) {
             case self::TYPE_BOOLEAN:
-                $lvalue = strtolower($value);
-                if (in_array($lvalue, ['yes', 'no', 'true', 'false'])) {
-                    $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
-                }
-
-                return (bool)$value;
+                return $this->normalizeBoolValue($value);
 
             case self::TYPE_INTEGER:
-                return (int)$value;
+                return $this->normalizeIntegerValue($value);
 
             case self::TYPE_ENUM:
-                $updatedValue = [];
-                foreach ($value as $key => $subvalue) {
-                    foreach ($this->getEnumConfig() as $subfield => $subconfig) {
-                        $updatedValue[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $value[$key][$subfield]);
-                    }
-                }
-                return $updatedValue;
+                return $this->normalizeEnumValue($value);
 
             case self::TYPE_STRING:
             default:
-                return (string)$value;
+                return $this->normalizeStringValue($value);
         }
+    }
+
+    /**
+     * @param mixed $value
+     * @return int
+     */
+    protected function normalizeIntegerValue($value)
+    {
+        return (int)$value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected function normalizeStringValue($value)
+    {
+        return (string)$value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    protected function normalizeBoolValue($value)
+    {
+        $lvalue = strtolower($value);
+        if (in_array($lvalue, ['yes', 'no', 'true', 'false'])) {
+            $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
+        }
+
+        return (bool)$value;
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     */
+    protected function normalizeEnumValue($value)
+    {
+        $updatedValue = [];
+        foreach ($value as $key => $subvalue) {
+            $updatedValue[$key] = [];
+            foreach ($this->getEnumConfig() as $subfield => $subconfig) {
+                $updatedValue[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
+            }
+        }
+
+        return $updatedValue;
     }
 
     /**
@@ -240,6 +296,23 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $current = $value;
 
         return true;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDefaultScopeOptions()
+    {
+        return [
+            'extend' => [
+                'owner'     => ExtendScope::OWNER_CUSTOM,
+                'state'     => ExtendScope::STATE_NEW,
+                'origin'    => ExtendScope::ORIGIN_CUSTOM,
+                'is_extend' => true,
+                'is_deleted' => false,
+                'is_serialized' => false,
+            ]
+        ];
     }
 
     /**
