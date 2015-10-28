@@ -14,10 +14,7 @@ define(function(require) {
         options: {
             route_name: '',
             route_parameters: {},
-            timeout: 500,
-            config: {
-                minLength: 1
-            }
+            timeout: 500
         },
 
         /**
