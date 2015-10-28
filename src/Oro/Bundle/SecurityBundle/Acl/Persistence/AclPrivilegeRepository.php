@@ -41,8 +41,9 @@ class AclPrivilegeRepository
     protected $translator;
 
     /**
-     * @param AclManager $manager
+     * @param AclManager          $manager
      * @param TranslatorInterface $translator
+     * @param Registry            $doctrine
      */
     final public function __construct(AclManager $manager, TranslatorInterface $translator, Registry $doctrine)
     {
@@ -93,7 +94,7 @@ class AclPrivilegeRepository
     {
         $extensionKey = 'field';
         $extension = $this->manager->getExtensionSelector()->select(
-            'field:' . $className
+            $extensionKey . ':' . $className
         );
 
         $entityClass = array_filter(
