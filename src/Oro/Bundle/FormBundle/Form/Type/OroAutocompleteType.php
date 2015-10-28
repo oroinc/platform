@@ -8,9 +8,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OroEntityAutocompleteType extends AbstractType
+class OroAutocompleteType extends AbstractType
 {
-    const NAME = 'oro_entity_autocomplete';
+    const NAME = 'oro_autocomplete';
 
     /**
      * {@inheritDoc}
