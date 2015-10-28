@@ -342,7 +342,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title }}</a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}

@@ -516,6 +516,9 @@
             {% endif %}
             {{ _self.renderWidgetAttributes(options) }}
         {% endif %}
+        {% if parameters.pageComponent is defined %}
+            {{ _self.renderPageComponentAttributes(parameters.pageComponent) }}
+        {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
         {% endif %}
@@ -905,7 +908,7 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
 
