@@ -1,0 +1,49 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set label = 'oro.security.action.share'|trans %}
+{% set title = label %}
+{% set shareCount = oro_share_count(entity) %}
+{% if shareCount > 0 %}
+    {% set label = label ~ ' (' ~ shareCount ~ ')' %}
+    {% set name = oro_shared_with_name(entity) %}
+    {% if shareCount > 1 %}
+        {% set title = 'oro.security.action.shared_with_plural'|trans({
+            '{{ name }}': name,
+            '{{ count }}': shareCount - 1
+        }) %}
+    {% else %}
+        {% set title = 'oro.security.action.shared_with'|trans({
+            '{{ name }}': name,
+        }) %}
+    {% endif %}
+{% endif %}
+
+{{ UI.clientButton({
+    'dataUrl': path(
+    'oro_share_update', {
+        entityClass: oro_class_name(entity, true),
+        entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-share',
+    'dataId': entity.id,
+    'label': label,
+    'title': title,
+    'widget': {
+        'type': 'dialog',
+        'multiple': false,
+        'refresh-widget-alias': 'activity-list-widget',
+        'options': {
+            'alias': 'shared-dialog',
+            'dialogOptions': {
+                'title': 'oro.security.share_scopes.widget.title'|trans,
+                'allowMaximize': false,
+                'allowMinimize': false,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 455,
+                'height': 400
+            }
+        }
+    }
+}) }}

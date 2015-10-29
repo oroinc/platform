@@ -28,17 +28,18 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-
         $userManager = $this->container->get('oro_user.manager');
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
+            ->setFirstName("First Name")
+            ->setLastName("Last Name")
             ->setOrganization($organization)
             ->setOrganizations(new ArrayCollection([$organization]))
+            ->setOwner($organization->getBusinessUnits()->first())
             ->setEnabled(true);
-
         $userManager->updateUser($user);
 
         $this->setReference($user->getUsername(), $user);

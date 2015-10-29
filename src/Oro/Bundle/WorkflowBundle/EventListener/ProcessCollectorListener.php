@@ -302,6 +302,11 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 /** @var ProcessData $data */
                 $data = $entityProcess['data'];
 
+                if (!$this->handler->isTriggerApplicable($trigger, $data)) {
+                    $this->logger->debug('Process trigger is not applicable', $trigger, $data);
+                    continue;
+                }
+
                 if ($trigger->isQueued() || $this->forceQueued) {
                     $processJob = $this->queueProcess($trigger, $data);
                     $entityManager->persist($processJob);

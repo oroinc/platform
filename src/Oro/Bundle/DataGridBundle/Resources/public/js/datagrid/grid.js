@@ -20,6 +20,7 @@ define(function(require) {
     var ResetCollectionAction = require('oro/datagrid/action/reset-collection-action');
     var ExportAction = require('oro/datagrid/action/export-action');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     /**
      * Basic grid class.
@@ -142,6 +143,7 @@ define(function(require) {
                 this.pluginManager.enable(options.plugins);
             }
 
+            this.trigger('beforeParseOptions', options);
             if (this.className) {
                 this.$el.addClass(_.result(this, 'className'));
             }
@@ -179,6 +181,11 @@ define(function(require) {
             this._initColumns(opts);
 
             this.toolbar = this._createToolbar(this.toolbarOptions);
+
+            // use columns collection as event bus since there is no alternatives
+            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
 
             this.trigger('beforeBackgridInitialize');
             Grid.__super__.initialize.apply(this, arguments);
@@ -226,6 +233,7 @@ define(function(require) {
          * @private
          */
         _initColumns: function(options) {
+
             if (Object.keys(this.rowActions).length > 0) {
                 options.columns.push(this._createActionsColumn());
             }
@@ -239,6 +247,7 @@ define(function(require) {
                 if (column.order === void 0 && !(column instanceof Backgrid.Column)) {
                     column.order = i + this.DEFAULT_COLUMN_START_INDEX;
                 }
+                column.metadata = _.findWhere(options.metadata.columns, {name: column.name});
             }
 
             this.columns = options.columns = new GridColumns(options.columns);
@@ -283,8 +292,8 @@ define(function(require) {
          * @private
          */
         _createSelectRowColumn: function() {
-            var coulmn;
-            coulmn = new Backgrid.Column({
+            var column;
+            column = new Backgrid.Column({
                 name:       'massAction',
                 label:      __('Selected Rows'),
                 renderable: true,
@@ -295,7 +304,7 @@ define(function(require) {
                 headerCell: SelectAllHeaderCell,
                 order: -Infinity
             });
-            return coulmn;
+            return column;
         },
 
         /**
@@ -501,8 +510,10 @@ define(function(require) {
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
             });
-            this.listenTo(this.header.row, 'content:update', function() {
-                this.trigger('content:update');
+            this.listenTo(this.header.row, 'columns:reorder', function() {
+                // triggers content:update event in separate process
+                // to give time body's rows to finish reordering
+                _.defer(_.bind(this.trigger, this, 'content:update'));
             });
         },
 
@@ -744,6 +755,77 @@ define(function(require) {
             var state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
+            }
+        },
+
+        /**
+         * Ensure that cell is visible. Works like cell.el.scrollIntoView, but in more appropriate way
+         *
+         * @param cell
+         */
+        ensureCellIsVisible: function(cell) {
+            var e = $.Event('ensureCellIsVisible');
+            this.trigger('ensureCellIsVisible', e, cell);
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+            scrollHelper.scrollIntoView(cell.el);
+        },
+
+        /**
+         * Finds cell by corresponding model and column
+         *
+         * @param model
+         * @param column
+         * @return {Backgrid.Cell}
+         */
+        findCell: function(model, column) {
+            var rows = this.body.rows;
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                if (row.model === model) {
+                    var cells = row.cells;
+                    for (var j = 0; j < cells.length; j++) {
+                        var cell = cells[j];
+                        if (cell.column === column) {
+                            return cell;
+                        }
+                    }
+                }
+            }
+            return null;
+        },
+
+        /**
+         * Finds cell by model and column indexes
+         *
+         * @param {number} modelI
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findCellByIndex: function(modelI, columnI) {
+            try {
+                return _.findWhere(this.body.rows[modelI].cells, {
+                    column: this.columns.at(columnI)
+                });
+            } catch (e) {
+                return null;
+            }
+        },
+
+        /**
+         * Finds header cell by column index
+         *
+         * @param {number} columnI
+         * @return {Backgrid.Cell}
+         */
+        findHeaderCellByIndex: function(columnI) {
+            try {
+                return _.findWhere(this.header.row.cells, {
+                    column: this.columns.at(columnI)
+                });
+            } catch (e) {
+                return null;
             }
         }
     });

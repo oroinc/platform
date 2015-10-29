@@ -3,6 +3,7 @@ parameters:
     oro_datagrid.extension.action.type.ajax.class:        Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxAction
     oro_datagrid.extension.action.type.delete.class:      Oro\Bundle\DataGridBundle\Extension\Action\Actions\DeleteAction
     oro_datagrid.extension.action.type.ajaxdelete.class:  Oro\Bundle\DataGridBundle\Extension\Action\Actions\AjaxDeleteAction
+    oro_datagrid.extension.action.type.frontend.class:    Oro\Bundle\DataGridBundle\Extension\Action\Actions\FrontendAction
 
 services:
     oro_datagrid.extension.action.type.navigate:
@@ -28,3 +29,9 @@ services:
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: ajaxdelete }
+
+    oro_datagrid.extension.action.type.frontend:
+        class: %oro_datagrid.extension.action.type.frontend.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: frontend }
