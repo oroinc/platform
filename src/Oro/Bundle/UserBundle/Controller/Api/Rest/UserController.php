@@ -18,6 +18,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
@@ -207,9 +208,21 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * Filter user by username or email
      *
-     * @QueryParam(name="email", requirements="[a-zA-Z0-9\-_\.@]+", nullable=true, description="Email to filter")
-     * @QueryParam(name="username", requirements="[a-zA-Z0-9\-_\.]+", nullable=true, description="Username to filter")
+     * @QueryParam(
+     *      name="email",
+     *      requirements="[a-zA-Z0-9\-_\.@]+",
+     *      nullable=true,
+     *      description="Email to filter"
+     * )
+     * @QueryParam(
+     *      name="username",
+     *      requirements="[a-zA-Z0-9\-_\.]+",
+     *      nullable=true,
+     *      description="Username to filter"
+     * )
+     *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @ApiDoc(
      *      description="Get user by username or email",
      *      resource=true,
@@ -222,20 +235,24 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function getFilterAction()
     {
-        $params = $this->getRequest()->query->all();
+        $params = array_intersect_key(
+            $this->getRequest()->query->all(),
+            array_flip($this->getSupportedQueryParameters(__FUNCTION__))
+        );
 
         if (empty($params)) {
-            return $this->handleView($this->view('', Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
+        /** @var User $entity */
         $entity = $this->getManager()->getRepository()->findOneBy($params);
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
 
-        return $this->handleView(
-            $this->view(
-                $entity ? $this->getPreparedItem($entity) : null,
-                $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
-            )
-        );
+        $result = $this->getPreparedItem($entity);
+
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Codes::HTTP_OK);
     }
 
     /**
