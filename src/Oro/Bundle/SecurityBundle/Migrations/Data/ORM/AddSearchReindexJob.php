@@ -8,12 +8,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class AddSearchReindexJob extends AbstractFixture implements ContainerAwareInterface
 {
