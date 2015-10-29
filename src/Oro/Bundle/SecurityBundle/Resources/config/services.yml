@@ -189,6 +189,8 @@ services:
     oro_security.acl.object_id_accessor:
         public: false
         class: %oro_security.acl.object_id_accessor.class%
+        arguments:
+            - @oro_entity.doctrine_helper
 
     oro_security.acl.group_provider.chain:
         class: %oro_security.acl.group_provider.chain.class%
@@ -535,6 +537,7 @@ services:
         class: %oro_security.form.extension.aclprotected_fields_type%
         arguments:
             - @oro_security.security_facade
+            - @oro_entity.orm.entity_class_resolver
         tags:
             - { name: form.type_extension, alias: form }
 

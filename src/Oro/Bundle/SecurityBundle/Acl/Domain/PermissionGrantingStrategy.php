@@ -118,6 +118,15 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $result = $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
             }
         }
+
+        // fallback to object aces in order to grant access to (not restricted by mask) fields
+        if ($result === null) {
+            $aces = $acl->getObjectAces();
+            if (!empty($aces)) {
+                $result = $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
+            }
+        }
+
         // check parent ACEs if object and class ACEs were not found
         if ($result === null && $acl->isEntriesInheriting()) {
             $parentAcl = $acl->getParentAcl();

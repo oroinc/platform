@@ -81,11 +81,9 @@ class EntityClassResolver
     public function isEntity($className)
     {
         try {
-            $manager = $this->doctrine->getManagerForClass($className);
+            return !is_null($this->doctrine->getManagerForClass($className));
         } catch (\Exception $e) {
-            $manager = null;
+            return false;
         }
-
-        return !is_null($manager);
     }
 }
