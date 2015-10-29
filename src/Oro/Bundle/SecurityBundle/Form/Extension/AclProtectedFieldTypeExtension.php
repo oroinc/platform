@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
@@ -20,11 +21,16 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
     /** @var array forbidden form field names */
     protected $forbiddenFields = [];
 
-    public function __construct(SecurityFacade $securityFacade) {
+    public function __construct(SecurityFacade $securityFacade, EntityClassResolver $entityClassResolver)
+    {
         $this->securityFacade  = $securityFacade;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -40,8 +46,11 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (empty($options['data_class'])) {
-            // apply extension only to forms that bound to some class
+        $className = empty($options['data_class']) ? false : $options['data_class'];
+        if (!$className || !$this->entityClassResolver->isEntity($className)) {
+            // apply extension only to forms that bound to entities
+            // cause there's no way to get object identifier for non-entity (can be any field, or even without it)
+
             return;
         }
 
@@ -90,6 +99,12 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     public function validateForbiddenFields(FormEvent $event)
     {
+        $entity = $event->getData();
+        $className = $event->getForm()->getConfig()->getDataClass();
+        if (!$entity instanceof $className) {
+            return;
+        }
+
         foreach ($event->getForm()->all() as $childForm) {
             if (static::IS_REMOVE_RESTRICTED) {
                 $isGranted = !isset($this->forbiddenFields[$childForm->getName()]);
