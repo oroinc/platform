@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
@@ -37,6 +38,10 @@ class SchemaTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
         /** @var EntityManager $em */
         foreach ($registry->getManagers() as $em) {
+            /** @var CacheProvider $cacheDriver */
+            $cacheDriver = $em->getConfiguration()->getMetadataCacheImpl();
+            $cacheDriver->deleteAll();
+
             $schemaTool = new SchemaTool($em);
             $allMetadata = $em->getMetadataFactory()->getAllMetadata();
 
