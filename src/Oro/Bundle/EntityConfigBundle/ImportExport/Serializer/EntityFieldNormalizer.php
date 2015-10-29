@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Serializer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
@@ -28,9 +27,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var ConfigModelManager */
-    protected $configModelManager;
-
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
 
@@ -48,14 +44,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-    }
-
-    /**
-     * @param ConfigModelManager $configModelManager
-     */
-    public function setConfigModelManager(ConfigModelManager $configModelManager)
-    {
-        $this->configModelManager = $configModelManager;
     }
 
     /**
@@ -119,16 +107,17 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $fieldName = $data['fieldName'];
         $entity = $this->getEntityConfigModel($data['entity']['id']);
 
-        $model = $this->configModelManager->createFieldModel($entity->getClassName(), $fieldName, $fieldType);
+        $fieldModel = new FieldConfigModel($fieldName, $fieldType);
+        $fieldModel->setEntity($entity);
 
         $options = [];
         foreach ($data as $key => $value) {
             $this->extractAndAppendKeyValue($options, $key, $value);
         }
 
-        $this->updateModelConfig($model, $options);
+        $this->updateModelConfig($fieldModel, $options);
 
-        return $model;
+        return $fieldModel;
     }
 
     /**
