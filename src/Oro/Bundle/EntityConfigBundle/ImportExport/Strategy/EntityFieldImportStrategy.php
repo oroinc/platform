@@ -72,7 +72,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         return $this->databaseHelper->findOneBy(
-            'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
+            $this->entityName,
             ['fieldName' => $entity->getFieldName(), 'entity' => $entity->getEntity()]
         );
     }

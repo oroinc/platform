@@ -5,9 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Translation;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigTranslationHelper
@@ -15,7 +16,7 @@ class ConfigTranslationHelper
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var DynamicTranslationMetadataCache */
@@ -23,12 +24,12 @@ class ConfigTranslationHelper
 
     /**
      * @param ManagerRegistry $registry
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      * @param DynamicTranslationMetadataCache $translationCache
      */
     public function __construct(
         ManagerRegistry $registry,
-        Translator $translator,
+        TranslatorInterface $translator,
         DynamicTranslationMetadataCache $translationCache
     ) {
         $this->registry = $registry;
