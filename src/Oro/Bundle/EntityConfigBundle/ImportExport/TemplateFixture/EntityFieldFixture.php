@@ -58,6 +58,10 @@ class EntityFieldFixture implements TemplateFixtureInterface
      */
     public function fillEntityData($key, $entity)
     {
+        if (!$entity instanceof FieldConfigModel) {
+            return;
+        }
+
         /** @var FieldConfigModel $entity */
         $entity
             ->setType($key)
@@ -99,7 +103,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
         }
 
         if (!$value && isset($config['form']['type']) && $config['form']['type'] === 'integer') {
-            $value = rand(0, 20);
+            $value = rand(1, 20);
         }
 
         return $value;
@@ -115,7 +119,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
 
         for ($i = 0; $i <= $enumCount; $i++) {
             $values['enum_options.' . $i . '.label'] = 'enum_label_' . $i;
-            $values['enum_options.' . $i . '.is_default'] = $i ? 'yes' : 'no';
+            $values['enum_options.' . $i . '.is_default'] = $i ? 'no' : 'yes';
         }
 
         return $values;

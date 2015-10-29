@@ -40,7 +40,7 @@ class FieldTypeProvider
      */
     public function getSupportedRelationTypes()
     {
-        return $this->types[self::GROUP_FIELDS];
+        return $this->types[self::GROUP_RELATIONS];
     }
 
     /**
