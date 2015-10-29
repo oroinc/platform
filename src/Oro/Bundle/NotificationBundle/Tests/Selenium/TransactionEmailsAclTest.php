@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
+namespace Oro\Bundle\NotificationBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Roles;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
-class TransactionEmailsAcl extends Selenium2TestCase
+class TransactionEmailsAclTest extends Selenium2TestCase
 {
     public function testCreateRole()
     {
@@ -15,7 +16,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
-            ->setEntity('Email Notification', array('Create', 'Edit', 'Delete', 'View'), 'Organization')
+            ->setEntity('Notification Rule', array('Create', 'Edit', 'Delete', 'View'), 'System')
             ->save()
             ->assertMessage('Role saved')
             ->close();
@@ -33,7 +34,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $username = 'User_'.mt_rand();
 
         $login = $this->login();
-        /** @var Roles $login */
+        /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
             ->assertTitle('Create User - Users - User Management - System')
@@ -46,7 +47,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Label_' . $role))
-            ->setOrganization('OroCRM')
+            ->setBusinessUnit(['Main'])
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
@@ -85,6 +86,10 @@ class TransactionEmailsAcl extends Selenium2TestCase
 
 
     /**
+     * @depends testCreateUser
+     * @depends testCreateRole
+     * @depends testCreateTransactionEmail
+     *
      * @param $aclCase
      * @param $username
      * @param $role
@@ -96,9 +101,6 @@ class TransactionEmailsAcl extends Selenium2TestCase
     {
         $roleName = 'Label_' . $role;
         $login = $this->login();
-        $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->setPassword(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
-            ->submit();
         switch ($aclCase) {
             case 'delete':
                 $this->deleteAcl($login, $roleName, $username, $email);
@@ -120,7 +122,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setEntity('Email Notification', array('Delete'), 'None')
+            ->setEntity('Notification Rule', array('Delete'), 'None')
             ->save()
             ->logout()
             ->setUsername($username)
@@ -135,14 +137,14 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setEntity('Email Notification', array('Edit'), 'None')
+            ->setEntity('Notification Rule', array('Edit'), 'None')
             ->save()
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
             ->submit()
             ->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->checkContextMenu($email, 'Update');
+            ->checkContextMenu($email, 'Edit');
     }
 
     public function createAcl($login, $roleName, $username)
@@ -150,14 +152,17 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setEntity('Email Notification', array('Create'), 'None')
+            ->setEntity('Notification Rule', array('Create'), 'None')
             ->save()
             ->logout()
             ->setUsername($username)
             ->setPassword('123123q')
             ->submit()
             ->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->assertElementNotPresent("//div[@class = 'container-fluid']//a[contains(., 'Create Notification Rule')]");
+            ->assertElementNotPresent(
+                "//div[@class='pull-right title-buttons-container']".
+                "//a[contains(., 'Create Notification Rule')]"
+            );
     }
 
     public function viewListAcl($login, $roleName, $username)
@@ -165,7 +170,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setEntity('Email Notification', array('View'), 'None')
+            ->setEntity('Notification Rule', array('View'), 'None')
             ->save()
             ->logout()
             ->setUsername($username)
@@ -176,7 +181,7 @@ class TransactionEmailsAcl extends Selenium2TestCase
     }
 
     /**
-     * Data provider for Tags ACL test
+     * Data provider for Transaction Emails ACL test
      *
      * @return array
      */

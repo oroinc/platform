@@ -28,6 +28,11 @@ class ProcessHandler
     protected $eventDispatcher;
 
     /**
+     * @var array
+     */
+    protected $processes = [];
+
+    /**
      * @param ProcessFactory $factory
      * @param ProcessLogger $logger
      * @param EventDispatcherInterface $eventDispatcher
@@ -58,7 +63,7 @@ class ProcessHandler
             throw new InvalidParameterException('Invalid process data. Entity can not be empty.');
         }
 
-        $process = $this->factory->create($processTrigger->getDefinition());
+        $process = $this->getProcess($processTrigger);
         $process->execute($processData);
 
         $this->logger->debug('Process executed', $processTrigger, $processData);
@@ -95,5 +100,30 @@ class ProcessHandler
     public function finishJob(ProcessJob $processJob)
     {
         $this->finishTrigger($processJob->getProcessTrigger(), $processJob->getData());
+    }
+
+    /**
+     * @param ProcessTrigger $processTrigger
+     * @param ProcessData $processData
+     * @return bool
+     */
+    public function isTriggerApplicable(ProcessTrigger $processTrigger, ProcessData $processData)
+    {
+        $process = $this->getProcess($processTrigger);
+
+        return $process->isApplicable($processData);
+    }
+
+    /**
+     * @param ProcessTrigger $processTrigger
+     * @return Process
+     */
+    protected function getProcess(ProcessTrigger $processTrigger)
+    {
+        if (!array_key_exists($processTrigger->getId(), $this->processes)) {
+            $this->processes[$processTrigger->getId()] = $this->factory->create($processTrigger->getDefinition());
+        }
+
+        return $this->processes[$processTrigger->getId()];
     }
 }

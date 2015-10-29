@@ -14,6 +14,14 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $registry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManager
+     */
+    protected $entityFieldProvider;
+
     /**
      * @var EntityDetachFixer
      */
@@ -24,15 +32,30 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fixer = new EntityDetachFixer($this->entityManager);
+        
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
+        $this->entityFieldProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityFieldProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
+        $this->fixer = new EntityDetachFixer($this->registry, $this->entityFieldProvider);
     }
 
     public function testFixEntityAssociationFieldsLevel()
     {
         $entity = new \stdClass();
 
-        $this->entityManager->expects($this->never())
-            ->method('getClassMetadata');
+        $this->entityFieldProvider->expects($this->never())
+            ->method('getRelations');
         $this->fixer->fixEntityAssociationFields($entity, -1);
     }
 
@@ -56,18 +79,20 @@ class EntityDetachFixerTest extends \PHPUnit_Framework_TestCase
             $linkedEntity = $fieldValue;
         }
 
+        $this->entityFieldProvider->expects($this->once())
+            ->method('getRelations')
+            ->with(get_class($entity))
+            ->will($this->returnValue([['name' => 'field']]));
+
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $metadata->expects($this->once())
-            ->method('getAssociationMappings')
-            ->will($this->returnValue($mapping));
         $metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($linkedEntity)
             ->will($this->returnValue('id'));
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with(get_class($entity))
             ->will($this->returnValue($metadata));

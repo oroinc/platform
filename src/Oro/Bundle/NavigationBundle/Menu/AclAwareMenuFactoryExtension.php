@@ -3,11 +3,14 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Doctrine\Common\Cache\CacheProvider;
+
 use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
+
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
@@ -82,10 +85,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     {
         $this->processAcl($options);
 
-        $hasNonAuth = array_key_exists('showNonAuthorized', $options['extras']);
-        if ($options['extras']['isAllowed']
-            || ($hasNonAuth && $options['extras']['showNonAuthorized'])
-        ) {
+        if ($options['extras']['isAllowed'] && !empty($options['route'])) {
             $this->processRoute($options);
         }
 
@@ -96,39 +96,52 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      * Check ACL based on acl_resource_id, route or uri.
      *
      * @param array $options
+     *
+     * @return void
      */
     protected function processAcl(array &$options = array())
     {
-        $needCheck = !isset($options['check_access']) || $options['check_access'] === true;
+        $isAllowed                      = self::DEFAULT_ACL_POLICY;
+        $options['extras']['isAllowed'] = self::DEFAULT_ACL_POLICY;
 
-        $isAllowed = self::DEFAULT_ACL_POLICY;
-        if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
-            $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+        if (isset($options['check_access']) && $options['check_access'] === false) {
+            return;
         }
 
-        if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
-            if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
-                $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
-            } else {
-                if ($needCheck) {
-                    $isAllowed =  $this->securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
-                }
-
-                $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+        if (!$this->securityFacade->hasLoggedUser()) {
+            if (isset($options['extras'])
+                && array_key_exists('showNonAuthorized', $options['extras'])
+                && $options['extras']['showNonAuthorized']
+            ) {
+                return;
             }
+
+            $isAllowed = false;
         } else {
-            $routeInfo = $this->getRouteInfo($options);
-            if ($routeInfo) {
-                if (array_key_exists($routeInfo['key'], $this->aclCache)) {
-                    $isAllowed = $this->aclCache[$routeInfo['key']];
+            if (array_key_exists('extras', $options) && array_key_exists(self::ACL_POLICY_KEY, $options['extras'])) {
+                $isAllowed = $options['extras'][self::ACL_POLICY_KEY];
+            }
+
+            if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {
+                if (array_key_exists($options[self::ACL_RESOURCE_ID_KEY], $this->aclCache)) {
+                    $isAllowed = $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]];
                 } else {
-                    if ($needCheck) {
+                    $isAllowed = $this->securityFacade->isGranted($options[self::ACL_RESOURCE_ID_KEY]);
+                    $this->aclCache[$options[self::ACL_RESOURCE_ID_KEY]] = $isAllowed;
+                }
+            } else {
+                $routeInfo = $this->getRouteInfo($options);
+                if ($routeInfo) {
+                    if (array_key_exists($routeInfo['key'], $this->aclCache)) {
+                        $isAllowed = $this->aclCache[$routeInfo['key']];
+                    } else {
                         $isAllowed = $this->securityFacade->isClassMethodGranted(
                             $routeInfo['controller'],
                             $routeInfo['action']
                         );
+
+                        $this->aclCache[$routeInfo['key']] = $isAllowed;
                     }
-                    $this->aclCache[$routeInfo['key']] = $isAllowed;
                 }
             }
         }
@@ -143,44 +156,42 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function processRoute(array &$options = array())
     {
-        if (!empty($options['route'])) {
-            $params = array();
-            if (isset($options['routeParameters'])) {
-                $params = $options['routeParameters'];
-            }
-            $cacheKey = null;
-            $hasInCache = false;
-            $uri = null;
-            if ($this->cache) {
-                $cacheKey = $this->getCacheKey('route_uri', $options['route'] . ($params ? serialize($params) : ''));
-                if ($this->cache->contains($cacheKey)) {
-                    $uri = $this->cache->fetch($cacheKey);
-                    $hasInCache = true;
-                }
-            }
-            if (!$hasInCache) {
-                $absolute = false;
-                if (isset($options['routeAbsolute'])) {
-                    $absolute = $options['routeAbsolute'];
-                }
-                $uri = $this->router->generate($options['route'], $params, $absolute);
-                if ($this->cache) {
-                    $this->cache->save($cacheKey, $uri);
-                }
-            }
-
-            $options['uri'] = $uri;
-
-            $options = array_merge_recursive(
-                array(
-                    'extras' => array(
-                        'routes' => array($options['route']),
-                        'routesParameters' => array($options['route']=>$params),
-                    )
-                ),
-                $options
-            );
+        $params = [];
+        if (isset($options['routeParameters'])) {
+            $params = $options['routeParameters'];
         }
+        $cacheKey   = null;
+        $hasInCache = false;
+        $uri        = null;
+        if ($this->cache) {
+            $cacheKey = $this->getCacheKey('route_uri', $options['route'] . ($params ? serialize($params) : ''));
+            if ($this->cache->contains($cacheKey)) {
+                $uri        = $this->cache->fetch($cacheKey);
+                $hasInCache = true;
+            }
+        }
+        if (!$hasInCache) {
+            $absolute = false;
+            if (isset($options['routeAbsolute'])) {
+                $absolute = $options['routeAbsolute'];
+            }
+            $uri = $this->router->generate($options['route'], $params, $absolute);
+            if ($this->cache) {
+                $this->cache->save($cacheKey, $uri);
+            }
+        }
+
+        $options['uri'] = $uri;
+
+        $options = array_merge_recursive(
+            [
+                'extras' => [
+                    'routes'           => [$options['route']],
+                    'routesParameters' => [$options['route'] => $params],
+                ]
+            ],
+            $options
+        );
     }
 
     /**
