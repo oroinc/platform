@@ -5,9 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Serializer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
@@ -27,6 +27,9 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
     /** @var ConfigManager */
     protected $configManager;
+
+    /** @var ConfigModelManager */
+    protected $configModelManager;
 
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
@@ -48,19 +51,19 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     }
 
     /**
+     * @param ConfigModelManager $configModelManager
+     */
+    public function setConfigModelManager(ConfigModelManager $configModelManager)
+    {
+        $this->configModelManager = $configModelManager;
+    }
+
+    /**
      * @param FieldTypeProvider $fieldTypeProvider
      */
     public function setFieldTypeProvider(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null, array $context = [])
-    {
-        return is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
     }
 
     /**
@@ -76,14 +79,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!$object instanceof FieldConfigModel) {
-            return null;
-        }
-
-        if (!empty($context['mode']) && $context['mode'] === 'short') {
-            return ['id' => $object->getId()];
-        }
-
         $result = [
             'id' => $object->getId(),
             'fieldName' => $object->getFieldName(),
@@ -92,9 +87,8 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
-            $values = $object->toArray($scope);
 
-            foreach ($values as $code => $value) {
+            foreach ($object->toArray($scope) as $code => $value) {
                 $result[sprintf('%s.%s', $scope, $code)] = $value;
             }
         }
@@ -105,43 +99,36 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        if (!isset($data['fieldName']) || !isset($data['type'])) {
-            return null;
-        }
-
-        $fieldName = $data['fieldName'];
-        $fieldType = $data['type'];
-
         $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
 
-        if (!in_array($fieldType, $supportedTypes, true)) {
-            return false;
-        }
+        return is_array($data) &&
+            array_key_exists('type', $data) &&
+            in_array($data['type'], $supportedTypes, true) &&
+            array_key_exists('fieldName', $data) &&
+            is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+    }
 
-        $configOptions = [];
-        foreach ($data as $key => $value) {
-            $this->extractAndAppendKeyValue($configOptions, $key, $value);
-        }
-
-        $options = $this->getDefaultScopeOptions();
-
-        $fieldProperties = $this->fieldTypeProvider->getFieldProperties($fieldType);
-        foreach ($fieldProperties as $scope => $properties) {
-            $this->updateScopeOptions($options, $configOptions, $scope, $properties);
-        }
-
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize($data, $class, $format = null, array $context = [])
+    {
+        $fieldType = $data['type'];
+        $fieldName = $data['fieldName'];
         $entity = $this->getEntityConfigModel($data['entity']['id']);
 
-        $field = $this->configManager->createConfigFieldModel($entity->getClassName(), $fieldName, $fieldType);
+        $model = $this->configModelManager->createFieldModel($entity->getClassName(), $fieldName, $fieldType);
 
-        $this->updateFieldConfig($field, $options);
+        $options = [];
+        foreach ($data as $key => $value) {
+            $this->extractAndAppendKeyValue($options, $key, $value);
+        }
 
-        $field->setCreated(new \DateTime());
-        $field->setUpdated(new \DateTime());
+        $this->updateModelConfig($model, $options);
 
-        return $field;
+        return $model;
     }
 
     /**
@@ -156,39 +143,27 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     }
 
     /**
-     * @param array $options
-     * @param array $configOptions
-     * @param string $scope
-     * @param array $properties
-     */
-    protected function updateScopeOptions(&$options, $configOptions, $scope, $properties)
-    {
-        foreach ($properties as $code => $config) {
-            if (!array_key_exists($scope, $configOptions) || !array_key_exists($code, $configOptions[$scope])) {
-                continue;
-            }
-
-            if (!isset($options[$scope])) {
-                $options[$scope] = [];
-            }
-
-            $importOptions = isset($config['options']) ? $config['options'] : [];
-
-            $options[$scope][$code] = $this->denormalizeFieldValue($importOptions, $configOptions[$scope][$code]);
-        }
-    }
-
-    /**
-     * @param FieldConfigModel $field
+     * @param FieldConfigModel $model
      * @param array $options
      */
-    protected function updateFieldConfig(FieldConfigModel $field, array $options)
+    protected function updateModelConfig(FieldConfigModel $model, array $options)
     {
-        foreach ($options as $scope => $scopeValues) {
-            $configProvider = $this->configManager->getProvider($scope);
-            $config         = $configProvider->getConfig($field->getEntity()->getClassName(), $field->getFieldName());
-            $indexedValues  = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
-            $field->fromArray($scope, $scopeValues, $indexedValues);
+        $fieldProperties = $this->fieldTypeProvider->getFieldProperties($model->getType());
+        foreach ($fieldProperties as $scope => $properties) {
+            $values = [];
+
+            foreach ($properties as $code => $config) {
+                if (!isset($options[$scope][$code])) {
+                    continue;
+                }
+
+                $values[$code] = $this->denormalizeFieldValue(
+                    isset($config['options']) ? $config['options'] : [],
+                    $options[$scope][$code]
+                );
+            }
+
+            $model->fromArray($scope, $values, []);
         }
     }
 
@@ -199,46 +174,29 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function denormalizeFieldValue($config, $value)
     {
-        if (!isset($config[self::CONFIG_TYPE])) {
-            return $value;
-        }
-
         if ($value === null && array_key_exists(self::CONFIG_DEFAULT, $config)) {
             return $config[self::CONFIG_DEFAULT];
         }
 
-        switch ($config[self::CONFIG_TYPE]) {
+        $type = array_key_exists(self::CONFIG_TYPE, $config) ? $config[self::CONFIG_TYPE] : null;
+        $result = null;
+
+        switch ($type) {
             case self::TYPE_BOOLEAN:
-                return $this->normalizeBoolValue($value);
-
-            case self::TYPE_INTEGER:
-                return $this->normalizeIntegerValue($value);
-
+                $result = $this->normalizeBoolValue($value);
+                break;
             case self::TYPE_ENUM:
-                return $this->normalizeEnumValue($value);
-
-            case self::TYPE_STRING:
+                $result = $this->normalizeEnumValue($value);
+                break;
+            case self::TYPE_INTEGER:
+                $result = (int)$value;
+                break;
             default:
-                return $this->normalizeStringValue($value);
+                $result = (string)$value;
+                break;
         }
-    }
 
-    /**
-     * @param mixed $value
-     * @return int
-     */
-    protected function normalizeIntegerValue($value)
-    {
-        return (int)$value;
-    }
-
-    /**
-     * @param mixed $value
-     * @return string
-     */
-    protected function normalizeStringValue($value)
-    {
-        return (string)$value;
+        return $result;
     }
 
     /**
@@ -248,7 +206,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     protected function normalizeBoolValue($value)
     {
         $lvalue = strtolower($value);
-        if (in_array($lvalue, ['yes', 'no', 'true', 'false'])) {
+        if (in_array($lvalue, ['yes', 'no', 'true', 'false'], true)) {
             $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
         }
 
@@ -296,23 +254,6 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
         $current = $value;
 
         return true;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDefaultScopeOptions()
-    {
-        return [
-            'extend' => [
-                'owner'     => ExtendScope::OWNER_CUSTOM,
-                'state'     => ExtendScope::STATE_NEW,
-                'origin'    => ExtendScope::ORIGIN_CUSTOM,
-                'is_extend' => true,
-                'is_deleted' => false,
-                'is_serialized' => false,
-            ]
-        ];
     }
 
     /**
