@@ -7,6 +7,7 @@ use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntityFieldWriter implements ItemWriterInterface
 {
@@ -41,8 +42,16 @@ class EntityFieldWriter implements ItemWriterInterface
      */
     protected function writeItem(FieldConfigModel $configModel)
     {
-        $translations = [];
+        $className = $configModel->getEntity()->getClassName();
+        $fieldName = $configModel->getFieldName();
+        $state = ExtendScope::STATE_UPDATE;
 
+        if (!$this->configManager->hasConfig($className, $fieldName)) {
+            $this->configManager->createConfigFieldModel($className, $fieldName, $configModel->getType());
+            $state = ExtendScope::STATE_NEW;
+        }
+
+        $translations = [];
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             $data = $configModel->toArray($scope);
@@ -51,16 +60,17 @@ class EntityFieldWriter implements ItemWriterInterface
                 continue;
             }
 
-            $configId = $this->configManager->getConfigIdByModel($configModel, $scope);
-            $config = $provider->getConfigById($configId);
-            $translatable = $provider->getPropertyConfig()->getTranslatableValues($configId);
+            $config = $provider->getConfig($className, $fieldName);
+            $translatable = $provider->getPropertyConfig()->getTranslatableValues($config->getId());
 
             foreach ($data as $code => $value) {
                 if (in_array($code, $translatable, true)) {
                     // check if a label text was changed
                     $labelKey = $config->get($code);
 
-                    if (!$configModel->getId() || !$this->translationHelper->isTranslationEqual($labelKey, $value)) {
+                    if ($state === ExtendScope::STATE_NEW ||
+                        !$this->translationHelper->isTranslationEqual($labelKey, $value)
+                    ) {
                         $translations[$labelKey] = $value;
                     }
                     // replace label text with label name in $value variable
@@ -71,7 +81,35 @@ class EntityFieldWriter implements ItemWriterInterface
             $this->configManager->persist($config);
         }
 
+        $this->setExtendData($className, $fieldName, $state);
+
         $this->configManager->flush();
         $this->translationHelper->saveTranslations($translations);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $state
+     */
+    protected function setExtendData($className, $fieldName, $state)
+    {
+        $extendProvider = $this->configManager->getProvider('extend');
+        $config = $extendProvider->getConfig($className, $fieldName);
+
+        $data = [
+            'owner' => ExtendScope::OWNER_CUSTOM,
+            'state' => $state,
+            'origin' => ExtendScope::ORIGIN_CUSTOM,
+            'is_extend' => true,
+            'is_deleted' => false,
+            'is_serialized' => false
+        ];
+
+        foreach ($data as $code => $value) {
+            $config->set($code, $value);
+        }
+
+        $this->configManager->persist($config);
     }
 }

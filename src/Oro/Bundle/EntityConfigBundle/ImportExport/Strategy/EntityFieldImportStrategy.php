@@ -4,12 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy;
+use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 
-class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
+class EntityFieldImportStrategy extends AbstractImportStrategy
 {
     /** @var TranslatorInterface */
     protected $translator;
@@ -23,67 +22,67 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
     }
 
     /**
-     * @param FieldConfigModel $entity
-     *
      * {@inheritdoc}
+     */
+    public function process($entity)
+    {
+        $this->assertEnvironment($entity);
+
+        /** @var FieldConfigModel $entity */
+        $entity = $this->beforeProcessEntity($entity);
+        $entity = $this->processEntity($entity);
+        $entity = $this->afterProcessEntity($entity);
+        if ($entity) {
+            $entity = $this->validateAndUpdateContext($entity);
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param FieldConfigModel $entity
+     * @return null|FieldConfigModel
+     */
+    protected function processEntity(FieldConfigModel $entity)
+    {
+        $existingEntity = $this->findExistingEntity($entity);
+
+        if ($existingEntity) {
+            if ($this->isSystemField($existingEntity)) {
+                $entity = null;
+            } elseif ($entity->getType() !== $existingEntity->getType()) {
+                $this->context->incrementErrorEntriesCount();
+                $this->strategyHelper->addValidationErrors(
+                    [$this->translator->trans('oro.entity_config.importexport.message.invelid_field_type')],
+                    $this->context
+                );
+
+                $entity = null;
+            }
+        }
+
+        return $entity;
+    }
+
+    /**
+     * @param FieldConfigModel $entity
+     * @param array $searchContext
+     * @return null|FieldConfigModel
      */
     protected function findExistingEntity($entity, array $searchContext = [])
     {
-        $existingEntity = parent::findExistingEntity($entity, $searchContext);
-
-        if (!$existingEntity) {
-            $existingEntity = $this->databaseHelper->findOneBy(
-                'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
-                ['fieldName' => $entity->getFieldName(), 'entity' => $entity->getEntity()]
-            );
-        }
-
-        return $existingEntity;
+        return $this->databaseHelper->findOneBy(
+            'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
+            ['fieldName' => $entity->getFieldName(), 'entity' => $entity->getEntity()]
+        );
     }
 
     /**
      * @param FieldConfigModel $entity
-     * @param FieldConfigModel $existingEntity
-     *
-     * {@inheritdoc}
+     * @return null|FieldConfigModel
      */
-    protected function importExistingEntity($entity, $existingEntity, $itemData = null, array $excludedFields = [])
+    protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
-        if ($this->isSystemField($existingEntity)) {
-            return null;
-        }
-
-        if ($entity->getType() !== $existingEntity->getType()) {
-            $this->context->incrementErrorEntriesCount();
-            $this->strategyHelper->addValidationErrors(
-                [$this->translator->trans('oro.entity_config.importexport.message.invelid_field_type')],
-                $this->context
-            );
-
-            return null;
-        }
-
-        $entity->fromArray(
-            'extend',
-            array_merge($existingEntity->toArray('extend'), ['state' => ExtendScope::STATE_UPDATE]),
-            []
-        );
-
-        /** @var ConfigManager $configManager */
-        parent::importExistingEntity(
-            $entity,
-            $existingEntity,
-            $itemData,
-            array_merge($excludedFields, ['fieldName', 'type', 'entity'])
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function validateAndUpdateContext($entity)
-    {
-        // validate entity
         $validationErrors = $this->strategyHelper->validateEntity($entity, ['FieldConfigModel']);
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
@@ -98,19 +97,15 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
     }
 
     /**
-     * {@inheritdoc}
+     * @param FieldConfigModel $entity
      */
-    protected function updateContextCounters($entity)
+    protected function updateContextCounters(FieldConfigModel $entity)
     {
-        // increment context counter
-        $identifier = $this->databaseHelper->getIdentifier($entity);
-        if ($identifier) {
+        if ($this->findExistingEntity($entity)) {
             $this->context->incrementUpdateCount();
         } else {
             $this->context->incrementAddCount();
         }
-
-        return $entity;
     }
 
     /**
@@ -120,7 +115,6 @@ class EntityFieldImportStrategy extends ConfigurableAddOrReplaceStrategy
     protected function isSystemField(FieldConfigModel $entity)
     {
         $extend = $entity->toArray('extend');
-
         return $extend['owner'] === ExtendScope::OWNER_SYSTEM;
     }
 }

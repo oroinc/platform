@@ -153,7 +153,7 @@
             WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                 var backAction = $('<button type="button" class="btn">{{ 'Back'|trans }}</button>');
                 backAction.on('click', function(e) {
-                    widget.setUrl({{ path('oro_importexport_import_form', {entity: entityName, options: options})|json_encode|raw }});
+                    widget.setUrl({{ path('oro_importexport_import_form', {entity: entityName, importJob: importJob, options: options})|json_encode|raw }});
                     widget.loadContent();
                 });
                 widget.addAction('back', 'adopted', backAction);
