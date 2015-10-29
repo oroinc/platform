@@ -55,6 +55,3 @@ oro:
         form:
             name.label: Name
             type.label: Type
-
-        importexport:
-            import.need_update_schema: This import requires schema update

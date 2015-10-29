@@ -84,11 +84,9 @@
                 {% if dataGridName is defined %}
                 var datagridName = {{ dataGridName|json_encode|raw }};
                 widget.on('importComplete', function (data) {
-                    {% block importOnSuccessJs %}
-                        if (data.success) {
-                            mediator.trigger('datagrid:doReset:' + datagridName);
-                        }
-                    {% endblock %}
+                    if (data.success) {
+                        mediator.trigger('datagrid:doReset:' + datagridName);
+                    }
                 });
                 {% endif %}
             });
