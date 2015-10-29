@@ -26,7 +26,8 @@ class SchemaTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
         foreach ($registry->getManagers() as $em) {
             $validator = new SchemaValidator($em);
-            $this->assertEquals([], $validator->validateMapping());
+            $validateMapping = $validator->validateMapping();
+            $this->assertEquals([], $validateMapping, implode("\n", $validateMapping));
         }
     }
 
@@ -39,7 +40,8 @@ class SchemaTest extends WebTestCase
             $schemaTool = new SchemaTool($em);
             $allMetadata = $em->getMetadataFactory()->getAllMetadata();
 
-            $this->assertEquals([], $schemaTool->getUpdateSchemaSql($allMetadata, true));
+            $queries = $schemaTool->getUpdateSchemaSql($allMetadata, true);
+            $this->assertEquals([], $queries, implode("\n", $queries));
         }
     }
 }
