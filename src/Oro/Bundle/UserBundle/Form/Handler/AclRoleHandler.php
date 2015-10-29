@@ -23,6 +23,9 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AclRoleHandler
 {
     /**
@@ -171,13 +174,6 @@ class AclRoleHandler
         foreach ($this->privilegeConfig as $configName => $config) {
             $this->privilegeConfig[$configName]['permissions']
                 = $this->privilegeRepository->getPermissionNames($config['types']);
-        }
-
-        //TODO: Removing 'SHARE' from config. Remove this code after sharing is implemented.
-        if ($ignoreShare && isset($this->privilegeConfig['entity']['permissions']) &&
-            $key = array_search('SHARE', $this->privilegeConfig['entity']['permissions'], true)
-        ) {
-            unset($this->privilegeConfig['entity']['permissions'][$key]);
         }
     }
 
