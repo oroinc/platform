@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\SecurityBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
