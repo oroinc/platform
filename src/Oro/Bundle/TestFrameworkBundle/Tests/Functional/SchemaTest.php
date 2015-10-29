@@ -30,7 +30,9 @@ class SchemaTest extends WebTestCase
         foreach ($registry->getManagers() as $em) {
             $validator = new SchemaValidator($em);
             $validateMapping = $validator->validateMapping();
-            $this->assertEquals([], $validateMapping, implode("\n", $validateMapping));
+            if ($validateMapping) {
+                $this->fail(implode("\n", $validateMapping));
+            }
         }
     }
 
@@ -76,7 +78,9 @@ class SchemaTest extends WebTestCase
                 );
             }
 
-            $this->assertEquals([], $queries, implode("\n", $queries));
+            if ($queries) {
+                $this->fail(implode("\n", $queries));
+            }
         }
     }
 }
