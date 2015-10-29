@@ -19,13 +19,10 @@ class DateTimeTypeFormatter extends DateTimeFormatter implements TypeFormatterIn
         switch ($type) {
             case self::TYPE_DATETIME:
                 return $this->format($value);
-                break;
             case self::TYPE_DATE:
                 return $this->formatDate($value);
-                break;
             case self::TYPE_TIME:
                 return $this->formatTime($value);
-                break;
             default:
                 throw new InvalidArgumentException(sprintf('Couldn\'t format "%s" type', $type));
         }

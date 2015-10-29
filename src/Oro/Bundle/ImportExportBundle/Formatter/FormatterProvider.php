@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Formatter;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
 class FormatterProvider

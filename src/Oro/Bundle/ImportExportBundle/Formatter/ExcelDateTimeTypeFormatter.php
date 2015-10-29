@@ -9,26 +9,51 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
     /**
      * {@inheritdoc}
      */
-    public function getPattern($dateType, $timeType, $locale = null)
-    {
+    public function getPattern(
+        $dateType = \IntlDateFormatter::SHORT,
+        $timeType = \IntlDateFormatter::SHORT,
+        $locale = null
+    ) {
+        $localeFormatter = $this->getIntlFormatter($dateType, $timeType, $locale);
+        $pattern         = $localeFormatter->getPattern();
+
+        return $this->modifyPattern($pattern, $dateType, $timeType);
+    }
+
+    public function getIntlFormatter(
+        $dateType = \IntlDateFormatter::SHORT,
+        $timeType = \IntlDateFormatter::SHORT,
+        $timezone = null,
+        $locale = null
+    ) {
+        $dateType = ($dateType == \IntlDateFormatter::NONE) ? \IntlDateFormatter::NONE : \IntlDateFormatter::SHORT;
+        $timeType = ($timeType == \IntlDateFormatter::NONE) ? \IntlDateFormatter::NONE : \IntlDateFormatter::SHORT;
+
+        if (!$timezone) {
+            $timezone = $this->localeSettings->getTimeZone();
+        }
+
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
         }
 
-        if ($timeType !== \IntlDateFormatter::NONE) {
-            $timeType = \IntlDateFormatter::SHORT;
-        }
-
-        $localeFormatter = new \IntlDateFormatter(
+        return new \IntlDateFormatter(
             $locale,
-            \IntlDateFormatter::SHORT,
+            $dateType,
             $timeType,
-            null,
+            $timezone,
             \IntlDateFormatter::GREGORIAN
         );
-        $pattern         = $localeFormatter->getPattern();
+    }
 
-        return $this->modifyPattern($pattern, $timeType);
+    /**
+     * @param int $timestamp
+     *
+     * @return \DateTime
+     */
+    public function getDateTimeFromTimestamp($timestamp)
+    {
+        return new \DateTime(sprintf('@%f', $timestamp));
     }
 
     /**
@@ -37,21 +62,33 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
      * @link http://userguide.icu-project.org/formatparse/datetime
      *
      * @param string $pattern
-     * @param int    $timeType
+     * @param int    $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param int    $dateType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
      *
      * @return string
      */
-    protected function modifyPattern($pattern, $timeType)
+    protected function modifyPattern($pattern, $dateType, $timeType)
     {
-        $order       = $this->detectOrder($pattern);
-        $delimiter   = $this->detectDelimiter($pattern);
-        $datePattern = str_replace(['m', 'd'], ['MM', 'dd'], implode($delimiter, $order));
-        $timePattern = $timeType !== \IntlDateFormatter::NONE ? ' HH:mm:ss' : '';
+        $patternParts = [];
 
-        return $datePattern . $timePattern;
+        if ($dateType !== \IntlDateFormatter::NONE) {
+            $order       = $this->detectOrder($pattern);
+            $delimiter   = $this->detectDelimiter($pattern);
+            $datePattern = str_replace(['m', 'd'], ['MM', 'dd'], implode($delimiter, $order));
+
+            $patternParts[] = $datePattern;
+        }
+
+        if ($timeType !== \IntlDateFormatter::NONE) {
+            $patternParts[] = 'HH:mm:ss';
+        }
+
+        return implode(' ', $patternParts);
     }
 
     /**
+     * Detects order of day, month and year from IntlDateFormatter pattern string.
+     *
      * @param string $pattern
      *
      * @return array

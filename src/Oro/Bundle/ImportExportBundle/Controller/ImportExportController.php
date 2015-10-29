@@ -57,7 +57,11 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form'       => $importForm->createView(),
-            'options'    => $this->getOptionsFromRequest(),
+            'options'    => array_merge(
+                [FormatterProvider::FORMAT_TYPE => 'excel'],
+                [],
+                $this->getOptionsFromRequest()
+            )
         ];
     }
 
@@ -161,7 +165,10 @@ class ImportExportController extends Controller
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
             null,
-            $this->getOptionsFromRequest()
+            array_merge(
+                [FormatterProvider::FORMAT_TYPE => 'excel'],
+                $this->getOptionsFromRequest()
+            )
         );
 
         return $this->redirect($result['url']);

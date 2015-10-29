@@ -32,8 +32,8 @@ services:
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
-    oro_importexport.serializer.datetime_formatter:
-        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeFormatter
+    oro_importexport.serializer.excel_datetime_normalizer:
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ExcelDateTimeNormalizer
         arguments:
             - @oro_importexport.formatter.formatter_provider
         tags:
