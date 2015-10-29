@@ -19,7 +19,7 @@ define([
 
         /** @property */
         events: {
-            click: 'stopPropagation'
+            'click a': 'stopPropagation'
         },
 
         /**

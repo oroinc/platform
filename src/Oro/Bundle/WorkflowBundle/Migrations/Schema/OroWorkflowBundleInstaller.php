@@ -13,7 +13,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -211,6 +211,11 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('actions_configuration', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn(
+            'pre_conditions_configuration',
+            'array',
+            ['notnull' => false, 'comment' => '(DC2Type:array)']
+        );
         $table->setPrimaryKey(['name']);
     }
 

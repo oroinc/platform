@@ -36,13 +36,15 @@
             <strong>
         {% endif %}
 
-        {% set firstEmail = recipients[0] %}
-        {% set lastEmail = recipients[recipients|length - 1] %}
-        {{
-            EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
-        }}..{{
-            EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
-        }}
+        {% if recipients|length > 0 %}
+            {% set firstEmail = recipients[0] %}
+            {% set lastEmail = recipients[recipients|length - 1] %}
+            {{
+                EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
+            }}..{{
+                EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
+            }}
+        {% endif %}
         {% if isNew == 1 %}
             </strong>
         {% endif %}

@@ -10,6 +10,8 @@ use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+
 /**
  * Finds detached properties in entity and reloads them from UnitOfWork.
  *
@@ -23,9 +25,19 @@ class EntityDetachFixer
      */
     protected $registry;
 
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var EntityFieldProvider
+     */
+    protected $entityFieldProvider;
+
+    /**
+     * @param EntityManager       $entityManager
+     * @param EntityFieldProvider $entityFieldProvider
+     */
+    public function __construct(ManagerRegistry $registry, EntityFieldProvider $entityFieldProvider)
     {
         $this->registry = $registry;
+        $this->entityFieldProvider = $entityFieldProvider;
     }
 
     /**
@@ -39,13 +51,18 @@ class EntityDetachFixer
         if ($level < 0) {
             return;
         }
-        $entityClass = ClassUtils::getClass($entity);
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        $metadata = $entityManager->getClassMetadata($entityClass);
-        foreach ($metadata->getAssociationMappings() as $associationMapping) {
-            $fieldName = $associationMapping['fieldName'];
-            $value = PropertyAccess::createPropertyAccessor()->getValue($entity, $fieldName);
+
+        // we should use entityFieldProvider to get relations data to avoid deleted relations in result list
+        $relations = $this->entityFieldProvider->getRelations(ClassUtils::getClass($entity));
+        if (!$relations) {
+            return;
+        }
+
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        foreach ($relations as $associationMapping) {
+            $fieldName = $associationMapping['name'];
+            $value = $propertyAccessor->getValue($entity, $fieldName);
+
             if ($value && is_object($value)) {
                 if ($value instanceof Collection) {
                     $this->fixCollectionField($value, $level);

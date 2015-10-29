@@ -73,10 +73,11 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
     public function testTabPanel()
     {
         $this->environment
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('render');
 
-        $this->extension->tabPanel($this->environment, []);
+        $this->extension->tabPanel($this->environment, $tabs = []);
+        $this->extension->tabPanel($this->environment, $tabs = [], $options = []);
     }
 
     /**

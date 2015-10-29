@@ -41,12 +41,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "group_name"=""
+ *              "group_name"="",
+ *              "share_grid"="share-with-business-units-datagrid"
  *          }
  *      }
  * )
  */
-class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface
+class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface, BusinessUnitInterface
 {
     /**
      * @var integer

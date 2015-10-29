@@ -8,6 +8,8 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\BusinessUnitSecurityIdentity;
+
 class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MutableAclProvider */
@@ -137,6 +139,12 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
                 'UPDATE acl_security_identities SET identifier = \'ROLE_TEST\' WHERE '
                 . 'identifier = \'ROLE_OLD\' AND username = 0'
             ),
+            [
+                new BusinessUnitSecurityIdentity(2, 'Acme\BusinessUnit'),
+                '1',
+                'UPDATE acl_security_identities SET identifier = \'Acme\BusinessUnit-2\' WHERE '
+                . 'identifier = \'Acme\BusinessUnit-1\' AND username = 0'
+            ]
         );
     }
 

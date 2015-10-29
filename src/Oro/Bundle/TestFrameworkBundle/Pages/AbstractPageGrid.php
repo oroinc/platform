@@ -304,7 +304,8 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function delete($entityData, $actionName = 'Delete', $confirmation = true)
     {
-        return $this->action($entityData, $actionName, $confirmation);
+        $this->action($entityData, $actionName, $confirmation);
+        return $this;
     }
 
     /**
@@ -317,10 +318,15 @@ abstract class AbstractPageGrid extends AbstractPage
     public function action($entityData, $actionName = 'Update', $confirmation = false)
     {
         $entity = $this->getEntity($entityData);
-        $element = $entity->element(
-            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
-        );
-        $this->test->moveto($element);
+        $flag = $entity->elements($this->test->using('xpath')->value(
+            "td[contains(@class,'action-cell')]//a[contains(., '...')]"
+        ));
+        if (!empty($flag)) {
+            $element = $entity->element($this->test->using('xpath')->value(
+                "td[contains(@class,'action-cell')]//a[contains(., '...')]"
+            ));
+            $this->test->moveto($element);
+        }
 
         $entity->element(
             $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
@@ -484,9 +490,11 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function assertNoActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($actionMenu);
-        $this->waitForAjax();
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+            $this->test->moveto($actionMenu);
+            $this->waitForAjax();
+        }
         $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;

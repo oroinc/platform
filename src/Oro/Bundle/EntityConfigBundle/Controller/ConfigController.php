@@ -328,6 +328,10 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
         $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
 
+        /** @var ConfigProvider $securityConfigProvider */
+        $securityConfigProvider = $this->get('oro_entity_config.provider.security');
+        $securityConfig         = $securityConfigProvider->getConfig($entity->getClassName());
+
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
         $ownerTypes              = $this->get('oro_organization.form.type.ownership_type')->getOwnershipsArray();
@@ -341,6 +345,7 @@ class ConfigController extends Controller
             'entity_owner_type' => $ownerType,
             'entity_name'       => $entityName,
             'module_name'       => $moduleName,
+            'security_config'   => $securityConfig,
         ];
     }
 

@@ -1157,6 +1157,44 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $expected
+     *
+     * @dataProvider relationsExpectedDataProvider
+     */
+    public function testGetRelations(array $expected)
+    {
+        $this->prepareWithRelations();
+        $result = $this->provider->getRelations('Acme:Test', true);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * exclusions are not used in workflow
+     *
+     * @return array
+     */
+    public function relationsExpectedDataProvider()
+    {
+        return [
+            [
+                [
+                    'rel1' => [
+                        'name' => 'rel1',
+                        'type' => 'ref-many',
+                        'label' => 'Rel1',
+                        'relation_type' => 'ref-many',
+                        'related_entity_name' => 'Acme\Entity\Test1',
+                        'related_entity_label' => 'Test1 Label',
+                        'related_entity_plural_label' => 'Test1 Plural Label',
+                        'related_entity_icon' => 'icon-test1'
+                    ],
+                ]
+            ]
+        ];
+    }
+
+    /**
      * @param string $entityClassName
      * @param mixed $values
      * @return Config

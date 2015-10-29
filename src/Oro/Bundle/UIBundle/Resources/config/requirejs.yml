@@ -137,6 +137,7 @@ config:
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
+        'oroui/js/tools/api-accessor': 'bundles/oroui/js/tools/api-accessor.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
         'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
@@ -168,6 +169,7 @@ config:
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
         'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
         'oroui/js/app/components/jquery-widget-component': 'bundles/oroui/js/app/components/jquery-widget-component.js'
+        'oroui/js/app/components/tabs-component': 'bundles/oroui/js/app/components/tabs-component.js'
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
