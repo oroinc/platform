@@ -25,6 +25,7 @@ services:
         class: %oro_importexport.writer.entity_detach_fixer.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity.entity_field_provider
 
     oro_importexport.writer.dummy:
         class: %oro_importexport.writer.dummy.class%
