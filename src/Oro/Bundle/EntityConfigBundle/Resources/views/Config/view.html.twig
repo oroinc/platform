@@ -13,7 +13,7 @@
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
         {% if extend_config.is('is_extend') %}
-            {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
+            {% include 'OroEntityConfigBundle:ImportExport:buttons.html.twig' with {
                 entity_class: 'Oro\\Bundle\\EntityConfigBundle\\Entity\\FieldConfigModel',
                 importProcessor: 'oro_entity_config_entity_field.add_or_replace',
                 importJob: 'entity_import_fields_from_csv',

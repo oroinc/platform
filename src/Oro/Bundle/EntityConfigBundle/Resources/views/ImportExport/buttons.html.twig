@@ -1,0 +1,13 @@
+{% extends 'OroImportExportBundle:ImportExport:buttons.html.twig' %}
+{% block importOnSuccessJs %}
+    if (data.success) {
+        mediator.once('page:afterChange', function() {
+            mediator.execute(
+                'showFlashMessage',
+                'warning',
+                '{{ 'oro.entity_config.importexport.import.need_update_schema'|trans|json_encode|raw }}'
+            );
+        });
+        mediator.execute('refreshPage');
+    }
+{% endblock %}
