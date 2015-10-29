@@ -83,6 +83,12 @@ class EntityFieldWriter implements ItemWriterInterface
 
         $this->setExtendData($className, $fieldName, $state);
 
+        $entityConfig = $this->configManager->getProvider('extend')->getConfig($className);
+        if (!$entityConfig->is('state', ExtendScope::STATE_UPDATE)) {
+            $entityConfig->set('state', ExtendScope::STATE_UPDATE);
+            $this->configManager->persist($entityConfig);
+        }
+
         $this->configManager->flush();
         $this->translationHelper->saveTranslations($translations);
     }
