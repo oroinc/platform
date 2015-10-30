@@ -96,15 +96,17 @@ define(function(require) {
         adjustMaxHeight: function() {
             var rect;
             var contentMargin;
-            var content = this.$el.find('.sidebar-widget-content').get(0);
-            var windowHeight = $('html').height();
-            if (content) {
+            var $content;
+            var windowHeight;
+            if (this.contentView) {
+                $content = this.contentView.$el;
+                windowHeight = $('html').height();
                 if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                    rect = content.getBoundingClientRect();
-                    contentMargin = $(content).outerHeight(true) - rect.height;
-                    $(content).css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                    rect = $content[0].getBoundingClientRect();
+                    contentMargin = $content.outerHeight(true) - rect.height;
+                    $content.css('max-height', windowHeight - rect.top - contentMargin + 'px');
                 } else {
-                    $(content).css('max-height', 'none');
+                    $content.css('max-height', 'none');
                 }
             }
         },

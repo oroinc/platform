@@ -98,14 +98,14 @@ define(function(require) {
             var rect;
             var contentRect;
             var maxHeight;
-            var $items;
+            var $list;
             if (this.el) {
                 maxHeight = parseInt(this.$el.css('max-height'));
-                $items = this.$el.find('.items');
-                if ($items.length === 1 && !isNaN(maxHeight)) {
+                $list = this.$list;
+                if ($list.length === 1 && !isNaN(maxHeight)) {
                     rect = this.$el[0].getBoundingClientRect();
-                    contentRect = this.$el.find('.content')[0].getBoundingClientRect();
-                    $items.css('max-height', rect.top + maxHeight + $items.height() - contentRect.bottom + 'px');
+                    contentRect = $list.parent()[0].getBoundingClientRect();
+                    $list.css('max-height', rect.top + maxHeight + $list.height() - contentRect.bottom + 'px');
                 }
             }
         },
