@@ -23,6 +23,7 @@ datagrid:
                         - { join: e.recipientList, alias: recipientList }
                         - { join: recipientList.users, alias: recipientUsersList }
                         - { join: recipientList.groups, alias: recipientGroupsList }
+                groupBy: e.id, eventName, eventId, ownerRecipient, emailRecipient, templateName
 
         columns:
             entityName:
