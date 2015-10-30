@@ -40,14 +40,18 @@ class SchemaTest extends WebTestCase
      */
     public function testSchema()
     {
-        class_alias(
-            'Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets',
-            'Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets'
-        );
-        class_alias(
-            'Oro\Bundle\MigrationBundle\Migration\Schema\SchemaDiff',
-            'Doctrine\DBAL\Schema\SchemaDiff'
-        );
+        if (!class_exists('Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets', false)) {
+            class_alias(
+                'Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets',
+                'Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets'
+            );
+        }
+        if (!class_exists('Doctrine\DBAL\Schema\SchemaDiff', false)) {
+            class_alias(
+                'Oro\Bundle\MigrationBundle\Migration\Schema\SchemaDiff',
+                'Doctrine\DBAL\Schema\SchemaDiff'
+            );
+        }
 
         /** @var ManagerRegistry $registry */
         $registry = $this->getContainer()->get('doctrine');
