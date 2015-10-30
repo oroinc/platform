@@ -21,11 +21,24 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
-    {% set html = UI.saveAndCloseButton() %}
+    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save'|trans}) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
+    {% set options = {
+        elSelector: '.btn-success.role-submit',
+        formName: form.vars.name,
+        formSelector: '#' ~ form.vars.id,
+        labelSelector: '#' ~ form.label.vars.id,
+        privilegesSelector: '#' ~ form.privileges.vars.id,
+        appendUsersSelector: '#roleAppendUsers',
+        removeUsersSelector: '#roleRemoveUsers',
+        tokenSelector: '#' ~ form._token.vars.id
+    } %}
+    <div data-page-component-module="orouser/js/views/role-view"
+         data-page-component-options="{{ options|json_encode }}">
+    </div>
 {% endblock navButtons %}
 
 {% block pageHeader %}
