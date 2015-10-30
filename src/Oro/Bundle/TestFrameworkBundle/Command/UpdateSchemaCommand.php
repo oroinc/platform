@@ -10,11 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
+    use SchemaTrait;
+
     const TEST_ENTITY_NAMESPACE = 'Oro\Bundle\TestFrameworkBundle\Entity';
+    const WORKFLOW_ENTITY_NAMESPACE = 'Oro\Bundle\WorkflowBundle\Entity';
 
     /**
      * Console command configuration
@@ -45,6 +49,9 @@ class UpdateSchemaCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->overrideRemoveNamespacedAssets();
+        $this->overrideSchemaDiff();
+
         $output->writeln($this->getDescription());
 
         /** @var EntityManager $em */
@@ -54,7 +61,10 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             $em->getMetadataFactory()->getAllMetadata(),
             function ($doctrineMetadata) {
                 /** @var ClassMetadataInfo $doctrineMetadata */
-                return strpos($doctrineMetadata->getReflectionClass()->getName(), self::TEST_ENTITY_NAMESPACE) === 0;
+                $className = $doctrineMetadata->getReflectionClass()->getName();
+
+                return strpos($className, self::TEST_ENTITY_NAMESPACE) === 0
+                    || strpos($className, self::WORKFLOW_ENTITY_NAMESPACE) === 0;
             }
         );
         $schemaTool = new SchemaTool($em);
@@ -90,7 +100,10 @@ class UpdateSchemaCommand extends ContainerAwareCommand
                 $doctrineAllMetadata,
                 function ($item) {
                     /** @var ClassMetadataInfo $item */
-                    return strpos($item->getReflectionClass()->getName(), self::TEST_ENTITY_NAMESPACE) === 0;
+                    $className = $item->getReflectionClass()->getName();
+
+                    return strpos($className, self::TEST_ENTITY_NAMESPACE) === 0
+                        || strpos($className, self::WORKFLOW_ENTITY_NAMESPACE) === 0;
                 }
             );
         };

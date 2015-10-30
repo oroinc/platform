@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
 
 use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
+use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -15,6 +16,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SchemaTest extends WebTestCase
 {
+    use SchemaTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -40,18 +43,8 @@ class SchemaTest extends WebTestCase
      */
     public function testSchema()
     {
-        if (!class_exists('Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets', false)) {
-            class_alias(
-                'Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets',
-                'Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets'
-            );
-        }
-        if (!class_exists('Doctrine\DBAL\Schema\SchemaDiff', false)) {
-            class_alias(
-                'Oro\Bundle\MigrationBundle\Migration\Schema\SchemaDiff',
-                'Doctrine\DBAL\Schema\SchemaDiff'
-            );
-        }
+        $this->overrideRemoveNamespacedAssets();
+        $this->overrideSchemaDiff();
 
         /** @var ManagerRegistry $registry */
         $registry = $this->getContainer()->get('doctrine');
