@@ -13,6 +13,7 @@ class ExtendHelper
     const MAX_ENUM_VALUE_ID_LENGTH = 32;
     const MAX_ENUM_SNAPSHOT_LENGTH = 500;
     const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
+    const ENUM_SNAPSHOT_SUFFIX     = 'Snapshot';
 
     /**
      * @param string $type
@@ -232,7 +233,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
+        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
     }
 
     /**
@@ -245,7 +246,7 @@ class ExtendHelper
      */
     public static function getMultiEnumSnapshotFieldName($fieldName)
     {
-        return $fieldName . 'Snapshot';
+        return $fieldName . self::ENUM_SNAPSHOT_SUFFIX;
     }
 
     /**
