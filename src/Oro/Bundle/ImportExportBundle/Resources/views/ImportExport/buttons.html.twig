@@ -86,13 +86,13 @@
                 widget.on('importComplete', function (data) {
                     if (data.success) {
                         {% if refreshPageOnSuccess %}
-                            {% if afterRefreshPageMessage is defined and datagridName is not empty %}
+                            {% if afterRefreshPageMessage is defined and afterRefreshPageMessage is not empty %}
                                 mediator.once('page:afterChange', function() {
                                     mediator.execute('showFlashMessage', 'warning', {{ afterRefreshPageMessage|json_encode|raw }});
                                 });
                             {% endif %}
                             mediator.execute('refreshPage');
-                        {% elseif datagridName is defined %}
+                        {% elseif dataGridName is defined %}
                             mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
                         {% endif %}
                     }
