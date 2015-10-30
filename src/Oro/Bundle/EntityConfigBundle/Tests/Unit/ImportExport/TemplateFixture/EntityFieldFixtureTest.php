@@ -167,7 +167,7 @@ class EntityFieldFixtureTest extends \PHPUnit_Framework_TestCase
         if ($type) {
             $entity
                 ->setType($type)
-                ->setFieldName($type . 'field');
+                ->setFieldName('field_' . $type);
         }
 
         foreach ($data as $scope => $values) {
