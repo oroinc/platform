@@ -43,7 +43,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($command, $params, $logger) {
                         if ($logger instanceof LoggerInterface) {
-                            $logger->notice('ok');
+                            $logger->info('ok');
                         }
 
                         return 0;

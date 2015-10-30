@@ -35,7 +35,7 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $cacheSalt = '$CLASSMETADATA';
-        $this->assertAttributeSame(
+        $this->assertAttributeEquals(
             [
                 '[Oro\Bundle\UserBundle\Entity\User'.$cacheSalt .'][1]' => $metadata
             ],

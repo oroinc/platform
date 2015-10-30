@@ -117,10 +117,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('json')
             ->will($this->returnValue(['success' => true]));
 
-        $this->logger->expects($this->once())
-            ->method('notice');
-
-        $this->logger->expects($this->once())
+        $this->logger->expects($this->atLeastOnce())
             ->method('info');
 
         $this->adapter->createDirectories($dirs);

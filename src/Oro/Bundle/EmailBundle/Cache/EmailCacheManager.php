@@ -71,7 +71,7 @@ class EmailCacheManager implements LoggerAwareInterface
             try {
                 $emailBody = $loader->loadEmailBody($folder, $email, $this->em);
             } catch (LoadEmailBodyException $loadEx) {
-                $this->logger->notice(
+                $this->logger->info(
                     sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $loadEx->getMessage()),
                     ['exception' => $loadEx]
                 );

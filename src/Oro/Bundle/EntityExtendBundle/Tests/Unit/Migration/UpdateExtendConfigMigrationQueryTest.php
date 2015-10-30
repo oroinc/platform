@@ -32,7 +32,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($command, $params, $logger) {
                         if ($logger instanceof ArrayLogger) {
-                            $logger->notice('test message');
+                            $logger->info('test message');
                         }
 
                         return 0;
@@ -65,7 +65,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($command, $params, $logger) {
                         if ($logger instanceof ArrayLogger) {
-                            $logger->notice('test message');
+                            $logger->info('test message');
                         }
 
                         return 0;

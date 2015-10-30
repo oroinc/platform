@@ -191,7 +191,7 @@ class EmailCacheManagerTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with(
                 'Load email body failed. Email id: 123. Error: Cannot find a body for "test email" email.',
                 ['exception' => $exception]
