@@ -12,9 +12,14 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
+use Oro\Component\Testing\Unit\EntityTrait;
+
 class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
+    use EntityTrait;
+
+    const ENTITY_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
+    const FIELD_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
 
     /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
@@ -52,33 +57,30 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
+     * @param mixed $inputData
+     * @param bool $expected
      *
      * @dataProvider supportsNormalizationProvider
      */
-    public function testSupportsNormalization(array $inputData, array $expectedData)
+    public function testSupportsNormalization($inputData, $expected)
     {
-        $this->assertEquals(
-            $expectedData['supports'],
-            $this->normalizer->supportsNormalization($inputData['data'])
-        );
+        $this->assertEquals($expected, $this->normalizer->supportsNormalization($inputData));
     }
 
     /**
      * @param array $inputData
-     * @param array $expectedData
+     * @param bool $expected
      *
      * @dataProvider supportsDenormalizationProvider
      */
-    public function testSupportsDenormalization(array $inputData, array $expectedData)
+    public function testSupportsDenormalization(array $inputData, $expected)
     {
         $this->fieldTypeProvider->expects($this->once())
             ->method('getSupportedFieldTypes')
             ->willReturn($inputData['supportedTypes']);
 
         $this->assertEquals(
-            $expectedData['supports'],
+            $expected,
             $this->normalizer->supportsDenormalization($inputData['data'], $inputData['type'])
         );
     }
@@ -96,20 +98,20 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($inputData['providers']);
 
         $this->assertEquals(
-            $expectedData['result'],
+            $expectedData,
             $this->normalizer->normalize($inputData['object'])
         );
     }
 
     /**
      * @param array $inputData
-     * @param array $expectedData
+     * @param FieldConfigModel $expectedData
      *
      * @dataProvider denormalizeProvider
      */
-    public function testDenormalize(array $inputData, array $expectedData)
+    public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
-        /* @var $objectManager ObjectManager */
+        /* @var \PHPUnit_Framework_MockObject_MockObject|ObjectManager $objectManager */
         $objectManager = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
         $this->registry->expects($this->once())
@@ -127,10 +129,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             ->with($inputData['fieldType']['modelType'])
             ->willReturn($inputData['fieldType']['fieldProperties']);
 
-        $this->assertEquals(
-            $expectedData['result'],
-            $this->normalizer->denormalize($inputData['data'], $inputData['class'])
-        );
+        $this->assertEquals($expectedData, $this->normalizer->denormalize($inputData['data'], $inputData['class']));
     }
 
     /**
@@ -145,12 +144,10 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'type' => 'type1',
                         'fieldName' => 'field1',
                     ],
-                    'type' => new FieldConfigModel(),
+                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
                     'supportedTypes' => ['type1'],
                 ],
-                'expected' => [
-                    'supports' => true,
-                ],
+                'expected' => true
             ],
             'not supported type' => [
                 'input' => [
@@ -158,12 +155,10 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'type' => 'type2',
                         'fieldName' => 'field2',
                     ],
-                    'type' => new \stdClass(),
+                    'type' => 'stdClass',
                     'supportedTypes' => ['type2'],
                 ],
-                'expected' => [
-                    'supports' => false,
-                ],
+                'expected' => false
             ],
             'data[type] is not in supportedTypes' => [
                 'input' => [
@@ -171,46 +166,38 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'type' => 'type3',
                         'fieldName' => 'field3',
                     ],
-                    'type' => new FieldConfigModel(),
+                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
                     'supportedTypes' => ['type'],
                 ],
-                'expected' => [
-                    'supports' => false,
-                ],
+                'expected' => false
             ],
             'empty data[type]' => [
                 'input' => [
                     'data' => [
                         'fieldName' => 'field4',
                     ],
-                    'type' => new FieldConfigModel(),
+                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
                     'supportedTypes' => ['type4'],
                 ],
-                'expected' => [
-                    'supports' => false,
-                ],
+                'expected' => false
             ],
             'empty data[fieldName]' => [
                 'input' => [
                     'data' => [
                         'type' => 'type5',
                     ],
-                    'type' => new FieldConfigModel(),
+                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
                     'supportedTypes' => ['type5'],
                 ],
-                'expected' => [
-                    'supports' => false,
-                ],
+                'expected' => false
             ],
             'data is not array' => [
                 'input' => [
                     'data' => 'testdata',
-                    'type' => new FieldConfigModel(),
+                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
                     'supportedTypes' => ['type6'],
                 ],
-                'expected' => [
-                    'supports' => false,
-                ],
+                'expected' => false
             ],
         ];
     }
@@ -222,20 +209,16 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'supported' => [
-                'input' => [
-                    'data' => new FieldConfigModel(),
-                ],
-                'expected' => [
-                    'supports' => true,
-                ],
+                'input' => new FieldConfigModel(),
+                'expected' => true
             ],
-            'not supported' => [
-                'input' => [
-                    'data' => new \stdClass(),
-                ],
-                'expected' => [
-                    'supports' => false,
-                ],
+            'not supported object' => [
+                'input' => new \stdClass(),
+                'expected' => false
+            ],
+            'not supported value' => [
+                'input' => 'data',
+                'expected' => false
             ],
         ];
     }
@@ -265,15 +248,13 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]),
                 ],
                 'expected' => [
-                    'result' => [
-                        'id' => 11,
-                        'fieldName' => 'field1',
-                        'type' => 'type1',
-                        'scope1.code1' => 'value1',
-                        'scope1.code2' => 'value2',
-                        'scope2.code1' => 'value1',
-                        'scope2.code2' => 'value2',
-                    ],
+                    'id' => 11,
+                    'fieldName' => 'field1',
+                    'type' => 'type1',
+                    'scope1.code1' => 'value1',
+                    'scope1.code2' => 'value2',
+                    'scope2.code1' => 'value1',
+                    'scope2.code2' => 'value2',
                 ],
             ],
         ];
@@ -370,50 +351,48 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                 ],
-                'expected' => [
-                    'result' => $this->getFieldConfigModel(null, 'fieldName1', 'fieldType1', [
-                        'bool' => [
-                            'code1' => false,
-                            'code2' => false,
-                            'code3' => false,
-                            'code4' => false,
-                            'code5' => true,
-                            'code6' => true,
-                            'code7' => true,
-                            'code8' => true,
-                            'code9' => true,
-                        ],
-                        'int' => [
-                            'code1' => 1,
-                            'code2' => 2,
-                            'code3' => 0,
-                            'code4' => 4,
-                            'code5' => 0,
-                            'code6' => 0,
-                        ],
-                        'str' => [
-                            'code1' => '1',
-                            'code2' => '2',
-                            'code3' => '',
-                            'code4' => '',
-                        ],
-                        'unknown' => [
-                            'code1' => '1',
-                        ],
-                        'enum' => [
-                            'code1' => [
-                                [
-                                    'label' => 'label1',
-                                    'is_default' => true,
-                                ],
-                                [
-                                    'label' => 'label2',
-                                    'is_default' => false,
-                                ]
+                'expected' => $this->getFieldConfigModel(null, 'fieldName1', 'fieldType1', [
+                    'bool' => [
+                        'code1' => false,
+                        'code2' => false,
+                        'code3' => false,
+                        'code4' => false,
+                        'code5' => true,
+                        'code6' => true,
+                        'code7' => true,
+                        'code8' => true,
+                        'code9' => true,
+                    ],
+                    'int' => [
+                        'code1' => 1,
+                        'code2' => 2,
+                        'code3' => 0,
+                        'code4' => 4,
+                        'code5' => 0,
+                        'code6' => 0,
+                    ],
+                    'str' => [
+                        'code1' => '1',
+                        'code2' => '2',
+                        'code3' => '',
+                        'code4' => '',
+                    ],
+                    'unknown' => [
+                        'code1' => '1',
+                    ],
+                    'enum' => [
+                        'code1' => [
+                            [
+                                'label' => 'label1',
+                                'is_default' => true,
                             ],
-                        ]
-                    ])->setEntity($this->getEntityConfigModel(1, 'className1')),
-                ],
+                            [
+                                'label' => 'label2',
+                                'is_default' => false,
+                            ]
+                        ],
+                    ]
+                ])->setEntity($this->getEntityConfigModel(1, 'className1')),
             ],
         ];
     }
@@ -450,9 +429,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEnumOptions()
     {
-        return [
-            EntityFieldNormalizer::CONFIG_TYPE => EntityFieldNormalizer::TYPE_ENUM,
-        ];
+        return [EntityFieldNormalizer::CONFIG_TYPE => EntityFieldNormalizer::TYPE_ENUM];
     }
 
     /**
@@ -462,10 +439,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getOptions($type, $default)
     {
-        return [
-            EntityFieldNormalizer::CONFIG_TYPE => $type,
-            EntityFieldNormalizer::CONFIG_DEFAULT => $default,
-        ];
+        return [EntityFieldNormalizer::CONFIG_TYPE => $type, EntityFieldNormalizer::CONFIG_DEFAULT => $default];
     }
 
     /**
@@ -478,7 +452,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
         $provider->expects($this->any())
             ->method('getScope')
             ->willReturn($scope);
@@ -488,13 +461,14 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param int $objectId
+     * @param string $className
      * @return EntityConfigModel
      */
     protected function getEntityConfigModel($objectId, $className)
     {
-        $model = new EntityConfigModel($className);
-
-        $this->setPropertyValue($model, 'id', $objectId);
+        /** @var EntityConfigModel $model */
+        $model = $this->getEntity(self::ENTITY_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId]);
+        $model->setClassName($className);
 
         return $model;
     }
@@ -508,27 +482,14 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFieldConfigModel($objectId, $fieldName, $type, array $scopes)
     {
-        $model = new FieldConfigModel($fieldName, $type);
-
-        $this->setPropertyValue($model, 'id', $objectId);
+        /** @var FieldConfigModel $model */
+        $model = $this->getEntity(self::FIELD_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId]);
+        $model->setFieldName($fieldName)->setType($type);
 
         foreach ($scopes as $scope => $values) {
             $model->fromArray($scope, $values, []);
         }
 
         return $model;
-    }
-
-    /**
-     * @param object $object
-     * @param string $propertyName
-     * @param mixed $value
-     */
-    protected function setPropertyValue($object, $propertyName, $value)
-    {
-        $reflectionClass = new \ReflectionClass(get_class($object));
-        $method = $reflectionClass->getProperty($propertyName);
-        $method->setAccessible(true);
-        $method->setValue($object, $value);
     }
 }
