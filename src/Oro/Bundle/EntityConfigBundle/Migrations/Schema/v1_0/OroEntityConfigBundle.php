@@ -265,7 +265,7 @@ class OroEntityConfigBundle implements Migration
             $schema->getTable('oro_entity_config'),
             ['entity_id'],
             ['id'],
-            ['onDelete' => null, 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         /** End of generate foreign keys for table oro_entity_config_field **/
     }
