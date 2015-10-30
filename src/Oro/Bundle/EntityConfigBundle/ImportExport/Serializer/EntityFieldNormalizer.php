@@ -153,7 +153,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             $values = [];
 
             foreach ($properties as $code => $config) {
-                if (!isset($options[$scope][$code])) {
+                if (!array_key_exists($code, $options[$scope])) {
                     continue;
                 }
 
@@ -172,7 +172,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      * @param mixed $value
      * @return mixed
      */
-    public function denormalizeFieldValue($config, $value)
+    protected function denormalizeFieldValue(array $config, $value)
     {
         if ($value === null && array_key_exists(self::CONFIG_DEFAULT, $config)) {
             return $config[self::CONFIG_DEFAULT];
