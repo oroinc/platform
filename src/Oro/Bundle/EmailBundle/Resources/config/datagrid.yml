@@ -104,9 +104,6 @@ datagrid:
                             alias: thread
                         -
                             join: e.recipients
-                            alias: recipients
-                        -
-                            join: e.recipients
                             alias: r_to
                             conditionType: WITH
                             condition: r_to.type = 'to'
