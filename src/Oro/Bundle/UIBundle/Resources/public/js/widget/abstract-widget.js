@@ -275,7 +275,7 @@ define(function(require) {
             if (adoptedActionsContainer.length > 0) {
                 var self = this;
                 var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a');
+                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
@@ -284,7 +284,7 @@ define(function(require) {
                 _.each(actions, function(action, idx) {
                     var $action = $(action);
                     var actionId = $action.data('action-name') || 'adopted_action_' + idx;
-                    switch (action.type.toLowerCase()) {
+                    switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
                             var submitReplacement = $('<input type="submit"/>');
                             submitReplacement.css({
