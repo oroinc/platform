@@ -6,7 +6,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
@@ -22,9 +21,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
-
-    /** @var ConfigModelManager|\PHPUnit_Framework_MockObject_MockObject */
-    protected $configModelManager;
 
     /** @var FieldTypeProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $fieldTypeProvider;
@@ -45,10 +41,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configModelManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -56,7 +48,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->normalizer = new EntityFieldNormalizer();
         $this->normalizer->setRegistry($this->registry);
         $this->normalizer->setConfigManager($this->configManager);
-        $this->normalizer->setConfigModelManager($this->configModelManager);
         $this->normalizer->setFieldTypeProvider($this->fieldTypeProvider);
     }
 
@@ -130,11 +121,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('find')
             ->with($inputData['configModel']['class'], $inputData['configModel']['id'])
             ->willReturn($inputData['configModel']['object']);
-
-        $this->configModelManager->expects($this->once())
-            ->method('createFieldModel')
-            ->with($inputData['fieldModel']['class'], $inputData['data']['fieldName'], $inputData['data']['type'])
-            ->willReturn($inputData['fieldModel']['object']);
 
         $this->fieldTypeProvider->expects($this->once())
             ->method('getFieldProperties')
@@ -304,8 +290,8 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 'input' => [
                     'data' => [
-                        'type' => 'type1',
-                        'fieldName' => 'name1',
+                        'type' => 'fieldType1',
+                        'fieldName' => 'fieldName1',
                         'entity' => [
                             'id' => 11,
                         ],
@@ -347,10 +333,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'class' => 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
                         'object' => $this->getEntityConfigModel(1, 'className1'),
                     ],
-                    'fieldModel' => [
-                        'class' => 'className1',
-                        'object' => $this->getFieldConfigModel(2, 'fieldName1', 'fieldType1', []),
-                    ],
                     'fieldType' => [
                         'modelType' => 'fieldType1',
                         'fieldProperties' => [
@@ -389,7 +371,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
                 'expected' => [
-                    'result' => $this->getFieldConfigModel(2, 'fieldName1', 'fieldType1', [
+                    'result' => $this->getFieldConfigModel(null, 'fieldName1', 'fieldType1', [
                         'bool' => [
                             'code1' => false,
                             'code2' => false,
@@ -430,7 +412,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                                 ]
                             ],
                         ]
-                    ]),
+                    ])->setEntity($this->getEntityConfigModel(1, 'className1')),
                 ],
             ],
         ];
