@@ -9,7 +9,9 @@ oro_entity_config:
             items:
                 # custom field header, by default field label is used
                 header:
-                    options: []
+                    options:
+                        value_type:         string
+                        default_value:      null
                     form:
                         type:               text
                         options:
@@ -19,7 +21,9 @@ oro_entity_config:
                             tooltip:        oro.importexport.entity_config.header.tooltip
                 # field order in result file
                 order:
-                    options: []
+                    options:
+                        value_type:         integer
+                        default_value:      null
                     form:
                         type:               integer
                         options:
@@ -31,6 +35,7 @@ oro_entity_config:
                 # is filed will be used to find existing entity
                 identity:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
                     form:
                         type:               choice
@@ -44,7 +49,8 @@ oro_entity_config:
                             block:          import_export
                 # is field must be excluded from import/export
                 excluded:
-                    options: []
+                    options:
+                        value_type:         boolean
                     form:
                         type:               choice
                         options:
