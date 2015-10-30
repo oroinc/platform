@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
 
+use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -30,9 +31,7 @@ class SchemaTest extends WebTestCase
         foreach ($registry->getManagers() as $em) {
             $validator = new SchemaValidator($em);
             $validateMapping = $validator->validateMapping();
-            if ($validateMapping) {
-                $this->fail(implode("\n", $validateMapping));
-            }
+            $this->assertEmpty($validateMapping, implode("\n", $validateMapping));
         }
     }
 
@@ -54,10 +53,13 @@ class SchemaTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
 
         $ignoredQueries = [
-            'mysql' => [
+            DatabasePlatformInterface::DATABASE_MYSQL => [
                 // reference from myisam table
                 'ALTER TABLE oro_search_index_text ADD CONSTRAINT FK_A0243539126F525E FOREIGN KEY (item_id) ' .
                 'REFERENCES oro_search_item (id)',
+                // https://github.com/doctrine/dbal-documentation/blob/master/en/reference/known-vendor-issues.rst
+                'ALTER TABLE oro_audit_field CHANGE old_datetimetz old_datetimetz DATETIME DEFAULT NULL, ' .
+                'CHANGE new_datetimetz new_datetimetz DATETIME DEFAULT NULL',
             ],
         ];
 
@@ -78,9 +80,7 @@ class SchemaTest extends WebTestCase
                 );
             }
 
-            if ($queries) {
-                $this->fail(implode("\n", $queries));
-            }
+            $this->assertEmpty($queries, implode("\n", $queries));
         }
     }
 }
