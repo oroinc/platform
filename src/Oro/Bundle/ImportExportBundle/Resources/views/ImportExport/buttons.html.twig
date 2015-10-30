@@ -81,11 +81,21 @@
                 });
                 widget.render();
 
-                {% if dataGridName is defined %}
-                var datagridName = {{ dataGridName|json_encode|raw }};
+                {% if (dataGridName is defined) or (refreshPageOnSuccess is defined and refreshPageOnSuccess == true) %}
                 widget.on('importComplete', function (data) {
                     if (data.success) {
-                        mediator.trigger('datagrid:doReset:' + datagridName);
+                        {% if refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
+                            {% if afterRefreshPageMessage is defined %}
+                                var afterRefreshPageMessage = {{ afterRefreshPageMessage|json_encode|raw }};
+
+                                mediator.once('page:afterChange', function() {
+                                    mediator.execute('showFlashMessage', 'warning', afterRefreshPageMessage);
+                                });
+                            {% endif %}
+                            mediator.execute('refreshPage');
+                        {% elseif datagridName is defined and datagridName is not empty %}
+                            mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
+                        {% endif %}
                     }
                 });
                 {% endif %}

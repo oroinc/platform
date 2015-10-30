@@ -56,6 +56,8 @@ oro:
             name.label: Name
             type.label: Type
 
-        importexport:
+        import:
+            title: Import Entity Fields
             message:
-                invelid_field_type:  Invalid field type
+                invalid_field_type: Invalid field type
+                require_update_schema: "Please, click 'Update schema' to apply changes"
