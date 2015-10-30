@@ -31,7 +31,7 @@ class UpdateSchemaListener
         $command = $event->getCommand();
         $environment = $this->kernel->getEnvironment();
 
-        if ($environment == 'test'
+        if ($environment === 'test'
             && $command instanceof LoadMigrationsCommand
             && $event->getInput()->getOption('force')
         ) {
@@ -40,7 +40,7 @@ class UpdateSchemaListener
                 $event->getOutput(),
                 $command->getApplication()
             );
-            $executor->runCommand('oro:test:schema:update', ['--process-isolation' => true]);
+            $executor->runCommand('oro:test:schema:update', ['--process-isolation' => true, '--dump-sql' => true]);
         }
     }
 }

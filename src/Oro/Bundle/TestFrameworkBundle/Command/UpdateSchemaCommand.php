@@ -27,11 +27,11 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             ->setDefinition(
                 [
                     new InputOption(
-                        'dry-run',
+                        'dump-sql',
                         null,
                         InputOption::VALUE_NONE,
                         'Dumps the generated SQL statements to the screen (does not execute them).'
-                    )
+                    ),
                 ]
             );
     }
@@ -39,7 +39,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
     /**
      * Runs command
      *
-     * @param  InputInterface  $input
+     * @param  InputInterface $input
      * @param  OutputInterface $output
      * @return int|null|void
      */
@@ -50,7 +50,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        $metadata   = array_filter(
+        $metadata = array_filter(
             $em->getMetadataFactory()->getAllMetadata(),
             function ($doctrineMetadata) {
                 /** @var ClassMetadataInfo $doctrineMetadata */
@@ -63,18 +63,18 @@ class UpdateSchemaCommand extends ContainerAwareCommand
         if (0 === count($sqls)) {
             $output->writeln('Nothing to update - a database is already in sync with the current entity metadata.');
         } else {
-            if ($input->getOption('dry-run')) {
+            if ($input->getOption('dump-sql')) {
                 $output->writeln(implode(';' . PHP_EOL, $sqls) . ';');
-            } else {
-                $output->writeln('Updating database schema...');
-                $schemaTool->updateSchema($metadata, true);
-                $output->writeln(
-                    sprintf(
-                        'Database schema updated successfully! "<info>%s</info>" queries were executed',
-                        count($sqls)
-                    )
-                );
             }
+
+            $output->writeln('Updating database schema...');
+            $schemaTool->updateSchema($metadata, true);
+            $output->writeln(
+                sprintf(
+                    'Database schema updated successfully! "<info>%s</info>" queries were executed',
+                    count($sqls)
+                )
+            );
         }
 
         $this->loadEntityConfigData($em);
