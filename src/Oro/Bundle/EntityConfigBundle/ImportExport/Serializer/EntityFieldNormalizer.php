@@ -195,10 +195,11 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     {
         $updatedValue = [];
         foreach ($value as $key => $subvalue) {
-            $updatedValue[$key] = [];
+            $updatedValue[$key] = ['priority' => null];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
-                $updatedValue[$key][$subfield]= $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
+                $updatedValue[$key][$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
             }
+            $updatedValue[$key]['id'] = $updatedValue[$key]['label'];
         }
 
         return $updatedValue;

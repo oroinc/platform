@@ -373,12 +373,16 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                     'enum' => [
                         'code1' => [
                             [
+                                'id' => 'label1',
                                 'label' => 'label1',
                                 'is_default' => true,
+                                'priority' => null
                             ],
                             [
+                                'id' => 'label2',
                                 'label' => 'label2',
                                 'is_default' => false,
+                                'priority' => null
                             ]
                         ],
                     ]

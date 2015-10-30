@@ -48,6 +48,14 @@ class ConfigTranslationHelper
     }
 
     /**
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->translator->getLocale();
+    }
+
+    /**
      * @param array $translations
      */
     public function saveTranslations(array $translations)

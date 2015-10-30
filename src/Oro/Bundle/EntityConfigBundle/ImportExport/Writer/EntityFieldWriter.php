@@ -4,10 +4,14 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Writer;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class EntityFieldWriter implements ItemWriterInterface
 {
@@ -17,14 +21,22 @@ class EntityFieldWriter implements ItemWriterInterface
     /** @var ConfigTranslationHelper */
     protected $translationHelper;
 
+    /** @var EnumSynchronizer */
+    protected $enumSynchronizer;
+
     /**
      * @param ConfigManager $configManager
      * @param ConfigTranslationHelper $translationHelper
+     * @param EnumSynchronizer $enumSynchronizer
      */
-    public function __construct(ConfigManager $configManager, ConfigTranslationHelper $translationHelper)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        ConfigTranslationHelper $translationHelper,
+        EnumSynchronizer $enumSynchronizer
+    ) {
         $this->configManager = $configManager;
         $this->translationHelper = $translationHelper;
+        $this->enumSynchronizer = $enumSynchronizer;
     }
 
     /**
@@ -60,37 +72,94 @@ class EntityFieldWriter implements ItemWriterInterface
                 continue;
             }
 
-            $config = $provider->getConfig($className, $fieldName);
-            $translatable = $provider->getPropertyConfig()->getTranslatableValues($config->getId());
-
-            foreach ($data as $code => $value) {
-                if (in_array($code, $translatable, true)) {
-                    // check if a label text was changed
-                    $labelKey = $config->get($code);
-
-                    if ($state === ExtendScope::STATE_NEW ||
-                        !$this->translationHelper->isTranslationEqual($labelKey, $value)
-                    ) {
-                        $translations[$labelKey] = $value;
-                    }
-                    // replace label text with label name in $value variable
-                    $value = $labelKey;
-                }
-                $config->set($code, $value);
-            }
-            $this->configManager->persist($config);
+            $translations = array_merge(
+                $translations,
+                $this->processData($provider, $provider->getConfig($className, $fieldName), $data, $state)
+            );
         }
 
         $this->setExtendData($className, $fieldName, $state);
+        $this->updateEntityState($className);
 
+        if ($state === ExtendScope::STATE_UPDATE && in_array($configModel->getType(), ['enum', 'multiEnum'], true)) {
+            $this->setEnumData($configModel->toArray('enum'), $className, $fieldName);
+        }
+
+        $this->configManager->flush();
+        $this->translationHelper->saveTranslations($translations);
+    }
+
+    /**
+     * @param ConfigProvider $provider
+     * @param ConfigInterface $config
+     * @param array $data
+     * @param string $state
+     * @return array
+     */
+    protected function processData(ConfigProvider $provider, ConfigInterface $config, array $data, $state)
+    {
+        if ($provider->getScope() === 'enum' && $config->get('enum_code')) {
+            return [];
+        }
+
+        $translatable = $provider->getPropertyConfig()->getTranslatableValues($config->getId());
+        $translations = [];
+
+        foreach ($data as $code => $value) {
+            if (in_array($code, $translatable, true)) {
+                // check if a label text was changed
+                $labelKey = $config->get($code);
+
+                if ($state === ExtendScope::STATE_NEW ||
+                    !$this->translationHelper->isTranslationEqual($labelKey, $value)
+                ) {
+                    $translations[$labelKey] = $value;
+                }
+                // replace label text with label name in $value variable
+                $value = $labelKey;
+            }
+            $config->set($code, $value);
+        }
+        $this->configManager->persist($config);
+
+        return $translations;
+    }
+
+    /**
+     * @param string $className
+     */
+    protected function updateEntityState($className)
+    {
         $entityConfig = $this->configManager->getProvider('extend')->getConfig($className);
         if (!$entityConfig->is('state', ExtendScope::STATE_UPDATE)) {
             $entityConfig->set('state', ExtendScope::STATE_UPDATE);
             $this->configManager->persist($entityConfig);
         }
+    }
 
-        $this->configManager->flush();
-        $this->translationHelper->saveTranslations($translations);
+    /**
+     * @param array $data
+     * @param string $className
+     * @param string $fieldName
+     */
+    protected function setEnumData(array $data, $className, $fieldName)
+    {
+        $provider = $this->configManager->getProvider('enum');
+        $enumCode = $provider->getConfig($className, $fieldName)->get('enum_code');
+
+        if (!$enumCode || !isset($data['enum_options'])) {
+            return;
+        }
+
+        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+
+        if ($provider->hasConfig($enumValueClassName)) {
+            $this->enumSynchronizer->applyEnumOptions(
+                $enumValueClassName,
+                $data['enum_options'],
+                $this->translationHelper->getLocale()
+            );
+        }
     }
 
     /**
