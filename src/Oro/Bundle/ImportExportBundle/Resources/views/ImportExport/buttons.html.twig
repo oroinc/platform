@@ -4,6 +4,7 @@
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
+{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
@@ -81,19 +82,17 @@
                 });
                 widget.render();
 
-                {% if (dataGridName is defined) or (refreshPageOnSuccess is defined and refreshPageOnSuccess == true) %}
+                {% if dataGridName is defined or refreshPageOnSuccess %}
                 widget.on('importComplete', function (data) {
                     if (data.success) {
-                        {% if refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
-                            {% if afterRefreshPageMessage is defined %}
-                                var afterRefreshPageMessage = {{ afterRefreshPageMessage|json_encode|raw }};
-
+                        {% if refreshPageOnSuccess %}
+                            {% if afterRefreshPageMessage is defined and datagridName is not empty %}
                                 mediator.once('page:afterChange', function() {
-                                    mediator.execute('showFlashMessage', 'warning', afterRefreshPageMessage);
+                                    mediator.execute('showFlashMessage', 'warning', {{ afterRefreshPageMessage|json_encode|raw }});
                                 });
                             {% endif %}
                             mediator.execute('refreshPage');
-                        {% elseif datagridName is defined and datagridName is not empty %}
+                        {% elseif datagridName is defined %}
                             mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
                         {% endif %}
                     }
