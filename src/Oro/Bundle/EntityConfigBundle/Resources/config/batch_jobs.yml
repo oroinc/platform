@@ -11,5 +11,5 @@ connector:
                     services:
                         reader:    oro_importexport.reader.csv
                         processor: oro_importexport.processor.import_delegate
-                        writer:    oro_importexport.writer.entity
+                        writer:    oro_entity_config.importexport.writer.entity_field
                     parameters: ~

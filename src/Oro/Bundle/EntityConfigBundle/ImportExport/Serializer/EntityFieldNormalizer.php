@@ -32,25 +32,16 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
     /**
      * @param ManagerRegistry $registry
-     */
-    public function setRegistry(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
-    }
-
-    /**
      * @param ConfigManager $configManager
-     */
-    public function setConfigManager(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
-    /**
      * @param FieldTypeProvider $fieldTypeProvider
      */
-    public function setFieldTypeProvider(FieldTypeProvider $fieldTypeProvider)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        ConfigManager $configManager,
+        FieldTypeProvider $fieldTypeProvider
+    ) {
+        $this->registry = $registry;
+        $this->configManager = $configManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
@@ -142,14 +133,18 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             $values = [];
 
             foreach ($properties as $code => $config) {
-                if (!array_key_exists($code, $options[$scope])) {
+                if (!array_key_exists($code, $options[$scope]) || $options[$scope][$code] === null) {
                     continue;
                 }
 
-                $values[$code] = $this->denormalizeFieldValue(
+                $value = $this->denormalizeFieldValue(
                     isset($config['options']) ? $config['options'] : [],
                     $options[$scope][$code]
                 );
+
+                if ($value !== null) {
+                    $values[$code] = $value;
+                }
             }
 
             $model->fromArray($scope, $values, []);
@@ -163,12 +158,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     protected function denormalizeFieldValue(array $config, $value)
     {
-        if ($value === null && array_key_exists(self::CONFIG_DEFAULT, $config)) {
-            return $config[self::CONFIG_DEFAULT];
-        }
-
         $type = array_key_exists(self::CONFIG_TYPE, $config) ? $config[self::CONFIG_TYPE] : null;
-        $result = null;
 
         switch ($type) {
             case self::TYPE_BOOLEAN:
@@ -194,12 +184,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     protected function normalizeBoolValue($value)
     {
-        $lvalue = strtolower($value);
-        if (in_array($lvalue, ['yes', 'no', 'true', 'false'], true)) {
-            $value = str_replace(['yes', 'no', 'true', 'false'], [true, false, true, false], $lvalue);
-        }
-
-        return (bool)$value;
+        return in_array(strtolower($value), ['yes', 'true', '1'], true);
     }
 
     /**
@@ -255,8 +240,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
                 self::CONFIG_TYPE => self::TYPE_STRING
             ],
             'is_default' => [
-                self::CONFIG_TYPE => self::TYPE_BOOLEAN,
-                self::CONFIG_DEFAULT => false,
+                self::CONFIG_TYPE => self::TYPE_BOOLEAN
             ],
         ];
     }

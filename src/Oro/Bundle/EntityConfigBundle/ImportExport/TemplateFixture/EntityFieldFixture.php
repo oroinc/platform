@@ -65,7 +65,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
         /** @var FieldConfigModel $entity */
         $entity
             ->setType($key)
-            ->setFieldName($key . 'field');
+            ->setFieldName('field_' .$key);
 
         foreach ($this->fieldTypeProvider->getFieldProperties($key) as $scope => $properties) {
             $values = [];
