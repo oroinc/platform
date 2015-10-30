@@ -12,12 +12,8 @@ use Oro\Bundle\EntityConfigBundle\ImportExport\Serializer\EntityFieldNormalizer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
-use Oro\Component\Testing\Unit\EntityTrait;
-
 class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTrait;
-
     const ENTITY_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel';
     const FIELD_CONFIG_MODEL_CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
 
@@ -432,11 +428,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getEntityConfigModel($objectId, $className)
     {
-        /** @var EntityConfigModel $model */
-        $model = $this->getEntity(self::ENTITY_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId]);
-        $model->setClassName($className);
-
-        return $model;
+        return $this->getEntity(self::ENTITY_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId, 'className' => $className]);
     }
 
     /**
@@ -449,13 +441,34 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     protected function getFieldConfigModel($objectId, $fieldName, $type, array $scopes)
     {
         /** @var FieldConfigModel $model */
-        $model = $this->getEntity(self::FIELD_CONFIG_MODEL_CLASS_NAME, ['id' => $objectId]);
-        $model->setFieldName($fieldName)->setType($type);
+        $model = $this->getEntity(
+            self::FIELD_CONFIG_MODEL_CLASS_NAME,
+            ['id' => $objectId, 'fieldName' => $fieldName, 'type' => $type]
+        );
 
         foreach ($scopes as $scope => $values) {
             $model->fromArray($scope, $values, []);
         }
 
         return $model;
+    }
+
+    /**
+     * @param string $className
+     * @param array $properties
+     * @return object
+     */
+    protected function getEntity($className, array $properties)
+    {
+        $reflectionClass = new \ReflectionClass($className);
+        $entity = $reflectionClass->newInstance();
+
+        foreach ($properties as $property => $value) {
+            $method = $reflectionClass->getProperty($property);
+            $method->setAccessible(true);
+            $method->setValue($entity, $value);
+        }
+
+        return $entity;
     }
 }
