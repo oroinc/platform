@@ -50,10 +50,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->normalizer = new EntityFieldNormalizer();
-        $this->normalizer->setRegistry($this->registry);
-        $this->normalizer->setConfigManager($this->configManager);
-        $this->normalizer->setFieldTypeProvider($this->fieldTypeProvider);
+        $this->normalizer = new EntityFieldNormalizer($this->registry, $this->configManager, $this->fieldTypeProvider);
     }
 
     /**
@@ -318,29 +315,29 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'modelType' => 'fieldType1',
                         'fieldProperties' => [
                             'bool' => [
-                                'code1' => ['options' => $this->getBoolOptions()],
-                                'code2' => ['options' => $this->getBoolOptions()],
-                                'code3' => ['options' => $this->getBoolOptions()],
-                                'code4' => ['options' => $this->getBoolOptions()],
-                                'code5' => ['options' => $this->getBoolOptions()],
-                                'code6' => ['options' => $this->getBoolOptions()],
-                                'code7' => ['options' => $this->getBoolOptions()],
-                                'code8' => ['options' => $this->getBoolOptions()],
-                                'code9' => ['options' => $this->getBoolOptions()],
+                                'code1' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code2' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code3' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code4' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code5' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code6' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code7' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code8' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
+                                'code9' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN)],
                             ],
                             'int' => [
-                                'code1' => ['options' => $this->getIntOptions()],
-                                'code2' => ['options' => $this->getIntOptions()],
-                                'code3' => ['options' => $this->getIntOptions()],
-                                'code4' => ['options' => $this->getIntOptions()],
-                                'code5' => ['options' => $this->getIntOptions()],
-                                'code6' => ['options' => $this->getIntOptions()],
+                                'code1' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
+                                'code2' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
+                                'code3' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
+                                'code4' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
+                                'code5' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
+                                'code6' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER)],
                             ],
                             'str' => [
-                                'code1' => ['options' => $this->getStringOptions()],
-                                'code2' => ['options' => $this->getStringOptions()],
-                                'code3' => ['options' => $this->getStringOptions()],
-                                'code4' => ['options' => $this->getStringOptions()],
+                                'code1' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_STRING)],
+                                'code2' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_STRING)],
+                                'code3' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_STRING)],
+                                'code4' => ['options' => $this->getOptions(EntityFieldNormalizer::TYPE_STRING)],
                             ],
                             'unknown' => [
                                 'code1' => [],
@@ -357,11 +354,10 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'code2' => false,
                         'code3' => false,
                         'code4' => false,
-                        'code5' => true,
                         'code6' => true,
                         'code7' => true,
                         'code8' => true,
-                        'code9' => true,
+                        'code9' => false,
                     ],
                     'int' => [
                         'code1' => 1,
@@ -369,13 +365,11 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'code3' => 0,
                         'code4' => 4,
                         'code5' => 0,
-                        'code6' => 0,
                     ],
                     'str' => [
                         'code1' => '1',
                         'code2' => '2',
                         'code3' => '',
-                        'code4' => '',
                     ],
                     'unknown' => [
                         'code1' => '1',
@@ -398,33 +392,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $default
-     * @return array
-     */
-    protected function getBoolOptions($default = true)
-    {
-        return $this->getOptions(EntityFieldNormalizer::TYPE_BOOLEAN, $default);
-    }
-
-    /**
-     * @param int $default
-     * @return array
-     */
-    protected function getIntOptions($default = 0)
-    {
-        return $this->getOptions(EntityFieldNormalizer::TYPE_INTEGER, $default);
-    }
-
-    /**
-     * @param string $default
-     * @return array
-     */
-    protected function getStringOptions($default = '')
-    {
-        return $this->getOptions(EntityFieldNormalizer::TYPE_STRING, $default);
-    }
-
-    /**
      * @return array
      */
     protected function getEnumOptions()
@@ -434,12 +401,11 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $type
-     * @param mixed $default
      * @return array
      */
-    protected function getOptions($type, $default)
+    protected function getOptions($type)
     {
-        return [EntityFieldNormalizer::CONFIG_TYPE => $type, EntityFieldNormalizer::CONFIG_DEFAULT => $default];
+        return [EntityFieldNormalizer::CONFIG_TYPE => $type];
     }
 
     /**
