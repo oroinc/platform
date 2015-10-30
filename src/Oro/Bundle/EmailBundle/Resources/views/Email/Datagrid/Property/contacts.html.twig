@@ -37,8 +37,8 @@
         {% endif %}
 
         {% if recipients|length > 0 %}
-            {% set firstEmail = recipients[0] %}
-            {% set lastEmail = recipients[recipients|length - 1] %}
+            {% set firstEmail = recipients|first %}
+            {% set lastEmail = recipients|last %}
             {{
                 EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
             }}..{{
