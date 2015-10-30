@@ -15,7 +15,6 @@ use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class ImportExportController extends Controller
@@ -57,11 +56,7 @@ class ImportExportController extends Controller
         return [
             'entityName' => $entityName,
             'form'       => $importForm->createView(),
-            'options'    => array_merge(
-                [FormatterProvider::FORMAT_TYPE => 'excel'],
-                [],
-                $this->getOptionsFromRequest()
-            )
+            'options'    => $this->getOptionsFromRequest()
         ];
     }
 
@@ -141,7 +136,6 @@ class ImportExportController extends Controller
             'csv',
             null,
             array_merge(
-                [FormatterProvider::FORMAT_TYPE => 'excel'],
                 $this->getOptionsFromRequest(),
                 ['organization' => $this->get('oro_security.security_facade')->getOrganization()]
             )
@@ -165,10 +159,7 @@ class ImportExportController extends Controller
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
             null,
-            array_merge(
-                [FormatterProvider::FORMAT_TYPE => 'excel'],
-                $this->getOptionsFromRequest()
-            )
+            $this->getOptionsFromRequest()
         );
 
         return $this->redirect($result['url']);

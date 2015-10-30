@@ -2,63 +2,110 @@
 
 namespace Oro\Bundle\ImportExportBundle\Formatter;
 
-class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
-{
-    const FORMATTER_ALIAS = 'excel_datetime';
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 
+class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTimeTypeConverterInterface
+{
     /**
      * {@inheritdoc}
      */
-    public function getPattern(
-        $dateType = \IntlDateFormatter::SHORT,
-        $timeType = \IntlDateFormatter::SHORT,
-        $locale = null
-    ) {
-        $localeFormatter = $this->getIntlFormatter($dateType, $timeType, $locale);
-        $pattern         = $localeFormatter->getPattern();
-
-        return $this->modifyPattern($pattern, $dateType, $timeType);
+    public function convertToDateTime($value, $type)
+    {
+        switch ($type) {
+            case self::TYPE_DATETIME:
+                return $this->convert($value);
+            case self::TYPE_DATE:
+                return $this->convertToDate($value);
+            case self::TYPE_TIME:
+                return $this->convertToTime($value);
+            default:
+                throw new InvalidArgumentException(sprintf('Couldn\'t parse "%s" type', $type));
+        }
     }
 
-    public function getIntlFormatter(
-        $dateType = \IntlDateFormatter::SHORT,
-        $timeType = \IntlDateFormatter::SHORT,
-        $timezone = null,
-        $locale = null
+    /**
+     * Parse data string and convert to the \DateTime object.
+     *
+     * @param string          $value
+     * @param string|int|null $dateType
+     * @param string|int|null $timeType
+     * @param string|null     $locale
+     * @param string|null     $timeZone
+     * @param string|null     $pattern
+     *
+     * @return \DateTime|false
+     */
+    public function convert(
+        $value,
+        $dateType = null,
+        $timeType = null,
+        $locale = null,
+        $timeZone = null,
+        $pattern = null
     ) {
-        $dateType = ($dateType == \IntlDateFormatter::NONE) ? \IntlDateFormatter::NONE : \IntlDateFormatter::SHORT;
-        $timeType = ($timeType == \IntlDateFormatter::NONE) ? \IntlDateFormatter::NONE : \IntlDateFormatter::SHORT;
-
-        if (!$timezone) {
-            $timezone = $this->localeSettings->getTimeZone();
-        }
-
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
         }
 
-        return new \IntlDateFormatter(
-            $locale,
-            $dateType,
-            $timeType,
-            $timezone,
-            \IntlDateFormatter::GREGORIAN
-        );
+        if (!$timeZone) {
+            $timeZone = $this->localeSettings->getTimeZone();
+        }
+
+        if ($value) {
+            $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
+            $timestamp = $formatter->parse($value);
+            if (intl_get_error_code() === 0) {
+                return new \DateTime(sprintf('@%f', $timestamp));
+            }
+        }
+
+        return false;
     }
 
     /**
-     * @param int $timestamp
+     * Parse data string and convert to the \DateTime object.
      *
-     * @return \DateTime
+     * @param string          $value
+     * @param string|int|null $dateType
+     * @param string|null     $locale
+     * @param string|null     $timeZone
+     *
+     * @return \DateTime|false
      */
-    public function getDateTimeFromTimestamp($timestamp)
+    public function convertToDate($value, $dateType = null, $locale = null, $timeZone = 'UTC')
     {
-        return new \DateTime(sprintf('@%f', $timestamp));
+        return $this->convert($value, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone);
     }
 
     /**
-     * Modify locale specific pattern to excel supported.
+     * Parse data string and convert to the \DateTime object.
+     *
+     * @param string          $value
+     * @param string|int|null $timeType
+     * @param string|null     $locale
+     * @param string|null     $timeZone
+     *
+     * @return \DateTime|false
+     */
+    public function convertToTime($value, $timeType = null, $locale = null, $timeZone = 'UTC')
+    {
+        return $this->convert($value, \IntlDateFormatter::NONE, $timeType, $locale, $timeZone);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPattern($dateType, $timeType, $locale = null)
+    {
+        $pattern = parent::getPattern($dateType, $timeType, $locale);
+
+        return $this->modifyPattern($pattern, $dateType, $timeType);
+    }
+
+    /**
+     * Added leading zeros for 'day' and 'month'. Set time format to 'HH:mm:ss'.
      * See icu formats:
+     *
      * @link http://userguide.icu-project.org/formatparse/datetime
      *
      * @param string $pattern
@@ -87,7 +134,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter
     }
 
     /**
-     * Detects order of day, month and year from IntlDateFormatter pattern string.
+     * Detects order of day, month and year in the IntlDateFormatter pattern string.
      *
      * @param string $pattern
      *
