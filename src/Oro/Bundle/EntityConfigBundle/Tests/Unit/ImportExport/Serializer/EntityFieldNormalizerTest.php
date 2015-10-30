@@ -474,6 +474,7 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getConfigProvider($scope)
     {
+        /* @var $provider ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
