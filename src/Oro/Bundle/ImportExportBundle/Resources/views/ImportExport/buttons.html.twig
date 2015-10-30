@@ -89,6 +89,21 @@
                     }
                 });
                 {% endif %}
+
+                {% if refreshPageOnSuccess is defined %}
+                var refreshPageOnSuccess = {{ refreshPageOnSuccess|json_encode|raw }};
+
+                if (refreshPageOnSuccess) {
+                    {% if afterRefreshPageMessage is defined %}
+                    var afterRefreshPageMessage = {{ afterRefreshPageMessage|json_encode|raw }};
+
+                    mediator.once('page:afterChange', function() {
+                        mediator.execute('showFlashMessage', 'warning', afterRefreshPageMessage);
+                    });
+                    {% endif %}
+                    mediator.execute('refreshPage');
+                }
+                {% endif %}
             });
             {% endif %}
 

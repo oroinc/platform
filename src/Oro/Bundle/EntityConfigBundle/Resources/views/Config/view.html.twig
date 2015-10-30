@@ -17,9 +17,10 @@
                 entity_class: 'Oro\\Bundle\\EntityConfigBundle\\Entity\\FieldConfigModel',
                 importProcessor: 'oro_entity_config_entity_field.add_or_replace',
                 importJob: 'entity_import_fields_from_csv',
-                importTitle: 'orob2b.pricing.productprice.import'|trans,
-                dataGridName: 'price-list-product-prices-grid',
+                importTitle: 'oro.entity_config.import.title'|trans,
                 exportTemplateProcessor: 'oro_entity_config_entity_field',
+                refreshPageOnSuccess: true,
+                afterRefreshPageMessage: 'oro.entity_config.import.message.require_update_schema'|trans
                 options: {'entity_id': entity.id},
             } %}
         {% endif %}
