@@ -1,8 +1,9 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view'
-], function($, mediator, BaseView) {
+], function($, _, mediator, BaseView) {
     'use strict';
 
     var RoleView;
@@ -62,13 +63,15 @@ define([
             if (this.disposed) {
                 return;
             }
-            delete this.$form,
-                this.$label,
-                this.$privileges,
-                this.$appendUsers,
-                this.$removeUsers,
-                this.$token,
-                this.privileges;
+
+            delete this.$form;
+            delete this.$label;
+            delete this.$privileges;
+            delete this.$appendUsers;
+            delete this.$removeUsers;
+            delete this.$token;
+            delete this.privileges;
+
             RoleView.__super__.dispose.call(this);
         },
 
@@ -122,7 +125,7 @@ define([
             if (this.disposed) {
                 return;
             }
-            var self = this;
+
             $.each(this.privileges, function(scopeName, privileges) {
                 $.each(privileges, function(key, privilege) {
                     if (privilege.identity.id === data.identityId) {
