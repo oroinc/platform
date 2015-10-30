@@ -72,7 +72,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             }
         }
 
-        return $object->format($this->defaultDateTimeFormat);
+        return $object->format($this->getFormat($context));
     }
 
     /**
