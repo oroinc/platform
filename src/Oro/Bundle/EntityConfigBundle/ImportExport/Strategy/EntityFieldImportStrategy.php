@@ -53,7 +53,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             } elseif ($entity->getType() !== $existingEntity->getType()) {
                 $this->context->incrementErrorEntriesCount();
                 $this->strategyHelper->addValidationErrors(
-                    [$this->translator->trans('oro.entity_config.importexport.message.invelid_field_type')],
+                    [$this->translator->trans('oro.entity_config.import.message.invalid_field_type')],
                     $this->context
                 );
 
