@@ -90,10 +90,7 @@
                 });
                 {% endif %}
 
-                {% if refreshPageOnSuccess is defined %}
-                var refreshPageOnSuccess = {{ refreshPageOnSuccess|json_encode|raw }};
-
-                if (refreshPageOnSuccess) {
+                {% if refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
                     {% if afterRefreshPageMessage is defined %}
                     var afterRefreshPageMessage = {{ afterRefreshPageMessage|json_encode|raw }};
 
@@ -102,7 +99,6 @@
                     });
                     {% endif %}
                     mediator.execute('refreshPage');
-                }
                 {% endif %}
             });
             {% endif %}
