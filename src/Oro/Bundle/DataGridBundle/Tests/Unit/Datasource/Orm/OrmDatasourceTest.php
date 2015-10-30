@@ -20,6 +20,9 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     protected $em;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $eventDispatcher;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -31,11 +34,15 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->parameterBinder = $this->getMock('Oro\\Bundle\\DataGridBundle\\Datasource\\ParameterBinderInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $queryHintResolver     = new QueryHintResolver();
         $this->datasource      = new OrmDatasource(
-            $this->em,
+            $this->doctrine,
             $this->eventDispatcher,
             $this->parameterBinder,
             $queryHintResolver
@@ -57,6 +64,11 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
         if (null !== $hints) {
             $configs['hints'] = $hints;
         }
+
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with('Test')
+            ->willReturn($this->em);
 
         $this->prepareEntityManagerForTestHints($entityClass);
 
@@ -188,6 +200,11 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
                 ['table' => 'Test', 'alias' => 't']
             ]
         ];
+
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with('Test')
+            ->willReturn($this->em);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->setConstructorArgs([$this->em])

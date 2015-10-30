@@ -40,9 +40,7 @@ class BusinessUnits extends AbstractPageFilteredGrid
         if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
             $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
             $this->waitForAjax();
-            return $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
         }
-
-        return $this;
+        return $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
     }
 }

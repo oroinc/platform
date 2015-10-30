@@ -1,7 +1,12 @@
 {% extends 'OroInstallerBundle::layout.html.twig' %}
 {% use 'OroInstallerBundle::progress.html.twig' %}
 
-{% set step, steps = 'schema', ['cache', 'schema-drop', 'clear-config', 'clear-extend', 'schema-update', 'workflows', 'processes', 'fixtures'] %}
+{% set step = 'schema' %}
+{% set steps = ['cache'] %}
+{% if dropDatabase %}
+    {% set steps = steps|merge(['schema-drop', 'clear-config', 'clear-extend']) %}
+{% endif %}
+{% set steps = steps|merge(['schema-update', 'workflows', 'processes', 'fixtures']) %}
 
 {% block title %}{{ 'process.step.schema.header'|trans }} - {{ parent() }}{% endblock %}
 

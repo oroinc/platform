@@ -9,10 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 
 use Oro\Bundle\SearchBundle\Query\Expression\Lexer;
 use Oro\Bundle\SearchBundle\Query\Expression\Parser as ExpressionParser;
@@ -28,9 +25,6 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Class Indexer
- * @package Oro\Bundle\SearchBundle\Engine
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -214,27 +208,23 @@ class Indexer
      */
     public function autocompleteSearch(User $user, $searchString, $offset = 0, $maxResults = 0)
     {
-        $entityDescriptions = $this->entityProvider->getEntities();
-        $classNames         = [];
-        foreach ($entityDescriptions as $description) {
-            $classNames[] = $description['name'];
+        $classNameMap = [];
+        $entities     = $this->entityProvider->getEntities();
+        foreach ($entities as $description) {
+            $classNameMap[$description['name']] = true;
         }
-        $entities = $this->em->getRepository(EntityConfigModel::ENTITY_NAME)->findEntitiesByClassNames($classNames);
 
-        $tables = [];
-        foreach ($entities as $entity) {
-            /** @var EntityConfigModel $entity */
-            $data = $entity->toArray('activity');
-            if (!isset($data['activities']) || !$data['activities']) {
+        $tables  = [];
+        $configs = $this->configManager->getProvider('activity')->getConfigs();
+        foreach ($configs as $config) {
+            $className = $config->getId()->getClassName();
+            if (!isset($classNameMap[$className])) {
                 continue;
             }
-
-            if (!in_array(Email::ENTITY_CLASS, $data['activities'])) {
-                continue;
+            $activities = $config->get('activities');
+            if (!empty($activities) && in_array(Email::ENTITY_CLASS, $activities, true)) {
+                $tables[] = $this->em->getClassMetadata($className)->getTableName();
             }
-
-            $metadata = $this->em->getClassMetadata($entity->getClassName());
-            $tables[] = $metadata->getTableName();
         }
 
         $results       = [];
@@ -262,7 +252,7 @@ class Indexer
     }
 
     /**
-     * @param User   $user
+     * @param User $user
      * @param string $searchString
      * @return array
      */
@@ -319,8 +309,8 @@ class Indexer
         if (!$this->configManager->hasConfig($className)) {
             return null;
         }
-        $entityConfig = new EntityConfigId('entity', $className);
-        $label        = $this->configManager->getConfig($entityConfig)->get('label');
+
+        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }

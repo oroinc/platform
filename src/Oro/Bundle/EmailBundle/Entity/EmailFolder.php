@@ -116,14 +116,6 @@ class EmailFolder
      */
     protected $outdatedAt;
 
-//    /**
-//     * @var ArrayCollection|EmailUser[]
-//     *
-//     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
-//     *      cascade={"persist", "remove"}, orphanRemoval=true)
-//     */
-//    protected $emailUsers;
-
     /**
      * @var ArrayCollection|EmailUser[]
      *

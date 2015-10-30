@@ -5,6 +5,10 @@ definitions:
         entity: Oro\Bundle\UserBundle\Entity\User
         order: 20
         exclude_definitions: [another_definition]
+        pre_conditions:
+            @or:
+                - @true
+                - @false
         actions_configuration:
             - @assign_value: [$entity.field, 'value']
 

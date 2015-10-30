@@ -8,7 +8,7 @@ define(function() {
             percent:   'number',
             currency:  'number',
             array:     'string',
-            simple_array: 'string',
+            simple_array: 'string'
         };
 
     return function(type) {

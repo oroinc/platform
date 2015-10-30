@@ -112,14 +112,14 @@ class EmailUser
      */
     protected $seen = false;
 
-//    /**
-//     * @var EmailFolder $folder
-//     *
-//     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emailUsers", cascade={"persist"})
-//     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-//     * @JMS\Exclude
-//     */
-//    protected $folder;
+    /**
+     * @var EmailOrigin
+     *
+     * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
+     * @JMS\Exclude
+     */
+    protected $origin;
 
     /**
      * @var ArrayCollection|EmailFolder[]
@@ -310,28 +310,6 @@ class EmailUser
         return $this;
     }
 
-//    /**
-//     * Get email folder
-//     *
-//     * @return EmailFolder
-//     */
-//    public function getFolder()
-//    {
-//        return $this->folder;
-//    }
-//
-//    /**
-//     * @param EmailFolder $folder
-//     *
-//     * @return $this
-//     */
-//    public function setFolder($folder)
-//    {
-//        $this->folder = $folder;
-//
-//        return $this;
-//    }
-
     /**
      * Get email
      *
@@ -382,6 +360,30 @@ class EmailUser
     public function setMailboxOwner(Mailbox $mailboxOwner = null)
     {
         $this->mailboxOwner = $mailboxOwner;
+
+        return $this;
+    }
+
+    /**
+     * Get email user origin
+     *
+     * @return EmailOrigin
+     */
+    public function getOrigin()
+    {
+        return $this->origin;
+    }
+
+    /**
+     * Set email user origin
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return EmailUser
+     */
+    public function setOrigin(EmailOrigin $origin)
+    {
+        $this->origin = $origin;
 
         return $this;
     }

@@ -42,7 +42,7 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function toGrid()
     {
-        $this->test->byXPath("//div[@class='customer-content pull-left']/div[1]//a")->click();
+        $this->test->byXPath("//div[@class='customer-content']/div[1]//a")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -260,6 +260,8 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function verifyActivity($activityType, $activityName)
     {
+        $this->test->moveto($this->test->byXPath("//*[@class='container-fluid accordion']"));
+        $this->filterByMultiselect('Activity Type', [$activityType]);
         $this->assertElementPresent(
             "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$activityName}')]".

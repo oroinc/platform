@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
@@ -25,6 +26,9 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 class SegmentFilter extends EntityFilter
 {
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /** @var ServiceLink */
     protected $dynamicSegmentQueryBuilderLink;
 
@@ -45,6 +49,7 @@ class SegmentFilter extends EntityFilter
      *
      * @param FormFactoryInterface $factory
      * @param FilterUtility        $util
+     * @param ManagerRegistry      $doctrine
      * @param ServiceLink          $dynamicSegmentQueryBuilderLink
      * @param ServiceLink          $staticSegmentQueryBuilderLink
      * @param EntityNameProvider   $entityNameProvider
@@ -54,6 +59,7 @@ class SegmentFilter extends EntityFilter
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        ManagerRegistry $doctrine,
         ServiceLink $dynamicSegmentQueryBuilderLink,
         ServiceLink $staticSegmentQueryBuilderLink,
         EntityNameProvider $entityNameProvider,
@@ -62,6 +68,7 @@ class SegmentFilter extends EntityFilter
     ) {
         parent::__construct($factory, $util);
 
+        $this->doctrine                       = $doctrine;
         $this->dynamicSegmentQueryBuilderLink = $dynamicSegmentQueryBuilderLink;
         $this->staticSegmentQueryBuilderLink  = $staticSegmentQueryBuilderLink;
         $this->entityNameProvider             = $entityNameProvider;
@@ -86,7 +93,6 @@ class SegmentFilter extends EntityFilter
         $metadata = parent::getMetadata();
 
         $entityIds = [];
-        $em        = $this->entityConfigProvider->getConfigManager()->getEntityManager();
         $configIds = $this->entityConfigProvider->getIds();
         foreach ($configIds as $configId) {
             $className = $configId->getClassName();
@@ -95,7 +101,9 @@ class SegmentFilter extends EntityFilter
                 [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
             )
             ) {
-                $classMetadata         = $em->getClassMetadata($className);
+                $classMetadata         = $this->doctrine
+                    ->getManagerForClass($className)
+                    ->getClassMetadata($className);
                 $identifiers           = $classMetadata->getIdentifier();
                 $entityIds[$className] = array_shift($identifiers);
             }

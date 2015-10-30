@@ -31,6 +31,16 @@ parameters:
     oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
     oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
     oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
+    oro_dashboard.form.type.widget_user_multiselect.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetUserMultiselect
+    oro_dashboard.widget_config_value.widget_user_multiselect.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetUserMultiselectConverter
+    oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
+    oro_dashboard.form.type.widget_business_unit_select.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetBusinessUnitSelect
+    oro_dashboard.widget_config_value.widget_business_unit_select.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetBusinessUnitSelectConverter
+
+    # BigNumber
+    oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
+    oro_dashboard.provider.big_number.formatter.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberFormatter
+    oro_dashboard.provider.big_number.date_helper.class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper
 
 services:
     oro_datagrid.datagrid.name_strategy:
@@ -205,3 +215,53 @@ services:
         class: %oro_dashboard.widget_config_value.widget_items_choice.converter.class%
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.form.type.widget_user_multiselect:
+        class: %oro_dashboard.form.type.widget_user_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: "oro_type_widget_user_multiselect" }
+
+    oro_dashboard.widget_config_value.widget_user_multiselect.converter:
+        class: %oro_dashboard.widget_config_value.widget_user_multiselect.converter.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_user_multiselect" }
+
+    oro_dashboard.form.type.widget_date:
+        class: %oro_dashboard.form.type.widget_date.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_date" }
+
+    oro_dashboard.form.type.widget_business_unit_select:
+        class: %oro_dashboard.form.type.widget_business_unit_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - %oro_organization.business_unit.entity.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_business_unit_select" }
+
+    oro_dashboard.widget_config_value.widget_business_unit_select.converter:
+        class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
+
+    # BigNumber
+    oro_dashboard.provider.big_number.processor:
+        class: %oro_dashboard.provider.big_number.processor.class%
+        arguments:
+            - @oro_dashboard.provider.big_number.formatter
+            - @oro_dashboard.provider.big_number.date_helper
+
+    oro_dashboard.provider.big_number.formatter:
+        class: %oro_dashboard.provider.big_number.formatter.class%
+        arguments:
+            - @oro_locale.formatter.number
+
+    oro_dashboard.provider.big_number.date_helper:
+        class: %oro_dashboard.provider.big_number.date_helper.class%
+        arguments:
+            - @doctrine
+            - @oro_security.acl_helper

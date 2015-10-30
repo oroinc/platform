@@ -7,8 +7,8 @@ define(function(require) {
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var Backbone = require('backbone');
     var mediator = require('oroui/js/mediator');
-    var layout = require('oroui/js/layout');
-    var tools = require('oroui/js/tools');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
+    var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
 
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
@@ -43,8 +43,9 @@ define(function(require) {
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
-            this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
+            this.listenTo(this.grid, 'content:update', this.onGridContentUpdate);
             this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
+            this.listenTo(this.grid, 'ensureCellIsVisible', this.ensureCellIsVisible);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
             FloatingHeaderPlugin.__super__.enable.call(this);
@@ -92,7 +93,6 @@ define(function(require) {
             var widthDecrement = 0;
             var widths = [];
             var self = this;
-            var scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
@@ -158,7 +158,9 @@ define(function(require) {
         selectMode: function() {
             // get gridRect
             var tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
-            var visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
+            var visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+                top: -this.headerHeight
+            }, this.currentFloatTheadMode === 'default');
             var mode = 'default';
             if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
                 mode = 'fixed';
@@ -178,10 +180,11 @@ define(function(require) {
          */
         setFloatTheadMode: function(mode, visibleRect, tableRect) {
             var theadRect;
-            var sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
-                visibleRect = this.getVisibleRect(this.domCache.gridContainer[0]);
+                visibleRect = scrollHelper.getVisibleRect(this.domCache.gridContainer[0], {
+                    top: -this.headerHeight
+                }, this.currentFloatTheadMode === 'default');
             }
             if (!tableRect) {
                 tableRect = this.domCache.gridContainer[0].getBoundingClientRect();
@@ -192,11 +195,7 @@ define(function(require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
-                        if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.domCache.thead.clone().addClass('thead-sizing');
-                            sizingThead.find('th').attr('style', '');
-                            sizingThead.insertAfter(this.domCache.thead);
-                        }
+                        this._ensureTHeadSizing();
                     }
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
                     this.domCache.thead.css({
@@ -216,16 +215,13 @@ define(function(require) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
-                        if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.domCache.thead.clone().addClass('thead-sizing');
-                            sizingThead.find('th').attr('style', '');
-                            sizingThead.insertAfter(this.domCache.thead);
-                        }
+                        this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({
                         // show only visible part
                         top: visibleRect.top,
-                        width: visibleRect.right - visibleRect.left,
+                        width: visibleRect.right - visibleRect.left +
+                            (this.scrollStateModel.get('visible') ? scrollBarWidth : 0),
                         height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 
                         // left side should be also tracked
@@ -251,6 +247,30 @@ define(function(require) {
                     break;
             }
             this.currentFloatTheadMode = mode;
+        },
+
+        /**
+         * Handles grid head changes
+         * (hiding/showing and sorting columns)
+         */
+        onGridContentUpdate: function() {
+            this.$grid.find('.thead-sizing').remove();
+            this._ensureTHeadSizing();
+            this.fixHeaderCellWidth();
+        },
+
+        /**
+         * Creates thead clone if it does not exist
+         *
+         * @protected
+         */
+        _ensureTHeadSizing: function() {
+            if (!this.$grid.find('.thead-sizing').length) {
+                var sizingThead = this.domCache.thead.clone();
+                sizingThead.addClass('thead-sizing');
+                sizingThead.find('th').attr('style', '');
+                sizingThead.insertAfter(this.domCache.thead);
+            }
         },
 
         /**
@@ -398,67 +418,22 @@ define(function(require) {
             this._lastClientRect = scrollContainerRect;
         },
 
-        /**
-         * Returns visible rect of DOM element
-         *
-         * @param el
-         * @returns {{top: number, left: Number, bottom: Number, right: Number}}
-         */
-        getVisibleRect: function(el) {
-            var current = el;
-            var midRect = current.getBoundingClientRect();
-            var borders;
-            var resultRect = {
-                top: midRect.top - this.headerHeight,
-                left: midRect.left,
-                bottom: midRect.bottom,
-                right: midRect.right
-            };
-            if (
-                (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
-            ) {
-                // no need to calculate anything
-                return resultRect;
+        ensureCellIsVisible: function(e, cell) {
+            if (e.isDefaultPrevented()) {
+                return;
             }
-            current = current.parentNode;
-            while (current && current.getBoundingClientRect) {
-                midRect = current.getBoundingClientRect();
-                borders = $.fn.getBorders(current);
-
-                if (tools.isMobile()) {
-                    /**
-                     * Equals header height. Cannot calculate dynamically due to issues on ipad
-                     */
-                    if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && current.id === 'top-page' &&
-                        !this.domCache.body.hasClass('input-focused')) {
-                        resultRect.top = layout.MOBILE_HEADER_HEIGHT;
-                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT &&
-                        current.className === 'widget-content') {
-                        resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
+            if (this.currentFloatTheadMode in {relative: true, fixed: true}) {
+                var _this = this;
+                this.fixHeaderCellWidth();
+                scrollHelper.scrollIntoView(cell.el, function(el, rect) {
+                    if (_this.domCache.gridScrollableContainer &&
+                        _this.domCache.gridScrollableContainer.length &&
+                        el === _this.domCache.gridScrollableContainer[0]) {
+                        rect.top += _this.headerHeight;
                     }
-                }
-
-                if (resultRect.top < midRect.top + borders.top) {
-                    resultRect.top = midRect.top + borders.top;
-                }
-                if (resultRect.bottom > midRect.bottom - borders.bottom) {
-                    resultRect.bottom = midRect.bottom - borders.bottom;
-                }
-                if (resultRect.left < midRect.left + borders.left) {
-                    resultRect.left = midRect.left + borders.left;
-                }
-                if (resultRect.right > midRect.right - borders.right) {
-                    resultRect.right = midRect.right - borders.right;
-                }
-                current = current.parentNode;
+                });
+                e.preventDefault();
             }
-
-            if (resultRect.top < 0) {
-                resultRect.top = 0;
-            }
-
-            return resultRect;
         }
     });
 

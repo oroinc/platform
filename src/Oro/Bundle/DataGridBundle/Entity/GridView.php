@@ -88,6 +88,13 @@ class GridView
     protected $sortersData = [];
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    protected $columnsData = [];
+
+    /**
      * @var string
      *
      * @ORM\Column(type="string")
@@ -229,6 +236,22 @@ class GridView
     }
 
     /**
+     * @return array
+     */
+    public function getColumnsData()
+    {
+        return $this->columnsData;
+    }
+
+    /**
+     * @param array $columnsData
+     */
+    public function setColumnsData(array $columnsData = [])
+    {
+        $this->columnsData = $columnsData;
+    }
+
+    /**
      * @param string $gridName
      *
      * @return this
@@ -257,7 +280,7 @@ class GridView
      */
     public function createView()
     {
-        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type);
+        $view = new View($this->id, $this->filtersData, $this->sortersData, $this->type, $this->columnsData);
         $view->setLabel($this->name);
 
         return $view;

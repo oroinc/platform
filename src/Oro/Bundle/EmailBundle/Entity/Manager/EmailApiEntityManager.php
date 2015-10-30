@@ -167,14 +167,18 @@ class EmailApiEntityManager extends ApiEntityManager
                     'exclusion_policy' => 'all',
                     'hints'            => ['HINT_FILTER_BY_CURRENT_USER'],
                     'fields'           => [
+                        'id'       => null,
                         'seen'       => null,
                         'receivedAt' => null,
-                        // @todo: 'folder' should be changed to 'folders' in BAP-8538
-                        'folder'     => [
+                        'origin'     => [
+                            'exclusion_policy' => 'all',
+                            'fields' =>
+                                ['id' => null]
+                        ],
+                        'folders'     => [
                             'exclusion_policy' => 'all',
                             'fields'           => [
                                 'id'       => null,
-                                'origin'   => ['fields' => 'id'],
                                 'fullName' => null,
                                 'name'     => null,
                                 'type'     => null
@@ -221,8 +225,7 @@ class EmailApiEntityManager extends ApiEntityManager
             $emailUser            = reset($result['emailUsers']);
             $result['seen']       = $emailUser['seen'];
             $result['receivedAt'] = $emailUser['receivedAt'];
-            // @todo: [$emailUser['folder']] should be changed to $emailUser['folders'] in BAP-8538
-            $result['folders'] = [$emailUser['folder']];
+            $result['folders'] = [$emailUser['folders']];
         }
         unset($result['emailUsers']);
     }

@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -248,6 +249,8 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $testEntity = new \stdClass();
         $testEntity->subject = 'testSubject';
         $testEntity->description = 'testDescription';
+        $testEntity->owner = new User();
+        $testEntity->updatedBy = new User();
 
         $this->testActivityProvider->setTargets([new \stdClass()]);
         $this->doctrineHelper->expects($this->any())

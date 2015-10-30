@@ -70,4 +70,3 @@ UPGRADE FROM 1.8 to 1.9
 
 ####EmailBundle
  - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
-

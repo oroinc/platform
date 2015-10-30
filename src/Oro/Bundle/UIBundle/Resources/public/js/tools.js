@@ -167,7 +167,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          * Are we currently on mobile
          */
         isMobile: function() {
-            return $('body').hasClass('mobile-version');
+            return _.isMobile();
         },
 
         /**
@@ -202,6 +202,41 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
             }
             // loads requirements and execute onLoadHandler handler
             require(requirements, onLoadHandler);
+        },
+
+        /**
+         * Loads single module through requireJS and returns promise
+         *
+         * @param {string} module name
+         * @return ($.Promise}
+         */
+        loadModule: function(module) {
+            var deferred = $.Deferred();
+            require([module], function(moduleRealization) {
+                deferred.resolve(moduleRealization);
+            }, function(e) {
+                deferred.reject(e);
+            });
+            return deferred.promise();
+        },
+
+        /**
+         * Loads single module through requireJS and replaces the property
+         *
+         * @param {Object} container where to replace property
+         * @param {string} property name to replace module ref to concrete realization
+         * @return ($.Promise}
+         */
+        loadModuleAndReplace: function(container, moduleProperty) {
+            if (_.isFunction(container[moduleProperty])) {
+                var deferred = $.Deferred();
+                deferred.resolve(container[moduleProperty]);
+                return deferred.promise();
+            }
+            return this.loadModule(container[moduleProperty]).then(function(realization) {
+                container[moduleProperty] = realization;
+                return realization;
+            });
         },
 
         /**

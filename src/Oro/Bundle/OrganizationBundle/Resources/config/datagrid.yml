@@ -114,6 +114,91 @@ datagrid:
                     type: datetime
                     data_name: u.createdAt
 
+    share-with-business-units-datagrid:
+        options:
+            entityHint: business unit
+            skip_acl_check: true
+            entity_pagination: true
+        source:
+            acl_resource: oro_business_unit_view
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.name
+                    - u.email
+                    - u.phone
+                    - u.createdAt
+                    - owner.name as ownerName
+                    - o.name as fromName
+                from:
+                    - { table: OroOrganizationBundle:BusinessUnit, alias: u }
+                join:
+                    left:
+                        owner:
+                            join: u.owner
+                            alias: owner
+                    inner:
+                        - { join: u.organization, alias: o }
+
+        columns:
+            name:
+                label: oro.organization.businessunit.name.label
+            email:
+                label: oro.organization.businessunit.email.label
+            phone:
+                label: oro.organization.businessunit.phone.label
+            ownerName:
+                label: oro.organization.businessunit.owner.label
+            createdAt:
+                label:         oro.ui.created_at
+                frontend_type: datetime
+
+        properties:
+            id: ~
+            entity:
+                type: twig
+                frontend_type: html
+                template: OroOrganizationBundle:Share:Property/entity.html.twig
+                data_name: u
+        sorters:
+            columns:
+                name:
+                    data_name: u.name
+                email:
+                    data_name: u.email
+                phone:
+                    data_name: u.phone
+                ownerName:
+                    data_name: owner.name
+                createdAt:
+                    data_name: u.createdAt
+
+            default:
+                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+        filters:
+            columns:
+                name:
+                    type: string
+                    data_name: u.name
+                email:
+                    type: string
+                    data_name: u.email
+                phone:
+                    type: string
+                    data_name: u.phone
+                ownerName:
+                    type: choice
+                    data_name: ownerName
+                    options:
+                        field_options:
+                            choices: @oro_organization.provider.business_units_grid->getOwnerChoices
+                            translatable_options: false
+                createdAt:
+                    type: datetime
+                    data_name: u.createdAt
+
     bu-update-users-grid:
         extends: user-relation-grid
         source:
@@ -141,10 +226,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -156,12 +247,20 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active
         sorters:
             columns:
                 hasCurrentBusinessUnit:
@@ -196,10 +295,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         sorters:
             default:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
@@ -212,9 +317,17 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active

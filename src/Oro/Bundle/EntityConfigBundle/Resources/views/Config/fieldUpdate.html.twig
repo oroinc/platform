@@ -10,7 +10,7 @@
 }}) %}
 
 {% set audit_entity_class = field.entity.className|replace('\\', '_') %}
-{% set audit_title = entity_config.get('label') %}
+{% set audit_title = field.fieldName|default('N/A')|trans ~ ' - ' ~ entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit_field' %}
 {% set audit_entity_id = field.id %}
 {% set audit_show_change_history = true %}

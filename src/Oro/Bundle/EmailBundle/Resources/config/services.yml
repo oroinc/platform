@@ -49,9 +49,6 @@ parameters:
     # Email template API
     oro_email.manager.emailtemplate.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
-    # Entity config event listener
-    oro_email.listener.config_subscriber.class: Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber
-
     # Entity email user listener
     oro_email.event_listener.email_user_listener.class: Oro\Bundle\EmailBundle\EventListener\EmailUserListener
 
@@ -333,14 +330,16 @@ services:
     oro_email.cache:
           parent: oro.cache.abstract
           calls:
-              - [setNamespace, ['oro_email.cache']]
+              - [setNamespace, [ 'oro_email' ] ]
 
     # Available variables services
-    oro_email.listener.config_subscriber:
-        class:      %oro_email.listener.config_subscriber.class%
-        arguments:  [@oro_email.cache, %oro_email.cache.available_in_template_key%]
+    oro_email.listener.config_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
+        arguments:
+            - @oro_email.cache
+            - %oro_email.cache.available_in_template_key%
         tags:
-            - { name: kernel.event_subscriber}
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
     # email template twig instance
     oro_email.twig.string_loader:
@@ -606,6 +605,7 @@ services:
             - @oro_email.manager.email_attachment_manager
             - @doctrine.orm.entity_manager
             - @oro_email.mailbox.process_storage
+            - @oro_security.security_facade
         tags:
             - { name: twig.extension }
 
@@ -614,11 +614,15 @@ services:
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 10 }
 
+    oro_email.link.entity_manager:
+        tags:
+            - { name: oro_service_link, service: doctrine.orm.entity_manager }
+
     oro_email.activity_list.provider:
         class: %oro_email.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
-           - @oro_entity_config.link.entity_manager
+           - @oro_email.link.entity_manager
            - @oro_entity.entity_name_resolver
            - @router
            - @oro_entity_config.config_manager
