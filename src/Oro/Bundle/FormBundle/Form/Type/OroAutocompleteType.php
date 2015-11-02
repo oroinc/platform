@@ -74,7 +74,21 @@ class OroAutocompleteType extends AbstractType
         $resolver->setNormalizer(
             'autocomplete',
             function (Options $options, $configs) use ($defaultConfigs) {
-                return array_replace_recursive($defaultConfigs, $configs);
+                $configs = array_replace_recursive($defaultConfigs, $configs);
+
+                $configs['route_parameters']['per_page'] = $configs['per_page'];
+
+                if (empty($configs['route_name']) && !empty($configs['alias'])) {
+                    $configs['route_name'] = 'oro_form_autocomplete_search';
+                    $configs['route_parameters']['name'] = $configs['alias'];
+                }
+
+                if (empty($configs['properties']) && !empty($configs['alias'])) {
+                    $searchHandler = $this->searchRegistry->getSearchHandler($configs['alias']);
+                    $configs['properties'] = $searchHandler->getProperties();
+                }
+
+                return $configs;
             }
         );
     }
@@ -86,30 +100,12 @@ class OroAutocompleteType extends AbstractType
     {
         $autocompleteOptions = $options['autocomplete'];
 
-        $componentOptions = [
+        $view->vars['autocomplete'] = $autocompleteOptions;
+        $view->vars['componentModule'] = $autocompleteOptions['componentModule'];
+        $view->vars['componentOptions'] = [
             'route_name' => $autocompleteOptions['route_name'],
             'route_parameters' => $autocompleteOptions['route_parameters'],
             'properties' => $autocompleteOptions['properties'],
         ];
-
-        $routeParameters = [
-            'per_page' => $autocompleteOptions['per_page'],
-        ];
-
-        if (empty($componentOptions['route_name']) && !empty($autocompleteOptions['alias'])) {
-            $componentOptions['route_name'] = 'oro_form_autocomplete_search';
-            $routeParameters['name'] = $autocompleteOptions['alias'];
-        }
-
-        if (empty($componentOptions['properties']) && !empty($autocompleteOptions['alias'])) {
-            $searchHandler = $this->searchRegistry->getSearchHandler($autocompleteOptions['alias']);
-            $componentOptions['properties'] = $searchHandler->getProperties();
-        }
-
-        $componentOptions['route_parameters'] = array_replace($componentOptions['route_parameters'], $routeParameters);
-
-        $view->vars['autocomplete'] = $autocompleteOptions;
-        $view->vars['componentModule'] = $autocompleteOptions['componentModule'];
-        $view->vars['componentOptions'] = $componentOptions;
     }
 }

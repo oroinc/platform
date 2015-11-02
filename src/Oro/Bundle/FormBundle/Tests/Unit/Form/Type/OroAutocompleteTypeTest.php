@@ -79,6 +79,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
      * @param array $options
      * @param array $expectedFormOptions
      * @param array $expectedComponentOptions
+     *
      * @dataProvider buildFormDataProvider
      */
     public function testBuildForm(array $options, array $expectedFormOptions, array $expectedComponentOptions)
@@ -103,7 +104,7 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
      */
     public function buildFormDataProvider()
     {
-        $defaultConfigs = [
+        $defaultOptions = [
             'route_name' => '',
             'route_parameters' => [],
             'alias' => '',
@@ -113,50 +114,58 @@ class OroAutocompleteTypeTest extends FormIntegrationTestCase
             'componentModule' => 'oro/autocomplete-component',
         ];
 
+        $defaultOptions['route_parameters']['per_page'] = $defaultOptions['per_page'];
+
         $routeOptions = [
             'route_name' => 'autocomplete_route',
             'route_parameters' => ['param' => 'value'],
             'properties' => ['property'],
         ];
+        $routeFormOptions = array_merge($defaultOptions, $routeOptions);
+        $routeFormOptions['route_parameters'] = array_merge(
+            $routeOptions['route_parameters'],
+            $defaultOptions['route_parameters']
+        );
 
         $aliasOptions = [
             'alias' => 'autocomplete_alias',
         ];
+        $aliasFormOptions = array_merge(
+            $defaultOptions,
+            $aliasOptions,
+            [
+                'route_name' => 'oro_form_autocomplete_search',
+                'properties' => $this->getMockSearchHandler()->getProperties(),
+            ]
+        );
+        $aliasFormOptions['route_parameters']['name'] = $aliasOptions['alias'];
 
         return array(
             'without options' => array(
                 'options' => [],
-                'expectedFormOptions' => $defaultConfigs,
+                'expectedFormOptions' => $defaultOptions,
                 'expectedComponentOptions' => [
-                    'route_name' => '',
-                    'route_parameters' => [
-                        'per_page' => $defaultConfigs['per_page']
-                    ],
-                    'properties' => [],
+                    'route_name' => $defaultOptions['route_name'],
+                    'route_parameters' => $defaultOptions['route_parameters'],
+                    'properties' => $defaultOptions['properties'],
                 ],
             ),
             'with route' => array(
                 'options' => $routeOptions,
-                'expectedFormOptions' => array_merge($defaultConfigs, $routeOptions),
+                'expectedFormOptions' => $routeFormOptions,
                 'expectedComponentOptions' => [
-                    'route_name' => $routeOptions['route_name'],
-                    'route_parameters' => array_merge(
-                        ['per_page' => $defaultConfigs['per_page']],
-                        $routeOptions['route_parameters']
-                    ),
-                    'properties' => ['property'],
+                    'route_name' => $routeFormOptions['route_name'],
+                    'route_parameters' => $routeFormOptions['route_parameters'],
+                    'properties' => $routeFormOptions['properties'],
                 ],
             ),
             'with alias' => array(
                 'options' => $aliasOptions,
-                'expectedFormOptions' => array_merge($defaultConfigs, $aliasOptions),
+                'expectedFormOptions' => $aliasFormOptions,
                 'expectedComponentOptions' => [
-                    'route_name' => 'oro_form_autocomplete_search',
-                    'route_parameters' => [
-                        'per_page' => $defaultConfigs['per_page'],
-                        'name' => $aliasOptions['alias'],
-                    ],
-                    'properties' => $this->getMockSearchHandler()->getProperties(),
+                    'route_name' => $aliasFormOptions['route_name'],
+                    'route_parameters' => $aliasFormOptions['route_parameters'],
+                    'properties' => $aliasFormOptions['properties'],
                 ],
             ),
         );
