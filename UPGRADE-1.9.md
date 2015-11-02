@@ -2,7 +2,7 @@ UPGRADE FROM 1.8 to 1.9
 =======================
 
 ####ActivityListBundle
-- `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead.
+- `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::setUpdatedBy` instead. 
 - `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getEditor` deprecated since 1.8.0. Will be removed in 1.10.0. Use `Oro\Bundle\ActivityListBundle\Entity\ActivityList::getUpdatedBy` instead.
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getDate` removed. Use `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getCreatedAt` and `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::getUpdatedAt` instead
 - `Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface::isDateUpdatable` removed. It is not needed.
@@ -43,19 +43,19 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
-- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy)
+- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
 
 ####EmbeddedFormBundle
- - Bundle now contains configuration of security firewall `embedded_form`
+ - Bundle now contains configuration of security firewall `embedded_form` 
 
 ####PlatformBundle
  - Bundle now has priority `-200` and it is loaded right after main Symfony bundles
 
 ####SoapBundle
- - Bundle now contains configuration of security firewall `wsse_secured`
+ - Bundle now contains configuration of security firewall `wsse_secured` 
 
 ####TrackingBundle
- - Bundle now contains configuration of security firewall `tracking_data`
+ - Bundle now contains configuration of security firewall `tracking_data` 
 
 ####UiBundle
  - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
