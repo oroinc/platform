@@ -12,7 +12,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
- * @ORM\MappedSuperclass
+ * @ORM\MappedSuperclass()
+ * @ORM\Entity()
+ * @ORM\Table(name="oro_audit", indexes={
+ *      @ORM\Index(name="idx_oro_audit_logged_at", columns={"logged_at"}),
+ *      @ORM\Index(name="idx_oro_audit_type", columns={"type"})
+ * })
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap({"audit" = "Audit"})
  */
 abstract class AbstractAudit extends AbstractLogEntry
 {
