@@ -31,7 +31,7 @@ class EnumValue
     public function fromArray(array $data)
     {
         if (isset($data['id'])) {
-            $this->setLabel($data['id']);
+            $this->setId($data['id']);
         }
 
         if (isset($data['label'])) {

@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\DefaultTranslator;
 use Symfony\Component\Validator\Mapping\ClassMetadataFactory;
@@ -12,8 +11,9 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
-class EnumValueTypeTest extends TypeTestCase
+class EnumValueTypeTest extends FormIntegrationTestCase
 {
     /** @var EnumValueType */
     protected $type;
@@ -41,7 +41,8 @@ class EnumValueTypeTest extends TypeTestCase
                         new FormTypeValidatorExtension($validator)
                     ]
                 ]
-            )
+            ),
+            $this->getValidatorExtension(true)
         ];
     }
 
@@ -54,7 +55,6 @@ class EnumValueTypeTest extends TypeTestCase
         ];
 
         $form = $this->factory->create($this->type);
-        $this->type->postSetData($this->getFormEvent($formData, $form));
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
@@ -68,7 +68,7 @@ class EnumValueTypeTest extends TypeTestCase
         );
 
         $nameConstraints = $form->get('label')->getConfig()->getOption('constraints');
-        $this->assertCount(3, $nameConstraints);
+        $this->assertCount(2, $nameConstraints);
 
         $this->assertInstanceOf(
             'Symfony\Component\Validator\Constraints\NotBlank',
@@ -80,14 +80,6 @@ class EnumValueTypeTest extends TypeTestCase
             $nameConstraints[1]
         );
         $this->assertEquals(255, $nameConstraints[1]->max);
-
-        $this->assertInstanceOf(
-            'Symfony\Component\Validator\Constraints\Callback',
-            $nameConstraints[2]
-        );
-        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $context->expects($this->once())->method('addViolation')->with(EnumValueType::INVALID_NAME_MESSAGE);
-        call_user_func($nameConstraints[2]->methods[0], '!@#$', $context);
     }
 
     public function testSubmitValidDataForExistingEnumValue()
@@ -100,7 +92,6 @@ class EnumValueTypeTest extends TypeTestCase
         ];
 
         $form = $this->factory->create($this->type);
-        $this->type->postSetData($this->getFormEvent($formData, $form));
         $form->submit($formData);
         $this->assertTrue($form->isSynchronized());
         $this->assertEquals(

@@ -37,6 +37,7 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $cacheSalt = '$CLASSMETADATA';
         $this->assertAttributeSame(
             [
+                'DoctrineNamespaceCacheKey[]' => 1,
                 '[Oro\Bundle\UserBundle\Entity\User'.$cacheSalt .'][1]' => $metadata
             ],
             'data',
