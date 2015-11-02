@@ -17,7 +17,7 @@ class EnumValue
     /**
      * @var bool
      */
-    protected $is_default;
+    protected $isDefault;
 
     /**
      * @var int
@@ -38,8 +38,8 @@ class EnumValue
             $this->setLabel($data['label']);
         }
 
-        if (isset($data['is_default'])) {
-            $this->setIsDefault($data['is_default']);
+        if (isset($data['isDefault'])) {
+            $this->setIsDefault($data['isDefault']);
         }
 
         if (isset($data['priority'])) {
@@ -63,7 +63,7 @@ class EnumValue
             $data['label'] = $this->getLabel();
         }
         if ($this->getIsDefault()) {
-            $data['is_default'] = $this->getIsDefault();
+            $data['isDefault'] = $this->getIsDefault();
         }
         if ($this->getPriority()) {
             $data['priority'] = $this->getPriority();
@@ -129,7 +129,7 @@ class EnumValue
      */
     public function setIsDefault($isDefault)
     {
-        $this->is_default = $isDefault;
+        $this->isDefault = $isDefault;
 
         return $this;
     }
@@ -141,7 +141,7 @@ class EnumValue
      */
     public function getIsDefault()
     {
-        return $this->is_default;
+        return $this->isDefault;
     }
 
     /**
