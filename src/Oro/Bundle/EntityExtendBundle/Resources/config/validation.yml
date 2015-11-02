@@ -33,3 +33,12 @@ Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
                 message: "This value should contain only alphabetic symbols and numbers."
             - oro_entity_extend:NotSqlKeyword: {groups: Sql}
             - oro_entity_extend:NotPhpKeyword: {groups: Php}
+
+Oro\Bundle\EntityExtendBundle\Model\EnumValue:
+    constraints:
+        - oro_entity_extend:EnumValue: ~
+    properties:
+        label:
+            - NotBlank: ~
+            - Length:
+                max: 255
