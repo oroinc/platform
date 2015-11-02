@@ -159,9 +159,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             $scopeData = $entity->toArray($scope);
 
             foreach ($properties as $code => $config) {
-
-                $success &= $this->validateScopeField($config, $scope, $code, $scopeData);
-
+                $success = $success && $this->validateScopeField($config, $scope, $code, $scopeData);
             }
         }
 
@@ -183,16 +181,16 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
 
         $success = true;
 
-        if ($scope == 'enum') {
+        if ($scope === 'enum') {
             foreach ($scopeData[$code] as $key => $enumFields) {
                 $enumEntity = $this->getEnumEntity($enumFields);
 
-                $success &= $this->validateEntityField($enumEntity, $scope, $code . '.' . $key);
+                $success = $success && $this->validateEntityField($enumEntity, $scope, $code . '.' . $key);
             }
         } elseif (isset($config['constraints'])) {
             $constraints = $this->getFieldConstraints($config['constraints']);
 
-            $success &= $this->validateEntityField($scopeData[$code], $scope, $code, $constraints);
+            $success = $success && $this->validateEntityField($scopeData[$code], $scope, $code, $constraints);
         }
 
         return $success;
@@ -238,7 +236,6 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     {
         $constraintObjects = [];
         foreach ($constraints as $constraint) {
-
             foreach ($constraint as $name => $options) {
                 $constraintObjects[] = $this->constraintFactory->create($name, $options);
             }

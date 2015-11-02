@@ -24,7 +24,7 @@ class EnumValueValidator extends ConstraintValidator
         }
 
         /* @var $entity EnumValueEntity */
-        if ($entity->getId()) {
+        if ($entity->getId() || !$entity->getLabel()) {
             return;
         }
 

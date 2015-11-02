@@ -17,7 +17,6 @@ class EnumValue
     /**
      * @var bool
      */
-    //protected $is_default = false;
     protected $is_default;
 
     /**
@@ -26,7 +25,6 @@ class EnumValue
     protected $priority;
 
     /**
-     *
      * @param array $data
      * @return EnumValue
      */
@@ -41,7 +39,7 @@ class EnumValue
         }
 
         if (isset($data['is_default'])) {
-            $this->setIsDefault((bool)$data['is_default']);
+            $this->setIsDefault($data['is_default']);
         }
 
         if (isset($data['priority'])) {

@@ -22,7 +22,7 @@ class EnumValueType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(),
-                    new Assert\Length(['max' => 255])
+                    new Assert\Length(['max' => 255]),
                 ],
             ])
             ->add('is_default', 'checkbox', ['required' => false])
