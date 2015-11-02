@@ -95,6 +95,21 @@ class ImportExportTest extends WebTestCase
         $this->assertCount(count($this->fields), $this->getEntityFields());
     }
 
+    public function testValidationError()
+    {
+        $this->assertErrors(
+            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_parameters.csv',
+            [
+                'Error in row #1. "attachment.maxsize" This value should be 1 or more.',
+                'Error in row #1. fieldName: This value should not be blank.',
+                'Error in row #4. "attachment.maxsize" This value should be 1 or more.',
+                'Error in row #7. "enum.enum_options.0" [label]: ' .
+                'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.',
+                'Error in row #1. "attachment.maxsize" This value should be 1 or more.'
+            ]
+        );
+    }
+
     /**
      * @return string
      */
@@ -193,13 +208,17 @@ class ImportExportTest extends WebTestCase
 
     /**
      * @param string $path
-     * @param string $errorMessage
+     * @param string|array $errorMessages
      */
-    protected function assertErrors($path, $errorMessage)
+    protected function assertErrors($path, $errorMessages)
     {
         $this->validateImportFile($this->getFilePath($path), 1);
 
-        $this->assertContains($errorMessage, $this->client->getCrawler()->filter('.import-errors')->html());
+        $errors = $this->client->getCrawler()->filter('.import-errors')->html();
+
+        foreach ((array)$errorMessages as $message) {
+            $this->assertContains($message, $errors);
+        }
     }
 
     /**
