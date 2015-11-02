@@ -399,4 +399,32 @@ class User extends AbstractPageEntity
 
         return $this;
     }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setSignature($value)
+    {
+        $this->test->waitUntil(
+            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
+                return $testCase->execute(
+                    [
+                        'script' => 'return tinyMCE.activeEditor.initialized',
+                        'args' => [],
+                    ]
+                );
+            },
+            intval(MAX_EXECUTION_TIME)
+        );
+
+        $this->test->execute(
+            [
+                'script' => sprintf('tinyMCE.activeEditor.setContent(\'%s\')', $value),
+                'args' => [],
+            ]
+        );
+
+        return $this;
+    }
 }
