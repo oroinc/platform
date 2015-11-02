@@ -60,6 +60,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                     'prototype_name'       => '__name__',
                     'add_label'            => 'Add',
                     'allow_add_after'      => false,
+                    'row_count_add'        => 1,
                     'row_count_initial'    => 1,
                 ],
                 'expectedVars' => [
@@ -77,6 +78,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                     'prototype_name'       => '__custom_name__',
                     'add_label'            => 'Test Label',
                     'allow_add_after'      => false,
+                    'row_count_add'        => 1,
                     'row_count_initial'    => 5,
                 ],
                 'expectedVars' => [
@@ -123,6 +125,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'show_form_when_empty' => true,
                 'add_label'            => '',
                 'allow_add_after'      => false,
+                'row_count_add'        => 1,
                 'row_count_initial'    => 1,
             ],
             $resolvedOptions
@@ -152,6 +155,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'show_form_when_empty' => false,
                 'add_label'            => '',
                 'allow_add_after'      => false,
+                'row_count_add'        => 1,
                 'row_count_initial'    => 1,
             ],
             $resolvedOptions
@@ -181,6 +185,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'show_form_when_empty' => false,
                 'add_label'            => '',
                 'allow_add_after'      => false,
+                'row_count_add'        => 1,
                 'row_count_initial'    => 1,
             ],
             $resolvedOptions
@@ -210,6 +215,7 @@ class CollectionTypeTest extends \PHPUnit_Framework_TestCase
                 'show_form_when_empty' => true,
                 'add_label'            => 'Test Label',
                 'allow_add_after'      => false,
+                'row_count_add'        => 1,
                 'row_count_initial'    => 1,
             ],
             $resolvedOptions
