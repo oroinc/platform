@@ -108,19 +108,58 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function validateAndUpdateContext(FieldConfigModel $entity)
     {
-        $this->validateEntityFields($entity);
+        $success = true;
+
+        if (!$this->validateEntityFields($entity)) {
+            $this->context->incrementErrorEntriesCount();
+
+            $success = false;
+        }
 
         $validationErrors = $this->strategyHelper->validateEntity($entity, ['FieldConfigModel']);
         if ($validationErrors) {
             $this->context->incrementErrorEntriesCount();
             $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
 
-            return null;
+            $success = false;
         }
 
-        $this->updateContextCounters($entity);
+        if ($success) {
+            $this->updateContextCounters($entity);
 
-        return $entity;
+            return $entity;
+        }
+    }
+
+    /**
+     * @param mixed $entity
+     * @param string $scope
+     * @param string $code
+     * @param array $constraints
+     * @return boolean
+     */
+    protected function validateEntityField($entity, $scope, $code, array $constraints = null)
+    {
+        $errors = $this->strategyHelper->validateEntity($entity, $constraints);
+
+        if ($errors) {
+            $errorPrefix = $this->translator->trans(
+                'oro.importexport.import.error %number%',
+                [
+                    '%number%' => $this->context->getReadOffset()
+                ]
+            );
+
+            $this->strategyHelper->addValidationErrors(
+                $errors,
+                $this->context,
+                sprintf('%s "%s.%s"', $errorPrefix, $scope, $code)
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -149,7 +188,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      * @param FieldConfigModel $entity
      * @return null|FieldConfigModel
      */
-    public function validateEntityFields(FieldConfigModel $entity)
+    protected function validateEntityFields(FieldConfigModel $entity)
     {
         $success = true;
 
@@ -159,7 +198,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             $scopeData = $entity->toArray($scope);
 
             foreach ($properties as $code => $config) {
-                $success = $success && $this->validateScopeField($config, $scope, $code, $scopeData);
+                $success = $this->validateScopeField($config, $scope, $code, $scopeData) && $success;
             }
         }
 
@@ -185,47 +224,15 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
             foreach ($scopeData[$code] as $key => $enumFields) {
                 $enumEntity = $this->getEnumEntity($enumFields);
 
-                $success = $success && $this->validateEntityField($enumEntity, $scope, $code . '.' . $key);
+                $success = $this->validateEntityField($enumEntity, $scope, $code . '.' . $key) && $success;
             }
         } elseif (isset($config['constraints'])) {
             $constraints = $this->getFieldConstraints($config['constraints']);
 
-            $success = $success && $this->validateEntityField($scopeData[$code], $scope, $code, $constraints);
+            $success = $this->validateEntityField($scopeData[$code], $scope, $code, $constraints) && $success;
         }
 
         return $success;
-    }
-
-    /**
-     * @param mixed $entity
-     * @param string $scope
-     * @param sring $code
-     * @param array $constraints
-     * @return boolean
-     */
-    protected function validateEntityField($entity, $scope, $code, array $constraints = null)
-    {
-        $errors = $this->strategyHelper->validateEntity($entity, $constraints);
-
-        if ($errors) {
-            $errorPrefix = $this->translator->trans(
-                'oro.importexport.import.error %number%',
-                [
-                    '%number%' => $this->context->getReadOffset()
-                ]
-            );
-
-            $this->context->incrementErrorEntriesCount();
-            $this->strategyHelper->addValidationErrors(
-                $errors,
-                $this->context,
-                sprintf('%s "%s.%s"', $errorPrefix, $scope, $code)
-            );
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
