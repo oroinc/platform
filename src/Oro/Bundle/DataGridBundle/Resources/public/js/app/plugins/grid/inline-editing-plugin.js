@@ -98,6 +98,7 @@ define(function(require) {
         },
 
         onAfterMakeCell: function(row, cell) {
+            var _this = this;
             function enterEditModeIfNeeded(e) {
                 if (_this.isEditable(cell)) {
                     _this.enterEditMode(cell);
@@ -105,22 +106,24 @@ define(function(require) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-            var _this = this;
-            cell.render = _.wrap(cell.render, function(originalRender) {
-                originalRender.apply(this, _.rest(arguments));
+            var originalRender = cell.render;
+            cell.render = function() {
+                originalRender.apply(this, arguments);
+                var originalEvents = cell.events;
                 if (_this.isEditable(cell)) {
-                    this.$el.addClass('editable view-mode');
+                    this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
                     this.$el.append('<i class="icon-edit hide-text">Edit</i>');
+                    cell.events = _.extend(Object.create(cell.events), {
+                        'dblclick': enterEditModeIfNeeded,
+                        'mouseleave': this.hidePopover,
+                        'mousedown .icon-edit': enterEditModeIfNeeded,
+                        'click': _.noop
+                    });
                 }
+                cell.delegateEvents();
+                cell.events = originalEvents;
                 return this;
-            });
-            cell.events = _.extend({}, cell.events, {
-                'dblclick': enterEditModeIfNeeded,
-                'mouseleave': this.hidePopover,
-                'mousedown .icon-edit': enterEditModeIfNeeded
-            });
-            delete cell.events.click;
-            cell.delegateEvents();
+            };
         },
 
         onGridShown: function() {

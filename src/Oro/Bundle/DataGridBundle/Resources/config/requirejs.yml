@@ -14,6 +14,8 @@ config:
         'oro/datagrid/action/abstract-action': 'bundles/orodatagrid/js/datagrid/action/abstract-action.js'
         'oro/datagrid/action/delete-action': 'bundles/orodatagrid/js/datagrid/action/delete-action.js'
         'oro/datagrid/action/ajax-action': 'bundles/orodatagrid/js/datagrid/action/ajax-action.js'
+        'oro/datagrid/action/frontend-action': 'bundles/orodatagrid/js/datagrid/action/frontend-action.js'
+        'oro/datagrid/action/frontend-mass-action': 'bundles/orodatagrid/js/datagrid/action/frontend-mass-action.js'
         'oro/datagrid/action/ajaxdelete-action': 'bundles/orodatagrid/js/datagrid/action/ajaxdelete-action.js'
         'oro/datagrid/action/mass-action': 'bundles/orodatagrid/js/datagrid/action/mass-action.js'
         'oro/datagrid/action/delete-mass-action': 'bundles/orodatagrid/js/datagrid/action/delete-mass-action.js'

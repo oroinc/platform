@@ -285,4 +285,18 @@ class FieldProviderTest extends EntityFieldProviderTest
             ]
         ];
     }
+
+    /**
+     * exclusions are not used in workflow
+     *
+     * @return array
+     */
+    public function relationsExpectedDataProvider()
+    {
+        return [
+            [
+                []
+            ]
+        ];
+    }
 }

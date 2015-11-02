@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Form\Handler;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -61,6 +62,11 @@ class AclRoleHandler
     protected $privilegeRepository;
 
     /**
+     * @var AclCacheInterface
+     */
+    protected $aclCache;
+
+    /**
      * @var array
      */
     protected $privilegeConfig;
@@ -74,11 +80,13 @@ class AclRoleHandler
 
     /**
      * @param FormFactory $formFactory
+     * @param AclCacheInterface $aclCache
      * @param array $privilegeConfig
      */
-    public function __construct(FormFactory $formFactory, array $privilegeConfig)
+    public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
+        $this->aclCache = $aclCache;
         $this->privilegeConfig = $privilegeConfig;
     }
 
@@ -328,11 +336,14 @@ class AclRoleHandler
                 new ArrayCollection($formPrivileges)
             );
         }
+
+        $this->aclCache->clearCache();
     }
 
     /**
      * @param ArrayCollection $privileges
-     * @param array $rootIds
+     * @param array           $rootIds
+     *
      * @return ArrayCollection|AclPrivilege[]
      */
     protected function filterPrivileges(ArrayCollection $privileges, array $rootIds)
