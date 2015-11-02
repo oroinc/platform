@@ -3,6 +3,7 @@ define(function(require) {
 
     var WidgetContainerView;
     var _ = require('underscore');
+    var $ = require('jquery');
     var Backbone = require('backbone');
     var constants = require('../constants');
     var widgetMinTemplate = require('tpl!./templates/widget-min-template.html');
@@ -26,7 +27,8 @@ define(function(require) {
         listen: {
             'change model': 'render',
             'start-loading model': 'onLoadingStart',
-            'end-loading model': 'onLoadingEnd'
+            'end-loading model': 'onLoadingEnd',
+            'layout:reposition mediator': 'adjustMaxHeight'
         },
 
         render: function() {
@@ -91,6 +93,24 @@ define(function(require) {
             view.$el.offset(cord);
         },
 
+        adjustMaxHeight: function() {
+            var rect;
+            var contentMargin;
+            var $content;
+            var windowHeight;
+            if (this.contentView) {
+                $content = this.contentView.$el;
+                windowHeight = $('html').height();
+                if (this.model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                    rect = $content[0].getBoundingClientRect();
+                    contentMargin = $content.outerHeight(true) - rect.height;
+                    $content.css('max-height', windowHeight - rect.top - contentMargin + 'px');
+                } else {
+                    $content.css('max-height', 'none');
+                }
+            }
+        },
+
         onClickToggle: function(e) {
             e.stopPropagation();
             e.preventDefault();
@@ -131,6 +151,7 @@ define(function(require) {
 
         onLoadingEnd: function() {
             this.$('.sidebar-widget-header-icon').removeClass('loading');
+            this.adjustMaxHeight();
         }
     });
 
