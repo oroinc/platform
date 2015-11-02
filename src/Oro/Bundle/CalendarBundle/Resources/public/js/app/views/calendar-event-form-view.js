@@ -26,8 +26,10 @@ define([
 
         render: function() {
             var self = this;
+            var renderDeferred = this.renderDeferred = $.Deferred();
             this.initLayout().done(function() {
                 self.handleLayoutInit();
+                renderDeferred.resolve();
             });
         },
 
