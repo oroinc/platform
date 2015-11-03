@@ -48,6 +48,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####PlatformBundle
  - Bundle now has priority `-200` and it is loaded right after main Symfony bundles
+ - Services with tag `doctrine.event_listener` was marked as private
 
 ####SoapBundle
  - Bundle now contains configuration of security firewall `wsse_secured` 
@@ -60,6 +61,8 @@ UPGRADE FROM 1.8 to 1.9
  - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
  - Added possibility to set content for specific tab. Example: `{{ tabPanel([{label: 'Tab', content: 'Tab content'}]) }}`
  - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
+ - Services with tag `oro_ui.content_provider` was marked as private
+ - Services with tag `oro_formatter` was marked as private
 
 ####UserBundle
  - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
@@ -70,7 +73,9 @@ UPGRADE FROM 1.8 to 1.9
  - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
  - Added new process definition option `pre_conditions`
  - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
- 
+ - Services with tag `oro_workflow.condition` was marked as private 
+ - Services with tag `oro_workflow.action` was marked as private 
+
 ###DataAuditBundle
  - `Oro\Bundle\DataauditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
 
@@ -89,3 +94,35 @@ UPGRADE FROM 1.8 to 1.9
 
 ###SidebarBundle
  - `Oro\Bundle\SidebarBundle\EventListener\RequestHandler` added to the class cache as performance improvement
+
+###AddressBundle
+ - `oro_address.address.manager` service was marked as private
+
+###CalendarBundle
+ - `oro_calendar.calendar_provider.user` service was marked as private
+ - `oro_calendar.calendar_provider.system` service was marked as private
+ - `oro_calendar.calendar_provider.public` service was marked as private
+
+###DataGridBundle
+ - Services with tag `oro_datagrid.extension.formatter.property` was marked as private
+ 
+###EmailBundle
+ - `oro_email.emailtemplate.variable_provider.entity` service was marked as private
+ - `oro_email.emailtemplate.variable_provider.system` service was marked as private
+ - `oro_email.emailtemplate.variable_provider.user` service was marked as private 
+
+###EntityExtendBundle
+ - Services with tag `oro_entity_extend.entity_config_dumper_extension` was marked as private
+ - Services with tag `oro_entity_extend.entity_generator_extension` was marked as private
+
+###FilterBundle
+ - Services with tag `oro_filter.extension.orm_filter.filter` was marked as private
+
+###ImportExportBundle
+ - Services with tag `oro_importexport.normalizer` was marked as private
+
+###MigrationBundle
+ - Services with tag `oro_migration.extension` was marked as private
+
+###ActivityBundle
+ - Services with tag `oro_activity.activity_widget_provider` was marked as private
