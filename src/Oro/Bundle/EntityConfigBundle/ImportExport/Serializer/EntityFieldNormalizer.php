@@ -80,13 +80,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
-
-        return is_array($data) &&
-            array_key_exists('type', $data) &&
-            in_array($data['type'], $supportedTypes, true) &&
-            array_key_exists('fieldName', $data) &&
-            is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+        return is_array($data) && is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
     }
 
     /**
@@ -195,11 +189,10 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     {
         $updatedValue = [];
         foreach ($value as $key => $subvalue) {
-            $updatedValue[$key] = ['priority' => null];
+            $updatedValue[$key] = ['id' => null, 'priority' => null];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
                 $updatedValue[$key][$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
             }
-            $updatedValue[$key]['id'] = $updatedValue[$key]['label'];
         }
 
         return $updatedValue;
