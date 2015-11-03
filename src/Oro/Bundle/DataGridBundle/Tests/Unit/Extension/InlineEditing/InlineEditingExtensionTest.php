@@ -114,28 +114,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
         ];
         $config = DatagridConfiguration::create($configValues);
 
-        $callback = function ($columnName, $entity, $column) {
-            switch ($columnName) {
-                case 'testText':
-                case 'testAnotherText':
-                case 'id':
-                case 'updatedAt':
-                case 'createdAt':
-                    return [Configuration::BASE_CONFIG_KEY => ['enable' => 'true']];
-                case 'testSelect':
-                    return [
-                        Configuration::BASE_CONFIG_KEY => ['enable' => 'true'],
-                        PropertyInterface::FRONTEND_TYPE_KEY => 'select',
-                        'choices' => [
-                            'one' => 'One',
-                            'two' => 'Two',
-                        ]
-                    ];
-            }
-
-            return [];
-        };
-
+        $callback = $this->getProcessConfigsCallBack();
         $this->guesser->expects($this->any())
             ->method('getColumnOptions')
             ->will($this->returnCallback($callback));
@@ -145,7 +124,19 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->extension->processConfigs($config);
 
-        $expectedValues = [
+        $expectedValues = $this->getProcessConfigsExpectedValues($entityName);
+        $expectedResult = DatagridConfiguration::create($expectedValues);
+
+        $key = Configuration::BASE_CONFIG_KEY;
+        $this->assertEquals($config->offsetGet($key), $expectedResult->offsetGet($key));
+
+        $key = FormatterConfiguration::COLUMNS_KEY;
+        $this->assertEquals($config->offsetGet($key), $expectedResult->offsetGet($key));
+    }
+
+    protected function getProcessConfigsExpectedValues($entityName)
+    {
+        return [
             Configuration::BASE_CONFIG_KEY => [
                 'enable' => false,
                 'entity_name' => $entityName,
@@ -181,13 +172,30 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
                 'createdAt' => ['label' => 'test_black_list'],
             ]
         ];
+    }
 
-        $expectedResult = DatagridConfiguration::create($expectedValues);
+    protected function getProcessConfigsCallBack()
+    {
+        return function ($columnName, $entity, $column) {
+            switch ($columnName) {
+                case 'testText':
+                case 'testAnotherText':
+                case 'id':
+                case 'updatedAt':
+                case 'createdAt':
+                    return [Configuration::BASE_CONFIG_KEY => ['enable' => 'true']];
+                case 'testSelect':
+                    return [
+                        Configuration::BASE_CONFIG_KEY => ['enable' => 'true'],
+                        PropertyInterface::FRONTEND_TYPE_KEY => 'select',
+                        'choices' => [
+                            'one' => 'One',
+                            'two' => 'Two',
+                        ]
+                    ];
+            }
 
-        $key = Configuration::BASE_CONFIG_KEY;
-        $this->assertEquals($config->offsetGet($key), $expectedResult->offsetGet($key));
-
-        $key = FormatterConfiguration::COLUMNS_KEY;
-        $this->assertEquals($config->offsetGet($key), $expectedResult->offsetGet($key));
+            return [];
+        };
     }
 }
