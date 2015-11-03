@@ -456,6 +456,12 @@ oro_entity_config:
             items:
                 # Indicates what custom entity can be searchable
                 searchable:
+                    options:
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
                     form:
                         type:               choice
                         options:
@@ -463,6 +469,7 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
+                            tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
         field:
             items:
                 # Indicates what custom field could be searchable
@@ -481,6 +488,7 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
+                            tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
                 # Indicates what custom text field is a part of search result title
                 title_field:
                     options:
