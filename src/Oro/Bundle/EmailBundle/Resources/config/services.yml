@@ -390,6 +390,7 @@ services:
             - @doctrine
             - @oro_ui.formatter
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
@@ -401,6 +402,7 @@ services:
             - @oro_config.user
             - @oro_locale.formatter.date_time
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
@@ -413,6 +415,7 @@ services:
             - @oro_entity.entity_name_resolver
             - @oro_config.user
         lazy: true
+        public: false
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
