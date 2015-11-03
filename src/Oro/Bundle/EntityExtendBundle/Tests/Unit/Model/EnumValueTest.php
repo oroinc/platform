@@ -3,31 +3,39 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
-use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class EnumValueTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTestCaseTrait;
-
-    /** @var EnumValue */
-    protected $enumValue;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    public function testIdGetterAndSetter()
     {
-        $this->enumValue = new EnumValue();
+        $enumValue = new EnumValue();
+        static::assertNull($enumValue->getId());
+        $enumValue->setId('testId');
+        static::assertEquals('testId', $enumValue->getId());
     }
 
-    public function testProperties()
+    public function testLabelGetterAndSetter()
     {
-        static::assertPropertyAccessors($this->enumValue, [
-            ['id', 'testId'],
-            ['label', 'test label'],
-            ['isDefault', true],
-            ['priority', 100],
-        ]);
+        $enumValue = new EnumValue();
+        static::assertNull($enumValue->getLabel());
+        $enumValue->setLabel('test label');
+        static::assertEquals('test label', $enumValue->getLabel());
+    }
+
+    public function testIsDefaultGetterAndSetter()
+    {
+        $enumValue = new EnumValue();
+        static::assertNull($enumValue->getIsDefault());
+        $enumValue->setIsDefault(true);
+        static::assertEquals(true, $enumValue->getIsDefault());
+    }
+
+    public function testPriorityGetterAndSetter()
+    {
+        $enumValue = new EnumValue();
+        static::assertNull($enumValue->getPriority());
+        $enumValue->setPriority(100);
+        static::assertEquals(100, $enumValue->getPriority());
     }
 
     public function testFromArrayAndToArray()
