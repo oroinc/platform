@@ -100,12 +100,12 @@ class ImportExportTest extends WebTestCase
         $this->assertErrors(
             '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_parameters.csv',
             [
-                'Error in row #1. "attachment.maxsize" This value should be 1 or more.',
                 'Error in row #1. fieldName: This value should not be blank.',
-                'Error in row #4. "attachment.maxsize" This value should be 1 or more.',
-                'Error in row #7. "enum.enum_options.0" [label]: ' .
-                'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.',
-                'Error in row #1. "attachment.maxsize" This value should be 1 or more.'
+                'Error in row #1. attachment.maxsize: This value should be 1 or more.',
+                'Error in row #2. Invalid field type.',
+                'Error in row #4. enum.enum_options.0: [label]: This value should contain only alphabetic symbols, ' .
+                    'underscore, hyphen, spaces and numbers.',
+                'Error in row #5. entity.label: This value is too long. It should have 50 characters or less.'
             ]
         );
     }
@@ -175,6 +175,7 @@ class ImportExportTest extends WebTestCase
         $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+
         $this->assertEquals($errorsCount, $this->client->getCrawler()->filter('.import-errors')->count());
     }
 
