@@ -138,7 +138,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
         static::assertEquals($expected, $this->strategy->process($field));
     }
 
-
     /**
      * @return array
      */
