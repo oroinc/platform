@@ -28,25 +28,27 @@ class EnumValue
      * @param array $data
      * @return EnumValue
      */
-    public function fromArray(array $data)
+    public static function createFromArray(array $data)
     {
+        $instance = new self();
+
         if (isset($data['id'])) {
-            $this->setId($data['id']);
+            $instance->setId($data['id']);
         }
 
         if (isset($data['label'])) {
-            $this->setLabel($data['label']);
+            $instance->setLabel($data['label']);
         }
 
         if (isset($data['is_default'])) {
-            $this->setIsDefault($data['is_default']);
+            $instance->setIsDefault($data['is_default']);
         }
 
         if (isset($data['priority'])) {
-            $this->setPriority($data['priority']);
+            $instance->setPriority($data['priority']);
         }
 
-        return $this;
+        return $instance;
     }
 
     /**
@@ -54,27 +56,15 @@ class EnumValue
      */
     public function toArray()
     {
-        $data = [];
-
-        if ($this->getId()) {
-            $data['id'] = $this->getId();
-        }
-        if ($this->getLabel()) {
-            $data['label'] = $this->getLabel();
-        }
-        if ($this->getIsDefault()) {
-            $data['is_default'] = $this->getIsDefault();
-        }
-        if ($this->getPriority()) {
-            $data['priority'] = $this->getPriority();
-        }
-
-        return $data;
+        return [
+            'id' => $this->getId(),
+            'label' => $this->getLabel(),
+            'is_default' => $this->getIsDefault(),
+            'priority' => $this->getPriority()
+        ];
     }
 
     /**
-     * Set id
-     *
      * @param integer $id
      *
      * @return EnumValue
@@ -87,8 +77,6 @@ class EnumValue
     }
 
     /**
-     * Get id
-     *
      * @return integer
      */
     public function getId()
@@ -97,8 +85,6 @@ class EnumValue
     }
 
     /**
-     * Set label
-     *
      * @param string $label
      *
      * @return EnumValue
@@ -111,8 +97,6 @@ class EnumValue
     }
 
     /**
-     * Get label
-     *
      * @return string
      */
     public function getLabel()
@@ -121,8 +105,6 @@ class EnumValue
     }
 
     /**
-     * Set isDefault
-     *
      * @param boolean $isDefault
      *
      * @return EnumValue
@@ -135,8 +117,6 @@ class EnumValue
     }
 
     /**
-     * Get isDefault
-     *
      * @return boolean
      */
     public function getIsDefault()
@@ -145,8 +125,6 @@ class EnumValue
     }
 
     /**
-     * Set priority
-     *
      * @param integer $priority
      *
      * @return EnumValue
@@ -159,8 +137,6 @@ class EnumValue
     }
 
     /**
-     * Get priority
-     *
      * @return integer
      */
     public function getPriority()

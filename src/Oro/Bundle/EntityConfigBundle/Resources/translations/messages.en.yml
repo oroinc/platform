@@ -60,4 +60,5 @@ oro:
             title: Import Entity Fields
             message:
                 invalid_field_type: Invalid field type
+                change_type_not_allowed: Changing type of existing fields is not allowed
                 require_update_schema: "Please, click 'Update Schema' to apply changes"
