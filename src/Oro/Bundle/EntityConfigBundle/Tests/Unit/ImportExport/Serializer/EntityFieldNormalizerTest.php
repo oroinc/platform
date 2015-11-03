@@ -68,10 +68,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsDenormalization(array $inputData, $expected)
     {
-        $this->fieldTypeProvider->expects($this->once())
-            ->method('getSupportedFieldTypes')
-            ->willReturn($inputData['supportedTypes']);
-
         $this->assertEquals(
             $expected,
             $this->normalizer->supportsDenormalization($inputData['data'], $inputData['type'])
@@ -138,7 +134,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'fieldName' => 'field1',
                     ],
                     'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
-                    'supportedTypes' => ['type1'],
                 ],
                 'expected' => true
             ],
@@ -149,38 +144,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                         'fieldName' => 'field2',
                     ],
                     'type' => 'stdClass',
-                    'supportedTypes' => ['type2'],
-                ],
-                'expected' => false
-            ],
-            'data[type] is not in supportedTypes' => [
-                'input' => [
-                    'data' => [
-                        'type' => 'type3',
-                        'fieldName' => 'field3',
-                    ],
-                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
-                    'supportedTypes' => ['type'],
-                ],
-                'expected' => false
-            ],
-            'empty data[type]' => [
-                'input' => [
-                    'data' => [
-                        'fieldName' => 'field4',
-                    ],
-                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
-                    'supportedTypes' => ['type4'],
-                ],
-                'expected' => false
-            ],
-            'empty data[fieldName]' => [
-                'input' => [
-                    'data' => [
-                        'type' => 'type5',
-                    ],
-                    'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
-                    'supportedTypes' => ['type5'],
                 ],
                 'expected' => false
             ],
@@ -188,7 +151,6 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'data' => 'testdata',
                     'type' => self::FIELD_CONFIG_MODEL_CLASS_NAME,
-                    'supportedTypes' => ['type6'],
                 ],
                 'expected' => false
             ],
@@ -373,13 +335,13 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
                     'enum' => [
                         'code1' => [
                             [
-                                'id' => 'label1',
+                                'id' => null,
                                 'label' => 'label1',
                                 'is_default' => true,
                                 'priority' => null
                             ],
                             [
-                                'id' => 'label2',
+                                'id' => null,
                                 'label' => 'label2',
                                 'is_default' => false,
                                 'priority' => null

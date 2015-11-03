@@ -67,7 +67,7 @@ class EntityFieldDataConverter extends AbstractTableDataConverter implements Con
                 foreach ($fields as $code => $config) {
                     $field = sprintf('%s.%s', $scope, $code);
 
-                    if (in_array($code, $this->excludedFields, true) || in_array($field, $header, true)) {
+                    if (in_array($field, $this->excludedFields, true) || in_array($field, $header, true)) {
                         continue;
                     }
                     $header[] = $field;
