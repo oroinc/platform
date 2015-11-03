@@ -15,9 +15,11 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
             case self::TYPE_DATETIME:
                 return $this->convert($value);
             case self::TYPE_DATE:
-                return $this->convertToDate($value);
+                // Date data does not contain time and timezone information.
+                return $this->convertToDate($value, null, null, 'UTC');
             case self::TYPE_TIME:
-                return $this->convertToTime($value);
+                // Time data does not contain date and timezone information.
+                return $this->convertToTime($value, null, null, 'UTC');
             default:
                 throw new InvalidArgumentException(sprintf('Couldn\'t parse "%s" type', $type));
         }
@@ -55,7 +57,7 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
             $formatter = $this->getFormatter($dateType, $timeType, $locale, $timeZone, $pattern);
             $timestamp = $formatter->parse($value);
             if (intl_get_error_code() === 0) {
-                return new \DateTime(sprintf('@%f', $timestamp));
+                return $this->getDateTime($timestamp);
             }
         }
 
@@ -68,13 +70,13 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
      * @param string          $value
      * @param string|int|null $dateType
      * @param string|null     $locale
-     * @param string|null     $timeZone
+     * @param string|null     $timezone
      *
      * @return \DateTime|false
      */
-    public function convertToDate($value, $dateType = null, $locale = null, $timeZone = 'UTC')
+    public function convertToDate($value, $dateType = null, $locale = null, $timezone = null)
     {
-        return $this->convert($value, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone);
+        return $this->convert($value, $dateType, \IntlDateFormatter::NONE, $locale, $timezone);
     }
 
     /**
@@ -83,13 +85,13 @@ class ExcelDateTimeTypeFormatter extends DateTimeTypeFormatter implements DateTi
      * @param string          $value
      * @param string|int|null $timeType
      * @param string|null     $locale
-     * @param string|null     $timeZone
+     * @param string|null     $timezone
      *
      * @return \DateTime|false
      */
-    public function convertToTime($value, $timeType = null, $locale = null, $timeZone = 'UTC')
+    public function convertToTime($value, $timeType = null, $locale = null, $timezone = null)
     {
-        return $this->convert($value, \IntlDateFormatter::NONE, $timeType, $locale, $timeZone);
+        return $this->convert($value, \IntlDateFormatter::NONE, $timeType, $locale, $timezone);
     }
 
     /**
