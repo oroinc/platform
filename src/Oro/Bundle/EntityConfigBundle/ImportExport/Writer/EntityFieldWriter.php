@@ -153,10 +153,21 @@ class EntityFieldWriter implements ItemWriterInterface
 
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
+        $enumOptions = array_map(
+            function ($option) {
+                if (!isset($option['id'])) {
+                    $option['id'] = $option['label'];
+                }
+
+                return $option;
+            },
+            $data['enum_options']
+        );
+
         if ($provider->hasConfig($enumValueClassName)) {
             $this->enumSynchronizer->applyEnumOptions(
                 $enumValueClassName,
-                $data['enum_options'],
+                $enumOptions,
                 $this->translationHelper->getLocale()
             );
         }

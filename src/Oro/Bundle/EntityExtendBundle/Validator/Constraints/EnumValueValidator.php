@@ -1,0 +1,36 @@
+<?php
+
+namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
+
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
+
+use Oro\Bundle\EntityExtendBundle\Model\EnumValue as EnumValueEntity;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+class EnumValueValidator extends ConstraintValidator
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function validate($entity, Constraint $constraint)
+    {
+        if ($entity instanceof EnumValueEntity) {
+            $entity = $entity->toArray();
+        }
+
+        if (!empty($entity['id']) || empty($entity['label'])) {
+            return;
+        }
+
+        $valueId = ExtendHelper::buildEnumValueId($entity['label'], false);
+
+        if (empty($valueId)) {
+            $this->context
+                ->buildViolation($constraint->message, ['{{ value }}' => $entity['label']])
+                ->atPath('[label]')
+                ->addViolation()
+            ;
+        }
+    }
+}

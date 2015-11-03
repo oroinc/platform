@@ -80,13 +80,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
-        $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
-
-        return is_array($data) &&
-            array_key_exists('type', $data) &&
-            in_array($data['type'], $supportedTypes, true) &&
-            array_key_exists('fieldName', $data) &&
-            is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
+        return is_array($data) && is_a($type, 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel', true);
     }
 
     /**
@@ -139,7 +133,8 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
                 $value = $this->denormalizeFieldValue(
                     isset($config['options']) ? $config['options'] : [],
-                    $options[$scope][$code]
+                    $options[$scope][$code],
+                    $model->getType()
                 );
 
                 if ($value !== null) {
@@ -154,9 +149,10 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
     /**
      * @param array $config
      * @param mixed $value
+     * @param string $fieldType
      * @return mixed
      */
-    protected function denormalizeFieldValue(array $config, $value)
+    protected function denormalizeFieldValue(array $config, $value, $fieldType)
     {
         $type = array_key_exists(self::CONFIG_TYPE, $config) ? $config[self::CONFIG_TYPE] : null;
 
@@ -165,7 +161,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
                 $result = $this->normalizeBoolValue($value);
                 break;
             case self::TYPE_ENUM:
-                $result = $this->normalizeEnumValue($value);
+                $result = $this->normalizeEnumValue($value, $fieldType);
                 break;
             case self::TYPE_INTEGER:
                 $result = (int)$value;
@@ -189,17 +185,25 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
     /**
      * @param mixed $value
+     * @param string $type
      * @return array
      */
-    protected function normalizeEnumValue($value)
+    protected function normalizeEnumValue($value, $type)
     {
+        $default = false;
+
         $updatedValue = [];
         foreach ($value as $key => $subvalue) {
-            $updatedValue[$key] = ['priority' => null];
+            $updatedValue[$key] = ['id' => null, 'priority' => null];
             foreach ($this->getEnumConfig() as $subfield => $subconfig) {
-                $updatedValue[$key][$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield]);
+                $updatedValue[$key][$subfield] = $this->denormalizeFieldValue($subconfig, $subvalue[$subfield], $type);
             }
-            $updatedValue[$key]['id'] = $updatedValue[$key]['label'];
+
+            $updatedValue[$key]['is_default'] = !$default && !empty($updatedValue[$key]['is_default']);
+
+            if ($type !== 'multiEnum' && !$default && !empty($updatedValue[$key]['is_default'])) {
+                $default = true;
+            }
         }
 
         return $updatedValue;
