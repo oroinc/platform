@@ -46,7 +46,7 @@ class EnumValueTest extends \PHPUnit_Framework_TestCase
         $array = [
             'id' => 'testId',
             'label' => 'test label',
-            'isDefault' => true,
+            'is_default' => true,
             'priority' => 100,
         ];
 
@@ -57,7 +57,7 @@ class EnumValueTest extends \PHPUnit_Framework_TestCase
             ->setPriority(100)
         ;
 
-        static::assertEquals($enumValue, (new EnumValue())->fromArray($array));
+        static::assertEquals($enumValue, EnumValue::createFromArray($array));
         static::assertEquals($array, $enumValue->toArray($array));
     }
 }
