@@ -136,7 +136,7 @@ class InlineEditingExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getProcessConfigsExpectedValues($entityName)
     {
-         return [
+        return [
             Configuration::BASE_CONFIG_KEY => [
                 'enable' => false,
                 'entity_name' => $entityName,
