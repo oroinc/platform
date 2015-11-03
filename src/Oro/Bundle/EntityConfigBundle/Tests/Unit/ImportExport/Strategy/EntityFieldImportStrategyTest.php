@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Strategy;
 
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -10,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
