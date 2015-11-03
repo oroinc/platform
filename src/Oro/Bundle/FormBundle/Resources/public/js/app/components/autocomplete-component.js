@@ -81,7 +81,8 @@ define(function(require) {
                 $.getJSON(self.url, {
                     query: query
                 }, function(response) {
-                    callback(self.prepareResults(response));
+                    var results = self.prepareResults(response);
+                    callback(self.$el.is(':focus') ? results : []);
                 });
             }, this.options.timeout);
         },
