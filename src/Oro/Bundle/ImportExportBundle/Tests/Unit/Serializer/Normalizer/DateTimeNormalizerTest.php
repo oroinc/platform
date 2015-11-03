@@ -19,6 +19,8 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->localeSettings->expects($this->any())->method('getTimezone')->willReturn('Europe/Kiev');
+
 
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
@@ -266,7 +268,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             // Test denormalization depends on FR locale and context type
             'Denormalize data depends on FR locale and datetime type' => [
-                new \DateTime('2013-12-31T23:59:59'),
+                new \DateTime('2013-12-31T23:59:59+0200'),
                 '31/12/2013 23:59:59',
                 'fr',
                 ['type' => 'datetime']
@@ -285,7 +287,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             // Test denormalization depends on EN locale and context type
             'Denormalize data depends on EN locale and datetime type' => [
-                new \DateTime('2013-12-31T23:59:59'),
+                new \DateTime('2013-12-31T23:59:59+0200'),
                 '12/31/2013 23:59:59',
                 'en',
                 ['type' => 'datetime']
@@ -304,7 +306,7 @@ class DateTimeNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             // Test denormalization depends on DE locale and context type
             'Denormalize data depends on DE locale and datetime type' => [
-                new \DateTime('2013-12-31T23:59:59'),
+                new \DateTime('2013-12-31T23:59:59+0200'),
                 '31.12.2013 23:59:59',
                 'de',
                 ['type' => 'datetime']
