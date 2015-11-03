@@ -15,7 +15,7 @@ class FieldFilter
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
         $this->propertyAccessor = new PropertyAccessor();
@@ -29,7 +29,6 @@ class FieldFilter
      */
     public function filterRestrictedFields(&$entity, $className)
     {
-        //$this->securityFacade->getToken()->ge
         foreach ($entity as $fieldName => $value) {
             $isGranted = $this->securityFacade->isGranted('VIEW', new FieldVote('Entity:' . $className, $fieldName));
             if (!$isGranted) {
