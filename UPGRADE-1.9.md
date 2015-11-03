@@ -41,6 +41,7 @@ UPGRADE FROM 1.8 to 1.9
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
 - Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
+- `Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener` added to the class cache and constructor have container as performance improvement
 
 ####EmbeddedFormBundle
  - Bundle now contains configuration of security firewall `embedded_form` 
@@ -50,6 +51,7 @@ UPGRADE FROM 1.8 to 1.9
 
 ####SoapBundle
  - Bundle now contains configuration of security firewall `wsse_secured` 
+ - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
 ####TrackingBundle
  - Bundle now contains configuration of security firewall `tracking_data` 
@@ -57,6 +59,7 @@ UPGRADE FROM 1.8 to 1.9
 ####UiBundle
  - Added possibility to group tabs in dropdown for tabs panel. Added options to tabPanel function. Example: `{{ tabPanel(tabs, {useDropdown: true}) }}`
  - Added possibility to set content for specific tab. Example: `{{ tabPanel([{label: 'Tab', content: 'Tab content'}]) }}`
+ - `Oro\Bundle\UIBundle\EventListener\ContentProviderListener` added to the class cache and constructor have container as performance improvement
 
 ####UserBundle
  - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
@@ -67,3 +70,22 @@ UPGRADE FROM 1.8 to 1.9
  - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
  - Added new process definition option `pre_conditions`
  - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
+ 
+###DataAuditBundle
+ - `Oro\Bundle\DataauditBundle\EventListener\KernelListener` added to the class cache and constructor have container as performance improvement
+
+###InstallerBundle
+ - `Oro\Bundle\InstallerBundle\EventListener\RequestListener` added to the class cache as performance improvement
+
+###LayoutBundle
+ - `Oro\Bundle\LayoutBundle\EventListener\ThemeListener` added to the class cache as performance improvement
+
+###LocaleBundle
+ - `Oro\Bundle\LocaleBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
+
+###NavigationBundle
+ - `Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener` added to the class cache as performance improvement
+ - `Oro\Bundle\NavigationBundle\Event\RequestTitleListener` added to the class cache as performance improvement
+
+###SidebarBundle
+ - `Oro\Bundle\SidebarBundle\EventListener\RequestHandler` added to the class cache as performance improvement
