@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints;
@@ -30,7 +30,7 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->context      = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $this->context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
 
         $violation = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
         $violation->expects(static::any())
@@ -41,8 +41,8 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('buildViolation')
             ->willReturn($violation);
 
-        $this->constraint   = new Constraints\EnumValue();
-        $this->validator    = new Constraints\EnumValueValidator();
+        $this->constraint = new Constraints\EnumValue();
+        $this->validator = new Constraints\EnumValueValidator();
         $this->validator->initialize($this->context);
     }
 
@@ -71,10 +71,9 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($data, $valid)
     {
-        $this->context
-            ->expects($valid ? static::never() : static::once())
-            ->method('buildViolation')
-        ;
+        $this->context->expects($valid ? static::never() : static::once())
+            ->method('buildViolation');
+
         $this->validator->validate($data, $this->constraint);
     }
 

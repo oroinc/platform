@@ -30,18 +30,7 @@ class EnumValueTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testToArray()
-    {
-        static::assertPropertyAccessors($this->enumValue, [
-            ['id', 'testId'],
-            ['label', 'test label'],
-            ['isDefault', true],
-            ['priority', 100],
-        ]);
-    }
-
-
-    public function testFromToArray()
+    public function testFromArrayAndToArray()
     {
         $array = [
             'id' => 'testId',
@@ -50,14 +39,14 @@ class EnumValueTest extends \PHPUnit_Framework_TestCase
             'priority' => 100,
         ];
 
-        $enumValue = (new EnumValue())
+        $enumValue = new EnumValue();
+        $enumValue
             ->setLabel('test label')
             ->setId('testId')
             ->setIsDefault(true)
-            ->setPriority(100)
-        ;
+            ->setPriority(100);
 
         static::assertEquals($enumValue, EnumValue::createFromArray($array));
-        static::assertEquals($array, $enumValue->toArray($array));
+        static::assertEquals($array, $enumValue->toArray());
     }
 }
