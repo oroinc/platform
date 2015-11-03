@@ -35,10 +35,7 @@ class EnumValueValidator extends ConstraintValidator
 
         if (empty($valueId)) {
             $this->context
-                ->buildViolation($constraint->message, ['{{ value }}' => $entity['label']])
-                ->atPath('[label]')
-                ->addViolation()
-            ;
+                ->addViolationAt('[label]', $constraint->message, ['{{ value }}' => $entity['label']]);
         }
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -56,6 +57,20 @@ class EnumValueTypeTest extends TypeTestCase
             ),
             new ValidatorExtension($this->getValidator()),
         ];
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider submitProvider
+     */
+    public function testSubmit(array $inputData, array $expectedData)
+    {
+        $form = $this->factory->create($this->type);
+        $form->submit($inputData['form']);
+
+        $this->assertEquals($expectedData['valid'], $form->isValid());
     }
 
     public function testSubmitValidDataForNewEnumValue()
@@ -126,6 +141,79 @@ class EnumValueTypeTest extends TypeTestCase
             'oro_entity_extend_enum_value',
             $this->type->getName()
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function submitProvider()
+    {
+        return [
+            'valid data' => [
+                'input' => [
+                    'entity' => null,
+                    'form' => [
+                        'label' => 'Label1',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                ],
+                'expected' => [
+                    'valid' => true,
+                ],
+            ],
+            'empty label' => [
+                'input' => [
+                    'entity' => null,
+                    'form' => [
+                        'is_default' => true,
+                        'priority' => 2,
+                    ],
+                ],
+                'expected' => [
+                    'valid' => false,
+                ],
+            ],
+            'long label' => [
+                'input' => [
+                    'entity' => null,
+                    'form' => [
+                        'label' => str_repeat('l', 256),
+                        'is_default' => true,
+                        'priority' => 3,
+                    ],
+                ],
+                'expected' => [
+                    'valid' => false,
+                ],
+            ],
+            'incorrect label and empty id' => [
+                'input' => [
+                    'entity' => new EnumValue(),
+                    'form' => [
+                        'label' => '!@#$',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                ],
+                'expected' => [
+                    'valid' => false,
+                ],
+            ],
+            'correct label and not empty id' => [
+                'input' => [
+                    'form' => [
+                        'id' => 11,
+                        'label' => '!@#$',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                ],
+                'expected' => [
+                    'valid' => true,
+                ],
+            ],
+        ];
     }
 
     /**
