@@ -115,7 +115,7 @@
     </div>
 
     {% if errors|length > 0 %}
-    <a href="javascript: void(0)" class="error-toggle error-toggle-head"><i class="icon-chevron-right"></i>{{ 'Errors found %errors%'|trans({'%errors%': errors|length}) }}</a>
+    <a href="javascript: void(0)" class="error-toggle error-toggle-head"><i class="icon-chevron-right"></i>{{ 'oro.importexport.import.errors_found'|trans({'%errors%': errors|length}) }}</a>
     <div class="import-errors">
         <ol>
             {% for error in errors %}
