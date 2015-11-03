@@ -50,12 +50,16 @@ class OwnerDeletionManagerTest extends \PHPUnit_Framework_TestCase
                 $this->returnValue('Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestOwnerEntity')
             );
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->ownerDeletionManager = new OwnerDeletionManager(
             $this->defaultChecker,
             $this->ownershipProvider,
             $this->ownershipMetadata,
             $this->em,
-            new ObjectIdAccessor()
+            new ObjectIdAccessor($doctrineHelper)
         );
     }
 
