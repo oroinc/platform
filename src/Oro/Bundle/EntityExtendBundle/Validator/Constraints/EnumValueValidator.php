@@ -21,10 +21,10 @@ class EnumValueValidator extends ConstraintValidator
         }
 
         if (!is_array($entity)) {
-                throw new UnexpectedTypeException(
-                    $entity,
-                    'Oro\Bundle\EntityExtendBundle\Model\EnumValue|array'
-                );
+            throw new UnexpectedTypeException(
+                $entity,
+                'Oro\Bundle\EntityExtendBundle\Model\EnumValue|array'
+            );
         }
 
         if (!empty($entity['id']) || empty($entity['label'])) {
