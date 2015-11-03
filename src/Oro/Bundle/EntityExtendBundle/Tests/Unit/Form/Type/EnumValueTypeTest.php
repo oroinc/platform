@@ -19,7 +19,6 @@ use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -151,7 +150,6 @@ class EnumValueTypeTest extends TypeTestCase
         return [
             'valid data' => [
                 'input' => [
-                    'entity' => null,
                     'form' => [
                         'label' => 'Label1',
                         'is_default' => true,
@@ -164,7 +162,6 @@ class EnumValueTypeTest extends TypeTestCase
             ],
             'empty label' => [
                 'input' => [
-                    'entity' => null,
                     'form' => [
                         'is_default' => true,
                         'priority' => 2,
@@ -176,7 +173,6 @@ class EnumValueTypeTest extends TypeTestCase
             ],
             'long label' => [
                 'input' => [
-                    'entity' => null,
                     'form' => [
                         'label' => str_repeat('l', 256),
                         'is_default' => true,
@@ -189,7 +185,6 @@ class EnumValueTypeTest extends TypeTestCase
             ],
             'incorrect label and empty id' => [
                 'input' => [
-                    'entity' => new EnumValue(),
                     'form' => [
                         'label' => '!@#$',
                         'is_default' => true,
