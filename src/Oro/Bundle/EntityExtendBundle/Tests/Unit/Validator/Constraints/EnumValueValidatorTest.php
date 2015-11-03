@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints;
@@ -30,16 +30,7 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-
-        $violation = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
-        $violation->expects(static::any())
-            ->method('atPath')
-            ->willReturn($violation);
-
-        $this->context->expects(static::any())
-            ->method('buildViolation')
-            ->willReturn($violation);
+        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->constraint = new Constraints\EnumValue();
         $this->validator = new Constraints\EnumValueValidator();
@@ -48,12 +39,12 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfiguration()
     {
-        static::assertEquals(
+        $this->assertEquals(
             'Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValueValidator',
             $this->constraint->validatedBy()
         );
 
-        static::assertEquals([Constraint::CLASS_CONSTRAINT], $this->constraint->getTargets());
+        $this->assertEquals([Constraint::CLASS_CONSTRAINT], $this->constraint->getTargets());
     }
 
     /**
@@ -71,8 +62,8 @@ class EnumValueValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($data, $valid)
     {
-        $this->context->expects($valid ? static::never() : static::once())
-            ->method('buildViolation');
+        $this->context->expects($valid ? $this->never() : $this->once())
+            ->method('addViolationAt');
 
         $this->validator->validate($data, $this->constraint);
     }
