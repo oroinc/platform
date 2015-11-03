@@ -8,6 +8,7 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
@@ -81,9 +82,16 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var User */
     private $user411;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    private $doctrineHelper;
+
     protected function setUp()
     {
         $this->tree = new OwnerTree();
+
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
         $this->metadataProvider->setMetadata(
@@ -134,7 +142,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
                         [
                             'oro_security.acl.object_id_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new ObjectIdAccessor(),
+                            new ObjectIdAccessor($this->doctrineHelper),
                         ],
                         [
                             'oro_security.owner.entity_owner_accessor',
@@ -152,7 +160,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($this->doctrineHelper),
             $entityOwnerAccessor, //new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
@@ -161,7 +169,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = TestHelper::get($this)->createEntityAclExtension(
             $this->metadataProvider,
             $this->tree,
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($this->doctrineHelper),
             $this->decisionMaker
         );
 
@@ -1104,7 +1112,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $extension = new EntityAclExtension(
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($this->doctrineHelper),
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,

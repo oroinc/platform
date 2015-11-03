@@ -62,6 +62,11 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             ->willReturn(false);
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->container->expects($this->any())
             ->method('get')
             ->will(
@@ -80,7 +85,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
                         [
                             'oro_security.acl.object_id_accessor',
                             ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                            new ObjectIdAccessor(),
+                            new ObjectIdAccessor($doctrineHelper),
                         ],
                         [
                             'oro_security.owner.entity_owner_accessor',

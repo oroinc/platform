@@ -42,7 +42,11 @@ class TestHelper
         OwnerTree $ownerTree = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ) {
-        $idAccessor = new ObjectIdAccessor();
+        $doctrineHelper = $this->testCase->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $idAccessor = new ObjectIdAccessor($doctrineHelper);
         $selector = new AclExtensionSelector($idAccessor);
         $actionMetadataProvider =
             $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider')
@@ -75,7 +79,11 @@ class TestHelper
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ) {
         if ($idAccessor === null) {
-            $idAccessor = new ObjectIdAccessor();
+            $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+            $idAccessor = new ObjectIdAccessor($doctrineHelper);
         }
         if ($metadataProvider === null) {
             $metadataProvider = new OwnershipMetadataProviderStub($this->testCase);

@@ -92,9 +92,13 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $strategy = $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityRetrievalStrategyInterface');
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->builder = new OwnershipConditionDataBuilder(
             $securityContextLink,
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($doctrineHelper),
             $entityMetadataProvider,
             $this->metadataProvider,
             $treeProvider,
