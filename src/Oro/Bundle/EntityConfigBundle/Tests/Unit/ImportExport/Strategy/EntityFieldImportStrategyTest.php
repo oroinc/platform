@@ -52,7 +52,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldProperties')
             ->willReturn([]);
 
-
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
         $this->translator
