@@ -49,7 +49,7 @@
             {% endfor %}
             {{ ui.renderHtmlProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
-            {{ ui.renderHtmlProperty('oro.user.phone.label'|trans, entity.phone ? ui.renderPhone(entity.phone) : null) }}
+            {{ ui.renderHtmlProperty('oro.user.phone.label'|trans, entity.phone ? ui.renderPhoneWithActions(entity.phone, entity) : null) }}
 
             {% if resource_granted('oro_user_role_view') %}
                 {% set roles = [] %}

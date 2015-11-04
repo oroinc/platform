@@ -11,7 +11,7 @@
 
         <div class="responsive-block">
             {{ ui.renderHtmlProperty('oro.organization.businessunit.email.label'|trans, email.email_address_simple(entity.email)) }}
-            {{ ui.renderHtmlProperty('oro.organization.businessunit.phone.label'|trans, entity.phone ? ui.renderPhone(entity.phone) : null) }}
+            {{ ui.renderHtmlProperty('oro.organization.businessunit.phone.label'|trans, entity.phone ? ui.renderPhoneWithActions(entity.phone, entity) : null) }}
             {{ ui.renderHtmlProperty('oro.organization.businessunit.fax.label'|trans, entity.fax ? ui.renderPhone(entity.fax) : null) }}
         </div>
     </div>
