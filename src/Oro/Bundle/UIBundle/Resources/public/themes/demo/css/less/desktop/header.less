@@ -1,6 +1,13 @@
 #oroplatform-header {
   .logo {
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+    padding: 0;
+    &:before {
+      display: none;
+    }
+    &:after {
+      display: none;
+    }
   }
   .nav.user-menu {
     #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);

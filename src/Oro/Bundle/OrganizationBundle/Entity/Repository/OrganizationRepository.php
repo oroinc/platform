@@ -153,4 +153,20 @@ class OrganizationRepository extends EntityRepository
             }
         );
     }
+
+    /**
+     * @param array $orgIds
+     *
+     * @return Organization[]
+     */
+    public function getEnabledOrganizations(array $orgIds)
+    {
+        return $this->createQueryBuilder('org')
+            ->select('org')
+            ->where('org.id in (:ids)')
+            ->andWhere('org.enabled = true')
+            ->setParameter('ids', $orgIds)
+            ->getQuery()
+            ->execute();
+    }
 }

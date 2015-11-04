@@ -14,6 +14,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         pageSize: 'p',
         sorters: 's',
         filters: 'f',
+        columns: 'c',
         gridView: 'v',
         urlParams: 'g'
     };
@@ -77,7 +78,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             pageSize: 25,
             totals: null,
             filters: {},
-            sorters: {}
+            sorters: {},
+            columns: {}
         },
 
         /**
@@ -189,8 +191,8 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          * Adds filter parameters to data
          *
          * @param {Object} data
-         * @param {Object} state
-         * @param {String} prefix
+         * @param {Object=} state
+         * @param {string=} prefix
          * @return {Object}
          */
         processFiltersParams: function(data, state, prefix) {
@@ -208,6 +210,30 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
                     this.generateParameterStrings(state.filters, prefix)
                 );
             }
+            return data;
+        },
+
+        /**
+         * Adds columns parameters to data
+         *
+         * @param {Object} data
+         * @param {Object=} state
+         * @param {string=} prefix
+         * @return {Object}
+         */
+        processColumnsParams: function(data, state, prefix) {
+            if (!state) {
+                state = this.state;
+            }
+
+            if (!prefix) {
+                prefix = this.inputName + '[_columns]';
+            }
+
+            var columnsData = {};
+            columnsData[prefix] = this._packColumnsStateData(state.columns);
+            _.extend(data, columnsData);
+
             return data;
         },
 
@@ -537,6 +563,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             var state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
+            data = this.processColumnsParams(data, state);
 
             return data;
         },
@@ -815,6 +842,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
         _encodeStateData: function(state) {
             var stateData = {urlParams: this.urlParams};
             stateData = _.extend(stateData, state);
+            this._packStateData(stateData);
             return PageableCollection.encodeStateData(stateData);
         },
 
@@ -825,6 +853,69 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
          */
         stateHashKey: function() {
             return PageableCollection.stateHashKey(this.inputName);
+        },
+
+        /**
+         * Packs state
+         * (packs state value to minified representation)
+         *
+         * @param {Object} data
+         * @protected
+         */
+        _packStateData: function(data) {
+            data.columns = this._packColumnsStateData(data.columns);
+        },
+
+        /**
+         * Converts column state object into a string
+         *
+         * @param {Object} state
+         * @returns {string}
+         * @protected
+         */
+        _packColumnsStateData: function(state) {
+            // convert columns state to array
+            var packedState = _.map(state, function(item, columnName) {
+                return _.extend({name: columnName}, item);
+            });
+
+            // sort columns by their order
+            packedState = _.sortBy(packedState, 'order');
+
+            // stringify state parts
+            packedState = _.map(packedState, function(item) {
+                return item.name + String(Number(item.renderable));
+            }).join('.');
+
+            return packedState;
+        },
+
+        /**
+         * Unpacks state
+         * (extract state value from minified object)
+         *
+         * @param {Object} data
+         * @protected
+         */
+        _unpackStateData: function(data) {
+            data.columns = this._unpackColumnsStateData(data.columns);
+        },
+
+        /**
+         * Extract column state from string
+         *
+         * @param {string} packedState
+         * @return {Object}
+         * @protected
+         */
+        _unpackColumnsStateData: function(packedState) {
+            return _.object(_.map(packedState.split('.'), function(value, index) {
+                var columnName = value.substr(0, value.length - 1);
+                return [columnName, {
+                    renderable: Boolean(Number(value.substr(-1))),
+                    order: index
+                }];
+            }));
         }
     });
 

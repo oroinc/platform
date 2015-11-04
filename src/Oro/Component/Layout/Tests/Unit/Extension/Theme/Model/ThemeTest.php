@@ -76,4 +76,12 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->theme->setParentTheme('base');
         $this->assertEquals('base', $this->theme->getParentTheme());
     }
+
+    public function testDescriptionMethods()
+    {
+        $this->assertNull($this->theme->getDescription());
+
+        $this->theme->setDescription('test');
+        $this->assertEquals('test', $this->theme->getDescription());
+    }
 }

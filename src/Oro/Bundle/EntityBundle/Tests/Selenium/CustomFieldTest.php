@@ -35,6 +35,7 @@ class CustomFieldTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $login = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', 'User', 'is equal to')
+            ->filterByMultiselect('Module', ['OroUserBundle'])
             ->open(array('User'));
         foreach ($this->fields as $field) {
             /** @var ConfigEntity $login */

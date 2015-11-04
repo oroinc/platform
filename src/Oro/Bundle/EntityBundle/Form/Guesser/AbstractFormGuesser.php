@@ -9,7 +9,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 abstract class AbstractFormGuesser implements FormTypeGuesserInterface
 {
@@ -19,15 +19,15 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     protected $managerRegistry;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $entityConfigProvider;
 
     /**
-     * @param ManagerRegistry         $managerRegistry
-     * @param ConfigProviderInterface $entityConfigProvider
+     * @param ManagerRegistry $managerRegistry
+     * @param ConfigProvider  $entityConfigProvider
      */
-    public function __construct(ManagerRegistry $managerRegistry, ConfigProviderInterface $entityConfigProvider)
+    public function __construct(ManagerRegistry $managerRegistry, ConfigProvider $entityConfigProvider)
     {
         $this->managerRegistry      = $managerRegistry;
         $this->entityConfigProvider = $entityConfigProvider;

@@ -6,7 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class ControllersTest extends WebTestCase

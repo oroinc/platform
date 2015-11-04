@@ -4,39 +4,36 @@ To add new config scope, developer should do next steps.
 
 ### Add scope manager ###
 
-Scope manager is the main scope class. This class should extend `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager`
-and realize two abstract methods.
+A scope manager is a class provides access to configuration attributes is a particular scope. This class should extend [AbstractScopeManager](./../../Config/AbstractScopeManager.php).
 
 In the simplest case, scope manager will looks like this:
 
 ``` php
+namespace Acme\Bundle\SomeBundle\Config;
 
-    <?php
-    
-    namespace Acme\Bundle\SomeBundle\Config;
-    
+use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
+
+/**
+ * Test config scope
+ */
+class TestScopeManager extends AbstractScopeManager
+{
     /**
-     * Test config scope
+     * {@inheritdoc}
      */
-    class TestScopeManager extends AbstractScopeManager
+    public function getScopedEntityName()
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function getScopedEntityName()
-        {
-            return 'test'; //scope entity name
-        }
-    
-        /**
-         * {@inheritdoc}
-         */
-        public function getScopeId()
-        {
-            return 0; // scope entity id (can be different for different cases)
-        }
+        return 'test'; //scope entity name
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getScopeId()
+    {
+        return 0; // scope entity id (can be different for different cases)
+    }
+}
 ```
 
 This manager should be registered as the service with tag `oro_config.scope` :
@@ -44,16 +41,16 @@ This manager should be registered as the service with tag `oro_config.scope` :
 ```yml
 
     acme_test.scope.test:
-        class:                        %acme_test.scope.test.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+        class: Acme\Bundle\SomeBundle\Config\TestScopeManager
+        public: false
+        parent: oro_config.scope_manager.abstract
         tags:
             - { name: oro_config.scope, scope: test, priority: 50 }
 
 ```
 
-After this, new `test scope` will be used during retrieving some config value. This scope will be between `global` and `user` scopes.
-Developer can use this scope with `oro_config.test` config provider.
+After this, the scope `test` will be used during retrieving some config value. This scope will be between `global` and `user` scopes.
+A developer can use this scope with `oro_config.test` config provider.
 
 ### Change scope values via UI ###
 

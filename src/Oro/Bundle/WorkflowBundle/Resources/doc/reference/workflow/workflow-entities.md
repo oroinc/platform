@@ -88,7 +88,7 @@ Workflow Registry
 **Class:**
 Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
 
-**Description:** Assembles Workflow object using WorkflowAssembler and ConfigProviderInterface then returns Workflow
+**Description:** Assembles Workflow object using WorkflowAssembler and ConfigProvider then returns Workflow
 objects by their names or managed entities.
 
 **Methods:**

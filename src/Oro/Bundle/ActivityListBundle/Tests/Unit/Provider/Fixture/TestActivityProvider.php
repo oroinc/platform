@@ -4,11 +4,15 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
-class TestActivityProvider implements ActivityListProviderInterface, CommentProviderInterface
+class TestActivityProvider implements
+    ActivityListProviderInterface,
+    CommentProviderInterface,
+    ActivityListUpdatedByProviderInterface
 {
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
     const ACL_CLASS = 'Test\Entity';
@@ -129,5 +133,37 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     public function getActivityOwners($entity, ActivityList $activity)
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        return $entity->createdAt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
+    {
+        return $entity->updatedAt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedBy($entity)
+    {
+        return $entity->updatedBy;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOwner($entity)
+    {
+        return $entity->owner;
     }
 }

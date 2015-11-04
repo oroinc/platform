@@ -57,18 +57,16 @@ class EmailManager
     }
 
     /**
-     * Set email seen status
+     * Set seen status for EmailUser
      *
-     * @param EmailUser $entity - entity
-     * @param bool      $value  - value for value filed EmailUser entity
-     * @param bool      $flush  - if $flush is true then method executes flush
-     *
-     * @return void
+     * @param EmailUser $entity
+     * @param bool      $isSeen
+     * @param bool      $flush - if true then method executes flush
      */
-    public function setEmailUserSeen(EmailUser $entity, $value = true, $flush = false)
+    public function setEmailUserSeen(EmailUser $entity, $isSeen = true, $flush = false)
     {
-        if ($entity->isSeen() !== $value) {
-            $entity->setSeen($value);
+        if ($entity->isSeen() !== $isSeen) {
+            $entity->setSeen($isSeen);
             if ($flush) {
                 $this->em->flush();
             }
@@ -76,41 +74,29 @@ class EmailManager
     }
 
     /**
+     * Set email seen status for current user for single email or thread
+     *
      * @param Email $entity
-     * @param bool $checkThread Set statuses for threaded emails
+     * @param bool  $isSeen
+     * @param bool  $checkThread - if false it will be applied for single email instead of thread
      */
-    public function setSeenStatus(Email $entity, $checkThread = false)
+    public function setSeenStatus(Email $entity, $isSeen = true, $checkThread = false)
     {
         $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
         foreach ($emails as $email) {
             $emailUsers = $this->getCurrentEmailUser($email);
             if ($emailUsers) {
                 foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, true, true);
+                    $this->setEmailUserSeen($emailUser, $isSeen);
                 }
             }
         }
+
+        $this->em->flush();
     }
 
     /**
-     * @param Email $entity
-     * @param bool $checkThread Set statuses for threaded emails
-     */
-    public function setUnseenStatus(Email $entity, $checkThread = false)
-    {
-        $emails = $this->prepareFlaggedEmailEntities($entity, $checkThread);
-        foreach ($emails as $email) {
-            $emailUsers = $this->getCurrentEmailUser($email);
-            if ($emailUsers) {
-                foreach ($emailUsers as $emailUser) {
-                    $this->setEmailUserSeen($emailUser, false, true);
-                }
-            }
-        }
-    }
-
-    /**
-     * Toggle user email seen
+     * Toggle EmailUser thread seen
      *
      * @param EmailUser $entity
      */
@@ -144,12 +130,12 @@ class EmailManager
      *
      * @return boolean
      */
-    public function markAllEmailsAsSeen(User $user, Organization $organization)
+    public function markAllEmailsAsSeen(User $user, Organization $organization, $ids = [])
     {
         $emailUserQueryBuilder = $this
             ->em
             ->getRepository('OroEmailBundle:EmailUser')
-            ->findUnseenUserEmail($user, $organization);
+            ->findUnseenUserEmail($user, $organization, $ids);
         $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
 
         foreach ($unseenUserEmails as $userEmail) {

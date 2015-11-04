@@ -1,6 +1,5 @@
 parameters:
     oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
-    oro_note.note_lifecycle_listener.class:             Oro\Bundle\NoteBundle\EventListener\NoteLifecycleListener
     oro_note.placeholder.filter.class:                  Oro\Bundle\NoteBundle\Placeholder\PlaceholderFilter
     oro_note.migration.extension.note.class:            Oro\Bundle\NoteBundle\Migration\Extension\NoteExtension
     oro_note.entity_config_dumper.extension.class:      Oro\Bundle\NoteBundle\Tools\NoteEntityConfigDumperExtension
@@ -10,14 +9,6 @@ parameters:
     oro_note.activity_list.provider.class:              Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider
 
 services:
-    oro_note.note_lifecycle_listener:
-        class: %oro_note.note_lifecycle_listener.class%
-        arguments:
-            - @oro_security.security_facade.link
-        tags:
-            - { name: doctrine.event_listener, event: prePersist }
-            - { name: doctrine.event_listener, event: preUpdate }
-
     oro_note.manager:
         class: %oro_note.manager.class%
         arguments:

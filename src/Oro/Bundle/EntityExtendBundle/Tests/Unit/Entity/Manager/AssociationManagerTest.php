@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SoapBundle\Event\GetListBefore;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
@@ -27,7 +26,7 @@ class AssociationManagerTest extends OrmTestCase
     private $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $eventDispatcher;
+    private $aclHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrineHelper;
@@ -54,13 +53,13 @@ class AssociationManagerTest extends OrmTestCase
             ]
         );
 
-        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->aclHelper     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine              = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine            = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())
@@ -71,9 +70,16 @@ class AssociationManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $aclHelperLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclHelperLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->aclHelper);
+
         $this->associationManager = new AssociationManager(
             $this->configManager,
-            $this->eventDispatcher,
+            $aclHelperLink,
             $this->doctrineHelper,
             $this->entityNameResolver
         );
@@ -361,20 +367,18 @@ class AssociationManagerTest extends OrmTestCase
         $joins              = ['phones'];
         $associationTargets = [$targetClass1 => 'targets_1', $targetClass2 => 'targets_2'];
 
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(0))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 10')->getQuery();
                 }
             );
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(1))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 100')->getQuery();
                 }
             );
 
@@ -431,20 +435,18 @@ class AssociationManagerTest extends OrmTestCase
         $joins             = [];
         $associationOwners = [$ownerClass1 => 'targets_1', $ownerClass2 => 'targets_1'];
 
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(0))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 10')->getQuery();
                 }
             );
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(1))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 100')->getQuery();
                 }
             );
 

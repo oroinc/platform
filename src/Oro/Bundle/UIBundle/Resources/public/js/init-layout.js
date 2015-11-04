@@ -20,6 +20,17 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     ], function($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
+    /**
+     * Remove selection after page change
+     */
+    mediator.on('page:beforeChange', function clearSelection() {
+        if (document.selection) {
+            document.selection.empty();
+        } else if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+    });
+
     /* ============================================================
      * from layout.js
      * ============================================================ */
@@ -413,7 +424,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
         var containerSelector = $(this).data('container') || '.collection-fields-list';
-        var $listContainer = $(this).closest('.row-oro').find(containerSelector);
+        var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
         var collectionInfo = getOroCollectionInfo($listContainer);
         $listContainer.append(collectionInfo.nextItemHtml)
             .trigger('content:changed')

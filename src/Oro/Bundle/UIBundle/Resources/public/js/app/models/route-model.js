@@ -38,6 +38,20 @@ define(function(require) {
 
     RouteModel = BaseModel.extend(/** @exports RouteModel.prototype */{
         /**
+         * Route name cache prepared for
+         *
+         * @member {String}
+         */
+        _cachedRouteName: null,
+
+        /**
+         * Cached required parameters
+         *
+         * @member {Array.<String>}
+         */
+        _requiredParametersCache: null,
+
+        /**
          * @inheritDoc
          * @member {Object}
          */
@@ -58,8 +72,35 @@ define(function(require) {
         },
 
         /**
+         * Return list of parameter names required by this route (Route parameters are required to build valid url, all
+         * query parameters assumed as filters and are not required)
+         *
+         * E.g. for route `api/rest/latest/<relationClass>/<relationId/comments`
+         * This function will return `['relationClass', 'relationId']`
+         *
+         * @returns {Array.<string>}
+         */
+        getRequiredParameters: function() {
+            if (!this._requiredParametersCache || this.get('routeName') !== this._cachedRouteName) {
+                if (!this.get('routeName')) {
+                    throw new Error('routeName must be specified');
+                }
+                var route = routing.getRoute(this.get('routeName'));
+                var variableTokens = _.filter(route.tokens, function(tokenPart) {
+                    return tokenPart[0] === 'variable';
+                });
+                var routeParameters = _.map(variableTokens, function(tokenPart) {
+                    return tokenPart[3];
+                });
+                this._requiredParametersCache = _.uniq(routeParameters);
+                this._cachedRouteName = this.get('routeName');
+            }
+            return this._requiredParametersCache;
+        },
+
+        /**
          * Return list of parameter names accepted by this route.
-         * Includes both query and route parameters,
+         * Includes both query and route parameters
          *
          * E.g. for route `api/rest/latest/<relationClass>/<relationId/comments?page=<page>&limit=<limit>`
          * this function will return `['relationClass', 'relationId', 'page', 'limit']`
@@ -67,16 +108,7 @@ define(function(require) {
          * @returns {Array.<string>}
          */
         getAcceptableParameters: function() {
-            if (!this.get('routeName')) {
-                throw new Error('routeName must be specified');
-            }
-            var route = routing.getRoute(this.get('routeName'));
-            var variableTokens = _.filter(route.tokens, function(tokenPart) {
-                return tokenPart[0] === 'variable';
-            });
-            var routeParameters = _.map(variableTokens, function(tokenPart) {
-                return tokenPart[3];
-            });
+            var routeParameters = this.getRequiredParameters();
             routeParameters.push.apply(routeParameters, this.get('routeQueryParameterNames'));
             return _.uniq(routeParameters);
         },
@@ -91,6 +123,42 @@ define(function(require) {
             var routeParameters = _.extend(this.toJSON(), parameters);
             var acceptableParameters = this.getAcceptableParameters();
             return routing.generate(this.get('routeName'), _.pick(routeParameters, acceptableParameters));
+        },
+
+        /**
+         * Validates parameters list
+         *
+         * @param parameters {Object=} parameters to build url
+         * @returns {boolean} true, if parameters are valid
+         */
+        validateParameters: function(parameters) {
+            var routeParameters = _.extend(this.toJSON(), parameters);
+            var requiredParameters = this.getRequiredParameters();
+
+            for (var i = 0; i < requiredParameters.length; i++) {
+                var parameterName = requiredParameters[i];
+                var parameterValue = routeParameters[parameterName];
+                if (_.isString(parameterValue)) {
+                    if (parameterValue !== '') {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+                if (_.isNumber(parameterValue)) {
+                    if (!isNaN(parameterValue)) {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+                if (parameterValue !== null && String(parameterValue) !== '[object Object]') {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            return true;
         }
     });
 

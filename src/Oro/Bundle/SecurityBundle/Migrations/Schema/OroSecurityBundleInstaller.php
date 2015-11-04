@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\OroSecurityBundle as OroSecurityBundle11;
 
 class OroSecurityBundleInstaller implements Installation, ContainerAwareInterface
 {
@@ -22,7 +23,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -40,5 +41,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
     {
         // create symfony acl tables
         $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
+
+        OroSecurityBundle11::updateAclTables($schema, $queries);
     }
 }

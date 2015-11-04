@@ -11,7 +11,6 @@ parameters:
     oro_organization.twig.business_units.class:                Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
-    oro_organization.listener.config_subscriber.class:         Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
@@ -32,6 +31,9 @@ parameters:
     oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
 
     oro_organization.orm.validator.oranization_unique.class:   Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
+    oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
+
+    oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
 
 services:
     #
@@ -48,6 +50,8 @@ services:
         class: %oro_organization.business_unit.manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
 
     oro_organization.organization_manager:
         class: %oro_organization.organization.manager.class%
@@ -120,10 +124,10 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preRemove }
 
-    oro_organization.listener.config_subscriber:
-        class: %oro_organization.listener.config_subscriber.class%
+    oro_organization.listener.config_listener:
+        class: Oro\Bundle\OrganizationBundle\Event\EntityConfigListener
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush, priority: 100 }
 
     oro_organization.import_strategy.listener:
         class: %oro_organization.import_strategy.listener.class%
@@ -162,6 +166,7 @@ services:
             - @?security.acl.voter.basic_permissions
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.business-unit-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.share-with-business-units-datagrid, method: onBuildBefore }
 
     # Autocomplete user organizations search handler
     oro_organization.autocomplete.organization_search_handler:
@@ -189,3 +194,19 @@ services:
             - @oro_entity.doctrine_helper
         tags:
               - { name: validator.constraint_validator, alias: organization_unique }
+
+    oro_organization.provider.filter.busines_unit_choice_tree:
+        class: %oro_organization.provider.filter.busines_unit_choice_tree.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
+
+    oro_organization.autocomplete.business_unit.search_handler:
+        class: %oro_organization.autocomplete.business_unit.search_handler.class%
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_organization.business_unit.entity.class%
+            - ["name"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }

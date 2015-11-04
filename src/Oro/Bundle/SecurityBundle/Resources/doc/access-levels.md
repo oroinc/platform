@@ -46,10 +46,10 @@ $queryBuilder = $repository->createQueryBuilder('p')
    ->setParameter('price', '19.99')
    ->orderBy('p.price', 'ASC');
    
-$query = $this->get('ro_security.acl_helper')->apply($queryBuilder, 'VIEW');   
+$query = $this->get('oro_security.acl_helper')->apply($queryBuilder, 'VIEW');
 ```
 
-As result, $query will be marked as ACL protected and it will automatically delete records that user does't have permission.
+As result, $query will be marked as ACL protected and it will automatically delete records that user doesn't have permission.
 
 ###Manual access check on object.
 
@@ -59,7 +59,7 @@ Developer can check access to the given entity record by using isGranted method 
 $entity = $repository->findOneBy('id' => 10);
 
 if (!$this->securityFacade->isGranted('VIEW', $entity)) {
-    throw new AccessDeniedException('Access denided');
+    throw new AccessDeniedException('Access denied');
 } else {
     // access is granted
 }  

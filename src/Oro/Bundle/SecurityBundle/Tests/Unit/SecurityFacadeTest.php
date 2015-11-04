@@ -30,6 +30,9 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $classResolver;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $shareProvider;
+
     protected function setUp()
     {
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
@@ -47,13 +50,17 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->shareProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Provider\ShareProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->facade = new SecurityFacade(
             $this->securityContext,
             $this->annotationProvider,
             $this->objectIdentityFactory,
             $this->classResolver,
-            $this->logger
+            $this->logger,
+            $this->shareProvider
         );
     }
 
@@ -489,5 +496,62 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
             ['testBundle::testAction', false, -1],
             ['wrong_action', true, 0]
         ];
+    }
+
+    public function testIsObjectSharedWithUser()
+    {
+        $this->shareProvider->expects($this->once())
+            ->method('isObjectSharedWithUser')
+            ->willReturn(true);
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $this->assertTrue($this->facade->isObjectSharedWithUser(new \stdClass()));
+    }
+
+    public function testIsObjectSharedWithUserSid()
+    {
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->shareProvider->expects($this->once())
+            ->method('isObjectSharedWithUserSid')
+            ->willReturn(true);
+
+        $this->assertTrue($this->facade->isObjectSharedWithUserSid(new \stdClass()));
+    }
+
+    public function testHasUserSidSharedRecords()
+    {
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->shareProvider->expects($this->once())
+            ->method('hasUserSidSharedRecords')
+            ->willReturn(true);
+
+        $this->assertTrue($this->facade->hasUserSidSharedRecords());
     }
 }
