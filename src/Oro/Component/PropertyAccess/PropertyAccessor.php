@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor}
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ */
+
 namespace Oro\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception;
@@ -11,10 +17,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * Writes and reads values to/from an object/array graph.
  *
- * This class is mostly a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor},
- * but it is a bit faster getValue method, allows to use the same syntax of the property
- * path for objects and arrays, and fixes some issues of Symfony's PropertyAccessor,
- * for example working with magic __get method.
+ * This class is mostly a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor} v2.7.3
+ * but it has the following advantages:
+ * * allows to use the same syntax of the property path for objects and arrays
+ * * a bit faster getValue method
+ * * fixes some issues of Symfony's PropertyAccessor, for example working with magic __get method
  * New features:
  * * 'remove' method is added to allow to remove items from arrays or objects
  *

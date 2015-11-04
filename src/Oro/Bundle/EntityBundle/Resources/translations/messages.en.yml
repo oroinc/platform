@@ -3,6 +3,8 @@ oro:
         controller:
             message:
                 saved:              Entity saved
+                access_denied:      You does not have access to edit this field name
+                field_not_found:    Field Name is not founded in entity
         form:
             choose_entity:          Choose an entity...
             choose_entity_field:    Choose a field...

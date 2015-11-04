@@ -17,9 +17,13 @@ class GroupsTest extends Selenium2TestCase
 
     protected $defaultGroups = array(
         'header' => array('NAME' => 'NAME', 'ROLES' => 'ROLES', '' => 'ACTION'),
-        'Administrators' => array('Administrators' => 'Administrators', 'Administrator' => 'ROLES', '...' => 'ACTION'),
-        'Marketing' => array('Marketing' => 'Marketing', 'Manager' => 'ROLES', '...' => 'ACTION'),
-        'Sales' => array('Sales' => 'Sales', 'Manager' => 'ROLES', '...' => 'ACTION')
+        'Administrators' => array(
+            'Administrators' => 'Administrators',
+            'Administrator'  => 'ROLES',
+            "Edit\nDelete"   => 'ACTION'
+        ),
+        'Marketing' => array('Marketing' => 'Marketing', 'Manager' => 'ROLES', "Edit\nDelete" => 'ACTION'),
+        'Sales' => array('Sales' => 'Sales', 'Manager' => 'ROLES', "Edit\nDelete" => 'ACTION')
     );
 
     public function testGroupsGrid()

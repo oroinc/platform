@@ -10,6 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -68,7 +70,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
 
-        $priorities  = [];
         $fields      = [];
         $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
@@ -85,14 +86,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $fields[]     = $fieldName;
-            $priorities[] = $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0);
+            $fields[$fieldName] = [
+                'priority' => $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0)
+            ];
         }
 
-        array_multisort($priorities, SORT_DESC, $fields);
+        ArrayUtil::sortBy($fields, true);
 
-        foreach ($fields as $field) {
-            $builder->add($field);
+        foreach ($fields as $fieldName => $priority) {
+            $builder->add($fieldName);
         }
     }
 
