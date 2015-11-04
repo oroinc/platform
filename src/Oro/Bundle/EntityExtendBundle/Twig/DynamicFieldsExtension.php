@@ -7,6 +7,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityExtendBundle\EntityExtendEvents;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -76,7 +78,6 @@ class DynamicFieldsExtension extends \Twig_Extension
     public function getFields($entity, $entityClass = null)
     {
         $dynamicRow = [];
-        $priorities = [];
 
         if (null === $entityClass) {
             $entityClass = ClassUtils::getRealClass($entity);
@@ -100,15 +101,17 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
-                'type'  => $fieldType,
-                'label' => $fieldConfig->get('label') ?: $fieldName,
-                'value' => $event->getFieldViewValue(),
+                'type'     => $fieldType,
+                'label'    => $fieldConfig->get('label') ?: $fieldName,
+                'value'    => $event->getFieldViewValue(),
+                'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0)
             ];
-
-            $priorities[] = $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0);
         }
 
-        array_multisort($priorities, SORT_DESC, $dynamicRow);
+        ArrayUtil::sortBy($dynamicRow, true);
+        foreach ($dynamicRow as &$row) {
+            unset($row['priority']);
+        }
 
         return $dynamicRow;
     }
