@@ -140,6 +140,9 @@ datagrid:
                 from:
                     - { table: %oro_tracking.tracking_event.class%, alias: e }
         columns:
+            id:
+                label: oro.tracking.trackingevent.id.label
+                renderable: false #required because of OrmSorterExtension
             name:
                 label: oro.tracking.trackingevent.name.label
             value:
@@ -158,6 +161,8 @@ datagrid:
                 frontend_type: datetime
         sorters:
             columns:
+                id:
+                    data_name: e.id
                 name:
                     data_name: e.name
                 value:
