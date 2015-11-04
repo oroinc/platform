@@ -469,7 +469,7 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
-                            tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
+                            tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
         field:
             items:
                 # Indicates what custom field could be searchable
