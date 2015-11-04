@@ -390,6 +390,8 @@ services:
             - @doctrine
             - @oro_ui.formatter
         lazy: true
+        calls:
+            - [setEntityExtendProvider, [@oro_entity_config.provider.extend]]
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
