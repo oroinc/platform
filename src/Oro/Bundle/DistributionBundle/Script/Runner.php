@@ -111,7 +111,7 @@ class Runner
      */
     public function clearApplicationCache()
     {
-        return $this->runCommand('cache:clear');
+        return $this->runCommand('cache:clear --no-debug');
     }
 
     /**

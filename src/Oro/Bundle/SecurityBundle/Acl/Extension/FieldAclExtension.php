@@ -60,7 +60,7 @@ class FieldAclExtension extends EntityAclExtension
         $supports = parent::supports($type, $id);
 
         // if entity extension supports AND
-        // rather id starts with 'field' (e.g. field+fieldName)
+        // either id starts with 'field' (e.g. field+fieldName)
         // or id is null (checking for new entity)
 
         return $supports && (0 === strpos($id, 'field') || null === $id);

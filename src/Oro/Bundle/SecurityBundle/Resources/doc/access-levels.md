@@ -65,6 +65,20 @@ if (!$this->securityFacade->isGranted('VIEW', $entity)) {
 }  
 ```
 
+###Manual access check on object field.
+
+Developer can check access to the given entity record by using isGranted method of Security facade service:
+
+``` php
+$entity = $repository->findOneBy('id' => 10);
+
+if (!$this->securityFacade->isGranted('VIEW', new FieldVote($entity, '_field_name_'))) {
+    throw new AccessDeniedException('Access denided');
+} else {
+    // access is granted
+}  
+```
+
 ###Check ACL for search queries
 
 During collecting entities to search, information about owner and organization will be added to search index automatically.
