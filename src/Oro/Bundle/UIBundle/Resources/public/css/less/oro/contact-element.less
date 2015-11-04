@@ -1,0 +1,62 @@
+.contact-element {
+  overflow: visible;
+  position: relative;
+  top: -4px;
+  left: -2px;
+  white-space: nowrap;
+  padding: 0 0 0 2px;
+  line-height: 19px;
+  height: 23px;
+  display: inline-block;
+  .contact-element-actions {
+    visibility: hidden;
+  }
+  &:hover {
+    background: #F4EFD4;
+    outline: solid 2px #F4EFD4;
+    .contact-element-actions {
+      visibility: visible;
+    }
+  }
+  &.contact-element-no-actions:hover {
+    background: transparent;
+    outline: none;
+  }
+  .phone, .email {
+    padding: 5px 0 3px;
+    line-height: 13px;
+    height: 21px;
+    display: inline-block;
+  }
+}
+.contact-element-actions {
+  margin-left: 5px;
+  display: inline-block;
+  vertical-align: top;
+  .btn {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    width: 23px;
+    height: 23px;
+    padding: 0;
+    [class^="icon-"], [class*=" icon-"] {
+      width: 14px;
+      height: 20px;
+      font: @baseFontSize/26px 'FontAwesome';
+      color: @btnTextColor;
+      &:before {
+        font-size: 15px;
+        line-height: 22px;
+        height: 22px;
+      }
+      &.hide-text {
+        .hide-text();
+      }
+    }
+    &:hover{
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+  }
+}

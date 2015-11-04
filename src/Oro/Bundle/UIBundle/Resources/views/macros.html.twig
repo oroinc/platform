@@ -912,6 +912,27 @@
     {% endif %}
 {%- endmacro -%}
 
+{#
+    Render phone number with related actions block
+    Parameters:
+        phone - PhoneInterface object or string
+        entity - related entity record
+#}
+{% macro renderPhoneWithActions(phone, entity) -%}
+    {% if phone is not empty %}
+        {%- set actions %}
+            {%- placeholder phone_actions with {phone: phone, entity: entity} -%}
+        {% endset -%}
+        {% set actions = actions|trim %}
+        <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
+            {{ _self.renderPhone(phone) }}
+            {% if actions is not empty -%}
+                <span class="contact-element-actions phone-actions">{{ actions|raw }}</span>
+            {%- endif %}
+        </span>
+    {% endif %}
+{%- endmacro %}
+
 {% macro getApplicableForUnderscore(str) %}
     {{ str|replace({
         "<script": '<% print("<sc" + "ript"); %>',

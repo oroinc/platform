@@ -348,6 +348,27 @@
 {%- endmacro -%}
 
 {#
+    Render email address with related actions block
+    Parameters:
+        email - EmailInterface object or string
+        entity - related entity record
+#}
+{%- macro renderEmailWithActions(email, entity) -%}
+    {% if email is not empty %}
+        {%- set actions %}
+            {%- placeholder email_actions with {email: email, entity: entity} -%}
+        {% endset -%}
+        {% set actions = actions|trim %}
+        <span class="contact-element{% if actions is empty %} contact-element-no-actions{% endif %}">
+            {{ _self.email_address_simple(email) }}
+            {% if actions is not empty -%}
+                <span class="contact-element-actions email-actions">{{ actions|raw }}</span>
+            {%- endif %}
+        </span>
+    {% endif %}
+{%- endmacro -%}
+
+{#
     Render the given email recipients
     Parameters:
         recipients - an array of Oro\Bundle\EmailBundle\Entity\EmailRecipients
