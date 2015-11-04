@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
@@ -22,6 +23,9 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
     /** @var ConfigProvider */
     protected $entityConfigProvider;
+
+    /** @var ConfigProvider */
+    protected $entityExtendProvider;
 
     /** @var FormatterManager */
     protected $formatterManager;
@@ -48,6 +52,14 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $this->entityConfigProvider = $entityConfigProvider;
         $this->doctrine             = $doctrine;
         $this->formatterManager     = $formatterManager;
+    }
+
+    /**
+     * @param ConfigProvider $entityExtendProvider
+     */
+    public function setEntityExtendProvider(ConfigProvider $entityExtendProvider)
+    {
+        $this->entityExtendProvider = $entityExtendProvider;
     }
 
     /**
@@ -89,6 +101,12 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $entityIds = $this->entityConfigProvider->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
+            if ($this->entityExtendProvider->hasConfig($className)) {
+                $extendConfig = $this->entityExtendProvider->getConfigById($entityId);
+                if ($extendConfig->get('state') !== ExtendScope::STATE_ACTIVE) {
+                    continue;
+                }
+            }
             $entityData = $this->getEntityVariableGetters($className);
             if (!empty($entityData)) {
                 $result[$className] = $entityData;
