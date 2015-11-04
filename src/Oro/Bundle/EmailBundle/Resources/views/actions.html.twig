@@ -150,8 +150,9 @@
         {% import 'OroUIBundle::macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(
-                'oro_email_context', {
-                    id: emailEntity.id
+                'oro_activity_context', {
+                    entityId:    emailEntity.id,
+                    entityClass: oro_class_name(emailEntity, true)
             }),
             'aCss': 'no-hash',
             'iCss': 'icon-link hide-text',

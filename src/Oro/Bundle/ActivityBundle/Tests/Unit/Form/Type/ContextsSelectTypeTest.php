@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
-use Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType;
+use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
@@ -88,7 +88,7 @@ class ContextsSelectTypeTest extends TypeTestCase
                 [
                     'tooltip' => false,
                     'configs' => [
-                        'placeholder'        => 'oro.email.contexts.placeholder',
+                        'placeholder'        => 'oro.activity.contexts.placeholder',
                         'allowClear'         => true,
                         'multiple'           => true,
                         'route_name'         => 'oro_api_get_search_autocomplete',
@@ -132,6 +132,6 @@ class ContextsSelectTypeTest extends TypeTestCase
             $this->mapper,
             $this->securityFacade
         );
-        $this->assertEquals('oro_email_contexts_select', $type->getName());
+        $this->assertEquals('oro_activity_contexts_select', $type->getName());
     }
 }

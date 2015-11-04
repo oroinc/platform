@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Form\Type;
+namespace Oro\Bundle\ActivityBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 
@@ -8,17 +8,18 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EmailBundle\Form\DataTransformer\ContextsToViewTransformer;
+use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextsSelectType extends AbstractType
 {
-    const NAME = 'oro_email_contexts_select';
+    const NAME = 'oro_activity_contexts_select';
 
     /**
      * @var EntityManager
@@ -89,23 +90,26 @@ class ContextsSelectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'tooltip' => false,
-                'configs' => [
-                    'placeholder'        => 'oro.email.contexts.placeholder',
-                    'allowClear'         => true,
-                    'multiple'           => true,
-                    'route_name'         => 'oro_api_get_search_autocomplete',
-                    'separator'          => ';',
-                    'forceSelectedData'  => true,
-                    'containerCssClass'  => 'taggable-email',
-                    'minimumInputLength' => 0,
-                ]
-            ]
-        );
+        $defaultConfigs = [
+            'placeholder'        => 'oro.activity.contexts.placeholder',
+            'allowClear'         => true,
+            'multiple'           => true,
+            'route_name'         => 'oro_api_get_search_autocomplete',
+            'separator'          => ';',
+            'forceSelectedData'  => true,
+            'minimumInputLength' => 0,
+        ];
+
+        $resolver->setDefaults([
+            'tooltip' => false,
+            'configs' => $defaultConfigs
+        ]);
+
+        $resolver->setNormalizer('configs', function (Options $options, $configs) use ($defaultConfigs) {
+            return array_replace_recursive($defaultConfigs, $configs);
+        });
     }
 
     /**

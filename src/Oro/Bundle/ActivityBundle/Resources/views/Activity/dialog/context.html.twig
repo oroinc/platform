@@ -1,6 +1,6 @@
 {#
     Available variables:
-    * entity       - Oro\Bundle\EmailBundle\Model\Email
+    * entity       - Oro\Bundle\ActivityBundle\Model\ActivityInterface
 #}
 
 {% block page_container %}
@@ -44,7 +44,7 @@
 
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_email_context_grid', {entityClass: firstContext.className, activityId: sourceEntity.id}),
+            'url': path('oro_activity_context_grid', {entityClass: firstContext.className, activityId: sourceEntity.id}),
             'alias': gridWidgetName,
         }) }}
     </div>

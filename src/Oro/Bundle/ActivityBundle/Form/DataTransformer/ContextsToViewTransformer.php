@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
+namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
