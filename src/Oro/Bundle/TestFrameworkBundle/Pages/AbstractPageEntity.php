@@ -42,7 +42,7 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function toGrid()
     {
-        $this->test->byXPath("//div[@class='customer-content pull-left']/div[1]//a")->click();
+        $this->test->byXPath("//div[@class='customer-content']/div[1]//a")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -291,6 +291,35 @@ abstract class AbstractPageEntity extends AbstractPage
             "//preceding-sibling::td/input"
         )->click();
 
+        return $this;
+    }
+
+
+    /**
+     * Method implement entity pagination switching
+     * Method can get 'Next', 'Previous', 'Last', 'First' as values
+     * @param string $value
+     * @return $this
+     */
+    public function switchEntityPagination($value)
+    {
+        $this->assertElementPresent("//div[@id='entity-pagination']", 'Pagination not available at entity view page');
+        switch ($value) {
+            case 'Next':
+                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-right hide-text']")->click();
+                break;
+            case 'Previous':
+                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-left hide-text']")->click();
+                break;
+            case 'Last':
+                $this->test->byXPath("//div[@class='pagination']//a[normalize-space()='Last']")->click();
+                break;
+            case 'First':
+                $this->test->byXPath("//div[@class='pagination']//a[normalize-space()='First']")->click();
+                break;
+        }
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 }
