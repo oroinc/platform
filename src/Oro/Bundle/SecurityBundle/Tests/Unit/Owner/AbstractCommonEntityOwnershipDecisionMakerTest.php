@@ -125,6 +125,8 @@ abstract class AbstractCommonEntityOwnershipDecisionMakerTest extends \PHPUnit_F
         $this->tree->addBusinessUnitRelation('bu41', 'bu4');
         $this->tree->addBusinessUnitRelation('bu411', 'bu41');
 
+        $this->tree->buildTree();
+
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
         $this->tree->addUser('user3', 'bu3');

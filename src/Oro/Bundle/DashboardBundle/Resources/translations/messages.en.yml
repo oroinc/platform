@@ -80,3 +80,12 @@ oro:
                 add.label: Add
                 add_all.label: Add all
                 delete.label: Delete column
+        form.choose_business_unit: Choose Business Unit
+
+        widget:
+            big_number:
+                choose_metrics: Choose Metrics
+                metricName: Metric name
+                no_changes: No changes
+                compare_to.label: Compare to
+                no_available_metrics: No available metrics

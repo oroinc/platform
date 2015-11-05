@@ -2,60 +2,51 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
-use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
-use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
-use Oro\Bundle\ConfigBundle\Form\Type\FormType;
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
-use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var GlobalScopeManager
-     */
-    protected $object;
+    /** @var GlobalScopeManager */
+    protected $manager;
 
-    /**
-     * @var ObjectManager
-     */
-    protected $om;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $em;
 
-    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
-    protected $ed;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $repo;
 
-    /**
-     * @var array
-     */
-    protected $loadedSettings = array(
-        'oro_user' => array(
-            'level'    => array(
-                'value' => 2000,
-                'type'  => 'scalar',
-            )
-        ),
-    );
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $cache;
 
     protected function setUp()
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
-        }
+        $this->em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->repo = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with('Oro\Bundle\ConfigBundle\Entity\Config')
+            ->willReturn($this->repo);
 
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $this->object = new GlobalScopeManager($this->om);
+        $doctrine    = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->cache = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->disableOriginalConstructor()
+            ->setMethods(['fetch', 'save'])
+            ->getMockForAbstractClass();
+
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with('Oro\Bundle\ConfigBundle\Entity\Config')
+            ->willReturn($this->em);
+
+        $this->manager = new GlobalScopeManager($doctrine, $this->cache);
     }
 
     /**
@@ -63,31 +54,48 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLoaded()
     {
-        $loadedSettings = $this->loadedSettings;
+        $config       = new Config();
+        $configValue1 = new ConfigValue();
+        $configValue1
+            ->setSection('oro_user')
+            ->setName('level')
+            ->setValue(2000)
+            ->setType('scalar');
+        $config->getValues()->add($configValue1);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->once())
-            ->method('loadSettings')
+        $this->repo->expects($this->once())
+            ->method('findByEntity')
             ->with('app', 0)
-            ->will($this->returnValue($loadedSettings));
+            ->will($this->returnValue($config));
 
-        $this->om
-            ->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
-
-        $object = $this->object;
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('app_0')
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                'app_0',
+                [
+                    'oro_user' => [
+                        'level' => [
+                            'value'                  => $configValue1->getValue(),
+                            'use_parent_scope_value' => false,
+                            'createdAt'              => null,
+                            'updatedAt'              => null
+                        ]
+                    ]
+                ]
+            );
 
         $this->assertEquals(
-            $this->loadedSettings['oro_user']['level']['value'],
-            $object->getSettingValue('oro_user.level')
+            $configValue1->getValue(),
+            $this->manager->getSettingValue('oro_user.level')
         );
 
-        $this->assertNull($object->getSettingValue('oro_user.greeting'));
-        $this->assertNull($object->getSettingValue('oro_test.nosetting'));
-        $this->assertNull($object->getSettingValue('noservice.nosetting'));
+        $this->assertNull($this->manager->getSettingValue('oro_user.greeting'));
+        $this->assertNull($this->manager->getSettingValue('oro_test.nosetting'));
+        $this->assertNull($this->manager->getSettingValue('noservice.nosetting'));
     }
 
     /**
@@ -96,36 +104,50 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetInfoLoaded()
     {
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
-        $loadedSettings = array(
-            'oro_user' => array(
-                'level'    => array(
-                    'value' => 2000,
-                    'type'  => 'scalar',
-                    'createdAt' => $datetime,
-                    'updatedAt' => $datetime,
-                )
-            ),
-        );
 
-        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config       = new Config();
+        $configValue1 = new ConfigValue();
+        $configValue1
+            ->setSection('oro_user')
+            ->setName('level')
+            ->setValue(2000)
+            ->setType('scalar')
+            ->setUpdatedAt($datetime);
+        $class = new \ReflectionClass($configValue1);
+        $prop  = $class->getProperty('createdAt');
+        $prop->setAccessible(true);
+        $prop->setValue($configValue1, $datetime);
+        $config->getValues()->add($configValue1);
 
-        $repository->expects($this->once())
-            ->method('loadSettings')
+        $this->repo->expects($this->once())
+            ->method('findByEntity')
             ->with('app', 0)
-            ->will($this->returnValue($loadedSettings));
+            ->will($this->returnValue($config));
 
-        $this->om
-            ->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
+        $this->cache->expects($this->once())
+            ->method('fetch')
+            ->with('app_0')
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                'app_0',
+                [
+                    'oro_user' => [
+                        'level' => [
+                            'value'                  => $configValue1->getValue(),
+                            'use_parent_scope_value' => false,
+                            'createdAt'              => $datetime,
+                            'updatedAt'              => $datetime
+                        ]
+                    ]
+                ]
+            );
 
-        $object = $this->object;
-        list($created, $updated, $isNullValue) = $object->getInfo('oro_user.level');
+        list($created, $updated, $isNullValue) = $this->manager->getInfo('oro_user.level');
 
-        $this->assertEquals($loadedSettings['oro_user']['level']['createdAt'], $created);
-        $this->assertEquals($loadedSettings['oro_user']['level']['updatedAt'], $updated);
+        $this->assertEquals($configValue1->getCreatedAt(), $created);
+        $this->assertEquals($configValue1->getUpdatedAt(), $updated);
         $this->assertFalse($isNullValue);
     }
 
@@ -134,145 +156,85 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSave()
     {
-        $settings = array(
-            'oro_user___level' => array(
-                'value' => 50,
-            ),
-        );
+        $config       = new Config();
+        $configValue1 = new ConfigValue();
+        $configValue1
+            ->setSection('oro_user')
+            ->setName('update')
+            ->setValue('old value')
+            ->setType('scalar');
+        $configValue2 = new ConfigValue();
+        $configValue2
+            ->setSection('oro_user')
+            ->setName('remove')
+            ->setValue('test')
+            ->setType('scalar');
+        $config->getValues()->add($configValue1);
+        $config->getValues()->add($configValue2);
 
-        $removed = array(
-            'oro_user___greeting' => array(
-                'oro_user', 'greeting',
-            ),
-        );
+        $settings = [
+            'oro_user.update' => [
+                'value'                  => 'updated value',
+                'use_parent_scope_value' => false
+            ],
+            'oro_user.remove' => [
+                'use_parent_scope_value' => true
+            ],
+            'oro_user.add'    => [
+                'value'                  => 'new value',
+                'use_parent_scope_value' => false
+            ],
+        ];
 
-        $object = $this->getMock(
-            'Oro\Bundle\ConfigBundle\Config\GlobalScopeManager',
-            array('calculateChangeSet', 'getSettingValue'),
-            array($this->om)
-        );
-
-        $changes = array(
-            $settings, $removed
-        );
-
-        $object->expects($this->once())
-            ->method('calculateChangeSet')
-            ->with($this->equalTo($settings))
-            ->will($this->returnValue($changes));
-
-        $configMock = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
-        $configMock->expects($this->once())
-            ->method('getOrCreateValue')
-            ->will($this->returnValue(new ConfigValue()));
-        $configMock->expects($this->once())
-            ->method('getValues')
-            ->will($this->returnValue(new ArrayCollection()));
-
-        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->once())
-            ->method('getByEntity')
+        $this->repo->expects($this->once())
+            ->method('findByEntity')
             ->with('app', 0)
-            ->will($this->returnValue($configMock));
+            ->will($this->returnValue($config));
 
-        $this->om
-            ->expects($this->at(0))
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with(
+                'app_0',
+                [
+                    'oro_user' => [
+                        'update' => [
+                            'value'                  => 'updated value',
+                            'use_parent_scope_value' => false,
+                            'createdAt'              => null,
+                            'updatedAt'              => null
+                        ],
+                        'add'    => [
+                            'value'                  => 'new value',
+                            'use_parent_scope_value' => false,
+                            'createdAt'              => null,
+                            'updatedAt'              => null
+                        ],
+                    ]
+                ]
+            );
 
-        $this->om
-            ->expects($this->at(1))
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
-
-        $this->om
-            ->expects($this->once())
-            ->method('persist');
-        $this->om
-            ->expects($this->once())
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($config));
+        $this->em->expects($this->once())
             ->method('flush');
 
-        $object->save($settings);
-    }
-
-    /**
-     * Test getChanged
-     */
-    public function testGetChanged()
-    {
-        $settings = array(
-            'oro_user___level' => array(
-                'value' => 50,
-            ),
+        $result = $this->manager->save($settings);
+        $this->assertEquals(
+            [
+                [
+                    'oro_user.update' => 'updated value',
+                    'oro_user.add'    => 'new value'
+                ],
+                [
+                    'oro_user.remove'
+                ]
+            ],
+            $result
         );
 
-        $object = $this->getMock(
-            'Oro\Bundle\ConfigBundle\Config\GlobalScopeManager',
-            array('getSettingValue'),
-            array($this->om)
-        );
-
-        $currentValue = array(
-            'value' => 20,
-            'use_parent_scope_value' => false,
-        );
-        $object->expects($this->once())
-            ->method('getSettingValue')
-            ->with('oro_user.level')
-            ->will($this->returnValue($currentValue));
-
-        $object->calculateChangeSet($settings);
-    }
-
-    /**
-     * @param string $configPath
-     *
-     * @return SystemConfigurationFormProvider
-     */
-    protected function getProviderWithConfigLoaded($configPath)
-    {
-        $config = Yaml::parse(file_get_contents($configPath));
-
-        $processor = new ProcessorDecorator(
-            new Processor(),
-            ['some_field', 'some_another_field', 'some_ui_only_field', 'some_api_only_field']
-        );
-        $config = $processor->process($config);
-
-        $subscriber    = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
-            ->setMethods(array('__construct'))
-            ->disableOriginalConstructor()->getMock();
-
-        $formType       = new FormType($subscriber);
-        $formFieldType  = new FormFieldType();
-        $useParentScope = new ParentScopeCheckbox();
-
-        $extensions = array(
-            new PreloadedExtension(
-                array(
-                    $formType->getName()       => $formType,
-                    $formFieldType->getName()  => $formFieldType,
-                    $useParentScope->getName() => $useParentScope
-                ),
-                array()
-            ),
-        );
-
-        $factory = Forms::createFormFactoryBuilder()
-            ->addExtensions($extensions)
-            ->addTypeExtension(
-                new DataBlockExtension()
-            )
-            ->getFormFactory();
-
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-                    ->disableOriginalConstructor()->getMock();
-
-        $provider = new SystemConfigurationFormProvider($config, $factory, $securityFacade);
-
-        return $provider;
+        $this->assertEquals('updated value', $this->manager->getSettingValue('oro_user.update'));
+        $this->assertNull($this->manager->getSettingValue('oro_user.remove'));
+        $this->assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
     }
 }

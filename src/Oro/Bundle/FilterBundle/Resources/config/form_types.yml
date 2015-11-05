@@ -8,6 +8,7 @@ parameters:
     oro_filter.form.type.filter.choice.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType
     oro_filter.form.type.filter.text.class: Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType
     oro_filter.form.type.filter.number.class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType
+    oro_filter.form.type.filter.number_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType
     oro_filter.form.type.filter.date_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType
     oro_filter.form.type.filter.datetime_range.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType
     oro_filter.form.type.filter.boolean.class: Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType
@@ -15,6 +16,7 @@ parameters:
     oro_filter.form.type.filter.selectrow.class: Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType
     oro_filter.form.type.filter.many_to_many.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType
     oro_filter.form.type.filter.dictionary.class: Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType
+    oro_filter.form.type.filter.choice_tree.class: Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType
 
 services:
     oro_filter.form.event_subscriber.date:
@@ -57,6 +59,12 @@ services:
         arguments: ["@translator"]
         tags:
             - { name: form.type, alias: oro_type_number_filter }
+
+    oro_filter.form.type.filter.number_range:
+        class: %oro_filter.form.type.filter.number_range.class%
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_number_range_filter }
 
     oro_filter.form.type.filter.date_range:
         class: %oro_filter.form.type.filter.date_range.class%
@@ -106,3 +114,8 @@ services:
         tags:
             - { name: form.type, alias: oro_type_dictionary_filter }
 
+    oro_filter.form.type.filter.choice_tree:
+        class: %oro_filter.form.type.filter.choice_tree.class%
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_choice_tree_filter }

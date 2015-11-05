@@ -38,6 +38,9 @@ class EntityAliasResolver implements WarmableInterface
     /** @var string */
     private $duplicateAliasHelpMessage;
 
+    /** @var bool */
+    private $allAliasesLoaded = false;
+
     /**
      * @param ManagerRegistry $doctrine
      * @param bool            $debug
@@ -284,33 +287,18 @@ class EntityAliasResolver implements WarmableInterface
      */
     protected function ensureAllAliasesLoaded()
     {
-        foreach ($this->getAllEntityClasses() as $entityClass) {
-            if (!isset($this->aliases[$entityClass])) {
-                $this->findEntityAlias($entityClass);
+        if ($this->allAliasesLoaded) {
+            return;
+        }
+
+        /** @var ClassMetadata[] $allMetadata */
+        $allMetadata = $this->doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        foreach ($allMetadata as $metadata) {
+            if (!$metadata->isMappedSuperclass && !isset($this->aliases[$metadata->name])) {
+                $this->findEntityAlias($metadata->name);
             }
         }
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getAllEntityClasses()
-    {
-        $metadataFactory = $this->doctrine->getManager()->getMetadataFactory();
-
-        $metadata = array_filter(
-            $metadataFactory->getAllMetadata(),
-            function (ClassMetadata $metadata) use ($metadataFactory) {
-                return !$metadata->isMappedSuperclass;
-            }
-        );
-
-        return array_map(
-            function (ClassMetadata $metadata) {
-                return $metadata->name;
-            },
-            $metadata
-        );
+        $this->allAliasesLoaded = true;
     }
 
     /**

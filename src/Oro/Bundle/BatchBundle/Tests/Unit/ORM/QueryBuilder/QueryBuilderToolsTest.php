@@ -8,11 +8,20 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
 {
     public function testPrepareFieldAliases()
     {
+        $subSelectExpression = '(SELECT sub_select_alias.id as subselect_id, sub_select_alias.name' .
+            ' as subselect_name FROM FAKE\ENTITY as sub_select_alias)';
+        $subSelectAlias = 'subSelectAlias';
+
         $selects = array(
             $this->getSelectMock(array('e.id', 'e.name')),
             $this->getSelectMock(array('e.data as eData')),
             $this->getSelectMock(array('someTable.field aS alias')),
             $this->getSelectMock(array('someTable.field2 AS alias2')),
+            $this->getSelectMock(
+                array(
+                    "$subSelectExpression AS $subSelectAlias"
+                )
+            ),
         );
 
         $tools = new QueryBuilderTools($selects);
@@ -20,9 +29,11 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
             'eData' => 'e.data',
             'alias' => 'someTable.field',
             'alias2' => 'someTable.field2',
+            $subSelectAlias => $subSelectExpression
         );
         $this->assertEquals($expected, $tools->getFieldAliases());
         $this->assertEquals('e.data', $tools->getFieldByAlias('eData'));
+        $this->assertEquals($subSelectExpression, $tools->getFieldByAlias($subSelectAlias));
         $this->assertNull($tools->getFieldByAlias('unknown'));
 
         $tools->resetFieldAliases();

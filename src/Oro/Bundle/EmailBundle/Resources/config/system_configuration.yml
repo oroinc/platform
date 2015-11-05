@@ -28,6 +28,10 @@ oro_system_configuration:
             title: oro.email.system_configuration.mailbox_configuration.label
             priority: -10
 
+        user_bar_settings:
+            title: oro.user.user_bar_settings.title
+            priority: 100
+
     fields:
         oro_email.minimum_input_length:
             data_type: integer
@@ -71,6 +75,13 @@ oro_system_configuration:
                 label: false
                 required: false
                 resettable: false
+        oro_email.show_recent_emails_in_user_bar:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 100
+            options:
+                label: oro.email.system_configuration.show_recent_emails_in_user_bar.label
+                required: true
 
     tree:
         system_configuration:
@@ -78,6 +89,11 @@ oro_system_configuration:
                 children:
                     general_setup:
                         children:
+                            look_and_feel:
+                                children:
+                                    user_bar_settings:
+                                        children:
+                                            - oro_email.show_recent_emails_in_user_bar
                             email_configuration:
                                 children:
                                     email_autocomplete_configuration:

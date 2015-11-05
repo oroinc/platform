@@ -9,6 +9,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OrmLogger
 {
     /** @var array */
@@ -26,8 +29,14 @@ class OrmLogger
     /** @var float */
     protected $statsTime = 0;
 
+    /** @var integer */
+    protected $hydrationStack = 0;
+
     /** @var array */
-    protected $startStack = [];
+    protected $operationStack = [];
+
+    /** @var array */
+    protected $metadataStack = [];
 
     /** @var Stopwatch|null */
     protected $stopwatch;
@@ -70,7 +79,19 @@ class OrmLogger
      */
     public function getStats()
     {
-        foreach (['persist', 'detach', 'merge', 'remove', 'refresh', 'flush'] as $name) {
+        $names = [
+            'metadata',
+            'getAllMetadata',
+            'getMetadataFor',
+            'isTransient',
+            'persist',
+            'detach',
+            'merge',
+            'remove',
+            'refresh',
+            'flush'
+        ];
+        foreach ($names as $name) {
             if (!isset($this->stats[$name])) {
                 $this->stats[$name] = ['count' => 0, 'time' => 0];
             }
@@ -102,6 +123,7 @@ class OrmLogger
         if ($this->stopwatch) {
             $this->stopwatch->start('doctrine.orm.hydrations', 'doctrine');
         }
+        $this->hydrationStack++;
     }
 
     /**
@@ -118,6 +140,7 @@ class OrmLogger
         if ($this->stopwatch) {
             $this->stopwatch->stop('doctrine.orm.hydrations');
         }
+        $this->hydrationStack--;
     }
 
     /**
@@ -217,13 +240,61 @@ class OrmLogger
     }
 
     /**
+     * Marks ClassMetadataFactory::getAllMetadata method as started
+     */
+    public function startGetAllMetadata()
+    {
+        $this->startMetadata('getAllMetadata');
+    }
+
+    /**
+     * Marks ClassMetadataFactory::getAllMetadata method as stopped
+     */
+    public function stopGetAllMetadata()
+    {
+        $this->stopMetadata('getAllMetadata');
+    }
+
+    /**
+     * Marks ClassMetadataFactory::getMetadataFor method as started
+     */
+    public function startGetMetadataFor()
+    {
+        $this->startMetadata('getMetadataFor');
+    }
+
+    /**
+     * Marks ClassMetadataFactory::getMetadataFor method as stopped
+     */
+    public function stopGetMetadataFor()
+    {
+        $this->stopMetadata('getMetadataFor');
+    }
+
+    /**
+     * Marks ClassMetadataFactory::isTransient method as started
+     */
+    public function startIsTransient()
+    {
+        $this->startMetadata('isTransient');
+    }
+
+    /**
+     * Marks ClassMetadataFactory::isTransient method as stopped
+     */
+    public function stopIsTransient()
+    {
+        $this->stopMetadata('isTransient');
+    }
+
+    /**
      * @param string $name
      */
     protected function startOperation($name)
     {
-        $startStopwatch = $this->stopwatch && !$this->hasNestedOperations();
+        $startStopwatch = $this->stopwatch && empty($this->operationStack);
 
-        $this->startStack[$name][] = microtime(true);
+        $this->operationStack[$name][] = microtime(true);
         if ($startStopwatch) {
             $this->stopwatch->start('doctrine.orm.operations', 'doctrine');
         }
@@ -234,17 +305,18 @@ class OrmLogger
      */
     protected function stopOperation($name)
     {
-        $time = microtime(true) - array_pop($this->startStack[$name]);
+        $time = microtime(true) - array_pop($this->operationStack[$name]);
         if (isset($this->stats[$name])) {
             $this->stats[$name]['count'] += 1;
         } else {
             $this->stats[$name] = ['count' => 1, 'time' => 0];
         }
         // add to an execution time only if there are no nested operations
-        if (empty($this->startStack[$name])) {
+        if (empty($this->operationStack[$name])) {
+            unset($this->operationStack[$name]);
             $this->stats[$name]['time'] += $time;
             // add to a total execution time only if there are no nested operations of any type
-            if (!$this->hasNestedOperations()) {
+            if (empty($this->operationStack)) {
                 $this->statsTime += $time;
                 if ($this->stopwatch) {
                     $this->stopwatch->stop('doctrine.orm.operations');
@@ -254,16 +326,48 @@ class OrmLogger
     }
 
     /**
-     * @return bool
+     * @param string $name
      */
-    protected function hasNestedOperations()
+    protected function startMetadata($name)
     {
-        foreach ($this->startStack as $startStack) {
-            if (!empty($startStack)) {
-                return true;
+        $startStopwatch = $this->stopwatch && empty($this->metadataStack);
+
+        $this->metadataStack[$name][] = microtime(true);
+        if ($startStopwatch) {
+            $this->stopwatch->start('doctrine.orm.metadata', 'doctrine');
+        }
+    }
+
+    /**
+     * @param string $name
+     */
+    protected function stopMetadata($name)
+    {
+        $time = microtime(true) - array_pop($this->metadataStack[$name]);
+        if (isset($this->stats[$name])) {
+            $this->stats[$name]['count'] += 1;
+        } else {
+            $this->stats[$name] = ['count' => 1, 'time' => 0];
+        }
+        if (isset($this->stats['metadata'])) {
+            $this->stats['metadata']['count'] += 1;
+        } else {
+            $this->stats['metadata'] = ['count' => 1, 'time' => 0];
+        }
+        // add to an execution time only if there are no nested metadata related methods
+        if (empty($this->metadataStack[$name])) {
+            unset($this->metadataStack[$name]);
+            $this->stats[$name]['time'] += $time;
+            // add to a total execution time only if it is standalone metadata related method call
+            if (empty($this->metadataStack)) {
+                $this->stats['metadata']['time'] += $time;
+                if (0 === $this->hydrationStack && empty($this->operationStack)) {
+                    $this->statsTime += $time;
+                }
+                if ($this->stopwatch) {
+                    $this->stopwatch->stop('doctrine.orm.metadata');
+                }
             }
         }
-
-        return false;
     }
 }

@@ -42,6 +42,16 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
         if (!is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array');
         }
+        // The filtration fixes transformation from empty string to array with empty string.
+        // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
+        // Example: explode(',', '') => array(0=>'').
+        // @todo remove after vendor fixation
+        $value = array_filter(
+            $value,
+            function ($val) {
+                return $val !== '';
+            }
+        );
 
         if (!$value) {
             return array();

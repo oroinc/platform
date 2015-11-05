@@ -4,6 +4,8 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -12,9 +14,16 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    /**
+     * @var Registry
+     */
+    protected $registry;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->registry = $this->getContainer()->get('doctrine');
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
     public function testIndex()
@@ -156,21 +165,63 @@ class ControllersTest extends WebTestCase
         $this->assertEquals('1999-01-01', $form['oro_user_user_form[birthday]']->getValue());
     }
 
-    public function testAutoCompleteTwoPart()
+    /**
+     * @dataProvider autoCompleteHandlerProvider
+     * @param boolean $active
+     * @param string $handlerName
+     */
+    public function testAutoCompleteHandler($active, $handlerName, $query)
     {
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user']);
+        $user->setEnabled($active);
+        $this->registry->getManager()->flush();
+
         $this->client->request(
             'GET',
             $this->getUrl('oro_form_autocomplete_search'),
             array(
                 'page' => 1,
                 'per_page' => 10,
-                'name' => 'acl_users',
-                'query' => 'John Doe;Oro_Bundle_UserBundle_Entity_User;CREATE;0;',
+                'name' => $handlerName,
+                'query' => $query,
             )
         );
 
         $result = $this->client->getResponse();
         $arr = $this->getJsonResponseContent($result, 200);
-        $this->assertCount(1, $arr['results']);
+        $this->assertCount((int)$active, $arr['results']);
+    }
+
+    /**
+     * @return array
+     */
+    public function autoCompleteHandlerProvider()
+    {
+        return array(
+                'Acl user autocomplete handler active' =>
+                array(
+                    'active' => true,
+                    'handler' => 'acl_users',
+                    'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                ),
+                'Acl user autocomplete handler inactive' =>
+                array(
+                    'active' => false,
+                    'handler' => 'acl_users',
+                    'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
+                ),
+                'Organization user autocomplete handler active' =>
+                array(
+                    'active' => true,
+                    'handler' => 'organization_users',
+                    'query' => 'Elley Towards'
+                ),
+                'Organization user autocomplete handler inactive' =>
+                array(
+                    'active' => false,
+                    'handler' => 'organization_users',
+                    'query' => 'Elley Towards'
+                ),
+        );
     }
 }

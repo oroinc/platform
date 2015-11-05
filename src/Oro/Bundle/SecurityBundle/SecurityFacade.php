@@ -6,12 +6,14 @@ use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Provider\ShareProvider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
@@ -34,6 +36,9 @@ class SecurityFacade
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var ShareProvider */
+    protected $shareProvider;
+
     /**
      * Constructor
      *
@@ -42,19 +47,22 @@ class SecurityFacade
      * @param ObjectIdentityFactory    $objectIdentityFactory
      * @param EntityClassResolver      $classResolver
      * @param LoggerInterface          $logger
+     * @param ShareProvider            $shareProvider
      */
     public function __construct(
         SecurityContextInterface $securityContext,
         AclAnnotationProvider $annotationProvider,
         ObjectIdentityFactory $objectIdentityFactory,
         EntityClassResolver $classResolver,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ShareProvider $shareProvider
     ) {
         $this->securityContext       = $securityContext;
         $this->annotationProvider    = $annotationProvider;
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->entityClassResolver   = $classResolver;
         $this->logger                = $logger;
+        $this->shareProvider         = $shareProvider;
     }
 
     /**
@@ -287,5 +295,52 @@ class SecurityFacade
         }
 
         return 0;
+    }
+
+    /**
+     * Determines if object is shared with logged user.
+     *
+     * @param $object
+     *
+     * @return bool
+     */
+    public function isObjectSharedWithUser($object)
+    {
+        return $this->shareProvider->isObjectSharedWithUser($object, $this->getToken());
+    }
+
+    /**
+     * Determines if object is shared with given user exactly. If no UserInterface entity is passed
+     * then user will be taken from current context.
+     *
+     * @param $object
+     * @param UserInterface|null $user
+     *
+     * @return bool
+     */
+    public function isObjectSharedWithUserSid($object, UserInterface $user = null)
+    {
+        if (!$user) {
+            $user = $this->getLoggedUser();
+        }
+
+        return $this->shareProvider->isObjectSharedWithUserSid($object, $user);
+    }
+
+    /**
+     * Determines if user has shared entity records exactly by UserSecurityIdentity.
+     * If no UserInterface entity is passed then user will be taken from current context.
+     *
+     * @param UserInterface|null $user
+     *
+     * @return bool
+     */
+    public function hasUserSidSharedRecords(UserInterface $user = null)
+    {
+        if (!$user) {
+            $user = $this->getLoggedUser();
+        }
+
+        return $this->shareProvider->hasUserSidSharedRecords($user);
     }
 }

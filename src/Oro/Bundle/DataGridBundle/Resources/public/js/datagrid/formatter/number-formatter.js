@@ -1,5 +1,5 @@
-define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
-    ], function(_, CellFormatter, formatter) {
+define(['underscore', 'orotranslation/js/translator', './cell-formatter', 'orolocale/js/formatter/number'
+    ], function(_, __, CellFormatter, formatter) {
     'use strict';
 
     function getFormatter(style) {
@@ -33,11 +33,13 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
          * @inheritDoc
          */
         fromRaw: function(rawData) {
-            var formattedData = '';
-            if (rawData !== null && rawData !== '') {
-                formattedData = this.formatter.call(this, rawData);
+            if (rawData === void 0 || rawData === null || rawData === '') {
+                return '';
             }
-            return formattedData;
+            if (isNaN(rawData)) {
+                return __('oro.datagrid.not_number');
+            }
+            return this.formatter.call(this, rawData);
         },
 
         /**

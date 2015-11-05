@@ -12,7 +12,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
@@ -28,6 +27,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -38,8 +38,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class OwnerFormExtension extends AbstractTypeExtension
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
@@ -78,7 +78,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected $entityOwnerAccessor;
 
     /**
-     * @param ManagerRegistry           $managerRegistry
+     * @param DoctrineHelper            $doctrineHelper
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
      * @param BusinessUnitManager       $businessUnitManager
      * @param SecurityFacade            $securityFacade
@@ -87,7 +87,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param EntityOwnerAccessor       $entityOwnerAccessor
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
+        DoctrineHelper $doctrineHelper,
         OwnershipMetadataProvider $ownershipMetadataProvider,
         BusinessUnitManager $businessUnitManager,
         SecurityFacade $securityFacade,
@@ -95,7 +95,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         OwnerTreeProvider $treeProvider,
         EntityOwnerAccessor $entityOwnerAccessor
     ) {
-        $this->managerRegistry           = $managerRegistry;
+        $this->doctrineHelper            = $doctrineHelper;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
         $this->businessUnitManager       = $businessUnitManager;
         $this->securityFacade            = $securityFacade;
@@ -176,7 +176,7 @@ class OwnerFormExtension extends AbstractTypeExtension
          */
         $builder->addEventSubscriber(
             new OwnerFormSubscriber(
-                $this->managerRegistry,
+                $this->doctrineHelper,
                 $this->fieldName,
                 $this->fieldLabel,
                 $this->isAssignGranted,
@@ -536,17 +536,17 @@ class OwnerFormExtension extends AbstractTypeExtension
     protected function getMetadata($entity)
     {
         if (is_object($entity)) {
-            $dataClassName = ClassUtils::getClass($entity);
-        } else {
-            $dataClassName = $entity;
+            $entity = ClassUtils::getClass($entity);
         }
-        $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
-
-        if ($metadata->hasOwner()) {
-            return $metadata;
-        } else {
+        if (!$this->doctrineHelper->isManageableEntity($entity)) {
             return false;
         }
+
+        $metadata = $this->ownershipMetadataProvider->getMetadata($entity);
+
+        return $metadata->hasOwner()
+            ? $metadata
+            : false;
     }
 
     /**

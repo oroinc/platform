@@ -6,6 +6,7 @@ define(function(require) {
     var routing = require('routing');
     var _ = require('underscore');
     var $ = require('jquery');
+    var mediator = require('oroui/js/mediator');
 
     SecurityAccessLevelsComponent = BaseComponent.extend({
         element: null,
@@ -45,8 +46,8 @@ define(function(require) {
                 var selectDiv = parentDiv.find(self.options.selectDivSelector);
                 var linkDiv = parentDiv.find(self.options.linkDivSelector);
                 link.hide();
-                var oid = parentDiv.attr(self.options.objectIdentityAttribute);
-                oid = oid.replace(/\\/g, '_');
+                var originOid = parentDiv.attr(self.options.objectIdentityAttribute);
+                var oid = originOid.replace(/\\/g, '_');
                 $.ajax({
                     url: routing.generate(self.options.accessLevelRoute, {oid: oid}),
                     success: function(data) {
@@ -62,6 +63,13 @@ define(function(require) {
                         selectDiv.show();
                         linkDiv.remove();
                         selector.uniform('update');
+                        selector.on('change', function(e) {
+                            mediator.trigger('securityAccessLevelsComponent:link:click', {
+                                accessLevel: $(e.target).val(),
+                                identityId: originOid,
+                                permissionName: parentDiv.next().val()
+                            });
+                        });
                     },
                     error: function() {
                         link.show();

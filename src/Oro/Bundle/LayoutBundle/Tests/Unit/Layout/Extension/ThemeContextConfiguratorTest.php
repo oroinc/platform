@@ -42,20 +42,6 @@ class ThemeContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('testTheme', $context->get('theme'));
     }
 
-    public function testConfigureContextWithThemeInQueryString()
-    {
-        $context = new LayoutContext();
-
-        $request = Request::create('');
-        $request->query->set('_theme', 'testTheme');
-
-        $this->contextConfigurator->setRequest($request);
-        $this->contextConfigurator->configureContext($context);
-
-        $context->resolve();
-        $this->assertSame('testTheme', $context->get('theme'));
-    }
-
     public function testConfigureContextWithRequestAndDataSetInContext()
     {
         $context = new LayoutContext();

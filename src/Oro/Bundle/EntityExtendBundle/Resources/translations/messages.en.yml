@@ -39,7 +39,6 @@ oro:
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many
-                optionSet:          Option Set (deprecated)
                 enum:               Select
                 multiEnum:          Multi-Select
 
@@ -112,8 +111,6 @@ oro:
                         length: "Length"
                         precision: "Precision"
                         scale: "Scale"
-                        set_expanded: "Expanded"
-                        set_options: "Options"
                         is_deleted: "Deleted"
 
             search:
