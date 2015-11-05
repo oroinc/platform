@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Grid;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -53,7 +55,6 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
 
         $fields = [];
-        $priorities = [];
         $fieldIds = $entityConfigProvider->getIds($entityClassName);
         /** @var FieldConfigId $fieldId */
         foreach ($fieldIds as $fieldId) {
@@ -63,16 +64,22 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
                 && !$extendConfig->is('state', ExtendScope::STATE_NEW)
                 && !$extendConfig->is('is_deleted')
             ) {
-                $fields[] = $fieldId;
-
                 $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
-                $priorities[] = $viewConfig->get('priority', false, 0);
+                $fields[] = [
+                    'id'       => $fieldId,
+                    'priority' => $viewConfig->get('priority', false, 0)
+                ];
             }
         }
 
-        array_multisort($priorities, SORT_DESC, $fields);
+        ArrayUtil::sortBy($fields, true);
 
-        return $fields;
+        return array_map(
+            function ($field) {
+                return $field['id'];
+            },
+            $fields
+        );
     }
 
     /**
