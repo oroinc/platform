@@ -67,6 +67,19 @@ UPGRADE FROM 1.8 to 1.9
  - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
  - Added new process definition option `pre_conditions`
  - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
+ - Route `oro_workflow_api_rest_process_activate` marked as deprecated. Use the route `oro_api_process_activate` instead.
+ - Route `oro_workflow_api_rest_process_deactivate` marked as deprecated. Use the route `oro_api_process_deactivate` instead.
+ - Route `oro_workflow_api_rest_workflowdefinition_get` marked as deprecated. Use the route `oro_api_workflow_definition_get` instead.
+ - Route `oro_workflow_api_rest_workflowdefinition_post` marked as deprecated. Use the route `oro_api_workflow_definition_post` instead.
+ - Route `oro_workflow_api_rest_workflowdefinition_put` marked as deprecated. Use the route `oro_api_workflow_definition_put` instead.
+ - Route `oro_workflow_api_rest_workflowdefinition_delete` marked as deprecated. Use the route `oro_api_workflow_definition_delete` instead.
+ - Route `oro_workflow_api_rest_entity_get` marked as deprecated. Use the route `oro_api_workflow_entity_get` instead.
+ - Route `oro_workflow_api_rest_workflow_get` marked as deprecated. Use the route `oro_api_workflow_get` instead.
+ - Route `oro_workflow_api_rest_workflow_delete` marked as deprecated. Use the route `oro_api_workflow_delete` instead.
+ - Route `oro_workflow_api_rest_workflow_activate` marked as deprecated. Use the route `oro_api_workflow_activate` instead.
+ - Route `oro_workflow_api_rest_workflow_deactivate` marked as deprecated. Use the route `oro_api_workflow_deactivate` instead.
+ - Route `oro_workflow_api_rest_workflow_start` marked as deprecated. Use the route `oro_api_workflow_start` instead.
+ - Route `oro_workflow_api_rest_workflow_transit` marked as deprecated. Use the route `oro_api_workflow_transit` instead.
 
 ####EmailBundle
  - Method `setFolder` of `Oro\Bundle\EmailBundle\Entity\EmailUser` marked as deprecated. Use the method `addFolder` instead.
