@@ -114,7 +114,6 @@ class ContextsToViewTransformer implements DataTransformerInterface
         foreach ($targets as $target) {
             $target = json_decode($target, true);
             if (array_key_exists('entityClass', $target) === true && array_key_exists('entityId', $target)) {
-
                 if (!isset($filters[$target['entityClass']])) {
                     $filters[$target['entityClass']] = [];
                 }
