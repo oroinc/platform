@@ -113,7 +113,6 @@ class SyncCommand extends AbstractSyncCronCommand
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
         $blockedJobsManager = $this->getService('oro_integration.manager.blocking_job');
 
-
         if ($this->isJobRunning($integrationId)) {
             $logger->warning('Job already running. Terminating....');
             return self::STATUS_SUCCESS;
