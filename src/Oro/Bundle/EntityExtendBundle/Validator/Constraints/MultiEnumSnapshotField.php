@@ -4,20 +4,20 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class UniqueExtendEntityField extends Constraint
+class MultiEnumSnapshotField extends Constraint
 {
     /** @var string */
-    public $sameFieldMessage = 'A field with this name is already exist.';
+    public $duplicateSnapshotMessage = 'This field name is duplicated snapshot of multi-select.';
 
     /** @var string */
-    public $similarFieldMessage = 'This name conflicts with existing \'{{ field }}\' field.';
+    public $duplicateFieldMessage = 'This multi-select name is duplicated a field.';
 
     /**
      * {@inheritdoc}
      */
     public function validatedBy()
     {
-        return UniqueExtendEntityFieldValidator::ALIAS;
+        return MultiEnumSnapshotFieldValidator::ALIAS;
     }
 
     /**

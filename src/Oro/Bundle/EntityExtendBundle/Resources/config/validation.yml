@@ -5,8 +5,9 @@ namespaces:
 Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     group_sequence: [FieldConfigModel, fieldName]
     constraints:
-        - oro_entity_extend:UniqueExtendEntityField:
-            groups: [fieldName]
+        - oro_entity_extend:UniqueExtendEntityField: {groups: fieldName}
+        - oro_entity_extend:DefaultRelationField: {groups: fieldName}
+        - oro_entity_extend:MultiEnumSnapshotField: {groups: fieldName}
     properties:
         fieldName:
             - NotBlank: ~

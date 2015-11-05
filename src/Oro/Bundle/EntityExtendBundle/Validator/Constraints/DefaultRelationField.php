@@ -4,20 +4,20 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-class UniqueExtendEntityField extends Constraint
+class DefaultRelationField extends Constraint
 {
     /** @var string */
-    public $sameFieldMessage = 'A field with this name is already exist.';
+    public $duplicateRelationMessage = 'This name is duplicated default field of relation.';
 
     /** @var string */
-    public $similarFieldMessage = 'This name conflicts with existing \'{{ field }}\' field.';
+    public $duplicateFieldMessage = 'This relation name is duplicated a field.';
 
     /**
      * {@inheritdoc}
      */
     public function validatedBy()
     {
-        return UniqueExtendEntityFieldValidator::ALIAS;
+        return DefaultRelationFieldValidator::ALIAS;
     }
 
     /**
