@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
@@ -35,11 +34,23 @@ class BlockingJob
         return $this;
     }
 
-    public function hasBlockingJobs($channelType) {
+    /**
+     * @param $channelType
+     *
+     * @return bool
+     */
+    public function hasBlockingJobs($channelType)
+    {
         return isset($this->jobs[$channelType]) && count($this->jobs[$channelType]) > 0;
     }
 
-    public function getBlockingJobs($channelType) {
+    /**
+     * @param $channelType
+     *
+     * @return ArrayCollection|mixed|null
+     */
+    public function getBlockingJobs($channelType)
+    {
         return $this->jobs[$channelType];
     }
 }
