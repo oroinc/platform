@@ -76,6 +76,12 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     {
         $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
 
+        if (empty($entity->getFieldName())) {
+            $this->addErrors($this->translator->trans('oro.entity_config.import.message.invalid_field_name'));
+
+            return null;
+        }
+
         if (!in_array($entity->getType(), $supportedTypes, true)) {
             $this->addErrors($this->translator->trans('oro.entity_config.import.message.invalid_field_type'));
 

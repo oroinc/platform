@@ -98,9 +98,13 @@ class ImportExportTest extends WebTestCase
     public function testValidationError()
     {
         $this->assertErrors(
+            '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_name.csv',
+            ['Data does not contain required properties: type, fieldType or entity_id']
+        );
+
+        $this->assertErrors(
             '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/invalid_field_parameters.csv',
             [
-                'Error in row #1. fieldName: This value should not be blank.',
                 'Error in row #1. attachment.maxsize: This value should be 1 or more.',
                 'Error in row #2. Invalid field type.',
                 'Error in row #4. enum.enum_options.0: [label]: This value should contain only alphabetic symbols, ' .
