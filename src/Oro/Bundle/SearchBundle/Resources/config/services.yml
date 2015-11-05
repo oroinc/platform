@@ -37,9 +37,6 @@ services:
             - @oro_search.search.engine
             - @oro_search.mapper
             - @oro_search.security_provider
-            - @oro_entity_config.config_manager
-            - @oro_entity.entity_provider
-            - @translator
             - @oro_security.search.acl_helper
             - @event_dispatcher
 

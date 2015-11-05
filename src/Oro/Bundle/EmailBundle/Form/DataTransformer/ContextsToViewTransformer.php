@@ -9,15 +9,12 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextsToViewTransformer implements DataTransformerInterface
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
     /** @var ConfigManager */
@@ -111,29 +108,43 @@ class ContextsToViewTransformer implements DataTransformerInterface
         }
 
         $targets = explode(';', $value);
-        $result = [];
+        $result  = [];
+        $filters = [];
+
         foreach ($targets as $target) {
             $target = json_decode($target, true);
             if (array_key_exists('entityClass', $target) === true && array_key_exists('entityId', $target)) {
-                $metadata = $this->entityManager->getClassMetadata($target['entityClass']);
-                $result[] = $this->entityManager->getRepository($metadata->getName())->find($target['entityId']);
+
+                if (!isset($filters[$target['entityClass']])) {
+                    $filters[$target['entityClass']] = [];
+                }
+                $filters[$target['entityClass']][] = $target['entityId'];
             }
+        }
+
+        foreach ($filters as $entityClass => $ids) {
+            $metadata = $this->entityManager->getClassMetadata($entityClass);
+            $entities = $this->entityManager->getRepository($metadata->getName())->findBy(
+                ['id' => $ids]
+            );
+            $result   = array_merge($result, $entities);
         }
 
         return $result;
     }
 
     /**
-     * @param string $className
-     * @return null|string
+     * @param string $className - FQCN
+     *
+     * @return string|null
      */
     protected function getClassLabel($className)
     {
         if (!$this->configManager->hasConfig($className)) {
             return null;
         }
-        $entityConfig = new EntityConfigId('entity', $className);
-        $label = $this->configManager->getConfig($entityConfig)->get('label');
+
+        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }

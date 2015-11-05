@@ -106,6 +106,16 @@ services:
         calls:
             - [setSecurityFacade, [@oro_security.security_facade]]
 
+    oro_activity.form.handler.autocomplete:
+        class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
+        arguments:
+            - @security.token_storage
+            - @translator
+            - @oro_search.index
+            - @oro_activity.manager
+            - @oro_entity_config.config_manager
+            - @oro_entity.entity_class_name_helper
+
     oro_activity.form.handler.activity_entity.api:
         class: %oro_activity.form.handler.activity_entity.api.class%
         scope: request
