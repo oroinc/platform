@@ -216,6 +216,7 @@ services:
             - @oro_entity.entity_identifier_accessor
             - @oro_entity.routing_helper
             - @oro_entity.entity_name_resolver
+            - @oro_entity.entity_alias_resolver
         tags:
             - { name: twig.extension }
 

@@ -54,14 +54,20 @@ class ActivityController extends Controller
      */
     public function contextAction($entityClass, $entityId)
     {
-        $entity = $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId);
+        $routingHelper = $this->get('oro_entity.routing_helper');
+        $entity = $routingHelper->getEntity($entityClass, $entityId);
+        $entityClass = $routingHelper->resolveEntityClass($entityClass);
+
         if (!$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
             throw new AccessDeniedException();
         }
 
         $entityTargets = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($entity);
+        $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')->getPluralAlias($entityClass);
+
         return [
             'sourceEntity' => $entity,
+            'sourceEntityClassAlias' => $entityClassAlias,
             'entityTargets' => $entityTargets,
             'params' => [
                 'grid_path' => $this->generateUrl(

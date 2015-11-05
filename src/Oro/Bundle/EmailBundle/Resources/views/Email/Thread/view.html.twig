@@ -1,6 +1,6 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
 {% import "OroEmailBundle::actions.html.twig" as Actions %}
-{% import "OroEmailBundle::macros.html.twig" as EA %}
+{% import "OroActivityBundle::macros.html.twig" as AC %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
 
@@ -36,8 +36,8 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
-    <li class="context-data email-context-activity-block">
-        {{ EA.email_contexts(entity) }}
+    <li class="context-data activity-context-activity-block">
+        {{ AC.activity_contexts(entity) }}
     </li>
 {% endblock %}
 

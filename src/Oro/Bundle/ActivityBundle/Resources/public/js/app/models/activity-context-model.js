@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var EmailContextModel;
+    var ActivityContextModel;
     var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
-     * @export  oroemail/js/app/models/email-context-model
+     * @export  oroactivity/js/app/models/activity-context-model
      */
-    EmailContextModel = BaseModel.extend({
+    ActivityContextModel = BaseModel.extend({
         defaults: {
             label: '',
             first: '',
@@ -16,5 +16,5 @@ define(function(require) {
         }
     });
 
-    return EmailContextModel;
+    return ActivityContextModel;
 });

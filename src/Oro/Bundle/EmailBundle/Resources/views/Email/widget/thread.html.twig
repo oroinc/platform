@@ -1,9 +1,9 @@
-{% import "OroEmailBundle::macros.html.twig" as EA %}
+{% import "OroActivityBundle::macros.html.twig" as AC %}
 
 <div class="widget-content">
     {% if renderContexts is defined and renderContexts %}
-    <div class="email-context-activity-list">
-        {{ EA.email_contexts(thread[0], target, true) }}
+    <div class="activity-context-activity-list">
+        {{ AC.activity_contexts(thread[0], target, true) }}
     </div>
     {% endif %}
 

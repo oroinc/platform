@@ -1,18 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var EmailContextView;
+    var ActivityContextView;
     var _ = require('underscore');
     var $ = require('jquery');
-    var EmailContextCollection = require('oroemail/js/app/models/email-context-collection');
+    var ActivityContextCollection = require('oroactivity/js/app/models/activity-context-collection');
     var BaseView = require('oroui/js/app/views/base/view');
     var WidgetManager = require('oroui/js/widget-manager');
 
-    EmailContextView = BaseView.extend({
+    ActivityContextView = BaseView.extend({
         initialize: function(options) {
             this.options = options;
-            this.template = _.template($('#email-context-item').html());
-            this.collection = new EmailContextCollection();
+            this.template = _.template($('#activity-context-item').html());
+            this.collection = new ActivityContextCollection();
             this.initEvents();
 
             if (this.options.items) {
@@ -35,7 +35,7 @@ define(function(require) {
         initEvents: function() {
             var self = this;
             var dropdown = this.$('.context-items-dropdown');
-            var firstItem = this.$('.email-context-current-item');
+            var firstItem = this.$('.activity-context-current-item');
             this.collection.on('add', function(model) {
                 var gridUrl = self.options.params.grid_path + '/' + model.attributes.className;
                 var view = self.template({
@@ -58,7 +58,7 @@ define(function(require) {
                     firstItem.html(item.html());
                     item.addClass('active');
 
-                    WidgetManager.getWidgetInstanceByAlias('email-context-grid', function(widget) {
+                    WidgetManager.getWidgetInstanceByAlias('activity-context-grid', function(widget) {
                         widget.setUrl(gridUrl);
                         widget.render();
                     });
@@ -81,5 +81,5 @@ define(function(require) {
         }
     });
 
-    return EmailContextView;
+    return ActivityContextView;
 });
