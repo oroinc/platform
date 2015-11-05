@@ -74,11 +74,8 @@ class EmailController extends RestController
      *
      * @param string $id
      *
-     * @Get(
-     *      "/emails/{id}",
-     *      name="",
-     *      requirements={"id"="\d+"}
-     * )
+     * @Get("/emails/{id}", requirements={"id"="\d+"})
+     *
      * @ApiDoc(
      *      description="Get email",
      *      resource=true
