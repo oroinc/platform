@@ -12,7 +12,7 @@ class EnumValue extends Constraint
     /**
      * @var string
      */
-    public $message = 'oro.entityextend.enumvalue.label.invalid';
+    public $message = 'This value should contain only alphabetic symbols, underscore, hyphen, spaces and numbers.';
 
     /**
      * {@inheritdoc}
