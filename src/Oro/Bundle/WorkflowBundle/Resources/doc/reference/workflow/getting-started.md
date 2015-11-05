@@ -186,11 +186,11 @@ class User
 WorkflowBundle provides REST API the allows to activate or deactivate workflow.
 
 Activation URL attributes:
-* **route:** oro_workflow_api_rest_workflow_activate or oro_api_workflow_activate
+* **route:** oro_api_workflow_activate
 * **parameter:** workflowDefinition - name of the appropriate workflow
 
 Deactivation URL attributes:
-* **route:** oro_workflow_api_rest_workflow_deactivate or oro_api_workflow_deactivate
+* **route:** oro_api_workflow_deactivate
 * **parameter:** entityClass - entity which workflow should be deactivated
 
 ### Workflow Manager
