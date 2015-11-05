@@ -121,8 +121,8 @@ class ImportExportTest extends WebTestCase
             $this->getUrl(
                 'oro_importexport_export_template',
                 [
-                    'processorAlias' => 'oro_entity_config_entity_field',
-                    'importJob' => 'entity_import_fields_from_csv',
+                    'processorAlias' => 'oro_entity_config_entity_field.export_template',
+                    'importJob' => 'entity_fields_import_from_csv',
                     'options[entity_id]' => $this->entity->getId()
                 ]
             )
@@ -148,7 +148,7 @@ class ImportExportTest extends WebTestCase
                 [
                     '_widgetContainer' => 'dialog',
                     'entity' => self::CLASS_NAME,
-                    'importJob' => 'entity_import_fields_from_csv',
+                    'importJob' => 'entity_fields_import_from_csv',
                     'options[entity_id]' => $this->entity->getId()
                 ]
             )
@@ -164,7 +164,7 @@ class ImportExportTest extends WebTestCase
         $form->getFormNode()->setAttribute(
             'action',
             sprintf(
-                '%s&entity=%s&importJob=entity_import_fields_from_csv&options[entity_id]=%d&_widgetContainer=dialog',
+                '%s&entity=%s&importJob=entity_fields_import_from_csv&options[entity_id]=%d&_widgetContainer=dialog',
                 $form->getFormNode()->getAttribute('action'),
                 self::CLASS_NAME,
                 $this->entity->getId()
@@ -189,7 +189,7 @@ class ImportExportTest extends WebTestCase
                 [
                     '_format' => 'json',
                     'processorAlias' => 'oro_entity_config_entity_field.add_or_replace',
-                    'importJob' => 'entity_import_fields_from_csv',
+                    'importJob' => 'entity_fields_import_from_csv',
                     'options[entity_id]' => $this->entity->getId()
                 ]
             )

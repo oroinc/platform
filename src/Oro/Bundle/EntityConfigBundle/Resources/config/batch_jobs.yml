@@ -1,7 +1,7 @@
 connector:
     name: oro_importexport
     jobs:
-        entity_import_fields_from_csv:
+        entity_fields_import_from_csv:
             title: "Entity Fields Import from CSV"
             type: import
             steps:

@@ -75,18 +75,6 @@ class EntityFieldDataConverter extends AbstractTableDataConverter implements Con
             }
         }
 
-        $header = array_merge(
-            $header,
-            [
-                'enum.enum_options.0.label',
-                'enum.enum_options.0.is_default',
-                'enum.enum_options.1.label',
-                'enum.enum_options.1.is_default',
-                'enum.enum_options.2.label',
-                'enum.enum_options.2.is_default'
-            ]
-        );
-
         return $header;
     }
 
@@ -106,6 +94,7 @@ class EntityFieldDataConverter extends AbstractTableDataConverter implements Con
      */
     protected function getHeaderConversionRules()
     {
+        // CSV headers are used as is during import, we do not need extra rules
         return [];
     }
 }

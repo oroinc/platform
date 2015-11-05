@@ -44,13 +44,19 @@ class EntityFieldWriter implements ItemWriterInterface
      */
     public function write(array $items)
     {
+        $translations = [];
+
         foreach ($items as $item) {
-            $this->writeItem($item);
+            $translations = array_merge($translations, $this->writeItem($item));
         }
+
+        $this->configManager->flush();
+        $this->translationHelper->saveTranslations($translations);
     }
 
     /**
      * @param FieldConfigModel $configModel
+     * @return array
      */
     protected function writeItem(FieldConfigModel $configModel)
     {
@@ -85,8 +91,7 @@ class EntityFieldWriter implements ItemWriterInterface
             $this->setEnumData($configModel->toArray('enum'), $className, $fieldName);
         }
 
-        $this->configManager->flush();
-        $this->translationHelper->saveTranslations($translations);
+        return $translations;
     }
 
     /**
@@ -130,7 +135,12 @@ class EntityFieldWriter implements ItemWriterInterface
      */
     protected function updateEntityState($className)
     {
-        $entityConfig = $this->configManager->getProvider('extend')->getConfig($className);
+        $provider = $this->configManager->getProvider('extend');
+        if (!$provider) {
+            return;
+        }
+
+        $entityConfig = $provider->getConfig($className);
         if (!$entityConfig->is('state', ExtendScope::STATE_UPDATE)) {
             $entityConfig->set('state', ExtendScope::STATE_UPDATE);
             $this->configManager->persist($entityConfig);
@@ -145,6 +155,10 @@ class EntityFieldWriter implements ItemWriterInterface
     protected function setEnumData(array $data, $className, $fieldName)
     {
         $provider = $this->configManager->getProvider('enum');
+        if (!$provider) {
+            return;
+        }
+
         $enumCode = $provider->getConfig($className, $fieldName)->get('enum_code');
 
         if (!$enumCode || !isset($data['enum_options'])) {
@@ -180,9 +194,12 @@ class EntityFieldWriter implements ItemWriterInterface
      */
     protected function setExtendData($className, $fieldName, $state)
     {
-        $extendProvider = $this->configManager->getProvider('extend');
-        $config = $extendProvider->getConfig($className, $fieldName);
+        $provider = $this->configManager->getProvider('extend');
+        if (!$provider) {
+            return;
+        }
 
+        $config = $provider->getConfig($className, $fieldName);
         $data = [
             'owner' => ExtendScope::OWNER_CUSTOM,
             'state' =>  $config->is('state', ExtendScope::STATE_NEW) ? ExtendScope::STATE_NEW : $state,

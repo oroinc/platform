@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -88,6 +90,12 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        if (!isset($data['type'], $data['fieldName'], $data['entity']['id'])) {
+            throw new UnexpectedValueException(
+                'Data does not contain required properties: type, fieldType or entity_id'
+            );
+        }
+
         $fieldType = $data['type'];
         $fieldName = $data['fieldName'];
         $entity = $this->getEntityConfigModel($data['entity']['id']);
@@ -127,7 +135,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
             $values = [];
 
             foreach ($properties as $code => $config) {
-                if (!array_key_exists($code, $options[$scope]) || $options[$scope][$code] === null) {
+                if (!isset($options[$scope][$code])) {
                     continue;
                 }
 
@@ -201,7 +209,7 @@ class EntityFieldNormalizer implements NormalizerInterface, DenormalizerInterfac
 
             $updatedValue[$key]['is_default'] = !$default && !empty($updatedValue[$key]['is_default']);
 
-            if ($type !== 'multiEnum' && !$default && !empty($updatedValue[$key]['is_default'])) {
+            if ($type !== 'multiEnum' && $updatedValue[$key]['is_default']) {
                 $default = true;
             }
         }

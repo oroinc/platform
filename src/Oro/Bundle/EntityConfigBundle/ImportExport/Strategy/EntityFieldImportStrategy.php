@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -21,6 +22,9 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
 
     /** @var FieldTypeProvider */
     protected $fieldTypeProvider;
+
+    /** @var bool */
+    protected $isExistingEntity = false;
 
     /**
      * @param TranslatorInterface $translator
@@ -73,20 +77,21 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $supportedTypes = $this->fieldTypeProvider->getSupportedFieldTypes();
 
         if (!in_array($entity->getType(), $supportedTypes, true)) {
-            $this->addErrors('oro.entity_config.import.message.invalid_field_type');
+            $this->addErrors($this->translator->trans('oro.entity_config.import.message.invalid_field_type'));
 
-            $entity = null;
-        } else {
-            $existingEntity = $this->findExistingEntity($entity);
+            return null;
+        }
 
-            if ($existingEntity) {
-                if ($existingEntity && $entity->getType() !== $existingEntity->getType()) {
-                    $this->addErrors('oro.entity_config.import.message.change_type_not_allowed');
+        $existingEntity = $this->findExistingEntity($entity);
+        $this->isExistingEntity = (bool)$existingEntity;
+        if ($this->isExistingEntity) {
+            if ($entity->getType() !== $existingEntity->getType()) {
+                $this->addErrors($this->translator->trans('oro.entity_config.import.message.change_type_not_allowed'));
 
-                    $entity = null;
-                } elseif ($this->isSystemField($existingEntity)) {
-                    $entity = null;
-                }
+                return null;
+            }
+            if ($this->isSystemField($existingEntity)) {
+                return null;
             }
         }
 
@@ -120,7 +125,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         if ($errors) {
             $this->addErrors($errors);
         } else {
-            $this->updateContextCounters($entity);
+            $this->updateContextCounters();
         }
 
         return $errors ? null : $entity;
@@ -131,23 +136,13 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
      */
     protected function addErrors($errors)
     {
-        $errors = array_map(
-            function ($error) {
-                return $this->translator->trans($error);
-            },
-            (array)$errors
-        );
-
         $this->context->incrementErrorEntriesCount();
-        $this->strategyHelper->addValidationErrors($errors, $this->context);
+        $this->strategyHelper->addValidationErrors((array)$errors, $this->context);
     }
 
-    /**
-     * @param FieldConfigModel $entity
-     */
-    protected function updateContextCounters(FieldConfigModel $entity)
+    protected function updateContextCounters()
     {
-        if ($this->findExistingEntity($entity)) {
+        if ($this->isExistingEntity) {
             $this->context->incrementUpdateCount();
         } else {
             $this->context->incrementAddCount();
@@ -161,7 +156,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
     protected function isSystemField(FieldConfigModel $entity)
     {
         $extend = $entity->toArray('extend');
-        return $extend['owner'] === ExtendScope::OWNER_SYSTEM;
+        return isset($extend['owner']) && $extend['owner'] === ExtendScope::OWNER_SYSTEM;
     }
 
     /**
@@ -206,7 +201,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
 
     /**
      * @param array $constraints
-     * @return array
+     * @return array|Constraint[]
      */
     protected function getFieldConstraints(array $constraints)
     {

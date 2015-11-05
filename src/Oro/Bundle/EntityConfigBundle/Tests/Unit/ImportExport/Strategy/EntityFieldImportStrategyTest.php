@@ -52,8 +52,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldProperties')
             ->willReturn([]);
 
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->getMock();
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $this->translator
             ->expects(static::any())
             ->method('trans')
@@ -142,11 +141,11 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function processProvider()
     {
-        $field = $this->createFieldConfigModel('field_name', 'type1');
+        $field = new FieldConfigModel('field_name', 'type1');
 
-        $fieldWrongType = $this->createFieldConfigModel('field_name', 'wrongType');
+        $fieldWrongType = new FieldConfigModel('field_name', 'wrongType');
 
-        $fieldSystem =$this->createFieldConfigModel('field_name', 'type1');
+        $fieldSystem = new FieldConfigModel('field_name', 'type1');
         $fieldSystem->fromArray('extend', ['owner' => ExtendScope::OWNER_SYSTEM], []);
 
         return [
@@ -184,19 +183,6 @@ class EntityFieldImportStrategyTest extends \PHPUnit_Framework_TestCase
             $this->fieldHelper,
             $this->databaseHelper
         );
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $type
-     * @return FieldConfigModel
-     */
-    protected function createFieldConfigModel($fieldName, $type)
-    {
-        return (new FieldConfigModel())
-            ->setFieldName($fieldName)
-            ->setType($type)
-        ;
     }
 
     /**

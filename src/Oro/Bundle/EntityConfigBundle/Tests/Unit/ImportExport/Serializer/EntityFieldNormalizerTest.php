@@ -93,6 +93,40 @@ class EntityFieldNormalizerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider denormalizeExceptionDataProvider
+     *
+     * @@expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @expectedExceptionMessage Data does not contain required properties: type, fieldType or entity_id
+     *
+     * @param array $data
+     */
+    public function testDenormalizeException(array $data)
+    {
+        $this->normalizer->denormalize($data, null);
+    }
+
+    /**
+     * @return array
+     */
+    public function denormalizeExceptionDataProvider()
+    {
+        return [
+            [
+                'data' => ['type' => 'test', 'fieldName' => 'test']
+            ],
+            [
+                'data' => ['type' => 'test', 'entity' => ['id' => 1]]
+            ],
+            [
+                'data' => ['fieldName' => 'test', 'entity' => ['id' => null]]
+            ],
+            [
+                'data' => []
+            ]
+        ];
+    }
+
+    /**
      * @param array $inputData
      * @param FieldConfigModel $expectedData
      *
