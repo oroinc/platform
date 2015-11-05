@@ -102,7 +102,7 @@ class PlaceholderProvider
     protected function resolveApplicable($conditions, array $variables)
     {
         $resolved = true;
-        $conditions = is_string($conditions) ? [$conditions] : $conditions ;
+        $conditions = (array) $conditions;
         foreach ($conditions as $condition) {
             $resolved = $this->resolver->resolve(
                 [
