@@ -164,9 +164,23 @@ services:
     oro_entity_extend.validator.unique_extend_entity_field_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator
         arguments:
-             - @oro_entity_extend.extend.unique_field_name_helper
+            - @oro_entity_extend.extend.field_name_validation_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
+
+    oro_entity_extend.validator.default_relation_field:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.default_relation_field }
+
+    oro_entity_extend.validator.multi_enum_snapshot:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\MultiEnumSnapshotFieldValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.multi_enum_snapshot }
 
     oro_entity_extend.validator.unique_enum_name:
         class: %oro_entity_extend.validator.unique_enum_name.class%
@@ -200,10 +214,10 @@ services:
         arguments:
             - []
 
-    oro_entity_extend.extend.unique_field_name_helper:
-        class: Oro\Bundle\EntityExtendBundle\Form\Util\UniqueFieldNameHelper
+    oro_entity_extend.extend.field_name_validation_helper:
+        class: Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper
         arguments:
-             - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.extend
 
     oro_entity_extend.migration.refresh_cache_before_entity_config_update.post_up.listener:
         class: %oro_entity_extend.migration.refresh_cache.post_up.listener.class%
