@@ -385,13 +385,10 @@ services:
         class: %oro_email.emailtemplate.variable_provider.entity.class%
         arguments:
             - @translator
-            - @oro_entity_config.provider.email
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.config_manager
             - @doctrine
             - @oro_ui.formatter
         lazy: true
-        calls:
-            - [setEntityExtendProvider, [@oro_entity_config.provider.extend]]
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
