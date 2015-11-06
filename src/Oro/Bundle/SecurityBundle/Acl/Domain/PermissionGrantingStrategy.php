@@ -182,10 +182,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                         if ($this->isAceApplicable($requiredMask, $ace, $acl)) {
                             $isGranting = $ace->isGranting();
 
+                            $aclExtension = $this->getContext()->getAclExtension();
                             if ($sid instanceof RoleSecurityIdentity) {
                                 // give an additional chance for the appropriate ACL extension to decide
                                 // whether an access to a domain object is granted or not
-                                $aclExtension   = $this->getContext()->getAclExtension();
                                 $decisionResult = $aclExtension->decideIsGranting(
                                     $requiredMask,
                                     $this->getContext()->getObject(),
@@ -198,9 +198,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
 
                             if ($isGranting) {
                                 // the access is granted if there is at least one granting ACE
-                                if ($this->getContext()
-                                        ->getAclExtension()
-                                        ->compareMasks($requiredMask, $triggeredMask) === 1
+                                if ($aclExtension->getAccessLevel($requiredMask)
+                                    > $aclExtension->getAccessLevel($triggeredMask)
                                 ) {
                                     $triggeredAce  = $ace;
                                     $triggeredMask = $requiredMask;

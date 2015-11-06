@@ -213,16 +213,4 @@ interface AclExtensionInterface
      *  value = access level name
      */
     public function getAccessLevelNames($object);
-
-    /**
-     * Compare two given masks.
-     *
-     * @param integer $firstMask
-     * @param integer $secondMask
-     *
-     * @return integer Returns 1 if first mask have biggest privilegy,
-     *                 0 if privelegies is equal
-     *                 -1 if the second mask have biggest privilegy
-     */
-    public function compareMasks($firstMask, $secondMask);
 }
