@@ -48,10 +48,10 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         ManagerRegistry $doctrine,
         FormatterManager $formatterManager
     ) {
-        $this->translator           = $translator;
-        $this->configManager = $configManager;
-        $this->doctrine             = $doctrine;
-        $this->formatterManager     = $formatterManager;
+        $this->translator       = $translator;
+        $this->configManager    = $configManager;
+        $this->doctrine         = $doctrine;
+        $this->formatterManager = $formatterManager;
     }
 
     /**
@@ -69,6 +69,9 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         $entityIds = $this->getEntityConfigProvider()->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
+            if (!$this->isEntityAvailable($className)) {
+                continue;
+            }
             $entityData = $this->getEntityVariableDefinitions($className);
             if (!empty($entityData)) {
                 $result[$className] = $entityData;
@@ -88,18 +91,13 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             return $this->getEntityVariableGetters($entityClass);
         }
 
-        $entityExtendProvider = $this->configManager->getProvider('extend');
         // process all entities
         $result    = [];
         $entityIds = $this->getEntityConfigProvider()->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
-            if ($entityExtendProvider->hasConfig($className)) {
-                $extendConfig = $entityExtendProvider->getConfigById($entityId);
-                // we should skip new and deleted fields
-                if ($extendConfig->is('state', ExtendScope::STATE_NEW) || $extendConfig->is('is_deleted')) {
-                    continue;
-                }
+            if (!$this->isEntityAvailable($className)) {
+                continue;
             }
             $entityData = $this->getEntityVariableGetters($className);
             if (!empty($entityData)) {
@@ -108,6 +106,29 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Return false if entity is new or deleted
+     *
+     * @param $entityClass
+     *
+     * @return bool
+     */
+    protected function isEntityAvailable($entityClass)
+    {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        if ($extendConfigProvider->hasConfig($entityClass)) {
+            $extendConfig = $extendConfigProvider->getConfig($entityClass);
+            if ($extendConfig->is('state', ExtendScope::STATE_NEW)
+                || $extendConfig->is('is_deleted')
+                || ($extendConfig->is('state', ExtendScope::STATE_DELETE) && $extendConfig->is('is_deleted', false))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

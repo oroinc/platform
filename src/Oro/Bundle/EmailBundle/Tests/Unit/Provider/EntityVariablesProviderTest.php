@@ -19,7 +19,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
     protected $entityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityExtendProvider;
+    protected $extendConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
@@ -45,7 +45,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityExtendProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -57,14 +57,28 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entity', $this->entityConfigProvider],
+                        ['email', $this->emailConfigProvider],
+                        ['extend', $this->extendConfigProvider],
+                    ]
+                )
+            );
+
         $this->provider = new EntityVariablesProvider(
             $translator,
-            $this->emailConfigProvider,
-            $this->entityConfigProvider,
+            $configManager,
             $this->doctrine,
             $this->formatterManager
         );
-        $this->provider->setEntityExtendProvider($this->entityExtendProvider);
     }
 
     protected function tearDown()
@@ -336,6 +350,10 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity3ExtendConfig = new Config(new EntityConfigId('extend', $entity3Class));
         $entity3ExtendConfig->set('state', ExtendScope::STATE_NEW);
 
+        $entity4Class        = 'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Attachment';
+        $entity4ExtendConfig = new Config(new EntityConfigId('extend', $entity4Class));
+        $entity4ExtendConfig->set('is_deleted', true);
+
         $this->entityConfigProvider->expects($this->once())
             ->method('getIds')
             ->will(
@@ -344,6 +362,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                         new EntityConfigId('entity', self::TEST_ENTITY_NAME),
                         new EntityConfigId('entity', $entity2Class),
                         new EntityConfigId('entity', $entity3Class),
+                        new EntityConfigId('entity', $entity4Class),
                     ]
                 )
             );
@@ -368,7 +387,7 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->entityExtendProvider->expects($this->exactly(3))
+        $this->extendConfigProvider->expects($this->exactly(4))
             ->method('hasConfig')
             ->will(
                 $this->returnValueMap(
@@ -376,13 +395,21 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                         [self::TEST_ENTITY_NAME, null, false],
                         [$entity2Class, null, false],
                         [$entity3Class, null, true],
+                        [$entity4Class, null, true],
                     ]
                 )
             );
 
-        $this->entityExtendProvider->expects($this->once())
-            ->method('getConfigById')
-            ->willReturn($entity3ExtendConfig);
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$entity3Class, null, $entity3ExtendConfig],
+                        [$entity4Class, null, $entity4ExtendConfig],
+                    ]
+                )
+            );
 
         $result = $this->provider->getVariableGetters();
         $this->assertEquals(
