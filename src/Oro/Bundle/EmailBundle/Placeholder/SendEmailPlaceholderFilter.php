@@ -10,7 +10,8 @@ class SendEmailPlaceholderFilter
     /** @var Email */
     protected $email;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->email  = new Email();
     }
 
