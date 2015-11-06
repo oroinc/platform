@@ -54,7 +54,8 @@ define(function(require) {
                 config: {
                     source: _.bind(this.source, this),
                     matcher: _.bind(this.matcher, this),
-                    sorter: _.bind(this.sorter, this)
+                    sorter: _.bind(this.sorter, this),
+                    show: this.show
                 }
             };
             this.options = $.extend(true, thisOptions, this.options, options || {});
@@ -135,6 +136,22 @@ define(function(require) {
          */
         sorter: function(items) {
             return items;//sorted on server
+        },
+
+        show: function() {
+            this.constructor.prototype.show.apply(this);
+
+            var $window = $(window);
+            var viewportBottom = $window.scrollTop() + $window.height();
+            var elementHeight = this.$element.outerHeight(false);
+            var resultsTop = this.$element.offset().top + elementHeight;
+            var resultsHeight = this.$menu.outerHeight(false);
+            var enoughBelow = resultsTop + resultsHeight <= viewportBottom;
+
+            if (!enoughBelow) {
+                var aboveTop = this.$menu.css('top').replace('px', '') - resultsHeight - elementHeight;
+                this.$menu.css('top', aboveTop + 'px');
+            }
         },
 
         /**
