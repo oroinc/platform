@@ -114,7 +114,7 @@ define(function(require) {
             }, this));
 
             this.$entitySelectEl.fieldsLoader({
-                router: 'oro_workflow_api_rest_entity_get',
+                router: 'oro_api_workflow_entity_get',
                 routingParams: {},
                 confirm: confirm,
                 requireConfirm: _.bind(function() {
