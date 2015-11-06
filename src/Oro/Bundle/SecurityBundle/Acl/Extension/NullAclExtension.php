@@ -164,4 +164,16 @@ final class NullAclExtension implements AclExtensionInterface
     {
         return array();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compareMasks($firstMask, $secondMask)
+    {
+        if ($firstMask === $secondMask) {
+            return 0;
+        } else {
+            return $firstMask > $secondMask ? 1 : -1;
+        }
+    }
 }

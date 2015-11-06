@@ -352,6 +352,18 @@ class EntityAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
+    public function compareMasks($firstMask, $secondMask)
+    {
+        if ($firstMask === $secondMask) {
+            return 0;
+        } else {
+            return $firstMask > $secondMask ? 1 : -1;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
         if (0 === $this->removeServiceBits($mask)) {

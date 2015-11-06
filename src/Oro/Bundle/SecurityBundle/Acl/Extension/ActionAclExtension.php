@@ -136,6 +136,18 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
+    public function compareMasks($firstMask, $secondMask)
+    {
+        if ($firstMask === $secondMask) {
+            return 0;
+        } else {
+            return $firstMask > $secondMask ? 1 : -1;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissions($mask = null, $setOnly = false)
     {
         $result = array();
